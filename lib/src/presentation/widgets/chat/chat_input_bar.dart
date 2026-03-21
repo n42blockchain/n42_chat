@@ -15,7 +15,8 @@ import '../../../core/utils/debug_log.dart';
 typedef VoiceRecordCallback = void Function(String path, Duration duration);
 
 /// 录音状态回调
-typedef RecordingStateCallback = void Function(bool isRecording, bool isCancelled, Duration duration);
+typedef RecordingStateCallback =
+    void Function(bool isRecording, bool isCancelled, Duration duration);
 
 /// 聊天输入栏
 ///
@@ -133,16 +134,20 @@ class ChatInputBarState extends State<ChatInputBar> {
   bool _cancelRecording = false;
   Duration _recordingDuration = Duration.zero;
   StreamSubscription<RecordingState>? _recordingSubscription;
-  
+
   late final VoiceService _voiceService;
   late final bool _ownsVoiceService;
 
   @override
   void initState() {
     super.initState();
-    _voiceService = widget.voiceService ??
-        (getIt.isRegistered<VoiceService>() ? getIt<VoiceService>() : VoiceService());
-    _ownsVoiceService = widget.voiceService == null && !getIt.isRegistered<VoiceService>();
+    _voiceService =
+        widget.voiceService ??
+        (getIt.isRegistered<VoiceService>()
+            ? getIt<VoiceService>()
+            : VoiceService());
+    _ownsVoiceService =
+        widget.voiceService == null && !getIt.isRegistered<VoiceService>();
     unawaited(_voiceService.initialize());
 
     _controller = widget.controller ?? TextEditingController();
@@ -151,7 +156,7 @@ class ChatInputBarState extends State<ChatInputBar> {
 
     _controller.addListener(_onTextChanged);
     _focusNode.addListener(_onFocusChanged);
-    
+
     // 监听录音状态
     _recordingSubscription = _voiceService.recordingStateStream.listen((state) {
       if (mounted) {
@@ -159,7 +164,11 @@ class ChatInputBarState extends State<ChatInputBar> {
           _recordingDuration = state.duration;
         });
         // 通知父组件录音状态变化
-        widget.onRecordingStateChanged?.call(_isRecording, _cancelRecording, state.duration);
+        widget.onRecordingStateChanged?.call(
+          _isRecording,
+          _cancelRecording,
+          state.duration,
+        );
       }
     });
   }
@@ -287,9 +296,14 @@ class ChatInputBarState extends State<ChatInputBar> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n?.commonMicrophonePermissionRequired ?? 'Microphone Permission Required'),
-        content: Text(l10n?.chatMicrophonePermissionDeniedPermanent ??
-            'Microphone permission has been denied. Please enable it in system settings to use voice messages.'),
+        title: Text(
+          l10n?.commonMicrophonePermissionRequired ??
+              'Microphone Permission Required',
+        ),
+        content: Text(
+          l10n?.chatMicrophonePermissionDeniedPermanent ??
+              'Microphone permission has been denied. Please enable it in system settings to use voice messages.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -308,9 +322,9 @@ class ChatInputBarState extends State<ChatInputBar> {
   }
 
   void _sendMessage() {
-    final text = _controller.text.trim();
-    if (text.isNotEmpty) {
-      widget.onSendText?.call(text);
+    final rawText = _controller.text;
+    if (rawText.trim().isNotEmpty) {
+      widget.onSendText?.call(rawText);
       _controller.clear();
     }
   }
@@ -333,7 +347,10 @@ class ChatInputBarState extends State<ChatInputBar> {
           messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.commonMicrophonePermissionRequired ?? 'Please allow microphone permission'),
+              content: Text(
+                S.of(context)?.commonMicrophonePermissionRequired ??
+                    'Please allow microphone permission',
+              ),
               backgroundColor: AppColors.error,
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
@@ -350,7 +367,9 @@ class ChatInputBarState extends State<ChatInputBar> {
         messenger.clearSnackBars();
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.commonStartRecordingFailed ?? 'Start recording failed'}: $e'),
+            content: Text(
+              '${S.of(context)?.commonStartRecordingFailed ?? 'Start recording failed'}: $e',
+            ),
             backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
@@ -367,21 +386,21 @@ class ChatInputBarState extends State<ChatInputBar> {
       _forceResetRecordingState();
       return;
     }
-    
+
     final wasCancelled = _cancelRecording;
-    
+
     try {
       if (wasCancelled) {
         await _voiceService.cancelRecording();
         _forceResetRecordingState();
         return;
       }
-      
+
       final result = await _voiceService.stopRecording();
-      
+
       // 先重置状态
       _forceResetRecordingState();
-      
+
       if (result != null && result.duration.inSeconds >= 1) {
         widget.onSendVoice?.call(result.path, result.duration);
       } else if (result != null) {
@@ -391,7 +410,9 @@ class ChatInputBarState extends State<ChatInputBar> {
           messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.commonRecordingTooShort ?? 'Recording too short'),
+              content: Text(
+                S.of(context)?.commonRecordingTooShort ?? 'Recording too short',
+              ),
               duration: const Duration(seconds: 1),
               behavior: SnackBarBehavior.floating,
               dismissDirection: DismissDirection.horizontal,
@@ -407,7 +428,9 @@ class ChatInputBarState extends State<ChatInputBar> {
         messenger.clearSnackBars();
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.commonStopRecordingFailed ?? 'Stop recording failed'}: $e'),
+            content: Text(
+              '${S.of(context)?.commonStopRecordingFailed ?? 'Stop recording failed'}: $e',
+            ),
             backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
@@ -417,7 +440,7 @@ class ChatInputBarState extends State<ChatInputBar> {
       }
     }
   }
-  
+
   /// 强制重置录音状态
   void _forceResetRecordingState() {
     setState(() {
@@ -520,8 +543,9 @@ class ChatInputBarState extends State<ChatInputBar> {
                   // 格式化工具栏切换按钮
                   _buildIconButton(
                     icon: Icons.text_format,
-                    onPressed: () =>
-                        setState(() => _showFormattingBar = !_showFormattingBar),
+                    onPressed: () => setState(
+                      () => _showFormattingBar = !_showFormattingBar,
+                    ),
                     isDark: isDark,
                   ),
 
@@ -529,12 +553,12 @@ class ChatInputBarState extends State<ChatInputBar> {
                   _hasText
                       ? _buildSendButton()
                       : (widget.showMoreButton
-                          ? _buildIconButton(
-                              icon: Icons.add_circle_outline,
-                              onPressed: widget.onMorePressed,
-                              isDark: isDark,
-                            )
-                          : const SizedBox.shrink()),
+                            ? _buildIconButton(
+                                icon: Icons.add_circle_outline,
+                                onPressed: widget.onMorePressed,
+                                isDark: isDark,
+                              )
+                            : const SizedBox.shrink()),
                 ],
               ),
             ),
@@ -560,9 +584,24 @@ class ChatInputBarState extends State<ChatInputBar> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildFormatButton(label: 'B', prefix: '**', suffix: '**', bold: true),
-          _buildFormatButton(label: 'I', prefix: '*', suffix: '*', italic: true),
-          _buildFormatButton(label: 'S', prefix: '~~', suffix: '~~', strikethrough: true),
+          _buildFormatButton(
+            label: 'B',
+            prefix: '**',
+            suffix: '**',
+            bold: true,
+          ),
+          _buildFormatButton(
+            label: 'I',
+            prefix: '*',
+            suffix: '*',
+            italic: true,
+          ),
+          _buildFormatButton(
+            label: 'S',
+            prefix: '~~',
+            suffix: '~~',
+            strikethrough: true,
+          ),
           _buildFormatButton(label: '<>', prefix: '`', suffix: '`'),
           _buildFormatButton(label: '```', prefix: '```\n', suffix: '\n```'),
           _buildFormatButton(label: '>', prefix: '\n> ', suffix: ''),
@@ -606,7 +645,11 @@ class ChatInputBarState extends State<ChatInputBar> {
     if (sel.isValid && !sel.isCollapsed) {
       // 有选中文本 → 包裹
       final selected = text.substring(sel.start, sel.end);
-      final newText = text.replaceRange(sel.start, sel.end, '$prefix$selected$suffix');
+      final newText = text.replaceRange(
+        sel.start,
+        sel.end,
+        '$prefix$selected$suffix',
+      );
       ctrl.value = TextEditingValue(
         text: newText,
         selection: TextSelection.collapsed(
@@ -634,10 +677,7 @@ class ChatInputBarState extends State<ChatInputBar> {
       color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       onPressed: widget.enabled ? onPressed : null,
       padding: const EdgeInsets.all(6),
-      constraints: const BoxConstraints(
-        minWidth: 40,
-        minHeight: 40,
-      ),
+      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
     );
   }
 
@@ -667,7 +707,10 @@ class ChatInputBarState extends State<ChatInputBar> {
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
         decoration: InputDecoration(
-          hintText: widget.hintText ?? S.of(context)?.commonSendMessage ?? 'Send message',
+          hintText:
+              widget.hintText ??
+              S.of(context)?.commonSendMessage ??
+              'Send message',
           hintStyle: const TextStyle(
             fontSize: 16,
             color: AppColors.textTertiary,
@@ -704,7 +747,11 @@ class ChatInputBarState extends State<ChatInputBar> {
             setState(() {
               _cancelRecording = shouldCancel;
             });
-            widget.onRecordingStateChanged?.call(_isRecording, shouldCancel, _recordingDuration);
+            widget.onRecordingStateChanged?.call(
+              _isRecording,
+              shouldCancel,
+              _recordingDuration,
+            );
           }
         }
       },
@@ -713,12 +760,14 @@ class ChatInputBarState extends State<ChatInputBar> {
         height: 40,
         decoration: BoxDecoration(
           color: _isRecording
-              ? (_cancelRecording ? AppColors.error.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1))
+              ? (_cancelRecording
+                    ? AppColors.error.withValues(alpha: 0.1)
+                    : AppColors.primary.withValues(alpha: 0.1))
               : (isDark ? AppColors.surfaceDark : AppColors.surface),
           borderRadius: BorderRadius.circular(4),
           border: _isRecording
               ? Border.all(
-                  color: _cancelRecording ? AppColors.error : AppColors.primary, 
+                  color: _cancelRecording ? AppColors.error : AppColors.primary,
                   width: 1,
                 )
               : null,
@@ -726,14 +775,20 @@ class ChatInputBarState extends State<ChatInputBar> {
         child: Center(
           child: Text(
             _isRecording
-                ? (_cancelRecording ? (S.of(context)?.chatReleaseToCancel ?? 'Release to cancel') : (S.of(context)?.chatReleaseToSend ?? 'Release to send, swipe up to cancel'))
+                ? (_cancelRecording
+                      ? (S.of(context)?.chatReleaseToCancel ??
+                            'Release to cancel')
+                      : (S.of(context)?.chatReleaseToSend ??
+                            'Release to send, swipe up to cancel'))
                 : (S.of(context)?.commonHoldToTalk ?? 'Hold to talk'),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: _isRecording
                   ? (_cancelRecording ? AppColors.error : AppColors.primary)
-                  : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                  : (isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary),
             ),
           ),
         ),
@@ -762,10 +817,7 @@ class ChatInputBarState extends State<ChatInputBar> {
           ),
           child: Text(
             S.of(context)?.commonSend ?? 'Send',
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
           ),
         ),
       ),
@@ -804,7 +856,10 @@ class ChatInputBarState extends State<ChatInputBar> {
               const SizedBox(height: 12),
               Text(
                 l10n?.scheduledSendTitle ?? 'Schedule message',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               _buildScheduleOption(
@@ -822,7 +877,9 @@ class ChatInputBarState extends State<ChatInputBar> {
               _buildScheduleOption(
                 ctx,
                 icon: Icons.wb_sunny,
-                label: l10n?.scheduledSendTomorrowMorning ?? 'Tomorrow morning (9:00 AM)',
+                label:
+                    l10n?.scheduledSendTomorrowMorning ??
+                    'Tomorrow morning (9:00 AM)',
                 dateTime: DateTime(now.year, now.month, now.day + 1, 9, 0),
               ),
               const Divider(),

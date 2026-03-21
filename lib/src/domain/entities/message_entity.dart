@@ -4,44 +4,64 @@ import 'package:equatable/equatable.dart';
 enum MessageType {
   /// 文本消息
   text,
+
   /// 图片消息
   image,
+
   /// 语音消息
   voice,
+
   /// 音频消息（别名）
   audio,
+
   /// 视频消息
   video,
+
   /// 文件消息
   file,
+
   /// 位置消息
   location,
+
   /// 贴纸/表情
   sticker,
+
   /// 系统消息
   system,
+
   /// 通知消息（入群、退群等）
   notice,
+
   /// 已加密（无法解密）
   encrypted,
+
   /// 已撤回
   redacted,
+
   /// 转账消息
   transfer,
+
   /// 收款请求
   paymentRequest,
+
   /// 红包
   redPacket,
+
   /// 投票
   poll,
+
   /// 音乐分享
   music,
+
   /// 语音通话
   voiceCall,
+
   /// 视频通话
   videoCall,
+
   /// 联系人名片
   contactCard,
+
   /// 未知类型
   unknown,
 }
@@ -50,12 +70,16 @@ enum MessageType {
 enum MessageStatus {
   /// 发送中
   sending,
+
   /// 已发送
   sent,
+
   /// 已送达
   delivered,
+
   /// 已读
   read,
+
   /// 发送失败
   failed,
 }
@@ -252,7 +276,7 @@ class MessageEntity extends Equatable {
   bool get isScheduledTimeReached {
     if (scheduledAt == null) return false;
     return DateTime.now().isAfter(scheduledAt!) ||
-           DateTime.now().isAtSameMomentAs(scheduledAt!);
+        DateTime.now().isAtSameMomentAs(scheduledAt!);
   }
 
   /// 获取距离定时发送的剩余秒数
@@ -273,7 +297,9 @@ class MessageEntity extends Equatable {
     if (senderName.isEmpty) return '?';
     final words = senderName.trim().split(RegExp(r'\s+'));
     if (words.length == 1) {
-      return senderName.substring(0, senderName.length.clamp(0, 2)).toUpperCase();
+      return senderName
+          .substring(0, senderName.length.clamp(0, 2))
+          .toUpperCase();
     }
     return words
         .where((w) => w.isNotEmpty)
@@ -284,38 +310,38 @@ class MessageEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        roomId,
-        senderId,
-        senderName,
-        senderAvatarUrl,
-        content,
-        formattedContent,
-        type,
-        timestamp,
-        status,
-        isFromMe,
-        replyToId,
-        replyToContent,
-        replyToSender,
-        isEdited,
-        editedAt,
-        metadata,
-        reactions,
-        readBy,
-        mentionedUserIds,
-        mentionsRoom,
-        selfDestructAfter,
-        destroyedAt,
-        scheduledAt,
-        threadRootId,
-        threadReplyCount,
-        threadLatestReply,
-        threadLatestReplySender,
-        threadLatestReplyTimestamp,
-        isBotMessage,
-        threadUnreadCount,
-      ];
+    id,
+    roomId,
+    senderId,
+    senderName,
+    senderAvatarUrl,
+    content,
+    formattedContent,
+    type,
+    timestamp,
+    status,
+    isFromMe,
+    replyToId,
+    replyToContent,
+    replyToSender,
+    isEdited,
+    editedAt,
+    metadata,
+    reactions,
+    readBy,
+    mentionedUserIds,
+    mentionsRoom,
+    selfDestructAfter,
+    destroyedAt,
+    scheduledAt,
+    threadRootId,
+    threadReplyCount,
+    threadLatestReply,
+    threadLatestReplySender,
+    threadLatestReplyTimestamp,
+    isBotMessage,
+    threadUnreadCount,
+  ];
 
   MessageEntity copyWith({
     String? id,
@@ -378,8 +404,10 @@ class MessageEntity extends Equatable {
       threadRootId: threadRootId ?? this.threadRootId,
       threadReplyCount: threadReplyCount ?? this.threadReplyCount,
       threadLatestReply: threadLatestReply ?? this.threadLatestReply,
-      threadLatestReplySender: threadLatestReplySender ?? this.threadLatestReplySender,
-      threadLatestReplyTimestamp: threadLatestReplyTimestamp ?? this.threadLatestReplyTimestamp,
+      threadLatestReplySender:
+          threadLatestReplySender ?? this.threadLatestReplySender,
+      threadLatestReplyTimestamp:
+          threadLatestReplyTimestamp ?? this.threadLatestReplyTimestamp,
       isBotMessage: isBotMessage ?? this.isBotMessage,
       threadUnreadCount: threadUnreadCount ?? this.threadUnreadCount,
     );
@@ -398,10 +426,13 @@ class MessageEntity extends Equatable {
 enum TranscriptionStatus {
   /// 尚未开始转录
   none,
+
   /// 正在转录中
   transcribing,
+
   /// 转录成功
   success,
+
   /// 转录失败
   failed,
 }
@@ -496,6 +527,15 @@ class MessageMetadata extends Equatable {
   /// 交易哈希
   final String? txHash;
 
+  /// 收款请求 ID
+  final String? paymentRequestId;
+
+  /// 收款地址
+  final String? paymentReceiverAddress;
+
+  /// 收款请求过期时间
+  final DateTime? paymentRequestExpiresAt;
+
   /// 红包 ID（用于领取和查询真实红包状态）
   final String? redPacketId;
 
@@ -589,6 +629,9 @@ class MessageMetadata extends Equatable {
     this.token,
     this.transferStatus,
     this.txHash,
+    this.paymentRequestId,
+    this.paymentReceiverAddress,
+    this.paymentRequestExpiresAt,
     this.redPacketId,
     this.pollQuestion,
     this.pollOptions,
@@ -635,47 +678,50 @@ class MessageMetadata extends Equatable {
 
   @override
   List<Object?> get props => [
-        mediaUrl,
-        httpUrl,
-        thumbnailUrl,
-        mimeType,
-        size,
-        width,
-        height,
-        duration,
-        fileName,
-        isPlayed,
-        waveform,
-        transcription,
-        transcriptionStatus,
-        latitude,
-        longitude,
-        locationName,
-        amount,
-        token,
-        transferStatus,
-        txHash,
-        redPacketId,
-        pollQuestion,
-        pollOptions,
-        pollOptionIds,
-        myVotes,
-        voteCounts,
-        totalVoters,
-        maxSelections,
-        pollEnded,
-        isAnonymousPoll,
-        musicTitle,
-        musicArtist,
-        musicUrl,
-        musicCover,
-        callDuration,
-        callEnded,
-        isMissedCall,
-        callEndReason,
-        callRoomId,
-        callPeerId,
-      ];
+    mediaUrl,
+    httpUrl,
+    thumbnailUrl,
+    mimeType,
+    size,
+    width,
+    height,
+    duration,
+    fileName,
+    isPlayed,
+    waveform,
+    transcription,
+    transcriptionStatus,
+    latitude,
+    longitude,
+    locationName,
+    amount,
+    token,
+    transferStatus,
+    txHash,
+    paymentRequestId,
+    paymentReceiverAddress,
+    paymentRequestExpiresAt,
+    redPacketId,
+    pollQuestion,
+    pollOptions,
+    pollOptionIds,
+    myVotes,
+    voteCounts,
+    totalVoters,
+    maxSelections,
+    pollEnded,
+    isAnonymousPoll,
+    musicTitle,
+    musicArtist,
+    musicUrl,
+    musicCover,
+    callDuration,
+    callEnded,
+    isMissedCall,
+    callEndReason,
+    callRoomId,
+    callPeerId,
+  ];
 
   /// Create a copy with updated poll fields
   MessageMetadata copyWithPoll({
@@ -714,6 +760,9 @@ class MessageMetadata extends Equatable {
     token: token,
     transferStatus: transferStatus,
     txHash: txHash,
+    paymentRequestId: paymentRequestId,
+    paymentReceiverAddress: paymentReceiverAddress,
+    paymentRequestExpiresAt: paymentRequestExpiresAt,
     redPacketId: redPacketId,
     musicTitle: musicTitle,
     musicArtist: musicArtist,
@@ -752,6 +801,9 @@ class MessageMetadata extends Equatable {
     token: token,
     transferStatus: transferStatus,
     txHash: txHash,
+    paymentRequestId: paymentRequestId,
+    paymentReceiverAddress: paymentReceiverAddress,
+    paymentRequestExpiresAt: paymentRequestExpiresAt,
     redPacketId: redPacketId,
     pollQuestion: pollQuestion,
     pollOptions: pollOptions,

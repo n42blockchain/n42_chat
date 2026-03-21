@@ -55,10 +55,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     emit(SearchLoading(query, type: event.type));
 
     try {
-      final results = await _searchRepository.searchGlobal(
-        query,
-        type: event.type,
-      );
+      final results = event.filter == null || event.filter!.isEmpty
+          ? await _searchRepository.searchGlobal(query, type: event.type)
+          : await _searchRepository.searchGlobal(
+              query,
+              type: event.type,
+              filter: event.filter,
+            );
       final history = await _searchRepository.getRecentSearches();
 
       emit(
@@ -92,9 +95,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     if (event.roomId != null) {
-      add(SearchInChat(event.roomId!, event.query));
+      add(SearchInChat(event.roomId!, event.query, filter: event.filter));
     } else {
-      add(PerformSearch(event.query, type: SearchResultType.message));
+      add(
+        PerformSearch(
+          event.query,
+          type: SearchResultType.message,
+          filter: event.filter,
+        ),
+      );
     }
   }
 
@@ -161,13 +170,25 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     emit(
       ChatSearchState(
-        results: ChatSearchResults(roomId: event.roomId, query: query),
+        results: ChatSearchResults(
+          roomId: event.roomId,
+          query: query,
+          filter: event.filter == null || event.filter!.isEmpty
+              ? null
+              : event.filter,
+        ),
         isSearching: true,
       ),
     );
 
     try {
-      final results = await _searchRepository.searchInChat(event.roomId, query);
+      final results = event.filter == null || event.filter!.isEmpty
+          ? await _searchRepository.searchInChat(event.roomId, query)
+          : await _searchRepository.searchInChat(
+              event.roomId,
+              query,
+              filter: event.filter,
+            );
       emit(ChatSearchState(results: results));
     } catch (e) {
       emit(SearchError(e.toString()));

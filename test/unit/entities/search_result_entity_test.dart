@@ -1,17 +1,48 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/domain/entities/search_result_entity.dart';
 
 void main() {
   group('SearchResultType', () {
     test('has 5 values', () {
       expect(SearchResultType.values.length, 5);
-      expect(SearchResultType.values, containsAll([
-        SearchResultType.contact,
-        SearchResultType.group,
-        SearchResultType.conversation,
-        SearchResultType.message,
-        SearchResultType.all,
-      ]));
+      expect(
+        SearchResultType.values,
+        containsAll([
+          SearchResultType.contact,
+          SearchResultType.group,
+          SearchResultType.conversation,
+          SearchResultType.message,
+          SearchResultType.all,
+        ]),
+      );
+    });
+  });
+
+  group('MessageSearchFilter', () {
+    test('isEmpty is true for default filter', () {
+      const filter = MessageSearchFilter();
+
+      expect(filter.isEmpty, isTrue);
+      expect(filter.activeCount, 0);
+    });
+
+    test('tracks active filters and supports copyWith clearing', () {
+      const filter = MessageSearchFilter(
+        senderId: '@alice:server.test',
+        messageType: MessageType.file,
+        onlyFromMe: true,
+      );
+      final cleared = filter.copyWith(
+        senderId: null,
+        messageType: null,
+        onlyFromMe: false,
+      );
+
+      expect(filter.activeCount, 3);
+      expect(cleared.senderId, isNull);
+      expect(cleared.messageType, isNull);
+      expect(cleared.onlyFromMe, isFalse);
     });
   });
 
@@ -117,20 +148,21 @@ void main() {
   });
 
   group('SearchResults', () {
-    const _emptyResults = SearchResults();
+    const emptyResults = SearchResults();
 
     test('defaults are empty', () {
-      expect(_emptyResults.contacts, isEmpty);
-      expect(_emptyResults.groups, isEmpty);
-      expect(_emptyResults.conversations, isEmpty);
-      expect(_emptyResults.messages, isEmpty);
-      expect(_emptyResults.query, '');
-      expect(_emptyResults.isSearching, isFalse);
-      expect(_emptyResults.hasMore, isFalse);
+      expect(emptyResults.contacts, isEmpty);
+      expect(emptyResults.groups, isEmpty);
+      expect(emptyResults.conversations, isEmpty);
+      expect(emptyResults.messages, isEmpty);
+      expect(emptyResults.query, '');
+      expect(emptyResults.isSearching, isFalse);
+      expect(emptyResults.hasMore, isFalse);
+      expect(emptyResults.messageFilter, isNull);
     });
 
     test('isEmpty is true when no results', () {
-      expect(_emptyResults.isEmpty, isTrue);
+      expect(emptyResults.isEmpty, isTrue);
     });
 
     test('totalCount sums all categories', () {
@@ -150,10 +182,26 @@ void main() {
     });
 
     test('allResults combines all categories in order', () {
-      const c = SearchResultItem(type: SearchResultType.contact, id: 'c', title: 'C');
-      const g = SearchResultItem(type: SearchResultType.group, id: 'g', title: 'G');
-      const conv = SearchResultItem(type: SearchResultType.conversation, id: 'cv', title: 'CV');
-      const m = SearchResultItem(type: SearchResultType.message, id: 'm', title: 'M');
+      const c = SearchResultItem(
+        type: SearchResultType.contact,
+        id: 'c',
+        title: 'C',
+      );
+      const g = SearchResultItem(
+        type: SearchResultType.group,
+        id: 'g',
+        title: 'G',
+      );
+      const conv = SearchResultItem(
+        type: SearchResultType.conversation,
+        id: 'cv',
+        title: 'CV',
+      );
+      const m = SearchResultItem(
+        type: SearchResultType.message,
+        id: 'm',
+        title: 'M',
+      );
 
       const results = SearchResults(
         contacts: [c],
@@ -166,7 +214,11 @@ void main() {
     });
 
     test('has* getters reflect presence of items', () {
-      const item = SearchResultItem(type: SearchResultType.contact, id: 'x', title: 'X');
+      const item = SearchResultItem(
+        type: SearchResultType.contact,
+        id: 'x',
+        title: 'X',
+      );
       const results = SearchResults(contacts: [item]);
 
       expect(results.hasContacts, isTrue);
@@ -177,12 +229,22 @@ void main() {
 
     test('copyWith replaces fields', () {
       const original = SearchResults(query: 'hello');
-      const item = SearchResultItem(type: SearchResultType.contact, id: 'x', title: 'X');
-      final updated = original.copyWith(contacts: [item], isSearching: true);
+      const item = SearchResultItem(
+        type: SearchResultType.contact,
+        id: 'x',
+        title: 'X',
+      );
+      const filter = MessageSearchFilter(onlyFromMe: true);
+      final updated = original.copyWith(
+        contacts: [item],
+        isSearching: true,
+        messageFilter: filter,
+      );
 
       expect(updated.query, 'hello');
       expect(updated.contacts, [item]);
       expect(updated.isSearching, isTrue);
+      expect(updated.messageFilter, filter);
     });
   });
 
@@ -196,6 +258,7 @@ void main() {
       expect(results.currentIndex, 0);
       expect(results.isSearching, isFalse);
       expect(results.hasMore, isFalse);
+      expect(results.filter, isNull);
       expect(results.isEmpty, isTrue);
       expect(results.totalCount, 0);
       expect(results.currentMessage, isNull);

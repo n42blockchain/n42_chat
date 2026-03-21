@@ -5,13 +5,13 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
+import 'package:n42_chat/src/core/utils/room_metadata_utils.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_group_datasource.dart';
 import 'package:n42_chat/src/data/repositories/group_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/group_entity.dart';
 
-class MockMatrixGroupDataSource extends Mock
-    implements MatrixGroupDataSource {}
+class MockMatrixGroupDataSource extends Mock implements MatrixGroupDataSource {}
 
 class MockMatrixClientManager extends Mock implements MatrixClientManager {}
 
@@ -55,47 +55,59 @@ void main() {
     required matrix.JoinRules joinRules,
     Map<String, Object?>? channelMeta,
     Map<String, Object?>? powerLevels,
+    String canonicalAlias = '',
+    String? announcement,
+    int joinedCount = 12,
+    int invitedCount = 3,
+    int? maxMembers,
   }) {
     when(() => mockGroupDS.getGroup(testRoomId)).thenReturn(mockRoom);
-    when(() => mockGroupDS.getGroupMembers(testRoomId))
-        .thenAnswer((_) async => []);
+    when(
+      () => mockGroupDS.getGroupMembers(testRoomId),
+    ).thenAnswer((_) async => []);
     when(() => mockGroupDS.getGroupAvatarUrl(testRoomId)).thenReturn(null);
+    when(
+      () => mockGroupDS.getGroupAnnouncement(testRoomId),
+    ).thenReturn(announcement ?? 'Pinned notice');
     when(() => mockGroupDS.isGroupOwner(testRoomId, any())).thenReturn(false);
     when(() => mockGroupDS.isGroupAdmin(testRoomId, any())).thenReturn(false);
     when(() => mockGroupDS.getPinnedEventIds(testRoomId)).thenReturn([]);
     when(() => mockGroupDS.getTokenGateConfig(testRoomId)).thenReturn(null);
-    when(() => mockGroupDS.getMaxMembers(testRoomId)).thenReturn(null);
+    when(() => mockGroupDS.getMaxMembers(testRoomId)).thenReturn(maxMembers);
     when(() => mockGroupDS.canInviteMembers(testRoomId)).thenReturn(false);
     when(() => mockGroupDS.canKickMembers(testRoomId)).thenReturn(false);
     when(() => mockGroupDS.canChangeSettings(testRoomId)).thenReturn(true);
-    when(() => mockGroupDS.canSendStateEvent(
-          any(),
-          any(),
-          fallbackMinPowerLevel: any(named: 'fallbackMinPowerLevel'),
-        )).thenReturn(false);
+    when(
+      () => mockGroupDS.canSendStateEvent(
+        any(),
+        any(),
+        fallbackMinPowerLevel: any(named: 'fallbackMinPowerLevel'),
+      ),
+    ).thenReturn(false);
 
     when(() => mockRoom.id).thenReturn(testRoomId);
     when(() => mockRoom.getLocalizedDisplayname()).thenReturn('Announcements');
     when(() => mockRoom.topic).thenReturn('Read-only updates');
+    when(() => mockRoom.canonicalAlias).thenReturn(canonicalAlias);
     when(() => mockRoom.encrypted).thenReturn(false);
     when(() => mockRoom.joinRules).thenReturn(joinRules);
     when(() => mockRoom.summary).thenReturn(
       matrix.RoomSummary.fromJson({
-        'm.joined_member_count': 12,
-        'm.invited_member_count': 3,
+        'm.joined_member_count': joinedCount,
+        'm.invited_member_count': invitedCount,
       }),
     );
 
-    when(() => mockRoom.getState('n42.room.channel_meta')).thenReturn(
-      channelMeta == null ? null : mockChannelMetaEvent,
-    );
+    when(
+      () => mockRoom.getState('n42.room.channel_meta'),
+    ).thenReturn(channelMeta == null ? null : mockChannelMetaEvent);
     if (channelMeta != null) {
       when(() => mockChannelMetaEvent.content).thenReturn(channelMeta);
     }
 
-    when(() => mockRoom.getState(matrix.EventTypes.RoomPowerLevels)).thenReturn(
-      powerLevels == null ? null : mockPowerLevelsEvent,
-    );
+    when(
+      () => mockRoom.getState(matrix.EventTypes.RoomPowerLevels),
+    ).thenReturn(powerLevels == null ? null : mockPowerLevelsEvent);
     if (powerLevels != null) {
       when(() => mockPowerLevelsEvent.content).thenReturn(powerLevels);
     }
@@ -106,10 +118,9 @@ void main() {
       const name = 'Test Group';
       final inviteIds = ['@alice:matrix.org', '@bob:matrix.org'];
 
-      when(() => mockGroupDS.createGroup(
-            name: name,
-            inviteUserIds: inviteIds,
-          )).thenAnswer((_) async => testRoomId);
+      when(
+        () => mockGroupDS.createGroup(name: name, inviteUserIds: inviteIds),
+      ).thenAnswer((_) async => testRoomId);
 
       final result = await repository.createGroup(
         name: name,
@@ -117,22 +128,20 @@ void main() {
       );
 
       expect(result, testRoomId);
-      verify(() => mockGroupDS.createGroup(
-            name: name,
-            inviteUserIds: inviteIds,
-          )).called(1);
+      verify(
+        () => mockGroupDS.createGroup(name: name, inviteUserIds: inviteIds),
+      ).called(1);
     });
 
     test('propagates exception on failure', () async {
-      when(() => mockGroupDS.createGroup(
-            name: any(named: 'name'),
-            inviteUserIds: any(named: 'inviteUserIds'),
-          )).thenThrow(Exception('Server error'));
+      when(
+        () => mockGroupDS.createGroup(
+          name: any(named: 'name'),
+          inviteUserIds: any(named: 'inviteUserIds'),
+        ),
+      ).thenThrow(Exception('Server error'));
 
-      expect(
-        () => repository.createGroup(name: 'Fail Group'),
-        throwsException,
-      );
+      expect(() => repository.createGroup(name: 'Fail Group'), throwsException);
     });
   });
 
@@ -147,8 +156,9 @@ void main() {
       when(() => mockUser1.avatarUrl).thenReturn(null);
       when(() => mockUser1.powerLevel).thenReturn(100);
       when(() => mockUser1.membership).thenReturn(matrix.Membership.join);
-      when(() => mockGroupDS.getUserPowerLevel(testRoomId, '@alice:matrix.org'))
-          .thenReturn(100);
+      when(
+        () => mockGroupDS.getUserPowerLevel(testRoomId, '@alice:matrix.org'),
+      ).thenReturn(100);
       when(() => mockGroupDS.getGroupAvatarUrl(testRoomId)).thenReturn(null);
 
       when(() => mockUser2.id).thenReturn('@bob:matrix.org');
@@ -157,11 +167,13 @@ void main() {
       when(() => mockUser2.avatarUrl).thenReturn(null);
       when(() => mockUser2.powerLevel).thenReturn(0);
       when(() => mockUser2.membership).thenReturn(matrix.Membership.join);
-      when(() => mockGroupDS.getUserPowerLevel(testRoomId, '@bob:matrix.org'))
-          .thenReturn(0);
+      when(
+        () => mockGroupDS.getUserPowerLevel(testRoomId, '@bob:matrix.org'),
+      ).thenReturn(0);
 
-      when(() => mockGroupDS.getGroupMembers(testRoomId))
-          .thenAnswer((_) async => [mockUser1, mockUser2]);
+      when(
+        () => mockGroupDS.getGroupMembers(testRoomId),
+      ).thenAnswer((_) async => [mockUser1, mockUser2]);
 
       final members = await repository.getGroupMembers(testRoomId);
 
@@ -171,8 +183,9 @@ void main() {
     });
 
     test('returns empty list for empty group', () async {
-      when(() => mockGroupDS.getGroupMembers(testRoomId))
-          .thenAnswer((_) async => []);
+      when(
+        () => mockGroupDS.getGroupMembers(testRoomId),
+      ).thenAnswer((_) async => []);
 
       final members = await repository.getGroupMembers(testRoomId);
 
@@ -194,6 +207,7 @@ void main() {
     test('maps channel metadata to channel entity fields', () async {
       stubBaseRoom(
         joinRules: matrix.JoinRules.invite,
+        canonicalAlias: '#announcements:matrix.org',
         channelMeta: const {
           'parent_room_id': '!parent:matrix.org',
           'members_can_speak': false,
@@ -211,34 +225,63 @@ void main() {
       expect(group.membersCanSpeak, isFalse);
       expect(group.showMemberList, isFalse);
       expect(group.slowModeInterval, 30);
+      expect(group.announcement, 'Pinned notice');
+      expect(group.channelUsername, 'announcements');
     });
 
-    test('falls back to room power levels when channel meta omits speak flag', () async {
+    test(
+      'falls back to room power levels when channel meta omits speak flag',
+      () async {
+        stubBaseRoom(
+          joinRules: matrix.JoinRules.public,
+          channelMeta: const {'parent_room_id': '!parent:matrix.org'},
+          powerLevels: const {'events_default': 50},
+        );
+
+        final group = await repository.getGroup(testRoomId);
+
+        expect(group, isNotNull);
+        expect(group!.isChannel, isTrue);
+        expect(group.joinRule, JoinRule.public);
+        expect(group.membersCanSpeak, isFalse);
+        expect(group.showMemberList, isFalse);
+        expect(group.slowModeInterval, 0);
+      },
+    );
+
+    test('classifies rooms larger than 1000 members as super groups', () async {
       stubBaseRoom(
         joinRules: matrix.JoinRules.public,
-        channelMeta: const {
-          'parent_room_id': '!parent:matrix.org',
-        },
-        powerLevels: const {
-          'events_default': 50,
-        },
+        joinedCount: 1001,
+        invitedCount: 10,
       );
 
       final group = await repository.getGroup(testRoomId);
 
       expect(group, isNotNull);
-      expect(group!.isChannel, isTrue);
-      expect(group.joinRule, JoinRule.public);
-      expect(group.membersCanSpeak, isFalse);
-      expect(group.showMemberList, isFalse);
-      expect(group.slowModeInterval, 0);
+      expect(group!.groupType, GroupType.superGroup);
+      expect(group.isSuperGroup, isTrue);
+    });
+  });
+
+  group('getGroupInviteLink', () {
+    test('delegates to datasource', () async {
+      final link = buildMatrixToRoomLink(
+        roomId: testRoomId,
+        canonicalAlias: '#announcements:matrix.org',
+      );
+      when(() => mockGroupDS.getGroupInviteLink(testRoomId)).thenReturn(link);
+
+      final result = await repository.getGroupInviteLink(testRoomId);
+
+      expect(result, link);
+      verify(() => mockGroupDS.getGroupInviteLink(testRoomId)).called(1);
     });
   });
 
   group('leaveGroup', () {
     test('delegates to datasource', () async {
-      when(() => mockGroupDS.leaveGroup(testRoomId))
-          .thenAnswer((_) async {});
+      when(() => mockGroupDS.leaveGroup(testRoomId)).thenAnswer((_) async {});
 
       await repository.leaveGroup(testRoomId);
 

@@ -4,12 +4,15 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../l10n/app_localizations.dart';
 import '../../n42_chat.dart';
+import '../../core/utils/livekit_call_utils.dart';
 import 'voip_config.dart';
 import 'webrtc_service.dart';
 import 'livekit_service.dart';
@@ -31,6 +34,7 @@ class CallManager {
   CallManager._internal();
 
   // 服务实例
+  matrix.Client? _client;
   WebRTCService? _webRTCService;
   LiveKitService? _liveKitService;
   final CallNotificationService _notificationService =
@@ -106,6 +110,7 @@ class CallManager {
     }
 
     _navigatorKey = navigatorKey;
+    _client = client;
 
     // 初始化通知服务
     await _notificationService.initialize();
@@ -351,6 +356,7 @@ class CallManager {
     required String roomName,
     required String participantName,
     required String token,
+    String? meetingDisplayName,
     String? participantAvatarUrl,
     bool enableVideo = true,
     bool enableAudio = true,
@@ -359,6 +365,7 @@ class CallManager {
       roomName: roomName,
       participantName: participantName,
       token: token,
+      meetingDisplayName: meetingDisplayName,
       participantAvatarUrl: participantAvatarUrl,
       enableVideo: enableVideo,
       enableAudio: enableAudio,
@@ -370,6 +377,7 @@ class CallManager {
     required String roomName,
     required String participantName,
     required String token,
+    String? meetingDisplayName,
     String? participantAvatarUrl,
     bool enableVideo = true,
     bool enableAudio = true,
@@ -399,10 +407,175 @@ class CallManager {
     );
 
     if (success) {
-      _navigateToGroupCallScreen(roomName);
+      _navigateToGroupCallScreen(meetingDisplayName ?? roomName);
     }
 
     return success;
+  }
+
+  Future<bool> startGroupVoiceCall({
+    required String conversationId,
+    required String roomDisplayName,
+    String? participantName,
+    String? participantAvatarUrl,
+  }) {
+    return _startGroupCall(
+      conversationId: conversationId,
+      roomDisplayName: roomDisplayName,
+      participantName: participantName,
+      participantAvatarUrl: participantAvatarUrl,
+      enableVideo: false,
+    );
+  }
+
+  Future<bool> startGroupVideoCall({
+    required String conversationId,
+    required String roomDisplayName,
+    String? participantName,
+    String? participantAvatarUrl,
+  }) {
+    return _startGroupCall(
+      conversationId: conversationId,
+      roomDisplayName: roomDisplayName,
+      participantName: participantName,
+      participantAvatarUrl: participantAvatarUrl,
+      enableVideo: true,
+    );
+  }
+
+  Future<bool> _startGroupCall({
+    required String conversationId,
+    required String roomDisplayName,
+    String? participantName,
+    String? participantAvatarUrl,
+    required bool enableVideo,
+  }) async {
+    final client = _client;
+    final userId = client?.userID;
+    if (client == null || userId == null || userId.isEmpty) {
+      onError?.call('call_not_initialized');
+      return false;
+    }
+
+    if (!_config.hasLiveKitConfig || N42Chat.liveKitJwtUrl == null) {
+      onError?.call('livekit_not_configured');
+      return false;
+    }
+
+    final currentDisplayName = N42Chat.currentUser?.displayName.trim();
+    final resolvedParticipantName = participantName?.trim().isNotEmpty == true
+        ? participantName!.trim()
+        : (currentDisplayName != null && currentDisplayName.isNotEmpty
+              ? currentDisplayName
+              : userId);
+    final roomName = buildLiveKitRoomName(conversationId);
+
+    final token = await _fetchLiveKitToken(
+      conversationId: conversationId,
+      roomName: roomName,
+      participantId: userId,
+      participantName: resolvedParticipantName,
+      enableVideo: enableVideo,
+    );
+    if (token == null) {
+      return false;
+    }
+
+    return joinMeeting(
+      roomName: roomName,
+      meetingDisplayName: roomDisplayName,
+      participantName: resolvedParticipantName,
+      participantAvatarUrl: participantAvatarUrl,
+      token: token,
+      enableVideo: enableVideo,
+      enableAudio: true,
+    );
+  }
+
+  Future<String?> _fetchLiveKitToken({
+    required String conversationId,
+    required String roomName,
+    required String participantId,
+    required String participantName,
+    required bool enableVideo,
+  }) async {
+    final client = _client;
+    final jwtUrl = N42Chat.liveKitJwtUrl;
+    final accessToken = client?.accessToken;
+    if (client == null ||
+        jwtUrl == null ||
+        jwtUrl.isEmpty ||
+        accessToken == null ||
+        accessToken.isEmpty) {
+      onError?.call('livekit_not_configured');
+      return null;
+    }
+
+    final uri = Uri.parse(jwtUrl);
+    final headers = <String, String>{
+      'Authorization': 'Bearer $accessToken',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
+    final payload = <String, Object?>{
+      'room': roomName,
+      'identity': participantId,
+      'name': participantName,
+      'video': enableVideo,
+      'conversation_id': conversationId,
+      'metadata': jsonEncode({
+        'conversation_id': conversationId,
+        'video': enableVideo,
+      }),
+    };
+
+    try {
+      final postResponse = await client.httpClient.post(
+        uri,
+        headers: headers,
+        body: jsonEncode(payload),
+      );
+      final token = _extractTokenFromResponse(postResponse);
+      if (token != null) {
+        return token;
+      }
+      debugLog(
+        'CallManager: LiveKit token POST returned ${postResponse.statusCode} without token',
+      );
+    } catch (e) {
+      debugLog('CallManager: LiveKit token POST failed: $e');
+    }
+
+    try {
+      final getUri = buildLiveKitTokenUri(
+        jwtUrl,
+        roomName: roomName,
+        participantId: participantId,
+        participantName: participantName,
+        enableVideo: enableVideo,
+        conversationId: conversationId,
+      );
+      final getResponse = await client.httpClient.get(getUri, headers: headers);
+      final token = _extractTokenFromResponse(getResponse);
+      if (token != null) {
+        return token;
+      }
+      debugLog(
+        'CallManager: LiveKit token GET returned ${getResponse.statusCode} without token',
+      );
+    } catch (e) {
+      debugLog('CallManager: LiveKit token GET failed: $e');
+    }
+
+    onError?.call('livekit_token_fetch_failed');
+    return null;
+  }
+
+  String? _extractTokenFromResponse(http.Response response) {
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      return null;
+    }
+    return extractLiveKitToken(response.body);
   }
 
   /// 离开会议
@@ -661,6 +834,7 @@ class CallManager {
     _liveKitService?.dispose();
     _liveKitService = null;
     _notificationService.dispose();
+    _client = null;
     _navigatorKey = null;
     _isCallScreenShowing = false;
     _setPendingAnswer(false);

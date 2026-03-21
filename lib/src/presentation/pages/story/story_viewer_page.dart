@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -36,7 +40,7 @@ class StoryViewerPage extends StatefulWidget {
 
   /// 回复 Story 的回调
   final Future<bool> Function(String userId, String storyId, String message)?
-      onReply;
+  onReply;
 
   /// 删除我的 Story 的回调
   final Future<bool> Function(StoryEntity story)? onDeleteStory;
@@ -360,14 +364,16 @@ class _StoryContentState extends State<_StoryContent> {
   final FocusNode _replyFocusNode = FocusNode();
   AudioPlayer? _musicPlayer;
   StreamSubscription<void>? _musicCompleteSubscription;
+  File? _tempMusicFile;
   bool _isMusicPlaying = false;
   bool _isDeletingStory = false;
   bool _isSendingReply = false;
+  int _musicLoadGeneration = 0;
 
   @override
   void initState() {
     super.initState();
-    _startMusicIfAvailable();
+    unawaited(_startMusicIfAvailable());
   }
 
   @override
@@ -376,7 +382,7 @@ class _StoryContentState extends State<_StoryContent> {
     // Story 切换时重新处理音乐
     if (oldWidget.story.id != widget.story.id) {
       _stopMusic();
-      _startMusicIfAvailable();
+      unawaited(_startMusicIfAvailable());
       _replyController.clear();
       _replyFocusNode.unfocus();
       _isDeletingStory = false;
@@ -392,64 +398,126 @@ class _StoryContentState extends State<_StoryContent> {
     }
   }
 
-  void _startMusicIfAvailable() {
+  Future<void> _startMusicIfAvailable() async {
     if (!widget.story.hasMusic) return;
 
     final musicUrl = widget.story.musicUrl;
     if (musicUrl == null || musicUrl.isEmpty) return;
 
-    _musicPlayer = AudioPlayer();
+    final generation = ++_musicLoadGeneration;
+    final player = AudioPlayer();
 
-    // Determine the source based on URL scheme
-    Source source;
-    if (musicUrl.startsWith('mxc://')) {
-      // Convert MXC URL to HTTP URL
-      final httpUrl = _getMusicHttpUrl(musicUrl);
-      if (httpUrl == null) return;
-      source = UrlSource(httpUrl);
-    } else if (musicUrl.startsWith('http')) {
-      source = UrlSource(musicUrl);
-    } else {
-      // Local file path
-      source = DeviceFileSource(musicUrl);
+    try {
+      final source = await _resolveMusicSource(musicUrl);
+      if (!mounted || generation != _musicLoadGeneration || source == null) {
+        _discardStaleMusicSource(source);
+        await player.dispose();
+        return;
+      }
+
+      _musicPlayer = player;
+      await player.play(source);
+
+      if (!mounted || generation != _musicLoadGeneration) {
+        return;
+      }
+      setState(() => _isMusicPlaying = true);
+
+      // Seek to start position if specified
+      final startAt = widget.story.musicStartAt;
+      if (startAt != null && startAt > 0) {
+        await player.seek(Duration(seconds: startAt));
+      }
+
+      await _musicCompleteSubscription?.cancel();
+      _musicCompleteSubscription = player.onPlayerComplete.listen((_) {
+        if (mounted) setState(() => _isMusicPlaying = false);
+      });
+    } catch (e) {
+      await player.dispose();
+      debugLog('StoryViewer: Music playback failed: $e');
     }
-
-    _musicPlayer!
-        .play(source)
-        .then((_) {
-          if (mounted) setState(() => _isMusicPlaying = true);
-        })
-        .catchError((Object e) {
-          debugLog('StoryViewer: Music playback failed: $e');
-        });
-
-    // Seek to start position if specified
-    final startAt = widget.story.musicStartAt;
-    if (startAt != null && startAt > 0) {
-      _musicPlayer!.seek(Duration(seconds: startAt));
-    }
-
-    _musicCompleteSubscription?.cancel();
-    _musicCompleteSubscription = _musicPlayer!.onPlayerComplete.listen((_) {
-      if (mounted) setState(() => _isMusicPlaying = false);
-    });
   }
 
-  String? _getMusicHttpUrl(String mxcUrl) {
+  Future<Source?> _resolveMusicSource(String musicUrl) async {
+    if (!musicUrl.startsWith('http') && !musicUrl.startsWith('mxc://')) {
+      return DeviceFileSource(musicUrl);
+    }
+
     final client = MatrixClientManager.instance.client;
-    if (client?.homeserver == null) return null;
-    final uri = Uri.parse(mxcUrl);
-    return client!.homeserver!
-        .resolve('/_matrix/media/v3/download/${uri.host}${uri.path}')
-        .toString();
+    final resolvedUrl = musicUrl.startsWith('mxc://')
+        ? mx_utils.MatrixUtils.getMediaDownloadUrl(musicUrl, client: client)
+        : musicUrl;
+    if (resolvedUrl == null || resolvedUrl.isEmpty) {
+      return null;
+    }
+
+    final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+      resolvedUrl,
+      client: client,
+    );
+    if (headers.isEmpty) {
+      return UrlSource(resolvedUrl);
+    }
+
+    return _downloadProtectedMusic(resolvedUrl, headers);
+  }
+
+  Future<Source?> _downloadProtectedMusic(
+    String url,
+    Map<String, String> headers,
+  ) async {
+    try {
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 20));
+      if (response.statusCode != 200 || response.bodyBytes.isEmpty) {
+        debugLog(
+          'StoryViewer: Protected music download failed: ${response.statusCode}',
+        );
+        return null;
+      }
+
+      final dir = await getTemporaryDirectory();
+      final file = File(
+        '${dir.path}/story_music_${DateTime.now().millisecondsSinceEpoch}.bin',
+      );
+      await file.writeAsBytes(response.bodyBytes, flush: true);
+
+      _tempMusicFile?.delete().ignore();
+      _tempMusicFile = file;
+      return DeviceFileSource(file.path);
+    } catch (e) {
+      debugLog('StoryViewer: Failed to cache protected music: $e');
+      return null;
+    }
+  }
+
+  void _discardStaleMusicSource(Source? source) {
+    if (source is! DeviceFileSource) {
+      return;
+    }
+
+    final stalePath = source.path;
+    final tempMusicFile = _tempMusicFile;
+    if (tempMusicFile?.path == stalePath) {
+      _tempMusicFile = null;
+      tempMusicFile?.delete().ignore();
+      return;
+    }
+
+    File(stalePath).delete().ignore();
   }
 
   void _stopMusic() {
+    _musicLoadGeneration++;
     _musicCompleteSubscription?.cancel();
     _musicCompleteSubscription = null;
     _musicPlayer?.stop();
     _musicPlayer?.dispose();
     _musicPlayer = null;
+    _tempMusicFile?.delete().ignore();
+    _tempMusicFile = null;
     _isMusicPlaying = false;
   }
 
@@ -990,9 +1058,7 @@ class _StoryContentState extends State<_StoryContent> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n?.commonRetry ?? 'Failed to delete story'),
-      ),
+      SnackBar(content: Text(l10n?.commonRetry ?? 'Failed to delete story')),
     );
   }
 

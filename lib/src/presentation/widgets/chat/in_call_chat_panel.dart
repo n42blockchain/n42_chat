@@ -13,10 +13,7 @@ import '../../../services/voip/livekit_service.dart';
 class InCallChatPanel extends StatefulWidget {
   final LiveKitService liveKitService;
 
-  const InCallChatPanel({
-    super.key,
-    required this.liveKitService,
-  });
+  const InCallChatPanel({super.key, required this.liveKitService});
 
   @override
   State<InCallChatPanel> createState() => _InCallChatPanelState();
@@ -59,10 +56,10 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
   }
 
   void _sendMessage() {
-    final text = _textController.text.trim();
-    if (text.isEmpty) return;
+    final rawText = _textController.text;
+    if (rawText.trim().isEmpty) return;
 
-    widget.liveKitService.sendChatMessage(text);
+    widget.liveKitService.sendChatMessage(rawText);
     _textController.clear();
   }
 
@@ -94,7 +91,11 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Row(
               children: [
-                const Icon(Icons.chat_bubble_outline, color: Colors.white70, size: 18),
+                const Icon(
+                  Icons.chat_bubble_outline,
+                  color: Colors.white70,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   S.of(context)?.callInCallChat ?? 'In-Call Chat',
@@ -106,7 +107,8 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                 ),
                 const Spacer(),
                 Text(
-                  S.of(context)?.callMessagesCount(messages.length) ?? '${messages.length} messages',
+                  S.of(context)?.callMessagesCount(messages.length) ??
+                      '${messages.length} messages',
                   style: const TextStyle(color: Colors.white38, fontSize: 12),
                 ),
               ],
@@ -120,14 +122,21 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
             child: messages.isEmpty
                 ? Center(
                     child: Text(
-                      S.of(context)?.callNoMessagesYet ?? 'No messages yet.\nSend a message to get started.',
+                      S.of(context)?.callNoMessagesYet ??
+                          'No messages yet.\nSend a message to get started.',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white38, fontSize: 14),
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 14,
+                      ),
                     ),
                   )
                 : ListView.builder(
                     controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       return _buildMessageItem(messages[index]);
@@ -155,7 +164,8 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                     maxLines: 3,
                     minLines: 1,
                     decoration: InputDecoration(
-                      hintText: S.of(context)?.callTypeMessage ?? 'Type a message...',
+                      hintText:
+                          S.of(context)?.callTypeMessage ?? 'Type a message...',
                       hintStyle: const TextStyle(color: Colors.white38),
                       filled: true,
                       fillColor: Colors.white.withValues(alpha: 0.1),
@@ -176,7 +186,10 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                   onPressed: _sendMessage,
                   icon: const Icon(Icons.send, color: Colors.greenAccent),
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
                 ),
               ],
             ),
@@ -212,7 +225,9 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: message.isLocal ? Colors.greenAccent : Colors.blueAccent,
+                  color: message.isLocal
+                      ? Colors.greenAccent
+                      : Colors.blueAccent,
                 ),
               ),
             ),
@@ -225,24 +240,35 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                 Row(
                   children: [
                     Text(
-                      message.isLocal ? (S.of(context)?.callYouSender ?? 'You') : message.senderName,
+                      message.isLocal
+                          ? (S.of(context)?.callYouSender ?? 'You')
+                          : message.senderName,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: message.isLocal ? Colors.greenAccent : Colors.blueAccent,
+                        color: message.isLocal
+                            ? Colors.greenAccent
+                            : Colors.blueAccent,
                       ),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       timeStr,
-                      style: const TextStyle(fontSize: 11, color: Colors.white38),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.white38,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 2),
                 Text(
                   message.content,
-                  style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.3),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1.3,
+                  ),
                 ),
               ],
             ),

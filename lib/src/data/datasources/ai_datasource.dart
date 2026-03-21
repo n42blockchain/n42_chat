@@ -276,6 +276,30 @@ class AiDatasource implements AiService {
     return result.text.trim();
   }
 
+  @override
+  Future<List<String>> suggestReplies(
+    List<AiMessage> messages, {
+    int count = 3,
+    String? language,
+  }) async {
+    final safeCount = count.clamp(1, 6);
+    final languageInstruction = language == null || language.trim().isEmpty
+        ? 'Use the same language as the conversation.'
+        : 'Write every suggestion in $language.';
+    final result = await completion(
+      messages,
+      systemPrompt:
+          'You generate short smart-reply suggestions for a chat conversation. '
+          'Return a JSON array with exactly $safeCount strings. '
+          'Each suggestion must be natural, standalone, and under 60 characters. '
+          '$languageInstruction '
+          'Do not include numbering, markdown, quotes, or explanations.',
+      temperature: 0.5,
+      maxTokens: 256,
+    );
+    return _parseReplySuggestions(result.text, expectedCount: safeCount);
+  }
+
   String _parseErrorMessage(DioException e) {
     if (e.response?.data != null) {
       try {
@@ -357,6 +381,71 @@ class AiDatasource implements AiService {
     }
 
     return null;
+  }
+
+  List<String> _parseReplySuggestions(
+    String raw, {
+    required int expectedCount,
+  }) {
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) return const [];
+
+    final parsedJson = _tryParseSuggestionJson(trimmed);
+    if (parsedJson.isNotEmpty) {
+      return parsedJson.take(expectedCount).toList();
+    }
+
+    final suggestions = trimmed
+        .split(RegExp(r'[\r\n]+'))
+        .map((line) => _stripReplyListPrefix(line.trim()))
+        .where((line) => line.isNotEmpty)
+        .fold<List<String>>(<String>[], (list, line) {
+          if (!list.contains(line)) {
+            list.add(line);
+          }
+          return list;
+        });
+    return suggestions.take(expectedCount).toList();
+  }
+
+  List<String> _tryParseSuggestionJson(String raw) {
+    List<String> normalize(List<dynamic> values) {
+      return values
+          .whereType<String>()
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
+          .fold<List<String>>(<String>[], (list, item) {
+            if (!list.contains(item)) {
+              list.add(item);
+            }
+            return list;
+          });
+    }
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List<dynamic>) {
+        return normalize(decoded);
+      }
+    } catch (_) {
+      final arrayMatch = RegExp(r'\[[\s\S]*\]').firstMatch(raw);
+      if (arrayMatch == null) {
+        return const [];
+      }
+      try {
+        final decoded = jsonDecode(arrayMatch.group(0)!);
+        if (decoded is List<dynamic>) {
+          return normalize(decoded);
+        }
+      } catch (_) {
+        return const [];
+      }
+    }
+    return const [];
+  }
+
+  String _stripReplyListPrefix(String line) {
+    return line.replaceFirst(RegExp(r'^[-*•\d\.)\s]+'), '').trim();
   }
 
   String _buildChatCompletionsUrl() {

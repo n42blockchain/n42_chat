@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/matrix_utils.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -105,32 +105,9 @@ class MatrixRoomDataSource {
     return room.getLocalizedDisplayname();
   }
 
-  /// 获取房间头像URL（手动构建 HTTP URL）
+  /// 获取房间头像URL
   String? getRoomAvatarUrl(matrix.Room room, {int size = 96}) {
-    final avatarMxc = room.avatar?.toString();
-    return _buildAvatarHttpUrl(avatarMxc, size);
-  }
-  
-  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
-  String? _buildAvatarHttpUrl(String? mxcUrl, int size) {
-    if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-    
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-      
-      final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-      
-      // 使用认证媒体 API (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$size&height=$size&method=crop';
-    } catch (e) {
-      return null;
-    }
+    return MatrixUtils.getAvatarUrl(room.avatar, client: _client, size: size);
   }
 
   /// 获取房间未读消息数
@@ -196,9 +173,9 @@ class MatrixRoomDataSource {
 
   /// 获取房间成员数量
   int getMemberCount(matrix.Room room) {
-    return room.summary.mJoinedMemberCount ?? 
-           room.summary.mInvitedMemberCount ?? 
-           0;
+    return room.summary.mJoinedMemberCount ??
+        room.summary.mInvitedMemberCount ??
+        0;
   }
 
   /// 获取私聊对方用户
@@ -214,12 +191,18 @@ class MatrixRoomDataSource {
   // ============================================
 
   /// 创建私聊房间
-  Future<String> createDirectChat(String userId) async {
+  Future<String> createDirectChat(
+    String userId, {
+    bool encrypted = true,
+  }) async {
     if (_client == null) {
       throw Exception('Matrix client not initialized');
     }
 
-    final roomId = await _client!.startDirectChat(userId);
+    final roomId = await _client!.startDirectChat(
+      userId,
+      enableEncryption: encrypted,
+    );
     return roomId;
   }
 
@@ -246,9 +229,7 @@ class MatrixRoomDataSource {
               matrix.StateEvent(
                 type: matrix.EventTypes.Encryption,
                 stateKey: '',
-                content: {
-                  'algorithm': matrix.AlgorithmTypes.megolmV1AesSha2,
-                },
+                content: {'algorithm': matrix.AlgorithmTypes.megolmV1AesSha2},
               ),
             ]
           : null,
@@ -296,11 +277,13 @@ class MatrixRoomDataSource {
   Future<void> markRoomAsRead(String roomId) async {
     final room = getRoomById(roomId);
     if (room == null) return;
-    
+
     final eventId = room.lastEvent?.eventId;
     // 验证 eventId 格式（Matrix 事件 ID 以 $ 开头）
     if (eventId == null || eventId.isEmpty || !eventId.startsWith('\$')) {
-      debugLog('MatrixRoomDataSource: Invalid eventId format for markRoomAsRead: $eventId');
+      debugLog(
+        'MatrixRoomDataSource: Invalid eventId format for markRoomAsRead: $eventId',
+      );
       return;
     }
 
@@ -340,7 +323,9 @@ class MatrixRoomDataSource {
         // 对于未解密的消息，messageType 会返回 'm.bad.encrypted' 或类似值
         final msgType = event.messageType;
         final body = event.body;
-        debugLog('MatrixRoomDatasource: Encrypted event - msgType=$msgType, body=$body');
+        debugLog(
+          'MatrixRoomDatasource: Encrypted event - msgType=$msgType, body=$body',
+        );
         if (msgType == matrix.MessageTypes.Audio) {
           return '[Voice]';
         } else if (msgType == matrix.MessageTypes.Video) {
@@ -351,7 +336,8 @@ class MatrixRoomDataSource {
           return '[File]';
         } else if (msgType == matrix.MessageTypes.Location) {
           return '[Location]';
-        } else if (msgType == matrix.MessageTypes.Text || msgType == matrix.MessageTypes.Notice) {
+        } else if (msgType == matrix.MessageTypes.Text ||
+            msgType == matrix.MessageTypes.Notice) {
           // 使用 plaintextBody 获取解密后的文本内容
           final plaintextBody = event.plaintextBody;
           if (plaintextBody.isNotEmpty) {
@@ -359,7 +345,9 @@ class MatrixRoomDataSource {
           }
         }
         // 消息尚未解密或解密失败
-        debugLog('MatrixRoomDatasource: Encrypted message not decrypted, returning [Encrypted]');
+        debugLog(
+          'MatrixRoomDatasource: Encrypted message not decrypted, returning [Encrypted]',
+        );
         return '[Encrypted]';
       case matrix.EventTypes.Sticker:
         return '[Sticker]';
@@ -429,4 +417,3 @@ class MatrixRoomDataSource {
     }
   }
 }
-

@@ -69,6 +69,9 @@ extension ChatBlocSendHandlers on ChatBloc {
     // 智能回复翻译：发送前自动翻译为对方语言
     String textToSend = event.text;
     String? originalText;
+    final selfDestructAfter = await _resolveSelfDestructAfter(
+      event.selfDestructAfter,
+    );
 
     if (state.smartReplyTranslate &&
         _translationService != null &&
@@ -103,7 +106,7 @@ extension ChatBlocSendHandlers on ChatBloc {
           _currentRoomId!,
           state.replyTarget!.id,
           textToSend,
-          selfDestructAfter: event.selfDestructAfter,
+          selfDestructAfter: selfDestructAfter,
           mentionedUserIds: event.mentionedUserIds,
           mentionsRoom: event.mentionsRoom,
         );
@@ -133,7 +136,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         final sentMsg = await _messageRepository.sendTextMessage(
           _currentRoomId!,
           textToSend,
-          selfDestructAfter: event.selfDestructAfter,
+          selfDestructAfter: selfDestructAfter,
           mentionedUserIds: event.mentionedUserIds,
           mentionsRoom: event.mentionsRoom,
         );
@@ -175,6 +178,9 @@ extension ChatBlocSendHandlers on ChatBloc {
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
+      final selfDestructAfter = await _resolveSelfDestructAfter(
+        event.selfDestructAfter,
+      );
       debugLog(
         'ChatBloc: Sending image ${event.filename}, size: ${event.imageBytes.length}',
       );
@@ -183,7 +189,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         imageBytes: event.imageBytes,
         filename: event.filename,
         mimeType: event.mimeType,
-        selfDestructAfter: event.selfDestructAfter,
+        selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Image sent successfully');
       emit(_buildPostSendState());
@@ -206,6 +212,9 @@ extension ChatBlocSendHandlers on ChatBloc {
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
+      final selfDestructAfter = await _resolveSelfDestructAfter(
+        event.selfDestructAfter,
+      );
       debugLog(
         'ChatBloc: Sending voice ${event.filename}, size: ${event.audioBytes.length}, duration: ${event.duration}ms',
       );
@@ -215,7 +224,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         filename: event.filename,
         duration: event.duration,
         mimeType: event.mimeType,
-        selfDestructAfter: event.selfDestructAfter,
+        selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Voice sent successfully');
       emit(_buildPostSendState());
@@ -236,13 +245,31 @@ extension ChatBlocSendHandlers on ChatBloc {
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
-      await _messageRepository.sendFileMessage(
-        _currentRoomId!,
-        fileBytes: event.fileBytes,
-        filename: event.filename,
-        mimeType: event.mimeType,
-        selfDestructAfter: event.selfDestructAfter,
+      final selfDestructAfter = await _resolveSelfDestructAfter(
+        event.selfDestructAfter,
       );
+      if (event.filePath != null || event.fileStream != null) {
+        await _messageRepository.sendFileMessage(
+          _currentRoomId!,
+          filename: event.filename,
+          mimeType: event.mimeType,
+          selfDestructAfter: selfDestructAfter,
+          filePath: event.filePath,
+          fileStream: event.fileStream,
+          fileSize: event.fileSize,
+        );
+      } else if (event.fileBytes != null) {
+        await _messageRepository.sendFileMessage(
+          _currentRoomId!,
+          fileBytes: event.fileBytes!,
+          filename: event.filename,
+          mimeType: event.mimeType,
+          selfDestructAfter: selfDestructAfter,
+          fileSize: event.fileSize,
+        );
+      } else {
+        throw Exception('No file content available');
+      }
       emit(_buildPostSendState());
     } catch (e) {
       emit(state.copyWith(isSending: false, error: 'Failed to send file'));
@@ -259,6 +286,9 @@ extension ChatBlocSendHandlers on ChatBloc {
     emit(state.copyWith(isSending: true, clearError: true));
 
     try {
+      final selfDestructAfter = await _resolveSelfDestructAfter(
+        event.selfDestructAfter,
+      );
       debugLog(
         'ChatBloc: Sending video with thumbnail: ${event.thumbnailBytes?.length ?? 0} bytes',
       );
@@ -268,7 +298,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         filename: event.filename,
         mimeType: event.mimeType,
         thumbnailBytes: event.thumbnailBytes,
-        selfDestructAfter: event.selfDestructAfter,
+        selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Video sent successfully');
       emit(_buildPostSendState());

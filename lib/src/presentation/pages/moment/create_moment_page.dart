@@ -15,6 +15,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
+import '../media/social_image_preparation.dart';
 import 'visibility_selection_page.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -94,7 +95,9 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.background,
         appBar: AppBar(
           title: const Text('Create Moment'),
           backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
@@ -116,7 +119,8 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                 return ValueListenableBuilder<TextEditingValue>(
                   valueListenable: _contentController,
                   builder: (context, textValue, _) {
-                    final canPost = textValue.text.trim().isNotEmpty ||
+                    final canPost =
+                        textValue.text.trim().isNotEmpty ||
                         _selectedMedia.isNotEmpty;
                     return TextButton(
                       style: TextButton.styleFrom(
@@ -126,9 +130,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                       onPressed: canPost ? _postMoment : null,
                       child: Text(
                         s?.commonSend ?? 'Post',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     );
                   },
@@ -277,18 +279,14 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     borderRadius: BorderRadius.circular(8),
                     child: media.isVideo
                         ? (media.thumbnailBytes != null
-                            ? Image.memory(
-                                media.thumbnailBytes!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, _, _) => Container(
-                                  color: Colors.grey[850],
-                                ),
-                              )
-                            : Container(color: Colors.grey[850]))
-                        : Image.memory(
-                            media.bytes,
-                            fit: BoxFit.cover,
-                          ),
+                              ? Image.memory(
+                                  media.thumbnailBytes!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) =>
+                                      Container(color: Colors.grey[850]),
+                                )
+                              : Container(color: Colors.grey[850]))
+                        : Image.memory(media.bytes, fit: BoxFit.cover),
                   ),
                   if (media.isVideo)
                     const Center(
@@ -302,7 +300,8 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     top: 4,
                     right: 4,
                     child: GestureDetector(
-                      onTap: () => setState(() => _selectedMedia.removeAt(index)),
+                      onTap: () =>
+                          setState(() => _selectedMedia.removeAt(index)),
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: const BoxDecoration(
@@ -337,14 +336,14 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       leading: Icon(icon, color: isDark ? Colors.grey[400] : Colors.grey[600]),
       title: Text(
         title,
-        style: TextStyle(
-          color: isDark ? Colors.white : Colors.black87,
-        ),
+        style: TextStyle(color: isDark ? Colors.white : Colors.black87),
       ),
-      trailing: trailing ?? Icon(
-        Icons.chevron_right,
-        color: isDark ? Colors.grey[600] : Colors.grey[400],
-      ),
+      trailing:
+          trailing ??
+          Icon(
+            Icons.chevron_right,
+            color: isDark ? Colors.grey[600] : Colors.grey[400],
+          ),
       onTap: onTap,
     );
   }
@@ -376,17 +375,32 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     );
 
     if (images.isNotEmpty) {
+      if (!mounted) return;
+      final shouldOpenEditor = images.length == 1;
       for (final image in images) {
         if (_selectedMedia.length >= 9) break;
 
-        final bytes = await image.readAsBytes();
+        final prepared = await prepareSocialImage(
+          context,
+          image: image,
+          openEditor: shouldOpenEditor,
+        );
+        if (prepared == null || !mounted) {
+          if (shouldOpenEditor) {
+            return;
+          }
+          continue;
+        }
+
         setState(() {
-          _selectedMedia.add(_MediaItem(
-            bytes: bytes,
-            filename: image.name,
-            mimeType: image.mimeType,
-            isVideo: false,
-          ));
+          _selectedMedia.add(
+            _MediaItem(
+              bytes: prepared.bytes,
+              filename: prepared.filename,
+              mimeType: prepared.mimeType,
+              isVideo: false,
+            ),
+          );
         });
       }
     }
@@ -417,13 +431,15 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 
       setState(() {
         _selectedMedia.clear();
-        _selectedMedia.add(_MediaItem(
-          bytes: bytes,
-          thumbnailBytes: thumbnailBytes,
-          filename: video.name,
-          mimeType: video.mimeType,
-          isVideo: true,
-        ));
+        _selectedMedia.add(
+          _MediaItem(
+            bytes: bytes,
+            thumbnailBytes: thumbnailBytes,
+            filename: video.name,
+            mimeType: video.mimeType,
+            isVideo: true,
+          ),
+        );
       });
     }
   }
@@ -511,7 +527,9 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
             ),
             ListTile(
               leading: const Icon(Icons.person_off),
-              title: Text(s?.momentVisibilityExcluded ?? 'Exclude Some Friends'),
+              title: Text(
+                s?.momentVisibilityExcluded ?? 'Exclude Some Friends',
+              ),
               subtitle: const Text('Hide from specific friends'),
               trailing: _visibility == MomentVisibility.excluded
                   ? const Icon(Icons.check, color: Colors.green)
@@ -540,16 +558,16 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       MaterialPageRoute<List<String>>(
         builder: (ctx) {
           final page = VisibilitySelectionPage(
-            initialSelectedIds: _visibility == visibility ? _visibilityUserIds : [],
+            initialSelectedIds: _visibility == visibility
+                ? _visibilityUserIds
+                : [],
             title: visibility == MomentVisibility.partial
                 ? (S.of(context)?.momentVisibilityPartial ?? 'Selected Friends')
-                : (S.of(context)?.momentVisibilityExcluded ?? 'Exclude Some Friends'),
+                : (S.of(context)?.momentVisibilityExcluded ??
+                      'Exclude Some Friends'),
           );
           if (contactBloc != null) {
-            return BlocProvider.value(
-              value: contactBloc,
-              child: page,
-            );
+            return BlocProvider.value(value: contactBloc, child: page);
           }
           return page;
         },
@@ -570,43 +588,51 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 
     if (_selectedMedia.isEmpty) {
       // 纯文字动态
-      bloc.add(PostTextMoment(
-        content: _contentController.text.trim(),
-        location: _location,
-        visibility: _visibility,
-      ));
+      bloc.add(
+        PostTextMoment(
+          content: _contentController.text.trim(),
+          location: _location,
+          visibility: _visibility,
+        ),
+      );
     } else if (_selectedMedia.first.isVideo) {
       // 视频动态
       final video = _selectedMedia.first;
-      bloc.add(PostVideoMoment(
-        content: _contentController.text.trim().isEmpty
-            ? null
-            : _contentController.text.trim(),
-        videoBytes: video.bytes,
-        thumbnailBytes: video.thumbnailBytes,
-        filename: video.filename,
-        mimeType: video.mimeType,
-        location: _location,
-        visibility: _visibility,
-      ));
+      bloc.add(
+        PostVideoMoment(
+          content: _contentController.text.trim().isEmpty
+              ? null
+              : _contentController.text.trim(),
+          videoBytes: video.bytes,
+          thumbnailBytes: video.thumbnailBytes,
+          filename: video.filename,
+          mimeType: video.mimeType,
+          location: _location,
+          visibility: _visibility,
+        ),
+      );
     } else {
       // 图片动态
       final images = _selectedMedia
-          .map((m) => MomentImageInput(
-                bytes: m.bytes,
-                filename: m.filename,
-                mimeType: m.mimeType,
-              ))
+          .map(
+            (m) => MomentImageInput(
+              bytes: m.bytes,
+              filename: m.filename,
+              mimeType: m.mimeType,
+            ),
+          )
           .toList();
 
-      bloc.add(PostImageMoment(
-        content: _contentController.text.trim().isEmpty
-            ? null
-            : _contentController.text.trim(),
-        images: images,
-        location: _location,
-        visibility: _visibility,
-      ));
+      bloc.add(
+        PostImageMoment(
+          content: _contentController.text.trim().isEmpty
+              ? null
+              : _contentController.text.trim(),
+          images: images,
+          location: _location,
+          visibility: _visibility,
+        ),
+      );
     }
   }
 }
@@ -614,6 +640,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 /// 媒体项
 class _MediaItem {
   final Uint8List bytes;
+
   /// 视频缩略图帧（使用 video_thumbnail 提取的首帧 JPEG）
   final Uint8List? thumbnailBytes;
   final String filename;

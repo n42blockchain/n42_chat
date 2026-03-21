@@ -11,10 +11,12 @@ import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../game/game_center_page.dart';
+import '../mini_app/mini_app_market_page.dart';
 import '../moment/moment_list_page.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
 import '../space/space_list_page.dart';
+import '../voice_room/voice_room_list_page.dart';
 import 'channel_discover_page.dart';
 
 /// 发现页面（仿微信）
@@ -85,6 +87,30 @@ class DiscoverPage extends StatelessWidget {
               _buildMenuItem(
                 context,
                 isDark: isDark,
+                iconWidget: const Icon(
+                  Icons.graphic_eq,
+                  color: Color(0xFFFF8A65),
+                  size: 26,
+                ),
+                title: l10n?.voiceRoomTitle ?? 'Voice Room',
+                onTap: () => _openVoiceRooms(context),
+              ),
+              _buildDivider(context, isDark),
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: const Icon(
+                  Icons.apps_rounded,
+                  color: Color(0xFF00B894),
+                  size: 26,
+                ),
+                title: l10n?.miniAppMarketTitle ?? 'Mini Apps',
+                onTap: () => _openMiniApps(context),
+              ),
+              _buildDivider(context, isDark),
+              _buildMenuItem(
+                context,
+                isDark: isDark,
                 iconWidget: _GameIcon(),
                 title: l10n?.discoverGames ?? 'Games',
                 onTap: () => _openGames(context),
@@ -134,7 +160,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          // TODO: 待后端就绪后启用：视频号、直播、听一听、看一看、附近的人、小程序
+          // 仍待产品/后端闭环：听一听、看一看、附近的人
           const SizedBox(height: 32),
         ],
       ),
@@ -300,6 +326,20 @@ class DiscoverPage extends StatelessWidget {
     ).push(MaterialPageRoute<void>(builder: (_) => const GameCenterPage()));
   }
 
+  void _openVoiceRooms(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const VoiceRoomListPage()));
+  }
+
+  void _openMiniApps(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const MiniAppMarketPage(roomId: ''),
+      ),
+    );
+  }
+
   void _openCommunities(BuildContext context) {
     Navigator.of(
       context,
@@ -365,7 +405,7 @@ class _MomentsIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// TODO: 待后端就绪后启用：_ChannelsIcon, _LiveIcon, _MusicIcon, _WatchIcon, _NearbyIcon, _MiniProgramIcon
+// TODO: 待产品闭环后补充：_MusicIcon, _WatchIcon, _NearbyIcon
 
 /// 游戏图标 - 游戏手柄
 class _GameIcon extends StatelessWidget {

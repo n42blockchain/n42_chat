@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
@@ -122,20 +123,37 @@ class SendVoiceMessage extends ChatEvent {
 
 /// 发送文件消息
 class SendFileMessage extends ChatEvent {
-  final Uint8List fileBytes;
+  final Uint8List? fileBytes;
   final String filename;
   final String? mimeType;
   final int? selfDestructAfter;
+  final String? filePath;
+  final Stream<List<int>>? fileStream;
+  final int? fileSize;
 
   const SendFileMessage({
-    required this.fileBytes,
+    this.fileBytes,
     required this.filename,
     this.mimeType,
     this.selfDestructAfter,
-  });
+    this.filePath,
+    this.fileStream,
+    this.fileSize,
+  }) : assert(
+         fileBytes != null || filePath != null || fileStream != null,
+         'SendFileMessage requires bytes, filePath, or fileStream',
+       );
 
   @override
-  List<Object?> get props => [fileBytes, filename, mimeType, selfDestructAfter];
+  List<Object?> get props => [
+    fileBytes,
+    filename,
+    mimeType,
+    selfDestructAfter,
+    filePath,
+    fileStream,
+    fileSize,
+  ];
 }
 
 /// 发送视频消息（带缩略图）

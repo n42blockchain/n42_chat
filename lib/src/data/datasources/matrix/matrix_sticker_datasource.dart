@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/matrix_utils.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
@@ -41,7 +42,8 @@ class MatrixStickerDataSource {
         installedPacksType,
       );
 
-      final packIds = (installedData['pack_ids'] as List?)?.cast<String>() ?? [];
+      final packIds =
+          (installedData['pack_ids'] as List?)?.cast<String>() ?? [];
       final packs = <StickerPack>[];
 
       // 获取每个贴纸包的详情
@@ -91,17 +93,19 @@ class MatrixStickerDataSource {
         if (value is Map<String, dynamic>) {
           final url = value['url'] as String?;
           if (url != null) {
-            stickers.add(Sticker(
-              id: key,
-              url: url,
-              httpUrl: _getHttpUrl(url),
-              name: (value['body'] ?? value['name']) as String?,
-              emoji: key,
-              width: (value['info']?['w'] as num?)?.toInt(),
-              height: (value['info']?['h'] as num?)?.toInt(),
-              mimeType: value['info']?['mimetype'] as String?,
-              size: (value['info']?['size'] as num?)?.toInt(),
-            ));
+            stickers.add(
+              Sticker(
+                id: key,
+                url: url,
+                httpUrl: _getHttpUrl(url),
+                name: (value['body'] ?? value['name']) as String?,
+                emoji: key,
+                width: (value['info']?['w'] as num?)?.toInt(),
+                height: (value['info']?['h'] as num?)?.toInt(),
+                mimeType: value['info']?['mimetype'] as String?,
+                size: (value['info']?['size'] as num?)?.toInt(),
+              ),
+            );
           }
         }
       });
@@ -164,11 +168,9 @@ class MatrixStickerDataSource {
       final installedData = await _getInstalledPackIds();
       if (!installedData.contains(packId)) {
         installedData.add(packId);
-        await _client!.setAccountData(
-          _client!.userID!,
-          installedPacksType,
-          {'pack_ids': installedData},
-        );
+        await _client!.setAccountData(_client!.userID!, installedPacksType, {
+          'pack_ids': installedData,
+        });
       }
 
       return true;
@@ -186,11 +188,9 @@ class MatrixStickerDataSource {
       // 从已安装列表移除
       final installedData = await _getInstalledPackIds();
       installedData.remove(packId);
-      await _client!.setAccountData(
-        _client!.userID!,
-        installedPacksType,
-        {'pack_ids': installedData},
-      );
+      await _client!.setAccountData(_client!.userID!, installedPacksType, {
+        'pack_ids': installedData,
+      });
 
       return true;
     } catch (e) {
@@ -261,17 +261,21 @@ class MatrixStickerDataSource {
 
           if (packId != null && stickerId != null) {
             final pack = await _getPackFromAccountData(packId);
-            final sticker = pack?.stickers.where((s) => s.id == stickerId).firstOrNull;
+            final sticker = pack?.stickers
+                .where((s) => s.id == stickerId)
+                .firstOrNull;
 
             if (sticker != null) {
-              result.add(RecentSticker(
-                sticker: sticker,
-                packId: packId,
-                lastUsedAt: lastUsed != null
-                    ? DateTime.fromMillisecondsSinceEpoch(lastUsed)
-                    : DateTime.now(),
-                usageCount: count,
-              ));
+              result.add(
+                RecentSticker(
+                  sticker: sticker,
+                  packId: packId,
+                  lastUsedAt: lastUsed != null
+                      ? DateTime.fromMillisecondsSinceEpoch(lastUsed)
+                      : DateTime.now(),
+                  usageCount: count,
+                ),
+              );
             }
           }
         }
@@ -296,7 +300,8 @@ class MatrixStickerDataSource {
           _client!.userID!,
           recentStickersType,
         );
-        recentList = (data['recent'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+        recentList =
+            (data['recent'] as List?)?.cast<Map<String, dynamic>>() ?? [];
       } catch (e) {
         // 账户数据不存在，使用空列表
         debugLog('Error: $e');
@@ -334,11 +339,9 @@ class MatrixStickerDataSource {
         recentList = recentList.sublist(0, 50);
       }
 
-      await _client!.setAccountData(
-        _client!.userID!,
-        recentStickersType,
-        {'recent': recentList},
-      );
+      await _client!.setAccountData(_client!.userID!, recentStickersType, {
+        'recent': recentList,
+      });
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to record sticker usage: $e');
     }
@@ -349,11 +352,9 @@ class MatrixStickerDataSource {
     if (_client == null) return;
 
     try {
-      await _client!.setAccountData(
-        _client!.userID!,
-        recentStickersType,
-        {'recent': []},
-      );
+      await _client!.setAccountData(_client!.userID!, recentStickersType, {
+        'recent': [],
+      });
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to clear recent stickers: $e');
     }
@@ -382,20 +383,11 @@ class MatrixStickerDataSource {
 
   /// 获取 HTTP URL
   String? _getHttpUrl(String? mxcUrl) {
-    if (mxcUrl == null || !mxcUrl.startsWith('mxc://')) return null;
-    if (_client?.homeserver == null) return null;
-
-    final uri = Uri.parse(mxcUrl);
-    return _client!.homeserver!
-        .resolve('/_matrix/media/v3/download/${uri.host}${uri.path}')
-        .toString();
+    return MatrixUtils.getMediaDownloadUrl(mxcUrl, client: _client);
   }
 
   /// 发送贴纸消息
-  Future<String?> sendStickerMessage(
-    String roomId,
-    Sticker sticker,
-  ) async {
+  Future<String?> sendStickerMessage(String roomId, Sticker sticker) async {
     if (_client == null) return null;
 
     try {

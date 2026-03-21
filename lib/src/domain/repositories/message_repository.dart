@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import '../entities/group_album_entity.dart';
@@ -69,10 +70,13 @@ abstract class IMessageRepository {
   /// 发送文件消息
   Future<MessageEntity?> sendFileMessage(
     String roomId, {
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
   });
 
   /// 发送位置消息

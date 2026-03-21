@@ -8,14 +8,102 @@ import 'message_entity.dart';
 enum SearchResultType {
   /// 联系人
   contact,
+
   /// 群聊
   group,
+
   /// 会话
   conversation,
+
   /// 消息
   message,
+
   /// 全部
   all,
+}
+
+class MessageSearchFilter extends Equatable {
+  static const Object _unset = Object();
+
+  final String? senderId;
+  final MessageType? messageType;
+  final DateTime? sentAfter;
+  final DateTime? sentBefore;
+  final bool onlyFromMe;
+  final bool hasMediaOnly;
+
+  const MessageSearchFilter({
+    this.senderId,
+    this.messageType,
+    this.sentAfter,
+    this.sentBefore,
+    this.onlyFromMe = false,
+    this.hasMediaOnly = false,
+  });
+
+  bool get isEmpty =>
+      (senderId == null || senderId!.isEmpty) &&
+      messageType == null &&
+      sentAfter == null &&
+      sentBefore == null &&
+      !onlyFromMe &&
+      !hasMediaOnly;
+
+  int get activeCount {
+    var count = 0;
+    if (senderId != null && senderId!.isNotEmpty) {
+      count++;
+    }
+    if (messageType != null) {
+      count++;
+    }
+    if (sentAfter != null || sentBefore != null) {
+      count++;
+    }
+    if (onlyFromMe) {
+      count++;
+    }
+    if (hasMediaOnly) {
+      count++;
+    }
+    return count;
+  }
+
+  MessageSearchFilter copyWith({
+    Object? senderId = _unset,
+    Object? messageType = _unset,
+    Object? sentAfter = _unset,
+    Object? sentBefore = _unset,
+    bool? onlyFromMe,
+    bool? hasMediaOnly,
+  }) {
+    return MessageSearchFilter(
+      senderId: identical(senderId, _unset)
+          ? this.senderId
+          : senderId as String?,
+      messageType: identical(messageType, _unset)
+          ? this.messageType
+          : messageType as MessageType?,
+      sentAfter: identical(sentAfter, _unset)
+          ? this.sentAfter
+          : sentAfter as DateTime?,
+      sentBefore: identical(sentBefore, _unset)
+          ? this.sentBefore
+          : sentBefore as DateTime?,
+      onlyFromMe: onlyFromMe ?? this.onlyFromMe,
+      hasMediaOnly: hasMediaOnly ?? this.hasMediaOnly,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    senderId,
+    messageType,
+    sentAfter,
+    sentBefore,
+    onlyFromMe,
+    hasMediaOnly,
+  ];
 }
 
 /// 搜索结果项
@@ -64,7 +152,10 @@ class SearchResultItem extends Equatable {
   });
 
   /// 从联系人创建
-  factory SearchResultItem.fromContact(ContactEntity contact, {String? matchedKeyword}) {
+  factory SearchResultItem.fromContact(
+    ContactEntity contact, {
+    String? matchedKeyword,
+  }) {
     return SearchResultItem(
       type: SearchResultType.contact,
       id: contact.userId,
@@ -77,9 +168,14 @@ class SearchResultItem extends Equatable {
   }
 
   /// 从会话创建
-  factory SearchResultItem.fromConversation(ConversationEntity conversation, {String? matchedKeyword}) {
+  factory SearchResultItem.fromConversation(
+    ConversationEntity conversation, {
+    String? matchedKeyword,
+  }) {
     return SearchResultItem(
-      type: conversation.isGroup ? SearchResultType.group : SearchResultType.conversation,
+      type: conversation.isGroup
+          ? SearchResultType.group
+          : SearchResultType.conversation,
       id: conversation.id,
       title: conversation.name,
       subtitle: conversation.lastMessage,
@@ -103,7 +199,9 @@ class SearchResultItem extends Equatable {
       type: SearchResultType.message,
       id: message.id,
       title: roomName,
-      subtitle: message.senderName.isNotEmpty ? message.senderName : message.senderId,
+      subtitle: message.senderName.isNotEmpty
+          ? message.senderName
+          : message.senderId,
       avatarUrl: roomAvatarUrl,
       matchedKeyword: matchedKeyword,
       matchedContent: message.content,
@@ -115,16 +213,16 @@ class SearchResultItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        type,
-        id,
-        title,
-        subtitle,
-        avatarUrl,
-        matchedKeyword,
-        matchedContent,
-        timestamp,
-        roomId,
-      ];
+    type,
+    id,
+    title,
+    subtitle,
+    avatarUrl,
+    matchedKeyword,
+    matchedContent,
+    timestamp,
+    roomId,
+  ];
 }
 
 /// 搜索结果集合
@@ -150,6 +248,9 @@ class SearchResults extends Equatable {
   /// 是否有更多结果
   final bool hasMore;
 
+  /// 当前消息检索过滤条件
+  final MessageSearchFilter? messageFilter;
+
   const SearchResults({
     this.contacts = const [],
     this.groups = const [],
@@ -158,15 +259,16 @@ class SearchResults extends Equatable {
     this.query = '',
     this.isSearching = false,
     this.hasMore = false,
+    this.messageFilter,
   });
 
   /// 所有结果
   List<SearchResultItem> get allResults => [
-        ...contacts,
-        ...groups,
-        ...conversations,
-        ...messages,
-      ];
+    ...contacts,
+    ...groups,
+    ...conversations,
+    ...messages,
+  ];
 
   /// 总结果数
   int get totalCount =>
@@ -189,14 +291,15 @@ class SearchResults extends Equatable {
 
   @override
   List<Object?> get props => [
-        contacts,
-        groups,
-        conversations,
-        messages,
-        query,
-        isSearching,
-        hasMore,
-      ];
+    contacts,
+    groups,
+    conversations,
+    messages,
+    query,
+    isSearching,
+    hasMore,
+    messageFilter,
+  ];
 
   SearchResults copyWith({
     List<SearchResultItem>? contacts,
@@ -206,6 +309,7 @@ class SearchResults extends Equatable {
     String? query,
     bool? isSearching,
     bool? hasMore,
+    Object? messageFilter = MessageSearchFilter._unset,
   }) {
     return SearchResults(
       contacts: contacts ?? this.contacts,
@@ -215,6 +319,9 @@ class SearchResults extends Equatable {
       query: query ?? this.query,
       isSearching: isSearching ?? this.isSearching,
       hasMore: hasMore ?? this.hasMore,
+      messageFilter: identical(messageFilter, MessageSearchFilter._unset)
+          ? this.messageFilter
+          : messageFilter as MessageSearchFilter?,
     );
   }
 }
@@ -239,6 +346,9 @@ class ChatSearchResults extends Equatable {
   /// 是否有更多结果
   final bool hasMore;
 
+  /// 当前消息检索过滤条件
+  final MessageSearchFilter? filter;
+
   const ChatSearchResults({
     this.messages = const [],
     this.query = '',
@@ -246,6 +356,7 @@ class ChatSearchResults extends Equatable {
     this.currentIndex = 0,
     this.isSearching = false,
     this.hasMore = false,
+    this.filter,
   });
 
   /// 总结果数
@@ -256,7 +367,9 @@ class ChatSearchResults extends Equatable {
 
   /// 当前消息
   MessageEntity? get currentMessage {
-    if (messages.isEmpty || currentIndex < 0 || currentIndex >= messages.length) {
+    if (messages.isEmpty ||
+        currentIndex < 0 ||
+        currentIndex >= messages.length) {
       return null;
     }
     return messages[currentIndex];
@@ -270,13 +383,14 @@ class ChatSearchResults extends Equatable {
 
   @override
   List<Object?> get props => [
-        messages,
-        query,
-        roomId,
-        currentIndex,
-        isSearching,
-        hasMore,
-      ];
+    messages,
+    query,
+    roomId,
+    currentIndex,
+    isSearching,
+    hasMore,
+    filter,
+  ];
 
   ChatSearchResults copyWith({
     List<MessageEntity>? messages,
@@ -285,6 +399,7 @@ class ChatSearchResults extends Equatable {
     int? currentIndex,
     bool? isSearching,
     bool? hasMore,
+    Object? filter = MessageSearchFilter._unset,
   }) {
     return ChatSearchResults(
       messages: messages ?? this.messages,
@@ -293,7 +408,9 @@ class ChatSearchResults extends Equatable {
       currentIndex: currentIndex ?? this.currentIndex,
       isSearching: isSearching ?? this.isSearching,
       hasMore: hasMore ?? this.hasMore,
+      filter: identical(filter, MessageSearchFilter._unset)
+          ? this.filter
+          : filter as MessageSearchFilter?,
     );
   }
 }
-

@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
@@ -14,6 +14,7 @@ import '../mappers/archived_message_mapper.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
 import '../../core/utils/debug_log.dart';
+import '../../core/utils/matrix_utils.dart';
 
 /// 消息仓库实现
 class MessageRepositoryImpl implements IMessageRepository {
@@ -310,10 +311,13 @@ class MessageRepositoryImpl implements IMessageRepository {
   @override
   Future<MessageEntity?> sendFileMessage(
     String roomId, {
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
   }) async {
     final eventId = await _messageDataSource.sendFileMessage(
       roomId,
@@ -321,6 +325,9 @@ class MessageRepositoryImpl implements IMessageRepository {
       filename: filename,
       mimeType: mimeType,
       selfDestructAfter: selfDestructAfter,
+      filePath: filePath,
+      fileStream: fileStream,
+      fileSize: fileSize,
     );
     if (eventId == null) return null;
 
@@ -556,21 +563,25 @@ class MessageRepositoryImpl implements IMessageRepository {
 
       final homeserver =
           _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      final accessToken = _client!.accessToken;
 
       // 方法1: 使用 Matrix 1.11+ 认证媒体端点 (直接 HTTP 请求)
-      final authenticatedUrl =
-          '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+      final authenticatedUrl = MatrixUtils.getMediaDownloadUrl(
+        mxcUrl,
+        client: _client,
+      );
+      final authHeaders = MatrixUtils.buildAuthenticatedMediaHeaders(
+        authenticatedUrl,
+        client: _client,
+      );
+      if (authenticatedUrl == null) {
+        debugLog('downloadMedia: Failed to build authenticated media URL');
+        return null;
+      }
       debugLog('downloadMedia: Trying authenticated URL: $authenticatedUrl');
 
       try {
         final response = await http
-            .get(
-              Uri.parse(authenticatedUrl),
-              headers: {
-                if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-              },
-            )
+            .get(Uri.parse(authenticatedUrl), headers: authHeaders)
             .timeout(const Duration(seconds: 30));
 
         debugLog(
@@ -591,12 +602,7 @@ class MessageRepositoryImpl implements IMessageRepository {
 
       try {
         final response = await http
-            .get(
-              Uri.parse(legacyUrl),
-              headers: {
-                if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-              },
-            )
+            .get(Uri.parse(legacyUrl), headers: authHeaders)
             .timeout(const Duration(seconds: 30));
 
         debugLog(
@@ -1300,18 +1306,19 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return MessageEntity(
-      id: eventId,
-      roomId: roomId,
-      senderId: _clientManager.client?.userID ?? '',
-      senderName: _clientManager.client?.userID ?? '',
-      content: text,
-      type: MessageType.text,
-      timestamp: DateTime.now(),
-      status: MessageStatus.sending,
-      isFromMe: true,
-      threadRootId: threadRootEventId,
-    );
+    return await _getMessageById(roomId, eventId) ??
+        MessageEntity(
+          id: eventId,
+          roomId: roomId,
+          senderId: _clientManager.client?.userID ?? '',
+          senderName: _clientManager.client?.userID ?? '',
+          content: text,
+          type: MessageType.text,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sending,
+          isFromMe: true,
+          threadRootId: threadRootEventId,
+        );
   }
 
   @override
@@ -1331,18 +1338,19 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return MessageEntity(
-      id: eventId,
-      roomId: roomId,
-      senderId: _clientManager.client?.userID ?? '',
-      senderName: _clientManager.client?.userID ?? '',
-      content: filename,
-      type: MessageType.image,
-      timestamp: DateTime.now(),
-      status: MessageStatus.sending,
-      isFromMe: true,
-      threadRootId: threadRootEventId,
-    );
+    return await _getMessageById(roomId, eventId) ??
+        MessageEntity(
+          id: eventId,
+          roomId: roomId,
+          senderId: _clientManager.client?.userID ?? '',
+          senderName: _clientManager.client?.userID ?? '',
+          content: filename,
+          type: MessageType.image,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sending,
+          isFromMe: true,
+          threadRootId: threadRootEventId,
+        );
   }
 
   @override
@@ -1362,18 +1370,19 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return MessageEntity(
-      id: eventId,
-      roomId: roomId,
-      senderId: _clientManager.client?.userID ?? '',
-      senderName: _clientManager.client?.userID ?? '',
-      content: filename,
-      type: MessageType.file,
-      timestamp: DateTime.now(),
-      status: MessageStatus.sending,
-      isFromMe: true,
-      threadRootId: threadRootEventId,
-    );
+    return await _getMessageById(roomId, eventId) ??
+        MessageEntity(
+          id: eventId,
+          roomId: roomId,
+          senderId: _clientManager.client?.userID ?? '',
+          senderName: _clientManager.client?.userID ?? '',
+          content: filename,
+          type: MessageType.file,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sending,
+          isFromMe: true,
+          threadRootId: threadRootEventId,
+        );
   }
 
   @override

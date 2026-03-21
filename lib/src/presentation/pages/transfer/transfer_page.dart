@@ -18,12 +18,14 @@ class TransferPage extends StatefulWidget {
   final String roomId;
   final String? recipientAddress;
   final String? recipientName;
+  final PaymentRequest? paymentRequest;
 
   const TransferPage({
     super.key,
     required this.roomId,
     this.recipientAddress,
     this.recipientName,
+    this.paymentRequest,
   });
 
   @override
@@ -39,14 +41,23 @@ class _TransferPageState extends State<TransferPage> {
   bool _isAddressValid = false;
   WalletUserInfo? _recipientInfo;
 
+  bool get _isPaymentRequestMode => widget.paymentRequest != null;
+
   @override
   void initState() {
     super.initState();
     context.read<TransferBloc>().add(const LoadWalletInfo());
 
-    if (widget.recipientAddress != null) {
-      _addressController.text = widget.recipientAddress!;
-      _validateAddress(widget.recipientAddress!);
+    final initialAddress =
+        widget.paymentRequest?.receiverAddress ?? widget.recipientAddress;
+    if (initialAddress != null && initialAddress.isNotEmpty) {
+      _addressController.text = initialAddress;
+      _validateAddress(initialAddress);
+    }
+
+    if (_isPaymentRequestMode) {
+      _amountController.text = widget.paymentRequest!.amount;
+      _memoController.text = widget.paymentRequest!.memo ?? '';
     }
   }
 
@@ -74,34 +85,74 @@ class _TransferPageState extends State<TransferPage> {
     final amount = _amountController.text.trim();
     final memo = _memoController.text.trim();
 
+    if (_isPaymentRequestMode) {
+      final expiresAt = widget.paymentRequest?.expiresAt;
+      if (expiresAt != null && DateTime.now().isAfter(expiresAt)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context)?.commonExpired ?? 'Expired')),
+        );
+        return;
+      }
+    }
+
     if (!_isAddressValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.transferEnterValidAddress ?? 'Please enter a valid address')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.transferEnterValidAddress ??
+                'Please enter a valid address',
+          ),
+        ),
       );
       return;
     }
 
     if (amount.isEmpty || double.tryParse(amount) == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.transferEnterValidAmount ?? 'Please enter a valid amount')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.transferEnterValidAmount ??
+                'Please enter a valid amount',
+          ),
+        ),
       );
       return;
     }
 
     if (_selectedToken == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.transferPleaseSelectToken ?? 'Please select a token')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.transferPleaseSelectToken ?? 'Please select a token',
+          ),
+        ),
       );
       return;
     }
 
-    context.read<TransferBloc>().add(InitiateTransfer(
+    if (_isPaymentRequestMode) {
+      final request = widget.paymentRequest!;
+      context.read<TransferBloc>().add(
+        FulfillPaymentRequest(
           roomId: widget.roomId,
-          receiverAddress: address,
-          amount: amount,
-          token: _selectedToken!.symbol,
-          memo: memo.isNotEmpty ? memo : null,
-        ));
+          requestId: request.requestId,
+          receiverAddress: request.receiverAddress,
+          amount: request.amount,
+          token: request.token,
+        ),
+      );
+      return;
+    }
+
+    context.read<TransferBloc>().add(
+      InitiateTransfer(
+        roomId: widget.roomId,
+        receiverAddress: address,
+        amount: amount,
+        token: _selectedToken!.symbol,
+        memo: memo.isNotEmpty ? memo : null,
+      ),
+    );
   }
 
   @override
@@ -117,17 +168,24 @@ class _TransferPageState extends State<TransferPage> {
           });
         } else if (state.status == TransferBlocStatus.success) {
           Navigator.pop(context, state.lastTransfer!);
-        } else if (state.status == TransferBlocStatus.failure && state.errorMessage != null) {
+        } else if (state.status == TransferBlocStatus.failure &&
+            state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
+            SnackBar(
+              content: Text(resolveBlocMessage(context, state.errorMessage!)),
+            ),
           );
         }
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: isDark
+              ? AppColors.backgroundDark
+              : AppColors.background,
           appBar: N42AppBar(
-            title: S.of(context)?.transferTitle ?? 'Transfer',
+            title: _isPaymentRequestMode
+                ? (S.of(context)?.commonPayment ?? 'Payment')
+                : (S.of(context)?.transferTitle ?? 'Transfer'),
             leading: IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
@@ -147,26 +205,35 @@ class _TransferPageState extends State<TransferPage> {
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            Builder(builder: (ctx) => Text(
-              state.processingMessage != null
-                  ? resolveBlocMessage(ctx, state.processingMessage!)
-                  : '...',
-            )),
+            Builder(
+              builder: (ctx) => Text(
+                state.processingMessage != null
+                    ? resolveBlocMessage(ctx, state.processingMessage!)
+                    : '...',
+              ),
+            ),
           ],
         ),
       );
     }
 
-    List<TokenInfo> tokens = [];
-    Map<String, String> balances = {};
+    final tokens = state.tokens;
+    final balances = state.balances;
 
-    if (state.status == TransferBlocStatus.walletLoaded) {
-      tokens = state.tokens;
-      balances = state.balances;
-
-      // 默认选择第一个代币
-      if (_selectedToken == null && tokens.isNotEmpty) {
-        _selectedToken = tokens.first;
+    if (tokens.isNotEmpty) {
+      if (_isPaymentRequestMode) {
+        final requestToken = widget.paymentRequest!.token;
+        TokenInfo? matchedToken;
+        for (final token in tokens) {
+          if (token.symbol == requestToken) {
+            matchedToken = token;
+            break;
+          }
+        }
+        _selectedToken = matchedToken;
+      }
+      if (!_isPaymentRequestMode) {
+        _selectedToken ??= tokens.first;
       }
     }
 
@@ -176,7 +243,10 @@ class _TransferPageState extends State<TransferPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 收款地址
-          _buildSectionTitle(S.of(context)?.transferReceiverAddressLabel ?? 'Receiver Address', isDark),
+          _buildSectionTitle(
+            S.of(context)?.transferReceiverAddressLabel ?? 'Receiver Address',
+            isDark,
+          ),
           const SizedBox(height: 8),
           _buildAddressInput(isDark),
 
@@ -187,21 +257,30 @@ class _TransferPageState extends State<TransferPage> {
           const SizedBox(height: 24),
 
           // 代币选择
-          _buildSectionTitle(S.of(context)?.transferSelectTokenLabel ?? 'Select Token', isDark),
+          _buildSectionTitle(
+            S.of(context)?.transferSelectTokenLabel ?? 'Select Token',
+            isDark,
+          ),
           const SizedBox(height: 8),
           _buildTokenSelector(tokens, balances, isDark),
 
           const SizedBox(height: 24),
 
           // 转账金额
-          _buildSectionTitle(S.of(context)?.transferAmountLabel ?? 'Transfer Amount', isDark),
+          _buildSectionTitle(
+            S.of(context)?.transferAmountLabel ?? 'Transfer Amount',
+            isDark,
+          ),
           const SizedBox(height: 8),
           _buildAmountInput(balances, isDark),
 
           const SizedBox(height: 24),
 
           // 备注
-          _buildSectionTitle(S.of(context)?.transferMemoLabel ?? 'Memo (Optional)', isDark),
+          _buildSectionTitle(
+            S.of(context)?.transferMemoLabel ?? 'Memo (Optional)',
+            isDark,
+          ),
           const SizedBox(height: 8),
           _buildMemoInput(isDark),
 
@@ -234,8 +313,8 @@ class _TransferPageState extends State<TransferPage> {
           color: _isAddressValid
               ? AppColors.success
               : (_addressController.text.isNotEmpty
-                  ? AppColors.error
-                  : (isDark ? AppColors.dividerDark : AppColors.divider)),
+                    ? AppColors.error
+                    : (isDark ? AppColors.dividerDark : AppColors.divider)),
         ),
       ),
       child: Row(
@@ -243,8 +322,11 @@ class _TransferPageState extends State<TransferPage> {
           Expanded(
             child: TextField(
               controller: _addressController,
+              readOnly: _isPaymentRequestMode,
               decoration: InputDecoration(
-                hintText: S.of(context)?.transferEnterOrPasteAddress ?? 'Enter or paste wallet address',
+                hintText:
+                    S.of(context)?.transferEnterOrPasteAddress ??
+                    'Enter or paste wallet address',
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -265,26 +347,26 @@ class _TransferPageState extends State<TransferPage> {
               },
             ),
           ),
-          // 粘贴按钮
-          IconButton(
-            icon: const Icon(Icons.content_paste, size: 20),
-            onPressed: () async {
-              final data = await Clipboard.getData(Clipboard.kTextPlain);
-              if (data?.text != null) {
-                _addressController.text = data!.text!;
-                _validateAddress(data.text!.trim());
-              }
-            },
-          ),
-          // 扫描二维码
-          IconButton(
-            icon: const Icon(Icons.qr_code_scanner, size: 20),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const ScanQRPage()),
-              );
-            },
-          ),
+          if (!_isPaymentRequestMode) ...[
+            IconButton(
+              icon: const Icon(Icons.content_paste, size: 20),
+              onPressed: () async {
+                final data = await Clipboard.getData(Clipboard.kTextPlain);
+                if (data?.text != null) {
+                  _addressController.text = data!.text!;
+                  _validateAddress(data.text!.trim());
+                }
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.qr_code_scanner, size: 20),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const ScanQRPage()),
+                );
+              },
+            ),
+          ],
         ],
       ),
     );
@@ -298,11 +380,7 @@ class _TransferPageState extends State<TransferPage> {
       padding: const EdgeInsets.only(top: 12),
       child: Row(
         children: [
-          N42Avatar(
-            imageUrl: avatar,
-            name: name ?? '',
-            size: 36,
-          ),
+          N42Avatar(imageUrl: avatar, name: name ?? '', size: 36),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,22 +413,30 @@ class _TransferPageState extends State<TransferPage> {
     Map<String, String> balances,
     bool isDark,
   ) {
+    final visibleTokens = _isPaymentRequestMode && _selectedToken != null
+        ? tokens
+              .where((token) => token.symbol == _selectedToken!.symbol)
+              .toList()
+        : tokens;
+
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        children: tokens.map((token) {
+        children: visibleTokens.map((token) {
           final isSelected = _selectedToken?.symbol == token.symbol;
           final balance = balances[token.symbol] ?? '0';
 
           return InkWell(
-            onTap: () {
-              setState(() {
-                _selectedToken = token;
-              });
-            },
+            onTap: _isPaymentRequestMode
+                ? null
+                : () {
+                    setState(() {
+                      _selectedToken = token;
+                    });
+                  },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -371,12 +457,17 @@ class _TransferPageState extends State<TransferPage> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.backgroundDark : AppColors.background,
+                      color: isDark
+                          ? AppColors.backgroundDark
+                          : AppColors.background,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
                       child: Text(
-                        token.symbol.substring(0, token.symbol.length.clamp(0, 2)),
+                        token.symbol.substring(
+                          0,
+                          token.symbol.length.clamp(0, 2),
+                        ),
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -396,7 +487,9 @@ class _TransferPageState extends State<TransferPage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: isDark ? Colors.white : AppColors.textPrimary,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
                           ),
                         ),
                         Text(
@@ -469,7 +562,10 @@ class _TransferPageState extends State<TransferPage> {
               Expanded(
                 child: TextField(
                   controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  readOnly: _isPaymentRequestMode,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   decoration: InputDecoration(
                     hintText: S.of(context)?.transferAmountHintZero ?? '0.00',
                     border: InputBorder.none,
@@ -499,23 +595,29 @@ class _TransferPageState extends State<TransferPage> {
           ),
           const SizedBox(height: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '${S.of(context)?.transferAvailableBalance ?? 'Available balance'}: $balance ${_selectedToken?.symbol ?? ''}',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+              Expanded(
+                child: Text(
+                  '${S.of(context)?.transferAvailableBalance ?? 'Available balance'}: $balance ${_selectedToken?.symbol ?? ''}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
+                  ),
                 ),
               ),
-              TextButton(
-                onPressed: () {
-                  _amountController.text = balance;
-                },
-                child: Text(S.of(context)?.commonAll ?? 'All'),
-              ),
+              if (!_isPaymentRequestMode) ...[
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    _amountController.text = balance;
+                  },
+                  child: Text(S.of(context)?.commonAll ?? 'All'),
+                ),
+              ],
             ],
           ),
         ],
@@ -531,12 +633,15 @@ class _TransferPageState extends State<TransferPage> {
       ),
       child: TextField(
         controller: _memoController,
+        readOnly: _isPaymentRequestMode,
         decoration: InputDecoration(
           hintText: S.of(context)?.transferAddMemoHint ?? 'Add memo',
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16),
           hintStyle: TextStyle(
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
         style: TextStyle(
@@ -552,10 +657,11 @@ class _TransferPageState extends State<TransferPage> {
     return SizedBox(
       width: double.infinity,
       child: N42Button(
-        text: S.of(context)?.transferConfirmTransfer ?? 'Confirm Transfer',
+        text: _isPaymentRequestMode
+            ? (S.of(context)?.commonPayment ?? 'Payment')
+            : (S.of(context)?.transferConfirmTransfer ?? 'Confirm Transfer'),
         onPressed: _submitTransfer,
       ),
     );
   }
 }
-

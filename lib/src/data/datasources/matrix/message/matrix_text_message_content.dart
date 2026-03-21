@@ -1,3 +1,19 @@
+import '../../../../core/utils/message_markdown_utils.dart' as message_markdown;
+
+const String _matrixHtmlFormat = 'org.matrix.custom.html';
+
+String normalizeMatrixText(String text) {
+  return message_markdown.normalizeMessageText(text);
+}
+
+String escapeMatrixHtml(String text) {
+  return message_markdown.escapeMessageHtml(text);
+}
+
+String buildMatrixFormattedBody(String text) {
+  return message_markdown.buildMatrixFormattedBody(text);
+}
+
 Map<String, dynamic> buildTextMessageContent(
   String text, {
   int? selfDestructAfter,
@@ -6,7 +22,13 @@ Map<String, dynamic> buildTextMessageContent(
   String? replySenderId,
   String? currentUserId,
 }) {
-  final content = <String, dynamic>{'msgtype': 'm.text', 'body': text};
+  final normalizedText = normalizeMatrixText(text);
+  final content = <String, dynamic>{
+    'msgtype': 'm.text',
+    'body': normalizedText,
+    'format': _matrixHtmlFormat,
+    'formatted_body': buildMatrixFormattedBody(normalizedText),
+  };
 
   final mentionIds = <String>{...?mentionedUserIds};
 

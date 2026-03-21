@@ -10,6 +10,7 @@ import '../../blocs/search/search_event.dart';
 import '../../blocs/search/search_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'search_result_tile.dart';
+import 'search_message_filter_sheet.dart';
 import '../../../n42_chat.dart';
 
 /// 全局搜索页面
@@ -23,6 +24,7 @@ class GlobalSearchPage extends StatefulWidget {
 class _GlobalSearchPageState extends State<GlobalSearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  MessageSearchFilter? _messageFilter;
 
   @override
   void initState() {
@@ -39,13 +41,30 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   }
 
   void _onSearch(String query) {
-    context.read<SearchBloc>().add(PerformSearch(query));
+    context.read<SearchBloc>().add(
+      PerformSearch(query, filter: _messageFilter),
+    );
   }
 
   void _clearSearch() {
     _searchController.clear();
     context.read<SearchBloc>().add(const ClearSearch());
     _focusNode.requestFocus();
+  }
+
+  Future<void> _showFilters() async {
+    final nextFilter = await showMessageSearchFilterSheet(
+      context,
+      currentFilter: _messageFilter ?? const MessageSearchFilter(),
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(() => _messageFilter = nextFilter);
+    final query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      _onSearch(query);
+    }
   }
 
   @override
@@ -151,6 +170,33 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
           ),
 
           const SizedBox(width: 8),
+          IconButton(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  Icons.tune,
+                  color: _messageFilter == null
+                      ? (isDark ? Colors.white : AppColors.textPrimary)
+                      : AppColors.primary,
+                ),
+                if (_messageFilter != null)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onPressed: _showFilters,
+          ),
         ],
       ),
     );
@@ -239,6 +285,22 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       children: [
         // 类型选择器
         _buildTypeSelector(state, isDark),
+        if (state.results.messageFilter != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Message filters active: ${state.results.messageFilter!.activeCount}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ),
 
         // 结果列表
         Expanded(child: _buildResultList(state, isDark)),

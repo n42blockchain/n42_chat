@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:n42_chat/src/presentation/widgets/chat/markdown_message_widget.dart';
+import 'package:n42_chat/src/core/utils/message_markdown_utils.dart';
 
 void main() {
   group('containsMarkdown', () {
@@ -113,8 +113,7 @@ void main() {
       });
 
       test('should detect link with title', () {
-        expect(
-            containsMarkdown('[link](https://example.com "title")'), true);
+        expect(containsMarkdown('[link](https://example.com "title")'), true);
       });
 
       test('should not detect incomplete link', () {
@@ -166,6 +165,10 @@ void main() {
       test('should return false for email address', () {
         expect(containsMarkdown('user@example.com'), false);
       });
+
+      test('should not treat snake_case identifiers as markdown', () {
+        expect(containsMarkdown('foo_bar_baz.dart'), false);
+      });
     });
 
     group('mixed content', () {
@@ -188,6 +191,26 @@ And more text.
         const text = 'Shopping:\n- Apples\n- Oranges\n- Bananas';
         expect(containsMarkdown(text), true);
       });
+    });
+  });
+
+  group('sanitization', () {
+    test('escapes raw html tags when markdown is present', () {
+      final sanitized = sanitizeMarkdownDisplayText(
+        '**bold** <img src="x" onerror="alert(1)">',
+      );
+
+      expect(
+        sanitized,
+        contains('&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;'),
+      );
+      expect(sanitized, isNot(contains('<img')));
+    });
+
+    test('buildMatrixFormattedBody keeps plain snake_case untouched', () {
+      final html = buildMatrixFormattedBody('foo_bar_baz.dart');
+
+      expect(html, 'foo_bar_baz.dart');
     });
   });
 }

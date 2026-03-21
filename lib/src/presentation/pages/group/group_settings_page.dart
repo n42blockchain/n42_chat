@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_entity.dart';
+import '../../../domain/repositories/group_repository.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
@@ -220,9 +222,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        group.canEditName
-                            ? Icons.edit
-                            : Icons.lock_outline,
+                        group.canEditName ? Icons.edit : Icons.lock_outline,
                         size: 16,
                         color: isDark
                             ? AppColors.textSecondaryDark
@@ -428,6 +428,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         },
       ),
       _buildSettingsDivider(isDark),
+      ListTile(
+        leading: const Icon(Icons.link_outlined),
+        title: const Text('Invite Link'),
+        subtitle: Text(
+          group.isPublic
+              ? 'Share a join link for this room'
+              : 'Share a room reference with invited members',
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => _showInviteLinkActions(group),
+      ),
+      _buildSettingsDivider(isDark),
       // 群公告
       ListTile(
         title: Text(
@@ -503,9 +515,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       if (group.canManageContentFilter)
         ListTile(
           leading: const Icon(Icons.filter_list),
-          title: Text(
-            S.of(context)?.groupContentFilter ?? 'Content Filter',
-          ),
+          title: Text(S.of(context)?.groupContentFilter ?? 'Content Filter'),
           trailing: const Icon(Icons.chevron_right),
           onTap: () {
             Navigator.of(context).push(
@@ -736,9 +746,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              // 群公告使用 topic 实现
               context.read<GroupBloc>().add(
-                UpdateGroupTopic(widget.roomId, controller.text.trim()),
+                UpdateGroupAnnouncement(widget.roomId, controller.text.trim()),
               );
             },
             child: Text(S.of(context)?.groupPublish ?? 'Publish'),
@@ -816,6 +825,68 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _showInviteLinkActions(GroupEntity group) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final link = await getIt<IGroupRepository>().getGroupInviteLink(
+        group.roomId,
+      );
+      if (!mounted) {
+        return;
+      }
+
+      await showModalBottomSheet<void>(
+        context: context,
+        builder: (sheetContext) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Invite Link'),
+                subtitle: Text(
+                  link,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.copy_outlined),
+                title: const Text('Copy Link'),
+                onTap: () async {
+                  Navigator.pop(sheetContext);
+                  await Clipboard.setData(ClipboardData(text: link));
+                  if (!mounted) {
+                    return;
+                  }
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Invite link copied')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share_outlined),
+                title: const Text('Share Link'),
+                onTap: () async {
+                  Navigator.pop(sheetContext);
+                  await SharePlus.instance.share(
+                    ShareParams(text: link, subject: group.name),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      messenger.showSnackBar(
+        SnackBar(content: Text('Failed to load invite link: $e')),
+      );
+    }
   }
 
   void _clearChatHistory() {

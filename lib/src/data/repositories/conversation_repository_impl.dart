@@ -47,7 +47,11 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   @override
   Future<ConversationEntity> createDirectChat(String userId) async {
-    final roomId = await _roomDataSource.createDirectChat(userId);
+    final encrypted = await _secureStorage.shouldDefaultEncryptNewChats();
+    final roomId = await _roomDataSource.createDirectChat(
+      userId,
+      encrypted: encrypted,
+    );
     final room = _roomDataSource.getRoomById(roomId);
     if (room == null) {
       throw Exception('Failed to create direct chat');
@@ -154,26 +158,27 @@ class ConversationRepositoryImpl implements IConversationRepository {
   /// 将Matrix Room转换为ConversationEntity
   ConversationEntity _mapRoomToEntity(matrix.Room room) {
     final lastMessageTime = _roomDataSource.getLastMessageTime(room);
-    
+
     // 获取头像和成员信息
     String? avatarUrl;
     List<String?>? memberAvatarUrls;
     List<String>? memberNames;
     List<String>? memberIds;
-    
+
     if (room.isDirectChat) {
       // 私聊：获取对方用户的真实头像
       final partner = _roomDataSource.getDirectChatPartner(room);
       final mxcUrl = partner?.avatarUrl?.toString();
-      
+
       // 只使用用户明确设置的头像（非空且非默认占位图）
       if (mxcUrl != null && mxcUrl.isNotEmpty && mxcUrl.startsWith('mxc://')) {
         // 检查是否是服务器默认头像（跳过 identicon 和其他默认图）
         // tuwunel/Synapse 可能使用不同的默认头像 URL 模式
-        final isDefaultAvatar = mxcUrl.contains('identicon') ||
+        final isDefaultAvatar =
+            mxcUrl.contains('identicon') ||
             mxcUrl.contains('default') ||
             mxcUrl.contains('placeholder');
-        
+
         if (!isDefaultAvatar) {
           avatarUrl = MatrixUtils.mxcToHttp(
             mxcUrl,
@@ -199,7 +204,7 @@ class ConversationRepositoryImpl implements IConversationRepository {
     if (room.isDirectChat) {
       directUserId = room.directChatMatrixID;
     }
-    
+
     return ConversationEntity(
       id: room.id,
       name: _roomDataSource.getRoomDisplayName(room),
@@ -222,13 +227,16 @@ class ConversationRepositoryImpl implements IConversationRepository {
       directUserId: directUserId,
     );
   }
-  
+
   /// 获取群成员头像、名称和ID列表（最多17个，用于群详情页显示）
   /// 参照微信：包含自己，按加入顺序排列
   ///
   /// 优化：首次渲染时返回空列表，UI 异步加载
   /// 将首次渲染从 800ms 降至约 200ms
-  (List<String?>, List<String>, List<String>) _getGroupMemberInfo(matrix.Room room, {bool lazyLoad = true}) {
+  (List<String?>, List<String>, List<String>) _getGroupMemberInfo(
+    matrix.Room room, {
+    bool lazyLoad = true,
+  }) {
     // 首次渲染使用懒加载模式，返回空列表让 UI 快速显示
     // 后续 UI 层会异步请求完整成员信息
     if (lazyLoad) {
@@ -258,7 +266,8 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
       // 检查是否是用户自定义头像（排除服务器默认头像）
       if (mxcUri != null && mxcUri.isNotEmpty && mxcUri.startsWith('mxc://')) {
-        final isDefaultAvatar = mxcUri.contains('identicon') ||
+        final isDefaultAvatar =
+            mxcUri.contains('identicon') ||
             mxcUri.contains('default') ||
             mxcUri.contains('placeholder');
 
@@ -282,4 +291,3 @@ class ConversationRepositoryImpl implements IConversationRepository {
     return (avatarUrls, names, ids);
   }
 }
-

@@ -139,6 +139,32 @@ void main() {
     );
 
     blocTest<AuthBloc, AuthState>(
+      'emits [loading, authenticated] when anonymous register succeeds',
+      build: () {
+        when(
+          () => mockAuthRepository.registerAnonymously(
+            homeserver: any(named: 'homeserver'),
+            password: any(named: 'password'),
+            registrationToken: any(named: 'registrationToken'),
+          ),
+        ).thenAnswer((_) async => AuthResult.success(testUser));
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(
+        const AuthAnonymousRegisterRequested(
+          homeserver: 'https://server.com',
+          password: 'password',
+        ),
+      ),
+      expect: () => [
+        isA<AuthState>().having((s) => s.status, 'status', AuthStatus.loading),
+        isA<AuthState>()
+            .having((s) => s.status, 'status', AuthStatus.authenticated)
+            .having((s) => s.user, 'user', testUser),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
       'emits [loading, unauthenticated] when logout succeeds',
       build: () {
         when(() => mockAuthRepository.logout()).thenAnswer((_) async {});
@@ -152,6 +178,60 @@ void main() {
           'status',
           AuthStatus.unauthenticated,
         ),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, authenticated] when switching stored account succeeds',
+      build: () {
+        const switchedUser = UserEntity(
+          userId: '@other:server.com',
+          displayName: 'Other User',
+        );
+        when(
+          () => mockAuthRepository.switchStoredAccount('@other:server.com'),
+        ).thenAnswer((_) async => AuthResult.success(switchedUser));
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      seed: () =>
+          const AuthState(status: AuthStatus.authenticated, user: testUser),
+      act: (bloc) => bloc.add(
+        const AuthSwitchStoredAccountRequested(userId: '@other:server.com'),
+      ),
+      expect: () => [
+        isA<AuthState>().having((s) => s.status, 'status', AuthStatus.loading),
+        isA<AuthState>()
+            .having((s) => s.status, 'status', AuthStatus.authenticated)
+            .having((s) => s.user?.userId, 'userId', '@other:server.com'),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'keeps previous user when switching stored account fails',
+      build: () {
+        when(
+          () => mockAuthRepository.switchStoredAccount('@other:server.com'),
+        ).thenAnswer(
+          (_) async => AuthResult.failure(
+            '账号数据不完整',
+            type: AuthErrorType.tokenExpired,
+          ),
+        );
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      seed: () =>
+          const AuthState(status: AuthStatus.authenticated, user: testUser),
+      act: (bloc) => bloc.add(
+        const AuthSwitchStoredAccountRequested(userId: '@other:server.com'),
+      ),
+      expect: () => [
+        isA<AuthState>()
+            .having((s) => s.status, 'status', AuthStatus.loading)
+            .having((s) => s.user, 'user', testUser),
+        isA<AuthState>()
+            .having((s) => s.status, 'status', AuthStatus.error)
+            .having((s) => s.user, 'user', testUser)
+            .having((s) => s.errorType, 'errorType', AuthErrorType.tokenExpired),
       ],
     );
 

@@ -101,6 +101,9 @@ void main() {
     when(
       () => mockSecureStorage.getDueScheduledMessages(),
     ).thenAnswer((_) async => <Map<String, dynamic>>[]);
+    when(
+      () => mockSecureStorage.getDefaultSelfDestructSeconds(),
+    ).thenAnswer((_) async => null);
   });
 
   ChatBloc buildBloc() => ChatBloc(
@@ -284,6 +287,42 @@ void main() {
 
       await bloc.close();
     });
+
+    test(
+      'uses default self-destruct timer when message does not override it',
+      () async {
+        when(
+          () => mockSecureStorage.getDefaultSelfDestructSeconds(),
+        ).thenAnswer((_) async => 45);
+        when(
+          () => mockRepository.sendTextMessage(
+            any(),
+            any(),
+            selfDestructAfter: any(named: 'selfDestructAfter'),
+            mentionedUserIds: any(named: 'mentionedUserIds'),
+            mentionsRoom: any(named: 'mentionsRoom'),
+          ),
+        ).thenAnswer((_) async => _testMessages.first);
+
+        final bloc = await buildInitializedBloc();
+        clearInteractions(mockRepository);
+
+        bloc.add(const SendTextMessage('Hello world'));
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+
+        verify(
+          () => mockRepository.sendTextMessage(
+            _roomId,
+            'Hello world',
+            selfDestructAfter: 45,
+            mentionedUserIds: null,
+            mentionsRoom: false,
+          ),
+        ).called(1);
+
+        await bloc.close();
+      },
+    );
 
     test('uses replyToMessage when reply target is set', () async {
       when(

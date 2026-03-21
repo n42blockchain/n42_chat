@@ -4,12 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/room_metadata_utils.dart';
 import '../../../domain/entities/channel_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'group_channels_page.dart';
+import 'channel_editor_sheet.dart';
 import '../../../n42_chat.dart';
 
 /// 群话题列表页面（用户视角，Telegram Topics 风格）
@@ -74,6 +76,11 @@ class _GroupTopicsBody extends StatelessWidget {
             .toList();
         final regular = channels.where((c) => !pinned.contains(c)).toList()
           ..sort((a, b) => a.order.compareTo(b.order));
+        final regularByCategory = <String?, List<ChannelEntity>>{};
+        for (final channel in regular) {
+          final key = normalizeChannelCategory(channel.category);
+          regularByCategory.putIfAbsent(key, () => []).add(channel);
+        }
 
         return Scaffold(
           backgroundColor: isDark
@@ -110,10 +117,6 @@ class _GroupTopicsBody extends StatelessWidget {
                   builder: (context) {
                     // 始终插入 General 条目作为父房间入口
                     final effectivePinned = pinned;
-                    final effectiveRegular = [
-                      ChannelEntity.general(roomId),
-                      ...regular,
-                    ];
 
                     return ListView(
                       children: [
@@ -135,19 +138,34 @@ class _GroupTopicsBody extends StatelessWidget {
                           ),
                         ],
 
-                        // 普通话题
-                        if (effectiveRegular.isNotEmpty) ...[
-                          if (effectivePinned.isNotEmpty)
+                        _buildSectionHeader(
+                          context,
+                          isDark,
+                          Icons.forum_outlined,
+                          'General',
+                        ),
+                        _buildTopicTile(
+                          context,
+                          ChannelEntity.general(roomId),
+                          isDark,
+                        ),
+                        ...regularByCategory.entries.expand((entry) {
+                          final label =
+                              entry.key ?? (l10n?.groupTopics ?? 'Topics');
+                          return <Widget>[
                             _buildSectionHeader(
                               context,
                               isDark,
-                              Icons.tag,
-                              l10n?.groupTopics ?? 'Topics',
+                              entry.key == null
+                                  ? Icons.tag
+                                  : Icons.folder_outlined,
+                              label,
                             ),
-                          ...effectiveRegular.map(
-                            (c) => _buildTopicTile(context, c, isDark),
-                          ),
-                        ],
+                            ...entry.value.map(
+                              (c) => _buildTopicTile(context, c, isDark),
+                            ),
+                          ];
+                        }),
 
                         const SizedBox(height: 80), // FAB 间距
                       ],
@@ -226,13 +244,38 @@ class _GroupTopicsBody extends StatelessWidget {
                 size: 22,
               ),
             ),
-            title: Text(
-              channel.name,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-                color: isDark ? Colors.white : AppColors.textPrimary,
-              ),
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    channel.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                if (channel.category != null && channel.roomId != roomId)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      channel.category!,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             subtitle: lastMsg != null
                 ? Text(
@@ -291,119 +334,22 @@ class _GroupTopicsBody extends StatelessWidget {
 
   void _showCreateTopicSheet(BuildContext context) {
     final l10n = S.of(context);
-    final nameController = TextEditingController();
-    final topicController = TextEditingController();
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetCtx) {
-        final isDark = Theme.of(sheetCtx).brightness == Brightness.dark;
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(sheetCtx).viewInsets.bottom,
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 标题行
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            l10n?.groupChannelCreate ?? 'New Topic',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? Colors.white
-                                  : AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 20),
-                          onPressed: () => Navigator.pop(sheetCtx),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: nameController,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        labelText: l10n?.groupChannelName ?? 'Topic Name',
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.tag),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: topicController,
-                      decoration: InputDecoration(
-                        labelText:
-                            l10n?.groupChannelTopic ?? 'Description (optional)',
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
-                          final name = nameController.text.trim();
-                          if (name.isEmpty) return;
-                          Navigator.pop(sheetCtx);
-                          context.read<GroupBloc>().add(
-                            CreateChannel(
-                              parentRoomId: roomId,
-                              name: name,
-                              topic: topicController.text.trim().isEmpty
-                                  ? null
-                                  : topicController.text.trim(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          l10n?.commonConfirm ?? 'Create',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    ).whenComplete(() {
-      nameController.dispose();
-      topicController.dispose();
+    showChannelEditorSheet(
+      context,
+      title: l10n?.groupChannelCreate ?? 'New Topic',
+      confirmLabel: l10n?.commonConfirm ?? 'Create',
+    ).then((draft) {
+      if (!context.mounted || draft == null) {
+        return;
+      }
+      context.read<GroupBloc>().add(
+        CreateChannel(
+          parentRoomId: roomId,
+          name: draft.name,
+          topic: draft.topic,
+          category: draft.category,
+        ),
+      );
     });
   }
 }

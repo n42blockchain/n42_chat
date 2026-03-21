@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/message_reaction_entity.dart';
 import '../../domain/repositories/message_action_repository.dart';
@@ -31,12 +30,20 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
   }
 
   @override
-  Future<void> removeReaction(String roomId, String eventId, String emoji) async {
+  Future<void> removeReaction(
+    String roomId,
+    String eventId,
+    String emoji,
+  ) async {
     await _reactionDataSource.removeReaction(roomId, eventId, emoji);
   }
 
   @override
-  Future<void> toggleReaction(String roomId, String eventId, String emoji) async {
+  Future<void> toggleReaction(
+    String roomId,
+    String eventId,
+    String emoji,
+  ) async {
     final reactions = await _reactionDataSource.getReactions(roomId, eventId);
     final currentUserId = _clientManager.client?.userID;
 
@@ -56,7 +63,10 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
     String roomId,
     String eventId,
   ) async {
-    final reactionsMap = await _reactionDataSource.getReactions(roomId, eventId);
+    final reactionsMap = await _reactionDataSource.getReactions(
+      roomId,
+      eventId,
+    );
     final client = _clientManager.client;
     final room = client?.getRoomById(roomId);
 
@@ -74,11 +84,13 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
         return userId;
       }).toList();
 
-      reactions.add(MessageReactionEntity(
-        emoji: emoji,
-        userIds: userIds,
-        userNames: userNames,
-      ));
+      reactions.add(
+        MessageReactionEntity(
+          emoji: emoji,
+          userIds: userIds,
+          userNames: userNames,
+        ),
+      );
     }
 
     return reactions;
@@ -270,7 +282,9 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       final jsonStr = jsonEncode(messages.map(_messageToJson).toList());
       await _storage.saveFavoriteMessages(jsonStr);
     } catch (e) {
-      debugLog('MessageActionRepository: Failed to persist saved messages - $e');
+      debugLog(
+        'MessageActionRepository: Failed to persist saved messages - $e',
+      );
     }
   }
 
@@ -320,7 +334,9 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
     }
   }
 
-  Future<void> _persistFavoriteMeta(Map<String, Map<String, dynamic>> meta) async {
+  Future<void> _persistFavoriteMeta(
+    Map<String, Map<String, dynamic>> meta,
+  ) async {
     try {
       await _storage.saveFavoriteMeta(jsonEncode(meta));
     } catch (e) {
@@ -354,7 +370,8 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       'threadReplyCount': m.threadReplyCount,
       'threadLatestReply': m.threadLatestReply,
       'threadLatestReplySender': m.threadLatestReplySender,
-      'threadLatestReplyTimestamp': m.threadLatestReplyTimestamp?.toIso8601String(),
+      'threadLatestReplyTimestamp': m.threadLatestReplyTimestamp
+          ?.toIso8601String(),
       if (m.metadata != null) 'metadata': _metadataToJson(m.metadata!),
     };
   }
@@ -368,12 +385,20 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       senderAvatarUrl: json['senderAvatarUrl'] as String?,
       content: json['content'] as String? ?? '',
       formattedContent: json['formattedContent'] as String?,
-      timestamp: DateTime.tryParse(json['timestamp'] as String? ?? '') ?? DateTime.now(),
-      type: MessageType.values.elementAtOrNull(json['type'] as int? ?? 0) ?? MessageType.text,
-      status: MessageStatus.values.elementAtOrNull(json['status'] as int? ?? 0) ?? MessageStatus.sent,
+      timestamp:
+          DateTime.tryParse(json['timestamp'] as String? ?? '') ??
+          DateTime.now(),
+      type:
+          MessageType.values.elementAtOrNull(json['type'] as int? ?? 0) ??
+          MessageType.text,
+      status:
+          MessageStatus.values.elementAtOrNull(json['status'] as int? ?? 0) ??
+          MessageStatus.sent,
       isFromMe: json['isFromMe'] as bool? ?? false,
       isEdited: json['isEdited'] as bool? ?? false,
-      editedAt: json['editedAt'] != null ? DateTime.tryParse(json['editedAt'] as String) : null,
+      editedAt: json['editedAt'] != null
+          ? DateTime.tryParse(json['editedAt'] as String)
+          : null,
       replyToId: json['replyToId'] as String?,
       replyToContent: json['replyToContent'] as String?,
       replyToSender: json['replyToSender'] as String?,
@@ -412,6 +437,9 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       'token': m.token,
       'transferStatus': m.transferStatus,
       'txHash': m.txHash,
+      'paymentRequestId': m.paymentRequestId,
+      'paymentReceiverAddress': m.paymentReceiverAddress,
+      'paymentRequestExpiresAt': m.paymentRequestExpiresAt?.toIso8601String(),
       'redPacketId': m.redPacketId,
       'pollQuestion': m.pollQuestion,
       'pollOptions': m.pollOptions,
@@ -450,7 +478,9 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       waveform: (json['waveform'] as List<dynamic>?)?.cast<int>(),
       transcription: json['transcription'] as String?,
       transcriptionStatus: json['transcriptionStatus'] != null
-          ? TranscriptionStatus.values.elementAtOrNull(json['transcriptionStatus'] as int)
+          ? TranscriptionStatus.values.elementAtOrNull(
+              json['transcriptionStatus'] as int,
+            )
           : null,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
@@ -459,13 +489,19 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       token: json['token'] as String?,
       transferStatus: json['transferStatus'] as String?,
       txHash: json['txHash'] as String?,
+      paymentRequestId: json['paymentRequestId'] as String?,
+      paymentReceiverAddress: json['paymentReceiverAddress'] as String?,
+      paymentRequestExpiresAt: json['paymentRequestExpiresAt'] != null
+          ? DateTime.tryParse(json['paymentRequestExpiresAt'] as String)
+          : null,
       redPacketId: json['redPacketId'] as String?,
       pollQuestion: json['pollQuestion'] as String?,
       pollOptions: (json['pollOptions'] as List<dynamic>?)?.cast<String>(),
       pollOptionIds: (json['pollOptionIds'] as List<dynamic>?)?.cast<String>(),
       myVotes: (json['myVotes'] as List<dynamic>?)?.cast<String>(),
-      voteCounts: (json['voteCounts'] as Map<String, dynamic>?)
-          ?.map((k, v) => MapEntry(k, v as int)),
+      voteCounts: (json['voteCounts'] as Map<String, dynamic>?)?.map(
+        (k, v) => MapEntry(k, v as int),
+      ),
       totalVoters: json['totalVoters'] as int?,
       maxSelections: json['maxSelections'] as int?,
       pollEnded: json['pollEnded'] as bool?,

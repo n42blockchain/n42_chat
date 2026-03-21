@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:n42_chat/src/core/notifications/firebase_push_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 测试后台来电 CallKit 触发逻辑
 ///
@@ -15,6 +16,7 @@ void main() {
 
   setUp(() {
     callkitCalls.clear();
+    SharedPreferences.setMockInitialValues({});
 
     // 拦截 flutter_callkit_incoming 的 platform channel 调用
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -41,7 +43,7 @@ void main() {
     );
   });
 
-  RemoteMessage _createCallInviteMessage({
+  RemoteMessage createCallInviteMessage({
     String? sender,
     String? senderDisplayName,
     String? roomId,
@@ -59,7 +61,7 @@ void main() {
 
   group('_showBackgroundCallKit', () {
     test('should trigger CallKit with sender display name', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         sender: '@alice:matrix.org',
         senderDisplayName: 'Alice',
         roomId: '!room123:matrix.org',
@@ -77,7 +79,7 @@ void main() {
     });
 
     test('should fallback to sender ID when display name is missing', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         sender: '@bob:matrix.org',
         roomId: '!room123:matrix.org',
       );
@@ -90,7 +92,7 @@ void main() {
     });
 
     test('should fallback to "Unknown" when no sender info', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         roomId: '!room123:matrix.org',
       );
 
@@ -103,7 +105,7 @@ void main() {
     });
 
     test('should include roomId and callerId in extra', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         sender: '@alice:matrix.org',
         senderDisplayName: 'Alice',
         roomId: '!room456:matrix.org',
@@ -118,7 +120,7 @@ void main() {
     });
 
     test('should set duration to 60 seconds', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         sender: '@alice:matrix.org',
       );
 
@@ -129,7 +131,7 @@ void main() {
     });
 
     test('should generate a unique UUID for each call', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         sender: '@alice:matrix.org',
       );
 
@@ -141,11 +143,32 @@ void main() {
       final id2 = (callkitCalls[1].arguments as Map)['id'];
       expect(id1, isNot(equals(id2)));
     });
+
+    test('should respect locally saved incoming-call ringtone preference', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'n42_chat_incoming_call_ringtone':
+            '{"mode":"silent","label":"Silent","sourceKey":"silent"}',
+      });
+
+      final message = createCallInviteMessage(
+        sender: '@alice:matrix.org',
+        senderDisplayName: 'Alice',
+      );
+
+      await FirebasePushService.showBackgroundCallKitForTest(message);
+
+      final args = callkitCalls.first.arguments as Map<dynamic, dynamic>;
+      final android = args['android'] as Map<dynamic, dynamic>;
+      final ios = args['ios'] as Map<dynamic, dynamic>;
+
+      expect(android['ringtonePath'], equals('silent'));
+      expect(ios['ringtonePath'], equals('system_ringtone_default'));
+    });
   });
 
   group('_handleBackgroundMessage routing', () {
     test('should show CallKit for m.call.invite', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         sender: '@alice:matrix.org',
         senderDisplayName: 'Alice',
         type: 'm.call.invite',
@@ -239,7 +262,7 @@ void main() {
 
   group('CallKit params platform compatibility', () {
     test('should include both Android and iOS params', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         sender: '@alice:matrix.org',
         senderDisplayName: 'Alice',
       );
@@ -262,7 +285,7 @@ void main() {
     });
 
     test('should set appName to N42 Chat', () async {
-      final message = _createCallInviteMessage(
+      final message = createCallInviteMessage(
         sender: '@alice:matrix.org',
       );
 

@@ -3,6 +3,7 @@
 //   field storage, equality (props), default values, optional fields.
 // No BLoC or platform dependencies — pure Dart + equatable.
 
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -233,6 +234,27 @@ void main() {
     test('mimeType defaults to null', () {
       final e = SendFileMessage(fileBytes: Uint8List(0), filename: 'f.pdf');
       expect(e.mimeType, isNull);
+    });
+
+    test('stores filePath and fileSize when provided', () {
+      const e = SendFileMessage(
+        filename: 'archive.zip',
+        filePath: '/tmp/archive.zip',
+        fileSize: 42,
+      );
+      expect(e.filePath, '/tmp/archive.zip');
+      expect(e.fileSize, 42);
+    });
+
+    test('stores fileStream when provided', () {
+      final stream = Stream<List<int>>.value(const [1, 2, 3]);
+      final e = SendFileMessage(
+        filename: 'stream.bin',
+        fileStream: stream,
+        fileSize: 3,
+      );
+      expect(e.fileStream, stream);
+      expect(e.fileSize, 3);
     });
   });
 
@@ -795,8 +817,8 @@ void main() {
       expect(const TranscribeVoiceMessage(messageId: 'm').messageId, 'm');
     });
 
-    test('language defaults to zh-CN', () {
-      expect(const TranscribeVoiceMessage(messageId: 'm').language, 'zh-CN');
+    test('language defaults to zh-TW', () {
+      expect(const TranscribeVoiceMessage(messageId: 'm').language, 'zh-TW');
     });
 
     test('audioPath defaults to null', () {

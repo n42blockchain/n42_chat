@@ -232,6 +232,25 @@ void main() {
     });
   });
 
+  group('room bot webhook secret', () {
+    test('saves and retrieves a room webhook secret', () async {
+      await dataSource.saveRoomBotWebhookSecret('!room:s.com', 'secret-value');
+
+      final secret = await dataSource.getRoomBotWebhookSecret('!room:s.com');
+
+      expect(secret, 'secret-value');
+    });
+
+    test('clears the room webhook secret when value is empty', () async {
+      await dataSource.saveRoomBotWebhookSecret('!room:s.com', 'secret-value');
+      await dataSource.saveRoomBotWebhookSecret('!room:s.com', '');
+
+      final secret = await dataSource.getRoomBotWebhookSecret('!room:s.com');
+
+      expect(secret, isNull);
+    });
+  });
+
   // ─────────────────────────────────────────────────────────────────────────
   // Biometric settings
   // ─────────────────────────────────────────────────────────────────────────

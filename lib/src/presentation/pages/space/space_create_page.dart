@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/room_metadata_utils.dart';
 import '../../../domain/entities/space_entity.dart';
 import '../../blocs/space/space_bloc.dart';
 import '../../blocs/space/space_event.dart';
@@ -22,12 +23,14 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
+  final _tagsCtrl = TextEditingController();
   SpaceType _type = SpaceType.public;
 
   @override
   void dispose() {
     _nameCtrl.dispose();
     _descCtrl.dispose();
+    _tagsCtrl.dispose();
     super.dispose();
   }
 
@@ -45,8 +48,9 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
         }
       },
       child: Scaffold(
-        backgroundColor:
-            isDark ? AppColors.backgroundDark : AppColors.background,
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.background,
         appBar: N42AppBar(
           title: S.of(context)?.spacesCreate ?? 'Create Community',
           showBackButton: true,
@@ -82,11 +86,21 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
                 controller: _descCtrl,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  labelText:
-                      S.of(context)?.spacesDescription ?? 'Description',
-                  hintText: S.of(context)?.spacesDescriptionHint ??
+                  labelText: S.of(context)?.spacesDescription ?? 'Description',
+                  hintText:
+                      S.of(context)?.spacesDescriptionHint ??
                       'What is this community about?',
                   border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              TextFormField(
+                controller: _tagsCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Tags',
+                  hintText: '#defi #trading #n42',
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 24),
@@ -117,7 +131,9 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white),
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : Text(S.of(context)?.spacesCreate ?? 'Create Community'),
                 ),
@@ -131,13 +147,16 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    context.read<SpaceBloc>().add(CreateSpace(
-          name: _nameCtrl.text.trim(),
-          description: _descCtrl.text.trim().isEmpty
-              ? null
-              : _descCtrl.text.trim(),
-          type: _type,
-        ));
+    context.read<SpaceBloc>().add(
+      CreateSpace(
+        name: _nameCtrl.text.trim(),
+        description: _descCtrl.text.trim().isEmpty
+            ? null
+            : _descCtrl.text.trim(),
+        type: _type,
+        topics: normalizeTopicLabels(_tagsCtrl.text),
+      ),
+    );
   }
 }
 
@@ -158,7 +177,8 @@ class _TypeSelector extends StatelessWidget {
             selected: value == SpaceType.public,
             icon: Icons.public,
             title: S.of(context)?.spacesPublic ?? 'Public',
-            subtitle: S.of(context)?.spacesPublicDesc ??
+            subtitle:
+                S.of(context)?.spacesPublicDesc ??
                 'Anyone can discover and join',
             onTap: () => onChanged(SpaceType.public),
             isDark: isDark,
@@ -170,7 +190,8 @@ class _TypeSelector extends StatelessWidget {
             selected: value == SpaceType.private,
             icon: Icons.lock_outlined,
             title: S.of(context)?.spacesPrivate ?? 'Private',
-            subtitle: S.of(context)?.spacesPrivateDesc ??
+            subtitle:
+                S.of(context)?.spacesPrivateDesc ??
                 'Only invited members can join',
             onTap: () => onChanged(SpaceType.private),
             isDark: isDark,

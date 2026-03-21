@@ -6,9 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_callkit_incoming/entities/android_params.dart';
 import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
-import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -16,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../services/voip/call_manager.dart';
+import '../../services/voip/incoming_call_ringtone_preference.dart';
 import 'push_notification_service.dart';
 import '../utils/debug_log.dart';
 
@@ -117,6 +116,15 @@ class FirebasePushService implements IPushNotificationService {
   /// 设置通知配置
   void setNotificationConfig(NotificationConfig config) {
     _notificationConfig = config;
+    if (Platform.isIOS) {
+      unawaited(
+        FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+          alert: config.enabled,
+          badge: config.enabled,
+          sound: config.enabled && config.playSound,
+        ),
+      );
+    }
   }
 
   /// 设置当前活跃房间（正在查看的房间不弹通知）
@@ -585,6 +593,7 @@ class FirebasePushService implements IPushNotificationService {
         message.notification?.title ??
         senderId ??
         'Unknown';
+    final ringtonePreference = await IncomingCallRingtonePreference.load();
 
     final callId = const Uuid().v4();
 
@@ -596,25 +605,11 @@ class FirebasePushService implements IPushNotificationService {
       type: 0, // 默认语音（后台推送无法确定通话类型）
       duration: 60000,
       extra: <String, dynamic>{'callerId': senderId, 'roomId': roomId},
-      android: const AndroidParams(
-        isCustomNotification: true,
-        isShowLogo: true,
-        ringtonePath: 'ringtone_default',
-        backgroundColor: '#0955fa',
-        actionColor: '#4CAF50',
-        textColor: '#ffffff',
+      android: buildIncomingCallAndroidParams(
+        ringtonePreference: ringtonePreference,
       ),
-      ios: const IOSParams(
-        iconName: 'CallKitLogo',
-        handleType: 'generic',
-        supportsVideo: true,
-        maximumCallGroups: 1,
-        maximumCallsPerCallGroup: 1,
-        audioSessionMode: 'videoChat',
-        audioSessionActive: true,
-        audioSessionPreferredSampleRate: 44100.0,
-        audioSessionPreferredIOBufferDuration: 0.005,
-        ringtonePath: 'ringtone_default',
+      ios: buildIncomingCallIOSParams(
+        ringtonePreference: ringtonePreference,
       ),
     );
 

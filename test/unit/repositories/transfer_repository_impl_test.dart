@@ -128,6 +128,54 @@ void main() {
     );
   });
 
+  group('sendPaymentRequestMessage', () {
+    test('sends n42.payment_request with canonical content fields', () async {
+      final request = PaymentRequest(
+        requestId: 'req-1',
+        amount: '12.5',
+        token: 'USDT',
+        receiverAddress: '0xreceiver',
+        memo: 'Dinner',
+        qrCodeData: 'wallet:0xreceiver?amount=12.5',
+        createdAt: DateTime(2026, 3, 21, 10),
+        expiresAt: DateTime(2026, 3, 21, 11),
+      );
+
+      when(
+        () => mockMessageDataSource.sendCustomMessage(
+          roomId: any(named: 'roomId'),
+          msgType: any(named: 'msgType'),
+          content: any(named: 'content'),
+        ),
+      ).thenAnswer((_) async => '\$payment1');
+
+      final eventId = await repository.sendPaymentRequestMessage(
+        roomId: '!room-pay:server.com',
+        request: request,
+      );
+
+      expect(eventId, '\$payment1');
+
+      final captured = verify(
+        () => mockMessageDataSource.sendCustomMessage(
+          roomId: '!room-pay:server.com',
+          msgType: any(named: 'msgType'),
+          content: captureAny(named: 'content'),
+        ),
+      ).captured;
+
+      expect(captured, hasLength(1));
+      final content = captured.single as Map<String, dynamic>;
+      expect(content['msgtype'], 'n42.payment_request');
+      expect(content['request_id'], 'req-1');
+      expect(content['receiver_address'], '0xreceiver');
+      expect(content['amount'], '12.5');
+      expect(content['token'], 'USDT');
+      expect(content['memo'], 'Dinner');
+      expect(content['expires_at'], request.expiresAt!.millisecondsSinceEpoch);
+    });
+  });
+
   // ─────────────────────────────────────────────────
   // Empty-cache read operations
   // ─────────────────────────────────────────────────

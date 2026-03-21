@@ -2,7 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
+import '../../../core/services/auto_download_policy_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
+import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -54,6 +58,9 @@ class ImageMessageWidget extends StatefulWidget {
   /// 是否是自己发送的
   final bool isFromMe;
 
+  /// 自动下载策略服务（测试或宿主注入）
+  final AutoDownloadPolicyService? autoDownloadPolicyService;
+
   const ImageMessageWidget({
     super.key,
     required this.imageUrl,
@@ -69,6 +76,7 @@ class ImageMessageWidget extends StatefulWidget {
     this.isExpired = false,
     this.isViewed = false,
     this.isFromMe = false,
+    this.autoDownloadPolicyService,
   });
 
   @override
@@ -78,53 +86,61 @@ class ImageMessageWidget extends StatefulWidget {
 class _ImageMessageWidgetState extends State<ImageMessageWidget> {
   int _retryCount = 0;
   static const int _maxRetries = 3;
+  late final AutoDownloadPolicyService _autoDownloadPolicyService;
+  bool _shouldLoadImage = false;
+  bool _autoDownloadResolved = false;
 
-  /// 将 mxc:// URL 转换为 HTTP URL
-  String? _convertMxcToHttp(String? mxcUrl) {
-    if (mxcUrl == null || mxcUrl.isEmpty) return null;
+  @override
+  void initState() {
+    super.initState();
+    _autoDownloadPolicyService =
+        widget.autoDownloadPolicyService ??
+        (getIt.isRegistered<AutoDownloadPolicyService>()
+            ? getIt<AutoDownloadPolicyService>()
+            : AutoDownloadPolicyService(
+                preferencesDataSource: getIt<PreferencesDataSource>(),
+              ));
+    _resolveAutoDownloadPreference();
+  }
 
-    // 如果已经是 HTTP URL，直接返回
-    if (mxcUrl.startsWith('http://') || mxcUrl.startsWith('https://')) {
-      return mxcUrl;
+  @override
+  void didUpdateWidget(covariant ImageMessageWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl ||
+        oldWidget.thumbnailUrl != widget.thumbnailUrl) {
+      _retryCount = 0;
+      _autoDownloadResolved = false;
+      _shouldLoadImage = false;
+      _resolveAutoDownloadPreference();
     }
+  }
 
-    // 如果不是 mxc:// URL，返回 null
-    if (!mxcUrl.startsWith('mxc://')) {
-      debugLog('ImageMessageWidget: Invalid URL format: $mxcUrl');
-      return null;
-    }
-
+  Future<void> _resolveAutoDownloadPreference() async {
     try {
-      final client = MatrixClientManager.instance.client;
-      if (client == null) {
-        debugLog('ImageMessageWidget: Client is null, cannot convert mxc URL');
-        return null;
-      }
-
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) {
-        debugLog('ImageMessageWidget: No homeserver configured');
-        return null;
-      }
-
-      // 解析 mxc://server/mediaId
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-
-      if (serverName.isEmpty || mediaId.isEmpty) {
-        debugLog('ImageMessageWidget: Invalid mxc URL format: $mxcUrl');
-        return null;
-      }
-
-      // 构建认证媒体 URL (Matrix 1.11+)
-      final httpUrl = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-      debugLog('ImageMessageWidget: Converted mxc URL to: $httpUrl');
-      return httpUrl;
+      final shouldAutoDownload = await _autoDownloadPolicyService
+          .shouldAutoDownload(AutoDownloadMediaType.image);
+      if (!mounted) return;
+      setState(() {
+        _shouldLoadImage = shouldAutoDownload;
+        _autoDownloadResolved = true;
+      });
     } catch (e) {
-      debugLog('ImageMessageWidget: Error converting mxc URL: $e');
-      return null;
+      debugLog(
+        'ImageMessageWidget: Failed to resolve auto-download policy: $e',
+      );
+      if (!mounted) return;
+      setState(() {
+        _shouldLoadImage = true;
+        _autoDownloadResolved = true;
+      });
     }
+  }
+
+  void _loadImageManually() {
+    setState(() {
+      _shouldLoadImage = true;
+      _autoDownloadResolved = true;
+    });
   }
 
   String get _effectiveUrl {
@@ -133,12 +149,17 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
 
     // 如果是 mxc:// URL，转换为 HTTP URL
     if (url.startsWith('mxc://')) {
-      final httpUrl = _convertMxcToHttp(url);
+      final httpUrl = mx_utils.MatrixUtils.getMediaDownloadUrl(
+        url,
+        client: MatrixClientManager.instance.client,
+      );
       if (httpUrl != null) {
         url = httpUrl;
       } else {
         // 转换失败，返回空字符串触发错误状态
-        debugLog('ImageMessageWidget: Failed to convert mxc URL, will show error state');
+        debugLog(
+          'ImageMessageWidget: Failed to convert mxc URL, will show error state',
+        );
         return '';
       }
     }
@@ -168,6 +189,14 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       return _buildViewOnceOverlay(context, size);
     }
 
+    if (!_autoDownloadResolved) {
+      return _buildPlaceholder(size);
+    }
+
+    if (!_shouldLoadImage) {
+      return _buildManualLoadCard(context, size);
+    }
+
     final url = _effectiveUrl;
 
     // 如果 URL 为空，显示占位符
@@ -176,11 +205,10 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
     }
 
     // 获取认证头（用于需要认证的 Matrix 媒体）
-    final accessToken = MatrixClientManager.instance.client?.accessToken;
-    final headers = <String, String>{};
-    if (accessToken != null && accessToken.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $accessToken';
-    }
+    final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+      url,
+      client: MatrixClientManager.instance.client,
+    );
 
     Widget imageWidget = GestureDetector(
       onTap: widget.onTap,
@@ -198,7 +226,9 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
             fadeOutDuration: const Duration(milliseconds: 200),
             placeholder: (context, url) => _buildPlaceholder(size),
             errorWidget: (context, url, error) {
-              debugLog('ImageMessageWidget: Failed to load image: $url, error: $error');
+              debugLog(
+                'ImageMessageWidget: Failed to load image: $url, error: $error',
+              );
               return _buildError(size, canRetry: _retryCount < _maxRetries);
             },
           ),
@@ -227,10 +257,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                   const SizedBox(width: 3),
                   Text(
                     S.of(context)?.chatViewOnce ?? 'View Once',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.white,
-                    ),
+                    style: const TextStyle(fontSize: 10, color: Colors.white),
                   ),
                 ],
               ),
@@ -241,6 +268,39 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
     }
 
     return imageWidget;
+  }
+
+  Widget _buildManualLoadCard(BuildContext context, Size size) {
+    return GestureDetector(
+      onTap: _loadImageManually,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(widget.borderRadius),
+        child: Container(
+          width: size.width,
+          height: size.height,
+          color: AppColors.placeholder.withValues(alpha: 0.6),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.download_for_offline_outlined,
+                color: AppColors.textSecondary,
+                size: 28,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                S.of(context)?.chatDownload ?? 'Download',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   /// View Once 消息蒙版（接收方）
@@ -296,10 +356,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.grey[400]!,
-                Colors.grey[600]!,
-              ],
+              colors: [Colors.grey[400]!, Colors.grey[600]!],
             ),
           ),
           child: Center(
@@ -312,11 +369,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                     color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.lock,
-                    color: Colors.white,
-                    size: 28,
-                  ),
+                  child: const Icon(Icons.lock, color: Colors.white, size: 28),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -344,7 +397,10 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
   }
 
   Size _calculateSize() {
-    if (widget.width == null || widget.height == null || widget.width == 0 || widget.height == 0) {
+    if (widget.width == null ||
+        widget.height == null ||
+        widget.width == 0 ||
+        widget.height == 0) {
       // 未知尺寸，使用默认正方形
       return Size(widget.minSize, widget.minSize);
     }
@@ -370,7 +426,10 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       }
     }
 
-    return Size(w.clamp(widget.minSize, widget.maxWidth), h.clamp(widget.minSize, widget.maxHeight));
+    return Size(
+      w.clamp(widget.minSize, widget.maxWidth),
+      h.clamp(widget.minSize, widget.maxHeight),
+    );
   }
 
   Widget _buildPlaceholder(Size size) {
@@ -447,52 +506,11 @@ class ImageGridWidget extends StatelessWidget {
     this.maxCount = 9,
   });
 
-  /// 将 mxc:// URL 转换为 HTTP URL
-  String _convertMxcToHttp(String url) {
-    // 如果已经是 HTTP URL，直接返回
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
-    }
-
-    // 如果不是 mxc:// URL，返回原始 URL
-    if (!url.startsWith('mxc://')) {
-      return url;
-    }
-
-    try {
-      final client = MatrixClientManager.instance.client;
-      if (client == null) return url;
-
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return url;
-
-      // 解析 mxc://server/mediaId
-      final uri = Uri.parse(url);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-
-      if (serverName.isEmpty || mediaId.isEmpty) return url;
-
-      // 构建认证媒体 URL (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-    } catch (e) {
-      debugLog('ImageGridWidget: Error converting mxc URL: $e');
-      return url;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final displayImages = images.take(maxCount).toList();
     final columns = _getColumns(displayImages.length);
     final itemSize = (200 - spacing * (columns - 1)) / columns;
-
-    // 获取认证头（用于需要认证的 Matrix 媒体）
-    final accessToken = MatrixClientManager.instance.client?.accessToken;
-    final headers = <String, String>{};
-    if (accessToken != null && accessToken.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $accessToken';
-    }
 
     return SizedBox(
       width: 200,
@@ -502,8 +520,17 @@ class ImageGridWidget extends StatelessWidget {
         children: List.generate(displayImages.length, (index) {
           final image = displayImages[index];
           final isLast = index == maxCount - 1 && images.length > maxCount;
-          // 获取图片 URL，确保转换 mxc:// URL
-          final imageUrl = _convertMxcToHttp(image.thumbnailUrl ?? image.url);
+          final sourceUrl = image.thumbnailUrl ?? image.url;
+          final imageUrl =
+              mx_utils.MatrixUtils.getMediaDownloadUrl(
+                sourceUrl,
+                client: MatrixClientManager.instance.client,
+              ) ??
+              sourceUrl;
+          final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+            imageUrl,
+            client: MatrixClientManager.instance.client,
+          );
 
           return GestureDetector(
             onTap: () => onTap?.call(index),
@@ -582,4 +609,3 @@ class ImageInfo {
     this.height,
   });
 }
-

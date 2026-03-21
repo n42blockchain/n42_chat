@@ -5,6 +5,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/download_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/group_file_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -30,7 +32,8 @@ class GroupFilesPage extends StatefulWidget {
 
 class _GroupFilesPageState extends State<GroupFilesPage>
     with SingleTickerProviderStateMixin {
-  final IMessageRepository _messageRepository = GetIt.instance<IMessageRepository>();
+  final IMessageRepository _messageRepository =
+      GetIt.instance<IMessageRepository>();
   final DownloadService _downloadService = GetIt.instance<DownloadService>();
 
   late TabController _tabController;
@@ -107,13 +110,21 @@ class _GroupFilesPageState extends State<GroupFilesPage>
     return _files.where((f) => f.fileType == _currentFilter).toList();
   }
 
+  Map<String, String> _buildAuthHeaders(String? url) {
+    return mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+      url,
+      client: MatrixClientManager.instance.client,
+    );
+  }
+
   Widget _buildTabBar(BuildContext context) {
     final isDark = context.isDarkMode;
     return TabBar(
       controller: _tabController,
       labelColor: AppColors.primary,
-      unselectedLabelColor:
-          isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+      unselectedLabelColor: isDark
+          ? AppColors.textSecondaryDark
+          : AppColors.textSecondary,
       indicatorColor: AppColors.primary,
       tabs: [
         Tab(text: S.of(context)?.commonAll ?? 'All'),
@@ -129,16 +140,15 @@ class _GroupFilesPageState extends State<GroupFilesPage>
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
 
     // 嵌入模式：不显示 Scaffold+AppBar，仅返回 TabBar + body
     if (widget.embedded) {
       return Column(
         children: [
-          Material(
-            color: cardColor,
-            child: _buildTabBar(context),
-          ),
+          Material(color: cardColor, child: _buildTabBar(context)),
           Expanded(child: _buildBody(cardColor, textColor)),
         ],
       );
@@ -173,7 +183,9 @@ class _GroupFilesPageState extends State<GroupFilesPage>
   Widget _buildBody(Color cardColor, Color textColor) {
     if (_isLoading) {
       return Center(
-        child: N42Loading(message: S.of(context)?.commonLoading ?? 'Loading...'),
+        child: N42Loading(
+          message: S.of(context)?.commonLoading ?? 'Loading...',
+        ),
       );
     }
 
@@ -193,7 +205,8 @@ class _GroupFilesPageState extends State<GroupFilesPage>
       return Center(
         child: N42EmptyState.noData(
           title: S.of(context)?.groupNoFiles ?? 'No files',
-          description: S.of(context)?.groupNoFilesDescription ??
+          description:
+              S.of(context)?.groupNoFilesDescription ??
               'No files in this group yet',
         ),
       );
@@ -217,8 +230,9 @@ class _GroupFilesPageState extends State<GroupFilesPage>
     Color textColor,
   ) {
     final isDark = context.isDarkMode;
-    final secondaryTextColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Container(
       color: cardColor,
@@ -238,27 +252,18 @@ class _GroupFilesPageState extends State<GroupFilesPage>
           children: [
             Text(
               file.formattedSize,
-              style: TextStyle(
-                color: secondaryTextColor,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: secondaryTextColor, fontSize: 12),
             ),
             const SizedBox(width: 8),
             Text(
               _formatDate(file.sentAt),
-              style: TextStyle(
-                color: secondaryTextColor,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: secondaryTextColor, fontSize: 12),
             ),
             if (file.senderName != null) ...[
               const SizedBox(width: 8),
               Text(
                 file.senderName!,
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: secondaryTextColor, fontSize: 12),
               ),
             ],
           ],
@@ -337,9 +342,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
               appBar: AppBar(title: Text(file.name)),
               body: Center(
                 child: file.isImage
-                    ? InteractiveViewer(
-                        child: Image.network(file.httpUrl!),
-                      )
+                    ? InteractiveViewer(child: Image.network(file.httpUrl!))
                     : const Icon(Icons.videocam, size: 64),
               ),
             ),
@@ -355,23 +358,32 @@ class _GroupFilesPageState extends State<GroupFilesPage>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-            S.of(context)?.groupDownloadStarted(file.name) ?? 'Downloading ${file.name}...'),
+          S.of(context)?.groupDownloadStarted(file.name) ??
+              'Downloading ${file.name}...',
+        ),
       ),
     );
 
     try {
       final downloadDir = await DownloadService.getDownloadDirectory();
       final savePath = '$downloadDir/${file.name}';
-      await _downloadService.download(
+      final taskId = await _downloadService.download(
         url: file.httpUrl!,
         savePath: savePath,
         fileName: file.name,
+        headers: _buildAuthHeaders(file.httpUrl),
       );
+      final task = await _downloadService.waitForTaskCompletion(taskId);
+      if (task.status != DownloadStatus.completed) {
+        throw Exception(task.error ?? 'Download failed');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.downloadFailed ?? 'Download failed'}: $e'),
+            content: Text(
+              '${S.of(context)?.downloadFailed ?? 'Download failed'}: $e',
+            ),
             backgroundColor: Colors.red,
           ),
         );

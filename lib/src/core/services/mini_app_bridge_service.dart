@@ -129,6 +129,11 @@ class MiniAppBridgeService {
 
   /// 检查 Mini App 是否拥有指定权限
   bool _hasPermission(MiniAppPermission permission) {
+    if ((permission == MiniAppPermission.chatRead ||
+            permission == MiniAppPermission.chatSend) &&
+        _roomId.trim().isEmpty) {
+      return false;
+    }
     if (_app == null) {
       // 没有清单时只保留低风险只读能力，避免把交易或发消息默认放开。
       return permission == MiniAppPermission.walletAddress;

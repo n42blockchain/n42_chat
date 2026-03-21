@@ -1,4 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'debug_log_impl_stub.dart'
+    if (dart.library.ui) 'debug_log_impl_flutter.dart'
+    as impl;
 
 /// Debug-only logging utility.
 ///
@@ -11,7 +13,5 @@ import 'package:flutter/foundation.dart';
 /// debugLog('MyClass: something happened');
 /// ```
 void debugLog(String message) {
-  if (kDebugMode) {
-    debugPrint(message);
-  }
+  impl.debugLog(message);
 }

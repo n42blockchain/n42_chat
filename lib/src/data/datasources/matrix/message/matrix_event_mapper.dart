@@ -1,5 +1,6 @@
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../../core/utils/matrix_utils.dart';
 import '../../../../domain/entities/message_entity.dart';
 import 'matrix_metadata_extractor.dart';
 import '../../../../core/utils/debug_log.dart';
@@ -55,9 +56,15 @@ class MatrixEventMapper {
   /// 将Matrix事件转换为消息实体
   MessageEntity mapEventToMessage(matrix.Event event, matrix.Room room) {
     final sender = room.unsafeGetUserFromMemoryOrFallback(event.senderId);
+    final resolvedDisplay = _resolveDisplayText(event);
+    final replyTargetId = event.inReplyToEventId(includingFallback: false);
 
     // 解析消息内容，处理回复格式
-    final parsedContent = _parseMessageContent(event, room);
+    final parsedContent = _parseMessageContent(
+      event,
+      room,
+      fallbackBody: resolvedDisplay.body,
+    );
 
     // 转换头像 mxc:// URL 为 HTTP URL（使用手动构建方式）
     final avatarHttpUrl = buildHttpUrl(
@@ -68,21 +75,25 @@ class MatrixEventMapper {
     );
 
     // 解析阅后即焚字段
-    final selfDestructData = event.content['n42.self_destruct'] as Map<String, dynamic>?;
+    final selfDestructData =
+        event.content['n42.self_destruct'] as Map<String, dynamic>?;
     final selfDestructAfter = selfDestructData?['after'] as int?;
 
     // 解析 m.mentions 字段
     final mentionsData = event.content['m.mentions'] as Map<String, dynamic>?;
     final mentionsRoom = mentionsData?['room'] as bool? ?? false;
-    final mentionedUserIds = (mentionsData?['user_ids'] as List<dynamic>?)
-        ?.cast<String>()
-        .toList() ?? <String>[];
+    final mentionedUserIds =
+        (mentionsData?['user_ids'] as List<dynamic>?)
+            ?.cast<String>()
+            .toList() ??
+        <String>[];
 
     // 解析线程信息 (MSC3440)
     final threadInfo = extractThreadInfo(event);
 
     // 检测 Bot 消息：n42.bot 标记 或 msgtype 为 m.notice
-    final isBotMessage = event.content['n42.bot'] == true ||
+    final isBotMessage =
+        event.content['n42.bot'] == true ||
         event.messageType == matrix.MessageTypes.Notice;
 
     // 对 n42.contact_card 消息，从 event.content 提取完整名片信息构建多行格式 body
@@ -101,6 +112,14 @@ class MatrixEventMapper {
       messageContent = buffer.toString().trimRight();
     }
 
+    if (event.content['msgtype'] == 'n42.transfer' ||
+        event.content['msgtype'] == 'n42.payment_request') {
+      final memo = event.content['memo'] as String?;
+      if (memo?.isNotEmpty == true) {
+        messageContent = memo!;
+      }
+    }
+
     return MessageEntity(
       id: event.eventId,
       roomId: room.id,
@@ -108,11 +127,12 @@ class MatrixEventMapper {
       senderName: sender.calcDisplayname(),
       senderAvatarUrl: avatarHttpUrl,
       content: messageContent,
+      formattedContent: resolvedDisplay.formattedBody,
       type: mapMessageType(event),
       timestamp: event.originServerTs,
       status: mapMessageStatus(event),
       isFromMe: event.senderId == _client?.userID,
-      replyToId: event.relationshipEventId,
+      replyToId: replyTargetId,
       replyToContent: parsedContent.replyToContent,
       replyToSender: parsedContent.replyToSender,
       isEdited: _checkIsEdited(event),
@@ -134,15 +154,21 @@ class MatrixEventMapper {
 
   /// 解析消息内容，处理回复格式
   /// Matrix 回复格式: "> <@user:server> 原消息内容\n\n实际回复内容"
-  ParsedContent _parseMessageContent(matrix.Event event, matrix.Room room) {
-    String body = event.body;
+  ParsedContent _parseMessageContent(
+    matrix.Event event,
+    matrix.Room room, {
+    required String fallbackBody,
+  }) {
+    String body = fallbackBody;
     String? replyToContent;
     String? replyToSender;
+    final replyTargetId = event.inReplyToEventId(includingFallback: false);
+    final sourceBody = event.body;
 
     // 检查是否是回复消息（有 m.relates_to 或以 > 开头）
-    if (event.relationshipEventId != null || body.startsWith('> ')) {
+    if (replyTargetId != null || sourceBody.startsWith('> ')) {
       // 尝试从 body 解析回复格式
-      final lines = body.split('\n');
+      final lines = sourceBody.split('\n');
       final List<String> quotedLines = [];
       int contentStartIndex = 0;
 
@@ -166,14 +192,19 @@ class MatrixEventMapper {
         // 解析引用的发送者和内容
         final firstQuoteLine = quotedLines.first;
         // 格式: "> <@user:server> 内容" 或 "> * <@user:server> 内容"
-        final userMatch = RegExp(r'> \*? ?<(@[^>]+)>(.*)').firstMatch(firstQuoteLine);
+        final userMatch = RegExp(
+          r'> \*? ?<(@[^>]+)>(.*)',
+        ).firstMatch(firstQuoteLine);
         if (userMatch != null) {
           final userId = userMatch.group(1);
           replyToContent = userMatch.group(2)?.trim();
 
           // 如果有多行引用，合并
           if (quotedLines.length > 1) {
-            final restQuotes = quotedLines.skip(1).map((l) => l.replaceFirst('> ', '')).join('\n');
+            final restQuotes = quotedLines
+                .skip(1)
+                .map((l) => l.replaceFirst('> ', ''))
+                .join('\n');
             replyToContent = '${replyToContent ?? ''}\n$restQuotes'.trim();
           }
 
@@ -191,7 +222,7 @@ class MatrixEventMapper {
         }
 
         // 提取实际回复内容
-        if (contentStartIndex < lines.length) {
+        if (fallbackBody.startsWith('> ') && contentStartIndex < lines.length) {
           body = lines.sublist(contentStartIndex).join('\n').trim();
         }
       }
@@ -202,6 +233,57 @@ class MatrixEventMapper {
       replyToContent: replyToContent,
       replyToSender: replyToSender,
     );
+  }
+
+  _ResolvedDisplayText _resolveDisplayText(matrix.Event event) {
+    final replace = _extractLatestEditReplacement(event);
+    if (replace == null) {
+      return _ResolvedDisplayText(
+        body: event.body,
+        formattedBody: event.formattedText.isNotEmpty
+            ? event.formattedText
+            : null,
+      );
+    }
+
+    final replacementContent = replace['content'] as Map<String, dynamic>?;
+    final newContent =
+        replacementContent?['m.new_content'] as Map<String, dynamic>? ??
+        replacementContent;
+
+    final body = newContent?['body'] as String?;
+    final formattedBody = newContent?['formatted_body'] as String?;
+
+    return _ResolvedDisplayText(
+      body: body?.isNotEmpty == true ? body! : event.body,
+      formattedBody: formattedBody?.isNotEmpty == true
+          ? formattedBody
+          : (event.formattedText.isNotEmpty ? event.formattedText : null),
+    );
+  }
+
+  Map<String, dynamic>? _extractLatestEditReplacement(matrix.Event event) {
+    final unsigned = event.unsigned;
+    if (unsigned == null) {
+      return null;
+    }
+
+    final relations = unsigned['m.relations'] as Map<String, dynamic>?;
+    if (relations == null) {
+      return null;
+    }
+
+    final replace = relations['m.replace'] as Map<String, dynamic>?;
+    if (replace == null) {
+      return null;
+    }
+
+    final replacementContent = replace['content'] as Map<String, dynamic>?;
+    if (replacementContent == null) {
+      return null;
+    }
+
+    return replace;
   }
 
   /// 映射消息类型
@@ -220,8 +302,12 @@ class MatrixEventMapper {
     if (event.type == 'm.call.hangup') {
       final callType = event.content['call_type'] as String?;
       final callId = event.content['call_id'] as String?;
-      debugLog('_mapMessageType: m.call.hangup - callId=$callId, call_type=$callType');
-      return callType == 'video' ? MessageType.videoCall : MessageType.voiceCall;
+      debugLog(
+        '_mapMessageType: m.call.hangup - callId=$callId, call_type=$callType',
+      );
+      return callType == 'video'
+          ? MessageType.videoCall
+          : MessageType.voiceCall;
     }
 
     // 获取消息类型
@@ -231,7 +317,9 @@ class MatrixEventMapper {
     if (msgType == 'n42.call.record') {
       final callType = event.content['call_type'] as String?;
       debugLog('_mapMessageType: n42.call.record - call_type=$callType');
-      return callType == 'video' ? MessageType.videoCall : MessageType.voiceCall;
+      return callType == 'video'
+          ? MessageType.videoCall
+          : MessageType.voiceCall;
     }
 
     // 处理加密消息
@@ -239,7 +327,9 @@ class MatrixEventMapper {
       final contentMsgType = event.content['msgtype'] as String?;
       final body = event.body;
       final plaintextBody = event.plaintextBody;
-      debugLog('_mapMessageType: Encrypted event - msgType=$msgType, contentMsgType=$contentMsgType, body=$body, plaintextBody=$plaintextBody');
+      debugLog(
+        '_mapMessageType: Encrypted event - msgType=$msgType, contentMsgType=$contentMsgType, body=$body, plaintextBody=$plaintextBody',
+      );
 
       String? effectiveMsgType;
       if (msgType.isNotEmpty && msgType != 'm.bad.encrypted') {
@@ -268,7 +358,9 @@ class MatrixEventMapper {
 
       if ((body.isNotEmpty && body != 'Encrypted event') ||
           (plaintextBody.isNotEmpty && plaintextBody != body)) {
-        debugLog('_mapMessageType: Encrypted message with valid body, treating as text');
+        debugLog(
+          '_mapMessageType: Encrypted message with valid body, treating as text',
+        );
         return MessageType.text;
       }
 
@@ -276,9 +368,13 @@ class MatrixEventMapper {
       return MessageType.encrypted;
     }
 
-    debugLog('_mapMessageType: msgType=$msgType, eventType=${event.type}, senderId=${event.senderId}');
+    debugLog(
+      '_mapMessageType: msgType=$msgType, eventType=${event.type}, senderId=${event.senderId}',
+    );
     if (event.content['url'] != null) {
-      debugLog('_mapMessageType: has url=${event.content['url']}, info=${event.content['info']}');
+      debugLog(
+        '_mapMessageType: has url=${event.content['url']}, info=${event.content['info']}',
+      );
     }
 
     switch (msgType) {
@@ -304,6 +400,9 @@ class MatrixEventMapper {
         }
         if (event.content['msgtype'] == 'n42.transfer') {
           return MessageType.transfer;
+        }
+        if (event.content['msgtype'] == 'n42.payment_request') {
+          return MessageType.paymentRequest;
         }
         if (event.content['msgtype'] == 'n42.music') {
           return MessageType.music;
@@ -388,7 +487,9 @@ class MatrixEventMapper {
       return MessageType.image;
     }
 
-    debugLog('_detectMediaTypeFromContent: has url but unknown type, treating as file');
+    debugLog(
+      '_detectMediaTypeFromContent: has url but unknown type, treating as file',
+    );
     return MessageType.file;
   }
 
@@ -468,17 +569,21 @@ class MatrixEventMapper {
           final count = item['count'] as int? ?? 0;
 
           if (emoji != null && emoji.isNotEmpty && count > 0) {
-            reactions.add(MessageReaction(
-              key: emoji,
-              userIds: List.generate(count, (i) => 'user_$i'),
-              isMe: false,
-            ));
+            reactions.add(
+              MessageReaction(
+                key: emoji,
+                userIds: List.generate(count, (i) => 'user_$i'),
+                isMe: false,
+              ),
+            );
           }
         }
       }
 
       if (reactions.isNotEmpty) {
-        debugLog('Extracted ${reactions.length} reactions for event ${event.eventId}');
+        debugLog(
+          'Extracted ${reactions.length} reactions for event ${event.eventId}',
+        );
       }
     } catch (e) {
       debugLog('Error extracting reactions: $e');
@@ -487,48 +592,27 @@ class MatrixEventMapper {
     return reactions;
   }
 
-  /// 手动构建 HTTP URL（参考 FluffyChat 实现）
-  String? buildHttpUrl(String? mxcUrl, {int? width, int? height, String method = 'scale'}) {
-    if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
-
-    if (mxcUrl.startsWith('http://') || mxcUrl.startsWith('https://')) {
-      return mxcUrl;
-    }
-
-    if (!mxcUrl.startsWith('mxc://')) {
-      debugLog('Invalid mxc URL: $mxcUrl');
-      return null;
-    }
-
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-
-      if (serverName.isEmpty || mediaId.isEmpty) {
-        debugLog('Invalid mxc URL format: $mxcUrl');
-        return null;
-      }
-
-      final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) {
-        debugLog('No homeserver configured');
-        return null;
-      }
-
-      String url;
-      if (width != null && height != null) {
-        url = '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$method';
-      } else {
-        url = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-      }
-
+  /// 构建认证媒体 HTTP URL
+  String? buildHttpUrl(
+    String? mxcUrl, {
+    int? width,
+    int? height,
+    String method = 'scale',
+  }) {
+    final thumbnailMethod = method == 'crop'
+        ? matrix.ThumbnailMethod.crop
+        : matrix.ThumbnailMethod.scale;
+    final url = MatrixUtils.mxcToHttp(
+      mxcUrl,
+      client: _client,
+      width: width,
+      height: height,
+      method: thumbnailMethod,
+    );
+    if (url != null) {
       debugLog('Built media URL: $url (mxcUrl: $mxcUrl)');
-      return url;
-    } catch (e) {
-      debugLog('Error building HTTP URL: $e');
-      return null;
     }
+    return url;
   }
 
   /// 转换 mxc:// URL 为 HTTP URL（兼容旧接口）
@@ -564,21 +648,14 @@ class MatrixEventMapper {
 
   /// 获取媒体下载URL
   Uri? getMediaUrl(String? mxcUrl, {int? width, int? height}) {
-    if (mxcUrl == null || _client == null) return null;
-
     try {
-      final uri = Uri.parse(mxcUrl);
-      if (width != null && height != null) {
-        // ignore: deprecated_member_use
-        return uri.getThumbnail(
-          _client!,
-          width: width,
-          height: height,
-          method: matrix.ThumbnailMethod.scale,
-        );
-      }
-      // ignore: deprecated_member_use
-      return uri.getDownloadLink(_client!);
+      final url = buildHttpUrl(
+        mxcUrl,
+        width: width,
+        height: height,
+        method: 'scale',
+      );
+      return url == null ? null : Uri.parse(url);
     } catch (e) {
       return null;
     }
@@ -610,19 +687,23 @@ class MatrixEventMapper {
           replyCount = threadSummary['count'] as int?;
 
           // 提取线程未读数（MSC3440 扩展）
-          final unreadNotifications = threadSummary['unread_notifications'] as Map<String, dynamic>?;
+          final unreadNotifications =
+              threadSummary['unread_notifications'] as Map<String, dynamic>?;
           if (unreadNotifications != null) {
             unreadCount = unreadNotifications['notification_count'] as int?;
           }
 
-          final latestEvent = threadSummary['latest_event'] as Map<String, dynamic>?;
+          final latestEvent =
+              threadSummary['latest_event'] as Map<String, dynamic>?;
           if (latestEvent != null) {
             latestReplySender = latestEvent['sender'] as String?;
             final content = latestEvent['content'] as Map<String, dynamic>?;
             latestReply = content?['body'] as String?;
             final originServerTs = latestEvent['origin_server_ts'] as int?;
             if (originServerTs != null) {
-              latestReplyTimestamp = DateTime.fromMillisecondsSinceEpoch(originServerTs);
+              latestReplyTimestamp = DateTime.fromMillisecondsSinceEpoch(
+                originServerTs,
+              );
             }
           }
         }
@@ -638,4 +719,11 @@ class MatrixEventMapper {
       unreadCount: unreadCount,
     );
   }
+}
+
+class _ResolvedDisplayText {
+  final String body;
+  final String? formattedBody;
+
+  const _ResolvedDisplayText({required this.body, this.formattedBody});
 }

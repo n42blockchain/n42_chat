@@ -4,12 +4,14 @@ import 'dart:async';
 import 'package:matrix/matrix.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../domain/entities/stored_account_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/secure_storage_datasource.dart';
 import '../datasources/matrix/matrix_auth_datasource.dart';
 import '../datasources/remote/social_auth_api.dart';
 import '../../core/utils/debug_log.dart';
+import '../../core/utils/matrix_utils.dart';
 
 /// 认证仓库实现
 class AuthRepositoryImpl implements IAuthRepository {
@@ -427,6 +429,42 @@ class AuthRepositoryImpl implements IAuthRepository {
   }
 
   @override
+  Future<AuthResult> registerAnonymously({
+    required String homeserver,
+    required String password,
+    String? registrationToken,
+  }) async {
+    try {
+      final username = await _generateAnonymousUsername(homeserver);
+      return register(
+        homeserver: homeserver,
+        username: username,
+        password: password,
+        registrationToken: registrationToken,
+      );
+    } catch (e) {
+      debugLog('AuthRepository: Anonymous registration failed - $e');
+      return AuthResult.failure('匿名注册失败: $e', type: AuthErrorType.unknown);
+    }
+  }
+
+  Future<String> _generateAnonymousUsername(String homeserver) async {
+    const uuid = Uuid();
+    for (var attempt = 0; attempt < 12; attempt++) {
+      final candidate =
+          'anon_${uuid.v4().replaceAll('-', '').substring(0, 12)}';
+      final available = await _authDataSource.isUsernameAvailable(
+        homeserver,
+        candidate,
+      );
+      if (available) {
+        return candidate;
+      }
+    }
+    throw StateError('No anonymous username available');
+  }
+
+  @override
   Future<HomeserverInfo> checkHomeserver(String homeserver) async {
     try {
       final (discoveryInfo, versionsResponse, loginFlows) =
@@ -490,18 +528,16 @@ class AuthRepositoryImpl implements IAuthRepository {
       ]);
       final profile = results[0] as Profile;
 
-      // 手动构建头像 HTTP URL
-      String? avatarHttpUrl;
-      if (profile.avatarUrl != null) {
-        avatarHttpUrl = _buildAvatarHttpUrl(
-          profile.avatarUrl.toString(),
-          client,
-        );
-      }
+      final avatarHttpUrl = MatrixUtils.getAvatarUrl(
+        profile.avatarUrl,
+        client: client,
+        size: 96,
+      );
 
       // 缓存头像和显示名
       _cachedAvatarUrl = avatarHttpUrl;
       _cachedDisplayName = profile.displayName ?? userId.localpart ?? '';
+      await _syncStoredAccountProfile();
 
       final profileData = _cachedProfileData ?? {};
 
@@ -518,34 +554,6 @@ class AuthRepositoryImpl implements IAuthRepository {
     } catch (e) {
       debugLog('AuthRepository: Get profile failed - $e');
       return currentUser;
-    }
-  }
-
-  /// 构建头像 HTTP URL（使用认证媒体 API，不在 URL 中暴露 access_token）
-  String? _buildAvatarHttpUrl(String? mxcUrl, Client client) {
-    if (mxcUrl == null || mxcUrl.isEmpty) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-      if (serverName.contains('/') || serverName.contains('..')) {
-        debugLog('AuthRepository: Rejected invalid mxc serverName');
-        return null;
-      }
-
-      final homeserver =
-          client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-
-      // 使用认证媒体 API (Matrix 1.11+)，通过请求头传递 token 而非 URL 参数
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
-    } catch (e) {
-      debugLog('AuthRepository: Error building avatar URL: $e');
-      return null;
     }
   }
 
@@ -859,7 +867,9 @@ class AuthRepositoryImpl implements IAuthRepository {
           );
           break;
         case 'wechat':
-          response = await _socialAuthApi.loginWithWeChat(code: primaryCredential);
+          response = await _socialAuthApi.loginWithWeChat(
+            code: primaryCredential,
+          );
           break;
         default:
           return AuthResult.failure(
@@ -1154,6 +1164,100 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
   }
 
+  @override
+  Future<String?> getBoundPhone() async {
+    if (!isLoggedIn) {
+      return null;
+    }
+
+    try {
+      final client = _authDataSource.clientManager.client;
+      if (client == null) {
+        return null;
+      }
+
+      final threePids = await client.getAccount3PIDs();
+      if (threePids != null) {
+        for (final threePid in threePids) {
+          if (threePid.medium == ThirdPartyIdentifierMedium.msisdn) {
+            debugLog('AuthRepository: Found bound phone: ${threePid.address}');
+            return threePid.address;
+          }
+        }
+      }
+
+      return null;
+    } catch (e) {
+      debugLog('AuthRepository: Get bound phone failed - $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<List<StoredAccountEntity>> getStoredAccounts() async {
+    final accounts = await _secureStorage.getAccounts();
+    final currentUserId =
+        _authDataSource.clientManager.userId ??
+        (await _secureStorage.getSession())?['userId'];
+
+    final stored = accounts.entries.map((entry) {
+      final data = entry.value;
+      final userId = (data['userId'] as String?) ?? entry.key;
+      return StoredAccountEntity(
+        userId: userId,
+        homeserver: (data['homeserver'] as String?) ?? '',
+        displayName: data['displayName'] as String?,
+        avatarUrl: data['avatarUrl'] as String?,
+        addedAt: DateTime.tryParse((data['addedAt'] as String?) ?? ''),
+        isCurrent: userId == currentUserId,
+      );
+    }).toList();
+
+    stored.sort((a, b) {
+      if (a.isCurrent != b.isCurrent) {
+        return a.isCurrent ? -1 : 1;
+      }
+
+      final aTime = a.addedAt;
+      final bTime = b.addedAt;
+      if (aTime == null && bTime == null) return a.userId.compareTo(b.userId);
+      if (aTime == null) return 1;
+      if (bTime == null) return -1;
+      return bTime.compareTo(aTime);
+    });
+
+    return stored;
+  }
+
+  @override
+  Future<AuthResult> switchStoredAccount(String userId) async {
+    final accounts = await _secureStorage.getAccounts();
+    final data = accounts[userId];
+    if (data == null) {
+      return AuthResult.failure('账号不存在', type: AuthErrorType.notLoggedIn);
+    }
+
+    final homeserver = data['homeserver'] as String?;
+    final accessToken = data['accessToken'] as String?;
+    final deviceId = data['deviceId'] as String?;
+    final storedUserId = data['userId'] as String? ?? userId;
+    if (homeserver == null ||
+        homeserver.isEmpty ||
+        accessToken == null ||
+        accessToken.isEmpty ||
+        deviceId == null ||
+        deviceId.isEmpty) {
+      return AuthResult.failure('账号数据不完整', type: AuthErrorType.tokenExpired);
+    }
+
+    return loginWithToken(
+      homeserver: homeserver,
+      accessToken: accessToken,
+      userId: storedUserId,
+      deviceId: deviceId,
+    );
+  }
+
   // ============================================
   // 私有方法
   // ============================================
@@ -1169,6 +1273,37 @@ class AuthRepositoryImpl implements IAuthRepository {
       accessToken: accessToken,
       userId: userId,
       deviceId: deviceId,
+    );
+    await _secureStorage.addAccount(
+      userId: userId,
+      homeserver: homeserver,
+      accessToken: accessToken,
+      deviceId: deviceId,
+      displayName: _cachedDisplayName ?? userId.localpart,
+      avatarUrl: _cachedAvatarUrl,
+    );
+  }
+
+  Future<void> _syncStoredAccountProfile() async {
+    final session = await _secureStorage.getSession();
+    final homeserver = session?['homeserver'];
+    final accessToken = session?['accessToken'];
+    final userId = session?['userId'];
+    final deviceId = session?['deviceId'];
+    if (homeserver == null ||
+        accessToken == null ||
+        userId == null ||
+        deviceId == null) {
+      return;
+    }
+
+    await _secureStorage.addAccount(
+      userId: userId,
+      homeserver: homeserver,
+      accessToken: accessToken,
+      deviceId: deviceId,
+      displayName: _cachedDisplayName ?? userId.localpart,
+      avatarUrl: _cachedAvatarUrl,
     );
   }
 

@@ -97,10 +97,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     }
 
     // 设置状态栏为透明
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
   }
 
   @override
@@ -113,10 +115,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     _pulseController.dispose();
     _hideControlsTimer?.cancel();
     WakelockPlus.disable();
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
     super.dispose();
   }
 
@@ -284,8 +288,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             _buildRemoteVideo(),
 
             // 本地视频（画中画）
-            if (_state == CallState.connected)
-              _buildLocalVideo(),
+            if (_state == CallState.connected) _buildLocalVideo(),
 
             // 顶部渐变遮罩
             if (_showControls)
@@ -374,13 +377,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
-        final scale = (_state == CallState.ringing || _state == CallState.incoming)
+        final scale =
+            (_state == CallState.ringing || _state == CallState.incoming)
             ? _pulseAnimation.value
             : 1.0;
-        return Transform.scale(
-          scale: scale,
-          child: child,
-        );
+        return Transform.scale(scale: scale, child: child);
       },
       child: Container(
         width: 120,
@@ -434,6 +435,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                     : (l10n?.chatSpeakerOn ?? 'Speaker'),
                 isActive: _isSpeakerOn,
                 onTap: _toggleSpeaker,
+              ),
+
+              _buildWeChatControlButton(
+                icon: Icons.chat_bubble_outline,
+                label: l10n?.callChatLabel ?? 'Chat',
+                onTap: _backToChat,
               ),
             ],
           ),
@@ -524,19 +531,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               shape: BoxShape.circle,
               color: _hangupColor,
             ),
-            child: const Icon(
-              Icons.call_end,
-              color: Colors.white,
-              size: 32,
-            ),
+            child: const Icon(Icons.call_end, color: Colors.white, size: 32),
           ),
           const SizedBox(height: 10),
           Text(
             l10n?.chatHangUp ?? 'Hang Up',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
         ],
       ),
@@ -557,23 +557,13 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           Container(
             width: 70,
             height: 70,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color,
-            ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 32,
-            ),
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+            child: Icon(icon, color: Colors.white, size: 32),
           ),
           const SizedBox(height: 10),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
         ],
       ),
@@ -601,7 +591,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           height: 140,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.3),
+              width: 1,
+            ),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(7),
@@ -735,6 +728,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                   label: l10n?.callSwitchCameraLabel ?? 'Switch',
                   onTap: _switchCamera,
                 ),
+
+                _buildWeChatControlButton(
+                  icon: Icons.chat_bubble_outline,
+                  label: l10n?.callChatLabel ?? 'Chat',
+                  onTap: _backToChat,
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -829,5 +828,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     // 停止铃声/通知
     await CallManager().stopRingtone();
     await widget.webRTCService.hangup();
+  }
+
+  void _backToChat() {
+    Navigator.of(context).maybePop();
   }
 }

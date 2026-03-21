@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
 
@@ -158,7 +160,9 @@ class _StickerPickerState extends State<StickerPicker> {
                 final actualIndex = _recentStickers.isNotEmpty ? index : index;
 
                 return _buildPackTab(
-                  emoji: pack.stickers.isNotEmpty ? pack.stickers.first.emoji : null,
+                  emoji: pack.stickers.isNotEmpty
+                      ? pack.stickers.first.emoji
+                      : null,
                   label: pack.name,
                   isSelected: _selectedPackIndex == actualIndex,
                   onTap: () => _onPackSelected(actualIndex),
@@ -207,7 +211,9 @@ class _StickerPickerState extends State<StickerPicker> {
                   size: 22,
                   color: isSelected
                       ? AppColors.primary
-                      : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                      : (isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondary),
                 )
               : Text(
                   emoji ?? label?.substring(0, 1) ?? '?',
@@ -215,7 +221,9 @@ class _StickerPickerState extends State<StickerPicker> {
                     fontSize: emoji != null ? 22 : 14,
                     color: isSelected
                         ? AppColors.primary
-                        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                        : (isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondary),
                   ),
                 ),
         ),
@@ -287,9 +295,7 @@ class _StickerPickerState extends State<StickerPicker> {
           color: isDark ? Colors.grey[800] : Colors.grey[100],
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Center(
-          child: _buildStickerContent(sticker),
-        ),
+        child: Center(child: _buildStickerContent(sticker)),
       ),
     );
   }
@@ -298,30 +304,31 @@ class _StickerPickerState extends State<StickerPicker> {
     // Emoji 贴纸
     if (sticker.url.startsWith('emoji:')) {
       final emoji = sticker.url.substring(6);
-      return Text(
-        emoji,
-        style: const TextStyle(fontSize: 32),
-      );
+      return Text(emoji, style: const TextStyle(fontSize: 32));
     }
 
     // 图片贴纸
     final httpUrl = sticker.httpUrl ?? sticker.url;
     if (httpUrl.startsWith('http')) {
+      final client = getIt.isRegistered<MatrixClientManager>()
+          ? getIt<MatrixClientManager>().client
+          : null;
       return ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: Image.network(
           httpUrl,
           fit: BoxFit.contain,
+          headers: mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+            httpUrl,
+            client: client,
+          ),
           errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported),
         ),
       );
     }
 
     // 显示 emoji 或占位符
-    return Text(
-      sticker.emoji ?? '?',
-      style: const TextStyle(fontSize: 32),
-    );
+    return Text(sticker.emoji ?? '?', style: const TextStyle(fontSize: 32));
   }
 
   Widget _buildEmptyState(bool isDark) {

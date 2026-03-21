@@ -10,6 +10,7 @@ import '../../core/services/username_service.dart';
 import '../datasources/matrix/matrix_search_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../../core/utils/debug_log.dart';
+import '../../core/utils/matrix_utils.dart';
 
 /// 搜索仓库实现
 class SearchRepositoryImpl implements ISearchRepository {
@@ -30,6 +31,7 @@ class SearchRepositoryImpl implements ISearchRepository {
   Future<SearchResults> searchGlobal(
     String query, {
     SearchResultType? type,
+    MessageSearchFilter? filter,
     int limit = 50,
   }) async {
     if (query.trim().isEmpty) {
@@ -49,7 +51,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       contacts = await searchContacts(query, limit: limit ~/ 4);
       groups = await searchGroups(query, limit: limit ~/ 4);
       conversations = await searchConversations(query, limit: limit ~/ 4);
-      messages = await searchMessages(query, limit: limit ~/ 4);
+      messages = await searchMessages(query, limit: limit ~/ 4, filter: filter);
     } else {
       switch (type) {
         case SearchResultType.contact:
@@ -62,7 +64,7 @@ class SearchRepositoryImpl implements ISearchRepository {
           conversations = await searchConversations(query, limit: limit);
           break;
         case SearchResultType.message:
-          messages = await searchMessages(query, limit: limit);
+          messages = await searchMessages(query, limit: limit, filter: filter);
           break;
         case SearchResultType.all:
           break;
@@ -75,6 +77,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       conversations: conversations,
       messages: messages,
       query: query,
+      messageFilter: filter == null || filter.isEmpty ? null : filter,
     );
   }
 
@@ -195,14 +198,22 @@ class SearchRepositoryImpl implements ISearchRepository {
     String query, {
     int limit = 50,
     String? roomId,
+    MessageSearchFilter? filter,
   }) async {
     if (roomId != null) {
       // 在指定房间搜索
-      final events = await _searchDataSource.searchMessagesInRoom(
-        roomId,
-        query,
-        limit: limit,
-      );
+      final events = filter == null || filter.isEmpty
+          ? await _searchDataSource.searchMessagesInRoom(
+              roomId,
+              query,
+              limit: limit,
+            )
+          : await _searchDataSource.searchMessagesInRoom(
+              roomId,
+              query,
+              filter: filter,
+              limit: limit,
+            );
 
       final room = _clientManager.client?.getRoomById(roomId);
       final roomName = room?.getLocalizedDisplayname() ?? '未知会话';
@@ -220,10 +231,13 @@ class SearchRepositoryImpl implements ISearchRepository {
       }).toList();
     } else {
       // 全局搜索消息
-      final results = await _searchDataSource.searchMessagesGlobally(
-        query,
-        limit: limit,
-      );
+      final results = filter == null || filter.isEmpty
+          ? await _searchDataSource.searchMessagesGlobally(query, limit: limit)
+          : await _searchDataSource.searchMessagesGlobally(
+              query,
+              filter: filter,
+              limit: limit,
+            );
 
       return results.map((result) {
         final message = _mapEventToMessage(result.event);
@@ -244,17 +258,25 @@ class SearchRepositoryImpl implements ISearchRepository {
   Future<ChatSearchResults> searchInChat(
     String roomId,
     String query, {
+    MessageSearchFilter? filter,
     int limit = 50,
   }) async {
     if (query.trim().isEmpty) {
       return ChatSearchResults(roomId: roomId);
     }
 
-    final events = await _searchDataSource.searchMessagesInRoom(
-      roomId,
-      query,
-      limit: limit,
-    );
+    final events = filter == null || filter.isEmpty
+        ? await _searchDataSource.searchMessagesInRoom(
+            roomId,
+            query,
+            limit: limit,
+          )
+        : await _searchDataSource.searchMessagesInRoom(
+            roomId,
+            query,
+            filter: filter,
+            limit: limit,
+          );
 
     final messages = events.map(_mapEventToMessage).toList();
 
@@ -264,6 +286,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       roomId: roomId,
       currentIndex: messages.isNotEmpty ? 0 : -1,
       hasMore: messages.length >= limit,
+      filter: filter == null || filter.isEmpty ? null : filter,
     );
   }
 
@@ -273,11 +296,19 @@ class SearchRepositoryImpl implements ISearchRepository {
     int limit = 50,
   }) async {
     // 加载更多结果
-    final events = await _searchDataSource.searchMessagesInRoom(
-      currentResults.roomId,
-      currentResults.query,
-      limit: currentResults.messages.length + limit,
-    );
+    final filter = currentResults.filter;
+    final events = filter == null || filter.isEmpty
+        ? await _searchDataSource.searchMessagesInRoom(
+            currentResults.roomId,
+            currentResults.query,
+            limit: currentResults.messages.length + limit,
+          )
+        : await _searchDataSource.searchMessagesInRoom(
+            currentResults.roomId,
+            currentResults.query,
+            filter: filter,
+            limit: currentResults.messages.length + limit,
+          );
 
     final messages = events.map(_mapEventToMessage).toList();
 
@@ -315,7 +346,11 @@ class SearchRepositoryImpl implements ISearchRepository {
     String? avatarUrl;
     final client = _clientManager.client;
     if (user.avatarUrl != null && client != null) {
-      avatarUrl = _buildAvatarHttpUrl(user.avatarUrl.toString(), client);
+      avatarUrl = MatrixUtils.getAvatarUrl(
+        user.avatarUrl,
+        client: client,
+        size: 96,
+      );
     }
 
     return ContactEntity(
@@ -323,29 +358,6 @@ class SearchRepositoryImpl implements ISearchRepository {
       displayName: user.calcDisplayname(),
       avatarUrl: avatarUrl,
     );
-  }
-
-  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
-  String? _buildAvatarHttpUrl(String? mxcUrl, matrix.Client client) {
-    if (mxcUrl == null || mxcUrl.isEmpty) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-
-      final homeserver =
-          client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-
-      // 使用认证媒体 API (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
-    } catch (e) {
-      return null;
-    }
   }
 
   ConversationEntity _mapRoomToConversation(matrix.Room room) {
@@ -401,10 +413,7 @@ class SearchRepositoryImpl implements ISearchRepository {
   String? _getRoomAvatarUrl(matrix.Room? room) {
     if (room == null) return null;
     final client = _clientManager.client;
-    final avatarMxc = room.avatar?.toString();
-    if (avatarMxc == null || client == null) return null;
-
-    return _buildAvatarHttpUrl(avatarMxc, client);
+    return MatrixUtils.getAvatarUrl(room.avatar, client: client, size: 96);
   }
 }
 

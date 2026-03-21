@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../entities/stored_account_entity.dart';
 import '../entities/user_entity.dart';
 
 /// 认证仓库接口
@@ -57,6 +58,13 @@ abstract class IAuthRepository {
     String? registrationToken,
   });
 
+  /// 匿名注册（不绑定手机号/邮箱，自动生成用户名）
+  Future<AuthResult> registerAnonymously({
+    required String homeserver,
+    required String password,
+    String? registrationToken,
+  });
+
   /// 检查Homeserver是否有效
   Future<HomeserverInfo> checkHomeserver(String homeserver);
 
@@ -67,28 +75,25 @@ abstract class IAuthRepository {
   Future<UserEntity?> getCurrentUserProfile();
 
   /// 更新用户资料
-  Future<void> updateProfile({
-    String? displayName,
-    String? avatarPath,
-  });
+  Future<void> updateProfile({String? displayName, String? avatarPath});
 
   /// 更新头像
-  /// 
+  ///
   /// [avatarBytes] 头像图片二进制数据
   /// [filename] 文件名
-  /// 
+  ///
   /// 返回是否成功
   Future<bool> updateAvatar(Uint8List avatarBytes, String filename);
 
   /// 更新显示名
-  /// 
+  ///
   /// [displayName] 新的显示名
-  /// 
+  ///
   /// 返回是否成功
   Future<bool> updateDisplayName(String displayName);
-  
+
   /// 更新用户自定义资料
-  /// 
+  ///
   /// 使用 Matrix 账户数据存储自定义字段
   Future<bool> updateUserProfileData({
     String? gender,
@@ -97,7 +102,7 @@ abstract class IAuthRepository {
     String? pokeText,
     String? ringtone,
   });
-  
+
   /// 获取用户自定义资料数据
   Future<Map<String, dynamic>?> getUserProfileData();
 
@@ -207,6 +212,15 @@ abstract class IAuthRepository {
 
   /// 获取当前绑定的邮箱
   Future<String?> getBoundEmail();
+
+  /// 获取当前绑定的手机号
+  Future<String?> getBoundPhone();
+
+  /// 获取当前设备已保存的账号列表
+  Future<List<StoredAccountEntity>> getStoredAccounts();
+
+  /// 切换到本机已保存的另一个账号
+  Future<AuthResult> switchStoredAccount(String userId);
 }
 
 /// 认证结果
@@ -224,28 +238,21 @@ class AuthResult {
   });
 
   /// 创建成功结果
-  factory AuthResult.success(UserEntity user) => AuthResult._(
-        success: true,
-        user: user,
-      );
+  factory AuthResult.success(UserEntity user) =>
+      AuthResult._(success: true, user: user);
 
   /// 创建失败结果
   factory AuthResult.failure(
     String message, {
     AuthErrorType type = AuthErrorType.unknown,
-  }) =>
-      AuthResult._(
-        success: false,
-        errorMessage: message,
-        errorType: type,
-      );
+  }) => AuthResult._(success: false, errorMessage: message, errorType: type);
 
   /// 未登录
   factory AuthResult.notLoggedIn() => const AuthResult._(
-        success: false,
-        errorMessage: '未登录',
-        errorType: AuthErrorType.notLoggedIn,
-      );
+    success: false,
+    errorMessage: '未登录',
+    errorType: AuthErrorType.notLoggedIn,
+  );
 
   @override
   String toString() => success
