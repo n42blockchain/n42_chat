@@ -152,7 +152,9 @@ class PreferencesDataSource {
   // 通知设置
   // ============================================
 
-  Future<void> saveNotificationSettingsModel(NotificationSettings settings) async {
+  Future<void> saveNotificationSettingsModel(
+    NotificationSettings settings,
+  ) async {
     final p = await prefs;
     await p.setString(
       _keyNotificationSettings,
@@ -164,6 +166,7 @@ class PreferencesDataSource {
         'doNotDisturb': settings.doNotDisturb,
         'doNotDisturbStart': settings.doNotDisturbStart,
         'doNotDisturbEnd': settings.doNotDisturbEnd,
+        'privacyMode': settings.privacyMode.name,
         'savedAt': DateTime.now().toIso8601String(),
       }),
     );
@@ -187,6 +190,10 @@ class PreferencesDataSource {
         doNotDisturb: json['doNotDisturb'] as bool? ?? false,
         doNotDisturbStart: json['doNotDisturbStart'] as String?,
         doNotDisturbEnd: json['doNotDisturbEnd'] as String?,
+        privacyMode: NotificationPrivacyMode.values.firstWhere(
+          (mode) => mode.name == json['privacyMode'],
+          orElse: () => NotificationPrivacyMode.full,
+        ),
       );
     } catch (e) {
       debugLog('Preferences: Failed to read notification settings - $e');

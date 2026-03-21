@@ -289,7 +289,9 @@ class N42Chat {
     return _preferencesDataSource().getNotificationSettingsModel();
   }
 
-  static Future<void> applyAppearanceSettings(AppearanceSettings settings) async {
+  static Future<void> applyAppearanceSettings(
+    AppearanceSettings settings,
+  ) async {
     await _preferencesDataSource().saveAppearanceSettingsModel(settings);
     setThemeMode(settings.themeMode);
     setFontSize(settings.fontSize);
@@ -299,7 +301,9 @@ class N42Chat {
     NotificationSettings settings,
   ) async {
     await _preferencesDataSource().saveNotificationSettingsModel(settings);
-    _pushService?.setNotificationConfig(_notificationConfigFromSettings(settings));
+    _pushService?.setNotificationConfig(
+      _notificationConfigFromSettings(settings),
+    );
   }
 
   static NotificationConfig _notificationConfigFromSettings(
@@ -313,6 +317,7 @@ class N42Chat {
       doNotDisturb: settings.doNotDisturb,
       dndStartTime: _parseStoredTimeOfDay(settings.doNotDisturbStart),
       dndEndTime: _parseStoredTimeOfDay(settings.doNotDisturbEnd),
+      privacyMode: settings.privacyMode,
     );
   }
 
@@ -2225,8 +2230,7 @@ Widget _wrapChatPresentation(
       ? ThemeData.dark(useMaterial3: true)
       : ThemeData.light(useMaterial3: true);
   final baseTheme =
-      parentTheme.brightness ==
-          (useDark ? Brightness.dark : Brightness.light)
+      parentTheme.brightness == (useDark ? Brightness.dark : Brightness.light)
       ? parentTheme
       : fallbackTheme.copyWith(
           textTheme: parentTheme.textTheme,

@@ -24,13 +24,21 @@ void main() {
       expect(defaults.doNotDisturb, isFalse);
       expect(defaults.doNotDisturbStart, isNull);
       expect(defaults.doNotDisturbEnd, isNull);
+      expect(defaults.privacyMode, NotificationPrivacyMode.full);
     });
 
     test('copyWith changes single field', () {
       final updated = defaults.copyWith(enabled: false);
       expect(updated.enabled, isFalse);
       expect(updated.showPreview, isTrue); // unchanged
-      expect(updated.playSound, isTrue);   // unchanged
+      expect(updated.playSound, isTrue); // unchanged
+    });
+
+    test('copyWith can set privacy mode', () {
+      final updated = defaults.copyWith(
+        privacyMode: NotificationPrivacyMode.hidden,
+      );
+      expect(updated.privacyMode, NotificationPrivacyMode.hidden);
     });
 
     test('copyWith can set doNotDisturb times', () {
@@ -102,8 +110,14 @@ void main() {
 
     test('VisibilityLevel has all three values', () {
       expect(VisibilityLevel.values, hasLength(3));
-      expect(VisibilityLevel.values,
-          containsAll([VisibilityLevel.everyone, VisibilityLevel.contacts, VisibilityLevel.nobody]));
+      expect(
+        VisibilityLevel.values,
+        containsAll([
+          VisibilityLevel.everyone,
+          VisibilityLevel.contacts,
+          VisibilityLevel.nobody,
+        ]),
+      );
     });
   });
 
@@ -150,11 +164,14 @@ void main() {
 
     test('BubbleStyle has wechat, modern, classic', () {
       expect(BubbleStyle.values, hasLength(3));
-      expect(BubbleStyle.values, containsAll([
-        BubbleStyle.wechat,
-        BubbleStyle.modern,
-        BubbleStyle.classic,
-      ]));
+      expect(
+        BubbleStyle.values,
+        containsAll([
+          BubbleStyle.wechat,
+          BubbleStyle.modern,
+          BubbleStyle.classic,
+        ]),
+      );
     });
   });
 
@@ -180,7 +197,9 @@ void main() {
     });
 
     test('copyWith changes sendMessageKey to ctrlEnter', () {
-      final updated = defaults.copyWith(sendMessageKey: SendMessageKey.ctrlEnter);
+      final updated = defaults.copyWith(
+        sendMessageKey: SendMessageKey.ctrlEnter,
+      );
       expect(updated.sendMessageKey, SendMessageKey.ctrlEnter);
     });
 

@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_room_datasource.dart';
 import 'package:n42_chat/src/data/repositories/conversation_repository_impl.dart';
+import 'package:n42_chat/src/domain/entities/conversation_entity.dart';
 
 class MockMatrixRoomDataSource extends Mock implements MatrixRoomDataSource {}
 
@@ -130,6 +131,40 @@ void main() {
       await repository.markAsRead(roomId);
 
       verify(() => mockRoomDS.markRoomAsRead(roomId)).called(1);
+    });
+  });
+
+  group('notification mode', () {
+    test('setMuted delegates to all-messages when unmuting', () async {
+      const roomId = '!room1:matrix.org';
+      when(
+        () => mockRoomDS.setRoomNotificationMode(
+          roomId,
+          ConversationNotificationMode.allMessages,
+        ),
+      ).thenAnswer((_) async {});
+
+      await repository.setMuted(roomId, false);
+
+      verify(
+        () => mockRoomDS.setRoomNotificationMode(
+          roomId,
+          ConversationNotificationMode.allMessages,
+        ),
+      ).called(1);
+    });
+
+    test('getNotificationMode reads mode from datasource', () async {
+      const roomId = '!room1:matrix.org';
+      final room = MockRoom();
+      when(() => mockRoomDS.getRoomById(roomId)).thenReturn(room);
+      when(
+        () => mockRoomDS.getRoomNotificationMode(room),
+      ).thenReturn(ConversationNotificationMode.mentionsOnly);
+
+      final mode = await repository.getNotificationMode(roomId);
+
+      expect(mode, ConversationNotificationMode.mentionsOnly);
     });
   });
 }

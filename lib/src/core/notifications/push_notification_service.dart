@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
+
+import '../../domain/entities/user_profile_entity.dart'
+    show NotificationPrivacyMode;
 import '../utils/debug_log.dart';
 
 /// 推送通知服务
@@ -317,6 +320,9 @@ class NotificationConfig {
   /// 免打扰结束时间
   final TimeOfDay? dndEndTime;
 
+  /// 通知隐私模式
+  final NotificationPrivacyMode privacyMode;
+
   const NotificationConfig({
     this.enabled = true,
     this.showPreview = true,
@@ -325,6 +331,7 @@ class NotificationConfig {
     this.doNotDisturb = false,
     this.dndStartTime,
     this.dndEndTime,
+    this.privacyMode = NotificationPrivacyMode.full,
   });
 
   /// 检查当前是否在免打扰时间内
@@ -355,6 +362,7 @@ class NotificationConfig {
     bool? doNotDisturb,
     TimeOfDay? dndStartTime,
     TimeOfDay? dndEndTime,
+    NotificationPrivacyMode? privacyMode,
   }) {
     return NotificationConfig(
       enabled: enabled ?? this.enabled,
@@ -364,8 +372,39 @@ class NotificationConfig {
       doNotDisturb: doNotDisturb ?? this.doNotDisturb,
       dndStartTime: dndStartTime ?? this.dndStartTime,
       dndEndTime: dndEndTime ?? this.dndEndTime,
+      privacyMode: privacyMode ?? this.privacyMode,
     );
   }
+
+  NotificationPresentation presentMessage({
+    required String title,
+    required String body,
+    String genericTitle = 'N42 Chat',
+    String genericBody = 'You have a new message',
+  }) {
+    final normalizedTitle = title.trim().isEmpty ? genericTitle : title;
+    final normalizedBody = body.trim().isEmpty ? genericBody : body;
+
+    switch (privacyMode) {
+      case NotificationPrivacyMode.full:
+        return NotificationPresentation(
+          title: normalizedTitle,
+          body: showPreview ? normalizedBody : genericBody,
+        );
+      case NotificationPrivacyMode.senderOnly:
+        return NotificationPresentation(
+          title: normalizedTitle,
+          body: genericBody,
+        );
+      case NotificationPrivacyMode.hidden:
+        return NotificationPresentation(title: genericTitle, body: genericBody);
+    }
+  }
+
+  bool get allowsNativeForegroundPreview =>
+      enabled &&
+      privacyMode == NotificationPrivacyMode.full &&
+      showPreview;
 
   Map<String, dynamic> toJson() {
     return {
@@ -380,6 +419,7 @@ class NotificationConfig {
       'dndEndTime': dndEndTime != null
           ? '${dndEndTime!.hour}:${dndEndTime!.minute}'
           : null,
+      'privacyMode': privacyMode.name,
     };
   }
 
@@ -392,6 +432,7 @@ class NotificationConfig {
       doNotDisturb: json['doNotDisturb'] as bool? ?? false,
       dndStartTime: _parseTimeOfDay(json['dndStartTime'] as String?),
       dndEndTime: _parseTimeOfDay(json['dndEndTime'] as String?),
+      privacyMode: _parsePrivacyMode(json['privacyMode'] as String?),
     );
   }
 
@@ -404,4 +445,18 @@ class NotificationConfig {
       minute: int.tryParse(parts[1]) ?? 0,
     );
   }
+
+  static NotificationPrivacyMode _parsePrivacyMode(String? value) {
+    return NotificationPrivacyMode.values.firstWhere(
+      (mode) => mode.name == value,
+      orElse: () => NotificationPrivacyMode.full,
+    );
+  }
+}
+
+class NotificationPresentation {
+  final String title;
+  final String body;
+
+  const NotificationPresentation({required this.title, required this.body});
 }

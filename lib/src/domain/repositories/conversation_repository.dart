@@ -39,6 +39,17 @@ abstract class IConversationRepository {
   /// 设置会话免打扰
   Future<void> setMuted(String conversationId, bool muted);
 
+  /// 设置会话通知模式
+  Future<void> setNotificationMode(
+    String conversationId,
+    ConversationNotificationMode mode,
+  );
+
+  /// 获取会话通知模式
+  Future<ConversationNotificationMode> getNotificationMode(
+    String conversationId,
+  );
+
   /// 设置会话置顶
   Future<void> setPinned(String conversationId, bool pinned);
 
@@ -60,4 +71,3 @@ abstract class IConversationRepository {
   /// 搜索会话
   Future<List<ConversationEntity>> searchConversations(String query);
 }
-

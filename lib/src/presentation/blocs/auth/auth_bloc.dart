@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/di/injection.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../../domain/repositories/auth_repository.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../../n42_chat.dart' show N42Chat;
 import '../../../services/auth/auth_methods_service.dart';
 import '../bloc_message_keys.dart';
@@ -89,6 +91,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (refreshProfile) {
       add(const LoadUserProfileData());
     }
+    await _refreshTimedStatusIfNeeded();
     // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
     await _initializeCallManager();
     unawaited(_registerPushNotifications());
@@ -105,6 +108,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = _authRepository.currentUser;
       emit(state.copyWith(status: AuthStatus.authenticated, user: user));
       N42Chat.notifyUserChanged();
+      await _refreshTimedStatusIfNeeded();
       // 已登录状态，注册推送通知并初始化通话管理器
       await _registerPushNotifications();
       await _initializeCallManager();
@@ -251,6 +255,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  Future<void> _refreshTimedStatusIfNeeded() async {
+    try {
+      if (!getIt.isRegistered<IContactRepository>()) {
+        return;
+      }
+      await getIt<IContactRepository>().getMyStatus();
+    } catch (e) {
+      debugLog('AuthBloc: Failed to refresh timed status: $e');
+    }
+  }
+
   /// 检查Homeserver
   Future<void> _onHomeserverCheckRequested(
     AuthHomeserverCheckRequested event,
@@ -386,7 +401,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           event.region != null ||
           event.signature != null ||
           event.pokeText != null ||
-          event.ringtone != null;
+          event.ringtone != null ||
+          event.avatarDecorationPreset != null;
 
       if (hasProfileChanges) {
         await _authRepository.updateUserProfileData(
@@ -395,6 +411,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           signature: event.signature,
           pokeText: event.pokeText,
           ringtone: event.ringtone,
+          avatarDecorationPreset: event.avatarDecorationPreset,
         );
       }
 

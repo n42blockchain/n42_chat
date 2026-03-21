@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/conversation_notification_utils.dart';
 import '../../../core/utils/matrix_utils.dart';
+import '../../../domain/entities/conversation_entity.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -122,7 +124,12 @@ class MatrixRoomDataSource {
 
   /// 房间是否免打扰
   bool isMuted(matrix.Room room) {
-    return room.pushRuleState == matrix.PushRuleState.dontNotify;
+    return getRoomNotificationMode(room) == ConversationNotificationMode.muted;
+  }
+
+  /// 获取房间通知模式
+  ConversationNotificationMode getRoomNotificationMode(matrix.Room room) {
+    return conversationNotificationModeFromPushRuleState(room.pushRuleState);
   }
 
   /// 房间是否加密
@@ -257,11 +264,24 @@ class MatrixRoomDataSource {
 
   /// 设置房间免打扰
   Future<void> setRoomMuted(String roomId, bool muted) async {
+    await setRoomNotificationMode(
+      roomId,
+      muted
+          ? ConversationNotificationMode.muted
+          : ConversationNotificationMode.allMessages,
+    );
+  }
+
+  /// 设置房间通知模式
+  Future<void> setRoomNotificationMode(
+    String roomId,
+    ConversationNotificationMode mode,
+  ) async {
     final room = getRoomById(roomId);
     if (room == null) return;
 
     await room.setPushRuleState(
-      muted ? matrix.PushRuleState.dontNotify : matrix.PushRuleState.notify,
+      pushRuleStateFromConversationNotificationMode(mode),
     );
   }
 

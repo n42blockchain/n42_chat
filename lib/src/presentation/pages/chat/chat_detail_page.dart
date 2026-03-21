@@ -63,9 +63,10 @@ class ChatDetailPage extends StatefulWidget {
 
 class _ChatDetailPageState extends State<ChatDetailPage> {
   bool _isPinned = false;
-  bool _isMuted = false;
   bool _isStrongReminder = false;
   bool _isChatLocked = false;
+  ConversationNotificationMode _notificationMode =
+      ConversationNotificationMode.allMessages;
 
   // 群名称（可编辑）
   late String _groupName;
@@ -79,9 +80,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   void initState() {
     super.initState();
     _isPinned = widget.conversation.isPinned;
-    _isMuted = widget.conversation.isMuted;
+    _notificationMode = widget.conversation.isMuted
+        ? ConversationNotificationMode.muted
+        : ConversationNotificationMode.allMessages;
     _groupName = widget.conversation.name;
 
+    _loadNotificationModeStatus();
     // 加载强提醒状态
     _loadStrongReminderStatus();
 
@@ -116,6 +120,18 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       }
     } catch (e) {
       debugLog('ChatDetailPage: Failed to load strong reminder status: $e');
+    }
+  }
+
+  Future<void> _loadNotificationModeStatus() async {
+    try {
+      final repository = getIt<IConversationRepository>();
+      final mode = await repository.getNotificationMode(widget.conversation.id);
+      if (mounted) {
+        setState(() => _notificationMode = mode);
+      }
+    } catch (e) {
+      debugLog('ChatDetailPage: Failed to load notification mode: $e');
     }
   }
 
@@ -365,20 +381,96 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     return widget.conversation.name;
   }
 
-  /// 更新免打扰状态
-  Future<void> _updateMuteStatus(bool muted) async {
+  /// 更新通知模式
+  Future<void> _updateNotificationMode(
+    ConversationNotificationMode mode,
+  ) async {
+    final previousMode = _notificationMode;
     try {
       final repository = getIt<IConversationRepository>();
-      await repository.setMuted(widget.conversation.id, muted);
-      debugLog('ChatDetailPage: Mute status updated to $muted');
+      await repository.setNotificationMode(widget.conversation.id, mode);
+      debugLog('ChatDetailPage: Notification mode updated to $mode');
     } catch (e) {
-      debugLog('ChatDetailPage: Failed to update mute status: $e');
+      debugLog('ChatDetailPage: Failed to update notification mode: $e');
       // 恢复原状态
       if (mounted) {
-        setState(() {
-          _isMuted = !muted;
-        });
+        setState(() => _notificationMode = previousMode);
       }
+    }
+  }
+
+  String _notificationModeLabel() {
+    switch (_notificationMode) {
+      case ConversationNotificationMode.allMessages:
+        return 'All Messages';
+      case ConversationNotificationMode.mentionsOnly:
+        return 'Mentions Only';
+      case ConversationNotificationMode.muted:
+        return S.of(context)?.commonMute ?? 'Mute';
+    }
+  }
+
+  Future<void> _showNotificationModeSheet() async {
+    final isDark = context.isDarkMode;
+    final textColor = isDark ? Colors.white : Colors.black;
+    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+
+    final selected = await showModalBottomSheet<ConversationNotificationMode>(
+      context: context,
+      backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text('All Messages', style: TextStyle(color: textColor)),
+              subtitle: Text(
+                'Notify for every new message in this chat',
+                style: TextStyle(color: secondaryTextColor),
+              ),
+              trailing:
+                  _notificationMode == ConversationNotificationMode.allMessages
+                  ? const Icon(Icons.check, color: AppColors.primary)
+                  : null,
+              onTap: () =>
+                  Navigator.pop(ctx, ConversationNotificationMode.allMessages),
+            ),
+            ListTile(
+              title: Text('Mentions Only', style: TextStyle(color: textColor)),
+              subtitle: Text(
+                'Only notify when you are mentioned or @room is used',
+                style: TextStyle(color: secondaryTextColor),
+              ),
+              trailing:
+                  _notificationMode == ConversationNotificationMode.mentionsOnly
+                  ? const Icon(Icons.check, color: AppColors.primary)
+                  : null,
+              onTap: () =>
+                  Navigator.pop(ctx, ConversationNotificationMode.mentionsOnly),
+            ),
+            ListTile(
+              title: Text(
+                S.of(context)?.commonMute ?? 'Mute',
+                style: TextStyle(color: textColor),
+              ),
+              subtitle: Text(
+                'Disable notifications for this chat on all devices',
+                style: TextStyle(color: secondaryTextColor),
+              ),
+              trailing: _notificationMode == ConversationNotificationMode.muted
+                  ? const Icon(Icons.check, color: AppColors.primary)
+                  : null,
+              onTap: () =>
+                  Navigator.pop(ctx, ConversationNotificationMode.muted),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (selected != null && selected != _notificationMode) {
+      setState(() => _notificationMode = selected);
+      await _updateNotificationMode(selected);
     }
   }
 
@@ -695,17 +787,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
-                _buildSwitchItem(
-                  title: S.of(context)?.commonMute ?? 'Mute',
-                  value: _isMuted,
+                _buildMenuItem(
+                  title:
+                      S.of(context)?.settingsMessageNotifications ??
+                      'Message Notifications',
+                  value: _notificationModeLabel(),
                   textColor: textColor,
-                  onChanged: (value) {
-                    setState(() {
-                      _isMuted = value;
-                    });
-                    // 持久化设置
-                    _updateMuteStatus(value);
-                  },
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _showNotificationModeSheet,
                 ),
                 _buildDivider(dividerColor),
                 _buildSwitchItem(

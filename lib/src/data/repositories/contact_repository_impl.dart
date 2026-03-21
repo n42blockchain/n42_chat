@@ -289,15 +289,20 @@ class ContactRepositoryImpl implements IContactRepository {
   }
 
   @override
-  Future<void> setMyStatus(String? statusMessage) async {
-    await _contactDataSource.setUserStatus(statusMessage);
+  Future<void> setMyStatus(String? statusMessage, {Duration? expiresIn}) async {
+    await _contactDataSource.setCurrentUserStatus(
+      statusMessage,
+      expiresAt: expiresIn == null
+          ? null
+          : DateTime.now().toUtc().add(expiresIn),
+    );
   }
 
   @override
   Future<String?> getMyStatus() async {
     final myUserId = _contactDataSource.currentUserId;
     if (myUserId == null) return null;
-    return await _contactDataSource.getUserStatusMessage(myUserId);
+    return await _contactDataSource.getCurrentUserStatusMessage();
   }
 
   // ============================================

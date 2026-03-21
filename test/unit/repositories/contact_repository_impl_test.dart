@@ -191,4 +191,47 @@ void main() {
       verify(() => mockContactDS.acceptInvite(roomId)).called(1);
     });
   });
+
+  group('status', () {
+    test('setMyStatus forwards a 24h-style expiry when requested', () async {
+      DateTime? capturedExpiry;
+      when(
+        () => mockContactDS.setCurrentUserStatus(
+          any(),
+          expiresAt: any(named: 'expiresAt'),
+        ),
+      ).thenAnswer((invocation) async {
+        capturedExpiry = invocation.namedArguments[#expiresAt] as DateTime?;
+      });
+
+      final before = DateTime.now().toUtc();
+      await repository.setMyStatus(
+        'Gaming',
+        expiresIn: const Duration(hours: 24),
+      );
+
+      final after = DateTime.now().toUtc();
+      expect(capturedExpiry, isNotNull);
+      expect(
+        capturedExpiry!.isAfter(before.add(const Duration(hours: 23))),
+        isTrue,
+      );
+      expect(
+        capturedExpiry!.isBefore(after.add(const Duration(hours: 25))),
+        isTrue,
+      );
+    });
+
+    test('getMyStatus uses current-user timed status path', () async {
+      when(() => mockContactDS.currentUserId).thenReturn('@me:matrix.org');
+      when(
+        () => mockContactDS.getCurrentUserStatusMessage(),
+      ).thenAnswer((_) async => 'Busy');
+
+      final result = await repository.getMyStatus();
+
+      expect(result, 'Busy');
+      verify(() => mockContactDS.getCurrentUserStatusMessage()).called(1);
+    });
+  });
 }

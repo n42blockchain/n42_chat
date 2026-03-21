@@ -133,11 +133,14 @@ void main() {
   });
 
   group('Notification Settings', () {
-    test('should return defaults when no notification settings are saved', () async {
-      final settings = await dataSource.getNotificationSettingsModel();
+    test(
+      'should return defaults when no notification settings are saved',
+      () async {
+        final settings = await dataSource.getNotificationSettingsModel();
 
-      expect(settings, equals(const NotificationSettings()));
-    });
+        expect(settings, equals(const NotificationSettings()));
+      },
+    );
 
     test('should save and retrieve notification settings model', () async {
       const settings = NotificationSettings(
@@ -148,6 +151,7 @@ void main() {
         doNotDisturb: true,
         doNotDisturbStart: '22:30',
         doNotDisturbEnd: '07:15',
+        privacyMode: NotificationPrivacyMode.senderOnly,
       );
 
       await dataSource.saveNotificationSettingsModel(settings);

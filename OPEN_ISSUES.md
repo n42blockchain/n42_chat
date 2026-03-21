@@ -27,6 +27,22 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: Stories and Moments now reuse the existing `MediaEditorPage` flow, so crop/draw/text/filter editing is available for social posting without duplicating editor code. However there is still no real AR stack for masks, face anchors, body tracking, or camera-time effects.
 - Next step: choose the supported AR surface and SDK first, then decide whether it should run only at capture time, export rendered media into Stories/Moments, or also support live preview and interactive effects.
 
+### SOCIAL-003 Virtual avatar support is still decorative, not a full persona system
+
+- Severity: M
+- Added: 2026-03-21
+- Evidence: `lib/src/presentation/widgets/common/n42_avatar.dart`, `lib/src/presentation/pages/profile/profile_edit_page.dart`, `lib/src/domain/entities/avatar_decoration_preset.dart`
+- Current state: the latest entertainment/social pass added reusable avatar-decoration presets so profile and settings surfaces can share a consistent decorated avatar without duplicating border/badge code. However there is still no full virtual-avatar stack such as custom character builders, Bitmoji-style assets, 3D mesh avatars, or cross-user persona syncing beyond the owner account's profile data.
+- Next step: decide whether the product wants lightweight 2D avatar kits, full 3D avatars, or both, then define the asset model, editor flow, and how avatar persona data should sync across devices and other users' clients.
+
+### SOCIAL-004 24-hour status expiry is still client-owned, not an authoritative cross-user protocol
+
+- Severity: M
+- Added: 2026-03-21
+- Evidence: `lib/src/data/datasources/matrix/matrix_contact_datasource.dart`, `lib/src/core/utils/timed_status_utils.dart`, `lib/src/presentation/pages/profile/status_page.dart`
+- Current state: status posts now store expiry metadata and the client clears expired statuses on session restore/profile reads instead of treating "visible for 24 hours" as a pure label. However the expiry is still enforced by the owner's client path. Other users still only see Matrix presence text, so there is no canonical shared expiry event that remote clients can independently honor.
+- Next step: define a shared status-expiry model, for example room/state/account-data that contacts can read or a server-shaped ephemeral-status API, then migrate contact rendering off plain presence text for this feature.
+
 ### OFFICE-001 Task / todo and calendar collaboration are still not implemented
 
 - Severity: M
@@ -163,6 +179,14 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: account deactivation no longer forces a password up front, but the retry path only handles `m.login.password`. Homeservers that require SSO/passkey or other UIA stages still fail closed.
 - Next step: implement a generic UIA handler for deactivation instead of password-only fallback logic.
 
+### SEC-005 iOS background APNs still bypasses client-side notification privacy mode
+
+- Severity: H
+- Added: 2026-03-21
+- Evidence: `lib/src/core/notifications/firebase_push_service.dart`, `lib/src/n42_chat.dart`
+- Current state: foreground notification privacy now applies in the local-notification path, and foreground iOS banners are suppressed when preview privacy would leak content. However iOS background/locked-screen APNs alerts still come from the homeserver push payload, so `senderOnly` / `hidden` privacy modes are not guaranteed once the app is backgrounded.
+- Next step: decide whether iOS should switch to an `event_id_only` / local-rendered path for privacy-sensitive modes, or explicitly scope the setting as foreground/local-only until server-side push shaping exists.
+
 ### SYSTEM-001 Bandwidth control is still coarse auto-download policy, not real traffic throttling
 
 - Severity: M
@@ -178,6 +202,14 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Evidence: `lib/src/n42_chat.dart`, `lib/src/presentation/pages/settings/account_switch_page.dart`, repository-wide search for `Semantics`, `ExcludeSemantics`, `MergeSemantics`, and `accessibleNavigation`
 - Current state: font scaling is now wired through the chat presentation wrapper, which improves large-text behavior, but the broader accessibility surface is still incomplete. The recent audit did not find systematic screen-reader labels, semantics grouping, high-contrast accommodations, reduced-motion handling, or accessibility-focused regression tests across key chat/settings flows.
 - Next step: define an accessibility checklist for navigation, message cells, media viewers, and settings controls, then add targeted semantics labels/tests and handle platform accessibility flags such as reduced motion and high contrast where applicable.
+
+### SYSTEM-003 Notification customization still lacks keyword-based alerts
+
+- Severity: M
+- Added: 2026-03-21
+- Evidence: `lib/src/presentation/pages/settings/notification_settings_page.dart`, `lib/src/presentation/pages/chat/chat_detail_page.dart`, `lib/src/core/notifications/firebase_push_service.dart`
+- Current state: the latest pass closed room-level notification granularity by wiring `all messages / mentions only / mute` to Matrix push rules, and it added notification privacy levels for sender/body hiding. However there is still no Slack-style keyword alert list that can trigger notifications outside direct mentions.
+- Next step: decide whether keyword rules should live in homeserver push rules or client-side preferences, then add a shared keyword matcher/editor and integrate it into foreground/background notification evaluation.
 
 ## Verification Gaps
 

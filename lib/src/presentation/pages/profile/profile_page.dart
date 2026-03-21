@@ -9,8 +9,8 @@ import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/local/preferences_datasource.dart';
+import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../../domain/entities/user_profile_entity.dart';
@@ -59,6 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _boundEmail;
   String? _boundPhoneNumber;
   bool _isNftAvatar = false; // 头像是否来自 NFT
+  AvatarDecorationPreset _avatarDecorationPreset = AvatarDecorationPreset.none;
   StreamSubscription<UserEntity?>? _userSubscription;
 
   @override
@@ -85,6 +86,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _boundEmail = null;
         _boundPhoneNumber = null;
         _isNftAvatar = false;
+        _avatarDecorationPreset = AvatarDecorationPreset.none;
       });
       return;
     }
@@ -106,47 +108,30 @@ class _ProfilePageState extends State<ProfilePage> {
         try {
           final authRepository = getIt<IAuthRepository>();
           final contactRepository = getIt<IContactRepository>();
-          final results = await Future.wait<String?>([
+          final results = await Future.wait<Object?>([
             contactRepository.getMyStatus(),
             authRepository.getBoundEmail(),
             authRepository.getBoundPhone(),
+            authRepository.getCurrentUserProfile(),
           ]);
-          final status = results[0];
-          final email = results[1];
-          final phoneNumber = results[2];
+          final status = results[0] as String?;
+          final email = results[1] as String?;
+          final phoneNumber = results[2] as String?;
+          final profile = results[3] as UserEntity?;
           if (mounted) {
             setState(() {
               _statusText = status;
               _boundEmail = email;
               _boundPhoneNumber = phoneNumber;
+              _displayName = profile?.displayName ?? _displayName;
+              _avatarUrl = profile?.avatarUrl ?? _avatarUrl;
+              _avatarDecorationPreset =
+                  profile?.avatarDecorationPreset ??
+                  AvatarDecorationPreset.none;
             });
           }
         } catch (e) {
           debugLog('Failed to get my status: $e');
-        }
-
-        // 异步获取头像
-        try {
-          final userId = client.userID;
-          if (userId != null) {
-            final profile = await client.getUserProfile(userId);
-            if (mounted) {
-              // 将 mxc:// URL 转换为 HTTP URL
-              final avatarMxc = profile.avatarUrl?.toString();
-              final avatarHttpUrl = mx_utils.MatrixUtils.mxcToHttp(
-                avatarMxc,
-                client: client,
-                width: 128,
-                height: 128,
-              );
-              setState(() {
-                _displayName = profile.displayname ?? _displayName;
-                _avatarUrl = avatarHttpUrl;
-              });
-            }
-          }
-        } catch (e) {
-          debugLog('Failed to get avatar: $e');
         }
       } else if (mounted) {
         setState(() {
@@ -157,6 +142,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _boundEmail = null;
           _boundPhoneNumber = null;
           _isNftAvatar = false;
+          _avatarDecorationPreset = AvatarDecorationPreset.none;
         });
       }
     } catch (e) {
@@ -305,28 +291,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 // 头像 - 单独可点击，触发头像操作菜单
                 GestureDetector(
                   onTap: () => _showAvatarOptions(context),
-                  child: Stack(
-                    children: [
-                      N42Avatar(
-                        imageUrl: _avatarUrl,
-                        name: _displayName,
-                        size: 64,
-                        borderRadius: 14,
-                      ),
-                      // NFT 认证金色环标记
-                      if (_isNftAvatar)
-                        Positioned.fill(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: const Color(0xFFFFD700),
-                                width: 2.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
+                  child: N42Avatar(
+                    imageUrl: _avatarUrl,
+                    name: _displayName,
+                    size: 64,
+                    borderRadius: 14,
+                    isNftAvatar: _isNftAvatar,
+                    decorationPreset: _avatarDecorationPreset,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -580,7 +551,10 @@ class _ProfilePageState extends State<ProfilePage> {
       // 同步状态到服务器
       try {
         final contactRepository = getIt<IContactRepository>();
-        await contactRepository.setMyStatus(result);
+        await contactRepository.setMyStatus(
+          result,
+          expiresIn: const Duration(hours: 24),
+        );
       } catch (e) {
         debugLog('Failed to sync status: $e');
       }
@@ -836,6 +810,7 @@ class _ProfilePageState extends State<ProfilePage> {
       statusMessage: _statusText,
       email: _boundEmail,
       phoneNumber: _boundPhoneNumber,
+      avatarDecorationPreset: _avatarDecorationPreset,
     );
   }
 
@@ -890,9 +865,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _openAccountSwitchPage(BuildContext context) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const AccountSwitchPage()),
-    );
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const AccountSwitchPage()));
   }
 
   void _openFavorites(BuildContext context) {
