@@ -14,23 +14,22 @@ MessageEntity _msg({
   MessageMetadata? metadata,
   List<MessageReaction> reactions = const [],
   MessageStatus status = MessageStatus.sent,
-}) =>
-    MessageEntity(
-      id: 'msg1',
-      roomId: '!room:server',
-      senderId: '@alice:server',
-      senderName: 'Alice',
-      content: 'hello',
-      type: MessageType.text,
-      timestamp: DateTime(2025, 6, 1),
-      isFromMe: isFromMe,
-      replyToId: replyToId,
-      threadReplyCount: threadReplyCount,
-      threadRootId: threadRootId,
-      metadata: metadata,
-      reactions: reactions,
-      status: status,
-    );
+}) => MessageEntity(
+  id: 'msg1',
+  roomId: '!room:server',
+  senderId: '@alice:server',
+  senderName: 'Alice',
+  content: 'hello',
+  type: MessageType.text,
+  timestamp: DateTime(2025, 6, 1),
+  isFromMe: isFromMe,
+  replyToId: replyToId,
+  threadReplyCount: threadReplyCount,
+  threadRootId: threadRootId,
+  metadata: metadata,
+  reactions: reactions,
+  status: status,
+);
 
 void main() {
   // ─────────────────────────────────────────────────
@@ -177,6 +176,30 @@ void main() {
       expect(updated.transferStatus, 'pending');
       expect(updated.redPacketId, 'rp_123');
     });
+  });
+
+  group('MessageMetadata.copyWithTransfer', () {
+    test(
+      'updates transfer status without dropping existing payment fields',
+      () {
+        final meta = MessageMetadata(
+          amount: '12.5',
+          token: 'USDT',
+          paymentRequestId: 'req-42',
+          paymentReceiverAddress: '0xreceiver',
+          paymentRequestExpiresAt: DateTime(2030, 1, 1),
+        );
+
+        final updated = meta.copyWithTransfer(transferStatus: 'completed');
+
+        expect(updated.amount, '12.5');
+        expect(updated.token, 'USDT');
+        expect(updated.paymentRequestId, 'req-42');
+        expect(updated.paymentReceiverAddress, '0xreceiver');
+        expect(updated.paymentRequestExpiresAt, DateTime(2030, 1, 1));
+        expect(updated.transferStatus, 'completed');
+      },
+    );
   });
 
   // ─────────────────────────────────────────────────

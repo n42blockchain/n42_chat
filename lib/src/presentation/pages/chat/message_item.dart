@@ -9,6 +9,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/payment_request_status_utils.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
 import '../../widgets/chat/message_status_indicator.dart' as indicator;
@@ -1366,15 +1367,13 @@ class MessageItem extends StatelessWidget {
     final metadata = message.metadata;
     final amount = metadata?.amount ?? '0';
     final currency = metadata?.token ?? 'ETH';
-    final isExpired =
-        metadata?.paymentRequestExpiresAt != null &&
-        DateTime.now().isAfter(metadata!.paymentRequestExpiresAt!);
-
-    final status = isExpired
-        ? PaymentRequestMessageStatus.expired
-        : (metadata?.transferStatus == 'completed'
-              ? PaymentRequestMessageStatus.paid
-              : PaymentRequestMessageStatus.pending);
+    final status = switch (resolvePaymentRequestStatus(metadata)) {
+      PaymentRequestLifecycleStatus.paid => PaymentRequestMessageStatus.paid,
+      PaymentRequestLifecycleStatus.expired =>
+        PaymentRequestMessageStatus.expired,
+      PaymentRequestLifecycleStatus.pending =>
+        PaymentRequestMessageStatus.pending,
+    };
 
     return PaymentRequestMessageWidget(
       amount: amount,

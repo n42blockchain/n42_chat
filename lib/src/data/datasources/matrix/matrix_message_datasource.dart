@@ -127,12 +127,9 @@ class MatrixMessageDataSource {
         continue;
       }
 
-      final expiresAt = DateTime.tryParse(
-            sharingContent['expires_at'] as String? ?? '',
-          ) ??
-          DateTime.tryParse(
-            sharingContent['started_at'] as String? ?? '',
-          ) ??
+      final expiresAt =
+          DateTime.tryParse(sharingContent['expires_at'] as String? ?? '') ??
+          DateTime.tryParse(sharingContent['started_at'] as String? ?? '') ??
           now;
       if (!expiresAt.isAfter(now)) {
         continue;
@@ -146,12 +143,9 @@ class MatrixMessageDataSource {
         continue;
       }
 
-      final updatedAt = DateTime.tryParse(
-            updateContent?['updated_at'] as String? ?? '',
-          ) ??
-          DateTime.tryParse(
-            sharingContent['started_at'] as String? ?? '',
-          ) ??
+      final updatedAt =
+          DateTime.tryParse(updateContent?['updated_at'] as String? ?? '') ??
+          DateTime.tryParse(sharingContent['started_at'] as String? ?? '') ??
           now;
       final durationMinutes =
           _toInt(sharingContent['duration_minutes']) ??
@@ -352,6 +346,13 @@ class MatrixMessageDataSource {
     msgType: msgType,
     content: content,
   );
+
+  /// 发送自定义房间事件（不直接展示为聊天消息）
+  Future<String> sendRoomEvent({
+    required String roomId,
+    required String type,
+    required Map<String, dynamic> content,
+  }) => _sender.sendRoomEvent(roomId: roomId, type: type, content: content);
 
   /// 重发消息
   Future<bool> resendMessage(String roomId, String eventId) =>

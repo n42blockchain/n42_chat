@@ -83,14 +83,6 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: member-join welcome messages and webhook callbacks now share the same room bot config, but they still execute from the client-side `GroupBloc`. If no logged-in client is online and subscribed, those automations do not fire.
 - Next step: move room automation triggers to a durable server-side worker/bot account, or introduce a background sync service with explicit delivery guarantees.
 
-### PAY-001 Payment requests still lack a shared paid-state acknowledgement protocol
-
-- Severity: M
-- Added: 2026-03-21
-- Evidence: `lib/src/data/repositories/transfer_repository_impl.dart`, `lib/src/presentation/pages/chat/chat_page_event_handlers.dart`, `lib/src/presentation/pages/chat/message_item.dart`
-- Current state: payment-request messages now render and can be fulfilled, and the client prevents duplicate payments on the same device by checking local transfer history plus request expiry. However the original `n42.payment_request` event is not updated with a durable "paid" acknowledgement that other devices/clients can observe, so the request card itself still appears pending across sessions/devices.
-- Next step: define a request-fulfillment acknowledgement model, for example a relation/state event keyed by `request_id` or a canonical update event that both sender and receiver can consume to mark the original request as paid.
-
 ### MEDIA-002 Encrypted-room large file uploads still cap at 64MB
 
 - Severity: H

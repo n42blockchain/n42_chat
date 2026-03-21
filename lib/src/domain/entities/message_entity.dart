@@ -826,6 +826,64 @@ class MessageMetadata extends Equatable {
     callPeerId: callPeerId,
   );
 
+  /// Create a copy with updated transfer/payment fields
+  MessageMetadata copyWithTransfer({
+    String? amount,
+    String? token,
+    String? transferStatus,
+    String? txHash,
+    String? paymentRequestId,
+    String? paymentReceiverAddress,
+    DateTime? paymentRequestExpiresAt,
+    String? redPacketId,
+  }) => MessageMetadata(
+    mediaUrl: mediaUrl,
+    httpUrl: httpUrl,
+    thumbnailUrl: thumbnailUrl,
+    mimeType: mimeType,
+    size: size,
+    width: width,
+    height: height,
+    duration: duration,
+    fileName: fileName,
+    isPlayed: isPlayed,
+    waveform: waveform,
+    transcription: transcription,
+    transcriptionStatus: transcriptionStatus,
+    latitude: latitude,
+    longitude: longitude,
+    locationName: locationName,
+    amount: amount ?? this.amount,
+    token: token ?? this.token,
+    transferStatus: transferStatus ?? this.transferStatus,
+    txHash: txHash ?? this.txHash,
+    paymentRequestId: paymentRequestId ?? this.paymentRequestId,
+    paymentReceiverAddress:
+        paymentReceiverAddress ?? this.paymentReceiverAddress,
+    paymentRequestExpiresAt:
+        paymentRequestExpiresAt ?? this.paymentRequestExpiresAt,
+    redPacketId: redPacketId ?? this.redPacketId,
+    pollQuestion: pollQuestion,
+    pollOptions: pollOptions,
+    pollOptionIds: pollOptionIds,
+    myVotes: myVotes,
+    voteCounts: voteCounts,
+    totalVoters: totalVoters,
+    maxSelections: maxSelections,
+    pollEnded: pollEnded,
+    isAnonymousPoll: isAnonymousPoll,
+    musicTitle: musicTitle,
+    musicArtist: musicArtist,
+    musicUrl: musicUrl,
+    musicCover: musicCover,
+    callDuration: callDuration,
+    callEnded: callEnded,
+    isMissedCall: isMissedCall,
+    callEndReason: callEndReason,
+    callRoomId: callRoomId,
+    callPeerId: callPeerId,
+  );
+
   /// 是否是匿名投票
   bool get isAnonymous => isAnonymousPoll == true;
 

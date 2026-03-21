@@ -8,6 +8,7 @@ import '../../core/services/message_archive_service.dart';
 import '../../domain/entities/group_album_entity.dart';
 import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
+import '../../domain/entities/transfer_entity.dart';
 import '../../domain/repositories/message_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
 import '../mappers/archived_message_mapper.dart';
@@ -87,9 +88,13 @@ class MessageRepositoryImpl implements IMessageRepository {
     final messages = events
         .map((e) => _messageDataSource.mapEventToMessage(e, room))
         .toList();
+    final resolvedMessages = _applyPaymentRequestFulfillments(
+      messages,
+      timeline.events,
+    );
 
     // 归档回退：初始加载时如果消息不足，补充归档数据
-    if (messages.length < limit && _archiveService != null) {
+    if (resolvedMessages.length < limit && _archiveService != null) {
       final oldestTs = events.isNotEmpty
           ? events.last.originServerTs.millisecondsSinceEpoch
           : null;
@@ -98,7 +103,7 @@ class MessageRepositoryImpl implements IMessageRepository {
           final archived = await _archiveService!.getArchivedMessages(
             roomId,
             beforeTimestamp: oldestTs,
-            limit: limit - messages.length,
+            limit: limit - resolvedMessages.length,
           );
           if (archived.isNotEmpty) {
             debugLog(
@@ -108,7 +113,7 @@ class MessageRepositoryImpl implements IMessageRepository {
               archived,
               currentUserId: _client?.userID,
             );
-            return [...messages, ...archivedEntities];
+            return [...resolvedMessages, ...archivedEntities];
           }
         } catch (e) {
           debugLog('MessageRepositoryImpl: Archive supplement failed: $e');
@@ -116,7 +121,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
     }
 
-    return messages;
+    return resolvedMessages;
   }
 
   @override
@@ -1046,10 +1051,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     matrix.Room room,
   ) {
     final now = DateTime.now();
-    return timeline.events
+    final allEvents = timeline.events;
+    final messages = allEvents
         .where((e) => _isDisplayableEvent(e))
         .map((e) => _getCachedOrMapMessage(e, room, now))
         .toList();
+    return _applyPaymentRequestFulfillments(messages, allEvents);
   }
 
   /// 从缓存获取消息或重新映射
@@ -1088,10 +1095,82 @@ class MessageRepositoryImpl implements IMessageRepository {
   ) {
     for (final event in timeline.events) {
       if (event.eventId == messageId) {
-        return _messageDataSource.mapEventToMessage(event, room);
+        return _applyPaymentRequestFulfillmentsToMessage(
+          _messageDataSource.mapEventToMessage(event, room),
+          timeline.events,
+        );
       }
     }
     return null;
+  }
+
+  List<MessageEntity> _applyPaymentRequestFulfillments(
+    List<MessageEntity> messages,
+    List<matrix.Event> allEvents,
+  ) {
+    final fulfilledRequestIds = _collectFulfilledPaymentRequestIds(allEvents);
+    if (fulfilledRequestIds.isEmpty) {
+      return messages;
+    }
+
+    return messages
+        .map(
+          (message) => _applyPaymentRequestFulfillmentsToMessage(
+            message,
+            allEvents,
+            fulfilledRequestIds: fulfilledRequestIds,
+          ),
+        )
+        .toList();
+  }
+
+  MessageEntity _applyPaymentRequestFulfillmentsToMessage(
+    MessageEntity message,
+    List<matrix.Event> allEvents, {
+    Set<String>? fulfilledRequestIds,
+  }) {
+    if (message.type != MessageType.paymentRequest) {
+      return message;
+    }
+
+    final requestId = message.metadata?.paymentRequestId;
+    if (requestId == null || requestId.isEmpty) {
+      return message;
+    }
+
+    final fulfilled =
+        fulfilledRequestIds ?? _collectFulfilledPaymentRequestIds(allEvents);
+    if (!fulfilled.contains(requestId)) {
+      return message;
+    }
+
+    final metadata =
+        message.metadata?.copyWithTransfer(transferStatus: 'completed') ??
+        const MessageMetadata(transferStatus: 'completed');
+    return message.copyWith(metadata: metadata);
+  }
+
+  Set<String> _collectFulfilledPaymentRequestIds(List<matrix.Event> events) {
+    final fulfilled = <String>{};
+    for (final event in events) {
+      if (event.type != PaymentRequestFulfillmentContent.eventType) {
+        continue;
+      }
+
+      try {
+        final content = PaymentRequestFulfillmentContent.fromEventContent(
+          event.content,
+        );
+        if (content.requestId.isNotEmpty) {
+          fulfilled.add(content.requestId);
+        }
+      } catch (e) {
+        debugLog(
+          'MessageRepositoryImpl: Failed to parse payment fulfillment event: $e',
+        );
+      }
+    }
+    return fulfilled;
   }
 
   /// 清理过期的消息缓存
