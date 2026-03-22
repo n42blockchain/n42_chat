@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../../domain/entities/user_entity.dart';
+import '../../helpers/story_interaction_helper.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/story/story_bloc.dart';
@@ -271,6 +272,7 @@ class _SocialHubView extends StatelessWidget {
           allUserStories: [myStory],
           currentUserId:
               authUser?.userId ?? MatrixClientManager.instance.userId,
+          onDeleteStory: (story) => _handleStoryDelete(context, story),
         ),
       ),
     );
@@ -295,8 +297,38 @@ class _SocialHubView extends StatelessWidget {
           onStoryViewed: (story) {
             context.read<StoryBloc>().add(ViewStory(story.id));
           },
+          onDeleteStory: (story) => _handleStoryDelete(context, story),
+          onReply: (userId, storyId, message) {
+            return _handleStoryReply(
+              context,
+              userId: userId,
+              storyId: storyId,
+              message: message,
+            );
+          },
         ),
       ),
+    );
+  }
+
+  Future<bool> _handleStoryReply(
+    BuildContext context, {
+    required String userId,
+    required String storyId,
+    required String message,
+  }) {
+    return StoryInteractionHelper.replyToStory(
+      context,
+      userId: userId,
+      storyId: storyId,
+      message: message,
+    );
+  }
+
+  Future<bool> _handleStoryDelete(BuildContext context, StoryEntity story) {
+    return StoryInteractionHelper.deleteStory(
+      storyBloc: context.read<StoryBloc>(),
+      story: story,
     );
   }
 }

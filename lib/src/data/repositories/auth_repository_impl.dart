@@ -553,7 +553,15 @@ class AuthRepositoryImpl implements IAuthRepository {
 
     try {
       await _authDataSource.clientManager.setAvatar(avatarBytes, filename);
-      await updateUserProfileData(clearNftAvatar: true);
+      final clearedNftAvatar = await updateUserProfileData(
+        clearNftAvatar: true,
+      );
+      if (!clearedNftAvatar) {
+        debugLog(
+          'AuthRepository: Avatar uploaded but failed to clear NFT avatar metadata',
+        );
+        return false;
+      }
       debugLog('AuthRepository: Avatar updated successfully');
 
       // 刷新用户资料以更新缓存的头像 URL
@@ -1329,6 +1337,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       displayName: _cachedDisplayName ?? userId.localpart ?? '',
       avatarUrl: _pickEffectiveAvatarUrl(
         avatarUrl: _cachedAvatarUrl,
+        nftContractAddress: nftContractAddress,
+        nftTokenId: nftTokenId,
         nftImageUrl: nftImageUrl,
       ),
       gender: profileData['gender'] as String?,
@@ -1348,11 +1358,21 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   String? get _effectiveAvatarUrl => _pickEffectiveAvatarUrl(
     avatarUrl: _cachedAvatarUrl,
+    nftContractAddress: _cachedProfileData?['nftContractAddress'] as String?,
+    nftTokenId: _toInt(_cachedProfileData?['nftTokenId']),
     nftImageUrl: _cachedProfileData?['nftImageUrl'] as String?,
   );
 
-  String? _pickEffectiveAvatarUrl({String? avatarUrl, String? nftImageUrl}) {
-    if (nftImageUrl != null && nftImageUrl.isNotEmpty) {
+  String? _pickEffectiveAvatarUrl({
+    String? avatarUrl,
+    String? nftContractAddress,
+    int? nftTokenId,
+    String? nftImageUrl,
+  }) {
+    if (nftContractAddress != null &&
+        nftTokenId != null &&
+        nftImageUrl != null &&
+        nftImageUrl.isNotEmpty) {
       return nftImageUrl;
     }
     return avatarUrl;

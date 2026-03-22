@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
@@ -5,6 +7,7 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_auth_datasource.dart
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/remote/social_auth_api.dart';
 import 'package:n42_chat/src/data/repositories/auth_repository_impl.dart';
+import 'package:n42_chat/src/domain/entities/user_entity.dart';
 
 class MockMatrixAuthDataSource extends Mock implements MatrixAuthDataSource {}
 
@@ -15,12 +18,50 @@ class MockMatrixClientManager extends Mock implements MatrixClientManager {}
 
 class MockSocialAuthApi extends Mock implements SocialAuthApi {}
 
+class SpyAuthRepositoryImpl extends AuthRepositoryImpl {
+  SpyAuthRepositoryImpl({
+    required super.authDataSource,
+    required super.secureStorage,
+    required super.socialAuthApi,
+  });
+
+  bool updateUserProfileDataResult = true;
+  int clearNftAvatarCalls = 0;
+
+  @override
+  Future<bool> updateUserProfileData({
+    String? gender,
+    String? region,
+    String? signature,
+    String? pokeText,
+    String? ringtone,
+    String? avatarDecorationPreset,
+    String? nftContractAddress,
+    int? nftTokenId,
+    int? nftChainId,
+    String? nftImageUrl,
+    bool clearNftAvatar = false,
+  }) async {
+    if (clearNftAvatar) {
+      clearNftAvatarCalls++;
+    }
+    return updateUserProfileDataResult;
+  }
+
+  @override
+  Future<UserEntity?> getCurrentUserProfile() async => null;
+}
+
 void main() {
   late MockMatrixAuthDataSource mockAuthDataSource;
   late MockSecureStorageDataSource mockSecureStorage;
   late MockMatrixClientManager mockClientManager;
   late MockSocialAuthApi mockSocialAuthApi;
   late AuthRepositoryImpl repository;
+
+  setUpAll(() {
+    registerFallbackValue(Uint8List(0));
+  });
 
   setUp(() {
     mockAuthDataSource = MockMatrixAuthDataSource();
@@ -32,6 +73,9 @@ void main() {
     when(() => mockAuthDataSource.isLoggedIn).thenReturn(true);
     when(
       () => mockClientManager.setDisplayName(any()),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockClientManager.setAvatar(any(), any()),
     ).thenAnswer((_) async {});
     when(() => mockClientManager.startSync()).thenAnswer((_) async {});
     when(
@@ -92,6 +136,26 @@ void main() {
           avatarUrl: null,
         ),
       ).called(1);
+    },
+  );
+
+  test(
+    'updateAvatar fails when NFT metadata cannot be cleared after upload',
+    () async {
+      final spyRepository = SpyAuthRepositoryImpl(
+        authDataSource: mockAuthDataSource,
+        secureStorage: mockSecureStorage,
+        socialAuthApi: mockSocialAuthApi,
+      )..updateUserProfileDataResult = false;
+
+      final result = await spyRepository.updateAvatar(
+        Uint8List.fromList([1, 2, 3]),
+        'avatar.png',
+      );
+
+      expect(result, isFalse);
+      expect(spyRepository.clearNftAvatarCalls, 1);
+      verify(() => mockClientManager.setAvatar(any(), 'avatar.png')).called(1);
     },
   );
 }
