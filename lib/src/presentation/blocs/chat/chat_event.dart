@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 
 /// 聊天事件
@@ -862,4 +863,34 @@ class ReportMessage extends ChatEvent {
 
   @override
   List<Object?> get props => [messageId, reason];
+}
+
+/// 关键词过滤配置加载完成（内部事件）
+class ContentFilterLoaded extends ChatEvent {
+  final ContentFilterConfig? config;
+
+  const ContentFilterLoaded(this.config);
+
+  @override
+  List<Object?> get props => [config];
+}
+
+/// 定时消息预览加载完成（内部事件）
+class ScheduledMessagesPreviewLoaded extends ChatEvent {
+  final List<MessageEntity> previewMessages;
+
+  const ScheduledMessagesPreviewLoaded(this.previewMessages);
+
+  @override
+  List<Object?> get props => [previewMessages];
+}
+
+/// 对方语言检测完成（内部事件）
+class RecipientLanguageDetected extends ChatEvent {
+  final String language;
+
+  const RecipientLanguageDetected(this.language);
+
+  @override
+  List<Object?> get props => [language];
 }

@@ -130,12 +130,12 @@ class DownloadService {
     final task = _tasks[taskId];
     if (task != null && task.status == DownloadStatus.downloading) {
       task.status = DownloadStatus.cancelled;
-      // 关闭 HTTP client 以中断正在进行的网络流
+      // 关闭 HTTP client 以中断正在进行的网络流。
+      // _activeCount 由 _executeDownload 的 finally 块统一管理，
+      // 此处不再重复递减。
       _activeClients[taskId]?.close();
       _activeClients.remove(taskId);
       _notifyTask(task);
-      _activeCount--;
-      _processQueue();
     }
   }
 
@@ -290,12 +290,12 @@ class DownloadService {
 
   /// 清理已完成的任务
   void clearCompleted() {
-    final completedIds = _tasks.entries
-        .where((e) => e.value.status == DownloadStatus.completed)
+    final terminalIds = _tasks.entries
+        .where((e) => _isTerminalStatus(e.value.status))
         .map((e) => e.key)
         .toList();
 
-    for (final id in completedIds) {
+    for (final id in terminalIds) {
       _taskControllers[id]?.close();
       _taskControllers.remove(id);
       _tasks.remove(id);

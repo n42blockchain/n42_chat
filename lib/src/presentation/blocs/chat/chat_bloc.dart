@@ -173,6 +173,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 房间信息（频道/权限）
     on<RoomInfoLoaded>(_onRoomInfoLoaded);
+    on<ContentFilterLoaded>(_onContentFilterLoaded);
+    on<ScheduledMessagesPreviewLoaded>(_onScheduledMessagesPreviewLoaded);
+    on<RecipientLanguageDetected>(_onRecipientLanguageDetected);
   }
 
   Future<int?> _resolveSelfDestructAfter(int? explicitValue) async {
@@ -291,7 +294,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     setupAutoRetry();
 
     // 加载关键词过滤配置
-    _loadContentFilter(event.roomId, emit);
+    _loadContentFilter(event.roomId);
 
     // 加载翻译设置
     _loadTranslationSettings();
@@ -300,17 +303,24 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _loadRoomInfo(event.roomId);
   }
 
-  void _loadContentFilter(String roomId, Emitter<ChatState> emit) {
+  void _loadContentFilter(String roomId) {
     Future.microtask(() async {
       try {
         final filter = await _groupRepository?.getContentFilter(roomId);
         if (!isClosed) {
-          emit(state.copyWith(contentFilter: filter));
+          add(ContentFilterLoaded(filter));
         }
       } catch (e) {
         // content filter 不影响聊天主流程，静默忽略错误
       }
     });
+  }
+
+  void _onContentFilterLoaded(
+    ContentFilterLoaded event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(state.copyWith(contentFilter: event.config));
   }
 
   void _loadTranslationSettings() {
@@ -470,15 +480,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
             .toList(growable: false);
 
         if (tempMessages.isNotEmpty && !isClosed) {
-          // 将定时消息添加到消息列表末尾（按时间排序）
-          final allMessages = [...state.messages, ...tempMessages];
-          allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-          // ignore: invalid_use_of_visible_for_testing_member
-          emit(state.copyWith(messages: allMessages));
+          add(ScheduledMessagesPreviewLoaded(tempMessages));
         }
       } catch (e) {
         debugLog('ChatBloc: Failed to load scheduled messages: $e');
       }
     });
+  }
+
+  void _onScheduledMessagesPreviewLoaded(
+    ScheduledMessagesPreviewLoaded event,
+    Emitter<ChatState> emit,
+  ) {
+    final allMessages = [...state.messages, ...event.previewMessages];
+    allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    emit(state.copyWith(messages: allMessages));
   }
 }

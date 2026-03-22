@@ -155,10 +155,17 @@ class SecureStorageDataSource {
       if (data == null) return null;
 
       final json = jsonDecode(data) as Map<String, dynamic>;
+      final homeserver = json['homeserver'] as String?;
+      final username = json['username'] as String?;
+      if (homeserver == null || username == null) {
+        debugLog('SecureStorage: Credentials data incomplete, clearing');
+        await _storage.delete(key: _keyCredentials);
+        return null;
+      }
       debugLog('SecureStorage: Credentials loaded');
       return {
-        'homeserver': json['homeserver'] as String,
-        'username': json['username'] as String,
+        'homeserver': homeserver,
+        'username': username,
       };
     } catch (e) {
       debugLog('SecureStorage: Failed to read credentials - $e');

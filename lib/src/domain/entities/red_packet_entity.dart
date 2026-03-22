@@ -99,8 +99,8 @@ class RedPacketEntity {
       claims: (json['claims'] as List<dynamic>? ?? [])
           .map((c) => RedPacketClaim.fromJson(c as Map<String, dynamic>))
           .toList(),
-      createdAt: DateTime.parse(json['created_at'] as String),
-      expiresAt: DateTime.parse(json['expires_at'] as String),
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
+      expiresAt: DateTime.tryParse(json['expires_at'] as String? ?? '') ?? DateTime.now().add(const Duration(hours: 24)),
     );
   }
 
@@ -144,7 +144,7 @@ class RedPacketClaim {
       userName: json['user_name'] as String? ?? '',
       avatarUrl: json['avatar_url'] as String?,
       amount: (json['amount'] as num).toDouble(),
-      claimedAt: DateTime.parse(json['claimed_at'] as String),
+      claimedAt: DateTime.tryParse(json['claimed_at'] as String? ?? '') ?? DateTime.now(),
     );
   }
 

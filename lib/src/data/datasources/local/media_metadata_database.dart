@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -62,12 +63,22 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
   MediaMetadataDatabase._internal(super.e);
 
   static MediaMetadataDatabase? _instance;
+  static Completer<MediaMetadataDatabase>? _initCompleter;
 
   /// 获取单例实例
   static Future<MediaMetadataDatabase> getInstance() async {
     if (_instance != null) return _instance!;
-    _instance = MediaMetadataDatabase._internal(await _openConnection());
-    return _instance!;
+    if (_initCompleter != null) return _initCompleter!.future;
+    _initCompleter = Completer<MediaMetadataDatabase>();
+    try {
+      _instance = MediaMetadataDatabase._internal(await _openConnection());
+      _initCompleter!.complete(_instance!);
+      return _instance!;
+    } catch (e, s) {
+      _initCompleter!.completeError(e, s);
+      _initCompleter = null;
+      rethrow;
+    }
   }
 
   /// 测试用构造函数

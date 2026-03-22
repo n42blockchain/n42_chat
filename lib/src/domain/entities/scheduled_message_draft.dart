@@ -36,10 +36,8 @@ class ScheduledMessageDraft extends Equatable {
       roomId: json['roomId'] as String?,
       text: json['text'] as String? ?? '',
       type: _parseMessageType(rawType),
-      scheduledAt: DateTime.parse(json['scheduledAt'] as String),
-      createdAt: DateTime.parse(
-        json['createdAt'] as String? ?? DateTime.now().toIso8601String(),
-      ),
+      scheduledAt: DateTime.tryParse(json['scheduledAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
       mentionedUserIds:
           (json['mentionedUserIds'] as List<dynamic>?)
               ?.map((item) => item.toString())
