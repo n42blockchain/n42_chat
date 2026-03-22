@@ -432,22 +432,48 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   Future<void> _sendScheduledLocalFile(ScheduledMessageDraft draft) async {
     final file = await _requireScheduledAttachmentFile(draft);
     final fileSize = draft.attachmentFileSize ?? await file.length();
-    final bytes = await file.readAsBytes();
-    if (bytes.isEmpty) {
-      throw StateError('Scheduled file attachment is empty');
+
+    if (_requiresEncryptedFileUpload(draft.roomId!)) {
+      final bytes = await file.readAsBytes();
+      if (bytes.isEmpty) {
+        throw StateError('Scheduled file attachment is empty');
+      }
+
+      await _messageRepository.sendFileMessage(
+        draft.roomId!,
+        fileBytes: bytes,
+        filename: draft.attachmentFilename,
+        mimeType:
+            draft.attachmentMimeType ??
+            lookupMimeType(file.path) ??
+            'application/octet-stream',
+        selfDestructAfter: draft.selfDestructAfter,
+        fileSize: fileSize,
+      );
+      return;
     }
 
     await _messageRepository.sendFileMessage(
       draft.roomId!,
-      fileBytes: bytes,
       filename: draft.attachmentFilename,
       mimeType:
           draft.attachmentMimeType ??
           lookupMimeType(file.path) ??
           'application/octet-stream',
       selfDestructAfter: draft.selfDestructAfter,
+      filePath: file.path,
       fileSize: fileSize,
     );
+  }
+
+  bool _requiresEncryptedFileUpload(String roomId) {
+    final client = _clientManager?.client;
+    final room = client?.getRoomById(roomId);
+    if (client == null || room == null) {
+      return true;
+    }
+
+    return room.encrypted && client.fileEncryptionEnabled;
   }
 
   Future<File> _requireScheduledAttachmentFile(
