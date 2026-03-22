@@ -438,7 +438,11 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
         break;
       case SearchResultType.message:
         if (item.roomId != null) {
-          N42Chat.openConversation(item.roomId!, context: context);
+          N42Chat.openConversation(
+            item.roomId!,
+            context: context,
+            targetMessageId: item.id,
+          );
         }
         break;
       case SearchResultType.all:

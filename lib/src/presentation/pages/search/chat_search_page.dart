@@ -362,7 +362,11 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           Navigator.pop(context, message.id);
           return;
         }
-        N42Chat.openConversation(widget.roomId, context: context);
+        N42Chat.openConversation(
+          widget.roomId,
+          context: context,
+          targetMessageId: message.id,
+        );
       },
     );
   }
