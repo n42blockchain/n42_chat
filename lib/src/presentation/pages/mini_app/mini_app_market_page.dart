@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/mini_app_entity.dart';
-import 'mini_app_page.dart';
+import '../../helpers/mini_app_launcher_helper.dart';
 
 /// Mini App 市场页面
 ///
@@ -12,8 +14,13 @@ import 'mini_app_page.dart';
 class MiniAppMarketPage extends StatefulWidget {
   /// 当前聊天室 ID（传给 Mini App Bridge）
   final String roomId;
+  final MiniAppCategory? initialCategory;
 
-  const MiniAppMarketPage({super.key, required this.roomId});
+  const MiniAppMarketPage({
+    super.key,
+    required this.roomId,
+    this.initialCategory,
+  });
 
   @override
   State<MiniAppMarketPage> createState() => _MiniAppMarketPageState();
@@ -33,7 +40,14 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _categories.length, vsync: this);
+    final initialIndex = widget.initialCategory == null
+        ? 0
+        : _categories.indexOf(widget.initialCategory);
+    _tabController = TabController(
+      length: _categories.length,
+      vsync: this,
+      initialIndex: initialIndex < 0 ? 0 : initialIndex,
+    );
   }
 
   @override
@@ -197,10 +211,11 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
   }
 
   void _openApp(MiniAppEntity app) {
-    Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (_) => MiniAppPage(app: app, roomId: widget.roomId),
+    unawaited(
+      MiniAppLauncherHelper.openApp<void>(
+        context,
+        app: app,
+        roomId: widget.roomId,
       ),
     );
   }

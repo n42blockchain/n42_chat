@@ -372,6 +372,75 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     );
   }
 
+  Future<void> _openReceive() async {
+    await Navigator.of(context).push<PaymentRequest>(
+      MaterialPageRoute<PaymentRequest>(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<TransferBloc>(),
+          child: ReceivePage(roomId: widget.conversation.id),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openCommerceHub() async {
+    final quickLaunchApps = MiniAppLauncherHelper.commerceQuickLaunchApps();
+    final actions = <PaymentCommerceAction>[
+      for (final app in quickLaunchApps)
+        PaymentCommerceAction(
+          icon: _commerceMiniAppIcon(app.id),
+          color: _commerceMiniAppColor(app.id),
+          title: app.name,
+          subtitle: app.description,
+          onTap: () => _openBuiltInMiniApp(app.id),
+        ),
+      PaymentCommerceAction(
+        icon: Icons.apps_rounded,
+        color: AppColors.primary,
+        title: S.of(context)?.miniAppMarketTitle ?? 'Mini Apps',
+        onTap: () => _openMiniApps(initialCategory: MiniAppCategory.commerce),
+      ),
+    ];
+
+    await PaymentCommerceSheet.show(context, actions: actions);
+  }
+
+  Future<void> _openBuiltInMiniApp(String appId) async {
+    final opened = await MiniAppLauncherHelper.openBuiltInAppById(
+      context,
+      appId: appId,
+      roomId: widget.conversation.id,
+    );
+
+    if (!mounted || opened) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Mini app is not available')));
+  }
+
+  IconData _commerceMiniAppIcon(String appId) {
+    switch (appId) {
+      case MiniAppLauncherHelper.shopAppId:
+        return Icons.storefront_outlined;
+      case MiniAppLauncherHelper.creatorPassAppId:
+        return Icons.workspace_premium_outlined;
+      default:
+        return Icons.apps_rounded;
+    }
+  }
+
+  Color _commerceMiniAppColor(String appId) {
+    switch (appId) {
+      case MiniAppLauncherHelper.shopAppId:
+        return Colors.amber.shade700;
+      case MiniAppLauncherHelper.creatorPassAppId:
+        return Colors.deepPurple;
+      default:
+        return AppColors.primary;
+    }
+  }
+
   /// 发送名片
   Future<void> _sendContactCard() async {
     debugLog('Send contact card');
@@ -616,18 +685,6 @@ Avatar: ${contactAvatar ?? ''}''';
     }
   }
 
-  void _selectCoupon() {
-    // TODO(backend): 实现选择卡券功能 — 需要卡券系统集成
-    debugLog('Select coupon');
-    _showFeatureToast(S.of(context)?.chatCouponsFeature ?? 'Coupons');
-  }
-
-  void _sendGift() {
-    // TODO(backend): 实现发送礼物功能 — 需要礼物系统集成
-    debugLog('Send gift');
-    _showFeatureToast(S.of(context)?.chatGiftFeature ?? 'Gift');
-  }
-
   /// 创建投票
   void _createPoll() async {
     final result = await showModalBottomSheet<Map<String, dynamic>>(
@@ -818,18 +875,5 @@ Avatar: ${contactAvatar ?? ''}''';
         ),
       );
     }
-  }
-
-  void _showFeatureToast(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          S.of(context)?.chatFeatureInDev(feature) ??
-              '$feature feature in development...',
-        ),
-        duration: const Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 }

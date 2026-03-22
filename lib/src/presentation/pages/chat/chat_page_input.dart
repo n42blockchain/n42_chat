@@ -341,6 +341,10 @@ extension _ChatPageInputMethods on _ChatPageState {
   }
 
   Widget _buildMorePanel() {
+    final shopApp = MiniAppLauncherHelper.findBuiltInAppById(
+      MiniAppLauncherHelper.shopAppId,
+    );
+
     return ChatMorePanel(
       onPhotoPressed: () {
         _hideMorePanel();
@@ -382,14 +386,15 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _shareMusic();
       },
-      onCouponPressed: () {
+      onReceivePressed: () {
         _hideMorePanel();
-        _selectCoupon();
+        _openReceive();
       },
-      onGiftPressed: () {
+      onShopPressed: () {
         _hideMorePanel();
-        _sendGift();
+        _openCommerceHub();
       },
+      shopLabel: shopApp?.name,
       onPollPressed: () {
         _hideMorePanel();
         _createPoll();
@@ -437,10 +442,13 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
   }
 
-  void _openMiniApps() {
+  void _openMiniApps({MiniAppCategory? initialCategory}) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => MiniAppMarketPage(roomId: widget.conversation.id),
+        builder: (_) => MiniAppMarketPage(
+          roomId: widget.conversation.id,
+          initialCategory: initialCategory,
+        ),
       ),
     );
   }
