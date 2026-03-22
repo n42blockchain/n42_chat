@@ -572,7 +572,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
     final result = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => ChatDeleteConfirmSheet(),
+      builder: (ctx) => const ChatDeleteConfirmSheet(),
     );
     return result ?? false;
   }

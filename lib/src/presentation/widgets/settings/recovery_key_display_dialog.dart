@@ -34,11 +34,11 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AlertDialog(
-      title: Row(
+      title: const Row(
         children: [
-          const Icon(Icons.key, color: AppColors.primary),
-          const SizedBox(width: 8),
-          const Expanded(
+          Icon(Icons.key, color: AppColors.primary),
+          SizedBox(width: 8),
+          Expanded(
             child: Text(
               'Recovery Key',
               style: TextStyle(fontSize: 18),

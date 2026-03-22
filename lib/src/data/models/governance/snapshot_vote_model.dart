@@ -49,7 +49,7 @@ class SnapshotVoteModel {
       id: id,
       voter: voter,
       proposalId: proposalId,
-      choice: choice,
+      choice: choice as Object,
       votingPower: vp,
       created: DateTime.fromMillisecondsSinceEpoch(created * 1000),
       reason: reason,
