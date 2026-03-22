@@ -17,6 +17,8 @@ class PointsTrackingService {
   StreamSubscription<dynamic>? _syncSubscription;
   final Map<String, DateTime> _lastActionTimes = {};
   final Map<String, PointsConfig> _configCache = {};
+  final Map<String, DateTime> _configCacheTimestamps = {};
+  static const Duration _configCacheTtl = Duration(minutes: 10);
   bool _isTracking = false;
 
   PointsTrackingService({
@@ -95,6 +97,7 @@ class PointsTrackingService {
     stopTracking();
     _lastActionTimes.clear();
     _configCache.clear();
+    _configCacheTimestamps.clear();
   }
 
   // ---------------------------------------------------------------------------
@@ -266,12 +269,16 @@ class PointsTrackingService {
 
   Future<PointsConfig?> _getConfig(String roomId) async {
     final cached = _configCache[roomId];
-    if (cached != null) {
+    final cachedAt = _configCacheTimestamps[roomId];
+    if (cached != null &&
+        cachedAt != null &&
+        DateTime.now().difference(cachedAt) < _configCacheTtl) {
       return cached;
     }
 
     final config = await _repository.getConfig(roomId);
     _configCache[roomId] = config;
+    _configCacheTimestamps[roomId] = DateTime.now();
     return config;
   }
 }
