@@ -325,6 +325,8 @@ extension ChatBlocActionHandlers on ChatBloc {
   Future<void> onDisposeChat(DisposeChat event, Emitter<ChatState> emit) async {
     await _messagesSubscription?.cancel();
     _messagesSubscription = null;
+    _typingUsersTimer?.cancel();
+    _typingUsersTimer = null;
     await _syncStatusSubscription?.cancel();
     _syncStatusSubscription = null;
     _retryTimer?.cancel();

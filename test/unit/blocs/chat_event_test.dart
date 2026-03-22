@@ -536,6 +536,22 @@ void main() {
     });
   });
 
+  group('TypingUsersUpdated', () {
+    test('stores typing users', () {
+      expect(const TypingUsersUpdated(['Alice', 'Bob']).typingUsers, [
+        'Alice',
+        'Bob',
+      ]);
+    });
+
+    test('same users → equal', () {
+      expect(
+        const TypingUsersUpdated(['Alice']),
+        equals(const TypingUsersUpdated(['Alice'])),
+      );
+    });
+  });
+
   // ─────────────────────────────────────────────────
   // SendSystemNotice / SendPokeMessage
   // ─────────────────────────────────────────────────

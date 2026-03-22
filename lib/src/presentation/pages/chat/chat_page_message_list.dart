@@ -39,8 +39,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           );
         }
 
-        // 额外项数：加密提示(1) + 加载更多指示器(可选)
-        final extraItems = 1 + (state.isLoadingMore ? 1 : 0);
+        // 额外项数：输入状态(可选) + 加密提示(1) + 加载更多指示器(可选)
+        final typingExtraItems = state.hasTypingUsers ? 1 : 0;
+        final extraItems = typingExtraItems + 1 + (state.isLoadingMore ? 1 : 0);
 
         return ListView.builder(
           controller: _scrollController,
@@ -48,8 +49,19 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: state.messages.length + extraItems,
           itemBuilder: (context, index) {
+            if (state.hasTypingUsers && index == 0) {
+              return TypingIndicator(
+                userName: state.typingUsers.length == 1
+                    ? state.typingUsers.first
+                    : null,
+              );
+            }
+
+            final messageIndex = index - typingExtraItems;
+
             // 加载更多指示器（列表顶部，index 最大）
-            if (state.isLoadingMore && index == state.messages.length + 1) {
+            if (state.isLoadingMore &&
+                messageIndex == state.messages.length + 1) {
               return const Padding(
                 padding: EdgeInsets.all(16),
                 child: N42Loading(),
@@ -57,7 +69,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             }
 
             // 端对端加密提示 + 群聊 AI 摘要（在所有消息之上）
-            if (index == state.messages.length) {
+            if (messageIndex == state.messages.length) {
               final isGroup =
                   widget.conversation.type == ConversationType.group;
               final aiAvailable = getIt.isRegistered<AiService>();
@@ -90,9 +102,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
               );
             }
 
-            final message = state.messages[index];
-            final previousMessage = index < state.messages.length - 1
-                ? state.messages[index + 1]
+            final message = state.messages[messageIndex];
+            final previousMessage = messageIndex < state.messages.length - 1
+                ? state.messages[messageIndex + 1]
                 : null;
 
             // 判断是否显示时间分隔器

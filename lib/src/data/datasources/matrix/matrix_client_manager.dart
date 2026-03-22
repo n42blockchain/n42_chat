@@ -182,7 +182,7 @@ class MatrixClientManager {
             limit: syncFilterConfig.timelineLimit,
             lazyLoadMembers: syncFilterConfig.lazyLoadMembers,
           ),
-          ephemeral: StateFilter(notTypes: ['m.typing', 'm.receipt']),
+          ephemeral: StateFilter(notTypes: ['m.receipt']),
         ),
       );
       final privacySettings =

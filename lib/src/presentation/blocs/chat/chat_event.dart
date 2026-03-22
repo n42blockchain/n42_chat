@@ -327,6 +327,16 @@ class MessagesUpdated extends ChatEvent {
   List<Object?> get props => [messages];
 }
 
+/// 正在输入的用户列表更新（内部事件）
+class TypingUsersUpdated extends ChatEvent {
+  final List<String> typingUsers;
+
+  const TypingUsersUpdated(this.typingUsers);
+
+  @override
+  List<Object?> get props => [typingUsers];
+}
+
 /// 清理聊天室
 class DisposeChat extends ChatEvent {
   const DisposeChat();

@@ -41,16 +41,15 @@ class RetentionRecommendation {
 class SyncOptimizationService {
   final MatrixClientManager _clientManager;
 
-  SyncOptimizationService({
-    required MatrixClientManager clientManager,
-  }) : _clientManager = clientManager;
+  SyncOptimizationService({required MatrixClientManager clientManager})
+    : _clientManager = clientManager;
 
   /// 配置最优同步过滤器
   ///
   /// 减少每次同步的数据量：
   /// - 限制 timeline 条数（默认 30 条）
   /// - 启用 lazy_load_members
-  /// - 过滤不必要的事件类型（typing、receipts 等）
+  /// - 过滤不必要的事件类型（如 receipts）
   Future<void> configureOptimalSyncFilter() async {
     try {
       final client = _clientManager.client;
@@ -60,9 +59,7 @@ class SyncOptimizationService {
         room: RoomFilter(
           state: StateFilter(lazyLoadMembers: true),
           timeline: StateFilter(limit: 30, lazyLoadMembers: true),
-          ephemeral: StateFilter(
-            notTypes: ['m.typing', 'm.receipt'],
-          ),
+          ephemeral: StateFilter(notTypes: ['m.receipt']),
         ),
       );
 
@@ -87,9 +84,7 @@ class SyncOptimizationService {
 
       // m.room.retention 不是标准 capability，暂通过 capabilities 存在性推断
       if (roomVersions != null) {
-        return const ServerRetentionInfo(
-          supported: false,
-        );
+        return const ServerRetentionInfo(supported: false);
       }
 
       return const ServerRetentionInfo(supported: false);

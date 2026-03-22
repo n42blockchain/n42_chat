@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' show min;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
 
@@ -42,6 +43,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   // 定时发送检查定时器
   Timer? _scheduledMessageTimer;
+
+  // 输入状态过期刷新定时器
+  Timer? _typingUsersTimer;
 
   // 已本地删除的消息ID集合（防止被消息订阅恢复）
   final Set<String> _locallyDeletedMessageIds = {};
@@ -93,6 +97,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SubscribeMessages>(onSubscribeMessages);
     on<UnsubscribeMessages>(onUnsubscribeMessages);
     on<MessagesUpdated>(onMessagesUpdated);
+    on<TypingUsersUpdated>(onTypingUsersUpdated);
     on<DisposeChat>(onDisposeChat);
 
     // 消息发送（各类型）
@@ -203,6 +208,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _pollResponsesSubscription?.cancel();
     _destructionTimer?.cancel();
     _scheduledMessageTimer?.cancel();
+    _typingUsersTimer?.cancel();
     _syncStatusSubscription?.cancel();
     _retryTimer?.cancel();
     return super.close();
