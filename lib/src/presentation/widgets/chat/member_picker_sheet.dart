@@ -12,6 +12,7 @@ class MemberPickerSheet extends StatefulWidget {
   final void Function(String memberName, String memberId) onMemberSelected;
 
   const MemberPickerSheet({
+    super.key,
     required this.roomId,
     required this.isDark,
     required this.onMemberSelected,

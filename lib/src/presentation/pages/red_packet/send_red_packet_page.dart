@@ -41,6 +41,8 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   bool _isLucky = false;
   var _isSending = false;
   int _selectedCoverIndex = 0;
+  RegExp? _cachedAmountRegex;
+  String? _cachedAmountPattern;
 
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
 
@@ -109,7 +111,17 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   
   /// 获取金额输入的正则表达式
   String get _amountPattern => r'^\d*\.?\d{0,' + _decimalPlaces.toString() + r'}';
-  
+
+  RegExp get _amountRegex {
+    final pattern = _amountPattern;
+    if (_cachedAmountPattern == pattern && _cachedAmountRegex != null) {
+      return _cachedAmountRegex!;
+    }
+    _cachedAmountPattern = pattern;
+    _cachedAmountRegex = RegExp(pattern);
+    return _cachedAmountRegex!;
+  }
+
   String get _currencySymbol {
     switch (_selectedToken) {
       case 'CNY':
@@ -285,7 +297,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           controller: _amountController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(_amountPattern)),
+                            FilteringTextInputFormatter.allow(_amountRegex),
                           ],
                           textAlign: TextAlign.right,
                           style: TextStyle(

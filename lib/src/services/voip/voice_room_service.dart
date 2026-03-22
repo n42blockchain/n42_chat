@@ -183,6 +183,7 @@ class VoiceRoomService {
   }
 
   void _emitState() {
+    if (_stateController.isClosed) return;
     _stateController.add(VoiceRoomServiceState(
       isConnected: _isConnected,
       isMuted: _isMuted,

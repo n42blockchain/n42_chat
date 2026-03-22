@@ -6,6 +6,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 
 class ChatDeleteConfirmSheet extends StatelessWidget {
+  const ChatDeleteConfirmSheet({super.key});
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -115,6 +117,7 @@ class ChatMessageMenuSheet extends StatelessWidget {
   final VoidCallback? onDelete;
 
   const ChatMessageMenuSheet({
+    super.key,
     required this.message,
     this.onCopy,
     this.onReply,

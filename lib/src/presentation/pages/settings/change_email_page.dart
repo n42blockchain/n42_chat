@@ -88,12 +88,13 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         ));
   }
 
+  static final _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return S.of(context)?.commonEnterEmailAddress ?? 'Please enter email address';
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
+    if (!_emailRegex.hasMatch(value)) {
       return S.of(context)?.commonInvalidEmailFormat ?? 'Invalid email format';
     }
     return null;

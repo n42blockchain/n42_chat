@@ -77,6 +77,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   @override
   void dispose() {
+    widget.liveKitService.onStateChanged = null;
+    widget.liveKitService.onParticipantsChanged = null;
+    widget.liveKitService.onDurationUpdate = null;
+    widget.liveKitService.onError = null;
     _hideControlsTimer?.cancel();
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -84,6 +88,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   void _onStateChanged(MeetingState state) {
+    if (!mounted) return;
     setState(() {
       _state = state;
       _syncControlsFromService();
@@ -97,12 +102,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   }
 
   void _onParticipantsChanged(List<MeetingParticipant> participants) {
+    if (!mounted) return;
     setState(() {
       _participants = participants;
     });
   }
 
   void _onDurationUpdate(Duration duration) {
+    if (!mounted) return;
     setState(() {
       _duration = duration;
     });

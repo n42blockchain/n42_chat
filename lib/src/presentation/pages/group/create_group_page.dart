@@ -51,9 +51,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     final image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       final bytes = await image.readAsBytes();
-      setState(() {
-        _avatarBytes = bytes;
-      });
+      if (mounted) {
+        setState(() {
+          _avatarBytes = bytes;
+        });
+      }
     }
   }
 

@@ -10,6 +10,7 @@ class ContactSelectDialog extends StatefulWidget {
   final String title;
 
   const ContactSelectDialog({
+    super.key,
     required this.contacts,
     required this.title,
   });
