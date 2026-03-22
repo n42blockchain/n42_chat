@@ -7,9 +7,27 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/giphy_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
+import 'scheduled_send_picker.dart';
 
 /// GIF 选择回调
 typedef GifSelectedCallback = void Function(GiphyGif gif);
+typedef GifLongPressedCallback = Future<void> Function(GiphyGif gif);
+
+class GifPickerResult {
+  final GiphyGif gif;
+  final DateTime? scheduledAt;
+
+  const GifPickerResult({required this.gif, this.scheduledAt});
+
+  String get title => gif.title;
+
+  Map<String, dynamic> get scheduledPayload => {
+    'gifUrl': gif.originalUrl,
+    'previewUrl': gif.previewUrl,
+    'width': gif.width,
+    'height': gif.height,
+  };
+}
 
 /// GIF 选择器面板
 ///
@@ -22,12 +40,16 @@ class GifPicker extends StatefulWidget {
   /// 选择 GIF 回调
   final GifSelectedCallback onGifSelected;
 
+  /// 长按 GIF 回调
+  final GifLongPressedCallback? onGifLongPressed;
+
   /// 面板高度
   final double height;
 
   const GifPicker({
     super.key,
     required this.onGifSelected,
+    this.onGifLongPressed,
     this.height = 300,
   });
 
@@ -198,9 +220,7 @@ class _GifPickerState extends State<GifPicker> {
             _buildSearchBar(isDark),
 
             // GIF 网格
-            Expanded(
-              child: _buildGifGrid(isDark),
-            ),
+            Expanded(child: _buildGifGrid(isDark)),
 
             // Giphy 署名
             _buildGiphyAttribution(isDark),
@@ -229,12 +249,16 @@ class _GifPickerState extends State<GifPicker> {
             hintText: 'Search GIFs...',
             hintStyle: TextStyle(
               fontSize: 14,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: isDark
+                  ? AppColors.textTertiaryDark
+                  : AppColors.textTertiary,
             ),
             prefixIcon: Icon(
               Icons.search,
               size: 20,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
@@ -287,9 +311,7 @@ class _GifPickerState extends State<GifPicker> {
     }
 
     if (_gifs.isEmpty && _isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_gifs.isEmpty) {
@@ -342,6 +364,9 @@ class _GifPickerState extends State<GifPicker> {
   Widget _buildGifItem(GiphyGif gif, bool isDark) {
     return GestureDetector(
       onTap: () => widget.onGifSelected(gif),
+      onLongPress: widget.onGifLongPressed == null
+          ? null
+          : () => widget.onGifLongPressed!(gif),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Container(
@@ -356,15 +381,13 @@ class _GifPickerState extends State<GifPicker> {
                   strokeWidth: 2,
                   value: loadingProgress.expectedTotalBytes != null
                       ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
+                            loadingProgress.expectedTotalBytes!
                       : null,
                 ),
               );
             },
-            errorBuilder: (_, _, _) => const Icon(
-              Icons.broken_image_outlined,
-              size: 32,
-            ),
+            errorBuilder: (_, _, _) =>
+                const Icon(Icons.broken_image_outlined, size: 32),
           ),
         ),
       ),
@@ -405,8 +428,8 @@ class _GifPickerState extends State<GifPicker> {
 /// GIF 选择对话框
 ///
 /// 以底部弹出的方式显示 GIF 选择器
-Future<GiphyGif?> showGifPicker(BuildContext context) async {
-  GiphyGif? selectedGif;
+Future<GifPickerResult?> showGifPicker(BuildContext context) async {
+  GifPickerResult? selectedGif;
 
   await showModalBottomSheet<void>(
     context: context,
@@ -439,10 +462,7 @@ Future<GiphyGif?> showGifPicker(BuildContext context) async {
               children: [
                 const Text(
                   'Choose a GIF',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 const Spacer(),
                 IconButton(
@@ -457,7 +477,18 @@ Future<GiphyGif?> showGifPicker(BuildContext context) async {
             child: GifPicker(
               height: double.infinity,
               onGifSelected: (gif) {
-                selectedGif = gif;
+                selectedGif = GifPickerResult(gif: gif);
+                Navigator.pop(context);
+              },
+              onGifLongPressed: (gif) async {
+                final scheduledAt = await showScheduledSendPicker(context);
+                if (!context.mounted || scheduledAt == null) {
+                  return;
+                }
+                selectedGif = GifPickerResult(
+                  gif: gif,
+                  scheduledAt: scheduledAt,
+                );
                 Navigator.pop(context);
               },
             ),

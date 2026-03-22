@@ -177,6 +177,7 @@ extension _ChatPageInputMethods on _ChatPageState {
   Widget _buildStickerPicker() {
     return StickerPicker(
       onStickerSelected: _onStickerSelected,
+      onStickerLongPressed: _onStickerLongPressed,
       onOpenStore: _openStickerStore,
     );
   }

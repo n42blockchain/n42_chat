@@ -39,9 +39,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
 
   Future<void> _loadDrafts() async {
     setState(() => _isLoading = true);
-    final drafts = (await _preferences.getScheduledMessages(widget.roomId))
-      .toList()
-      ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+    final drafts = (await _preferences.getScheduledMessages(
+      widget.roomId,
+    )).toList()..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
 
     if (!mounted) return;
     setState(() {
@@ -136,7 +136,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         const SizedBox(height: 8),
         Center(
           child: Text(
-            'Long press Send in chat to schedule follow-ups, reminders, or meeting notes.',
+            'Long press Send, a GIF, or a sticker to schedule follow-ups and reminders.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
@@ -235,6 +235,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   }
 
   IconData _iconForDraft(ScheduledMessageDraft draft) {
+    if (draft.isGif) {
+      return Icons.gif_box_outlined;
+    }
+
     switch (draft.type) {
       case MessageType.poll:
         return Icons.poll_outlined;

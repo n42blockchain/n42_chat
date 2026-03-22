@@ -708,7 +708,9 @@ void main() {
 
   group('Scheduled rich messages', () {
     test('saves scheduled poll payload and adds preview message', () async {
-      when(() => mockRepo.getCurrentUserId()).thenAnswer((_) async => '@me:test');
+      when(
+        () => mockRepo.getCurrentUserId(),
+      ).thenAnswer((_) async => '@me:test');
       when(
         () => mockPrefs.saveScheduledMessage(
           roomId: any(named: 'roomId'),
@@ -762,23 +764,23 @@ void main() {
     });
 
     test('sends due scheduled poll through repository', () async {
-      when(
-        () => mockPrefs.getDueScheduledMessages(),
-      ).thenAnswer((_) async => [
-        ScheduledMessageDraft(
-          messageId: 'scheduled_poll',
-          roomId: _roomId,
-          text: 'Lunch?',
-          type: MessageType.poll,
-          scheduledAt: DateTime.now().subtract(const Duration(minutes: 1)),
-          createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
-          payload: {
-            'options': ['Sushi', 'Pizza'],
-            'maxSelections': 1,
-            'isAnonymous': true,
-          },
-        ),
-      ]);
+      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+        (_) async => [
+          ScheduledMessageDraft(
+            messageId: 'scheduled_poll',
+            roomId: _roomId,
+            text: 'Lunch?',
+            type: MessageType.poll,
+            scheduledAt: DateTime.now().subtract(const Duration(minutes: 1)),
+            createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
+            payload: {
+              'options': ['Sushi', 'Pizza'],
+              'maxSelections': 1,
+              'isAnonymous': true,
+            },
+          ),
+        ],
+      );
       when(
         () => mockRepo.sendPollMessage(
           any(),
@@ -809,6 +811,62 @@ void main() {
       ).called(1);
       verify(
         () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_poll'),
+      ).called(1);
+
+      await bloc.close();
+    });
+
+    test('sends due scheduled gif through repository', () async {
+      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+        (_) async => [
+          ScheduledMessageDraft(
+            messageId: 'scheduled_gif',
+            roomId: _roomId,
+            text: 'Celebrate',
+            type: MessageType.image,
+            scheduledAt: DateTime.now().subtract(const Duration(minutes: 1)),
+            createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
+            payload: {
+              'gifUrl': 'https://media.giphy.com/media/abc/giphy.gif',
+              'previewUrl': 'https://media.giphy.com/media/abc/preview.gif',
+              'width': 320,
+              'height': 240,
+            },
+          ),
+        ],
+      );
+      when(
+        () => mockRepo.sendGifMessage(
+          any(),
+          gifUrl: any(named: 'gifUrl'),
+          previewUrl: any(named: 'previewUrl'),
+          width: any(named: 'width'),
+          height: any(named: 'height'),
+          title: any(named: 'title'),
+        ),
+      ).thenAnswer((_) async => _msg.copyWith(type: MessageType.image));
+      when(
+        () => mockPrefs.removeScheduledMessage(any(), any()),
+      ).thenAnswer((_) async {});
+
+      final bloc = buildBloc();
+      await initBloc(bloc);
+
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      verify(
+        () => mockRepo.sendGifMessage(
+          _roomId,
+          gifUrl: 'https://media.giphy.com/media/abc/giphy.gif',
+          previewUrl: 'https://media.giphy.com/media/abc/preview.gif',
+          width: 320,
+          height: 240,
+          title: 'Celebrate',
+        ),
+      ).called(1);
+      verify(
+        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_gif'),
       ).called(1);
 
       await bloc.close();

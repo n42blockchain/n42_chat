@@ -10,6 +10,8 @@ import '../../../domain/repositories/sticker_repository.dart';
 
 /// 贴纸选择回调
 typedef StickerSelectedCallback = void Function(Sticker sticker, String packId);
+typedef StickerLongPressedCallback =
+    Future<void> Function(Sticker sticker, String packId);
 
 /// 贴纸选择器面板
 ///
@@ -21,6 +23,9 @@ class StickerPicker extends StatefulWidget {
   /// 选择贴纸回调
   final StickerSelectedCallback onStickerSelected;
 
+  /// 长按贴纸回调
+  final StickerLongPressedCallback? onStickerLongPressed;
+
   /// 打开贴纸商店回调
   final VoidCallback? onOpenStore;
 
@@ -30,6 +35,7 @@ class StickerPicker extends StatefulWidget {
   const StickerPicker({
     super.key,
     required this.onStickerSelected,
+    this.onStickerLongPressed,
     this.onOpenStore,
     this.height = 260,
   });
@@ -290,6 +296,9 @@ class _StickerPickerState extends State<StickerPicker> {
   Widget _buildStickerItem(Sticker sticker, String packId, bool isDark) {
     return GestureDetector(
       onTap: () => _onStickerTap(sticker, packId),
+      onLongPress: widget.onStickerLongPressed == null
+          ? null
+          : () => widget.onStickerLongPressed!(sticker, packId),
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? Colors.grey[800] : Colors.grey[100],

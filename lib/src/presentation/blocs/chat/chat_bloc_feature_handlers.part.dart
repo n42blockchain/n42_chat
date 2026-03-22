@@ -302,6 +302,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             .where((item) => item.isNotEmpty)
             .toList(growable: false);
         return text.isNotEmpty && (options?.length ?? 0) >= 2;
+      case MessageType.image:
+        return (payload['gifUrl'] as String?)?.isNotEmpty == true;
       case MessageType.sticker:
         return (payload['stickerId'] as String?)?.isNotEmpty == true &&
             (payload['packId'] as String?)?.isNotEmpty == true &&
@@ -325,6 +327,19 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           options: draft.pollOptions,
           maxSelections: draft.pollMaxSelections,
           isAnonymous: draft.payload['isAnonymous'] as bool? ?? false,
+        );
+        return;
+      case MessageType.image:
+        if (!draft.isGif) {
+          throw UnsupportedError('Only remote GIF drafts are supported');
+        }
+        await _messageRepository.sendGifMessage(
+          roomId,
+          gifUrl: draft.payload['gifUrl'] as String,
+          previewUrl: draft.payload['previewUrl'] as String?,
+          width: draft.payload['width'] as int?,
+          height: draft.payload['height'] as int?,
+          title: draft.text.isEmpty ? null : draft.text,
         );
         return;
       case MessageType.sticker:
