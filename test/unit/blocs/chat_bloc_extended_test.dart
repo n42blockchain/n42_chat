@@ -5,9 +5,11 @@
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
+import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
 import 'package:n42_chat/src/domain/repositories/group_repository.dart';
@@ -23,6 +25,14 @@ class MockMessageRepository extends Mock implements IMessageRepository {}
 class MockPreferencesDataSource extends Mock implements PreferencesDataSource {}
 
 class MockGroupRepository extends Mock implements IGroupRepository {}
+
+class MockMatrixClientManager extends Mock implements MatrixClientManager {}
+
+class MockClient extends Mock implements matrix.Client {}
+
+class MockRoom extends Mock implements matrix.Room {}
+
+class MockUser extends Mock implements matrix.User {}
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -46,6 +56,9 @@ void main() {
   late MockMessageRepository mockRepo;
   late MockPreferencesDataSource mockPrefs;
   late MockGroupRepository mockGroupRepo;
+  late MockMatrixClientManager mockClientManager;
+  late MockClient mockClient;
+  late MockRoom mockRoom;
 
   /// Stub everything that InitializeChat triggers
   void stubInitDefaults() {
@@ -96,6 +109,12 @@ void main() {
   ChatBloc buildBloc() =>
       ChatBloc(messageRepository: mockRepo, secureStorage: mockPrefs);
 
+  ChatBloc buildBlocWithClientManager() => ChatBloc(
+    messageRepository: mockRepo,
+    secureStorage: mockPrefs,
+    clientManager: mockClientManager,
+  );
+
   /// Builds a bloc with a group repository
   ChatBloc buildBlocWithGroupRepo() => ChatBloc(
     messageRepository: mockRepo,
@@ -116,7 +135,18 @@ void main() {
     mockRepo = MockMessageRepository();
     mockPrefs = MockPreferencesDataSource();
     mockGroupRepo = MockGroupRepository();
+    mockClientManager = MockMatrixClientManager();
+    mockClient = MockClient();
+    mockRoom = MockRoom();
     stubInitDefaults();
+
+    when(() => mockClientManager.client).thenReturn(mockClient);
+    when(() => mockClient.getRoomById(_roomId)).thenReturn(mockRoom);
+    when(() => mockClient.userID).thenReturn('@me:server.com');
+    when(
+      () => mockClient.typingIndicatorTimeout,
+    ).thenReturn(const Duration(milliseconds: 20));
+    when(() => mockRoom.typingUsers).thenReturn(const <matrix.User>[]);
   });
 
   // ─────────────────────────────────────────────────
@@ -311,6 +341,53 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 50));
 
       verifyNever(() => mockRepo.sendTypingNotification(any(), any()));
+      await bloc.close();
+    });
+  });
+
+  group('Inbound typing users', () {
+    test(
+      'syncs room typing users into state and filters current user',
+      () async {
+        final alice = MockUser();
+        final me = MockUser();
+
+        when(() => alice.id).thenReturn('@alice:server.com');
+        when(() => alice.calcDisplayname()).thenReturn('Alice');
+        when(() => me.id).thenReturn('@me:server.com');
+        when(() => me.calcDisplayname()).thenReturn('Me');
+        when(() => mockRoom.typingUsers).thenReturn(<matrix.User>[alice, me]);
+
+        final bloc = buildBlocWithClientManager();
+        await initBloc(bloc);
+
+        bloc.add(MessagesUpdated([_msg]));
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        expect(bloc.state.typingUsers, ['Alice']);
+        await bloc.close();
+      },
+    );
+
+    test('clears typing users after local timeout refresh', () async {
+      final alice = MockUser();
+      var currentTypingUsers = <matrix.User>[alice];
+
+      when(() => alice.id).thenReturn('@alice:server.com');
+      when(() => alice.calcDisplayname()).thenReturn('Alice');
+      when(() => mockRoom.typingUsers).thenAnswer((_) => currentTypingUsers);
+
+      final bloc = buildBlocWithClientManager();
+      await initBloc(bloc);
+
+      bloc.add(MessagesUpdated([_msg]));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.typingUsers, ['Alice']);
+
+      currentTypingUsers = <matrix.User>[];
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+
+      expect(bloc.state.typingUsers, isEmpty);
       await bloc.close();
     });
   });

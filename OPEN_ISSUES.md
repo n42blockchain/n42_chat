@@ -115,14 +115,6 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: live smoke currently covers UTF-8 text, reply, edit, reaction redaction, and thread behavior. Search, favorites/bookmarks, pinning, built-in translation, scheduled send, and polls were not covered in the recent real-homeserver verification.
 - Next step: extend the live smoke or add integration tests for the uncovered feature set.
 
-### MSG-002 Typing-indicator receive/render wiring is still incomplete
-
-- Severity: M
-- Added: 2026-03-22
-- Evidence: `lib/src/presentation/blocs/chat/chat_state.dart`, `lib/src/presentation/blocs/chat/chat_bloc_action_handlers.part.dart`
-- Current state: the chat layer can send typing notifications and `ChatState` still exposes `typingUsers` / `typingText`, but this round's review did not find a corresponding inbound subscription/update path that populates those fields for the active room. In practice, the UI cannot reliably show who is typing even though the state shape suggests that feature exists.
-- Next step: wire inbound typing events from the Matrix/message datasource into `ChatBloc`, then render and clear room-scoped typing users with proper debounce/expiry semantics.
-
 ### MSG-004 Scheduled send still does not cover local attachments that require delayed upload
 
 - Severity: M
@@ -130,6 +122,14 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Evidence: `lib/src/domain/entities/scheduled_message_draft.dart`, `lib/src/presentation/widgets/chat/poll_create_sheet.dart`, `lib/src/presentation/pages/chat/chat_page_more_features.dart`, `lib/src/presentation/pages/chat/chat_page_input.dart`
 - Current state: scheduled send now uses a typed draft model and supports text, polls, stickers, and remote GIFs, including due-send replay through `ChatBloc` and picker-level schedule affordances for GIF/sticker selection. The remaining gap is content that depends on local file handles or post-pick upload work: image/video/file attachments still cannot be safely persisted and replayed for delayed send.
 - Next step: define a durable local-attachment draft format first, including path validity, permission expiry, thumbnail/metadata preservation, and how delayed upload should fail closed when the source file is no longer readable.
+
+### MSG-005 Conversation-list typing preview is still not wired
+
+- Severity: L
+- Added: 2026-03-22
+- Evidence: `lib/src/data/repositories/conversation_repository_impl.dart`, `lib/src/domain/entities/conversation_entity.dart`
+- Current state: active chat rooms now receive, render, and locally expire typing users through `ChatBloc`, but the room list still maps conversations from `room.lastEvent` only and does not populate `ConversationEntity.typingUsers`. That means list rows do not yet surface transient "Alice is typing..." previews.
+- Next step: decide whether the conversation list should show ephemeral typing previews; if yes, wire `room.typingUsers` into `ConversationRepositoryImpl` and add a lightweight expiry refresh so previews do not linger after the SDK timer clears locally.
 
 ### CALL-001 Background blur / replacement still lacks a real video processor path
 

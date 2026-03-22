@@ -267,6 +267,54 @@ extension ChatBlocMessageHandlers on ChatBloc {
     _messagesSubscription = null;
   }
 
+  List<String> _resolveCurrentTypingUsers() {
+    final roomId = _currentRoomId;
+    final client = _clientManager?.client;
+    if (roomId == null || client == null) {
+      return const [];
+    }
+
+    final room = client.getRoomById(roomId);
+    if (room == null) {
+      return const [];
+    }
+
+    final currentUserId = client.userID;
+    final names = <String>[];
+
+    for (final user in room.typingUsers) {
+      if (user.id == currentUserId) {
+        continue;
+      }
+
+      final displayName = user.calcDisplayname().trim();
+      final label = displayName.isNotEmpty ? displayName : user.id;
+      if (!names.contains(label)) {
+        names.add(label);
+      }
+    }
+
+    return List.unmodifiable(names);
+  }
+
+  void _scheduleTypingUsersRefresh(List<String> typingUsers) {
+    _typingUsersTimer?.cancel();
+    _typingUsersTimer = null;
+
+    if (typingUsers.isEmpty || isClosed) {
+      return;
+    }
+
+    final timeout =
+        _clientManager?.client?.typingIndicatorTimeout ??
+        const Duration(seconds: 30);
+    _typingUsersTimer = Timer(timeout + const Duration(milliseconds: 250), () {
+      if (!isClosed) {
+        add(TypingUsersUpdated(_resolveCurrentTypingUsers()));
+      }
+    });
+  }
+
   /// 消息列表更新
   void onMessagesUpdated(MessagesUpdated event, Emitter<ChatState> emit) {
     // 过滤掉已本地删除的消息和线程内回复消息（线程回复只在线程详情页显示）
@@ -354,8 +402,11 @@ extension ChatBlocMessageHandlers on ChatBloc {
       return newMsg;
     }).toList();
 
+    final typingUsers = _resolveCurrentTypingUsers();
+
     if (!isClosed) {
-      emit(state.copyWith(messages: mergedMessages));
+      emit(state.copyWith(messages: mergedMessages, typingUsers: typingUsers));
+      _scheduleTypingUsersRefresh(typingUsers);
 
       // 扫描失败消息加入自动重试队列
       ChatBlocRetryHandlers(this).scanFailedMessages();
@@ -370,6 +421,16 @@ extension ChatBlocMessageHandlers on ChatBloc {
         _detectRecipientLanguage(emit);
       }
     }
+  }
+
+  void onTypingUsersUpdated(TypingUsersUpdated event, Emitter<ChatState> emit) {
+    if (listEquals(state.typingUsers, event.typingUsers)) {
+      _scheduleTypingUsersRefresh(event.typingUsers);
+      return;
+    }
+
+    emit(state.copyWith(typingUsers: event.typingUsers));
+    _scheduleTypingUsersRefresh(event.typingUsers);
   }
 
   /// 应用关键词过滤
