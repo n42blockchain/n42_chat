@@ -57,9 +57,20 @@ extension _ChatPageInputMethods on _ChatPageState {
       onScheduledSend: (scheduledAt) {
         final text = _inputController.text.trim();
         if (text.isNotEmpty) {
-          context.read<ChatBloc>().add(
-            SendScheduledMessage(text: text, scheduledAt: scheduledAt),
+          final mentionPayload = ChatMentionHelper.buildPayload(
+            text: text,
+            selections: _composerMentions,
+            members: _groupMembers,
           );
+          context.read<ChatBloc>().add(
+            SendScheduledMessage(
+              text: text,
+              scheduledAt: scheduledAt,
+              mentionedUserIds: mentionPayload.mentionedUserIds,
+              mentionsRoom: mentionPayload.mentionsRoom,
+            ),
+          );
+          _clearComposerMentions();
         }
       },
     );
@@ -561,8 +572,8 @@ extension _ChatPageInputMethods on _ChatPageState {
         color: bgColor,
         border: Border(top: BorderSide(color: borderColor, width: 0.5)),
       ),
-      child: FutureBuilder<List<Map<String, String>>>(
-        future: _loadGroupMembers(),
+      child: FutureBuilder<List<ChatMentionMember>>(
+        future: _groupMembersFuture ??= _loadGroupMembers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -574,16 +585,13 @@ extension _ChatPageInputMethods on _ChatPageState {
           }
 
           final members = snapshot.data ?? [];
+          final suggestions = ChatMentionHelper.buildSuggestions(
+            members: members,
+            currentUserId: _currentUserId,
+            query: _mentionSearchQuery,
+          );
 
-          // 过滤成员
-          final filteredMembers = _mentionSearchQuery.isEmpty
-              ? members
-              : members.where((m) {
-                  final name = m['name']?.toLowerCase() ?? '';
-                  return name.contains(_mentionSearchQuery.toLowerCase());
-                }).toList();
-
-          if (filteredMembers.isEmpty) {
+          if (suggestions.isEmpty) {
             return Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
@@ -598,20 +606,15 @@ extension _ChatPageInputMethods on _ChatPageState {
           return ListView.builder(
             shrinkWrap: true,
             padding: EdgeInsets.zero,
-            itemCount: filteredMembers.length,
+            itemCount: suggestions.length,
             itemBuilder: (context, index) {
-              final member = filteredMembers[index];
-              final name = member['name'] ?? '';
-              final avatarUrl = member['avatarUrl'] ?? '';
-              final userId = member['id'] ?? '';
-
-              // 排除自己
-              if (userId == _currentUserId) {
-                return const SizedBox.shrink();
-              }
+              final suggestion = suggestions[index];
+              final name = suggestion.displayName;
+              final avatarUrl = suggestion.avatarUrl;
+              final isRoomMention = suggestion.mentionsRoom;
 
               return InkWell(
-                onTap: () => _onMentionMemberSelected(name, userId),
+                onTap: () => _onMentionSuggestionSelected(suggestion),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -624,31 +627,56 @@ extension _ChatPageInputMethods on _ChatPageState {
                   ),
                   child: Row(
                     children: [
-                      // 头像
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: Colors.grey[300],
-                        backgroundImage: avatarUrl.isNotEmpty
+                        backgroundColor: isRoomMention
+                            ? AppColors.primary.withValues(alpha: 0.12)
+                            : Colors.grey[300],
+                        backgroundImage: !isRoomMention && avatarUrl.isNotEmpty
                             ? NetworkImage(avatarUrl)
                             : null,
-                        child: avatarUrl.isEmpty
-                            ? Text(
-                                name.isNotEmpty ? name[0].toUpperCase() : '?',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                        child: isRoomMention
+                            ? const Icon(
+                                Icons.alternate_email,
+                                size: 18,
+                                color: AppColors.primary,
                               )
-                            : null,
+                            : (avatarUrl.isEmpty
+                                  ? Text(
+                                      name.isNotEmpty
+                                          ? name[0].toUpperCase()
+                                          : '?',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )
+                                  : null),
                       ),
                       const SizedBox(width: 12),
-                      // 名称
                       Expanded(
-                        child: Text(
-                          name,
-                          style: TextStyle(color: textColor, fontSize: 15),
-                          overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(color: textColor, fontSize: 15),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (suggestion.subtitle != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Text(
+                                  suggestion.subtitle!,
+                                  style: TextStyle(
+                                    color: subtextColor,
+                                    fontSize: 12,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ],

@@ -972,28 +972,31 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
 
   /// 插入@提及
   void _insertMention(String memberName, String memberId) {
+    final suggestion = ChatMentionSuggestion(
+      type: ChatMentionSuggestionType.user,
+      label: memberName,
+      displayName: memberName,
+      userId: memberId,
+    );
     final currentText = _inputController.text;
     final cursorPos = _inputController.selection.baseOffset;
-
-    // 微信风格：@用户名 后面有空格
-    final mention = '@$memberName ';
-
-    String newText;
-    int newCursorPos;
-
-    if (cursorPos >= 0) {
-      newText =
-          '${currentText.substring(0, cursorPos)}$mention${currentText.substring(cursorPos)}';
-      newCursorPos = cursorPos + mention.length;
-    } else {
-      newText = '$currentText$mention';
-      newCursorPos = newText.length;
-    }
-
-    _inputController.text = newText;
-    _inputController.selection = TextSelection.fromPosition(
-      TextPosition(offset: newCursorPos),
+    final insertion = ChatMentionHelper.applySuggestion(
+      text: currentText,
+      triggerPosition: cursorPos >= 0 ? cursorPos : currentText.length,
+      cursorOffset: cursorPos >= 0 ? cursorPos : currentText.length,
+      suggestion: suggestion,
     );
+
+    _inputController.text = insertion.text;
+    _inputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: insertion.cursorOffset),
+    );
+    setState(() {
+      _composerMentions = ChatMentionHelper.mergeSelection(
+        selections: _composerMentions,
+        selection: insertion.selection,
+      );
+    });
     _inputFocusNode.requestFocus();
   }
 

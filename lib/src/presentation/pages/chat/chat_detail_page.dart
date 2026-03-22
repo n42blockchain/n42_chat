@@ -5,13 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/encryption/e2ee_manager.dart';
+import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_lock_service.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
+import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/n42_avatar.dart';
@@ -19,7 +24,10 @@ import '../contact/contact_detail_page.dart';
 import '../group/group_settings_page.dart';
 import '../media/media_gallery_page.dart';
 import 'chat_export_page.dart';
+import 'scheduled_messages_page.dart';
+import '../settings/backup_restore_page.dart';
 import '../settings/chat_background_page.dart';
+import '../settings/security_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 聊天详情页面（仿微信）
@@ -776,6 +784,27 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _openChatExport(),
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: 'Scheduled Messages',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: () => _openScheduledMessages(),
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: 'Backup & Restore',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _openBackupRestore,
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: 'Encryption Keys & Devices',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _openSecuritySettings,
                 ),
               ],
             ),
@@ -1557,11 +1586,62 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 打开聊天记录导出
   void _openChatExport() {
+    List<MessageEntity> initialMessages = const [];
+    try {
+      initialMessages = context
+          .read<ChatBloc>()
+          .state
+          .messages
+          .where((message) => message.scheduledAt == null)
+          .toList(growable: false);
+    } catch (e) {
+      debugLog('ChatDetailPage: Failed to read ChatBloc for export: $e');
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ChatExportPage(
           roomId: widget.conversation.id,
           roomName: widget.conversation.name,
+          messages: initialMessages,
+        ),
+      ),
+    );
+  }
+
+  void _openScheduledMessages() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ScheduledMessagesPage(
+          roomId: widget.conversation.id,
+          roomName: widget.conversation.name,
+        ),
+      ),
+    );
+  }
+
+  void _openBackupRestore() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const BackupRestorePage()));
+  }
+
+  void _openSecuritySettings() {
+    final client = MatrixClientManager.instance.client;
+    if (client == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Encryption service is not available yet'),
+        ),
+      );
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SecuritySettingsPage(
+          e2eeManager: E2EEManager(client),
+          keyBackupService: KeyBackupService(client),
         ),
       ),
     );

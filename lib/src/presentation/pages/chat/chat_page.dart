@@ -77,6 +77,7 @@ import '../ai/ai_assistant_page.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../helpers/ai_reply_suggestion_helper.dart';
+import '../../helpers/chat_mention_helper.dart';
 import '../../widgets/chat/ai_summary_bubble.dart';
 import '../../../domain/repositories/ai_repository.dart';
 import '../../widgets/chat/ai_rewrite_bar.dart';
@@ -180,6 +181,9 @@ class _ChatPageState extends State<ChatPage> {
   bool _showMentionPicker = false;
   int _mentionTriggerPosition = -1; // @ 符号的位置
   String _mentionSearchQuery = ''; // @ 后面输入的搜索关键词
+  List<ChatMentionSelection> _composerMentions = const [];
+  Future<List<ChatMentionMember>>? _groupMembersFuture;
+  List<ChatMentionMember> _groupMembers = const [];
 
   // View Once 模式（阅后即焚媒体）
   bool _isViewOnce = false;
@@ -233,6 +237,10 @@ class _ChatPageState extends State<ChatPage> {
 
     // 初始化聊天室
     context.read<ChatBloc>().add(InitializeChat(widget.conversation.id));
+
+    if (widget.conversation.isGroup) {
+      _groupMembersFuture = _loadGroupMembers();
+    }
 
     // 获取当前用户ID
     _loadCurrentUserId();
@@ -532,6 +540,12 @@ class _ChatPageState extends State<ChatPage> {
   void _sendMessage(String text) {
     if (text.trim().isEmpty) return;
 
+    final mentionPayload = ChatMentionHelper.buildPayload(
+      text: text,
+      selections: _composerMentions,
+      members: _groupMembers,
+    );
+
     if (_smartReplySuggestions.isNotEmpty || _isLoadingSmartReplySuggestions) {
       _dismissAiSmartReplyBar();
     }
@@ -545,6 +559,7 @@ class _ChatPageState extends State<ChatPage> {
         !text.startsWith('/ ') &&
         text.length > 1) {
       _inputController.clear();
+      _clearComposerMentions();
       _processBotCommand(text);
       return;
     }
@@ -557,10 +572,16 @@ class _ChatPageState extends State<ChatPage> {
       chatBloc.add(const SetEditTarget(null));
     } else {
       chatBloc.add(
-        SendTextMessage(text, selfDestructAfter: _selfDestructAfter),
+        SendTextMessage(
+          text,
+          selfDestructAfter: _selfDestructAfter,
+          mentionedUserIds: mentionPayload.mentionedUserIds,
+          mentionsRoom: mentionPayload.mentionsRoom,
+        ),
       );
     }
     _inputController.clear();
+    _clearComposerMentions();
   }
 
   /// 处理 Bot 斜杠命令
@@ -623,6 +644,15 @@ class _ChatPageState extends State<ChatPage> {
 
     // 检测 @ 提醒（仅群聊）
     if (widget.conversation.isGroup) {
+      final prunedMentions = ChatMentionHelper.pruneSelections(
+        text,
+        _composerMentions,
+      );
+      if (!listEquals(prunedMentions, _composerMentions)) {
+        setState(() {
+          _composerMentions = prunedMentions;
+        });
+      }
       _checkMentionTrigger(text);
     }
   }
@@ -630,45 +660,20 @@ class _ChatPageState extends State<ChatPage> {
   /// 检测 @ 触发
   void _checkMentionTrigger(String text) {
     final cursorPos = _inputController.selection.baseOffset;
-
-    if (cursorPos < 0) {
+    final trigger = ChatMentionHelper.findTrigger(
+      text: text,
+      cursorOffset: cursorPos,
+    );
+    if (trigger == null) {
       _hideMentionPicker();
       return;
     }
 
-    // 获取光标前的文本
-    final textBeforeCursor = cursorPos <= text.length
-        ? text.substring(0, cursorPos)
-        : text;
-
-    // 查找最后一个 @ 符号
-    final lastAtIndex = textBeforeCursor.lastIndexOf('@');
-
-    if (lastAtIndex >= 0) {
-      // 检查 @ 前面是否是空格或行首（确保是新的 @ 提醒）
-      final isValidTrigger =
-          lastAtIndex == 0 ||
-          textBeforeCursor[lastAtIndex - 1] == ' ' ||
-          textBeforeCursor[lastAtIndex - 1] == '\n';
-
-      if (isValidTrigger) {
-        // 获取 @ 后面的搜索关键词（不包含空格）
-        final searchPart = textBeforeCursor.substring(lastAtIndex + 1);
-
-        // 如果 @ 后面没有空格，说明用户还在输入中，显示选择器
-        if (!searchPart.contains(' ')) {
-          setState(() {
-            _showMentionPicker = true;
-            _mentionTriggerPosition = lastAtIndex;
-            _mentionSearchQuery = searchPart;
-          });
-          return;
-        }
-      }
-    }
-
-    // 没有有效的 @ 触发，隐藏选择器
-    _hideMentionPicker();
+    setState(() {
+      _showMentionPicker = true;
+      _mentionTriggerPosition = trigger.triggerPosition;
+      _mentionSearchQuery = trigger.query;
+    });
   }
 
   /// 隐藏 @ 选择器
@@ -682,29 +687,45 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  void _clearComposerMentions() {
+    if (_composerMentions.isEmpty && !_showMentionPicker) {
+      return;
+    }
+    setState(() {
+      _composerMentions = const [];
+      _showMentionPicker = false;
+      _mentionTriggerPosition = -1;
+      _mentionSearchQuery = '';
+    });
+  }
+
   /// 选择要 @ 的成员
-  void _onMentionMemberSelected(String memberName, String memberId) {
+  void _onMentionSuggestionSelected(ChatMentionSuggestion suggestion) {
     if (_mentionTriggerPosition < 0) return;
 
     final text = _inputController.text;
     final cursorPos = _inputController.selection.baseOffset;
-
-    // 替换 @搜索词 为 @成员名
-    final beforeAt = text.substring(0, _mentionTriggerPosition);
-    final afterCursor = cursorPos <= text.length
-        ? text.substring(cursorPos)
-        : '';
-
-    final mention = '@$memberName ';
-    final newText = beforeAt + mention + afterCursor;
-    final newCursorPos = beforeAt.length + mention.length;
-
-    _inputController.text = newText;
-    _inputController.selection = TextSelection.fromPosition(
-      TextPosition(offset: newCursorPos),
+    final insertion = ChatMentionHelper.applySuggestion(
+      text: text,
+      triggerPosition: _mentionTriggerPosition,
+      cursorOffset: cursorPos,
+      suggestion: suggestion,
     );
 
-    _hideMentionPicker();
+    _inputController.text = insertion.text;
+    _inputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: insertion.cursorOffset),
+    );
+
+    setState(() {
+      _composerMentions = ChatMentionHelper.mergeSelection(
+        selections: _composerMentions,
+        selection: insertion.selection,
+      );
+      _showMentionPicker = false;
+      _mentionTriggerPosition = -1;
+      _mentionSearchQuery = '';
+    });
     _inputFocusNode.requestFocus();
   }
 
@@ -929,22 +950,24 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   /// 加载群成员
-  Future<List<Map<String, String>>> _loadGroupMembers() async {
+  Future<List<ChatMentionMember>> _loadGroupMembers() async {
     try {
       final groupRepository = getIt<IGroupRepository>();
       final members = await groupRepository.getGroupMembers(
         widget.conversation.id,
       );
 
-      return members
+      final mappedMembers = members
           .map(
-            (m) => {
-              'id': m.userId,
-              'name': m.displayName.isNotEmpty ? m.displayName : m.userId,
-              'avatarUrl': m.avatarUrl ?? '',
-            },
+            (m) => ChatMentionMember(
+              id: m.userId,
+              name: m.displayName.isNotEmpty ? m.displayName : m.userId,
+              avatarUrl: m.avatarUrl ?? '',
+            ),
           )
           .toList();
+      _groupMembers = mappedMembers;
+      return mappedMembers;
     } catch (e) {
       debugLog('Error loading group members: $e');
       return [];

@@ -141,6 +141,17 @@ void main() {
       });
     });
 
+    group('table syntax', () {
+      test('should detect markdown tables', () {
+        const text = '''
+| Name | Owner |
+| --- | --- |
+| Roadmap | Team |
+''';
+        expect(containsMarkdown(text), true);
+      });
+    });
+
     group('plain text (no markdown)', () {
       test('should return false for simple text', () {
         expect(containsMarkdown('Hello World'), false);
