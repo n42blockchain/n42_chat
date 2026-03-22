@@ -12,7 +12,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/story_entity.dart';
-import '../../../domain/repositories/message_repository.dart';
+import '../../helpers/story_interaction_helper.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
@@ -39,8 +39,6 @@ import '../search/global_search_page.dart';
 import '../story/create_story_page.dart';
 import '../story/story_viewer_page.dart';
 import 'conversation_tile.dart';
-import '../../../core/utils/debug_log.dart';
-import '../../../n42_chat.dart';
 
 /// 会话列表页面（仿微信）
 class ConversationListPage extends StatefulWidget {
@@ -368,7 +366,6 @@ class _ConversationListPageState extends State<ConversationListPage> {
           },
           onDeleteStory: _handleStoryDelete,
           onReply: (userId, storyId, message) {
-            // 回复 Story：创建私聊并发送消息
             return _handleStoryReply(userId, storyId, message);
           },
         ),
@@ -382,27 +379,12 @@ class _ConversationListPageState extends State<ConversationListPage> {
     String storyId,
     String message,
   ) async {
-    debugLog('Reply to story $storyId from user $userId: $message');
-    try {
-      final roomId = await N42Chat.createDirectMessage(userId);
-      final trimmedMessage = message.trim();
-      if (trimmedMessage.isNotEmpty) {
-        await getIt<IMessageRepository>().sendTextMessage(
-          roomId,
-          trimmedMessage,
-        );
-      }
-      if (!mounted) return false;
-      await N42Chat.openConversation(roomId, context: context);
-      return true;
-    } catch (e) {
-      debugLog('ConversationListPage: Failed to create DM for story reply: $e');
-      if (!mounted) return false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to send story reply')),
-      );
-      return false;
-    }
+    return StoryInteractionHelper.replyToStory(
+      context,
+      userId: userId,
+      storyId: storyId,
+      message: message,
+    );
   }
 
   Future<bool> _handleStoryDelete(StoryEntity story) async {
@@ -410,34 +392,10 @@ class _ConversationListPageState extends State<ConversationListPage> {
     if (storyBloc == null) {
       return false;
     }
-
-    final initialVersion = storyBloc.state.deleteActionVersion;
-    final completer = Completer<bool>();
-    late final StreamSubscription<StoryState> subscription;
-
-    subscription = storyBloc.stream.listen((state) {
-      if (state.deleteActionVersion == initialVersion) {
-        return;
-      }
-      if (state.deleteActionStoryId != story.id) {
-        return;
-      }
-      if (completer.isCompleted) {
-        return;
-      }
-      completer.complete(state.deleteActionStatus == StoryDeleteActionStatus.success);
-    });
-
-    storyBloc.add(DeleteStory(story.id));
-
-    try {
-      return await completer.future.timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => false,
-      );
-    } finally {
-      await subscription.cancel();
-    }
+    return StoryInteractionHelper.deleteStory(
+      storyBloc: storyBloc,
+      story: story,
+    );
   }
 
   /// 添加新 Story
