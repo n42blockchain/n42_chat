@@ -1089,5 +1089,91 @@ void main() {
 
       await bloc.close();
     });
+
+    test(
+      'sends due scheduled local file via filePath when room is not encrypted',
+      () async {
+        final tempDir = await Directory.systemTemp.createTemp(
+          'n42_scheduled_file_stream_test',
+        );
+        addTearDown(() async {
+          if (await tempDir.exists()) {
+            await tempDir.delete(recursive: true);
+          }
+        });
+        final documentFile = File('${tempDir.path}/doc.pdf');
+        await documentFile.writeAsBytes(const [1, 2, 3, 4, 5]);
+
+        when(() => mockRoom.encrypted).thenReturn(false);
+        when(() => mockClient.fileEncryptionEnabled).thenReturn(true);
+        when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+          (_) async => [
+            ScheduledMessageDraft(
+              messageId: 'scheduled_file_path',
+              roomId: _roomId,
+              text: 'doc.pdf',
+              type: MessageType.file,
+              scheduledAt: DateTime.now().subtract(const Duration(minutes: 1)),
+              createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
+              payload: {
+                'localPath': documentFile.path,
+                'filename': 'doc.pdf',
+                'mimeType': 'application/pdf',
+                'fileSize': 5,
+              },
+            ),
+          ],
+        );
+        when(
+          () => mockRepo.sendFileMessage(
+            any(),
+            fileBytes: any(named: 'fileBytes'),
+            filename: any(named: 'filename'),
+            mimeType: any(named: 'mimeType'),
+            selfDestructAfter: any(named: 'selfDestructAfter'),
+            filePath: any(named: 'filePath'),
+            fileStream: any(named: 'fileStream'),
+            fileSize: any(named: 'fileSize'),
+          ),
+        ).thenAnswer((_) async => _msg.copyWith(type: MessageType.file));
+        when(
+          () => mockPrefs.removeScheduledMessage(any(), any()),
+        ).thenAnswer((_) async {});
+
+        final bloc = buildBlocWithClientManager();
+        await initBloc(bloc);
+
+        bloc.add(const SendDueScheduledMessages());
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        verify(
+          () => mockRepo.sendFileMessage(
+            _roomId,
+            filename: 'doc.pdf',
+            mimeType: 'application/pdf',
+            selfDestructAfter: null,
+            filePath: documentFile.path,
+            fileSize: 5,
+          ),
+        ).called(1);
+        verifyNever(
+          () => mockRepo.sendFileMessage(
+            _roomId,
+            fileBytes: any(named: 'fileBytes'),
+            filename: 'doc.pdf',
+            mimeType: 'application/pdf',
+            selfDestructAfter: null,
+            filePath: any(named: 'filePath'),
+            fileSize: 5,
+          ),
+        );
+        verify(
+          () =>
+              mockPrefs.removeScheduledMessage(_roomId, 'scheduled_file_path'),
+        ).called(1);
+
+        await bloc.close();
+      },
+    );
   });
 }
