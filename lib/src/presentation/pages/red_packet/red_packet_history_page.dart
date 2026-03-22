@@ -123,7 +123,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: packets.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final rp = packets[index];
         return _buildRedPacketCard(rp, isDark, isSent: isSent);

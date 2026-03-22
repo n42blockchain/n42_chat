@@ -113,7 +113,7 @@ class PointsTrackingService {
       if (joinedRooms == null) return;
       if (joinedRooms is! Map) return;
 
-      for (final entry in (joinedRooms as Map).entries) {
+      for (final entry in joinedRooms.entries) {
         final roomId = entry.key as String?;
         if (roomId == null) continue;
         final roomData = entry.value;
