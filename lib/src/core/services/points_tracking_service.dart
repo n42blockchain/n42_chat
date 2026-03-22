@@ -109,20 +109,30 @@ class PointsTrackingService {
       final client = _clientManager.client;
       if (client == null) return;
 
-      final rooms = sync.rooms?.join as Map<String, dynamic>?;
-      if (rooms == null) return;
+      final joinedRooms = sync.rooms?.join;
+      if (joinedRooms == null) return;
+      if (joinedRooms is! Map) return;
 
-      for (final entry in rooms.entries) {
-        final roomId = entry.key;
+      for (final entry in (joinedRooms as Map).entries) {
+        final roomId = entry.key as String?;
+        if (roomId == null) continue;
         final roomData = entry.value;
-        final events =
-            (roomData?.timeline?.events as List<dynamic>?) ?? <dynamic>[];
+        final List<dynamic> events;
+        try {
+          events = (roomData?.timeline?.events as List<dynamic>?) ?? <dynamic>[];
+        } catch (_) {
+          continue;
+        }
 
         for (final event in events) {
-          if (event.senderId == client.userID) {
-            _processUserEvent(roomId, event);
-          } else {
-            _processOtherEvent(roomId, event);
+          try {
+            if (event.senderId == client.userID) {
+              _processUserEvent(roomId, event);
+            } else {
+              _processOtherEvent(roomId, event);
+            }
+          } catch (_) {
+            continue;
           }
         }
       }

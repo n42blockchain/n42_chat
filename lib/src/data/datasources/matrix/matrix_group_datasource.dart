@@ -562,7 +562,7 @@ class MatrixGroupDataSource {
     final pinnedContent = pinnedState.content;
     final pinnedList = pinnedContent['pinned'];
     if (pinnedList is List) {
-      return pinnedList.cast<String>();
+      return pinnedList.whereType<String>().toList();
     }
     return [];
   }

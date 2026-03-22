@@ -579,7 +579,7 @@ class SessionCredentials {
   factory SessionCredentials.fromJson(Map<String, dynamic> json) {
     return SessionCredentials(
       homeserver: json['homeserver'] as String,
-      accessToken: json['accessToken'] as String,
+      accessToken: json['accessToken'] as String? ?? '',
       userId: json['userId'] as String,
       deviceId: json['deviceId'] as String,
       deviceName: json['deviceName'] as String? ?? '',

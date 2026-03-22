@@ -332,7 +332,7 @@ class GroupEntity extends Equatable {
   bool get isFull => maxMembers != null && memberCount >= maxMembers!;
 
   /// 容量占比（0.0~1.0），null 表示不限
-  double? get capacityRatio => maxMembers == null ? null : memberCount / maxMembers!;
+  double? get capacityRatio => (maxMembers == null || maxMembers == 0) ? null : memberCount / maxMembers!;
 
   /// 是否有置顶消息
   bool get hasPinnedMessages => pinnedEventIds.isNotEmpty;

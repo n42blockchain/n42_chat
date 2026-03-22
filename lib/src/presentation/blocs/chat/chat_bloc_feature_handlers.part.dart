@@ -1099,7 +1099,6 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   ///
   /// 从 state.messages 中取最近一条非自己的文本消息，
   /// 用 translationService.detectLanguage() 检测语言。
-  /// 使用 BLoC 自身的 emit 方法（因为在异步回调中 Emitter 已失效）。
   void _detectRecipientLanguage(Emitter<ChatState> emit) {
     if (_translationService == null) return;
 
@@ -1115,10 +1114,6 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     if (recipientMsg == null) return;
 
-    // 保存 BLoC 的 emit 引用（避免与参数名 emit 冲突）
-    // ignore: invalid_use_of_visible_for_testing_member
-    final blocEmit = this.emit;
-
     // detectLanguage 基于字符集正则，几乎即时完成
     _translationService
         .detectLanguage(recipientMsg.content)
@@ -1126,13 +1121,21 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           if (detected != null &&
               !isClosed &&
               state.detectedRecipientLanguage != detected) {
-            blocEmit(state.copyWith(detectedRecipientLanguage: detected));
-            debugLog('ChatBloc: Detected recipient language: $detected');
+            add(RecipientLanguageDetected(detected));
           }
         })
         .catchError((Object e) {
           debugLog('ChatBloc: Failed to detect recipient language: $e');
         });
+  }
+
+  /// 处理对方语言检测完成事件
+  void _onRecipientLanguageDetected(
+    RecipientLanguageDetected event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(state.copyWith(detectedRecipientLanguage: event.language));
+    debugLog('ChatBloc: Detected recipient language: ${event.language}');
   }
 
   // ============================================

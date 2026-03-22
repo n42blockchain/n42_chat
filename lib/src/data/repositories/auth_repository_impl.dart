@@ -647,7 +647,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         await _syncPokeTextToRooms(pokeText);
       }
 
-      debugLog('AuthRepository: Profile data updated: $newData');
+      debugLog('AuthRepository: Profile data updated (${newData.keys.length} fields)');
       return true;
     } catch (e) {
       debugLog('AuthRepository: Update profile data failed - $e');

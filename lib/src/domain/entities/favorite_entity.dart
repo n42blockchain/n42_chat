@@ -159,7 +159,7 @@ class FavoriteEntity extends Equatable {
       sourceSenderId: json['source_sender_id'] as String?,
       sourceSenderName: json['source_sender_name'] as String?,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['created_at'] as int),
-      tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
+      tags: (json['tags'] as List<dynamic>?)?.whereType<String>().toList() ?? [],
       remark: json['remark'] as String?,
     );
   }

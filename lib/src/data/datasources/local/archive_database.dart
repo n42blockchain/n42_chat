@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -87,12 +88,22 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   ArchiveDatabase._internal(super.e);
 
   static ArchiveDatabase? _instance;
+  static Completer<ArchiveDatabase>? _initCompleter;
 
   /// 获取单例实例
   static Future<ArchiveDatabase> getInstance() async {
     if (_instance != null) return _instance!;
-    _instance = ArchiveDatabase._internal(await _openConnection());
-    return _instance!;
+    if (_initCompleter != null) return _initCompleter!.future;
+    _initCompleter = Completer<ArchiveDatabase>();
+    try {
+      _instance = ArchiveDatabase._internal(await _openConnection());
+      _initCompleter!.complete(_instance!);
+      return _instance!;
+    } catch (e, s) {
+      _initCompleter!.completeError(e, s);
+      _initCompleter = null;
+      rethrow;
+    }
   }
 
   @visibleForTesting
