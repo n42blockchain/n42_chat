@@ -115,6 +115,30 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: live smoke currently covers UTF-8 text, reply, edit, reaction redaction, and thread behavior. Search, favorites/bookmarks, pinning, built-in translation, scheduled send, and polls were not covered in the recent real-homeserver verification.
 - Next step: extend the live smoke or add integration tests for the uncovered feature set.
 
+### MSG-002 Typing-indicator receive/render wiring is still incomplete
+
+- Severity: M
+- Added: 2026-03-22
+- Evidence: `lib/src/presentation/blocs/chat/chat_state.dart`, `lib/src/presentation/blocs/chat/chat_bloc_action_handlers.part.dart`
+- Current state: the chat layer can send typing notifications and `ChatState` still exposes `typingUsers` / `typingText`, but this round's review did not find a corresponding inbound subscription/update path that populates those fields for the active room. In practice, the UI cannot reliably show who is typing even though the state shape suggests that feature exists.
+- Next step: wire inbound typing events from the Matrix/message datasource into `ChatBloc`, then render and clear room-scoped typing users with proper debounce/expiry semantics.
+
+### MSG-003 Exact message deep-linking is still missing outside the in-chat search flow
+
+- Severity: M
+- Added: 2026-03-22
+- Evidence: `lib/src/n42_chat.dart`, `lib/src/presentation/pages/search/global_search_page.dart`
+- Current state: this pass fixes room-local search so selecting a result inside an open chat can return and scroll to the chosen message. However the wider navigation API still only exposes `openConversation(roomId)`, so global search results, notifications, and other entry points still cannot open a room and jump directly to a specific event id.
+- Next step: extend the conversation-open API to accept an optional target message/event id, then reuse the existing `ChatPage._scrollToMessage()` path after room initialization finishes.
+
+### MSG-004 Scheduled send still only covers plain-text composer content
+
+- Severity: M
+- Added: 2026-03-22
+- Evidence: `lib/src/presentation/widgets/chat/chat_input_bar.dart`, `lib/src/presentation/pages/chat/chat_page_input.dart`, `lib/src/presentation/pages/chat/scheduled_messages_page.dart`
+- Current state: scheduled send is now discoverable from both send-button long press and the more panel, but the implementation still schedules only current text-composer content. Media attachments, polls, stickers, GIFs, and other rich message types cannot yet be queued for delayed delivery.
+- Next step: decide which message payloads are valid for deferred send, then extend the scheduled-message model and enqueue UI beyond plain text.
+
 ### CALL-001 Background blur / replacement still lacks a real video processor path
 
 - Severity: M

@@ -80,6 +80,9 @@ class ChatMorePanel extends StatefulWidget {
   /// 阅后即焚定时器回调
   final VoidCallback? onSelfDestructTimerPressed;
 
+  /// 定时发送回调
+  final VoidCallback? onScheduledPressed;
+
   /// 当前阅后即焚定时器（秒，null 表示关闭）
   final int? selfDestructAfter;
 
@@ -111,6 +114,7 @@ class ChatMorePanel extends StatefulWidget {
     this.isFaceBlur = false,
     this.onAiAssistantPressed,
     this.onSelfDestructTimerPressed,
+    this.onScheduledPressed,
     this.selfDestructAfter,
     this.onMiniAppsPressed,
   });
@@ -299,6 +303,13 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       iconColor: widget.selfDestructAfter != null
                           ? Colors.orange
                           : null,
+                    ),
+                    _MoreItem(
+                      icon: Icons.schedule_outlined,
+                      label:
+                          S.of(context)?.scheduledMessageLabel ?? 'Scheduled',
+                      onTap: widget.onScheduledPressed,
+                      iconColor: AppColors.primary,
                     ),
                     if (widget.onAiAssistantPressed != null)
                       _MoreItem(

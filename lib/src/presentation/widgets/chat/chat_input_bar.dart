@@ -9,6 +9,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import 'slash_command_picker.dart';
+import 'scheduled_send_picker.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 语音录音结果回调
@@ -883,7 +884,20 @@ class ChatInputBarState extends State<ChatInputBar> {
       margin: const EdgeInsets.only(left: 4),
       child: GestureDetector(
         onLongPress: widget.enabled && widget.onScheduledSend != null
-            ? () => _showScheduledSendPicker()
+            ? () async {
+                if (_controller.text.trim().isEmpty) {
+                  return;
+                }
+                final scheduledAt = await showScheduledSendPicker(context);
+                if (!mounted || scheduledAt == null) {
+                  return;
+                }
+                widget.onScheduledSend?.call(scheduledAt);
+                if (!mounted) {
+                  return;
+                }
+                _controller.clear();
+              }
             : null,
         child: ElevatedButton(
           onPressed: widget.enabled ? _sendMessage : null,
@@ -903,129 +917,6 @@ class ChatInputBarState extends State<ChatInputBar> {
           ),
         ),
       ),
-    );
-  }
-
-  void _showScheduledSendPicker() {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-
-    final l10n = S.of(context);
-    final now = DateTime.now();
-
-    showModalBottomSheet<DateTime>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                l10n?.scheduledSendTitle ?? 'Schedule message',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildScheduleOption(
-                ctx,
-                icon: Icons.schedule,
-                label: l10n?.scheduledSendInOneHour ?? 'In 1 hour',
-                dateTime: now.add(const Duration(hours: 1)),
-              ),
-              _buildScheduleOption(
-                ctx,
-                icon: Icons.nightlight_round,
-                label: l10n?.scheduledSendTonight ?? 'Tonight (8:00 PM)',
-                dateTime: DateTime(now.year, now.month, now.day, 20, 0),
-              ),
-              _buildScheduleOption(
-                ctx,
-                icon: Icons.wb_sunny,
-                label:
-                    l10n?.scheduledSendTomorrowMorning ??
-                    'Tomorrow morning (9:00 AM)',
-                dateTime: DateTime(now.year, now.month, now.day + 1, 9, 0),
-              ),
-              const Divider(),
-              _buildScheduleOption(
-                ctx,
-                icon: Icons.calendar_today,
-                label: l10n?.scheduledSendCustom ?? 'Pick a date & time',
-                dateTime: null,
-                isCustom: true,
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
-    ).then((scheduledAt) {
-      if (scheduledAt != null) {
-        widget.onScheduledSend?.call(scheduledAt);
-        _controller.clear();
-      }
-    });
-  }
-
-  Widget _buildScheduleOption(
-    BuildContext ctx, {
-    required IconData icon,
-    required String label,
-    DateTime? dateTime,
-    bool isCustom = false,
-  }) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: AppColors.primary),
-      title: Text(label),
-      onTap: () async {
-        if (isCustom) {
-          final pickedDate = await showDatePicker(
-            context: ctx,
-            initialDate: DateTime.now().add(const Duration(hours: 1)),
-            firstDate: DateTime.now(),
-            lastDate: DateTime.now().add(const Duration(days: 365)),
-          );
-          if (pickedDate != null && ctx.mounted) {
-            final pickedTime = await showTimePicker(
-              context: ctx,
-              initialTime: TimeOfDay.now(),
-            );
-            if (pickedTime != null && ctx.mounted) {
-              final scheduled = DateTime(
-                pickedDate.year,
-                pickedDate.month,
-                pickedDate.day,
-                pickedTime.hour,
-                pickedTime.minute,
-              );
-              if (scheduled.isAfter(DateTime.now())) {
-                Navigator.pop(ctx, scheduled);
-              }
-            }
-          }
-        } else {
-          Navigator.pop(ctx, dateTime);
-        }
-      },
     );
   }
 }
