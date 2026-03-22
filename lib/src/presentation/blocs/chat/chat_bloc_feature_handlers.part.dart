@@ -320,6 +320,11 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         return;
       }
 
+      if (message.metadata?.isTranscribing == true) {
+        debugLog('ChatBloc: Message is already transcribing');
+        return;
+      }
+
       // 更新状态为正在转录
       final updatedMessages = List<MessageEntity>.from(state.messages);
       updatedMessages[messageIndex] = message.copyWith(

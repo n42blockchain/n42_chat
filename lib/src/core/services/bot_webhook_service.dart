@@ -40,6 +40,39 @@ class BotWebhookEventPayload {
   };
 }
 
+class BotWebhookDispatchResult {
+  const BotWebhookDispatchResult({
+    required this.success,
+    this.statusCode,
+    this.errorMessage,
+    this.skipped = false,
+  });
+
+  final bool success;
+  final int? statusCode;
+  final String? errorMessage;
+  final bool skipped;
+
+  factory BotWebhookDispatchResult.sent(int statusCode) =>
+      BotWebhookDispatchResult(success: true, statusCode: statusCode);
+
+  factory BotWebhookDispatchResult.failed(
+    String errorMessage, {
+    int? statusCode,
+  }) => BotWebhookDispatchResult(
+    success: false,
+    statusCode: statusCode,
+    errorMessage: errorMessage,
+  );
+
+  factory BotWebhookDispatchResult.skipped(String errorMessage) =>
+      BotWebhookDispatchResult(
+        success: false,
+        skipped: true,
+        errorMessage: errorMessage,
+      );
+}
+
 /// 群 Bot Webhook 分发服务
 class BotWebhookService {
   BotWebhookService({
@@ -54,16 +87,20 @@ class BotWebhookService {
   final SecureStorageDataSource? _secureStorageDataSource;
   final http.Client Function() _clientFactory;
 
-  Future<void> dispatch({
+  Future<BotWebhookDispatchResult> dispatch({
     required BotConfig config,
     required BotWebhookEventPayload payload,
+    String? webhookSecretOverride,
+    bool useStoredSecretFallback = true,
   }) async {
     final webhookUrl = config.webhookUrl?.trim();
     if (webhookUrl == null || webhookUrl.isEmpty) {
-      return;
+      return BotWebhookDispatchResult.skipped('Webhook URL is empty');
     }
     if (!config.supportsWebhookEvent(payload.eventType)) {
-      return;
+      return BotWebhookDispatchResult.skipped(
+        'Webhook event is not enabled for this room',
+      );
     }
 
     final uri = parseSafeExternalUri(
@@ -72,7 +109,9 @@ class BotWebhookService {
     );
     if (uri == null) {
       debugLog('BotWebhookService: ignored invalid webhook url');
-      return;
+      return BotWebhookDispatchResult.failed(
+        'Webhook URL must be a public HTTPS address',
+      );
     }
 
     final requestBody = jsonEncode(payload.toJson());
@@ -80,9 +119,15 @@ class BotWebhookService {
       'Content-Type': 'application/json',
       'X-N42-Event': payload.eventType.wireValue,
     };
-    final secret = await _secureStorageDataSource?.getRoomBotWebhookSecret(
-      payload.roomId,
-    );
+    final configuredSecret =
+        webhookSecretOverride?.trim() ?? config.webhookSecret?.trim();
+    final secret = configuredSecret?.isNotEmpty == true
+        ? configuredSecret
+        : useStoredSecretFallback
+        ? await _secureStorageDataSource?.getRoomBotWebhookSecret(
+            payload.roomId,
+          )
+        : null;
     if (secret != null && secret.isNotEmpty) {
       final digest = Hmac(
         sha256,
@@ -100,9 +145,15 @@ class BotWebhookService {
         debugLog(
           'BotWebhookService: webhook returned status ${response.statusCode}',
         );
+        return BotWebhookDispatchResult.failed(
+          'Webhook returned status ${response.statusCode}',
+          statusCode: response.statusCode,
+        );
       }
+      return BotWebhookDispatchResult.sent(response.statusCode);
     } catch (e) {
       debugLog('BotWebhookService: webhook dispatch failed: $e');
+      return BotWebhookDispatchResult.failed('Webhook dispatch failed: $e');
     } finally {
       client.close();
     }

@@ -32,11 +32,9 @@ extension _ChatPageInputMethods on _ChatPageState {
             ),
             const SizedBox(width: 8),
             Text(
-              S.of(context)?.channelReadOnly ?? 'Only admins can post in this channel',
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade500,
-              ),
+              S.of(context)?.channelReadOnly ??
+                  'Only admins can post in this channel',
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
             ),
           ],
         ),
@@ -59,17 +57,20 @@ extension _ChatPageInputMethods on _ChatPageState {
       onScheduledSend: (scheduledAt) {
         final text = _inputController.text.trim();
         if (text.isNotEmpty) {
-          context.read<ChatBloc>().add(SendScheduledMessage(
-            text: text,
-            scheduledAt: scheduledAt,
-          ));
+          context.read<ChatBloc>().add(
+            SendScheduledMessage(text: text, scheduledAt: scheduledAt),
+          );
         }
       },
     );
   }
 
   /// 录音状态变化处理
-  void _onRecordingStateChanged(bool isRecording, bool isCancelled, Duration duration) {
+  void _onRecordingStateChanged(
+    bool isRecording,
+    bool isCancelled,
+    Duration duration,
+  ) {
     setState(() {
       _isRecording = isRecording;
       _isRecordingCancelled = isCancelled;
@@ -96,12 +97,17 @@ extension _ChatPageInputMethods on _ChatPageState {
                   width: 140,
                   height: 140,
                   decoration: BoxDecoration(
-                    color: _isRecordingCancelled ? AppColors.error : AppColors.primary,
+                    color: _isRecordingCancelled
+                        ? AppColors.error
+                        : AppColors.primary,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: (_isRecordingCancelled ? AppColors.error : AppColors.primary)
-                            .withValues(alpha: 0.4),
+                        color:
+                            (_isRecordingCancelled
+                                    ? AppColors.error
+                                    : AppColors.primary)
+                                .withValues(alpha: 0.4),
                         blurRadius: 30,
                         spreadRadius: 10,
                       ),
@@ -130,7 +136,10 @@ extension _ChatPageInputMethods on _ChatPageState {
                 const SizedBox(height: 40),
                 // 提示文字
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: _isRecordingCancelled
                         ? AppColors.error.withValues(alpha: 0.2)
@@ -139,10 +148,14 @@ extension _ChatPageInputMethods on _ChatPageState {
                   ),
                   child: Text(
                     _isRecordingCancelled
-                        ? (S.of(context)?.chatReleaseToCancel ?? 'Release to cancel')
-                        : (S.of(context)?.chatReleaseToSend ?? 'Release to send, swipe up to cancel'),
+                        ? (S.of(context)?.chatReleaseToCancel ??
+                              'Release to cancel')
+                        : (S.of(context)?.chatReleaseToSend ??
+                              'Release to send, swipe up to cancel'),
                     style: TextStyle(
-                      color: _isRecordingCancelled ? AppColors.error : Colors.white,
+                      color: _isRecordingCancelled
+                          ? AppColors.error
+                          : Colors.white,
                       fontSize: 16,
                     ),
                   ),
@@ -198,7 +211,11 @@ extension _ChatPageInputMethods on _ChatPageState {
           ),
           GestureDetector(
             onTap: () => setState(() => _selfDestructAfter = null),
-            child: const Icon(Icons.close, size: 18, color: AppColors.textTertiary),
+            child: const Icon(
+              Icons.close,
+              size: 18,
+              color: AppColors.textTertiary,
+            ),
           ),
         ],
       ),
@@ -247,19 +264,21 @@ extension _ChatPageInputMethods on _ChatPageState {
               ),
               const Divider(height: 1),
               // 预设时间列表
-              ...SelfDestructTimer.presets.map((preset) => ListTile(
-                    leading: Icon(
-                      Icons.timer_outlined,
-                      color: _selfDestructAfter == preset.seconds
-                          ? Colors.orange
-                          : null,
-                    ),
-                    title: Text(preset.name),
-                    trailing: _selfDestructAfter == preset.seconds
-                        ? const Icon(Icons.check, color: Colors.orange)
+              ...SelfDestructTimer.presets.map(
+                (preset) => ListTile(
+                  leading: Icon(
+                    Icons.timer_outlined,
+                    color: _selfDestructAfter == preset.seconds
+                        ? Colors.orange
                         : null,
-                    onTap: () => Navigator.pop(ctx, preset.seconds),
-                  )),
+                  ),
+                  title: Text(preset.name),
+                  trailing: _selfDestructAfter == preset.seconds
+                      ? const Icon(Icons.check, color: Colors.orange)
+                      : null,
+                  onTap: () => Navigator.pop(ctx, preset.seconds),
+                ),
+              ),
             ],
           ),
         ),
@@ -299,7 +318,11 @@ extension _ChatPageInputMethods on _ChatPageState {
                 _isViewOnce = false;
               });
             },
-            child: const Icon(Icons.close, size: 18, color: AppColors.textTertiary),
+            child: const Icon(
+              Icons.close,
+              size: 18,
+              color: AppColors.textTertiary,
+            ),
           ),
         ],
       ),
@@ -378,9 +401,8 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         Navigator.of(context).push(
           MaterialPageRoute<void>(
-            builder: (context) => LiveLocationPage(
-              roomId: widget.conversation.id,
-            ),
+            builder: (context) =>
+                LiveLocationPage(roomId: widget.conversation.id),
           ),
         );
       },
@@ -391,10 +413,12 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _showSelfDestructTimerPicker();
       },
-      onAiAssistantPressed: getIt.isRegistered<IAiRepository>() ? () {
-        _hideMorePanel();
-        _openAiAssistant();
-      } : null,
+      onAiAssistantPressed: getIt.isRegistered<IAiRepository>()
+          ? () {
+              _hideMorePanel();
+              _openAiAssistant();
+            }
+          : null,
       onMiniAppsPressed: () {
         _hideMorePanel();
         _openMiniApps();
@@ -457,11 +481,15 @@ extension _ChatPageInputMethods on _ChatPageState {
         if (selection.isValid && selection.isCollapsed) {
           // 有光标位置
           final cursorPos = selection.baseOffset;
-          newText = text.substring(0, cursorPos) + emoji + text.substring(cursorPos);
+          newText =
+              text.substring(0, cursorPos) + emoji + text.substring(cursorPos);
           newCursorPos = cursorPos + emoji.length;
         } else if (selection.isValid && !selection.isCollapsed) {
           // 有选中文本，替换选中的文本
-          newText = text.substring(0, selection.start) + emoji + text.substring(selection.end);
+          newText =
+              text.substring(0, selection.start) +
+              emoji +
+              text.substring(selection.end);
           newCursorPos = selection.start + emoji.length;
         } else {
           // 没有光标，添加到末尾
@@ -499,7 +527,9 @@ extension _ChatPageInputMethods on _ChatPageState {
           }
         } else if (selection.isValid && !selection.isCollapsed) {
           // 有选中文本，删除选中的文本
-          final newText = text.substring(0, selection.start) + text.substring(selection.end);
+          final newText =
+              text.substring(0, selection.start) +
+              text.substring(selection.end);
           _inputController.text = newText;
           _inputController.selection = TextSelection.fromPosition(
             TextPosition(offset: selection.start),
@@ -529,9 +559,7 @@ extension _ChatPageInputMethods on _ChatPageState {
       constraints: const BoxConstraints(maxHeight: 200),
       decoration: BoxDecoration(
         color: bgColor,
-        border: Border(
-          top: BorderSide(color: borderColor, width: 0.5),
-        ),
+        border: Border(top: BorderSide(color: borderColor, width: 0.5)),
       ),
       child: FutureBuilder<List<Map<String, String>>>(
         future: _loadGroupMembers(),
@@ -585,7 +613,10 @@ extension _ChatPageInputMethods on _ChatPageState {
               return InkWell(
                 onTap: () => _onMentionMemberSelected(name, userId),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(color: borderColor, width: 0.5),
@@ -616,10 +647,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                       Expanded(
                         child: Text(
                           name,
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 15,
-                          ),
+                          style: TextStyle(color: textColor, fontSize: 15),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -650,37 +678,9 @@ extension _ChatPageInputMethods on _ChatPageState {
         );
       },
       storageDataSource: getIt<PreferencesDataSource>(),
-      smartReplyLoader:
-          getIt.isRegistered<AiService>() ? _loadAiSmartReplies : null,
+      smartReplyLoader: getIt.isRegistered<AiService>()
+          ? _loadAiSmartReplies
+          : null,
     );
-  }
-
-  Future<List<String>> _loadAiSmartReplies() async {
-    if (!getIt.isRegistered<AiService>()) {
-      return const [];
-    }
-    final recentMessages = context.read<ChatBloc>().state.messages
-        .where((m) => m.type == MessageType.text && m.content.trim().isNotEmpty)
-        .take(6)
-        .toList()
-        .reversed
-        .toList();
-    if (recentMessages.isEmpty || recentMessages.every((m) => m.isFromMe)) {
-      return const [];
-    }
-
-    final contextMessages = recentMessages.map((message) {
-      final role = message.isFromMe ? AiRole.user : AiRole.assistant;
-      final prefix = message.isFromMe
-          ? 'Me'
-          : (message.senderName.trim().isEmpty ? 'Other' : message.senderName);
-      return AiMessage(role: role, content: '$prefix: ${message.content}');
-    }).toList();
-
-    try {
-      return await getIt<AiService>().suggestReplies(contextMessages);
-    } catch (_) {
-      return const [];
-    }
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -12,6 +13,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/payment_request_status_utils.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
+import '../../blocs/chat/chat_bloc.dart';
+import '../../blocs/chat/chat_event.dart';
 import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/contact_card_message_widget.dart';
@@ -356,8 +359,9 @@ class MessageItem extends StatelessWidget {
       case MessageType.image:
         content = _buildImageMessage();
         break;
+      case MessageType.voice:
       case MessageType.audio:
-        content = _buildVoiceMessage();
+        content = _buildVoiceMessage(context);
         break;
       case MessageType.video:
         content = _buildVideoMessage(context);
@@ -854,37 +858,36 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildVoiceMessage() {
+  Widget _buildVoiceMessage(BuildContext context) {
     final metadata = message.metadata;
     // 转换毫秒到秒
     final durationSec = ((metadata?.duration ?? 0) / 1000).round();
     // 优先使用 httpUrl
     final voiceUrl = metadata?.httpUrl ?? metadata?.mediaUrl;
+    final transcriptionStatus =
+        metadata?.transcriptionStatus ?? TranscriptionStatus.none;
 
     return VoiceMessageWidget(
       duration: durationSec > 0 ? durationSec : 1,
       isSelf: message.isFromMe,
       voiceUrl: voiceUrl,
-      // 语音转文字功能（需要接入语音识别API）
-      onConvertToText: voiceUrl != null ? _convertVoiceToText : null,
+      convertedText: metadata?.transcription,
+      isTranscribing: transcriptionStatus == TranscriptionStatus.transcribing,
+      transcriptionFailed: transcriptionStatus == TranscriptionStatus.failed,
+      onRequestTranscription: voiceUrl != null
+          ? () => _requestVoiceToText(context)
+          : null,
     );
   }
 
-  /// 语音转文字
-  Future<String?> _convertVoiceToText(String voiceUrl) async {
-    // 尝试使用语音识别服务
-    // 注意：需要先配置 API Key
-    // SpeechToTextService().configureGoogle('your-api-key');
-    // 或
-    // SpeechToTextService().configureWhisper('http://localhost:8000');
-
-    // 如果服务已配置，则使用真实的语音识别
-    // final text = await SpeechToTextService().transcribe(voiceUrl);
-    // if (text != null) return text;
-
-    // Speech-to-text API not configured
-    await Future<void>.delayed(const Duration(seconds: 1));
-    return '[Speech-to-text requires API configuration]';
+  void _requestVoiceToText(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+    context.read<ChatBloc>().add(
+      TranscribeVoiceMessage(
+        messageId: message.id,
+        language: locale.toLanguageTag(),
+      ),
+    );
   }
 
   Widget _buildVideoMessage(BuildContext context) {
