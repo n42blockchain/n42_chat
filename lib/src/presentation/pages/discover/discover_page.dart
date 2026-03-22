@@ -15,6 +15,7 @@ import '../mini_app/mini_app_market_page.dart';
 import '../moment/moment_list_page.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
+import 'social_hub_page.dart';
 import '../space/space_list_page.dart';
 import '../voice_room/voice_room_list_page.dart';
 import 'channel_discover_page.dart';
@@ -49,7 +50,21 @@ class DiscoverPage extends StatelessWidget {
           _buildGroupCard(
             context,
             isDark,
-            children: [_buildMomentsMenuItem(context, isDark, l10n)],
+            children: [
+              _buildMomentsMenuItem(context, isDark, l10n),
+              _buildDivider(context, isDark),
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: const Icon(
+                  Icons.auto_awesome,
+                  color: Color(0xFFEC4899),
+                  size: 26,
+                ),
+                title: 'Stories & Fun',
+                onTap: () => _openSocialHub(context),
+              ),
+            ],
           ),
 
           const SizedBox(height: 8),
@@ -235,6 +250,12 @@ class DiscoverPage extends StatelessWidget {
     Navigator.of(
       context,
     ).push(MaterialPageRoute<void>(builder: (_) => const ScanQRPage()));
+  }
+
+  void _openSocialHub(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const SocialHubPage()));
   }
 
   Widget _buildMomentsMenuItem(BuildContext context, bool isDark, S? l10n) {

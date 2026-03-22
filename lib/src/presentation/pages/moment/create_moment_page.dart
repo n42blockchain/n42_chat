@@ -23,7 +23,9 @@ const _kLastVisibilityKey = 'moment_last_visibility';
 
 /// 发布动态页面
 class CreateMomentPage extends StatefulWidget {
-  const CreateMomentPage({super.key});
+  final bool autoPickImages;
+
+  const CreateMomentPage({super.key, this.autoPickImages = false});
 
   @override
   State<CreateMomentPage> createState() => _CreateMomentPageState();
@@ -41,6 +43,12 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
   void initState() {
     super.initState();
     _loadLastVisibility();
+    if (widget.autoPickImages) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _pickImages();
+      });
+    }
   }
 
   Future<void> _loadLastVisibility() async {

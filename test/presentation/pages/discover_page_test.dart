@@ -34,7 +34,7 @@ Widget buildTestWidget(Widget child, {MomentBloc? momentBloc}) {
 
 void main() {
   group('DiscoverPage', () {
-    testWidgets('renders 8 menu items including Voice Room and Mini Apps', (
+    testWidgets('renders stories hub plus core discover menu items', (
       tester,
     ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
@@ -48,6 +48,7 @@ void main() {
 
       expect(find.text('Voice Room'), findsOneWidget);
       expect(find.text('Mini Apps'), findsOneWidget);
+      expect(find.text('Stories & Fun'), findsOneWidget);
 
       // 验证有 Search 菜单项（可能是 'Search' 或本地化的文本）
       final searchFinder = find.textContaining('Search');
@@ -141,15 +142,15 @@ void main() {
       expect(find.text('Moments'), findsOneWidget);
     });
 
-    testWidgets('has exactly 8 chevron_right icons for visible menu items', (
+    testWidgets('has exactly 9 chevron_right icons for visible menu items', (
       tester,
     ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
-      // 发现页当前显示 8 个入口（Moments、Scan、Search、Voice Room、Mini Apps、Games、Communities、Channels）
+      // 发现页当前显示 9 个入口（Moments、Stories & Fun、Scan、Search、Voice Room、Mini Apps、Games、Communities、Channels）
       final chevronIcons = find.byIcon(Icons.chevron_right);
-      expect(chevronIcons, findsNWidgets(8));
+      expect(chevronIcons, findsNWidgets(9));
     });
   });
 }

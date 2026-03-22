@@ -166,6 +166,11 @@ class UpdateUserProfile extends AuthEvent {
   final String? pokeText;
   final String? ringtone;
   final String? avatarDecorationPreset;
+  final String? nftContractAddress;
+  final int? nftTokenId;
+  final int? nftChainId;
+  final String? nftImageUrl;
+  final bool clearNftAvatar;
 
   const UpdateUserProfile({
     this.displayName,
@@ -175,6 +180,11 @@ class UpdateUserProfile extends AuthEvent {
     this.pokeText,
     this.ringtone,
     this.avatarDecorationPreset,
+    this.nftContractAddress,
+    this.nftTokenId,
+    this.nftChainId,
+    this.nftImageUrl,
+    this.clearNftAvatar = false,
   });
 
   @override
@@ -186,6 +196,11 @@ class UpdateUserProfile extends AuthEvent {
     pokeText,
     ringtone,
     avatarDecorationPreset,
+    nftContractAddress,
+    nftTokenId,
+    nftChainId,
+    nftImageUrl,
+    clearNftAvatar,
   ];
 }
 

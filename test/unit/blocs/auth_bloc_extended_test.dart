@@ -345,6 +345,12 @@ void main() {
             signature: any(named: 'signature'),
             pokeText: any(named: 'pokeText'),
             ringtone: any(named: 'ringtone'),
+            avatarDecorationPreset: any(named: 'avatarDecorationPreset'),
+            nftContractAddress: any(named: 'nftContractAddress'),
+            nftTokenId: any(named: 'nftTokenId'),
+            nftChainId: any(named: 'nftChainId'),
+            nftImageUrl: any(named: 'nftImageUrl'),
+            clearNftAvatar: any(named: 'clearNftAvatar'),
           ),
         ).thenAnswer((_) async => true);
         when(
@@ -367,6 +373,74 @@ void main() {
     );
 
     blocTest<AuthBloc, AuthState>(
+      'forwards nft avatar updates to profile data storage',
+      build: () {
+        when(
+          () => mockAuthRepository.updateUserProfileData(
+            gender: any(named: 'gender'),
+            region: any(named: 'region'),
+            signature: any(named: 'signature'),
+            pokeText: any(named: 'pokeText'),
+            ringtone: any(named: 'ringtone'),
+            avatarDecorationPreset: any(named: 'avatarDecorationPreset'),
+            nftContractAddress: any(named: 'nftContractAddress'),
+            nftTokenId: any(named: 'nftTokenId'),
+            nftChainId: any(named: 'nftChainId'),
+            nftImageUrl: any(named: 'nftImageUrl'),
+            clearNftAvatar: any(named: 'clearNftAvatar'),
+          ),
+        ).thenAnswer((_) async => true);
+        when(
+          () => mockAuthRepository.getUserProfileData(),
+        ).thenAnswer((_) async => null);
+        when(() => mockAuthRepository.currentUser).thenReturn(
+          const UserEntity(
+            userId: '@user:server.com',
+            displayName: 'Test User',
+            nftContractAddress: '0xabc',
+            nftTokenId: 42,
+            nftChainId: 1,
+            nftImageUrl: 'https://example.com/nft.png',
+          ),
+        );
+        return buildBloc();
+      },
+      act: (bloc) => bloc.add(
+        const UpdateUserProfile(
+          nftContractAddress: '0xabc',
+          nftTokenId: 42,
+          nftChainId: 1,
+          nftImageUrl: 'https://example.com/nft.png',
+        ),
+      ),
+      expect: () => [
+        isA<AuthState>().having((s) => s.status, 'status', AuthStatus.loading),
+        isA<AuthState>().having(
+          (s) => s.status,
+          'status',
+          AuthStatus.authenticated,
+        ),
+      ],
+      verify: (_) {
+        verify(
+          () => mockAuthRepository.updateUserProfileData(
+            gender: null,
+            region: null,
+            signature: null,
+            pokeText: null,
+            ringtone: null,
+            avatarDecorationPreset: null,
+            nftContractAddress: '0xabc',
+            nftTokenId: 42,
+            nftChainId: 1,
+            nftImageUrl: 'https://example.com/nft.png',
+            clearNftAvatar: false,
+          ),
+        ).called(1);
+      },
+    );
+
+    blocTest<AuthBloc, AuthState>(
       'emits [loading, error] when any update throws',
       build: () {
         when(
@@ -376,6 +450,12 @@ void main() {
             signature: any(named: 'signature'),
             pokeText: any(named: 'pokeText'),
             ringtone: any(named: 'ringtone'),
+            avatarDecorationPreset: any(named: 'avatarDecorationPreset'),
+            nftContractAddress: any(named: 'nftContractAddress'),
+            nftTokenId: any(named: 'nftTokenId'),
+            nftChainId: any(named: 'nftChainId'),
+            nftImageUrl: any(named: 'nftImageUrl'),
+            clearNftAvatar: any(named: 'clearNftAvatar'),
           ),
         ).thenThrow(Exception('Network error'));
         return buildBloc();
