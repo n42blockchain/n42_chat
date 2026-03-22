@@ -15,6 +15,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/livekit_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/chat/in_call_chat_panel.dart';
+import '../../widgets/call/call_enhancement_sheet.dart';
 import '../../widgets/common/n42_avatar.dart';
 
 /// 多人会议页面
@@ -48,6 +49,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   Timer? _hideControlsTimer;
 
+  late final LiveKitCallEnhancementController _enhancementController;
+
   @override
   void initState() {
     super.initState();
@@ -61,11 +64,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     widget.liveKitService.onDurationUpdate = _onDurationUpdate;
     widget.liveKitService.onError = _onError;
 
+    _enhancementController = LiveKitCallEnhancementController(
+      widget.liveKitService,
+    );
+
     _state = widget.liveKitService.state;
     _participants = widget.liveKitService.participants;
-    _isMuted = widget.liveKitService.isMuted;
-    _isVideoEnabled = widget.liveKitService.isVideoEnabled;
-    _isScreenSharing = widget.liveKitService.isScreenSharing;
+    _syncControlsFromService();
 
     _startHideControlsTimer();
   }
@@ -81,6 +86,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   void _onStateChanged(MeetingState state) {
     setState(() {
       _state = state;
+      _syncControlsFromService();
     });
 
     if (state == MeetingState.disconnected || state == MeetingState.failed) {
@@ -146,6 +152,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     if (_showControls) {
       _startHideControlsTimer();
     }
+  }
+
+  void _syncControlsFromService() {
+    _isMuted = widget.liveKitService.isMuted;
+    _isVideoEnabled = widget.liveKitService.isVideoEnabled;
+    _isScreenSharing = widget.liveKitService.isScreenSharing;
   }
 
   @override
@@ -582,6 +594,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               },
             ),
 
+            if (_state == MeetingState.connected)
+              IconButton(
+                icon: const Icon(Icons.tune, color: Colors.white),
+                onPressed: _openCallEnhancementTools,
+              ),
+
             // 参与者列表
             IconButton(
               icon: const Icon(Icons.people, color: Colors.white),
@@ -898,21 +916,21 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
   void _toggleMute() async {
     await widget.liveKitService.toggleMicrophone();
     setState(() {
-      _isMuted = widget.liveKitService.isMuted;
+      _syncControlsFromService();
     });
   }
 
   void _toggleVideo() async {
     await widget.liveKitService.toggleCamera();
     setState(() {
-      _isVideoEnabled = widget.liveKitService.isVideoEnabled;
+      _syncControlsFromService();
     });
   }
 
   void _toggleScreenShare() async {
     await widget.liveKitService.toggleScreenShare();
     setState(() {
-      _isScreenSharing = widget.liveKitService.isScreenSharing;
+      _syncControlsFromService();
     });
   }
 
@@ -927,6 +945,20 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   void _switchCamera() {
     widget.liveKitService.switchCamera();
+  }
+
+  Future<void> _openCallEnhancementTools() async {
+    await showCallEnhancementSheet(
+      context: context,
+      controller: _enhancementController,
+      title: 'Meeting tools',
+      onChanged: () {
+        if (!mounted) return;
+        setState(() {
+          _syncControlsFromService();
+        });
+      },
+    );
   }
 
   void _showLeaveDialog() {

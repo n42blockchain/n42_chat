@@ -13,6 +13,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/call_manager.dart';
 import '../../../services/voip/webrtc_service.dart';
+import '../../widgets/call/call_enhancement_sheet.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -49,6 +50,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   // 保存 session 信息（防止挂断后 webRTCService 的 session 被清除）
   CallSession? _cachedSession;
 
+  late final WebRTCCallEnhancementController _enhancementController;
+
   // 保存原来的回调（用于 dispose 时恢复）
   void Function(CallState)? _originalStateCallback;
   void Function(Duration)? _originalDurationCallback;
@@ -77,6 +80,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     // 保持屏幕常亮
     WakelockPlus.enable();
 
+    _enhancementController = WebRTCCallEnhancementController(
+      widget.webRTCService,
+    );
+
     // 保存原来的回调
     _originalStateCallback = widget.webRTCService.onStateChanged;
     _originalDurationCallback = widget.webRTCService.onDurationUpdate;
@@ -88,6 +95,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     widget.webRTCService.onError = _onError;
 
     _state = widget.webRTCService.state;
+    _syncControlsFromService();
 
     // 缓存 session 信息
     _cachedSession = widget.session ?? widget.webRTCService.currentSession;
@@ -132,6 +140,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
     setState(() {
       _state = state;
+      _syncControlsFromService();
     });
 
     if (state == CallState.connected) {
@@ -193,6 +202,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     if (_showControls) {
       _startHideControlsTimer();
     }
+  }
+
+  void _syncControlsFromService() {
+    _isMuted = widget.webRTCService.isMuted;
+    _isVideoEnabled = widget.webRTCService.isVideoEnabled;
+    _isSpeakerOn = widget.webRTCService.isSpeakerOn;
   }
 
   bool get _isVideoCall =>
@@ -351,24 +366,40 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       child: Row(
         children: [
           // 最小化按钮
-          GestureDetector(
+          _buildTopActionButton(
+            icon: Icons.keyboard_arrow_down,
             onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: _controlBgColor,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: const Icon(
-                Icons.keyboard_arrow_down,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
+            backgroundColor: _controlBgColor,
           ),
           const Spacer(),
+          if (_state == CallState.connected)
+            _buildTopActionButton(
+              icon: Icons.tune,
+              onTap: _openCallEnhancementTools,
+              backgroundColor: _controlBgColor,
+              iconSize: 20,
+            ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTopActionButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    required Color backgroundColor,
+    double iconSize = 24,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Icon(icon, color: Colors.white, size: iconSize),
       ),
     );
   }
@@ -631,21 +662,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       child: Row(
         children: [
           // 返回按钮
-          GestureDetector(
+          _buildTopActionButton(
+            icon: Icons.keyboard_arrow_down,
             onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: const Icon(
-                Icons.keyboard_arrow_down,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
+            backgroundColor: Colors.black.withValues(alpha: 0.3),
           ),
           const SizedBox(width: 12),
           // 用户名和状态
@@ -673,6 +693,13 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               ],
             ),
           ),
+          if (_state == CallState.connected)
+            _buildTopActionButton(
+              icon: Icons.tune,
+              onTap: _openCallEnhancementTools,
+              backgroundColor: Colors.black.withValues(alpha: 0.3),
+              iconSize: 20,
+            ),
         ],
       ),
     );
@@ -788,26 +815,40 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   void _toggleMute() {
     widget.webRTCService.toggleMute();
     setState(() {
-      _isMuted = widget.webRTCService.isMuted;
+      _syncControlsFromService();
     });
   }
 
   Future<void> _toggleSpeaker() async {
     await widget.webRTCService.toggleSpeaker();
     setState(() {
-      _isSpeakerOn = widget.webRTCService.isSpeakerOn;
+      _syncControlsFromService();
     });
   }
 
   void _toggleVideo() {
     widget.webRTCService.toggleVideo();
     setState(() {
-      _isVideoEnabled = widget.webRTCService.isVideoEnabled;
+      _syncControlsFromService();
     });
   }
 
   void _switchCamera() {
     widget.webRTCService.switchCamera();
+  }
+
+  Future<void> _openCallEnhancementTools() async {
+    await showCallEnhancementSheet(
+      context: context,
+      controller: _enhancementController,
+      title: 'Call tools',
+      onChanged: () {
+        if (!mounted) return;
+        setState(() {
+          _syncControlsFromService();
+        });
+      },
+    );
   }
 
   Future<void> _answerCall() async {
