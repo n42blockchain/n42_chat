@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -18,9 +17,9 @@ import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'bot_settings_page.dart';
 import 'content_filter_settings_page.dart';
-import 'group_channels_page.dart';
 import 'group_members_page.dart';
 import 'group_media_hub_page.dart';
+import 'group_topics_page.dart';
 import 'invite_members_page.dart';
 import 'token_gate_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
@@ -440,6 +439,24 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         onTap: () => _showInviteLinkActions(group),
       ),
       _buildSettingsDivider(isDark),
+      ListTile(
+        leading: const Icon(Icons.forum_outlined),
+        title: Text(S.of(context)?.groupChannels ?? 'Topic Channels'),
+        subtitle: Text(
+          group.canManageChannels
+              ? 'Browse topics and manage channel structure'
+              : 'Browse grouped topics and channel threads',
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => GroupTopicsPage(roomId: widget.roomId),
+            ),
+          );
+        },
+      ),
+      _buildSettingsDivider(isDark),
       // 群公告
       ListTile(
         title: Text(
@@ -483,19 +500,6 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           onChanged: (value) {
             context.read<GroupBloc>().add(
               UpdateGroupVisibility(widget.roomId, value),
-            );
-          },
-        ),
-      if (group.canManageChannels)
-        ListTile(
-          leading: const Icon(Icons.forum_outlined),
-          title: Text(S.of(context)?.groupChannels ?? 'Topic Channels'),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => GroupChannelsPage(roomId: widget.roomId),
-              ),
             );
           },
         ),
@@ -828,65 +832,29 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   }
 
   Future<void> _showInviteLinkActions(GroupEntity group) async {
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      final link = await getIt<IGroupRepository>().getGroupInviteLink(
-        group.roomId,
-      );
-      if (!mounted) {
-        return;
-      }
+    await showResolvedShareableLinkActions(
+      context,
+      resolveLink: () => _resolveGroupInviteLink(group),
+      presentation: _buildGroupInvitePresentation(group),
+    );
+  }
 
-      await showModalBottomSheet<void>(
-        context: context,
-        builder: (sheetContext) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('Invite Link'),
-                subtitle: Text(
-                  link,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.copy_outlined),
-                title: const Text('Copy Link'),
-                onTap: () async {
-                  Navigator.pop(sheetContext);
-                  await Clipboard.setData(ClipboardData(text: link));
-                  if (!mounted) {
-                    return;
-                  }
-                  messenger.showSnackBar(
-                    const SnackBar(content: Text('Invite link copied')),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.share_outlined),
-                title: const Text('Share Link'),
-                onTap: () async {
-                  Navigator.pop(sheetContext);
-                  await SharePlus.instance.share(
-                    ShareParams(text: link, subject: group.name),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) {
-        return;
-      }
-      messenger.showSnackBar(
-        SnackBar(content: Text('Failed to load invite link: $e')),
-      );
-    }
+  Future<String> _resolveGroupInviteLink(GroupEntity group) {
+    return getIt<IGroupRepository>().getGroupInviteLink(group.roomId);
+  }
+
+  ShareableLinkPresentation _buildGroupInvitePresentation(GroupEntity group) {
+    return ShareableLinkPresentation(
+      entityName: group.name,
+      linkLabel: 'Invite Link',
+      qrCodeTitle: S.of(context)?.groupQrCode ?? 'Group QR Code',
+      qrCodeSubtitle: group.isPublic
+          ? 'Scan to join this group directly'
+          : 'Scan to share this room reference with invited members',
+      errorPrefix: 'Failed to load invite link',
+      copySuccessMessage: 'Invite link copied',
+      icon: group.isChannel ? Icons.campaign_outlined : Icons.group_outlined,
+    );
   }
 
   void _clearChatHistory() {
@@ -998,15 +966,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             ListTile(
               leading: const Icon(Icons.qr_code),
               title: Text(S.of(context)?.groupQrCode ?? 'Group QR Code'),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(sheetContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.commonFeatureInDevelopment('') ??
-                          'Feature in development',
-                    ),
-                  ),
+                await showResolvedShareableLinkQrPage(
+                  context,
+                  resolveLink: () => _resolveGroupInviteLink(group),
+                  presentation: _buildGroupInvitePresentation(group),
                 );
               },
             ),
