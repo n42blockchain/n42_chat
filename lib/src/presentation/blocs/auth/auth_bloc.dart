@@ -402,7 +402,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           event.signature != null ||
           event.pokeText != null ||
           event.ringtone != null ||
-          event.avatarDecorationPreset != null;
+          event.avatarDecorationPreset != null ||
+          event.nftContractAddress != null ||
+          event.nftTokenId != null ||
+          event.nftChainId != null ||
+          event.nftImageUrl != null ||
+          event.clearNftAvatar;
 
       if (hasProfileChanges) {
         await _authRepository.updateUserProfileData(
@@ -412,6 +417,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           pokeText: event.pokeText,
           ringtone: event.ringtone,
           avatarDecorationPreset: event.avatarDecorationPreset,
+          nftContractAddress: event.nftContractAddress,
+          nftTokenId: event.nftTokenId,
+          nftChainId: event.nftChainId,
+          nftImageUrl: event.nftImageUrl,
+          clearNftAvatar: event.clearNftAvatar,
         );
       }
 

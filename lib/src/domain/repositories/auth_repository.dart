@@ -102,6 +102,11 @@ abstract class IAuthRepository {
     String? pokeText,
     String? ringtone,
     String? avatarDecorationPreset,
+    String? nftContractAddress,
+    int? nftTokenId,
+    int? nftChainId,
+    String? nftImageUrl,
+    bool clearNftAvatar = false,
   });
 
   /// 获取用户自定义资料数据

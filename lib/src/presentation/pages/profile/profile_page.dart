@@ -31,7 +31,7 @@ import '../settings/notification_settings_page.dart';
 import '../settings/privacy_settings_page.dart';
 import '../settings/security_settings_page.dart';
 import '../settings/settings_page.dart';
-import 'nft_avatar_picker_page.dart';
+import 'avatar_studio_page.dart';
 import 'orders_and_cards_page.dart';
 import 'profile_edit_page.dart';
 import 'services_page.dart';
@@ -125,6 +125,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _boundPhoneNumber = phoneNumber;
               _displayName = profile?.displayName ?? _displayName;
               _avatarUrl = profile?.avatarUrl ?? _avatarUrl;
+              _isNftAvatar = profile?.hasNftAvatar ?? false;
               _avatarDecorationPreset =
                   profile?.avatarDecorationPreset ??
                   AvatarDecorationPreset.none;
@@ -585,7 +586,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  /// 显示头像操作菜单：更换头像 / 绑定 NFT 头像
+  /// 显示头像操作菜单：更换头像 / Avatar Studio
   void _showAvatarOptions(BuildContext context) {
     final l10n = S.of(context);
     final isDark = context.isDarkMode;
@@ -631,14 +632,12 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               ListTile(
                 leading: const Icon(
-                  Icons.verified_outlined,
+                  Icons.auto_awesome,
                   color: Color(0xFFFFD700),
                 ),
-                title: Text(l10n?.profileBindNftAvatar ?? 'Bind NFT Avatar'),
+                title: const Text('Avatar Studio'),
                 subtitle: Text(
-                  _isNftAvatar
-                      ? (l10n?.nftPickerTitle ?? 'NFT Avatar bound')
-                      : 'Verified on-chain identity',
+                  'NFT Avatar / Decorations',
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark
@@ -648,7 +647,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
-                  _bindNftAvatar(context);
+                  _openAvatarStudio(context);
                 },
               ),
               const SizedBox(height: 8),
@@ -657,61 +656,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
-  }
-
-  /// 打开 NFT 头像绑定页面
-  void _bindNftAvatar(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => NftAvatarPickerPage(
-          onConfirm:
-              ({
-                required String imageUrl,
-                required String contractAddress,
-                required int tokenId,
-                required int chainId,
-              }) {
-                // 更新头像 URL 并标记为 NFT 来源
-                setState(() {
-                  _avatarUrl = imageUrl;
-                  _isNftAvatar = true;
-                });
-
-                // 同步到 Matrix 用户资料
-                _updateMatrixAvatar(imageUrl);
-
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
-                }
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.nftPickerUseAsAvatar ??
-                          'NFT Avatar applied',
-                    ),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-        ),
-      ),
-    );
-  }
-
-  /// 将图片 URL 更新为 Matrix 头像
-  Future<void> _updateMatrixAvatar(String imageUrl) async {
-    try {
-      final clientManager = getIt<MatrixClientManager>();
-      final client = clientManager.client;
-      if (client != null && client.isLogged()) {
-        debugLog(
-          'ProfilePage: Skip Matrix avatar sync for external NFT image $imageUrl',
-        );
-      }
-    } catch (e) {
-      debugLog('ProfilePage: Failed to update matrix avatar: $e');
-    }
   }
 
   void _openEditProfile(BuildContext context) {
@@ -729,6 +673,23 @@ class _ProfilePageState extends State<ProfilePage> {
         )
         .then((_) {
           // 返回后刷新用户信息
+          _loadUserInfo();
+        });
+  }
+
+  void _openAvatarStudio(BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
+
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute<void>(
+            builder: (_) => BlocProvider.value(
+              value: authBloc,
+              child: const AvatarStudioPage(),
+            ),
+          ),
+        )
+        .then((_) {
           _loadUserInfo();
         });
   }

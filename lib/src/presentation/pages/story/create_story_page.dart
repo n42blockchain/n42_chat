@@ -18,7 +18,14 @@ enum StoryMode { text, photo }
 
 /// Create Story page for posting text or photo stories
 class CreateStoryPage extends StatefulWidget {
-  const CreateStoryPage({super.key});
+  final StoryMode initialMode;
+  final bool autoPickMedia;
+
+  const CreateStoryPage({
+    super.key,
+    this.initialMode = StoryMode.text,
+    this.autoPickMedia = false,
+  });
 
   @override
   State<CreateStoryPage> createState() => _CreateStoryPageState();
@@ -49,6 +56,18 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
 
   // Selected music
   StoryMusicSelection? _musicSelection;
+
+  @override
+  void initState() {
+    super.initState();
+    _mode = widget.initialMode;
+    if (widget.autoPickMedia && widget.initialMode == StoryMode.photo) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _pickImage();
+      });
+    }
+  }
 
   @override
   void dispose() {

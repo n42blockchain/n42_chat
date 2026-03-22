@@ -64,22 +64,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     final userId = client.userID;
     if (userId == null) return null;
 
-    // 从缓存的资料数据中获取额外字段
-    final profileData = _cachedProfileData ?? {};
-
-    return UserEntity(
-      userId: userId,
-      displayName: _cachedDisplayName ?? userId.localpart ?? '',
-      avatarUrl: _cachedAvatarUrl,
-      gender: profileData['gender'] as String?,
-      region: profileData['region'] as String?,
-      signature: profileData['signature'] as String?,
-      pokeText: profileData['pokeText'] as String?,
-      ringtone: profileData['ringtone'] as String?,
-      avatarDecorationPreset: AvatarDecorationPresetX.fromStorageKey(
-        profileData['avatarDecorationPreset'] as String?,
-      ),
-    );
+    return _buildCurrentUserEntity(userId);
   }
 
   @override
@@ -546,22 +531,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       _cachedAvatarUrl = avatarHttpUrl;
       _cachedDisplayName = profile.displayName ?? userId.localpart ?? '';
       await _syncStoredAccountProfile();
-
-      final profileData = _cachedProfileData ?? {};
-
-      return UserEntity(
-        userId: userId,
-        displayName: _cachedDisplayName!,
-        avatarUrl: avatarHttpUrl,
-        gender: profileData['gender'] as String?,
-        region: profileData['region'] as String?,
-        signature: profileData['signature'] as String?,
-        pokeText: profileData['pokeText'] as String?,
-        ringtone: profileData['ringtone'] as String?,
-        avatarDecorationPreset: AvatarDecorationPresetX.fromStorageKey(
-          profileData['avatarDecorationPreset'] as String?,
-        ),
-      );
+      return _buildCurrentUserEntity(userId);
     } catch (e) {
       debugLog('AuthRepository: Get profile failed - $e');
       return currentUser;
@@ -583,6 +553,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
     try {
       await _authDataSource.clientManager.setAvatar(avatarBytes, filename);
+      await updateUserProfileData(clearNftAvatar: true);
       debugLog('AuthRepository: Avatar updated successfully');
 
       // 刷新用户资料以更新缓存的头像 URL
@@ -619,6 +590,11 @@ class AuthRepositoryImpl implements IAuthRepository {
     String? pokeText,
     String? ringtone,
     String? avatarDecorationPreset,
+    String? nftContractAddress,
+    int? nftTokenId,
+    int? nftChainId,
+    String? nftImageUrl,
+    bool clearNftAvatar = false,
   }) async {
     if (!isLoggedIn) return false;
 
@@ -639,6 +615,18 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (avatarDecorationPreset != null) {
         newData['avatarDecorationPreset'] = avatarDecorationPreset;
       }
+      if (clearNftAvatar) {
+        newData.remove('nftContractAddress');
+        newData.remove('nftTokenId');
+        newData.remove('nftChainId');
+        newData.remove('nftImageUrl');
+      }
+      if (nftContractAddress != null) {
+        newData['nftContractAddress'] = nftContractAddress;
+      }
+      if (nftTokenId != null) newData['nftTokenId'] = nftTokenId;
+      if (nftChainId != null) newData['nftChainId'] = nftChainId;
+      if (nftImageUrl != null) newData['nftImageUrl'] = nftImageUrl;
 
       // 保存到 Matrix 账户数据
       await client.setAccountData(client.userID!, 'n42.user.profile', newData);
@@ -1296,7 +1284,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       accessToken: accessToken,
       deviceId: deviceId,
       displayName: _cachedDisplayName ?? userId.localpart,
-      avatarUrl: _cachedAvatarUrl,
+      avatarUrl: _effectiveAvatarUrl,
     );
   }
 
@@ -1325,8 +1313,56 @@ class AuthRepositoryImpl implements IAuthRepository {
       accessToken: accessToken,
       deviceId: deviceId,
       displayName: _cachedDisplayName ?? userId.localpart,
-      avatarUrl: _cachedAvatarUrl,
+      avatarUrl: _effectiveAvatarUrl,
     );
+  }
+
+  UserEntity _buildCurrentUserEntity(String userId) {
+    final profileData = _cachedProfileData ?? const <String, dynamic>{};
+    final nftContractAddress = profileData['nftContractAddress'] as String?;
+    final nftTokenId = _toInt(profileData['nftTokenId']);
+    final nftChainId = _toInt(profileData['nftChainId']);
+    final nftImageUrl = profileData['nftImageUrl'] as String?;
+
+    return UserEntity(
+      userId: userId,
+      displayName: _cachedDisplayName ?? userId.localpart ?? '',
+      avatarUrl: _pickEffectiveAvatarUrl(
+        avatarUrl: _cachedAvatarUrl,
+        nftImageUrl: nftImageUrl,
+      ),
+      gender: profileData['gender'] as String?,
+      region: profileData['region'] as String?,
+      signature: profileData['signature'] as String?,
+      pokeText: profileData['pokeText'] as String?,
+      ringtone: profileData['ringtone'] as String?,
+      avatarDecorationPreset: AvatarDecorationPresetX.fromStorageKey(
+        profileData['avatarDecorationPreset'] as String?,
+      ),
+      nftContractAddress: nftContractAddress,
+      nftTokenId: nftTokenId,
+      nftChainId: nftChainId,
+      nftImageUrl: nftImageUrl,
+    );
+  }
+
+  String? get _effectiveAvatarUrl => _pickEffectiveAvatarUrl(
+    avatarUrl: _cachedAvatarUrl,
+    nftImageUrl: _cachedProfileData?['nftImageUrl'] as String?,
+  );
+
+  String? _pickEffectiveAvatarUrl({String? avatarUrl, String? nftImageUrl}) {
+    if (nftImageUrl != null && nftImageUrl.isNotEmpty) {
+      return nftImageUrl;
+    }
+    return avatarUrl;
+  }
+
+  int? _toInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
   }
 
   AuthResult _handleMatrixError(MatrixException e) {

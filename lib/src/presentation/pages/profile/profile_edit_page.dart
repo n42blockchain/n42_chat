@@ -9,10 +9,12 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/avatar_decoration_preset.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'avatar_studio_page.dart';
 import 'profile_address_manage_page.dart';
 import 'profile_invoice_manage_page.dart';
 import 'profile_ringtone_select_page.dart';
@@ -32,7 +34,6 @@ class ProfileEditPage extends StatefulWidget {
 
 enum _PendingProfileOperation {
   avatar,
-  avatarDecoration,
   displayName,
   gender,
   region,
@@ -140,6 +141,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                             name: user?.displayName ?? '',
                             imageUrl: user?.avatarUrl,
                             size: 60,
+                            isNftAvatar: user?.hasNftAvatar ?? false,
                             decorationPreset:
                                 user?.avatarDecorationPreset ??
                                 AvatarDecorationPreset.none,
@@ -157,18 +159,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
                   _buildListTile(
                     isDark: isDark,
-                    title: 'Avatar Style',
-                    value: _avatarDecorationLabel(
-                      user?.avatarDecorationPreset ??
-                          AvatarDecorationPreset.none,
-                    ),
-                    onTap: () => _selectAvatarDecoration(
-                      currentPreset:
-                          user?.avatarDecorationPreset ??
-                          AvatarDecorationPreset.none,
-                      currentName: user?.displayName,
-                      currentAvatarUrl: user?.avatarUrl,
-                    ),
+                    title: 'Avatar Studio',
+                    value: _avatarStudioLabel(user),
+                    onTap: _openAvatarStudio,
                   ),
                   _buildDivider(isDark),
 
@@ -433,8 +426,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     }
   }
 
-  String _avatarDecorationLabel(AvatarDecorationPreset preset) {
-    return preset.displayName;
+  String _avatarStudioLabel(UserEntity? user) {
+    final parts = <String>[
+      if (user?.hasNftAvatar ?? false) 'NFT',
+      if ((user?.avatarDecorationPreset ?? AvatarDecorationPreset.none) !=
+          AvatarDecorationPreset.none)
+        (user?.avatarDecorationPreset ?? AvatarDecorationPreset.none)
+            .displayName,
+    ];
+
+    return parts.isEmpty ? 'Customize' : parts.join(' · ');
   }
 
   void _dispatchProfileOperation({
@@ -1004,57 +1005,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     }
   }
 
-  Future<void> _selectAvatarDecoration({
-    required AvatarDecorationPreset currentPreset,
-    String? currentName,
-    String? currentAvatarUrl,
-  }) async {
-    final result = await showModalBottomSheet<AvatarDecorationPreset>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) {
-        final isDark = context.isDarkMode;
-        const presets = AvatarDecorationPreset.values;
-        return SafeArea(
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: presets.length,
-            separatorBuilder: (_, _) => Divider(
-              height: 1,
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
-            ),
-            itemBuilder: (context, index) {
-              final preset = presets[index];
-              final selected = preset == currentPreset;
-              return ListTile(
-                leading: N42Avatar(
-                  imageUrl: currentAvatarUrl,
-                  name: currentName ?? 'Me',
-                  size: 44,
-                  decorationPreset: preset,
-                ),
-                title: Text(preset.displayName),
-                trailing: selected
-                    ? const Icon(Icons.check, color: AppColors.primary)
-                    : null,
-                onTap: () => Navigator.of(context).pop(preset),
-              );
-            },
-          ),
-        );
-      },
-    );
-
-    if (result != null && result != currentPreset && mounted) {
-      _dispatchProfileOperation(
-        operation: _PendingProfileOperation.avatarDecoration,
-        successMessage: 'Avatar style set to: ${result.displayName}',
-        errorFallback: 'Update profile failed',
-        dispatch: (bloc) => bloc.add(
-          UpdateUserProfile(avatarDecorationPreset: result.storageKey),
+  Future<void> _openAvatarStudio() async {
+    final authBloc = context.read<AuthBloc>();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider.value(
+          value: authBloc,
+          child: const AvatarStudioPage(),
         ),
-      );
-    }
+      ),
+    );
   }
 
   Future<void> _manageAddresses() async {
