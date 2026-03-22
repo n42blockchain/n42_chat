@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:pointycastle/export.dart' as pc;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'biometric_service.dart';
@@ -110,10 +112,13 @@ class ChatLockService {
     await prefs.remove('$_chatPinSaltPrefix$roomId');
   }
 
-  /// 对 PIN 码进行哈希
+  /// 对 PIN 码进行 PBKDF2 哈希（100 000 轮，抵抗 4-6 位 PIN 的暴力破解）
   String _hashPin(String pin, String salt) {
-    final bytes = utf8.encode('$salt:$pin');
-    return sha256.convert(bytes).toString();
+    final saltBytes = Uint8List.fromList(utf8.encode(salt));
+    final derivator = pc.PBKDF2KeyDerivator(pc.HMac(pc.SHA256Digest(), 64))
+      ..init(pc.Pbkdf2Parameters(saltBytes, 100000, 32));
+    final key = derivator.process(Uint8List.fromList(utf8.encode(pin)));
+    return base64UrlEncode(key);
   }
 
   String _hashLegacyPin(String pin) {
