@@ -13,10 +13,7 @@ import 'translation_settings_page.dart';
 import 'backup_restore_page.dart';
 import 'storage_management_page.dart';
 import 'auto_download_settings_page.dart';
-import '../../../data/datasources/matrix/matrix_client_manager.dart';
-import '../bridge/bridge_list_page.dart';
-import '../../../integration/bridge/bridge_manager.dart';
-import '../../../core/utils/debug_log.dart';
+import 'system_accounts_page.dart';
 
 /// 设置页面
 class SettingsPage extends StatelessWidget {
@@ -193,23 +190,16 @@ class SettingsPage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // 设置组2.8：Connected Accounts (Bridge)
+          // 设置组2.8：System & Accounts
           _SettingsGroup(
             children: [
               _SettingsItem(
-                icon: Icons.manage_accounts_outlined,
+                icon: Icons.settings_suggest_outlined,
                 iconColor: Colors.indigo,
-                title: 'Accounts',
-                subtitle: 'Switch between saved chat accounts',
-                onTap: onAccounts,
-                isDark: isDark,
-              ),
-              _SettingsItem(
-                icon: Icons.link,
-                iconColor: Colors.deepPurple,
-                title: 'Connected Accounts',
-                subtitle: 'Discord, WhatsApp, Telegram...',
-                onTap: () => _navigateToBridges(context),
+                title: 'System & Accounts',
+                subtitle:
+                    'Accounts, devices, usernames, notifications, and bridges',
+                onTap: () => _navigateToSystemAccounts(context),
                 isDark: isDark,
               ),
             ],
@@ -413,21 +403,10 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  void _navigateToBridges(BuildContext context) {
-    try {
-      final clientManager = getIt<MatrixClientManager>();
-      final client = clientManager.client;
-      if (client != null) {
-        final manager = BridgeManager(client: client);
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => BridgeListPage(bridgeManager: manager),
-          ),
-        );
-      }
-    } catch (e) {
-      debugLog('SettingsPage: Failed to open bridges: $e');
-    }
+  void _navigateToSystemAccounts(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const SystemAccountsPage()));
   }
 
   void _navigateToTranslation(BuildContext context) {
