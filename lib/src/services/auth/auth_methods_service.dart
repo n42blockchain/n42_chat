@@ -650,7 +650,7 @@ class AuthMethodsService {
     try {
       debugLog('AuthMethodsService: Requesting email OTP for [redacted]');
 
-      final clientSecret = 'n42_${DateTime.now().millisecondsSinceEpoch}';
+      final clientSecret = _generateSecureClientSecret();
       final uri = Uri.parse(
         '$homeserver/_matrix/client/v3/register/email/requestToken',
       );
@@ -1188,6 +1188,14 @@ class AuthMethodsService {
   Future<void> signOutAll() async {
     await signOutGoogle();
     await signOutFacebook();
+  }
+
+  /// Generate a cryptographically secure client secret for Matrix APIs.
+  /// Uses 32 bytes of randomness (base64url-encoded) instead of a predictable timestamp.
+  String _generateSecureClientSecret() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(32, (_) => random.nextInt(256));
+    return 'n42_${base64UrlEncode(bytes)}';
   }
 
   String _generateNonce() {

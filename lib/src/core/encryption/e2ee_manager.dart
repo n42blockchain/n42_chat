@@ -104,6 +104,13 @@ class E2EEManager {
     return _cachedRecoveryKey;
   }
 
+  /// 清除内存中缓存的恢复密钥
+  ///
+  /// 应在用户查看/保存恢复密钥后调用，以减少密钥在内存中的暴露时间。
+  void clearCachedRecoveryKey() {
+    _cachedRecoveryKey = null;
+  }
+
   /// 创建新的恢复密钥
   ///
   /// 通过 SSSS（安全秘密存储）创建新的恢复密钥。

@@ -206,7 +206,7 @@ class MiniAppBridgeService {
     chat: {
       getRoomId: function() {
         if (!_canChatRead) return null;
-        return '${_roomId.replaceAll("'", "\\'")}';
+        return '${_escapeJsString(_roomId)}';
       },
       sendMessage: function(text) {
         if (!_canChatSend || typeof text !== 'string' || !text.trim()) return false;
@@ -429,14 +429,31 @@ class MiniAppBridgeService {
     String dataJson,
   ) async {
     if (id == null) return;
-    final escapedId = id.replaceAll("'", "\\'");
+    // Validate callback id: only allow safe alphanumeric + underscore ids
+    // to prevent JS injection via crafted callback identifiers.
+    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(id)) {
+      debugLog('MiniAppBridge: rejected callback id with unsafe characters');
+      return;
+    }
     try {
       await controller.runJavaScript(
-        "window._n42NativeCallback('$escapedId', $success, $dataJson);",
+        "window._n42NativeCallback('$id', $success, $dataJson);",
       );
     } catch (e) {
       debugLog('MiniAppBridge: callback resolution error: $e');
     }
+  }
+
+  /// Escape a string for safe embedding inside a JS single-quoted literal.
+  /// Prevents XSS via roomId or other injected values.
+  static String _escapeJsString(String s) {
+    return s
+        .replaceAll(r'\', r'\\')
+        .replaceAll("'", r"\'")
+        .replaceAll('"', r'\"')
+        .replaceAll('\n', r'\n')
+        .replaceAll('\r', r'\r')
+        .replaceAll('</', r'<\/');
   }
 
   Future<bool> _isTrustedSource(WebViewController controller) async {
