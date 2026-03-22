@@ -1,8 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -19,6 +17,7 @@ import '../../blocs/contact/contact_event.dart';
 import '../../blocs/space/space_bloc.dart';
 import '../../blocs/space/space_event.dart';
 import '../../blocs/space/space_state.dart';
+import '../../widgets/common/common_widgets.dart';
 import '../chat/chat_page.dart';
 
 enum _PendingSpaceNavigationAction { leave, delete }
@@ -476,65 +475,19 @@ class _SpaceDetailScaffold extends StatelessWidget {
   }
 
   Future<void> _showSpaceLinkActions(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
-
-    try {
-      final link = await getIt<ISpaceRepository>().getSpaceInviteLink(space.id);
-      if (!context.mounted) {
-        return;
-      }
-
-      await showModalBottomSheet<void>(
-        context: context,
-        builder: (sheetContext) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('Community Link'),
-                subtitle: Text(
-                  link,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.copy_outlined),
-                title: const Text('Copy Link'),
-                onTap: () async {
-                  navigator.pop();
-                  await Clipboard.setData(ClipboardData(text: link));
-                  if (!context.mounted) {
-                    return;
-                  }
-                  messenger.showSnackBar(
-                    const SnackBar(content: Text('Community link copied')),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.share_outlined),
-                title: const Text('Share Link'),
-                onTap: () async {
-                  navigator.pop();
-                  await SharePlus.instance.share(
-                    ShareParams(text: link, subject: space.name),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!context.mounted) {
-        return;
-      }
-      messenger.showSnackBar(
-        SnackBar(content: Text('Failed to load community link: $e')),
-      );
-    }
+    await showResolvedShareableLinkActions(
+      context,
+      resolveLink: () => getIt<ISpaceRepository>().getSpaceInviteLink(space.id),
+      presentation: ShareableLinkPresentation(
+        entityName: space.name,
+        linkLabel: 'Community Link',
+        qrCodeTitle: 'Community QR Code',
+        qrCodeSubtitle: 'Scan to join this community and browse its channels',
+        errorPrefix: 'Failed to load community link',
+        copySuccessMessage: 'Community link copied',
+        icon: Icons.hub_outlined,
+      ),
+    );
   }
 
   Widget _buildMembersPreview(BuildContext context, bool isDark) {
