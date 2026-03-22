@@ -18,7 +18,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
       },
       builder: (context, state) {
         if (state.isLoading) {
-          return N42Loading(message: S.of(context)?.commonLoading ?? 'Loading...');
+          return N42Loading(
+            message: S.of(context)?.commonLoading ?? 'Loading...',
+          );
         }
 
         if (state.isEmpty) {
@@ -29,7 +31,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
               const SizedBox(height: 16),
               N42EmptyState.noData(
                 title: S.of(context)?.chatNoMessages ?? 'No messages',
-                description: S.of(context)?.chatSendFirstMessage ?? 'Send first message to start chatting',
+                description:
+                    S.of(context)?.chatSendFirstMessage ??
+                    'Send first message to start chatting',
               ),
             ],
           );
@@ -54,7 +58,8 @@ extension _ChatPageMessageListMethods on _ChatPageState {
 
             // 端对端加密提示 + 群聊 AI 摘要（在所有消息之上）
             if (index == state.messages.length) {
-              final isGroup = widget.conversation.type == ConversationType.group;
+              final isGroup =
+                  widget.conversation.type == ConversationType.group;
               final aiAvailable = getIt.isRegistered<AiService>();
               return Column(
                 children: [
@@ -63,13 +68,21 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     if (_aiSummaryResult != null || _isAiSummarizing)
                       AiSummaryBubble(
                         summary: _aiSummaryResult ?? '',
-                        messageCount: state.messages.where((m) => m.type == MessageType.text).take(50).length,
+                        messageCount: state.messages
+                            .where((m) => m.type == MessageType.text)
+                            .take(50)
+                            .length,
                         isLoading: _isAiSummarizing,
-                        onDismiss: () => setState(() { _aiSummaryResult = null; }),
+                        onDismiss: () => setState(() {
+                          _aiSummaryResult = null;
+                        }),
                       )
                     else
                       AiSummarizeButton(
-                        unreadCount: state.messages.where((m) => m.type == MessageType.text).take(50).length,
+                        unreadCount: state.messages
+                            .where((m) => m.type == MessageType.text)
+                            .take(50)
+                            .length,
                         onTap: _summarizeRecentMessages,
                       ),
                   ],
@@ -78,8 +91,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             }
 
             final message = state.messages[index];
-            final previousMessage =
-                index < state.messages.length - 1 ? state.messages[index + 1] : null;
+            final previousMessage = index < state.messages.length - 1
+                ? state.messages[index + 1]
+                : null;
 
             // 判断是否显示时间分隔器
             final showTimeSeparator = _shouldShowTimeSeparator(
@@ -89,23 +103,27 @@ extension _ChatPageMessageListMethods on _ChatPageState {
 
             // 群聊中判断是否需要显示发送者名称
             // 如果与上一条消息发送者不同，或者时间间隔较大，则显示名称
-            final isGroupChat = widget.conversation.type == ConversationType.group;
-            final showSenderName = isGroupChat && !message.isFromMe && (
-              previousMessage == null ||
-              previousMessage.senderId != message.senderId ||
-              _shouldShowTimeSeparator(message, previousMessage)
-            );
+            final isGroupChat =
+                widget.conversation.type == ConversationType.group;
+            final showSenderName =
+                isGroupChat &&
+                !message.isFromMe &&
+                (previousMessage == null ||
+                    previousMessage.senderId != message.senderId ||
+                    _shouldShowTimeSeparator(message, previousMessage));
 
             // 检查消息是否被撤回：
             // 1. BLoC state 中已是 redacted 类型（服务端确认或乐观更新）
             // 2. 本会话中通过长按菜单撤回的消息（_recalledMessageIds 追踪）
             // 两个条件满足任意一个即显示"已撤回"提示；
             // 长按菜单撤回的消息（最后一条）额外显示"重新编辑"按钮。
-            final isRecalled = message.type == MessageType.redacted ||
+            final isRecalled =
+                message.type == MessageType.redacted ||
                 _recalledMessageIds.contains(message.id);
             if (isRecalled) {
               // 仅对本会话内通过长按菜单撤回的最后一条消息提供"重新编辑"
-              final canReEdit = message.isFromMe &&
+              final canReEdit =
+                  message.isFromMe &&
                   _recalledMessageIds.contains(message.id) &&
                   _lastRecalledContent != null;
               return Column(
@@ -114,7 +132,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     TimeSeparator(dateTime: message.timestamp),
                   RecalledMessageWidget(
                     isFromMe: message.isFromMe,
-                    onReEdit: canReEdit ? () => _onReEditRecalledMessage() : null,
+                    onReEdit: canReEdit
+                        ? () => _onReEditRecalledMessage()
+                        : null,
                   ),
                 ],
               );
@@ -126,7 +146,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
 
             // 翻译状态
             final translatedText = state.translatedMessages[message.id];
-            final isTranslatingMsg = state.translatingMessageIds.contains(message.id);
+            final isTranslatingMsg = state.translatingMessageIds.contains(
+              message.id,
+            );
             final detectedLang = state.detectedSourceLanguages[message.id];
             final hasTranslation = translatedText != null || isTranslatingMsg;
 
@@ -148,21 +170,35 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                           message: message,
                           isHighlighted: message.id == _highlightedMessageId,
                           onTap: () => _onMessageTap(message),
-                          onLongPress: () => _showWeChatMessageMenu(message, messageKey),
+                          onLongPress: () =>
+                              _showWeChatMessageMenu(message, messageKey),
                           onAvatarTap: () => _onAvatarTap(message),
                           onAvatarDoubleTap: () => _onAvatarDoubleTap(message),
                           onResend: () => _onResend(message),
                           isGroupChat: isGroupChat,
                           showSenderName: showSenderName,
                           currentUserId: _currentUserId,
-                          onReactionTap: (emoji) => _addReaction(message, emoji),
-                          onPollVote: (pollEventId, optionId, currentVotes, maxSelections) => _onPollVote(pollEventId, optionId, currentVotes, maxSelections),
+                          onReactionTap: (emoji) =>
+                              _addReaction(message, emoji),
+                          onPollVote:
+                              (
+                                pollEventId,
+                                optionId,
+                                currentVotes,
+                                maxSelections,
+                              ) => _onPollVote(
+                                pollEventId,
+                                optionId,
+                                currentVotes,
+                                maxSelections,
+                              ),
                           onEndPoll: (pollEventId) => _onEndPoll(pollEventId),
                           onRedPacketTap: _onRedPacketTap,
                           onContactCardTap: _onContactCardTap,
                           onReplyQuoteTap: _scrollToMessage,
                           onThreadTap: _navigateToThread,
                           messageFontSize: _messageFontSize,
+                          showLinkPreview: _showLinkPreviews,
                         ),
                       ),
                 // 微信风格：翻译结果显示在消息气泡下方
@@ -206,7 +242,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
       child: Container(
         key: messageKey,
         color: isSelected
-            ? (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.blue.withValues(alpha: 0.1))
+            ? (isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.blue.withValues(alpha: 0.1))
             : Colors.transparent,
         child: Row(
           children: [
@@ -225,8 +263,8 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     color: isRedacted
                         ? (isDark ? Colors.grey.shade600 : Colors.grey.shade400)
                         : (isSelected
-                            ? AppColors.primary
-                            : (isDark ? Colors.white54 : Colors.black38)),
+                              ? AppColors.primary
+                              : (isDark ? Colors.white54 : Colors.black38)),
                     width: 2,
                   ),
                 ),
@@ -234,15 +272,17 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     ? Icon(
                         Icons.block,
                         size: 14,
-                        color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
+                        color: isDark
+                            ? Colors.grey.shade500
+                            : Colors.grey.shade500,
                       )
                     : (isSelected
-                        ? const Icon(
-                            Icons.check,
-                            size: 16,
-                            color: Colors.white,
-                          )
-                        : null),
+                          ? const Icon(
+                              Icons.check,
+                              size: 16,
+                              color: Colors.white,
+                            )
+                          : null),
               ),
             ),
             // 消息内容
@@ -261,6 +301,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                   onReactionTap: null, // 多选模式下不响应表情点击
                   onRedPacketTap: null, // 多选模式下不响应红包点击
                   messageFontSize: _messageFontSize,
+                  showLinkPreview: _showLinkPreviews,
                 ),
               ),
             ),
@@ -284,15 +325,12 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.lock_outline,
-              size: 16,
-              color: AppColors.primary,
-            ),
+            const Icon(Icons.lock_outline, size: 16, color: AppColors.primary),
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                S.of(context)?.chatEncryptionNotice ?? 'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
+                S.of(context)?.chatEncryptionNotice ??
+                    'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 12,
@@ -323,8 +361,12 @@ extension _ChatPageMessageListMethods on _ChatPageState {
 
         final isDark = context.isDarkMode;
         final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-        final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-        final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+        final textColor = isDark
+            ? AppColors.textPrimaryDark
+            : AppColors.textPrimary;
+        final secondaryTextColor = isDark
+            ? AppColors.textSecondaryDark
+            : AppColors.textSecondary;
 
         return GestureDetector(
           onTap: () => _scrollToMessage(msg.id),
@@ -342,11 +384,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             child: Row(
               children: [
                 // 置顶图标
-                const Icon(
-                  Icons.push_pin,
-                  size: 16,
-                  color: AppColors.primary,
-                ),
+                const Icon(Icons.push_pin, size: 16, color: AppColors.primary),
                 const SizedBox(width: 8),
                 // 消息内容预览
                 Expanded(
@@ -366,10 +404,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                         _getPinnedMessagePreview(msg),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: textColor,
-                        ),
+                        style: TextStyle(fontSize: 13, color: textColor),
                       ),
                     ],
                   ),
@@ -379,10 +414,15 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
-                      context.read<ChatBloc>().add(const NavigatePinnedMessage(1));
+                      context.read<ChatBloc>().add(
+                        const NavigatePinnedMessage(1),
+                      );
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -401,7 +441,11 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 // 关闭按钮（如果有权限可以取消置顶）
                 if (state.canPinMessages)
                   IconButton(
-                    icon: Icon(Icons.close, size: 16, color: secondaryTextColor),
+                    icon: Icon(
+                      Icons.close,
+                      size: 16,
+                      color: secondaryTextColor,
+                    ),
                     constraints: const BoxConstraints(
                       minWidth: 32,
                       minHeight: 32,
@@ -435,7 +479,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
       case MessageType.location:
         return '[${S.of(context)?.chatLocation ?? 'Location'}]';
       default:
-        return msg.content.isNotEmpty ? msg.content : '[${S.of(context)?.chatMessage ?? 'Message'}]';
+        return msg.content.isNotEmpty
+            ? msg.content
+            : '[${S.of(context)?.chatMessage ?? 'Message'}]';
     }
   }
 
@@ -451,7 +497,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           return const SizedBox.shrink();
         }
 
-        final replyToText = l10n?.chatReplyTo(state.replyTarget!.senderName) ?? 'Reply to ${state.replyTarget!.senderName}';
+        final replyToText =
+            l10n?.chatReplyTo(state.replyTarget!.senderName) ??
+            'Reply to ${state.replyTarget!.senderName}';
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -502,10 +550,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
               IconButton(
                 icon: const Icon(Icons.close, size: 18),
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 onPressed: () {
                   context.read<ChatBloc>().add(const SetReplyTarget(null));
                 },
@@ -577,10 +622,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
               IconButton(
                 icon: const Icon(Icons.close, size: 18),
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 onPressed: () {
                   context.read<ChatBloc>().add(const SetEditTarget(null));
                   _inputController.clear();
@@ -600,11 +642,14 @@ extension _ChatPageMessageListMethods on _ChatPageState {
 
     // 是否有可撤回的消息（自己发的、未被撤回的）
     final stateMessages = context.read<ChatBloc>().state.messages;
-    final hasOwnSelection = hasSelection &&
-        stateMessages.any((m) =>
-            _selectedMessageIds.contains(m.id) &&
-            m.isFromMe &&
-            m.type != MessageType.redacted);
+    final hasOwnSelection =
+        hasSelection &&
+        stateMessages.any(
+          (m) =>
+              _selectedMessageIds.contains(m.id) &&
+              m.isFromMe &&
+              m.type != MessageType.redacted,
+        );
 
     return Container(
       padding: EdgeInsets.only(
@@ -668,8 +713,8 @@ extension _ChatPageMessageListMethods on _ChatPageState {
     final color = !enabled
         ? (isDark ? Colors.white38 : Colors.black26)
         : isDestructive
-            ? AppColors.error
-            : (isDark ? Colors.white : Colors.black87);
+        ? AppColors.error
+        : (isDark ? Colors.white : Colors.black87);
 
     return GestureDetector(
       onTap: onTap,
@@ -680,13 +725,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           children: [
             Icon(icon, color: color, size: 24),
             const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-              ),
-            ),
+            Text(label, style: TextStyle(color: color, fontSize: 12)),
           ],
         ),
       ),

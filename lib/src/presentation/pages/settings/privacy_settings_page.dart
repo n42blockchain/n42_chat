@@ -200,6 +200,18 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             child: Column(
               children: [
                 _buildSwitchTile(
+                  title: 'Link Previews',
+                  subtitle:
+                      'Fetch titles, descriptions, and thumbnails when messages contain URLs',
+                  icon: Icons.link_outlined,
+                  value: _settings.showLinkPreviews,
+                  onChanged: (value) => _updateSettings(
+                    _settings.copyWith(showLinkPreviews: value),
+                  ),
+                  isDark: isDark,
+                ),
+                _buildDivider(isDark),
+                _buildSwitchTile(
                   title: 'IP Address Protection',
                   subtitle:
                       'Route Matrix and link-preview requests through your configured HTTP privacy proxy when available',

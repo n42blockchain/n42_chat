@@ -92,6 +92,9 @@ class MessageItem extends StatelessWidget {
   /// 消息文本字体大小（用户自定义）
   final double? messageFontSize;
 
+  /// 是否展示链接预览与链接摘要
+  final bool showLinkPreview;
+
   const MessageItem({
     super.key,
     required this.message,
@@ -113,6 +116,7 @@ class MessageItem extends StatelessWidget {
     this.onReplyQuoteTap,
     this.onThreadTap,
     this.messageFontSize,
+    this.showLinkPreview = true,
   });
 
   @override
@@ -523,19 +527,21 @@ class MessageItem extends StatelessWidget {
               ),
             ),
           ),
-          if (urlMatch != null)
+          if (urlMatch != null && showLinkPreview)
             UrlPreviewWidget(
               url: urlMatch.group(0)!,
               previewService: getIt<UrlPreviewService>(),
             ),
-          if (urlMatch != null && getIt.isRegistered<AiService>())
+          if (urlMatch != null &&
+              showLinkPreview &&
+              getIt.isRegistered<AiService>())
             AiLinkSummaryWrapper(url: urlMatch.group(0)!),
         ],
       );
     }
 
     // 如果有 URL，在文本下方显示 URL 预览
-    if (urlMatch != null) {
+    if (urlMatch != null && showLinkPreview) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

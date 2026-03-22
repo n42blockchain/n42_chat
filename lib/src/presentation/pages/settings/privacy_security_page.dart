@@ -367,6 +367,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         _settings.proxyEnabled) {
       chips.add('IP / proxy');
     }
+    if (!_settings.showLinkPreviews) {
+      chips.add('Link previews off');
+    }
     if (_username?.trim().isNotEmpty == true) {
       chips.add('Public handle');
     }

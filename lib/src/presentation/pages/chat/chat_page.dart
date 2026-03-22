@@ -226,7 +226,9 @@ class _ChatPageState extends State<ChatPage> {
 
   // 消息字体大小
   double _messageFontSize = 16.0;
+  bool _showLinkPreviews = true;
   bool _sessionPrivacyShieldEnabled = false;
+  int _privacyPreferencesLoadVersion = 0;
 
   @override
   void initState() {
@@ -281,8 +283,8 @@ class _ChatPageState extends State<ChatPage> {
     // 加载草稿
     _loadDraft();
 
-    // 根据私密聊天策略临时启用截图防护
-    unawaited(_applyPrivacySessionProtection());
+    // 加载隐私相关配置（链接预览、私密聊天截图防护）
+    unawaited(_loadPrivacyPreferences());
 
     // 设置当前聊天房间（应用内通知过滤）
     InAppNotificationService.instance.setCurrentChatRoom(
@@ -427,10 +429,18 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  Future<void> _applyPrivacySessionProtection() async {
+  Future<void> _loadPrivacyPreferences() async {
+    final loadVersion = ++_privacyPreferencesLoadVersion;
     try {
       final storage = getIt<PreferencesDataSource>();
       final privacySettings = await storage.getPrivacySettingsModel();
+      if (!mounted || loadVersion != _privacyPreferencesLoadVersion) {
+        return;
+      }
+      if (_showLinkPreviews != privacySettings.showLinkPreviews) {
+        setState(() => _showLinkPreviews = privacySettings.showLinkPreviews);
+      }
+
       final shouldProtect =
           privacySettings.privateChatMode &&
           (widget.conversation.type == ConversationType.direct ||
@@ -440,7 +450,14 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       await ScreenshotProtectionService.instance.initialize();
+      if (!mounted || loadVersion != _privacyPreferencesLoadVersion) {
+        return;
+      }
       await ScreenshotProtectionService.instance.enableForSession();
+      if (!mounted || loadVersion != _privacyPreferencesLoadVersion) {
+        await ScreenshotProtectionService.instance.restoreDefault();
+        return;
+      }
       _sessionPrivacyShieldEnabled = true;
     } catch (e) {
       debugLog('ChatPage: Failed to apply privacy session protection: $e');
@@ -474,6 +491,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    _privacyPreferencesLoadVersion++;
+
     // 清除当前活跃房间
     N42Chat.pushService?.setActiveRoom(null);
 

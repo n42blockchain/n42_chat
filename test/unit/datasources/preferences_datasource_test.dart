@@ -669,6 +669,7 @@ void main() {
         showReadReceipts: false,
         showTypingIndicator: true,
         hidePhoneNumber: true,
+        showLinkPreviews: false,
         defaultEncryptNewChats: false,
         privateChatMode: true,
         protectIpAddress: true,
@@ -688,6 +689,7 @@ void main() {
       expect(result['showReadReceipts'], equals(false));
       expect(result['showTypingIndicator'], equals(true));
       expect(result['hidePhoneNumber'], equals(true));
+      expect(result['showLinkPreviews'], equals(false));
       expect(result['defaultEncryptNewChats'], equals(false));
       expect(result['privateChatMode'], equals(true));
       expect(result['protectIpAddress'], equals(true));
@@ -713,6 +715,7 @@ void main() {
       expect(result['allowStrangerMessage'], equals(true));
       expect(result['showReadReceipts'], equals(true));
       expect(result['showTypingIndicator'], equals(true));
+      expect(result['showLinkPreviews'], equals(true));
       expect(result['defaultEncryptNewChats'], equals(true));
       expect(result['privateChatMode'], equals(false));
       expect(result['protectIpAddress'], equals(false));
@@ -778,6 +781,7 @@ void main() {
         protectIpAddress: true,
         proxyEnabled: true,
         proxyUrl: 'http://127.0.0.1:7890',
+        showLinkPreviews: false,
         defaultSelfDestructSeconds: 60,
       );
 
@@ -789,6 +793,7 @@ void main() {
       expect(settings.protectIpAddress, isTrue);
       expect(settings.proxyEnabled, isTrue);
       expect(settings.proxyUrl, 'http://127.0.0.1:7890');
+      expect(settings.showLinkPreviews, isFalse);
       expect(settings.defaultSelfDestructSeconds, 60);
     });
   });
