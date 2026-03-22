@@ -59,6 +59,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
 
       // 检查位置服务
       final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!mounted) return;
       if (!serviceEnabled) {
         setState(() {
           _isLoading = false;
@@ -69,8 +70,10 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
 
       // 检查权限
       LocationPermission permission = await Geolocator.checkPermission();
+      if (!mounted) return;
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+        if (!mounted) return;
         if (permission == LocationPermission.denied) {
           setState(() {
             _isLoading = false;
@@ -96,6 +99,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         ),
       );
 
+      if (!mounted) return;
       setState(() {
         _currentPosition = position;
         _mapCenter = LatLng(position.latitude, position.longitude);
@@ -107,10 +111,12 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
       // 生成附近地点
       _generateNearbyPlaces(position);
 
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _errorMessage = S.of(context)?.chatGetLocationFailed(e.toString()) ?? 'Failed to get location: $e';

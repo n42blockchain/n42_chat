@@ -13,6 +13,7 @@ class ContactCardSelectSheet extends StatefulWidget {
   final String noContactsFoundText;
 
   const ContactCardSelectSheet({
+    super.key,
     required this.isDark,
     required this.selectContactText,
     required this.searchContactHintText,

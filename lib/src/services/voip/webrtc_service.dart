@@ -1091,7 +1091,8 @@ class WebRTCService {
       );
 
       try {
-        if (_peerConnection?.getRemoteDescription() != null) {
+        final remoteDesc = await _peerConnection?.getRemoteDescription();
+        if (remoteDesc != null) {
           await _peerConnection?.addCandidate(candidate);
           debugLog('WebRTCService: Added ICE candidate');
         } else {

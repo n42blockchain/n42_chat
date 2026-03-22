@@ -169,9 +169,11 @@ class _SpeakingAvatarState extends State<SpeakingAvatar>
     );
   }
 
+  static final RegExp _whitespacePattern = RegExp(r'\s+');
+
   String _getInitials(String name) {
     if (name.isEmpty) return '?';
-    final words = name.trim().split(RegExp(r'\s+'));
+    final words = name.trim().split(_whitespacePattern);
     if (words.length == 1) {
       return name.substring(0, name.length.clamp(0, 2)).toUpperCase();
     }

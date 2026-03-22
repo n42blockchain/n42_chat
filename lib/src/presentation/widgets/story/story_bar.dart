@@ -323,12 +323,15 @@ class _MyStoryAvatar extends StatelessWidget {
     );
   }
 
+  static final RegExp _nonWordCjkPattern = RegExp(r'[^\w\u4e00-\u9fa5]');
+  static final RegExp _whitespacePattern = RegExp(r'\s+');
+
   String _getInitials(String name) {
     final cleanName =
-        name.replaceAll(RegExp(r'[^\w\u4e00-\u9fa5]'), '').trim();
+        name.replaceAll(_nonWordCjkPattern, '').trim();
     if (cleanName.isEmpty) return '';
 
-    final parts = cleanName.split(RegExp(r'\s+'));
+    final parts = cleanName.split(_whitespacePattern);
     if (parts.length >= 2 && parts[0].isNotEmpty && parts[1].isNotEmpty) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }

@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -225,37 +224,36 @@ class WelcomePage extends StatelessWidget {
   }
 
   Widget _buildAgreement(BuildContext context, bool isDark) {
-    return Text.rich(
-      TextSpan(
-        text: S.of(context)?.authAgreeTerms ?? 'By logging in, you agree to ',
-        style: TextStyle(
-          fontSize: 12,
-          color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+    final tertiaryColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final linkColor = AppColors.textLink.withValues(alpha: 0.8);
+    const textStyle = TextStyle(fontSize: 12);
+
+    return Wrap(
+      alignment: WrapAlignment.center,
+      children: [
+        Text(
+          S.of(context)?.authAgreeTerms ?? 'By logging in, you agree to ',
+          style: textStyle.copyWith(color: tertiaryColor),
         ),
-        children: [
-          TextSpan(
-            text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
-            style: TextStyle(
-              color: AppColors.textLink.withValues(alpha: 0.8),
-            ),
-            recognizer: TapGestureRecognizer()..onTap = onTermsOfService,
+        GestureDetector(
+          onTap: onTermsOfService,
+          child: Text(
+            S.of(context)?.authTermsOfService ?? 'Terms of Service',
+            style: textStyle.copyWith(color: linkColor),
           ),
-          TextSpan(
-            text: ' ${S.of(context)?.authAnd ?? 'and'} ',
-            style: TextStyle(
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
-            ),
+        ),
+        Text(
+          ' ${S.of(context)?.authAnd ?? 'and'} ',
+          style: textStyle.copyWith(color: tertiaryColor),
+        ),
+        GestureDetector(
+          onTap: onPrivacyPolicy,
+          child: Text(
+            S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
+            style: textStyle.copyWith(color: linkColor),
           ),
-          TextSpan(
-            text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
-            style: TextStyle(
-              color: AppColors.textLink.withValues(alpha: 0.8),
-            ),
-            recognizer: TapGestureRecognizer()..onTap = onPrivacyPolicy,
-          ),
-        ],
-      ),
-      textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

@@ -277,6 +277,9 @@ class CallManager {
       _navigateToCallScreen();
     } else {
       await _notificationService.endAllCalls();
+      // 通话失败，恢复推送通知状态
+      N42Chat.pushService?.setActiveRoom(null);
+      N42Chat.pushService?.setInCall(false);
     }
 
     return success;
@@ -344,6 +347,8 @@ class CallManager {
     await _notificationService.endAllCalls();
     // 清除活跃房间
     N42Chat.pushService?.setActiveRoom(null);
+    // 清除通话状态，恢复消息通知
+    N42Chat.pushService?.setInCall(false);
   }
 
   // ============================================
@@ -698,7 +703,7 @@ class CallManager {
   void _handleNotificationAction(CallAction action, IncomingCallInfo callInfo) {
     // 获取本地化字符串
     final context = _navigatorKey?.currentContext;
-    final l10n = context != null ? S.of(context) : null;
+    final l10n = (context != null && context.mounted) ? S.of(context) : null;
 
     switch (action) {
       case CallAction.accept:

@@ -8,7 +8,7 @@ import '../../../core/utils/debug_log.dart';
 class MusicSelectSheet extends StatefulWidget {
   final bool isDark;
   
-  const MusicSelectSheet({required this.isDark});
+  const MusicSelectSheet({super.key, required this.isDark});
   
   @override
   State<MusicSelectSheet> createState() => _MusicSelectSheetState();

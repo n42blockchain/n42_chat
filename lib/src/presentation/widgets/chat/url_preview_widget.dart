@@ -228,7 +228,9 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
   }
 
   Future<void> _openUrl(String url) async {
-    final uri = Uri.parse(url);
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    if (uri.scheme != 'http' && uri.scheme != 'https') return;
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }

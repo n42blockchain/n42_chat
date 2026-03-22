@@ -129,10 +129,14 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
                           .add(MarkOnChainNotificationRead(notif.id));
                     }
                     if (notif.ctaUrl != null) {
-                      launchUrl(
-                        Uri.parse(notif.ctaUrl!),
-                        mode: LaunchMode.externalApplication,
-                      );
+                      final uri = Uri.tryParse(notif.ctaUrl!);
+                      if (uri != null &&
+                          (uri.scheme == 'https' || uri.scheme == 'http')) {
+                        launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      }
                     }
                   },
                 );
