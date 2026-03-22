@@ -1039,7 +1039,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
 
     try {
-      debugLog('AuthRepository: Requesting change email to $newEmail');
+      debugLog('AuthRepository: Requesting change email');
 
       final client = _authDataSource.clientManager.client;
       if (client == null) {
@@ -1163,7 +1163,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (threePids != null) {
         for (final threePid in threePids) {
           if (threePid.medium == ThirdPartyIdentifierMedium.email) {
-            debugLog('AuthRepository: Found bound email: ${threePid.address}');
+            debugLog('AuthRepository: Found bound email');
             return threePid.address;
           }
         }

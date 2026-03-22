@@ -44,10 +44,16 @@ bool isPrivateNetworkHost(String rawHost) {
     if (first == 0) return true;
   }
 
-  if (host.startsWith('fe80:') ||
-      host.startsWith('fc') ||
-      host.startsWith('fd')) {
-    return true;
+  // IPv6 link-local and ULA (Unique Local Address) ranges.
+  // ULA addresses start with fc00::/7 (i.e. fc00:: - fdff::).
+  // Only match when the host contains a colon (IPv6 format) to avoid
+  // false positives on domain names like "facebook.com".
+  if (host.contains(':')) {
+    if (host.startsWith('fe80:') ||
+        host.startsWith('fc') ||
+        host.startsWith('fd')) {
+      return true;
+    }
   }
 
   return false;

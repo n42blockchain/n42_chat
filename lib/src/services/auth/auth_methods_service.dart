@@ -648,7 +648,7 @@ class AuthMethodsService {
     required String homeserver,
   }) async {
     try {
-      debugLog('AuthMethodsService: Requesting email OTP for $email');
+      debugLog('AuthMethodsService: Requesting email OTP for [redacted]');
 
       final clientSecret = 'n42_${DateTime.now().millisecondsSinceEpoch}';
       final uri = Uri.parse(
