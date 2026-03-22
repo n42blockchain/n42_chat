@@ -54,25 +54,7 @@ extension _ChatPageInputMethods on _ChatPageState {
       onMorePressed: _onMorePressed,
       onQuickReplyPressed: _onQuickReplyPressed,
       onCommandPoll: _createPoll,
-      onScheduledSend: (scheduledAt) {
-        final text = _inputController.text.trim();
-        if (text.isNotEmpty) {
-          final mentionPayload = ChatMentionHelper.buildPayload(
-            text: text,
-            selections: _composerMentions,
-            members: _groupMembers,
-          );
-          context.read<ChatBloc>().add(
-            SendScheduledMessage(
-              text: text,
-              scheduledAt: scheduledAt,
-              mentionedUserIds: mentionPayload.mentionedUserIds,
-              mentionsRoom: mentionPayload.mentionsRoom,
-            ),
-          );
-          _clearComposerMentions();
-        }
-      },
+      onScheduledSend: _scheduleComposerText,
     );
   }
 
@@ -429,6 +411,10 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _showSelfDestructTimerPicker();
       },
+      onScheduledPressed: () {
+        _hideMorePanel();
+        _openScheduledComposerPicker();
+      },
       onAiAssistantPressed: getIt.isRegistered<IAiRepository>()
           ? () {
               _hideMorePanel();
@@ -440,6 +426,50 @@ extension _ChatPageInputMethods on _ChatPageState {
         _openMiniApps();
       },
     );
+  }
+
+  void _scheduleComposerText(DateTime scheduledAt) {
+    final text = _inputController.text.trim();
+    if (text.isEmpty) {
+      return;
+    }
+
+    final mentionPayload = ChatMentionHelper.buildPayload(
+      text: text,
+      selections: _composerMentions,
+      members: _groupMembers,
+    );
+    context.read<ChatBloc>().add(
+      SendScheduledMessage(
+        text: text,
+        scheduledAt: scheduledAt,
+        mentionedUserIds: mentionPayload.mentionedUserIds,
+        mentionsRoom: mentionPayload.mentionsRoom,
+      ),
+    );
+    _clearComposerMentions();
+  }
+
+  Future<void> _openScheduledComposerPicker() async {
+    final text = _inputController.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter a message before scheduling'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
+
+    final scheduledAt = await showScheduledSendPicker(context);
+    if (!mounted || scheduledAt == null) {
+      return;
+    }
+
+    _scheduleComposerText(scheduledAt);
+    _inputController.clear();
+    _inputFocusNode.requestFocus();
   }
 
   void _openMiniApps({MiniAppCategory? initialCategory}) {

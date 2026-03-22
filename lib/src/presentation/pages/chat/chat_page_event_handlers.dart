@@ -3,6 +3,27 @@ part of 'chat_page.dart';
 
 /// 消息事件处理相关方法（消息点击、头像、红包、名片、位置、媒体查看等）
 extension _ChatPageEventHandlersMethods on _ChatPageState {
+  Future<void> _openChatHistorySearch({String initialQuery = ''}) async {
+    final selectedMessageId = await Navigator.of(context).push<String>(
+      MaterialPageRoute<String>(
+        builder: (_) => BlocProvider<SearchBloc>(
+          create: (_) => getIt<SearchBloc>(),
+          child: ChatSearchPage(
+            roomId: widget.conversation.id,
+            initialQuery: initialQuery,
+            returnSelectedMessageId: true,
+          ),
+        ),
+      ),
+    );
+
+    if (!mounted || selectedMessageId == null || selectedMessageId.isEmpty) {
+      return;
+    }
+
+    await _scrollToMessage(selectedMessageId);
+  }
+
   void _onMessageTap(MessageEntity message) {
     // 阅后即焚消息：接收方首次查看时触发销毁倒计时
     if (message.isSelfDestructing &&
@@ -887,37 +908,42 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
     if (!mounted) return;
 
-    unawaited(
-      Navigator.of(context)
-          .push(
-            MaterialPageRoute<void>(
-              builder: (ctx) {
-                final page = ChatDetailPage(
-                  conversation: widget.conversation,
-                  canKickMembers: canKickMembers,
-                  canChangeSettings: canChangeSettings,
-                  onAddMember: () => _showAddMemberDialog(ctx),
-                  onRemoveMember: (userId) => _removeMemberFromGroup(userId),
-                  onMemberTap: (userId, displayName, avatarUrl) {
-                    _openMemberProfile(ctx, userId, displayName, avatarUrl);
-                  },
-                  onClearHistory: () {
-                    context.read<ChatBloc>().add(const ClearChatHistory());
-                  },
-                );
+    final result = await Navigator.of(context).push<Object?>(
+      MaterialPageRoute<Object?>(
+        builder: (ctx) {
+          final page = ChatDetailPage(
+            conversation: widget.conversation,
+            canKickMembers: canKickMembers,
+            canChangeSettings: canChangeSettings,
+            onAddMember: () => _showAddMemberDialog(ctx),
+            onRemoveMember: (userId) => _removeMemberFromGroup(userId),
+            onMemberTap: (userId, displayName, avatarUrl) {
+              _openMemberProfile(ctx, userId, displayName, avatarUrl);
+            },
+            onClearHistory: () {
+              context.read<ChatBloc>().add(const ClearChatHistory());
+            },
+          );
 
-                if (contactBloc != null) {
-                  return BlocProvider.value(value: contactBloc, child: page);
-                }
-                return page;
-              },
-            ),
-          )
-          .then((_) {
-            // 返回时刷新背景（用户可能在详情页修改了聊天背景）
-            _loadBackground();
-          }),
+          if (contactBloc != null) {
+            return BlocProvider.value(value: contactBloc, child: page);
+          }
+          return page;
+        },
+      ),
     );
+
+    await _loadBackground();
+    if (!mounted) {
+      return;
+    }
+
+    if (result is Map && result['action'] == 'search') {
+      final initialQuery = result['query'] is String
+          ? result['query'] as String
+          : '';
+      await _openChatHistorySearch(initialQuery: initialQuery);
+    }
   }
 
   /// 显示添加成员对话框

@@ -208,16 +208,18 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
       builder: (dialogContext) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           title: Text(l10n?.chatReportMessage ?? 'Report'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: reasons.map((reason) {
-              return RadioListTile<String>(
-                title: Text(reason),
-                value: reason,
-                groupValue: selectedReason,
-                onChanged: (v) => setDialogState(() => selectedReason = v),
-              );
-            }).toList(),
+          content: RadioGroup<String>(
+            groupValue: selectedReason,
+            onChanged: (value) => setDialogState(() => selectedReason = value),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: reasons.map((reason) {
+                return RadioListTile<String>(
+                  title: Text(reason),
+                  value: reason,
+                );
+              }).toList(),
+            ),
           ),
           actions: [
             TextButton(
@@ -243,7 +245,8 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
 
   /// 搜一搜
   void _searchMessage(MessageEntity message) {
-    if (message.type != MessageType.text || message.content.isEmpty) {
+    final searchSeed = message.content.trim();
+    if (message.type != MessageType.text || searchSeed.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -256,124 +259,6 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
       return;
     }
 
-    // 使用浏览器搜索
-    _showSearchOptionsDialog(message.content);
-  }
-
-  /// 显示搜索选项对话框
-  Future<void> _showSearchOptionsDialog(String searchText) async {
-    final isDark = context.isDarkMode;
-
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  S.of(context)?.chatSearchFor(searchText) ??
-                      'Search "$searchText"',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              _buildSearchOption(
-                context,
-                icon: Icons.search,
-                title: S.of(context)?.chatBaiduSearch ?? 'Baidu Search',
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _openSearch(
-                    'https://www.baidu.com/s?wd=${Uri.encodeComponent(searchText)}',
-                  );
-                },
-                isDark: isDark,
-              ),
-              _buildSearchOption(
-                context,
-                icon: Icons.g_mobiledata,
-                title: S.of(context)?.chatGoogleSearch ?? 'Google Search',
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _openSearch(
-                    'https://www.google.com/search?q=${Uri.encodeComponent(searchText)}',
-                  );
-                },
-                isDark: isDark,
-              ),
-              _buildSearchOption(
-                context,
-                icon: Icons.article,
-                title: S.of(context)?.chatBingSearch ?? 'Bing Search',
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _openSearch(
-                    'https://www.bing.com/search?q=${Uri.encodeComponent(searchText)}',
-                  );
-                },
-                isDark: isDark,
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchOption(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    required bool isDark,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: isDark ? Colors.white70 : Colors.black54),
-      title: Text(
-        title,
-        style: TextStyle(color: isDark ? Colors.white : Colors.black),
-      ),
-      onTap: onTap,
-    );
-  }
-
-  Future<void> _openSearch(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              S.of(context)?.chatCannotOpenBrowser ?? 'Cannot open browser',
-            ),
-          ),
-        );
-      }
-    }
+    unawaited(_openChatHistorySearch(initialQuery: searchSeed));
   }
 }

@@ -17,8 +17,15 @@ import '../../../n42_chat.dart';
 /// 房间内搜索页面
 class ChatSearchPage extends StatefulWidget {
   final String roomId;
+  final String initialQuery;
+  final bool returnSelectedMessageId;
 
-  const ChatSearchPage({super.key, required this.roomId});
+  const ChatSearchPage({
+    super.key,
+    required this.roomId,
+    this.initialQuery = '',
+    this.returnSelectedMessageId = false,
+  });
 
   @override
   State<ChatSearchPage> createState() => _ChatSearchPageState();
@@ -32,9 +39,20 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
   @override
   void initState() {
     super.initState();
+    final initialQuery = widget.initialQuery.trim();
+    if (initialQuery.isNotEmpty) {
+      _searchController.text = initialQuery;
+      _searchController.selection = TextSelection.collapsed(
+        offset: initialQuery.length,
+      );
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _focusNode.requestFocus();
+      if (!mounted) {
+        return;
+      }
+      _focusNode.requestFocus();
+      if (initialQuery.isNotEmpty) {
+        _onSearchChanged(initialQuery);
       }
     });
   }
@@ -340,6 +358,10 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         ),
       ),
       onTap: () {
+        if (widget.returnSelectedMessageId) {
+          Navigator.pop(context, message.id);
+          return;
+        }
         N42Chat.openConversation(widget.roomId, context: context);
       },
     );

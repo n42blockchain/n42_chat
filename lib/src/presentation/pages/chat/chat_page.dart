@@ -67,12 +67,14 @@ import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
+import '../search/chat_search_page.dart';
 import 'chat_detail_page.dart';
 import '../favorite/favorite_list_page.dart';
 import 'message_item.dart';
 import 'live_location_page.dart';
 import 'thread_detail_page.dart';
 import '../../widgets/chat/quick_reply_sheet.dart';
+import '../../widgets/chat/scheduled_send_picker.dart';
 import '../settings/quick_replies_page.dart';
 import '../ai/ai_assistant_page.dart';
 import '../../../core/services/ai_service.dart';
@@ -767,11 +769,58 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _navigateToMessage(String eventId) {
-    _scrollToMessage(eventId);
+    unawaited(_scrollToMessage(eventId));
+  }
+
+  Future<bool> _ensureMessageLoaded(String eventId) async {
+    final chatBloc = context.read<ChatBloc>();
+    var currentState = chatBloc.state;
+    if (currentState.messages.any((message) => message.id == eventId)) {
+      return true;
+    }
+
+    var attempts = 0;
+    var lastMessageCount = currentState.messages.length;
+
+    while (mounted && currentState.hasMore && attempts < 8) {
+      attempts++;
+
+      if (!currentState.isLoadingMore) {
+        chatBloc.add(const LoadMoreMessages());
+      }
+
+      currentState = await chatBloc.stream.firstWhere(
+        (state) => !state.isLoadingMore,
+      );
+      if (!mounted) {
+        return false;
+      }
+
+      if (currentState.messages.any((message) => message.id == eventId)) {
+        return true;
+      }
+
+      if (currentState.messages.length <= lastMessageCount) {
+        break;
+      }
+      lastMessageCount = currentState.messages.length;
+    }
+
+    return false;
   }
 
   /// 滚动到指定消息并高亮显示
-  void _scrollToMessage(String eventId) async {
+  Future<void> _scrollToMessage(String eventId) async {
+    final isLoaded = await _ensureMessageLoaded(eventId);
+    if (!mounted || !isLoaded) {
+      return;
+    }
+
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) {
+      return;
+    }
+
     // 先检查消息是否在当前视图中
     final messageKey = _messageKeys[eventId];
     if (messageKey?.currentContext != null) {
