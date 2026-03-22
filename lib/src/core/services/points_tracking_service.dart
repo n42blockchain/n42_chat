@@ -235,10 +235,8 @@ class PointsTrackingService {
         return _EffectiveRuleSettings.disabled();
       }
 
-      final rule = config.rules
-          .where((candidate) => candidate.action == action)
-          .cast<RewardRule?>()
-          .firstWhere((candidate) => candidate != null, orElse: () => null);
+      final rules = config.rules.where((candidate) => candidate.action == action);
+      final rule = rules.isEmpty ? null : rules.first;
       if (rule == null) {
         return _EffectiveRuleSettings(
           points: fallbackPoints,

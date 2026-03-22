@@ -12,6 +12,8 @@ enum ConversationType {
   space,
 }
 
+final _whitespaceRegExp = RegExp(r'\s+');
+
 /// 会话通知模式
 enum ConversationNotificationMode {
   /// 所有消息都提醒
@@ -185,7 +187,7 @@ class ConversationEntity extends Equatable {
   String get initials {
     if (name.isEmpty) return '?';
 
-    final words = name.trim().split(RegExp(r'\s+'));
+    final words = name.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return name.substring(0, name.length.clamp(0, 2)).toUpperCase();
     }

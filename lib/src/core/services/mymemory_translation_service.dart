@@ -98,17 +98,15 @@ class MyMemoryTranslationService implements ITranslationService {
     return sha256.convert(utf8.encode(text)).toString().substring(0, 16);
   }
 
+  static final RegExp _chineseRegExp = RegExp(r'[\u4e00-\u9fff]');
+  static final RegExp _japaneseRegExp = RegExp(r'[\u3040-\u309f\u30a0-\u30ff]');
+  static final RegExp _koreanRegExp = RegExp(r'[\uac00-\ud7af]');
+
   @override
   Future<String?> detectLanguage(String text) async {
-    final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-    final containsJapanese = RegExp(
-      r'[\u3040-\u309f\u30a0-\u30ff]',
-    ).hasMatch(text);
-    final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
-
-    if (containsChinese) return 'zh';
-    if (containsJapanese) return 'ja';
-    if (containsKorean) return 'ko';
+    if (_chineseRegExp.hasMatch(text)) return 'zh';
+    if (_japaneseRegExp.hasMatch(text)) return 'ja';
+    if (_koreanRegExp.hasMatch(text)) return 'ko';
     return 'en';
   }
 

@@ -35,6 +35,8 @@ class MatrixClientManager {
   Completer<void>? _initCompleter;
   Duration _syncWaitTimeout = const Duration(seconds: 3);
 
+  static final _heicHeifRegExp = RegExp(r'\.(heic|heif)$', caseSensitive: false);
+
   /// 获取Matrix客户端实例
   Client? get client => _client;
 
@@ -614,7 +616,7 @@ class MatrixClientManager {
       // HEIC/HEIF 需要转换为 JPEG，因为 Matrix 服务器可能不支持
       mimeType = 'image/jpeg';
       actualFilename = actualFilename.replaceAll(
-        RegExp(r'\.(heic|heif)$', caseSensitive: false),
+        _heicHeifRegExp,
         '.jpg',
       );
     }

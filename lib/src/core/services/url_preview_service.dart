@@ -8,6 +8,29 @@ import 'privacy_http_client.dart';
 import '../utils/debug_log.dart';
 import '../utils/external_url_safety.dart';
 
+final RegExp _ogMetaRegex = RegExp(
+  r'''<meta\s+[^>]*(?:property|name)\s*=\s*["']([^"']*)["'][^>]*content\s*=\s*["']([^"']*)["'][^>]*/?>''',
+  caseSensitive: false,
+);
+final RegExp _ogMetaRegex2 = RegExp(
+  r'''<meta\s+[^>]*content\s*=\s*["']([^"']*)["'][^>]*(?:property|name)\s*=\s*["']([^"']*)["'][^>]*/?>''',
+  caseSensitive: false,
+);
+final RegExp _titleTagRegex = RegExp(
+  r'<title[^>]*>([^<]+)</title>',
+  caseSensitive: false,
+);
+final RegExp _scriptStyleRegex = RegExp(
+  r'<(script|style|noscript)[^>]*>[\s\S]*?</\1>',
+  caseSensitive: false,
+);
+final RegExp _htmlTagsRegex = RegExp(r'<[^>]+>');
+final RegExp _multiWhitespaceRegex = RegExp(r'\s+');
+final RegExp _urlExtractFirstRegex = RegExp(
+  r'https?://[^\s<>\[\](){}"\u4e00-\u9fff]+',
+  caseSensitive: false,
+);
+
 /// URL 预览数据
 class UrlPreviewData {
   final String url;
@@ -79,10 +102,7 @@ class UrlPreviewService {
       }
       return result;
     } finally {
-      final removed = _pending.remove(url);
-      if (removed != null) {
-        unawaited(removed);
-      }
+      unawaited(_pending.remove(url));
     }
   }
 
@@ -133,18 +153,7 @@ class UrlPreviewService {
     String? imageUrl;
     String? siteName;
 
-    // 解析 og:* meta 标签
-    final metaRegex = RegExp(
-      r'''<meta\s+[^>]*(?:property|name)\s*=\s*["']([^"']*)["'][^>]*content\s*=\s*["']([^"']*)["'][^>]*/?>''',
-      caseSensitive: false,
-    );
-    // 也匹配 content 在前的情况
-    final metaRegex2 = RegExp(
-      r'''<meta\s+[^>]*content\s*=\s*["']([^"']*)["'][^>]*(?:property|name)\s*=\s*["']([^"']*)["'][^>]*/?>''',
-      caseSensitive: false,
-    );
-
-    for (final match in metaRegex.allMatches(html)) {
+    for (final match in _ogMetaRegex.allMatches(html)) {
       final prop = match.group(1)?.toLowerCase();
       final content = match.group(2);
       _setProperty(
@@ -157,7 +166,7 @@ class UrlPreviewService {
       );
     }
 
-    for (final match in metaRegex2.allMatches(html)) {
+    for (final match in _ogMetaRegex2.allMatches(html)) {
       final content = match.group(1);
       final prop = match.group(2)?.toLowerCase();
       _setProperty(
@@ -170,12 +179,8 @@ class UrlPreviewService {
       );
     }
 
-    // 回退到 <title> 标签
     if (title == null) {
-      final titleMatch = RegExp(
-        r'<title[^>]*>([^<]+)</title>',
-        caseSensitive: false,
-      ).firstMatch(html);
+      final titleMatch = _titleTagRegex.firstMatch(html);
       title = titleMatch?.group(1)?.trim();
     }
 
@@ -233,13 +238,8 @@ class UrlPreviewService {
     _cache[url] = _CachedPreview(data: data, cachedAt: _now());
   }
 
-  /// 从文本中提取第一个 URL
   static String? extractFirstUrl(String text) {
-    final regex = RegExp(
-      r'https?://[^\s<>\[\](){}"\u4e00-\u9fff]+',
-      caseSensitive: false,
-    );
-    final match = regex.firstMatch(text);
+    final match = _urlExtractFirstRegex.firstMatch(text);
     return match?.group(0);
   }
 
@@ -276,19 +276,9 @@ class UrlPreviewService {
     }
   }
 
-  /// 从 HTML 中提取可见文本
   String _extractTextContent(String html) {
-    // 移除 script 和 style 标签及其内容
-    var text = html.replaceAll(
-      RegExp(
-        r'<(script|style|noscript)[^>]*>[\s\S]*?</\1>',
-        caseSensitive: false,
-      ),
-      ' ',
-    );
-    // 移除 HTML 标签
-    text = text.replaceAll(RegExp(r'<[^>]+>'), ' ');
-    // 解码 HTML 实体
+    var text = html.replaceAll(_scriptStyleRegex, ' ');
+    text = text.replaceAll(_htmlTagsRegex, ' ');
     text = text
         .replaceAll('&nbsp;', ' ')
         .replaceAll('&amp;', '&')
@@ -296,8 +286,7 @@ class UrlPreviewService {
         .replaceAll('&gt;', '>')
         .replaceAll('&quot;', '"')
         .replaceAll('&#39;', "'");
-    // 合并多个空白字符
-    text = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+    text = text.replaceAll(_multiWhitespaceRegex, ' ').trim();
 
     // 截取前 4000 字符
     return text.length > 4000 ? text.substring(0, 4000) : text;

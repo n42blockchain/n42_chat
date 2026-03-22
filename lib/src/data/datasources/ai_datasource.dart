@@ -17,6 +17,11 @@ class AiDatasource implements AiService {
   final String _defaultModel;
   final bool _useProxyEndpoint;
 
+  static final _newlineRegExp = RegExp(r'[\r\n]+');
+  static final _arrayRegExp = RegExp(r'\[[\s\S]*\]');
+  static final _listPrefixRegExp = RegExp(r'^[-*•\d\.)\s]+');
+  static final _trailingSlashRegExp = RegExp(r'/$');
+
   AiDatasource({
     required String baseUrl,
     required String apiKey,
@@ -396,7 +401,7 @@ class AiDatasource implements AiService {
     }
 
     final suggestions = trimmed
-        .split(RegExp(r'[\r\n]+'))
+        .split(_newlineRegExp)
         .map((line) => _stripReplyListPrefix(line.trim()))
         .where((line) => line.isNotEmpty)
         .fold<List<String>>(<String>[], (list, line) {
@@ -428,7 +433,7 @@ class AiDatasource implements AiService {
         return normalize(decoded);
       }
     } catch (_) {
-      final arrayMatch = RegExp(r'\[[\s\S]*\]').firstMatch(raw);
+      final arrayMatch = _arrayRegExp.firstMatch(raw);
       if (arrayMatch == null) {
         return const [];
       }
@@ -445,14 +450,14 @@ class AiDatasource implements AiService {
   }
 
   String _stripReplyListPrefix(String line) {
-    return line.replaceFirst(RegExp(r'^[-*•\d\.)\s]+'), '').trim();
+    return line.replaceFirst(_listPrefixRegExp, '').trim();
   }
 
   String _buildChatCompletionsUrl() {
     final baseUri = Uri.tryParse(_baseUrl);
     if (baseUri == null) return '$_baseUrl/v1/chat/completions';
 
-    final normalizedPath = baseUri.path.replaceFirst(RegExp(r'/$'), '');
+    final normalizedPath = baseUri.path.replaceFirst(_trailingSlashRegExp, '');
     final endpointPath = switch (normalizedPath) {
       '' => '/v1/chat/completions',
       '/v1' => '/v1/chat/completions',

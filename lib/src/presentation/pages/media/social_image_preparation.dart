@@ -63,6 +63,8 @@ Future<PreparedSocialImage?> prepareSocialImage(
   );
 }
 
+final _slashRegex = RegExp(r'[\\/]');
+
 String _resolveOriginalFilename(XFile image) {
   final explicitName = image.name.trim();
   if (explicitName.isNotEmpty) {
@@ -71,7 +73,7 @@ String _resolveOriginalFilename(XFile image) {
 
   final path = image.path.trim();
   if (path.isNotEmpty) {
-    final slashIndex = path.lastIndexOf(RegExp(r'[\\/]'));
+    final slashIndex = path.lastIndexOf(_slashRegex);
     if (slashIndex >= 0 && slashIndex < path.length - 1) {
       return path.substring(slashIndex + 1);
     }

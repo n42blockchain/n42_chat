@@ -100,8 +100,9 @@ class MatrixMediaUploader {
     }
     request.bodyBytes = content;
 
+    final httpClient = http.Client();
     try {
-      final streamedResponse = await http.Client().send(request);
+      final streamedResponse = await httpClient.send(request);
       final response = await http.Response.fromStream(streamedResponse);
 
       debugLog('MatrixMessageDataSource: Upload response status: ${response.statusCode}');
@@ -163,6 +164,8 @@ class MatrixMediaUploader {
         debugLog('MatrixMessageDataSource: SDK upload failed: $sdkError');
         rethrow;
       }
+    } finally {
+      httpClient.close();
     }
   }
 
@@ -331,6 +334,7 @@ class MatrixMediaUploader {
 
     debugLog('MatrixMessageDataSource: Uploading (legacy) to: $uri');
 
+    final httpClient = http.Client();
     try {
       final request = http.Request('POST', uri);
       request.headers['Authorization'] = 'Bearer ${client.accessToken}';
@@ -339,7 +343,7 @@ class MatrixMediaUploader {
       }
       request.bodyBytes = content;
 
-      final streamedResponse = await http.Client().send(request);
+      final streamedResponse = await httpClient.send(request);
       final response = await http.Response.fromStream(streamedResponse);
 
       debugLog('MatrixMessageDataSource: Legacy upload response: ${response.statusCode}');
@@ -372,6 +376,8 @@ class MatrixMediaUploader {
         debugLog('MatrixMessageDataSource: All upload methods failed: $sdkError');
         rethrow;
       }
+    } finally {
+      httpClient.close();
     }
   }
 }

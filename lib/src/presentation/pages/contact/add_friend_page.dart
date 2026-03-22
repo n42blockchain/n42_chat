@@ -19,10 +19,12 @@ enum _InputType {
   username, // anything else
 }
 
+final _walletAddressRegExp = RegExp(r'^0x[0-9a-fA-F]{40}$');
+
 _InputType _detectInputType(String input) {
   final q = input.trim();
   if (q.startsWith('@') && q.contains(':')) return _InputType.matrixId;
-  if (RegExp(r'^0x[0-9a-fA-F]{40}$').hasMatch(q)) {
+  if (_walletAddressRegExp.hasMatch(q)) {
     return _InputType.walletAddress;
   }
   // ENS: requires at least 1 label char before the TLD dot (e.g. "a.eth")

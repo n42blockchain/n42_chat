@@ -60,10 +60,12 @@ class CallNotificationService {
   /// 构造函数中立即开始监听 CallKit 事件，防止 app 从锁屏/冷启动时丢失
   /// action_call_accept 事件（用户在通知中点击接听但 Flutter 引擎尚未就绪的情况）
   CallNotificationService._internal() {
-    FlutterCallkitIncoming.onEvent.listen(_handleCallKitEvent);
+    _callKitSubscription =
+        FlutterCallkitIncoming.onEvent.listen(_handleCallKitEvent);
     debugLog('CallNotificationService: Event listener attached in constructor');
   }
 
+  StreamSubscription<dynamic>? _callKitSubscription;
   final _uuid = const Uuid();
 
   // 事件流
@@ -338,6 +340,8 @@ class CallNotificationService {
   /// 释放资源
   void dispose() {
     // 单例在同一进程内会被重复复用，不能把事件流永久关闭。
+    _callKitSubscription?.cancel();
+    _callKitSubscription = null;
     _currentCallId = null;
     _pendingAcceptAction = null;
     _pendingAcceptTime = null;

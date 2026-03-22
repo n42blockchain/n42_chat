@@ -13,6 +13,10 @@ import '../../../core/utils/debug_log.dart';
 class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
   final IGovernanceRepository _repository;
 
+  static final _exceptionPrefixRe = RegExp(r'^Exception:\s*');
+  static final _stateErrorPrefixRe = RegExp(r'^StateError:\s*');
+  static final _longHexRe = RegExp(r'[a-fA-F0-9]{20,}');
+
   GovernanceBloc({required IGovernanceRepository repository})
       : _repository = repository,
         super(const GovernanceState()) {
@@ -179,11 +183,11 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
     final message = error.toString();
     // Remove Exception/Error prefix for cleaner display
     final cleaned = message
-        .replaceAll(RegExp(r'^Exception:\s*'), '')
-        .replaceAll(RegExp(r'^StateError:\s*'), '');
+        .replaceAll(_exceptionPrefixRe, '')
+        .replaceAll(_stateErrorPrefixRe, '');
     // Strip potential API keys or tokens (hex strings > 20 chars)
     final sanitized =
-        cleaned.replaceAll(RegExp(r'[a-fA-F0-9]{20,}'), '[redacted]');
+        cleaned.replaceAll(_longHexRe, '[redacted]');
     // Cap length to prevent overly verbose error messages in UI
     if (sanitized.length > 200) {
       return '${sanitized.substring(0, 200)}...';

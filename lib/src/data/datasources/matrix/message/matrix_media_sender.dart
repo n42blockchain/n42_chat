@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:matrix/matrix.dart' as matrix;

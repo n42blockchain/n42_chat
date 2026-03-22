@@ -11,7 +11,7 @@ class BotCommandDefinition extends Equatable {
   /// 描述
   final String description;
 
-  /// 参数提示（例如 "<token>"）
+  /// 参数提示（例如 `<token>`）
   final String? argHint;
 
   /// 是否仅限管理员
@@ -149,10 +149,10 @@ class BuiltInBotCommands {
   ];
 
   static BotCommandDefinition? find(String command) {
-    try {
-      return all.firstWhere((c) => c.command == command.toLowerCase());
-    } catch (_) {
-      return null;
+    final lowerCommand = command.toLowerCase();
+    for (final c in all) {
+      if (c.command == lowerCommand) return c;
     }
+    return null;
   }
 }

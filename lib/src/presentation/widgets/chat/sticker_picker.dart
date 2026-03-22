@@ -163,15 +163,14 @@ class _StickerPickerState extends State<StickerPicker> {
               itemCount: _packs.length,
               itemBuilder: (context, index) {
                 final pack = _packs[index];
-                final actualIndex = _recentStickers.isNotEmpty ? index : index;
 
                 return _buildPackTab(
                   emoji: pack.stickers.isNotEmpty
                       ? pack.stickers.first.emoji
                       : null,
                   label: pack.name,
-                  isSelected: _selectedPackIndex == actualIndex,
-                  onTap: () => _onPackSelected(actualIndex),
+                  isSelected: _selectedPackIndex == index,
+                  onTap: () => _onPackSelected(index),
                   isDark: isDark,
                 );
               },

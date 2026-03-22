@@ -19,6 +19,9 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
   final OnChainIdentityDatasource _identity;
   final SocialGraphService _graphService;
 
+  static final _evmAddressRegExp = RegExp(r'^0x[0-9a-fA-F]{40}$');
+  static final _whitespaceRegExp = RegExp(r'\s');
+
   SocialGraphRepositoryImpl({
     required DeBankDatasource debank,
     required OnChainIdentityDatasource identity,
@@ -27,20 +30,13 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
        _identity = identity,
        _graphService = graphService;
 
-  /// Validate that [address] looks like a plausible blockchain address.
-  ///
-  /// Accepts EVM (0x-prefixed, 42 chars) and other common formats.
-  /// This is a lightweight check to catch obvious bad input before
-  /// making network calls.
   bool _isValidAddress(String address) {
     if (address.isEmpty) return false;
-    // EVM addresses: 0x + 40 hex chars
     if (address.startsWith('0x')) {
       return address.length == 42 &&
-          RegExp(r'^0x[0-9a-fA-F]{40}$').hasMatch(address);
+          _evmAddressRegExp.hasMatch(address);
     }
-    // Non-EVM addresses: at least 20 chars, no whitespace
-    return address.length >= 20 && !address.contains(RegExp(r'\s'));
+    return address.length >= 20 && !address.contains(_whitespaceRegExp);
   }
 
   @override

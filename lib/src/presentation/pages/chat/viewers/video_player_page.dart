@@ -53,18 +53,6 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         throw Exception('Video URL is empty');
       }
 
-      // 获取 access token
-      String? accessToken;
-      try {
-        final matrixManager = getIt<MatrixClientManager>();
-        accessToken = matrixManager.client?.accessToken;
-        debugLog(
-          'Access token obtained: ${accessToken != null ? 'Yes (${accessToken.length} chars)' : 'No'}',
-        );
-      } catch (e) {
-        debugLog('Failed to get access token: $e');
-      }
-
       final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
         widget.videoUrl,
         client: getIt<MatrixClientManager>().client,
@@ -80,8 +68,10 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         debugLog('iOS: streaming download with auth headers to temp file...');
         final request = http.Request('GET', Uri.parse(widget.videoUrl));
         request.headers.addAll(headers);
-        final streamResponse = await http.Client().send(request);
+        final httpClient = http.Client();
+        final streamResponse = await httpClient.send(request);
         if (streamResponse.statusCode != 200) {
+          httpClient.close();
           throw Exception(
             'Video download failed: ${streamResponse.statusCode}',
           );
@@ -93,6 +83,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         final sink = file.openWrite();
         await streamResponse.stream.pipe(sink);
         await sink.close();
+        httpClient.close();
         _tempVideoFile = file;
         debugLog('iOS: temp file ready, size: ${await file.length()} bytes');
         _controller = VideoPlayerController.file(file);

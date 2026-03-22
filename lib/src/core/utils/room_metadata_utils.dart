@@ -1,3 +1,10 @@
+final RegExp _whitespaceCollapseRegExp = RegExp(r'\s+');
+final RegExp _hashtagRegExp = RegExp(r'(?<![\w/])#([^\s#.,!?;:()[\]{}]+)');
+final RegExp _splitRegExp = RegExp(r'[\s,]+');
+final RegExp _labelCleanRegExp = RegExp(
+  r'^[#]+|[^\w\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u4E00-\u9FFF_-]+$',
+);
+
 String? extractAliasLocalpart(String? canonicalAlias) {
   final raw = canonicalAlias?.trim();
   if (raw == null || raw.isEmpty || !raw.startsWith('#')) {
@@ -44,14 +51,13 @@ String? normalizeChannelCategory(String? raw) {
   if (trimmed == null || trimmed.isEmpty) {
     return null;
   }
-  return trimmed.replaceAll(RegExp(r'\s+'), ' ');
+  return trimmed.replaceAll(_whitespaceCollapseRegExp, ' ');
 }
 
 List<String> extractHashtagsFromTexts(
   Iterable<String?> texts, {
   int maxCount = 12,
 }) {
-  final hashtagRegExp = RegExp(r'(?<![\w/])#([^\s#.,!?;:()[\]{}]+)');
   final tags = <String>[];
   final seen = <String>{};
 
@@ -59,7 +65,7 @@ List<String> extractHashtagsFromTexts(
     if (text == null || text.isEmpty) {
       continue;
     }
-    for (final match in hashtagRegExp.allMatches(text)) {
+    for (final match in _hashtagRegExp.allMatches(text)) {
       final tagBody = match.group(1)?.trim();
       if (tagBody == null || tagBody.isEmpty) {
         continue;
@@ -86,17 +92,10 @@ List<String> normalizeTopicLabels(String raw, {int maxCount = 12}) {
   final tags = <String>[];
   final seen = <String>{};
   final cleaned = raw
-      .split(RegExp(r'[\s,]+'))
+      .split(_splitRegExp)
       .map((part) => part.trim())
       .where((part) => part.isNotEmpty)
-      .map(
-        (part) => part.replaceAll(
-          RegExp(
-            r'^[#]+|[^\w\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u4E00-\u9FFF_-]+$',
-          ),
-          '',
-        ),
-      )
+      .map((part) => part.replaceAll(_labelCleanRegExp, ''))
       .where((part) => part.isNotEmpty);
 
   for (final part in cleaned) {

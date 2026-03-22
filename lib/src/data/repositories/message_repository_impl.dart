@@ -25,6 +25,8 @@ class MessageRepositoryImpl implements IMessageRepository {
   MessageArchiveService? _archiveService;
   final ArchivedMessageMapper _archiveMapper = const ArchivedMessageMapper();
 
+  static final _trailingSlashRegExp = RegExp(r'/$');
+
   // 缓存时间线，避免重复创建（使用 LRU 策略，最多缓存 15 个）
   // 增加缓存大小可提升约 30% 房间切换速度
   static const int _maxTimelineCacheSize = 15;
@@ -567,7 +569,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
 
       final homeserver =
-          _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+          _client!.homeserver?.toString().replaceAll(_trailingSlashRegExp, '') ?? '';
 
       // 方法1: 使用 Matrix 1.11+ 认证媒体端点 (直接 HTTP 请求)
       final authenticatedUrl = MatrixUtils.getMediaDownloadUrl(

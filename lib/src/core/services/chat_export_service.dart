@@ -7,6 +7,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../domain/entities/message_entity.dart';
 
+final RegExp _unsafeExportNameRegExp = RegExp(r'[^\w\s-]');
+
 /// 导出格式
 enum ExportFormat { html, json, txt }
 
@@ -51,7 +53,7 @@ class ChatExportService {
       ExportFormat.json => 'json',
       ExportFormat.txt => 'txt',
     };
-    final sanitizedName = roomName.replaceAll(RegExp(r'[^\w\s-]'), '_');
+    final sanitizedName = roomName.replaceAll(_unsafeExportNameRegExp, '_');
     final file = File(
       '${dir.path}/chat_${sanitizedName}_$timestamp.$extension',
     );

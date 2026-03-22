@@ -69,7 +69,7 @@ class ForwardResult extends MessageActionState {
   int get failureCount => results.values.where((v) => !v).length;
 
   @override
-  List<Object?> get props => [results, successCount, failureCount];
+  List<Object?> get props => [results];
 
   bool get allSuccess => failureCount == 0;
 }

@@ -47,6 +47,9 @@ class CallManager {
   // 是否已初始化
   bool _isInitialized = false;
 
+  // 通知动作订阅
+  StreamSubscription<(CallAction, IncomingCallInfo)>? _callActionSubscription;
+
   // 是否已显示通话界面
   bool _isCallScreenShowing = false;
 
@@ -116,7 +119,7 @@ class CallManager {
     await _notificationService.initialize();
 
     // 监听来电通知动作
-    _notificationService.callActions.listen((event) {
+    _callActionSubscription = _notificationService.callActions.listen((event) {
       final (action, callInfo) = event;
       _handleNotificationAction(action, callInfo);
     });
@@ -826,6 +829,8 @@ class CallManager {
 
   /// 释放资源
   Future<void> dispose() async {
+    await _callActionSubscription?.cancel();
+    _callActionSubscription = null;
     await _webRTCService?.dispose();
     _webRTCService = null;
     // LiveKitService.dispose() 是同步的（ChangeNotifier 要求）

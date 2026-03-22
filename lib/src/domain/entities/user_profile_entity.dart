@@ -3,6 +3,8 @@ import 'package:flutter/material.dart' show ThemeMode;
 
 import 'avatar_decoration_preset.dart';
 
+final _whitespaceRegExp = RegExp(r'\s+');
+
 /// 用户资料实体
 class UserProfileEntity extends Equatable {
   /// 用户ID（Matrix格式：@user:server.com）
@@ -95,7 +97,7 @@ class UserProfileEntity extends Equatable {
     final name = effectiveDisplayName;
     if (name.isEmpty) return '?';
 
-    final words = name.trim().split(RegExp(r'\s+'));
+    final words = name.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return name.substring(0, name.length.clamp(0, 2)).toUpperCase();
     }

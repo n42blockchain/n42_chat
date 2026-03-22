@@ -5,6 +5,8 @@ part of 'chat_bloc.dart';
 /// 包含：文本、图片、语音、文件、视频、位置、GIF、贴纸、
 /// 联系人名片、自定义消息（红包/转账/音乐）、系统通知、拍一拍等。
 extension ChatBlocSendHandlers on ChatBloc {
+  static final _whitespaceRe = RegExp(r'\s+');
+
   bool _canSendUserMessage(Emitter<ChatState> emit, String actionLabel) {
     if (_currentRoomId == null) {
       debugLog('ChatBloc: Cannot send $actionLabel - no room ID');
@@ -47,7 +49,7 @@ extension ChatBlocSendHandlers on ChatBloc {
     // 斜杠命令拦截
     final trimmed = event.text.trim();
     if (trimmed.startsWith('/')) {
-      final parts = trimmed.substring(1).split(RegExp(r'\s+'));
+      final parts = trimmed.substring(1).split(_whitespaceRe);
       final cmd = parts.isNotEmpty ? parts[0].toLowerCase() : '';
       final args = parts.length > 1 ? parts.sublist(1).join(' ') : '';
       add(ExecuteSlashCommand(command: cmd, args: args));

@@ -44,6 +44,8 @@ class MatrixEventMapper {
   final matrix.Client? Function() _clientGetter;
   late final MatrixMetadataExtractor _metadataExtractor;
 
+  static final _replyUserRegExp = RegExp(r'> \*? ?<(@[^>]+)>(.*)');
+
   MatrixEventMapper(this._clientGetter) {
     _metadataExtractor = MatrixMetadataExtractor(
       _clientGetter,
@@ -192,9 +194,7 @@ class MatrixEventMapper {
         // 解析引用的发送者和内容
         final firstQuoteLine = quotedLines.first;
         // 格式: "> <@user:server> 内容" 或 "> * <@user:server> 内容"
-        final userMatch = RegExp(
-          r'> \*? ?<(@[^>]+)>(.*)',
-        ).firstMatch(firstQuoteLine);
+        final userMatch = _replyUserRegExp.firstMatch(firstQuoteLine);
         if (userMatch != null) {
           final userId = userMatch.group(1);
           replyToContent = userMatch.group(2)?.trim();

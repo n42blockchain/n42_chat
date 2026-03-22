@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 
 import 'avatar_decoration_preset.dart';
 
+final _whitespaceRegExp = RegExp(r'\s+');
+
 /// 用户实体
 ///
 /// 表示Matrix用户的基本信息
@@ -116,7 +118,7 @@ class UserEntity extends Equatable {
     final name = effectiveDisplayName;
     if (name.isEmpty) return '?';
 
-    final words = name.trim().split(RegExp(r'\s+'));
+    final words = name.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return name.substring(0, name.length.clamp(0, 2)).toUpperCase();
     }

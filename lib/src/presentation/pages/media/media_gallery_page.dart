@@ -10,7 +10,6 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/download_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
-import '../../../core/utils/matrix_utils.dart' as n42_matrix_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/media_folder_entity.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -579,7 +578,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
     if (url == null || url.isEmpty) return null;
     if (!url.startsWith('mxc://')) return url;
 
-    return n42_matrix_utils.MatrixUtils.mxcToHttp(
+    return mx_utils.MatrixUtils.mxcToHttp(
       url,
       client: MatrixClientManager.instance.client,
       width: width,

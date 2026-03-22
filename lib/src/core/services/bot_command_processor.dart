@@ -17,6 +17,10 @@ class BotCommandProcessor {
   final String? _authToken;
   final bool _useProxyEndpoint;
 
+  static final RegExp _whitespaceRegExp = RegExp(r'\s+');
+  static final RegExp _numberFormatRegExp =
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+
   /// CoinGecko 免费公共 API（无需 API Key）
   static const _defaultPriceApiBase = 'https://api.coingecko.com/api/v3';
 
@@ -81,7 +85,7 @@ class BotCommandProcessor {
     final trimmed = rawText.trim();
     if (!trimmed.startsWith('/')) return const BotCommandResult.unknown();
 
-    final parts = trimmed.substring(1).split(RegExp(r'\s+'));
+    final parts = trimmed.substring(1).split(_whitespaceRegExp);
     final command = parts.first.toLowerCase();
     final args = parts.skip(1).toList();
 
@@ -328,7 +332,7 @@ class BotCommandProcessor {
       return value
           .toStringAsFixed(2)
           .replaceAllMapped(
-            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+            _numberFormatRegExp,
             (m) => '${m[1]},',
           );
     }

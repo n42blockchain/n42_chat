@@ -28,6 +28,11 @@ import '../../../core/utils/debug_log.dart';
 
 /// 消息列表项
 class MessageItem extends StatelessWidget {
+  static final _urlRegex = RegExp(r'https?://\S+');
+  static final _nameRegex = RegExp(r'^(Name[：:]|联系人[：:]|Contact[：:])');
+  static final _idRegex = RegExp(r'^ID[：:]');
+  static final _avatarRegex = RegExp(r'^(头像[：:]|Avatar[：:])');
+
   /// 消息实体
   final MessageEntity message;
 
@@ -504,7 +509,7 @@ class MessageItem extends StatelessWidget {
     );
 
     // 检测消息中的 URL，用于显示预览
-    final urlMatch = RegExp(r'https?://\S+').firstMatch(message.content);
+    final urlMatch = _urlRegex.firstMatch(message.content);
 
     // 如果消息被编辑过，在文字下方显示 "已编辑" 标签
     if (message.isEdited) {
@@ -606,16 +611,16 @@ class MessageItem extends StatelessWidget {
             line.startsWith('Contact：') ||
             line.startsWith('Contact:')) {
           contactName = line
-              .replaceFirst(RegExp(r'^(Name[：:]|联系人[：:]|Contact[：:])'), '')
+              .replaceFirst(_nameRegex, '')
               .trim();
         } else if (line.startsWith('ID：') || line.startsWith('ID:')) {
-          contactId = line.replaceFirst(RegExp(r'^ID[：:]'), '').trim();
+          contactId = line.replaceFirst(_idRegex, '').trim();
         } else if (line.startsWith('头像：') ||
             line.startsWith('头像:') ||
             line.startsWith('Avatar：') ||
             line.startsWith('Avatar:')) {
           contactAvatar = line
-              .replaceFirst(RegExp(r'^(头像[：:]|Avatar[：:])'), '')
+              .replaceFirst(_avatarRegex, '')
               .trim();
         }
       }

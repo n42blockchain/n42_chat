@@ -18,11 +18,13 @@ class PointsApiDatasource {
         _getAccessToken = getAccessToken,
         _httpClient = httpClient ?? http.Client();
 
-  Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        if (_getAccessToken() != null)
-          'Authorization': 'Bearer ${_getAccessToken()}',
-      };
+  Map<String, String> get _headers {
+    final token = _getAccessToken();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
 
   /// Get points balance for a user in a room.
   Future<Map<String, dynamic>> getBalance(

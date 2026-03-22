@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/conversation_entity.dart';
+
 /// 会话列表事件
 abstract class ConversationEvent extends Equatable {
   const ConversationEvent();
@@ -121,7 +123,7 @@ class CreateGroupChat extends ConversationEvent {
 
 /// 会话列表更新（内部事件）
 class ConversationsUpdated extends ConversationEvent {
-  final List<dynamic> conversations;
+  final List<ConversationEntity> conversations;
 
   const ConversationsUpdated(this.conversations);
 

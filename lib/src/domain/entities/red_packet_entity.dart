@@ -1,8 +1,3 @@
-/// Red packet domain entity.
-///
-/// Models a group/P2P red packet sent inside a chat room.
-/// Tracks all claims and computes derived stats (best luck, remaining, etc.).
-
 /// Distribution strategy: equal split vs random amounts.
 enum RedPacketType {
   normal, // Equal amount per packet

@@ -135,19 +135,15 @@ class TtsService {
     return _state == TtsState.playing && _currentMessageId == messageId;
   }
 
+  static final RegExp _chineseRegex = RegExp(r'[\u4e00-\u9fff]');
+  static final RegExp _japaneseRegex = RegExp(r'[\u3040-\u309f\u30a0-\u30ff]');
+  static final RegExp _koreanRegex = RegExp(r'[\uac00-\ud7af]');
+
   /// 简单的语言检测
   String _detectLanguage(String text) {
-    // 检测中文字符
-    final chineseRegex = RegExp(r'[\u4e00-\u9fff]');
-    final chineseCount = chineseRegex.allMatches(text).length;
-
-    // 检测日文
-    final japaneseRegex = RegExp(r'[\u3040-\u309f\u30a0-\u30ff]');
-    final japaneseCount = japaneseRegex.allMatches(text).length;
-
-    // 检测韩文
-    final koreanRegex = RegExp(r'[\uac00-\ud7af]');
-    final koreanCount = koreanRegex.allMatches(text).length;
+    final chineseCount = _chineseRegex.allMatches(text).length;
+    final japaneseCount = _japaneseRegex.allMatches(text).length;
+    final koreanCount = _koreanRegex.allMatches(text).length;
 
     final totalNonAscii = chineseCount + japaneseCount + koreanCount;
     final totalLength = text.length;
