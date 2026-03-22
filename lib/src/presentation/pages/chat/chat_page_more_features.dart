@@ -686,7 +686,7 @@ Avatar: ${contactAvatar ?? ''}''';
 
   /// 创建投票
   void _createPoll() async {
-    final result = await showModalBottomSheet<Map<String, dynamic>>(
+    final result = await showModalBottomSheet<PollComposerResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -694,19 +694,37 @@ Avatar: ${contactAvatar ?? ''}''';
     );
 
     if (result != null && mounted) {
-      final question = result['question'] as String;
-      final options = result['options'] as List<String>;
-      final maxSelections = result['maxSelections'] as int? ?? 1;
+      if (result.action == PollComposerAction.schedule) {
+        final scheduledAt = await showScheduledSendPicker(context);
+        if (!mounted || scheduledAt == null) {
+          return;
+        }
+
+        context.read<ChatBloc>().add(
+          SendScheduledMessage(
+            text: result.question,
+            type: MessageType.poll,
+            payload: {
+              'options': result.options,
+              'maxSelections': result.maxSelections,
+              'isAnonymous': result.isAnonymous,
+            },
+            scheduledAt: scheduledAt,
+          ),
+        );
+        return;
+      }
 
       debugLog(
-        'ChatPage: Creating poll - question: $question, options: $options, maxSelections: $maxSelections',
+        'ChatPage: Creating poll - question: ${result.question}, options: ${result.options}, maxSelections: ${result.maxSelections}',
       );
 
       context.read<ChatBloc>().add(
         SendPollMessage(
-          question: question,
-          options: options,
-          maxSelections: maxSelections,
+          question: result.question,
+          options: result.options,
+          maxSelections: result.maxSelections,
+          isAnonymous: result.isAnonymous,
         ),
       );
     }

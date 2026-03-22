@@ -1,0 +1,168 @@
+import 'package:equatable/equatable.dart';
+
+import 'message_entity.dart';
+
+class ScheduledMessageDraft extends Equatable {
+  final String messageId;
+  final String? roomId;
+  final String text;
+  final MessageType type;
+  final DateTime scheduledAt;
+  final DateTime createdAt;
+  final List<String> mentionedUserIds;
+  final bool mentionsRoom;
+  final int? selfDestructAfter;
+  final Map<String, dynamic> payload;
+
+  const ScheduledMessageDraft({
+    required this.messageId,
+    required this.text,
+    required this.type,
+    required this.scheduledAt,
+    required this.createdAt,
+    this.roomId,
+    this.mentionedUserIds = const [],
+    this.mentionsRoom = false,
+    this.selfDestructAfter,
+    this.payload = const {},
+  });
+
+  factory ScheduledMessageDraft.fromJson(Map<String, dynamic> json) {
+    final rawPayload = json['payload'];
+    final rawType = json['type'] as String?;
+
+    return ScheduledMessageDraft(
+      messageId: json['messageId'] as String? ?? '',
+      roomId: json['roomId'] as String?,
+      text: json['text'] as String? ?? '',
+      type: _parseMessageType(rawType),
+      scheduledAt: DateTime.parse(json['scheduledAt'] as String),
+      createdAt: DateTime.parse(
+        json['createdAt'] as String? ?? DateTime.now().toIso8601String(),
+      ),
+      mentionedUserIds:
+          (json['mentionedUserIds'] as List<dynamic>?)
+              ?.map((item) => item.toString())
+              .toList(growable: false) ??
+          const [],
+      mentionsRoom: json['mentionsRoom'] as bool? ?? false,
+      selfDestructAfter: json['selfDestructAfter'] as int?,
+      payload: rawPayload is Map<String, dynamic>
+          ? rawPayload
+          : rawPayload is Map
+          ? Map<String, dynamic>.from(rawPayload)
+          : const {},
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'messageId': messageId,
+    'text': text,
+    'type': type.name,
+    'scheduledAt': scheduledAt.toIso8601String(),
+    'createdAt': createdAt.toIso8601String(),
+    'mentionedUserIds': mentionedUserIds,
+    'mentionsRoom': mentionsRoom,
+    'selfDestructAfter': selfDestructAfter,
+    'payload': payload,
+    if (roomId != null) 'roomId': roomId,
+  };
+
+  ScheduledMessageDraft copyWith({
+    String? roomId,
+    Map<String, dynamic>? payload,
+  }) {
+    return ScheduledMessageDraft(
+      messageId: messageId,
+      roomId: roomId ?? this.roomId,
+      text: text,
+      type: type,
+      scheduledAt: scheduledAt,
+      createdAt: createdAt,
+      mentionedUserIds: mentionedUserIds,
+      mentionsRoom: mentionsRoom,
+      selfDestructAfter: selfDestructAfter,
+      payload: payload ?? this.payload,
+    );
+  }
+
+  List<String> get pollOptions =>
+      (payload['options'] as List<dynamic>?)
+          ?.map((item) => item.toString())
+          .toList(growable: false) ??
+      const [];
+
+  int get pollMaxSelections => payload['maxSelections'] as int? ?? 1;
+
+  String get typeLabel {
+    switch (type) {
+      case MessageType.poll:
+        return 'Poll';
+      case MessageType.sticker:
+        return 'Sticker';
+      default:
+        return 'Message';
+    }
+  }
+
+  String get timelinePreviewText {
+    switch (type) {
+      case MessageType.poll:
+        return '[Poll] $text';
+      case MessageType.sticker:
+        return text.isEmpty ? '[Sticker]' : '[Sticker] $text';
+      default:
+        return text;
+    }
+  }
+
+  MessageEntity toPreviewMessage({
+    required String roomId,
+    required String senderId,
+    String senderName = 'Me',
+  }) {
+    return MessageEntity(
+      id: messageId,
+      roomId: roomId,
+      senderId: senderId,
+      senderName: senderName,
+      content: timelinePreviewText,
+      type: MessageType.text,
+      timestamp: createdAt,
+      status: MessageStatus.sending,
+      isFromMe: true,
+      scheduledAt: scheduledAt,
+      selfDestructAfter: selfDestructAfter,
+      mentionedUserIds: mentionedUserIds,
+      mentionsRoom: mentionsRoom,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    messageId,
+    roomId,
+    text,
+    type,
+    scheduledAt,
+    createdAt,
+    mentionedUserIds,
+    mentionsRoom,
+    selfDestructAfter,
+    payload,
+  ];
+
+  static MessageType _parseMessageType(String? rawType) {
+    if (rawType == null || rawType.isEmpty) {
+      return MessageType.text;
+    }
+
+    for (final type in MessageType.values) {
+      if (type.name == rawType) {
+        return type;
+      }
+    }
+
+    return MessageType.text;
+  }
+}

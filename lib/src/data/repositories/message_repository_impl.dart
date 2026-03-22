@@ -773,16 +773,18 @@ class MessageRepositoryImpl implements IMessageRepository {
     required String question,
     required List<String> options,
     int maxSelections = 1,
+    bool isAnonymous = false,
   }) async {
     try {
       debugLog(
-        'MessageRepositoryImpl: Sending poll - question: $question, options: $options',
+        'MessageRepositoryImpl: Sending poll - question: $question, options: $options, isAnonymous: $isAnonymous',
       );
       final eventId = await _messageDataSource.sendPollMessage(
         roomId,
         question: question,
         options: options,
         maxSelections: maxSelections,
+        isAnonymous: isAnonymous,
       );
       if (eventId != null) {
         debugLog(
@@ -817,6 +819,8 @@ class MessageRepositoryImpl implements IMessageRepository {
           metadata: MessageMetadata(
             pollQuestion: question,
             pollOptions: options,
+            isAnonymousPoll: isAnonymous,
+            maxSelections: maxSelections,
           ),
         );
       }

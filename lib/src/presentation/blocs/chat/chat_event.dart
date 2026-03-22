@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
@@ -369,15 +370,17 @@ class SendPollMessage extends ChatEvent {
   final String question;
   final List<String> options;
   final int maxSelections; // 1 = 单选, 0 = 多选（不限）
+  final bool isAnonymous;
 
   const SendPollMessage({
     required this.question,
     required this.options,
     this.maxSelections = 1,
+    this.isAnonymous = false,
   });
 
   @override
-  List<Object?> get props => [question, options, maxSelections];
+  List<Object?> get props => [question, options, maxSelections, isAnonymous];
 }
 
 /// 投票响应事件
@@ -490,6 +493,8 @@ class UpdateDestructionCountdown extends ChatEvent {
 /// 发送定时消息
 class SendScheduledMessage extends ChatEvent {
   final String text;
+  final MessageType type;
+  final Map<String, dynamic>? payload;
   final DateTime scheduledAt;
   final int? selfDestructAfter;
   final List<String>? mentionedUserIds;
@@ -497,6 +502,8 @@ class SendScheduledMessage extends ChatEvent {
 
   const SendScheduledMessage({
     required this.text,
+    this.type = MessageType.text,
+    this.payload,
     required this.scheduledAt,
     this.selfDestructAfter,
     this.mentionedUserIds,
@@ -506,6 +513,8 @@ class SendScheduledMessage extends ChatEvent {
   @override
   List<Object?> get props => [
     text,
+    type,
+    payload == null ? null : jsonEncode(payload),
     scheduledAt,
     selfDestructAfter,
     mentionedUserIds,

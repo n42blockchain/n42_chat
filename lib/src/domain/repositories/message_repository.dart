@@ -191,6 +191,7 @@ abstract class IMessageRepository {
     required String question,
     required List<String> options,
     int maxSelections = 1,
+    bool isAnonymous = false,
   });
 
   /// 发送转发的投票快照（包含投票结果，不可再投票）

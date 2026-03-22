@@ -6,6 +6,8 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
+import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 
@@ -27,7 +29,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   final PreferencesDataSource _preferences = getIt<PreferencesDataSource>();
 
   bool _isLoading = true;
-  List<_ScheduledMessageDraft> _drafts = const [];
+  List<ScheduledMessageDraft> _drafts = const [];
 
   @override
   void initState() {
@@ -37,10 +39,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
 
   Future<void> _loadDrafts() async {
     setState(() => _isLoading = true);
-    final rawDrafts = await _preferences.getScheduledMessages(widget.roomId);
-    final drafts =
-        rawDrafts.map(_ScheduledMessageDraft.fromJson).toList(growable: false)
-          ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+    final drafts = (await _preferences.getScheduledMessages(widget.roomId))
+      .toList()
+      ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
 
     if (!mounted) return;
     setState(() {
@@ -49,7 +50,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     });
   }
 
-  Future<void> _cancelDraft(_ScheduledMessageDraft draft) async {
+  Future<void> _cancelDraft(ScheduledMessageDraft draft) async {
     try {
       context.read<ChatBloc>().add(CancelScheduledMessage(draft.messageId));
     } catch (_) {
@@ -149,7 +150,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     );
   }
 
-  Widget _buildDraftCard(_ScheduledMessageDraft draft, bool isDark) {
+  Widget _buildDraftCard(ScheduledMessageDraft draft, bool isDark) {
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final secondaryColor = isDark
         ? AppColors.textSecondaryDark
@@ -166,7 +167,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.schedule, size: 18, color: Colors.blue[700]),
+              Icon(_iconForDraft(draft), size: 18, color: Colors.blue[700]),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -185,6 +186,8 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             ],
           ),
           const SizedBox(height: 10),
+          _buildChip(label: draft.typeLabel, isDark: isDark),
+          const SizedBox(height: 10),
           Text(
             draft.text,
             style: TextStyle(
@@ -192,12 +195,20 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          if (draft.mentionsRoom || draft.mentionedUserIds.isNotEmpty) ...[
+          if (draft.pollOptions.isNotEmpty ||
+              draft.mentionsRoom ||
+              draft.mentionedUserIds.isNotEmpty ||
+              draft.selfDestructAfter != null) ...[
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
+                if (draft.pollOptions.isNotEmpty)
+                  _buildChip(
+                    label: '${draft.pollOptions.length} options',
+                    isDark: isDark,
+                  ),
                 if (draft.mentionsRoom)
                   _buildChip(label: '@all', isDark: isDark),
                 if (draft.mentionedUserIds.isNotEmpty)
@@ -221,6 +232,17 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         ],
       ),
     );
+  }
+
+  IconData _iconForDraft(ScheduledMessageDraft draft) {
+    switch (draft.type) {
+      case MessageType.poll:
+        return Icons.poll_outlined;
+      case MessageType.sticker:
+        return Icons.emoji_emotions_outlined;
+      default:
+        return Icons.schedule;
+    }
   }
 
   Widget _buildChip({required String label, required bool isDark}) {
@@ -256,39 +278,5 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
       return 'Tomorrow ${DateFormat('HH:mm').format(scheduledAt)}';
     }
     return DateFormat('yyyy-MM-dd HH:mm').format(scheduledAt);
-  }
-}
-
-class _ScheduledMessageDraft {
-  final String messageId;
-  final String text;
-  final DateTime scheduledAt;
-  final DateTime createdAt;
-  final List<String> mentionedUserIds;
-  final bool mentionsRoom;
-  final int? selfDestructAfter;
-
-  const _ScheduledMessageDraft({
-    required this.messageId,
-    required this.text,
-    required this.scheduledAt,
-    required this.createdAt,
-    required this.mentionedUserIds,
-    required this.mentionsRoom,
-    this.selfDestructAfter,
-  });
-
-  factory _ScheduledMessageDraft.fromJson(Map<String, dynamic> json) {
-    return _ScheduledMessageDraft(
-      messageId: json['messageId'] as String? ?? '',
-      text: json['text'] as String? ?? '',
-      scheduledAt: DateTime.parse(json['scheduledAt'] as String),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      mentionedUserIds:
-          (json['mentionedUserIds'] as List<dynamic>?)?.cast<String>() ??
-          const [],
-      mentionsRoom: json['mentionsRoom'] as bool? ?? false,
-      selfDestructAfter: json['selfDestructAfter'] as int?,
-    );
   }
 }

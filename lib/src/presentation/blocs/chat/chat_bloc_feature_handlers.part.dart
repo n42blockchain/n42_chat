@@ -145,9 +145,19 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     SendScheduledMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null || event.text.trim().isEmpty) return;
+    if (_currentRoomId == null) return;
 
     try {
+      final normalizedText = event.text.trim();
+      final payload = Map<String, dynamic>.from(event.payload ?? const {});
+      if (!_isValidScheduledDraft(
+        type: event.type,
+        text: normalizedText,
+        payload: payload,
+      )) {
+        return;
+      }
+
       final selfDestructAfter = await _resolveSelfDestructAfter(
         event.selfDestructAfter,
       );
@@ -157,32 +167,35 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       // 获取当前用户ID
       final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
 
+      final draft = ScheduledMessageDraft(
+        messageId: tempId,
+        text: normalizedText,
+        type: event.type,
+        scheduledAt: event.scheduledAt,
+        createdAt: DateTime.now(),
+        selfDestructAfter: selfDestructAfter,
+        mentionedUserIds: event.mentionedUserIds ?? const [],
+        mentionsRoom: event.mentionsRoom,
+        payload: payload,
+      );
+
       // 保存定时消息到本地存储
       await _secureStorage.saveScheduledMessage(
         roomId: _currentRoomId!,
         messageId: tempId,
-        text: event.text,
-        scheduledAt: event.scheduledAt,
+        text: draft.text,
+        type: draft.type,
+        payload: draft.payload,
+        scheduledAt: draft.scheduledAt,
         selfDestructAfter: selfDestructAfter,
-        mentionedUserIds: event.mentionedUserIds,
-        mentionsRoom: event.mentionsRoom,
+        mentionedUserIds: draft.mentionedUserIds,
+        mentionsRoom: draft.mentionsRoom,
       );
 
       // 创建临时消息显示在UI中
-      final tempMessage = MessageEntity(
-        id: tempId,
+      final tempMessage = draft.toPreviewMessage(
         roomId: _currentRoomId!,
         senderId: currentUserId,
-        senderName: 'Me',
-        content: event.text,
-        type: MessageType.text,
-        timestamp: DateTime.now(),
-        status: MessageStatus.sending,
-        isFromMe: true,
-        scheduledAt: event.scheduledAt,
-        selfDestructAfter: selfDestructAfter,
-        mentionedUserIds: event.mentionedUserIds ?? [],
-        mentionsRoom: event.mentionsRoom,
       );
 
       // 添加到消息列表
@@ -242,43 +255,101 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
       debugLog('ChatBloc: Found ${dueMessages.length} due scheduled messages');
 
-      for (final msg in dueMessages) {
-        final roomId = msg['roomId'] as String;
-        final messageId = msg['messageId'] as String;
-        final text = msg['text'] as String;
-        final selfDestructAfter = msg['selfDestructAfter'] as int?;
-        final mentionedUserIds = (msg['mentionedUserIds'] as List<dynamic>?)
-            ?.cast<String>();
-        final mentionsRoom = msg['mentionsRoom'] as bool? ?? false;
+      for (final draft in dueMessages) {
+        final roomId = draft.roomId;
+        if (roomId == null || roomId.isEmpty) {
+          debugLog(
+            'ChatBloc: Skip scheduled message without room id - ${draft.messageId}',
+          );
+          continue;
+        }
 
         try {
-          // 发送消息
-          await _messageRepository.sendTextMessage(
-            roomId,
-            text,
-            selfDestructAfter: selfDestructAfter,
-            mentionedUserIds: mentionedUserIds,
-            mentionsRoom: mentionsRoom,
-          );
+          await _sendScheduledDraft(draft);
 
           // 从存储中删除
-          await _secureStorage.removeScheduledMessage(roomId, messageId);
+          await _secureStorage.removeScheduledMessage(roomId, draft.messageId);
 
           // 如果是当前房间，更新UI
           if (roomId == _currentRoomId && !isClosed) {
             final updatedMessages = state.messages
-                .where((m) => m.id != messageId)
+                .where((m) => m.id != draft.messageId)
                 .toList();
             emit(state.copyWith(messages: updatedMessages));
           }
 
-          debugLog('ChatBloc: Sent scheduled message - $messageId');
+          debugLog('ChatBloc: Sent scheduled message - ${draft.messageId}');
         } catch (e) {
-          debugLog('ChatBloc: Failed to send scheduled message $messageId: $e');
+          debugLog(
+            'ChatBloc: Failed to send scheduled message ${draft.messageId}: $e',
+          );
         }
       }
     } catch (e) {
       debugLog('ChatBloc: Failed to process due scheduled messages: $e');
+    }
+  }
+
+  bool _isValidScheduledDraft({
+    required MessageType type,
+    required String text,
+    required Map<String, dynamic> payload,
+  }) {
+    switch (type) {
+      case MessageType.poll:
+        final options = (payload['options'] as List<dynamic>?)
+            ?.map((item) => item.toString().trim())
+            .where((item) => item.isNotEmpty)
+            .toList(growable: false);
+        return text.isNotEmpty && (options?.length ?? 0) >= 2;
+      case MessageType.sticker:
+        return (payload['stickerId'] as String?)?.isNotEmpty == true &&
+            (payload['packId'] as String?)?.isNotEmpty == true &&
+            (payload['url'] as String?)?.isNotEmpty == true;
+      default:
+        return text.isNotEmpty;
+    }
+  }
+
+  Future<void> _sendScheduledDraft(ScheduledMessageDraft draft) async {
+    final roomId = draft.roomId;
+    if (roomId == null || roomId.isEmpty) {
+      throw StateError('Scheduled draft missing roomId');
+    }
+
+    switch (draft.type) {
+      case MessageType.poll:
+        await _messageRepository.sendPollMessage(
+          roomId,
+          question: draft.text,
+          options: draft.pollOptions,
+          maxSelections: draft.pollMaxSelections,
+          isAnonymous: draft.payload['isAnonymous'] as bool? ?? false,
+        );
+        return;
+      case MessageType.sticker:
+        await _messageRepository.sendStickerMessage(
+          roomId,
+          stickerId: draft.payload['stickerId'] as String,
+          packId: draft.payload['packId'] as String,
+          url: draft.payload['url'] as String,
+          httpUrl: draft.payload['httpUrl'] as String?,
+          name: draft.payload['name'] as String?,
+          emoji: draft.payload['emoji'] as String?,
+          width: draft.payload['width'] as int?,
+          height: draft.payload['height'] as int?,
+          mimeType: draft.payload['mimeType'] as String?,
+          size: draft.payload['size'] as int?,
+        );
+        return;
+      default:
+        await _messageRepository.sendTextMessage(
+          roomId,
+          draft.text,
+          selfDestructAfter: draft.selfDestructAfter,
+          mentionedUserIds: draft.mentionedUserIds,
+          mentionsRoom: draft.mentionsRoom,
+        );
     }
   }
 

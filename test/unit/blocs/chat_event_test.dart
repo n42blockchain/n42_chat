@@ -631,10 +631,31 @@ void main() {
       );
     });
 
+    test('stores anonymous flag', () {
+      expect(
+        const SendPollMessage(
+          question: 'Q',
+          options: ['A', 'B'],
+          isAnonymous: true,
+        ).isAnonymous,
+        isTrue,
+      );
+    });
+
     test('same fields → equal', () {
       expect(
-        const SendPollMessage(question: 'Q', options: ['A', 'B']),
-        equals(const SendPollMessage(question: 'Q', options: ['A', 'B'])),
+        const SendPollMessage(
+          question: 'Q',
+          options: ['A', 'B'],
+          isAnonymous: true,
+        ),
+        equals(
+          const SendPollMessage(
+            question: 'Q',
+            options: ['A', 'B'],
+            isAnonymous: true,
+          ),
+        ),
       );
     });
   });
@@ -768,6 +789,7 @@ void main() {
       final t = DateTime.utc(2025, 12, 31);
       final e = SendScheduledMessage(text: 'Happy NY!', scheduledAt: t);
       expect(e.text, 'Happy NY!');
+      expect(e.type, MessageType.text);
       expect(e.scheduledAt, t);
     });
 
@@ -799,6 +821,21 @@ void main() {
       expect(e.selfDestructAfter, 60);
       expect(e.mentionedUserIds, ['@u:s']);
       expect(e.mentionsRoom, isTrue);
+    });
+
+    test('stores rich payload fields', () {
+      final t = DateTime.utc(2025, 6, 1);
+      final e = SendScheduledMessage(
+        text: 'Lunch?',
+        type: MessageType.poll,
+        payload: {
+          'options': ['Sushi', 'Pizza'],
+          'maxSelections': 1,
+        },
+        scheduledAt: t,
+      );
+      expect(e.type, MessageType.poll);
+      expect(e.payload?['options'], ['Sushi', 'Pizza']);
     });
   });
 

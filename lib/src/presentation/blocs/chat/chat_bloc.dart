@@ -11,6 +11,7 @@ import '../../../core/utils/content_filter_utils.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'chat_event.dart';
@@ -451,30 +452,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
 
         // 为每个定时消息创建临时消息实体显示在UI中
-        final tempMessages = <MessageEntity>[];
-        for (final msg in scheduledMessages) {
-          final scheduledAt = DateTime.parse(msg['scheduledAt'] as String);
-
-          tempMessages.add(
-            MessageEntity(
-              id: msg['messageId'] as String,
-              roomId: roomId,
-              senderId: currentUserId,
-              senderName: 'Me',
-              content: msg['text'] as String,
-              type: MessageType.text,
-              timestamp: DateTime.parse(msg['createdAt'] as String),
-              status: MessageStatus.sending,
-              isFromMe: true,
-              scheduledAt: scheduledAt,
-              selfDestructAfter: msg['selfDestructAfter'] as int?,
-              mentionedUserIds:
-                  (msg['mentionedUserIds'] as List<dynamic>?)?.cast<String>() ??
-                  [],
-              mentionsRoom: msg['mentionsRoom'] as bool? ?? false,
-            ),
-          );
-        }
+        final tempMessages = scheduledMessages
+            .map(
+              (draft) => draft.toPreviewMessage(
+                roomId: roomId,
+                senderId: currentUserId,
+              ),
+            )
+            .toList(growable: false);
 
         if (tempMessages.isNotEmpty && !isClosed) {
           // 将定时消息添加到消息列表末尾（按时间排序）
