@@ -76,9 +76,11 @@ import '../settings/quick_replies_page.dart';
 import '../ai/ai_assistant_page.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/services/translation_service.dart';
+import '../../helpers/ai_reply_suggestion_helper.dart';
 import '../../widgets/chat/ai_summary_bubble.dart';
 import '../../../domain/repositories/ai_repository.dart';
 import '../../widgets/chat/ai_rewrite_bar.dart';
+import '../../widgets/chat/ai_smart_reply_bar.dart';
 import '../../widgets/chat/translated_message.dart';
 import 'viewers/image_viewer_page.dart';
 import 'viewers/pdf_viewer_page.dart';
@@ -207,6 +209,10 @@ class _ChatPageState extends State<ChatPage> {
   // AI 群聊消息摘要状态
   String? _aiSummaryResult;
   bool _isAiSummarizing = false;
+  List<String> _smartReplySuggestions = const [];
+  bool _isLoadingSmartReplySuggestions = false;
+  String? _smartReplyAnchorMessageId;
+  String? _dismissedSmartReplyAnchorMessageId;
 
   // 聊天背景 key（如 solid_0, gradient_1, default 等）
   String? _backgroundKey;
@@ -526,6 +532,10 @@ class _ChatPageState extends State<ChatPage> {
   void _sendMessage(String text) {
     if (text.trim().isEmpty) return;
 
+    if (_smartReplySuggestions.isNotEmpty || _isLoadingSmartReplySuggestions) {
+      _dismissAiSmartReplyBar();
+    }
+
     // 斜杠命令拦截（编辑模式下不拦截）
     final chatBloc = context.read<ChatBloc>();
     final editingMsg = chatBloc.state.editingMessage;
@@ -599,6 +609,17 @@ class _ChatPageState extends State<ChatPage> {
   void _onInputChanged(String text) {
     // 发送正在输入状态
     context.read<ChatBloc>().add(SendTypingNotification(text.isNotEmpty));
+
+    if (text.trim().isNotEmpty) {
+      if (_smartReplySuggestions.isNotEmpty ||
+          _isLoadingSmartReplySuggestions) {
+        setState(() {
+          _resetAiSmartReplyState();
+        });
+      }
+    } else {
+      _handleSmartReplyStateChanged(context.read<ChatBloc>().state);
+    }
 
     // 检测 @ 提醒（仅群聊）
     if (widget.conversation.isGroup) {
@@ -688,12 +709,18 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _toggleSearch() {
+    final shouldShowSearchBar = !_showSearchBar;
     setState(() {
-      _showSearchBar = !_showSearchBar;
-      if (!_showSearchBar) {
+      _showSearchBar = shouldShowSearchBar;
+      if (_showSearchBar) {
+        _resetAiSmartReplyState();
+      } else {
         _highlightedMessageId = null;
       }
     });
+    if (!shouldShowSearchBar && _inputController.text.trim().isEmpty) {
+      _handleSmartReplyStateChanged(context.read<ChatBloc>().state);
+    }
   }
 
   void _navigateToMessage(String eventId) {
@@ -1043,6 +1070,13 @@ class _ChatPageState extends State<ChatPage> {
               // AI 改写栏
               if (_showRewriteBar && !_isMultiSelectMode) _buildAiRewriteBar(),
 
+              if (!_showSearchBar &&
+                  !_isMultiSelectMode &&
+                  !_showRewriteBar &&
+                  (_smartReplySuggestions.isNotEmpty ||
+                      _isLoadingSmartReplySuggestions))
+                _buildAiSmartReplyBar(),
+
               // View Once 提示条
               if (_isViewOnce && !_isMultiSelectMode && !_showSearchBar)
                 _buildViewOnceIndicator(),
@@ -1087,6 +1121,12 @@ class _ChatPageState extends State<ChatPage> {
           // 立即清除信号，防止重复触发
           context.read<ChatBloc>().add(const ClearPendingCommand());
           _handlePendingCommand(command);
+        },
+      ),
+      BlocListener<ChatBloc, ChatState>(
+        listenWhen: (prev, curr) => prev.messages != curr.messages,
+        listener: (context, state) {
+          _handleSmartReplyStateChanged(state);
         },
       ),
     ];

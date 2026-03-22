@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -34,7 +35,7 @@ void main() {
           }),
         );
 
-        await service.dispatch(
+        final result = await service.dispatch(
           config: const BotConfig(
             enabled: true,
             webhookUrl: 'http://127.0.0.1:8080/hook',
@@ -48,11 +49,12 @@ void main() {
           ),
         );
 
+        expect(result.success, isFalse);
         expect(requestCount, 0);
       },
     );
 
-    test('signs payload with locally stored secret only', () async {
+    test('prefers config secret over stored fallback when present', () async {
       http.Request? capturedRequest;
       when(
         () => secureStorage.getRoomBotWebhookSecret('!room:test'),
@@ -65,7 +67,7 @@ void main() {
         }),
       );
 
-      await service.dispatch(
+      final result = await service.dispatch(
         config: const BotConfig(
           enabled: true,
           webhookUrl: 'https://hooks.example.com/n42',
@@ -81,17 +83,51 @@ void main() {
         ),
       );
 
+      expect(result.success, isTrue);
       expect(capturedRequest, isNotNull);
-      expect(capturedRequest!.headers['X-N42-Signature'], isNotNull);
-      expect(
-        capturedRequest!.headers['X-N42-Signature'],
-        isNot(contains('remote-secret')),
-      );
+      final signature = capturedRequest!.headers['X-N42-Signature'];
+      expect(signature, isNotNull);
+      final expectedSignature =
+          'sha256=${Hmac(sha256, utf8.encode('remote-secret')).convert(utf8.encode(capturedRequest!.body))}';
+      expect(signature, expectedSignature);
       final body = jsonDecode(capturedRequest!.body) as Map<String, dynamic>;
       expect(body['room_id'], '!room:test');
-      verify(
+      verifyNever(() => secureStorage.getRoomBotWebhookSecret('!room:test'));
+    });
+
+    test('can skip stored secret fallback for draft webhook testing', () async {
+      http.Request? capturedRequest;
+      when(
         () => secureStorage.getRoomBotWebhookSecret('!room:test'),
-      ).called(1);
+      ).thenAnswer((_) async => 'device-secret');
+      final service = BotWebhookService(
+        secureStorageDataSource: secureStorage,
+        clientFactory: () => MockClient((request) async {
+          capturedRequest = request;
+          return http.Response('ok', 200);
+        }),
+      );
+
+      final result = await service.dispatch(
+        config: const BotConfig(
+          enabled: true,
+          webhookUrl: 'https://hooks.example.com/n42',
+          webhookEvents: {BotAutomationEventType.memberJoined},
+        ),
+        payload: BotWebhookEventPayload(
+          eventType: BotAutomationEventType.memberJoined,
+          roomId: '!room:test',
+          roomName: 'Test',
+          triggeredAt: DateTime.utc(2026, 3, 21, 12),
+        ),
+        webhookSecretOverride: '',
+        useStoredSecretFallback: false,
+      );
+
+      expect(result.success, isTrue);
+      expect(capturedRequest, isNotNull);
+      expect(capturedRequest!.headers['X-N42-Signature'], isNull);
+      verifyNever(() => secureStorage.getRoomBotWebhookSecret('!room:test'));
     });
   });
 }

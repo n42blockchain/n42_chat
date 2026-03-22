@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/services/bot_webhook_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/external_url_safety.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
@@ -29,6 +30,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
   bool _enabled = false;
   bool _isLoading = true;
   bool _isSaving = false;
+  bool _isTestingWebhook = false;
   bool _webhookEnabled = false;
   bool _notifyMemberJoined = true;
   bool _notifyWelcomeSent = true;
@@ -267,8 +269,152 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                       ),
                     ],
                   ],
+                  if (_enabled && _webhookEnabled)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                      child: OutlinedButton.icon(
+                        onPressed: _isSaving || _isTestingWebhook
+                            ? null
+                            : _sendTestWebhook,
+                        icon: _isTestingWebhook
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.send_outlined),
+                        label: Text(
+                          _isTestingWebhook
+                              ? 'Sending test webhook...'
+                              : 'Send test webhook',
+                        ),
+                      ),
+                    ),
                 ],
               ),
+      ),
+    );
+  }
+
+  Set<BotAutomationEventType> _buildWebhookEvents() => {
+    if (_notifyMemberJoined) BotAutomationEventType.memberJoined,
+    if (_notifyWelcomeSent) BotAutomationEventType.welcomeMessageSent,
+  };
+
+  BotConfig _buildDraftConfig() {
+    final normalizedWebhookUrl = _webhookEnabled
+        ? _webhookUrlController.text.trim()
+        : '';
+    final webhookSecret = _webhookEnabled
+        ? _webhookSecretController.text.trim()
+        : '';
+
+    return BotConfig(
+      enabled: _enabled,
+      welcomeMessage: _welcomeController.text.trim().isEmpty
+          ? null
+          : _welcomeController.text.trim(),
+      webhookUrl: normalizedWebhookUrl.isEmpty ? null : normalizedWebhookUrl,
+      webhookSecret: webhookSecret.isEmpty ? null : webhookSecret,
+      webhookEvents: _webhookEnabled ? _buildWebhookEvents() : const {},
+    );
+  }
+
+  String? _validateDraftConfig(BotConfig config) {
+    if (!_webhookEnabled) {
+      return null;
+    }
+    if (parseSafeExternalUri(
+          config.webhookUrl?.trim() ?? '',
+          allowedSchemes: const {'https'},
+        ) ==
+        null) {
+      return 'Webhook URL must be a public HTTPS address';
+    }
+    if (config.webhookEvents.isEmpty) {
+      return 'Select at least one webhook event';
+    }
+    return null;
+  }
+
+  BotAutomationEventType? _preferredTestEvent(BotConfig config) {
+    if (config.webhookEvents.contains(BotAutomationEventType.memberJoined)) {
+      return BotAutomationEventType.memberJoined;
+    }
+    if (config.webhookEvents.contains(
+      BotAutomationEventType.welcomeMessageSent,
+    )) {
+      return BotAutomationEventType.welcomeMessageSent;
+    }
+    return null;
+  }
+
+  BotWebhookEventPayload _buildTestPayload(
+    BotConfig config,
+    BotAutomationEventType eventType,
+  ) {
+    const displayName = 'AI Test User';
+    final resolvedWelcome =
+        (config.welcomeMessage?.trim().isNotEmpty == true
+                ? config.welcomeMessage!.replaceAll('{name}', displayName)
+                : 'Welcome $displayName')
+            .trim();
+
+    return BotWebhookEventPayload(
+      eventType: eventType,
+      roomId: widget.roomId,
+      roomName: 'N42 Test Room',
+      triggeredAt: DateTime.now(),
+      userId: '@ai-test:n42.chat',
+      displayName: displayName,
+      message: eventType == BotAutomationEventType.welcomeMessageSent
+          ? resolvedWelcome
+          : null,
+    );
+  }
+
+  Future<void> _sendTestWebhook() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final config = _buildDraftConfig();
+    final validationError = _validateDraftConfig(config);
+    if (validationError != null) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(validationError), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final eventType = _preferredTestEvent(config);
+    if (eventType == null) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Select at least one webhook event'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isTestingWebhook = true);
+    final result = await getIt<BotWebhookService>().dispatch(
+      config: config,
+      payload: _buildTestPayload(config, eventType),
+      webhookSecretOverride: _webhookSecretController.text,
+      useStoredSecretFallback: false,
+    );
+    if (!mounted) return;
+
+    setState(() => _isTestingWebhook = false);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          result.success
+              ? 'Test webhook sent successfully'
+              : (result.errorMessage ?? 'Failed to send test webhook'),
+        ),
+        backgroundColor: result.success ? Colors.green : Colors.red,
       ),
     );
   }
@@ -276,47 +422,20 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
   Future<void> _save() async {
     final messenger = ScaffoldMessenger.of(context);
     final secureStorage = getIt<SecureStorageDataSource>();
-    final webhookEvents = <BotAutomationEventType>{
-      if (_notifyMemberJoined) BotAutomationEventType.memberJoined,
-      if (_notifyWelcomeSent) BotAutomationEventType.welcomeMessageSent,
-    };
-    final normalizedWebhookUrl = _webhookEnabled
-        ? _webhookUrlController.text.trim()
-        : '';
-    if (_webhookEnabled &&
-        parseSafeExternalUri(
-              normalizedWebhookUrl,
-              allowedSchemes: const {'https'},
-            ) ==
-            null) {
+    final config = _buildDraftConfig();
+    final validationError = _validateDraftConfig(config);
+    if (validationError != null) {
       messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Webhook URL must be a public HTTPS address'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(validationError), backgroundColor: Colors.red),
       );
       return;
     }
     await secureStorage.saveRoomBotWebhookSecret(
       widget.roomId,
-      _webhookEnabled ? _webhookSecretController.text : null,
+      _webhookEnabled ? config.webhookSecret : null,
     );
     if (!mounted) return;
     setState(() => _isSaving = true);
-    context.read<GroupBloc>().add(
-      SetBotConfig(
-        widget.roomId,
-        BotConfig(
-          enabled: _enabled,
-          welcomeMessage: _welcomeController.text.trim().isEmpty
-              ? null
-              : _welcomeController.text.trim(),
-          webhookUrl: normalizedWebhookUrl.isEmpty
-              ? null
-              : normalizedWebhookUrl,
-          webhookEvents: _webhookEnabled ? webhookEvents : const {},
-        ),
-      ),
-    );
+    context.read<GroupBloc>().add(SetBotConfig(widget.roomId, config));
   }
 }

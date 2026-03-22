@@ -107,7 +107,7 @@ void main() {
         config: any(named: 'config'),
         payload: any(named: 'payload'),
       ),
-    ).thenAnswer((_) async {});
+    ).thenAnswer((_) async => BotWebhookDispatchResult.sent(200));
   });
 
   // =========================================================================

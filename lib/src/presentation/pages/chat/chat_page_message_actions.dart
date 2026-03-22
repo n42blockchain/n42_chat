@@ -603,6 +603,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
   /// 进入多选模式
   void _enterMultiSelectMode() {
     setState(() {
+      _resetAiSmartReplyState();
       _isMultiSelectMode = true;
       _selectedMessageIds.clear();
     });
@@ -614,6 +615,11 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
       _isMultiSelectMode = false;
       _selectedMessageIds.clear();
     });
+    if (!_showSearchBar &&
+        !_showRewriteBar &&
+        _inputController.text.trim().isEmpty) {
+      _handleSmartReplyStateChanged(context.read<ChatBloc>().state);
+    }
   }
 
   /// 切换消息选中状态
@@ -914,6 +920,9 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
   void _enterEditMode(MessageEntity message) {
     // 仅文本消息可编辑
     if (message.type != MessageType.text || !message.isFromMe) return;
+    setState(() {
+      _resetAiSmartReplyState();
+    });
     context.read<ChatBloc>().add(SetEditTarget(message));
     _inputController.text = message.content;
     _inputController.selection = TextSelection.fromPosition(
