@@ -136,7 +136,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         const SizedBox(height: 8),
         Center(
           child: Text(
-            'Long press Send, a GIF, or a sticker to schedule follow-ups and reminders.',
+            'Long press Send, Photos, Files, a GIF, or a sticker to schedule follow-ups and reminders.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,

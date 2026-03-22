@@ -5,6 +5,8 @@ import 'dart:math' show min;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
+import 'package:mime/mime.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../core/services/speech_to_text_service.dart';
 import '../../../core/services/translation_service.dart';

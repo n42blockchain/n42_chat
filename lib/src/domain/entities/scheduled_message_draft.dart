@@ -96,12 +96,33 @@ class ScheduledMessageDraft extends Equatable {
 
   bool get isGif => (payload['gifUrl'] as String?)?.isNotEmpty == true;
 
+  bool get hasLocalAttachment =>
+      (payload['localPath'] as String?)?.isNotEmpty == true &&
+      attachmentFilename.isNotEmpty;
+
+  String? get localAttachmentPath => payload['localPath'] as String?;
+
+  String get attachmentFilename =>
+      (payload['filename'] as String?)?.trim().isNotEmpty == true
+      ? (payload['filename'] as String).trim()
+      : text.trim();
+
+  String? get attachmentMimeType => payload['mimeType'] as String?;
+
+  int? get attachmentFileSize => (payload['fileSize'] as num?)?.toInt();
+
   String get typeLabel {
     if (isGif) {
       return 'GIF';
     }
 
     switch (type) {
+      case MessageType.image:
+        return hasLocalAttachment ? 'Photo' : 'Message';
+      case MessageType.video:
+        return 'Video';
+      case MessageType.file:
+        return 'File';
       case MessageType.poll:
         return 'Poll';
       case MessageType.sticker:
@@ -117,6 +138,15 @@ class ScheduledMessageDraft extends Equatable {
     }
 
     switch (type) {
+      case MessageType.image:
+        final label = attachmentFilename.isNotEmpty ? attachmentFilename : text;
+        return label.isEmpty ? '[Photo]' : '[Photo] $label';
+      case MessageType.video:
+        final label = attachmentFilename.isNotEmpty ? attachmentFilename : text;
+        return label.isEmpty ? '[Video]' : '[Video] $label';
+      case MessageType.file:
+        final label = attachmentFilename.isNotEmpty ? attachmentFilename : text;
+        return label.isEmpty ? '[File]' : '[File] $label';
       case MessageType.poll:
         return '[Poll] $text';
       case MessageType.sticker:

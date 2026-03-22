@@ -112,16 +112,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Severity: M
 - Added: 2026-03-20
 - Evidence: `tool/live_message_smoke.dart`
-- Current state: live smoke currently covers UTF-8 text, reply, edit, reaction redaction, and thread behavior. Search, favorites/bookmarks, pinning, built-in translation, scheduled send, and polls were not covered in the recent real-homeserver verification.
-- Next step: extend the live smoke or add integration tests for the uncovered feature set.
-
-### MSG-004 Scheduled send still does not cover local attachments that require delayed upload
-
-- Severity: M
-- Added: 2026-03-22
-- Evidence: `lib/src/domain/entities/scheduled_message_draft.dart`, `lib/src/presentation/widgets/chat/poll_create_sheet.dart`, `lib/src/presentation/pages/chat/chat_page_more_features.dart`, `lib/src/presentation/pages/chat/chat_page_input.dart`
-- Current state: scheduled send now uses a typed draft model and supports text, polls, stickers, and remote GIFs, including due-send replay through `ChatBloc` and picker-level schedule affordances for GIF/sticker selection. The remaining gap is content that depends on local file handles or post-pick upload work: image/video/file attachments still cannot be safely persisted and replayed for delayed send.
-- Next step: define a durable local-attachment draft format first, including path validity, permission expiry, thumbnail/metadata preservation, and how delayed upload should fail closed when the source file is no longer readable.
+- Current state: the live smoke script covers UTF-8 text, reply, edit, reaction redaction, and thread behavior, and now includes a poll send/vote/end path in code. However the latest confirmed real-homeserver run still does not cover search, favorites/bookmarks, pinning, built-in translation, scheduled send, and the new poll path still needs a live run with credentials to count as verified.
+- Next step: run the updated smoke script against a real homeserver, then either extend it further for the remaining Matrix-facing flows or add a Flutter-hosted live test path for client-local features such as scheduled send that depend on local storage/BLoC wiring.
 
 ### CALL-001 Background blur / replacement still lacks a real video processor path
 

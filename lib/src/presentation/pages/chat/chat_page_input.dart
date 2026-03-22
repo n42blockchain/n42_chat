@@ -333,6 +333,14 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _showPhotoPickerOptions();
       },
+      onPhotoLongPress: () async {
+        _hideMorePanel();
+        final scheduledAt = await showScheduledSendPicker(context);
+        if (!mounted || scheduledAt == null) {
+          return;
+        }
+        await _showPhotoPickerOptions(scheduledAt: scheduledAt);
+      },
       onCameraPressed: () {
         _hideMorePanel();
         _takePhoto();
@@ -356,6 +364,14 @@ extension _ChatPageInputMethods on _ChatPageState {
       onFilePressed: () {
         _hideMorePanel();
         _pickFile();
+      },
+      onFileLongPress: () async {
+        _hideMorePanel();
+        final scheduledAt = await showScheduledSendPicker(context);
+        if (!mounted || scheduledAt == null) {
+          return;
+        }
+        await _pickFile(scheduledAt: scheduledAt);
       },
       onContactCardPressed: () {
         _hideMorePanel();

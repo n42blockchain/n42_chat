@@ -3,6 +3,9 @@
 //   DisposeChat, SendTypingNotification, SendSystemNotice, SendPokeMessage,
 //   DeleteFailedMessage, ReplyToMessage, LoadPinnedMessages, PinMessage, UnpinMessage
 
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -59,6 +62,10 @@ void main() {
   late MockMatrixClientManager mockClientManager;
   late MockClient mockClient;
   late MockRoom mockRoom;
+
+  setUpAll(() {
+    registerFallbackValue(Uint8List(0));
+  });
 
   /// Stub everything that InitializeChat triggers
   void stubInitDefaults() {
@@ -944,6 +951,140 @@ void main() {
       ).called(1);
       verify(
         () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_gif'),
+      ).called(1);
+
+      await bloc.close();
+    });
+
+    test('sends due scheduled local image through repository', () async {
+      final tempDir = await Directory.systemTemp.createTemp(
+        'n42_scheduled_image_test',
+      );
+      addTearDown(() async {
+        if (await tempDir.exists()) {
+          await tempDir.delete(recursive: true);
+        }
+      });
+      final imageFile = File('${tempDir.path}/photo.jpg');
+      await imageFile.writeAsBytes(const [0xFF, 0xD8, 0xFF, 0xDB]);
+
+      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+        (_) async => [
+          ScheduledMessageDraft(
+            messageId: 'scheduled_photo',
+            roomId: _roomId,
+            text: 'photo.jpg',
+            type: MessageType.image,
+            scheduledAt: DateTime.now().subtract(const Duration(minutes: 1)),
+            createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
+            payload: {
+              'localPath': imageFile.path,
+              'filename': 'photo.jpg',
+              'mimeType': 'image/jpeg',
+              'fileSize': 4,
+            },
+          ),
+        ],
+      );
+      when(
+        () => mockRepo.sendImageMessage(
+          any(),
+          imageBytes: any(named: 'imageBytes'),
+          filename: any(named: 'filename'),
+          mimeType: any(named: 'mimeType'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+        ),
+      ).thenAnswer((_) async => _msg.copyWith(type: MessageType.image));
+      when(
+        () => mockPrefs.removeScheduledMessage(any(), any()),
+      ).thenAnswer((_) async {});
+
+      final bloc = buildBloc();
+      await initBloc(bloc);
+
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      verify(
+        () => mockRepo.sendImageMessage(
+          _roomId,
+          imageBytes: any(named: 'imageBytes'),
+          filename: 'photo.jpg',
+          mimeType: 'image/jpeg',
+          selfDestructAfter: null,
+        ),
+      ).called(1);
+      verify(
+        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_photo'),
+      ).called(1);
+
+      await bloc.close();
+    });
+
+    test('sends due scheduled local file through repository', () async {
+      final tempDir = await Directory.systemTemp.createTemp(
+        'n42_scheduled_file_test',
+      );
+      addTearDown(() async {
+        if (await tempDir.exists()) {
+          await tempDir.delete(recursive: true);
+        }
+      });
+      final documentFile = File('${tempDir.path}/doc.pdf');
+      await documentFile.writeAsBytes(const [1, 2, 3, 4, 5]);
+
+      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+        (_) async => [
+          ScheduledMessageDraft(
+            messageId: 'scheduled_file',
+            roomId: _roomId,
+            text: 'doc.pdf',
+            type: MessageType.file,
+            scheduledAt: DateTime.now().subtract(const Duration(minutes: 1)),
+            createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
+            payload: {
+              'localPath': documentFile.path,
+              'filename': 'doc.pdf',
+              'mimeType': 'application/pdf',
+              'fileSize': 5,
+            },
+          ),
+        ],
+      );
+      when(
+        () => mockRepo.sendFileMessage(
+          any(),
+          fileBytes: any(named: 'fileBytes'),
+          filename: any(named: 'filename'),
+          mimeType: any(named: 'mimeType'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          filePath: any(named: 'filePath'),
+          fileStream: any(named: 'fileStream'),
+          fileSize: any(named: 'fileSize'),
+        ),
+      ).thenAnswer((_) async => _msg.copyWith(type: MessageType.file));
+      when(
+        () => mockPrefs.removeScheduledMessage(any(), any()),
+      ).thenAnswer((_) async {});
+
+      final bloc = buildBloc();
+      await initBloc(bloc);
+
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      verify(
+        () => mockRepo.sendFileMessage(
+          _roomId,
+          fileBytes: any(named: 'fileBytes'),
+          filename: 'doc.pdf',
+          mimeType: 'application/pdf',
+          selfDestructAfter: null,
+          fileSize: 5,
+        ),
+      ).called(1);
+      verify(
+        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_file'),
       ).called(1);
 
       await bloc.close();

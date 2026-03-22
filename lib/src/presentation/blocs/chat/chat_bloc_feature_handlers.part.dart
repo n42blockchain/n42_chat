@@ -222,19 +222,15 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     if (_currentRoomId == null) return;
 
     try {
-      // 从存储中删除
-      await _secureStorage.removeScheduledMessage(
-        _currentRoomId!,
-        event.messageId,
-      );
-
-      // 从UI中移除
-      final updatedMessages = state.messages
-          .where((m) => m.id != event.messageId)
-          .toList();
-
-      if (!isClosed) {
-        emit(state.copyWith(messages: updatedMessages));
+      final draft = await _findScheduledDraft(_currentRoomId!, event.messageId);
+      if (draft != null) {
+        await _removeScheduledDraftRecord(draft, emit);
+      } else {
+        await _secureStorage.removeScheduledMessage(
+          _currentRoomId!,
+          event.messageId,
+        );
+        _emitWithoutScheduledPreview(event.messageId, emit);
       }
 
       debugLog('ChatBloc: Scheduled message cancelled - ${event.messageId}');
@@ -267,22 +263,20 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         try {
           await _sendScheduledDraft(draft);
 
-          // 从存储中删除
-          await _secureStorage.removeScheduledMessage(roomId, draft.messageId);
-
-          // 如果是当前房间，更新UI
-          if (roomId == _currentRoomId && !isClosed) {
-            final updatedMessages = state.messages
-                .where((m) => m.id != draft.messageId)
-                .toList();
-            emit(state.copyWith(messages: updatedMessages));
-          }
+          await _removeScheduledDraftRecord(draft, emit);
 
           debugLog('ChatBloc: Sent scheduled message - ${draft.messageId}');
         } catch (e) {
           debugLog(
             'ChatBloc: Failed to send scheduled message ${draft.messageId}: $e',
           );
+
+          if (await _shouldDiscardFailedScheduledDraft(draft)) {
+            await _removeScheduledDraftRecord(draft, emit);
+            debugLog(
+              'ChatBloc: Discarded scheduled draft with unreadable local attachment - ${draft.messageId}',
+            );
+          }
         }
       }
     } catch (e) {
@@ -303,7 +297,11 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             .toList(growable: false);
         return text.isNotEmpty && (options?.length ?? 0) >= 2;
       case MessageType.image:
-        return (payload['gifUrl'] as String?)?.isNotEmpty == true;
+        return (payload['gifUrl'] as String?)?.isNotEmpty == true ||
+            _hasValidScheduledLocalAttachmentPayload(payload);
+      case MessageType.video:
+      case MessageType.file:
+        return _hasValidScheduledLocalAttachmentPayload(payload);
       case MessageType.sticker:
         return (payload['stickerId'] as String?)?.isNotEmpty == true &&
             (payload['packId'] as String?)?.isNotEmpty == true &&
@@ -312,6 +310,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         return text.isNotEmpty;
     }
   }
+
+  bool _hasValidScheduledLocalAttachmentPayload(Map<String, dynamic> payload) =>
+      (payload['localPath'] as String?)?.isNotEmpty == true &&
+      (payload['filename'] as String?)?.trim().isNotEmpty == true;
 
   Future<void> _sendScheduledDraft(ScheduledMessageDraft draft) async {
     final roomId = draft.roomId;
@@ -330,17 +332,25 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         );
         return;
       case MessageType.image:
-        if (!draft.isGif) {
-          throw UnsupportedError('Only remote GIF drafts are supported');
+        if (draft.isGif) {
+          await _messageRepository.sendGifMessage(
+            roomId,
+            gifUrl: draft.payload['gifUrl'] as String,
+            previewUrl: draft.payload['previewUrl'] as String?,
+            width: draft.payload['width'] as int?,
+            height: draft.payload['height'] as int?,
+            title: draft.text.isEmpty ? null : draft.text,
+          );
+          return;
         }
-        await _messageRepository.sendGifMessage(
-          roomId,
-          gifUrl: draft.payload['gifUrl'] as String,
-          previewUrl: draft.payload['previewUrl'] as String?,
-          width: draft.payload['width'] as int?,
-          height: draft.payload['height'] as int?,
-          title: draft.text.isEmpty ? null : draft.text,
-        );
+
+        await _sendScheduledLocalImage(draft);
+        return;
+      case MessageType.video:
+        await _sendScheduledLocalVideo(draft);
+        return;
+      case MessageType.file:
+        await _sendScheduledLocalFile(draft);
         return;
       case MessageType.sticker:
         await _messageRepository.sendStickerMessage(
@@ -366,6 +376,178 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           mentionsRoom: draft.mentionsRoom,
         );
     }
+  }
+
+  Future<void> _sendScheduledLocalImage(ScheduledMessageDraft draft) async {
+    final file = await _requireScheduledAttachmentFile(draft);
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) {
+      throw StateError('Scheduled image attachment is empty');
+    }
+
+    await _messageRepository.sendImageMessage(
+      draft.roomId!,
+      imageBytes: bytes,
+      filename: draft.attachmentFilename,
+      mimeType:
+          draft.attachmentMimeType ??
+          lookupMimeType(file.path, headerBytes: bytes) ??
+          'image/jpeg',
+      selfDestructAfter: draft.selfDestructAfter,
+    );
+  }
+
+  Future<void> _sendScheduledLocalVideo(ScheduledMessageDraft draft) async {
+    final file = await _requireScheduledAttachmentFile(draft);
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) {
+      throw StateError('Scheduled video attachment is empty');
+    }
+
+    Uint8List? thumbnailBytes;
+    try {
+      thumbnailBytes = await VideoThumbnail.thumbnailData(
+        video: file.path,
+        imageFormat: ImageFormat.JPEG,
+        maxHeight: 320,
+        quality: 75,
+      );
+    } catch (e) {
+      debugLog(
+        'ChatBloc: Failed to build thumbnail for scheduled video ${draft.messageId}: $e',
+      );
+    }
+
+    await _messageRepository.sendVideoMessage(
+      draft.roomId!,
+      videoBytes: bytes,
+      filename: draft.attachmentFilename,
+      mimeType:
+          draft.attachmentMimeType ?? lookupMimeType(file.path) ?? 'video/mp4',
+      thumbnailBytes: thumbnailBytes,
+      selfDestructAfter: draft.selfDestructAfter,
+    );
+  }
+
+  Future<void> _sendScheduledLocalFile(ScheduledMessageDraft draft) async {
+    final file = await _requireScheduledAttachmentFile(draft);
+    final fileSize = draft.attachmentFileSize ?? await file.length();
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) {
+      throw StateError('Scheduled file attachment is empty');
+    }
+
+    await _messageRepository.sendFileMessage(
+      draft.roomId!,
+      fileBytes: bytes,
+      filename: draft.attachmentFilename,
+      mimeType:
+          draft.attachmentMimeType ??
+          lookupMimeType(file.path) ??
+          'application/octet-stream',
+      selfDestructAfter: draft.selfDestructAfter,
+      fileSize: fileSize,
+    );
+  }
+
+  Future<File> _requireScheduledAttachmentFile(
+    ScheduledMessageDraft draft,
+  ) async {
+    final path = draft.localAttachmentPath;
+    if (path == null || path.isEmpty) {
+      throw StateError('Scheduled draft missing local attachment path');
+    }
+
+    final file = File(path);
+    if (!await file.exists()) {
+      throw FileSystemException('Scheduled attachment file not found', path);
+    }
+
+    return file;
+  }
+
+  Future<bool> _shouldDiscardFailedScheduledDraft(
+    ScheduledMessageDraft draft,
+  ) async {
+    if (!draft.hasLocalAttachment) {
+      return false;
+    }
+
+    final path = draft.localAttachmentPath;
+    if (path == null || path.isEmpty) {
+      return true;
+    }
+
+    try {
+      final file = File(path);
+      if (!await file.exists()) {
+        return true;
+      }
+
+      return await file.length() <= 0;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  Future<ScheduledMessageDraft?> _findScheduledDraft(
+    String roomId,
+    String messageId,
+  ) async {
+    final drafts = await _secureStorage.getScheduledMessages(roomId);
+    for (final draft in drafts) {
+      if (draft.messageId == messageId) {
+        return draft.copyWith(roomId: roomId);
+      }
+    }
+    return null;
+  }
+
+  Future<void> _removeScheduledDraftRecord(
+    ScheduledMessageDraft draft,
+    Emitter<ChatState> emit,
+  ) async {
+    final roomId = draft.roomId;
+    if (roomId == null || roomId.isEmpty) {
+      return;
+    }
+
+    await _secureStorage.removeScheduledMessage(roomId, draft.messageId);
+    await _deleteScheduledDraftArtifacts(draft);
+    if (roomId == _currentRoomId) {
+      _emitWithoutScheduledPreview(draft.messageId, emit);
+    }
+  }
+
+  Future<void> _deleteScheduledDraftArtifacts(
+    ScheduledMessageDraft draft,
+  ) async {
+    final path = draft.localAttachmentPath;
+    if (path == null || path.isEmpty) {
+      return;
+    }
+
+    try {
+      final file = File(path);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (e) {
+      debugLog(
+        'ChatBloc: Failed to delete scheduled attachment artifact ${draft.messageId}: $e',
+      );
+    }
+  }
+
+  void _emitWithoutScheduledPreview(String messageId, Emitter<ChatState> emit) {
+    if (isClosed) {
+      return;
+    }
+
+    final updatedMessages = state.messages
+        .where((message) => message.id != messageId)
+        .toList(growable: false);
+    emit(state.copyWith(messages: updatedMessages));
   }
 
   // ============================================
