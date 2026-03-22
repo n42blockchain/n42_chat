@@ -14,6 +14,9 @@ class ChatMorePanel extends StatefulWidget {
   /// 选择照片回调
   final VoidCallback? onPhotoPressed;
 
+  /// 长按照片回调
+  final VoidCallback? onPhotoLongPress;
+
   /// 拍摄回调
   final VoidCallback? onCameraPressed;
 
@@ -34,6 +37,9 @@ class ChatMorePanel extends StatefulWidget {
 
   /// 文件回调
   final VoidCallback? onFilePressed;
+
+  /// 长按文件回调
+  final VoidCallback? onFileLongPress;
 
   /// 名片回调
   final VoidCallback? onContactCardPressed;
@@ -92,6 +98,7 @@ class ChatMorePanel extends StatefulWidget {
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
+    this.onPhotoLongPress,
     this.onCameraPressed,
     this.onVideoCallPressed,
     this.onLocationPressed,
@@ -99,6 +106,7 @@ class ChatMorePanel extends StatefulWidget {
     this.onRedPacketPressed,
     this.onTransferPressed,
     this.onFilePressed,
+    this.onFileLongPress,
     this.onContactCardPressed,
     this.onFavoritePressed,
     this.onMusicPressed,
@@ -183,6 +191,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       icon: Icons.photo_library_outlined,
                       label: S.of(context)?.contactPhotos ?? 'Photos',
                       onTap: widget.onPhotoPressed,
+                      onLongPress: widget.onPhotoLongPress,
                     ),
                     _MoreItem(
                       icon: Icons.camera_alt_outlined,
@@ -220,6 +229,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       icon: Icons.folder_outlined,
                       label: S.of(context)?.commonFileLabel ?? 'File',
                       onTap: widget.onFilePressed,
+                      onLongPress: widget.onFileLongPress,
                     ),
                     _MoreItem(
                       icon: Icons.person_outline,
@@ -402,6 +412,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
 
     return GestureDetector(
       onTap: item.onTap,
+      onLongPress: item.onLongPress,
       child: SizedBox(
         width: 70,
         child: Column(
@@ -443,12 +454,14 @@ class _MoreItem {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final Color? iconColor;
 
   const _MoreItem({
     required this.icon,
     required this.label,
     this.onTap,
+    this.onLongPress,
     this.iconColor,
   });
 }

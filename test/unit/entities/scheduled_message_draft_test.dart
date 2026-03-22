@@ -63,5 +63,28 @@ void main() {
       expect(draft.typeLabel, 'GIF');
       expect(draft.timelinePreviewText, '[GIF] Celebration');
     });
+
+    test('parses local attachment payload and builds media preview text', () {
+      final draft = ScheduledMessageDraft.fromJson({
+        'messageId': 'scheduled_photo',
+        'text': 'IMG_0001.jpg',
+        'type': 'image',
+        'scheduledAt': DateTime.utc(2026, 3, 22, 12).toIso8601String(),
+        'createdAt': DateTime.utc(2026, 3, 22, 11).toIso8601String(),
+        'payload': {
+          'localPath': '/tmp/scheduled/IMG_0001.jpg',
+          'filename': 'IMG_0001.jpg',
+          'mimeType': 'image/jpeg',
+          'fileSize': 2048,
+        },
+      });
+
+      expect(draft.hasLocalAttachment, isTrue);
+      expect(draft.localAttachmentPath, '/tmp/scheduled/IMG_0001.jpg');
+      expect(draft.attachmentMimeType, 'image/jpeg');
+      expect(draft.attachmentFileSize, 2048);
+      expect(draft.typeLabel, 'Photo');
+      expect(draft.timelinePreviewText, '[Photo] IMG_0001.jpg');
+    });
   });
 }

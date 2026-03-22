@@ -307,7 +307,9 @@ class MatrixMetadataExtractor {
       }
 
       // 提取投票设置
+      final kind = pollStart['kind'] as String?;
       final maxSelections = pollStart['max_selections'] as int? ?? 1;
+      final isAnonymousPoll = kind == 'org.matrix.msc3381.poll.undisclosed';
 
       // 从聚合事件中获取投票统计
       final voteCounts = <String, int>{};
@@ -431,6 +433,7 @@ class MatrixMetadataExtractor {
           pollOptionIds: optionIds,
           maxSelections: maxSelections,
           pollEnded: forwardedEnded, // 转发的投票始终标记为已结束
+          isAnonymousPoll: isAnonymousPoll,
           voteCounts: voteCounts,
           totalVoters: forwardedTotalVoters,
           myVotes: myVotes, // 转发的投票不包含用户的投票记录
@@ -443,6 +446,7 @@ class MatrixMetadataExtractor {
         pollOptionIds: optionIds,
         maxSelections: maxSelections,
         pollEnded: pollEnded,
+        isAnonymousPoll: isAnonymousPoll,
         voteCounts: voteCounts,
         totalVoters: voters.length,
         myVotes: myVotes,

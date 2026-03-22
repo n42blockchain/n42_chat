@@ -3,11 +3,21 @@ part of 'chat_page.dart';
 
 enum _PhotoSendMode { media, originalFile }
 
+class _PersistedScheduledAttachment {
+  final String localPath;
+  final int fileSize;
+
+  const _PersistedScheduledAttachment({
+    required this.localPath,
+    required this.fileSize,
+  });
+}
+
 /// 媒体操作相关方法（图片、视频、文件、语音的选择与发送）
 extension _ChatPageMediaActionsMethods on _ChatPageState {
   static const int _maxEncryptedRoomFileBytes = 64 * 1024 * 1024;
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage({DateTime? scheduledAt}) async {
     try {
       final picker = ImagePicker();
       final mediaFiles = await picker.pickMultipleMedia();
@@ -17,13 +27,13 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       for (final file in mediaFiles) {
         final mimeType = lookupMimeType(file.path) ?? '';
         if (mimeType.startsWith('video/')) {
-          await _sendVideo(file);
+          await _sendVideo(file, scheduledAt: scheduledAt);
         } else {
           // 单张图片时提供编辑选项
           if (mediaFiles.length == 1) {
-            await _editAndSendImage(file);
+            await _editAndSendImage(file, scheduledAt: scheduledAt);
           } else {
-            await _sendImage(file);
+            await _sendImage(file, scheduledAt: scheduledAt);
           }
         }
       }
@@ -43,7 +53,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
-  Future<void> _showPhotoPickerOptions() async {
+  Future<void> _showPhotoPickerOptions({DateTime? scheduledAt}) async {
     final isDark = context.isDarkMode;
     final selectedMode = await showModalBottomSheet<_PhotoSendMode>(
       context: context,
@@ -85,14 +95,14 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
 
     if (selectedMode == _PhotoSendMode.originalFile) {
-      await _pickOriginalImagesAsFiles();
+      await _pickOriginalImagesAsFiles(scheduledAt: scheduledAt);
       return;
     }
 
-    await _pickImage();
+    await _pickImage(scheduledAt: scheduledAt);
   }
 
-  Future<void> _pickOriginalImagesAsFiles() async {
+  Future<void> _pickOriginalImagesAsFiles({DateTime? scheduledAt}) async {
     try {
       final picker = ImagePicker();
       final images = await picker.pickMultiImage();
@@ -104,7 +114,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         if (!mounted) {
           return;
         }
-        await _sendOriginalImageAsFile(image);
+        await _sendOriginalImageAsFile(image, scheduledAt: scheduledAt);
       }
     } catch (e) {
       debugLog('Pick original images error: $e');
@@ -123,7 +133,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
   /// 打开编辑器编辑图片后发送
   ///
   /// 编辑器中确认发送编辑后的图片，取消则不发送。
-  Future<void> _editAndSendImage(XFile image) async {
+  Future<void> _editAndSendImage(XFile image, {DateTime? scheduledAt}) async {
     try {
       final bytes = await image.readAsBytes();
       if (!mounted) return;
@@ -146,6 +156,24 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       );
       filename = _ensureFilenameMatchesMimeType(filename, mimeType);
 
+      if (scheduledAt != null) {
+        await _scheduleLocalAttachmentDraft(
+          type: MessageType.image,
+          scheduledAt: scheduledAt,
+          filename: filename,
+          mimeType: mimeType,
+          fileBytes: editedBytes,
+          fileSize: editedBytes.length,
+          selfDestructAfter: _isViewOnce ? 1 : null,
+        );
+
+        if (_isViewOnce) {
+          setState(() => _isViewOnce = false);
+        }
+        _showScheduledAttachmentSnackBar(filename, scheduledAt);
+        return;
+      }
+
       context.read<ChatBloc>().add(
         SendImageMessage(
           imageBytes: editedBytes,
@@ -161,7 +189,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     } catch (e) {
       debugLog('Edit image error: $e');
       // 编辑器出错时回退到直接发送
-      await _sendImage(image);
+      await _sendImage(image, scheduledAt: scheduledAt);
     }
   }
 
@@ -275,7 +303,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
-  Future<void> _sendVideo(XFile video) async {
+  Future<void> _sendVideo(XFile video, {DateTime? scheduledAt}) async {
     try {
       debugLog('=== _sendVideo start ===');
       debugLog('Video path: ${video.path}');
@@ -377,6 +405,27 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         return;
       }
 
+      if (scheduledAt != null) {
+        await _scheduleLocalAttachmentDraft(
+          type: MessageType.video,
+          scheduledAt: scheduledAt,
+          filename: filename,
+          mimeType: mimeType,
+          fileBytes: video.path.isEmpty || kIsWeb ? bytes : null,
+          filePath: video.path.isEmpty || kIsWeb ? null : video.path,
+          fileSize: bytes.length,
+          selfDestructAfter: _isViewOnce ? 1 : null,
+        );
+
+        if (_isViewOnce) {
+          setState(() {
+            _isViewOnce = false;
+          });
+        }
+        _showScheduledAttachmentSnackBar(filename, scheduledAt);
+        return;
+      }
+
       // 生成视频缩略图（第一帧）
       Uint8List? thumbnailBytes;
       try {
@@ -456,7 +505,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
-  Future<void> _sendImage(XFile image) async {
+  Future<void> _sendImage(XFile image, {DateTime? scheduledAt}) async {
     try {
       debugLog('=== _sendImage start ===');
       debugLog('Image path: ${image.path}');
@@ -557,6 +606,26 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       debugLog('Image size: ${bytes.length} bytes');
       debugLog('=== Sending image to ChatBloc ===');
 
+      if (scheduledAt != null) {
+        await _scheduleLocalAttachmentDraft(
+          type: MessageType.image,
+          scheduledAt: scheduledAt,
+          filename: filename,
+          mimeType: mimeType,
+          fileBytes: bytes,
+          fileSize: bytes.length,
+          selfDestructAfter: _isViewOnce ? 1 : null,
+        );
+
+        if (_isViewOnce) {
+          setState(() {
+            _isViewOnce = false;
+          });
+        }
+        _showScheduledAttachmentSnackBar(filename, scheduledAt);
+        return;
+      }
+
       if (!mounted) return;
       context.read<ChatBloc>().add(
         SendImageMessage(
@@ -601,7 +670,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
-  Future<void> _pickFile() async {
+  Future<void> _pickFile({DateTime? scheduledAt}) async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.any,
@@ -620,7 +689,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
           continue;
         }
 
-        await _sendFile(file);
+        await _sendFile(file, scheduledAt: scheduledAt);
       }
     } catch (e) {
       debugLog('Pick file error: $e');
@@ -638,7 +707,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
-  Future<void> _sendFile(PlatformFile file) async {
+  Future<void> _sendFile(PlatformFile file, {DateTime? scheduledAt}) async {
     try {
       final filename = file.name;
       final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
@@ -655,14 +724,17 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         fileBytes: file.bytes,
         filePath: file.path,
         fileStream: file.readStream,
+        scheduledAt: scheduledAt,
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              S.of(context)?.chatFileSending(filename) ??
-                  'Sending file: $filename',
+              scheduledAt == null
+                  ? (S.of(context)?.chatFileSending(filename) ??
+                        'Sending file: $filename')
+                  : 'Scheduled file: $filename',
             ),
             duration: const Duration(seconds: 1),
           ),
@@ -684,7 +756,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
-  Future<void> _sendOriginalImageAsFile(XFile image) async {
+  Future<void> _sendOriginalImageAsFile(
+    XFile image, {
+    DateTime? scheduledAt,
+  }) async {
     try {
       var filename = image.name.trim();
       if (filename.isEmpty) {
@@ -719,6 +794,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         fileSize: fileSize,
         fileBytes: imageBytes,
         filePath: filePath,
+        scheduledAt: scheduledAt,
       );
 
       if (!mounted) {
@@ -726,7 +802,11 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Sending original image: $filename'),
+          content: Text(
+            scheduledAt == null
+                ? 'Sending original image: $filename'
+                : 'Scheduled original image: $filename',
+          ),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -864,19 +944,36 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     Uint8List? fileBytes,
     String? filePath,
     Stream<List<int>>? fileStream,
+    DateTime? scheduledAt,
   }) async {
     if (!mounted) {
       return;
     }
+
+    if (widget.conversation.isEncrypted &&
+        fileSize > _maxEncryptedRoomFileBytes) {
+      throw Exception(
+        'Encrypted rooms currently support secure file uploads up to 64MB',
+      );
+    }
+
+    if (scheduledAt != null) {
+      await _scheduleLocalAttachmentDraft(
+        type: MessageType.file,
+        scheduledAt: scheduledAt,
+        filename: filename,
+        mimeType: mimeType,
+        fileBytes: fileBytes,
+        filePath: filePath,
+        fileStream: fileStream,
+        fileSize: fileSize,
+      );
+      return;
+    }
+
     final chatBloc = context.read<ChatBloc>();
 
     if (widget.conversation.isEncrypted) {
-      if (fileSize > _maxEncryptedRoomFileBytes) {
-        throw Exception(
-          'Encrypted rooms currently support secure file uploads up to 64MB',
-        );
-      }
-
       final secureBytes = await _resolveFileBytes(
         fileBytes: fileBytes,
         filePath: filePath,
@@ -954,6 +1051,122 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       return _readAllBytes(fileStream);
     }
     return null;
+  }
+
+  Future<void> _scheduleLocalAttachmentDraft({
+    required MessageType type,
+    required DateTime scheduledAt,
+    required String filename,
+    required String mimeType,
+    Uint8List? fileBytes,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
+    int? selfDestructAfter,
+  }) async {
+    final persisted = await _persistScheduledAttachment(
+      filename: filename,
+      fileBytes: fileBytes,
+      filePath: filePath,
+      fileStream: fileStream,
+      fileSize: fileSize,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    context.read<ChatBloc>().add(
+      SendScheduledMessage(
+        text: filename,
+        type: type,
+        payload: {
+          'localPath': persisted.localPath,
+          'filename': filename,
+          'mimeType': mimeType,
+          'fileSize': persisted.fileSize,
+        },
+        scheduledAt: scheduledAt,
+        selfDestructAfter: selfDestructAfter,
+      ),
+    );
+  }
+
+  Future<_PersistedScheduledAttachment> _persistScheduledAttachment({
+    required String filename,
+    Uint8List? fileBytes,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
+  }) async {
+    final targetDirectory = await _ensureScheduledAttachmentDirectory();
+    final targetFile = File(
+      '${targetDirectory.path}/${_buildScheduledAttachmentFilename(filename)}',
+    );
+
+    if (filePath != null && filePath.isNotEmpty) {
+      final sourceFile = File(filePath);
+      if (!await sourceFile.exists()) {
+        throw FileSystemException(
+          'Scheduled attachment source is no longer readable',
+          filePath,
+        );
+      }
+
+      final copiedFile = await sourceFile.copy(targetFile.path);
+      return _PersistedScheduledAttachment(
+        localPath: copiedFile.path,
+        fileSize: fileSize ?? await copiedFile.length(),
+      );
+    }
+
+    final resolvedBytes = await _resolveFileBytes(
+      fileBytes: fileBytes,
+      filePath: filePath,
+      fileStream: fileStream,
+    );
+    if (resolvedBytes == null || resolvedBytes.isEmpty) {
+      throw Exception('No readable file source available');
+    }
+
+    await targetFile.writeAsBytes(resolvedBytes, flush: true);
+    return _PersistedScheduledAttachment(
+      localPath: targetFile.path,
+      fileSize: fileSize ?? resolvedBytes.length,
+    );
+  }
+
+  Future<Directory> _ensureScheduledAttachmentDirectory() async {
+    final appSupportDir = await getApplicationSupportDirectory();
+    final directory = Directory('${appSupportDir.path}/scheduled_attachments');
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    return directory;
+  }
+
+  String _buildScheduledAttachmentFilename(String filename) {
+    final sanitized = filename
+        .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
+        .replaceAll(' ', '_');
+    return '${DateTime.now().microsecondsSinceEpoch}_$sanitized';
+  }
+
+  void _showScheduledAttachmentSnackBar(String filename, DateTime scheduledAt) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Scheduled $filename for ${scheduledAt.month}/${scheduledAt.day} '
+          '${scheduledAt.hour.toString().padLeft(2, '0')}:'
+          '${scheduledAt.minute.toString().padLeft(2, '0')}',
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   String _resolveMimeType({

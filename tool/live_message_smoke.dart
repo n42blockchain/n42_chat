@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:matrix/matrix.dart' as matrix;
+import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/data/datasources/matrix/message/matrix_event_mapper.dart';
 import 'package:n42_chat/src/data/datasources/matrix/message/matrix_text_message_content.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -129,12 +130,15 @@ void main() async {
     const replyText = '回复 Reply 🫡 café';
     const editedText = '已编辑 cafe\u0301 👩‍👩‍👧‍👦 <script>alert(1)</script>';
     const threadText = '线程 Thread 🧵 español';
+    const pollQuestion = 'Lunch?';
+    const pollOptions = ['Sushi', 'Pizza'];
 
     String? rootEventId;
     String? replyEventId;
     String? editEventId;
     String? reactionEventId;
     String? threadEventId;
+    String? pollEventId;
 
     await _step('send UTF-8 root message', () async {
       rootEventId = await room.sendEvent(
@@ -277,6 +281,105 @@ void main() async {
       );
     });
 
+    await _step('send anonymous poll, vote, and end poll', () async {
+      pollEventId = await room.sendEvent(
+        _buildPollStartContent(
+          question: pollQuestion,
+          options: pollOptions,
+          maxSelections: 1,
+          isAnonymous: true,
+        ),
+        type: 'org.matrix.msc3381.poll.start',
+      );
+      _expect(pollEventId != null, 'poll send returned null');
+      await _sync(client, rounds: 2);
+
+      final pollEvent = await _waitForServerEvent(client, room, pollEventId!);
+      final pollStart =
+          pollEvent.content['org.matrix.msc3381.poll.start']
+              as Map<String, dynamic>?;
+      _expect(pollStart != null, 'poll.start content missing');
+      _expect(
+        pollStart?['kind'] == 'org.matrix.msc3381.poll.undisclosed',
+        'poll kind did not preserve anonymous mode',
+      );
+
+      final answers =
+          (pollStart?['answers'] as List<dynamic>?)
+              ?.whereType<Map<String, dynamic>>()
+              .toList(growable: false) ??
+          const [];
+      _expect(answers.length == 2, 'poll answers count mismatch');
+      final firstOptionId = answers.first['id'] as String?;
+      _expect(
+        firstOptionId != null && firstOptionId.isNotEmpty,
+        'poll option id missing',
+      );
+
+      final mappedInitial = mapper.mapEventToMessage(pollEvent, room);
+      _expect(
+        mappedInitial.type == MessageType.poll,
+        'mapped poll type mismatch',
+      );
+      _expect(
+        mappedInitial.metadata?.pollQuestion == pollQuestion,
+        'mapped poll question mismatch',
+      );
+      _expect(
+        mappedInitial.metadata?.pollOptions?.length == 2,
+        'mapped poll options missing',
+      );
+      _expect(
+        mappedInitial.metadata?.isAnonymousPoll == true,
+        'mapped poll anonymity missing',
+      );
+
+      final voted = await room.sendEvent(<String, dynamic>{
+        'm.relates_to': <String, dynamic>{
+          'rel_type': 'm.reference',
+          'event_id': pollEventId,
+        },
+        'org.matrix.msc3381.poll.response': <String, dynamic>{
+          'answers': [firstOptionId],
+        },
+      }, type: 'org.matrix.msc3381.poll.response');
+      _expect(voted != null, 'poll vote send returned null');
+
+      final ended = await room.sendEvent(<String, dynamic>{
+        'm.relates_to': <String, dynamic>{
+          'rel_type': 'm.reference',
+          'event_id': pollEventId,
+        },
+        'org.matrix.msc3381.poll.end': <String, dynamic>{},
+        'org.matrix.msc1767.text': 'Poll ended',
+      }, type: 'org.matrix.msc3381.poll.end');
+      _expect(ended != null, 'poll end send returned null');
+      await _sync(client, rounds: 3);
+
+      final bundledPoll = await _waitForBundledPollEvent(
+        client,
+        room,
+        pollEventId!,
+      );
+      final mappedBundled = mapper.mapEventToMessage(bundledPoll, room);
+      final metadata = mappedBundled.metadata;
+      _expect(metadata != null, 'bundled poll metadata missing');
+      _expect(metadata?.pollEnded == true, 'poll end aggregation missing');
+      _expect(metadata?.totalVoters == 1, 'poll voter count mismatch');
+      _expect(
+        metadata?.voteCounts?[firstOptionId] == 1,
+        'poll vote count mismatch',
+      );
+      _expect(
+        metadata?.myVotes?.contains(firstOptionId) == true,
+        'poll myVotes missing',
+      );
+      _expect(
+        metadata?.isAnonymousPoll == true,
+        'bundled poll anonymity mismatch',
+      );
+    });
+
     print('');
     print('Live smoke passed.');
     print('roomId=$roomId');
@@ -285,6 +388,7 @@ void main() async {
     print('editEventId=$editEventId');
     print('reactionEventId=$reactionEventId');
     print('threadEventId=$threadEventId');
+    print('pollEventId=$pollEventId');
   } catch (error, stackTrace) {
     stderr.writeln('');
     stderr.writeln('Live smoke failed: $error');
@@ -465,6 +569,62 @@ Future<matrix.Event> _attachLatestEditAggregation(
   return matrix.Event.fromJson(baseJson, room);
 }
 
+Future<matrix.Event> _waitForBundledPollEvent(
+  matrix.Client client,
+  matrix.Room room,
+  String pollEventId,
+) async {
+  matrix.Event? event;
+  await _waitFor(() async {
+    final base = await _fetchServerEvent(client, room, pollEventId);
+    if (base == null) {
+      return false;
+    }
+
+    final aggregated = await _attachReferenceAggregation(client, room, base);
+    final mapped = MatrixEventMapper(
+      () => client,
+    ).mapEventToMessage(aggregated, room);
+    final metadata = mapped.metadata;
+    final hasVoteCount =
+        metadata?.voteCounts?.values.any((count) => count > 0) == true;
+    if (metadata?.pollEnded == true && hasVoteCount) {
+      event = aggregated;
+      return true;
+    }
+    return false;
+  }, description: 'bundled poll aggregation for $pollEventId');
+  return event!;
+}
+
+Future<matrix.Event> _attachReferenceAggregation(
+  matrix.Client client,
+  matrix.Room room,
+  matrix.Event base,
+) async {
+  final response = await client.request(
+    matrix.RequestType.GET,
+    '/client/v1/rooms/${Uri.encodeComponent(room.id)}/relations/${Uri.encodeComponent(base.eventId)}/m.reference',
+    query: <String, String>{'limit': '50'},
+  );
+
+  final chunk = (response['chunk'] as List<dynamic>? ?? const [])
+      .whereType<Map<Object?, Object?>>()
+      .map((event) => Map<String, dynamic>.from(event.cast<String, dynamic>()))
+      .toList(growable: false);
+
+  final unsigned = Map<String, dynamic>.from(base.unsigned ?? const {});
+  final relations = Map<String, dynamic>.from(
+    (unsigned['m.relations'] as Map<String, dynamic>?) ?? const {},
+  );
+  relations['m.reference'] = <String, dynamic>{'chunk': chunk};
+  unsigned['m.relations'] = relations;
+
+  final baseJson = Map<String, dynamic>.from(base.toJson());
+  baseJson['unsigned'] = unsigned;
+  return matrix.Event.fromJson(baseJson, room);
+}
+
 Future<Map<String, Set<String>>> _activeReactions(
   matrix.Room room,
   String eventId,
@@ -513,6 +673,37 @@ Future<List<matrix.Event>> _waitForThreadEvents(
     return chunk.isNotEmpty;
   }, description: 'thread relations for $threadRootEventId');
   return events;
+}
+
+Map<String, dynamic> _buildPollStartContent({
+  required String question,
+  required List<String> options,
+  required int maxSelections,
+  required bool isAnonymous,
+}) {
+  final pollOptions = options
+      .asMap()
+      .entries
+      .map((entry) {
+        return <String, dynamic>{
+          'id': '${DateTime.now().millisecondsSinceEpoch}_${entry.key}',
+          'org.matrix.msc1767.text': entry.value,
+        };
+      })
+      .toList(growable: false);
+
+  return <String, dynamic>{
+    'org.matrix.msc3381.poll.start': <String, dynamic>{
+      'question': <String, dynamic>{'org.matrix.msc1767.text': question},
+      'kind': isAnonymous
+          ? 'org.matrix.msc3381.poll.undisclosed'
+          : 'org.matrix.msc3381.poll.disclosed',
+      'max_selections': maxSelections,
+      'answers': pollOptions,
+    },
+    'org.matrix.msc1767.text':
+        '$question\n${options.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')}',
+  };
 }
 
 Future<void> _waitFor(
