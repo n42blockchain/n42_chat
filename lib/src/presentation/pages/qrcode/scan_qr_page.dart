@@ -7,9 +7,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/social_scan_payload_parser.dart';
-import '../../../domain/entities/mini_app_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
-import '../mini_app/mini_app_page.dart';
+import '../../helpers/mini_app_launcher_helper.dart';
 import 'my_qrcode_page.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -178,8 +177,10 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           await _startChatWithUser(payload.userId!);
           break;
         case SocialScanPayloadType.miniApp:
-          await _openMiniApp(
-            payload.miniApp!,
+          await MiniAppLauncherHelper.openApp<void>(
+            context,
+            app: payload.miniApp!,
+            roomId: '',
             initialUrl: payload.miniAppLaunchUrl,
           );
           if (mounted) {
@@ -199,16 +200,6 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         setState(() => _isProcessing = false);
       }
     }
-  }
-
-  Future<void> _openMiniApp(MiniAppEntity app, {String? initialUrl}) async {
-    if (!mounted) return;
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) =>
-            MiniAppPage(app: app, roomId: '', initialUrl: initialUrl),
-      ),
-    );
   }
 
   Future<void> _startChatWithUser(String userId) async {
