@@ -18,6 +18,7 @@ import '../../../integration/bridge/bridge_manager.dart';
 import '../../../n42_chat.dart';
 import '../../helpers/system_account_summary_helper.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/settings/settings_hub_widgets.dart';
 import '../bridge/bridge_list_page.dart';
 import '../profile/set_username_page.dart';
 import 'account_switch_page.dart';
@@ -25,7 +26,14 @@ import 'notification_settings_page.dart';
 import 'security_settings_page.dart';
 
 class SystemAccountsPage extends StatefulWidget {
-  const SystemAccountsPage({super.key});
+  final Future<void> Function()? onOpenAccounts;
+  final Future<void> Function()? onOpenSecuritySettings;
+
+  const SystemAccountsPage({
+    super.key,
+    this.onOpenAccounts,
+    this.onOpenSecuritySettings,
+  });
 
   @override
   State<SystemAccountsPage> createState() => _SystemAccountsPageState();
@@ -110,7 +118,27 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
     }
   }
 
+  Future<bool> _runExternalFlow(Future<void> Function()? action) async {
+    if (action == null) {
+      return false;
+    }
+
+    await action();
+    if (!mounted) {
+      return true;
+    }
+    await _loadSummary();
+    return true;
+  }
+
   Future<void> _openAccounts() async {
+    if (await _runExternalFlow(widget.onOpenAccounts)) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+
     await Navigator.of(
       context,
     ).push(MaterialPageRoute<void>(builder: (_) => const AccountSwitchPage()));
@@ -139,6 +167,17 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
   }
 
   Future<void> _openUsername() async {
+    final client = MatrixClientManager.instance.client;
+    if (client == null || client.isLogged() != true) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username requires an active session')),
+      );
+      return;
+    }
+
     await Navigator.of(
       context,
     ).push(MaterialPageRoute<void>(builder: (_) => const SetUsernamePage()));
@@ -149,8 +188,15 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
   }
 
   Future<void> _openSecurity() async {
+    if (await _runExternalFlow(widget.onOpenSecuritySettings)) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+
     final client = MatrixClientManager.instance.client;
-    if (client == null) {
+    if (client == null || client.isLogged() != true) {
       if (!mounted) {
         return;
       }
@@ -178,7 +224,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
 
   Future<void> _openBridges() async {
     final client = MatrixClientManager.instance.client;
-    if (client == null) {
+    if (client == null || client.isLogged() != true) {
       if (!mounted) {
         return;
       }
@@ -225,12 +271,12 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
             const SizedBox(height: 16),
-            _buildOverviewCard(context, isDark),
+            _buildOverviewCard(),
             const SizedBox(height: 16),
-            _Section(
+            SettingsHubSection(
               title: 'Account & Identity',
               children: [
-                _ActionTile(
+                SettingsHubActionTile(
                   icon: Icons.manage_accounts_outlined,
                   iconColor: Colors.indigo,
                   title: 'Accounts',
@@ -239,7 +285,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
                   ),
                   onTap: _isLoading ? null : _openAccounts,
                 ),
-                _ActionTile(
+                SettingsHubActionTile(
                   icon: Icons.devices_outlined,
                   iconColor: Colors.teal,
                   title: 'Devices & Sessions',
@@ -249,7 +295,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
                   ),
                   onTap: _isLoading ? null : _openSecurity,
                 ),
-                _ActionTile(
+                SettingsHubActionTile(
                   icon: Icons.alternate_email,
                   iconColor: Colors.orange,
                   title: 'Username',
@@ -261,10 +307,10 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
               ],
             ),
             const SizedBox(height: 16),
-            _Section(
+            SettingsHubSection(
               title: l10n?.settingsNotificationSettings ?? 'Notifications',
               children: [
-                _ActionTile(
+                SettingsHubActionTile(
                   icon: Icons.notifications_outlined,
                   iconColor: Colors.red,
                   title:
@@ -278,10 +324,10 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
               ],
             ),
             const SizedBox(height: 16),
-            _Section(
+            SettingsHubSection(
               title: 'Integrations',
               children: [
-                _ActionTile(
+                SettingsHubActionTile(
                   icon: Icons.hub_outlined,
                   iconColor: Colors.deepPurple,
                   title: 'Connected Accounts',
@@ -298,12 +344,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
     );
   }
 
-  Widget _buildOverviewCard(BuildContext context, bool isDark) {
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final titleColor = isDark ? Colors.white : AppColors.textPrimary;
-    final subtitleColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildOverviewCard() {
     final effectiveDeviceCount = _deviceCount > 0
         ? _deviceCount
         : (_currentUserId == null ? 0 : 1);
@@ -312,217 +353,24 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
       orElse: () => null,
     );
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
+    return SettingsHubOverviewCard(
+      avatarUrl: currentAccount?.avatarUrl,
+      avatarName: currentAccount?.effectiveDisplayName ?? _currentUserId,
+      title:
+          currentAccount?.effectiveDisplayName ??
+          (_currentUserId?.split(':').first.replaceFirst('@', '') ??
+              'System overview'),
+      subtitle: SystemAccountSummaryHelper.currentAccountLabel(
+        userId: _currentUserId,
+        homeserver: _currentHomeserver,
       ),
-      child: Row(
-        children: [
-          N42Avatar(
-            imageUrl: currentAccount?.avatarUrl,
-            name: currentAccount?.effectiveDisplayName ?? _currentUserId,
-            size: 56,
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  currentAccount?.effectiveDisplayName ??
-                      (_currentUserId?.split(':').first.replaceFirst('@', '') ??
-                          'System overview'),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: titleColor,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  SystemAccountSummaryHelper.currentAccountLabel(
-                    userId: _currentUserId,
-                    homeserver: _currentHomeserver,
-                  ),
-                  style: TextStyle(fontSize: 13, color: subtitleColor),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _SummaryChip(
-                      label: _isLoading
-                          ? 'Loading...'
-                          : '${_accounts.length} account${_accounts.length == 1 ? '' : 's'}',
-                    ),
-                    _SummaryChip(
-                      label:
-                          '$effectiveDeviceCount device${effectiveDeviceCount == 1 ? '' : 's'}',
-                    ),
-                    if ((_username?.trim().isNotEmpty ?? false))
-                      _SummaryChip(label: '@${_username!.trim()}'),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Section extends StatelessWidget {
-  final String title;
-  final List<Widget> children;
-
-  const _Section({required this.title, required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
-    return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
-              ),
-            ),
-          ),
-          ...List.generate(children.length * 2 - 1, (index) {
-            if (index.isOdd) {
-              return Padding(
-                padding: const EdgeInsets.only(left: 60),
-                child: Divider(
-                  height: 1,
-                  color: isDark ? AppColors.dividerDark : AppColors.divider,
-                ),
-              );
-            }
-            return children[index ~/ 2];
-          }),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActionTile extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
-  final VoidCallback? onTap;
-
-  const _ActionTile({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: iconColor,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Icon(icon, color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Opacity(
-                  opacity: onTap == null ? 0.55 : 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: isDark ? Colors.white : AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SummaryChip extends StatelessWidget {
-  final String label;
-
-  const _SummaryChip({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: isDark ? Colors.white : AppColors.textPrimary,
-        ),
-      ),
+      chips: [
+        _isLoading
+            ? 'Loading...'
+            : '${_accounts.length} account${_accounts.length == 1 ? '' : 's'}',
+        '$effectiveDeviceCount device${effectiveDeviceCount == 1 ? '' : 's'}',
+        if ((_username?.trim().isNotEmpty ?? false)) '@${_username!.trim()}',
+      ],
     );
   }
 }
