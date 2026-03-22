@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:async';
 
 import 'package:matrix/matrix.dart' as matrix;
 

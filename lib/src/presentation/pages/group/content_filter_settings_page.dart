@@ -26,22 +26,6 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
   final TextEditingController _wordController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    // 从 GroupBloc 中读取当前配置
-    final group = context.read<GroupBloc>().state.currentGroup;
-    if (group != null) {
-      _loadCurrentConfig();
-    }
-  }
-
-  void _loadCurrentConfig() {
-    // 通过 datasource 同步读取（需要通过 GroupRepository）
-    // 这里先尝试从 GroupBloc state 的 currentGroup 中没有 filter，
-    // 所以需要单独读取，暂时用 empty 初始值，保存时会完整更新
-  }
-
-  @override
   void dispose() {
     _wordController.dispose();
     super.dispose();

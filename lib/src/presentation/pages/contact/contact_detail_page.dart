@@ -54,14 +54,6 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   bool _isAddingFriend = false;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadContact();
-    });
-  }
-  
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _loadContact();

@@ -192,20 +192,5 @@ enum SpeechProvider {
   whisper,
 }
 
-/// 语音识别配置
-/// 
-/// 使用示例：
-/// ```dart
-/// // 配置 Google API
-/// SpeechToTextService().configureGoogle('your-api-key');
-/// 
-/// // 配置 Azure
-/// SpeechToTextService().configureAzure('your-api-key', 'eastus');
-/// 
-/// // 配置本地 Whisper 服务器
-/// SpeechToTextService().configureWhisper('http://localhost:8000');
-/// 
-/// // 转文字
-/// final text = await SpeechToTextService().transcribe('/path/to/audio.mp3');
-/// ```
+
 

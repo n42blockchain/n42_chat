@@ -19,15 +19,6 @@ class E2EEManager {
   /// 是否已初始化加密
   bool get isEncryptionInitialized => _client.encryption != null;
 
-  /// 初始化加密
-  Future<void> initializeEncryption() async {
-    if (!isEncryptionSupported) {
-      throw E2EEException('Encryption is not supported');
-    }
-
-    // Matrix SDK会自动初始化加密
-  }
-
   /// 获取加密状态
   E2EEStatus get status {
     if (!isEncryptionSupported) {
@@ -485,15 +476,6 @@ class E2EEManager {
   Stream<kv.KeyVerification> get onVerificationRequest {
     return _client.onKeyVerificationRequest.stream;
   }
-
-  // ============================================
-  // 密钥请求处理
-  // ============================================
-
-  /// 处理传入的密钥请求
-  void handleKeyRequests(void Function(KeyRequest request)? onKeyRequest) {
-    // Matrix SDK自动处理密钥请求，这里提供回调接口
-  }
 }
 
 /// E2EE状态
@@ -543,21 +525,6 @@ class DeviceInfo {
 
   DateTime? get lastSeen =>
       lastSeenTs != null ? DateTime.fromMillisecondsSinceEpoch(lastSeenTs!) : null;
-}
-
-/// 密钥请求
-class KeyRequest {
-  final String requesterId;
-  final String deviceId;
-  final String roomId;
-  final String sessionId;
-
-  KeyRequest({
-    required this.requesterId,
-    required this.deviceId,
-    required this.roomId,
-    required this.sessionId,
-  });
 }
 
 /// E2EE异常

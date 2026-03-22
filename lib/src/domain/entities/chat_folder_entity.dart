@@ -69,7 +69,7 @@ class ChatFolderEntity extends Equatable {
   );
 
   /// 未读文件夹
-  static ChatFolderEntity unread = const ChatFolderEntity(
+  static const ChatFolderEntity unread = ChatFolderEntity(
     id: 'unread',
     name: 'Unread',
     icon: '🔔',

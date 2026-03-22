@@ -35,8 +35,7 @@ class CallManager {
   LiveKitService? _liveKitService;
   final CallNotificationService _notificationService = CallNotificationService();
   final VoIPConfig _config = VoIPConfig();
-  
-  
+
   // 导航键
   GlobalKey<NavigatorState>? _navigatorKey;
 
@@ -311,29 +310,6 @@ class CallManager {
   // 多人会议
   // ============================================
   
-  /// 创建会议
-  /// 
-  /// [roomName] 会议名称
-  /// [participantName] 参与者名称
-  /// [token] LiveKit 访问令牌（从服务端获取）
-  Future<bool> createMeeting({
-    required String roomName,
-    required String participantName,
-    required String token,
-    String? participantAvatarUrl,
-    bool enableVideo = true,
-    bool enableAudio = true,
-  }) async {
-    return joinMeeting(
-      roomName: roomName,
-      participantName: participantName,
-      token: token,
-      participantAvatarUrl: participantAvatarUrl,
-      enableVideo: enableVideo,
-      enableAudio: enableAudio,
-    );
-  }
-  
   /// 加入会议
   Future<bool> joinMeeting({
     required String roomName,
@@ -481,7 +457,7 @@ class CallManager {
   void _handleNotificationAction(CallAction action, IncomingCallInfo callInfo) {
     // 获取本地化字符串
     final context = _navigatorKey?.currentContext;
-    final l10n = context != null ? S.of(context) : null;
+    final l10n = (context != null && context.mounted) ? S.of(context) : null;
 
     switch (action) {
       case CallAction.accept:

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -14,6 +13,7 @@ class ContactCardSelectSheet extends StatefulWidget {
   final String noContactsFoundText;
 
   const ContactCardSelectSheet({
+    super.key,
     required this.isDark,
     required this.selectContactText,
     required this.searchContactHintText,

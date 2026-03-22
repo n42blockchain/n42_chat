@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
@@ -77,8 +77,39 @@ class TranslationLanguage {
   });
 }
 
+/// 翻译服务共享逻辑
+mixin TranslationServiceMixin implements ITranslationService {
+  String generateCacheKey(String text) {
+    return sha256.convert(utf8.encode(text)).toString().substring(0, 16);
+  }
+
+  @override
+  Future<String?> detectLanguage(String text) async {
+    if (RegExp(r'[\u4e00-\u9fff]').hasMatch(text)) return 'zh';
+    if (RegExp(r'[\u3040-\u309f\u30a0-\u30ff]').hasMatch(text)) return 'ja';
+    if (RegExp(r'[\uac00-\ud7af]').hasMatch(text)) return 'ko';
+    return 'en';
+  }
+
+  @override
+  List<TranslationLanguage> getSupportedLanguages() {
+    return const [
+      TranslationLanguage(code: 'zh', name: 'Chinese', localizedName: '中文'),
+      TranslationLanguage(code: 'en', name: 'English', localizedName: 'English'),
+      TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
+      TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
+      TranslationLanguage(code: 'fr', name: 'French', localizedName: 'Français'),
+      TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
+      TranslationLanguage(code: 'es', name: 'Spanish', localizedName: 'Español'),
+      TranslationLanguage(code: 'pt', name: 'Portuguese', localizedName: 'Português'),
+      TranslationLanguage(code: 'ru', name: 'Russian', localizedName: 'Русский'),
+      TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+    ];
+  }
+}
+
 /// Google 翻译服务实现
-class GoogleTranslationService implements ITranslationService {
+class GoogleTranslationService with TranslationServiceMixin {
   final String? apiKey;
   final PreferencesDataSource _storageDataSource;
 
@@ -96,9 +127,9 @@ class GoogleTranslationService implements ITranslationService {
     required String targetLanguage,
     String? sourceLanguage,
   }) async {
-    // 首先检查缓存
+    final cacheKey = generateCacheKey(text);
     final cachedTranslation = await _storageDataSource.getTranslationCache(
-      _generateCacheKey(text),
+      cacheKey,
       targetLanguage,
     );
     if (cachedTranslation != null) {
@@ -109,7 +140,6 @@ class GoogleTranslationService implements ITranslationService {
       );
     }
 
-    // 无 API Key 时返回错误提示，而非假翻译
     if (apiKey == null || apiKey!.isEmpty) {
       return TranslationResult.error('翻译服务不可用：未配置 API Key');
     }
@@ -134,9 +164,8 @@ class GoogleTranslationService implements ITranslationService {
           final detectedSource =
               translation['detectedSourceLanguage'] as String?;
 
-          // 保存到缓存
           await _storageDataSource.saveTranslationCache(
-            _generateCacheKey(text),
+            cacheKey,
             targetLanguage,
             translatedText,
           );
@@ -155,46 +184,10 @@ class GoogleTranslationService implements ITranslationService {
       return TranslationResult.error('Translation failed: $e');
     }
   }
-
-  String _generateCacheKey(String text) {
-    // 使用 SHA-256 前 16 字符作为稳定的缓存键
-    return sha256.convert(utf8.encode(text)).toString().substring(0, 16);
-  }
-
-  @override
-  Future<String?> detectLanguage(String text) async {
-    // 简单的语言检测
-    final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-    final containsJapanese = RegExp(r'[\u3040-\u309f\u30a0-\u30ff]').hasMatch(text);
-    final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
-
-    if (containsChinese) return 'zh';
-    if (containsJapanese) return 'ja';
-    if (containsKorean) return 'ko';
-
-    // 默认假设是英文
-    return 'en';
-  }
-
-  @override
-  List<TranslationLanguage> getSupportedLanguages() {
-    return const [
-      TranslationLanguage(code: 'zh', name: 'Chinese', localizedName: '中文'),
-      TranslationLanguage(code: 'en', name: 'English', localizedName: 'English'),
-      TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
-      TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
-      TranslationLanguage(code: 'fr', name: 'French', localizedName: 'Français'),
-      TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
-      TranslationLanguage(code: 'es', name: 'Spanish', localizedName: 'Español'),
-      TranslationLanguage(code: 'pt', name: 'Portuguese', localizedName: 'Português'),
-      TranslationLanguage(code: 'ru', name: 'Russian', localizedName: 'Русский'),
-      TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
-    ];
-  }
 }
 
 /// AI 翻译服务实现（委托给 AiService）
-class AiTranslationService implements ITranslationService {
+class AiTranslationService with TranslationServiceMixin {
   final AiService _aiService;
   final PreferencesDataSource _storageDataSource;
 
@@ -224,8 +217,7 @@ class AiTranslationService implements ITranslationService {
     required String targetLanguage,
     String? sourceLanguage,
   }) async {
-    // 检查缓存
-    final cacheKey = _generateCacheKey(text);
+    final cacheKey = generateCacheKey(text);
     final cached = await _storageDataSource.getTranslationCache(
       cacheKey,
       targetLanguage,
@@ -242,7 +234,6 @@ class AiTranslationService implements ITranslationService {
       final targetName = _languageNames[targetLanguage] ?? targetLanguage;
       final translatedText = await _aiService.translateMessage(text, targetName);
 
-      // 保存到缓存
       await _storageDataSource.saveTranslationCache(
         cacheKey,
         targetLanguage,
@@ -260,48 +251,6 @@ class AiTranslationService implements ITranslationService {
       debugLog('AiTranslationService: Translation error: $e');
       return TranslationResult.error('Translation failed: $e');
     }
-  }
-
-  String _generateCacheKey(String text) {
-    return sha256.convert(utf8.encode(text)).toString().substring(0, 16);
-  }
-
-  @override
-  Future<String?> detectLanguage(String text) async {
-    final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-    final containsJapanese =
-        RegExp(r'[\u3040-\u309f\u30a0-\u30ff]').hasMatch(text);
-    final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
-
-    if (containsChinese) return 'zh';
-    if (containsJapanese) return 'ja';
-    if (containsKorean) return 'ko';
-    return 'en';
-  }
-
-  @override
-  List<TranslationLanguage> getSupportedLanguages() {
-    return const [
-      TranslationLanguage(code: 'zh', name: 'Chinese', localizedName: '中文'),
-      TranslationLanguage(
-          code: 'en', name: 'English', localizedName: 'English'),
-      TranslationLanguage(
-          code: 'ja', name: 'Japanese', localizedName: '日本語'),
-      TranslationLanguage(
-          code: 'ko', name: 'Korean', localizedName: '한국어'),
-      TranslationLanguage(
-          code: 'fr', name: 'French', localizedName: 'Français'),
-      TranslationLanguage(
-          code: 'de', name: 'German', localizedName: 'Deutsch'),
-      TranslationLanguage(
-          code: 'es', name: 'Spanish', localizedName: 'Español'),
-      TranslationLanguage(
-          code: 'pt', name: 'Portuguese', localizedName: 'Português'),
-      TranslationLanguage(
-          code: 'ru', name: 'Russian', localizedName: 'Русский'),
-      TranslationLanguage(
-          code: 'ar', name: 'Arabic', localizedName: 'العربية'),
-    ];
   }
 }
 

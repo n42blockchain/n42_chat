@@ -71,10 +71,7 @@ class StorageCleanupService {
         olderThanDays: StorageConstants.defaultCleanupDays,
       );
       if (oldFiles.isNotEmpty) {
-        int totalSize = 0;
-        for (final f in oldFiles) {
-          totalSize += f.fileSize;
-        }
+        final totalSize = oldFiles.fold<int>(0, (sum, f) => sum + f.fileSize);
         recommendations.add(CleanupRecommendation(
           type: CleanupRecommendationType.oldMedia,
           title: 'Old Media Files',
@@ -91,10 +88,7 @@ class StorageCleanupService {
         minFileSizeBytes: StorageConstants.largeFileThreshold,
       );
       if (largeFiles.isNotEmpty) {
-        int totalSize = 0;
-        for (final f in largeFiles) {
-          totalSize += f.fileSize;
-        }
+        final totalSize = largeFiles.fold<int>(0, (sum, f) => sum + f.fileSize);
         recommendations.add(CleanupRecommendation(
           type: CleanupRecommendationType.largeFiles,
           title: 'Large Files',

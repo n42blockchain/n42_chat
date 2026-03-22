@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import '../../data/datasources/local/preferences_datasource.dart';
 import '../di/injection.dart';
 import '../utils/debug_log.dart';

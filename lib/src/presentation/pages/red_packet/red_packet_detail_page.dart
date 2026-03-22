@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 
 class RedPacketDetailPage extends StatelessWidget {
   /// 发送者名称

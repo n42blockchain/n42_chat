@@ -119,7 +119,7 @@ class LocalRedPacketService extends IRedPacketService {
     }
 
     final maxAmount = (remaining / remainingCount) * 2;
-    final minAmount = 0.01;
+    const minAmount = 0.01;
     final amount = minAmount + _random.nextDouble() * (maxAmount - minAmount);
     return double.parse(amount.toStringAsFixed(2));
   }

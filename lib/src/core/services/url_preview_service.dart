@@ -212,19 +212,15 @@ class UrlPreviewService {
       case 'og:title':
       case 'twitter:title':
         setTitle(content);
-        break;
       case 'og:description':
       case 'twitter:description':
       case 'description':
         setDescription(content);
-        break;
       case 'og:image':
       case 'twitter:image':
         setImage(content);
-        break;
       case 'og:site_name':
         setSiteName(content);
-        break;
     }
   }
 

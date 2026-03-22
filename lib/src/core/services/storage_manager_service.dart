@@ -215,16 +215,12 @@ class StorageManagerService {
         switch (cat) {
           case 'image':
             categoryExts.addAll(MediaExtensions.image);
-            break;
           case 'video':
             categoryExts.addAll(MediaExtensions.video);
-            break;
           case 'audio':
             categoryExts.addAll(MediaExtensions.audio);
-            break;
           case 'document':
             categoryExts.addAll(MediaExtensions.document);
-            break;
         }
       }
 

@@ -694,7 +694,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             ),
             child: Icon(
               icon,
-              color: backgroundColor != null || isActive ? Colors.white : Colors.white,
+              color: Colors.white,
               size: 24,
             ),
           ),
@@ -872,25 +872,31 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         '${seconds.toString().padLeft(2, '0')}';
   }
   
-  void _toggleMute() async {
+  Future<void> _toggleMute() async {
     await widget.liveKitService.toggleMicrophone();
-    setState(() {
-      _isMuted = widget.liveKitService.isMuted;
-    });
+    if (mounted) {
+      setState(() {
+        _isMuted = widget.liveKitService.isMuted;
+      });
+    }
   }
-  
-  void _toggleVideo() async {
+
+  Future<void> _toggleVideo() async {
     await widget.liveKitService.toggleCamera();
-    setState(() {
-      _isVideoEnabled = widget.liveKitService.isVideoEnabled;
-    });
+    if (mounted) {
+      setState(() {
+        _isVideoEnabled = widget.liveKitService.isVideoEnabled;
+      });
+    }
   }
-  
-  void _toggleScreenShare() async {
+
+  Future<void> _toggleScreenShare() async {
     await widget.liveKitService.toggleScreenShare();
-    setState(() {
-      _isScreenSharing = widget.liveKitService.isScreenSharing;
-    });
+    if (mounted) {
+      setState(() {
+        _isScreenSharing = widget.liveKitService.isScreenSharing;
+      });
+    }
   }
   
   void _openInCallChat() {

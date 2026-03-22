@@ -274,13 +274,10 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     _pendingLikeOps.add(event.momentId);
 
     // 乐观更新：同时更新 isLikedByMe 和 likes 列表
-    final client = MatrixClientManager.instance.client;
-    final currentUserId = client?.userID ?? '';
-    final userId = client?.userID ?? '';
-    // Extract localpart from @user:server format
-    final currentUserName = userId.startsWith('@')
-        ? userId.substring(1).split(':').first
-        : userId;
+    final currentUserId = MatrixClientManager.instance.client?.userID ?? '';
+    final currentUserName = currentUserId.startsWith('@')
+        ? currentUserId.substring(1).split(':').first
+        : currentUserId;
 
     final updatedMoments = state.moments.map((m) {
       if (m.id == event.momentId) {

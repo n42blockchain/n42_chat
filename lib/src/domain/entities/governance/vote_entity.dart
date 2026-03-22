@@ -7,7 +7,7 @@ class VoteEntity extends Equatable {
   final String proposalId;
 
   /// Choice index (1-based for single choice) or map for weighted
-  final dynamic choice;
+  final Object choice;
   final double votingPower;
   final DateTime created;
   final String? reason;
@@ -26,7 +26,7 @@ class VoteEntity extends Equatable {
     String? id,
     String? voter,
     String? proposalId,
-    dynamic choice,
+    Object? choice,
     double? votingPower,
     DateTime? created,
     String? reason,

@@ -352,7 +352,6 @@ class WebRTCService {
             'sdp': offer.sdp,
           },
         },
-        targetUserId: peerId,
       );
       
       debugLog('WebRTCService: Call invite sent');
@@ -571,7 +570,6 @@ class WebRTCService {
     required matrix.Room room,
     required String type,
     required Map<String, dynamic> content,
-    String? targetUserId,
   }) async {
     await room.sendEvent(content, type: type);
   }

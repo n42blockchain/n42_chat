@@ -229,11 +229,7 @@ class _StickerStorePageState extends State<StickerStorePage>
   }
 
   Widget _buildStoreList(bool isDark) {
-    final filteredPacks = _storePacks.where((pack) {
-      if (_selectedCategory == null) return true;
-      // 简单的分类过滤逻辑
-      return true;
-    }).toList();
+    final filteredPacks = _storePacks;
 
     if (filteredPacks.isEmpty) {
       return Center(

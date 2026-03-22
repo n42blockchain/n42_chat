@@ -193,20 +193,20 @@ class ChatInputBarState extends State<ChatInputBar> {
       widget.onCommandPoll?.call();
     } else if (item.command == 'announce') {
       const prefix = '/announce ';
-      _controller.value = TextEditingValue(
+      _controller.value = const TextEditingValue(
         text: prefix,
         selection: TextSelection.collapsed(offset: prefix.length),
       );
     } else if (item.command == 'welcome') {
       const prefix = '/welcome ';
-      _controller.value = TextEditingValue(
+      _controller.value = const TextEditingValue(
         text: prefix,
         selection: TextSelection.collapsed(offset: prefix.length),
       );
     } else if (item.command == 'price') {
       // /price 需要参数，填入前缀让用户继续输入 token 符号
       const prefix = '/price ';
-      _controller.value = TextEditingValue(
+      _controller.value = const TextEditingValue(
         text: prefix,
         selection: TextSelection.collapsed(offset: prefix.length),
       );

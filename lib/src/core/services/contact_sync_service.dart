@@ -1,7 +1,7 @@
-import 'dart:typed_data';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -87,17 +87,7 @@ class ContactSyncService {
     return digest.toString().substring(0, 8);
   }
 
-  /// 检查通讯录权限
-  Future<bool> hasPermission() async {
-    try {
-      return await FlutterContacts.requestPermission(readonly: true);
-    } catch (e) {
-      debugLog('ContactSyncService: Permission check error: $e');
-      return false;
-    }
-  }
-
-  /// 请求通讯录权限
+  /// 检查/请求通讯录权限
   Future<bool> requestPermission() async {
     try {
       return await FlutterContacts.requestPermission(readonly: true);

@@ -137,16 +137,15 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     ConversationsUpdated event,
     Emitter<ConversationState> emit,
   ) {
-    final conversations = event.conversations.cast<ConversationEntity>();
-    final (pinned, normal) = _separateConversations(conversations);
+    final (pinned, normal) = _separateConversations(event.conversations);
 
-    final totalUnread = conversations.fold<int>(
+    final totalUnread = event.conversations.fold<int>(
       0,
       (sum, conv) => sum + conv.unreadCount,
     );
 
     emit(state.copyWith(
-      conversations: conversations,
+      conversations: event.conversations,
       pinnedConversations: pinned,
       normalConversations: normal,
       totalUnreadCount: totalUnread,

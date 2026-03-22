@@ -220,29 +220,20 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
+  static double _fontSizeToDouble(FontSize value) => switch (value) {
+    FontSize.small => 14,
+    FontSize.medium => 16,
+    FontSize.large => 18,
+    FontSize.extraLarge => 20,
+  };
+
   Widget _buildFontSizeItem({
     required String title,
     required FontSize value,
     required bool isDark,
   }) {
     final isSelected = _settings.fontSize == value;
-    
-    // 根据字体大小调整预览文字大小
-    double previewFontSize;
-    switch (value) {
-      case FontSize.small:
-        previewFontSize = 14;
-        break;
-      case FontSize.medium:
-        previewFontSize = 16;
-        break;
-      case FontSize.large:
-        previewFontSize = 18;
-        break;
-      case FontSize.extraLarge:
-        previewFontSize = 20;
-        break;
-    }
+    final previewFontSize = _fontSizeToDouble(value);
 
     return ListTile(
       title: Text(
@@ -264,23 +255,10 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
+  static const _fontSizeValues = [FontSize.small, FontSize.medium, FontSize.large, FontSize.extraLarge];
+
   Widget _buildFontSizeSliderSection(BuildContext context, bool isDark) {
-    // 将 FontSize 枚举映射到 slider 值 (0-3)
-    double sliderValue;
-    switch (_settings.fontSize) {
-      case FontSize.small:
-        sliderValue = 0;
-        break;
-      case FontSize.medium:
-        sliderValue = 1;
-        break;
-      case FontSize.large:
-        sliderValue = 2;
-        break;
-      case FontSize.extraLarge:
-        sliderValue = 3;
-        break;
-    }
+    final sliderValue = _fontSizeValues.indexOf(_settings.fontSize).toDouble();
 
     final l10n = S.of(context);
     final labels = [
@@ -299,7 +277,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           Text(
             labels[sliderValue.round()],
             style: TextStyle(
-              fontSize: 14 + sliderValue.round() * 2.0,
+              fontSize: _fontSizeToDouble(_fontSizeValues[sliderValue.round()]),
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
           ),
@@ -312,24 +290,9 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             label: labels[sliderValue.round()],
             activeColor: AppColors.primary,
             onChanged: (value) {
-              FontSize fontSize;
-              switch (value.round()) {
-                case 0:
-                  fontSize = FontSize.small;
-                  break;
-                case 1:
-                  fontSize = FontSize.medium;
-                  break;
-                case 2:
-                  fontSize = FontSize.large;
-                  break;
-                case 3:
-                  fontSize = FontSize.extraLarge;
-                  break;
-                default:
-                  fontSize = FontSize.medium;
-              }
-              _updateSettings(_settings.copyWith(fontSize: fontSize));
+              _updateSettings(_settings.copyWith(
+                fontSize: _fontSizeValues[value.round()],
+              ));
             },
           ),
           Row(

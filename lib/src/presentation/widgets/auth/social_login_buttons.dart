@@ -252,7 +252,10 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     );
   }
 
-  Future<void> _handleGoogleSignIn() async {
+  Future<void> _handleSocialSignIn({
+    required AuthEvent event,
+    required void Function(bool) setLoading,
+  }) async {
     if (!widget.isAgreedToTerms) {
       widget.onTermsNotAgreed?.call();
       return;
@@ -263,14 +266,11 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    setState(() => _isGoogleLoading = true);
+    setLoading(true);
 
     try {
-      // 触发 Google 登录事件
       if (mounted) {
-        context.read<AuthBloc>().add(AuthGoogleLoginRequested(
-          homeserver: widget.homeserver,
-        ));
+        context.read<AuthBloc>().add(event);
       }
     } catch (e) {
       if (mounted) {
@@ -278,134 +278,35 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       }
     } finally {
       if (mounted) {
-        setState(() => _isGoogleLoading = false);
+        setLoading(false);
       }
     }
   }
 
-  Future<void> _handleAppleSignIn() async {
-    if (!widget.isAgreedToTerms) {
-      widget.onTermsNotAgreed?.call();
-      return;
-    }
+  Future<void> _handleGoogleSignIn() => _handleSocialSignIn(
+    event: AuthGoogleLoginRequested(homeserver: widget.homeserver),
+    setLoading: (v) => setState(() => _isGoogleLoading = v),
+  );
 
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
-      return;
-    }
+  Future<void> _handleAppleSignIn() => _handleSocialSignIn(
+    event: AuthAppleLoginRequested(homeserver: widget.homeserver),
+    setLoading: (v) => setState(() => _isAppleLoading = v),
+  );
 
-    setState(() => _isAppleLoading = true);
+  Future<void> _handleFacebookSignIn() => _handleSocialSignIn(
+    event: AuthFacebookLoginRequested(homeserver: widget.homeserver),
+    setLoading: (v) => setState(() => _isFacebookLoading = v),
+  );
 
-    try {
-      // 触发 Apple 登录事件
-      if (mounted) {
-        context.read<AuthBloc>().add(AuthAppleLoginRequested(
-          homeserver: widget.homeserver,
-        ));
-      }
-    } catch (e) {
-      if (mounted) {
-        widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isAppleLoading = false);
-      }
-    }
-  }
+  Future<void> _handleTwitterSignIn() => _handleSocialSignIn(
+    event: AuthTwitterLoginRequested(homeserver: widget.homeserver),
+    setLoading: (v) => setState(() => _isTwitterLoading = v),
+  );
 
-  Future<void> _handleFacebookSignIn() async {
-    if (!widget.isAgreedToTerms) {
-      widget.onTermsNotAgreed?.call();
-      return;
-    }
-
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
-      return;
-    }
-
-    setState(() => _isFacebookLoading = true);
-
-    try {
-      // 触发 Facebook 登录事件
-      if (mounted) {
-        context.read<AuthBloc>().add(AuthFacebookLoginRequested(
-          homeserver: widget.homeserver,
-        ));
-      }
-    } catch (e) {
-      if (mounted) {
-        widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isFacebookLoading = false);
-      }
-    }
-  }
-
-  Future<void> _handleTwitterSignIn() async {
-    if (!widget.isAgreedToTerms) {
-      widget.onTermsNotAgreed?.call();
-      return;
-    }
-
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
-      return;
-    }
-
-    setState(() => _isTwitterLoading = true);
-
-    try {
-      // 触发 Twitter 登录事件
-      if (mounted) {
-        context.read<AuthBloc>().add(AuthTwitterLoginRequested(
-          homeserver: widget.homeserver,
-        ));
-      }
-    } catch (e) {
-      if (mounted) {
-        widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isTwitterLoading = false);
-      }
-    }
-  }
-
-  Future<void> _handleWeChatSignIn() async {
-    if (!widget.isAgreedToTerms) {
-      widget.onTermsNotAgreed?.call();
-      return;
-    }
-
-    if (widget.homeserver.isEmpty) {
-      widget.onError?.call(S.of(context)?.authEnterServerAddressFirst ?? 'Please enter server address first');
-      return;
-    }
-
-    setState(() => _isWeChatLoading = true);
-
-    try {
-      // 触发微信登录事件
-      if (mounted) {
-        context.read<AuthBloc>().add(AuthWeChatLoginRequested(
-          homeserver: widget.homeserver,
-        ));
-      }
-    } catch (e) {
-      if (mounted) {
-        widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isWeChatLoading = false);
-      }
-    }
-  }
+  Future<void> _handleWeChatSignIn() => _handleSocialSignIn(
+    event: AuthWeChatLoginRequested(homeserver: widget.homeserver),
+    setLoading: (v) => setState(() => _isWeChatLoading = v),
+  );
 }
 
 /// 单独的 Google 登录按钮

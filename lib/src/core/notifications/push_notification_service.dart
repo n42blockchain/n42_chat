@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import '../utils/debug_log.dart';

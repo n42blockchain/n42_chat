@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/bot_config_entity.dart';
-import '../../../domain/entities/channel_entity.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/token_gate_entity.dart';
 

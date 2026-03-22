@@ -142,12 +142,10 @@ class BiometricService {
   /// 执行生物识别认证
   ///
   /// [reason] 显示给用户的认证原因
-  /// [useErrorDialogs] 已废弃，local_auth 3.0 移除此选项
   /// [stickyAuth] 是否保持认证状态（对应 local_auth 3.0 的 persistAcrossBackgrounding）
   /// [biometricOnly] 是否仅使用生物识别（不允许密码备用）
   Future<BiometricResult> authenticate({
     required String reason,
-    bool useErrorDialogs = true,
     bool stickyAuth = true,
     bool biometricOnly = true,
   }) async {

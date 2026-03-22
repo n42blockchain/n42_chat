@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../domain/entities/points/reward_rule.dart';
 import '../../domain/repositories/points_repository.dart';
@@ -135,7 +134,6 @@ class PointsTrackingService {
           action = PointsAction.sendMedia;
           points = 2;
         }
-        break;
     }
 
     if (action != null && points > 0) {
