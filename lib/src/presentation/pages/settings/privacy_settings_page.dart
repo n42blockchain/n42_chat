@@ -14,6 +14,7 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
+import '../../helpers/privacy_security_summary_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'hidden_chats_page.dart';
 
@@ -231,12 +232,9 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       'Use a custom HTTP or HTTPS proxy for Matrix traffic and link previews',
                   icon: Icons.route_outlined,
                   value: _settings.proxyEnabled,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(
-                      proxyEnabled: value,
-                      useTor: value ? false : _settings.useTor,
-                    ),
-                  ),
+                  onChanged: (value) async {
+                    await _handleCustomProxyToggle(value);
+                  },
                   isDark: isDark,
                 ),
                 if (_settings.proxyEnabled) ...[
@@ -246,7 +244,11 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     subtitle: 'HTTP/HTTPS proxy address (SOCKS not supported)',
                     icon: Icons.dns_outlined,
                     value: _settings.proxyUrl?.trim().isNotEmpty == true
-                        ? _settings.proxyUrl!.trim()
+                        ? (PrivacySecuritySummaryHelper.hasValidCustomProxy(
+                                _settings,
+                              )
+                              ? _settings.proxyUrl!.trim()
+                              : 'Invalid endpoint')
                         : 'Not set',
                     onTap: _editProxyUrl,
                     isDark: isDark,
@@ -692,8 +694,34 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
   }
 
   Future<void> _editProxyUrl() async {
-    final controller = TextEditingController(text: _settings.proxyUrl ?? '');
-    final value = await showDialog<String>(
+    final value = await _showProxyUrlEditor(_settings.proxyUrl ?? '');
+    if (value == null) {
+      return;
+    }
+    _saveProxyUrl(value, enableProxyAfterSave: _settings.proxyEnabled);
+  }
+
+  Future<void> _handleCustomProxyToggle(bool value) async {
+    if (!value) {
+      _updateSettings(_settings.copyWith(proxyEnabled: false));
+      return;
+    }
+
+    if (PrivacySecuritySummaryHelper.hasValidCustomProxy(_settings)) {
+      _updateSettings(_settings.copyWith(proxyEnabled: true, useTor: false));
+      return;
+    }
+
+    final valueFromDialog = await _showProxyUrlEditor(_settings.proxyUrl ?? '');
+    if (valueFromDialog == null) {
+      return;
+    }
+    _saveProxyUrl(valueFromDialog, enableProxyAfterSave: true);
+  }
+
+  Future<String?> _showProxyUrlEditor(String initialValue) async {
+    final controller = TextEditingController(text: initialValue);
+    return showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Proxy Endpoint'),
@@ -724,12 +752,46 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
         ],
       ),
     );
+  }
 
-    if (value == null) {
+  void _saveProxyUrl(String value, {required bool enableProxyAfterSave}) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      _updateSettings(
+        _settings.copyWith(
+          proxyUrl: '',
+          proxyEnabled: enableProxyAfterSave ? false : _settings.proxyEnabled,
+        ),
+      );
+      if (enableProxyAfterSave && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Custom proxy stays off until you set a valid endpoint',
+            ),
+          ),
+        );
+      }
       return;
     }
 
-    _updateSettings(_settings.copyWith(proxyUrl: value));
+    final error = PrivacySecuritySummaryHelper.validateCustomProxyUrl(trimmed);
+    if (error != null) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error)));
+      }
+      return;
+    }
+
+    _updateSettings(
+      _settings.copyWith(
+        proxyUrl: trimmed,
+        proxyEnabled: enableProxyAfterSave ? true : _settings.proxyEnabled,
+        useTor: false,
+      ),
+    );
   }
 
   String _formatSelfDestructDuration(int? seconds) {

@@ -13,6 +13,7 @@ import 'translation_settings_page.dart';
 import 'backup_restore_page.dart';
 import 'storage_management_page.dart';
 import 'auto_download_settings_page.dart';
+import 'privacy_security_page.dart';
 import 'system_accounts_page.dart';
 
 /// 设置页面
@@ -76,7 +77,7 @@ class SettingsPage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // 设置组1：通知与隐私
+          // 设置组1：通知与隐私安全
           _SettingsGroup(
             children: [
               _SettingsItem(
@@ -89,10 +90,12 @@ class SettingsPage extends StatelessWidget {
                 isDark: isDark,
               ),
               _SettingsItem(
-                icon: Icons.lock_outline,
+                icon: Icons.shield_moon_outlined,
                 iconColor: Colors.blue,
-                title: S.of(context)?.settingsPrivacy ?? 'Privacy',
-                onTap: onPrivacy,
+                title: 'Privacy & Security',
+                subtitle:
+                    'E2EE, disappearing messages, screenshot protection, and proxies',
+                onTap: () => _navigateToPrivacySecurity(context),
                 isDark: isDark,
               ),
             ],
@@ -210,13 +213,6 @@ class SettingsPage extends StatelessWidget {
           // 设置组3：账号安全
           _SettingsGroup(
             children: [
-              _SettingsItem(
-                icon: Icons.security_outlined,
-                iconColor: Colors.teal,
-                title: S.of(context)?.settingsSecurity ?? 'Security',
-                onTap: onSecurity,
-                isDark: isDark,
-              ),
               if (isBiometricAvailable)
                 _SettingsItem(
                   icon: biometricTypeDescription?.contains('Face') == true
@@ -404,9 +400,41 @@ class SettingsPage extends StatelessWidget {
   }
 
   void _navigateToSystemAccounts(BuildContext context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const SystemAccountsPage()));
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SystemAccountsPage(
+          onOpenAccounts: onAccounts == null
+              ? null
+              : () async {
+                  onAccounts!.call();
+                },
+          onOpenSecuritySettings: onSecurity == null
+              ? null
+              : () async {
+                  onSecurity!.call();
+                },
+        ),
+      ),
+    );
+  }
+
+  void _navigateToPrivacySecurity(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PrivacySecurityPage(
+          onOpenPrivacySettings: onPrivacy == null
+              ? null
+              : () async {
+                  onPrivacy!.call();
+                },
+          onOpenSecuritySettings: onSecurity == null
+              ? null
+              : () async {
+                  onSecurity!.call();
+                },
+        ),
+      ),
+    );
   }
 
   void _navigateToTranslation(BuildContext context) {
