@@ -1,96 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:n42_chat/src/core/services/chat_export_service.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
 
 /// ChatExportService 测试
 ///
-/// 由于 ChatExportService.exportChat 依赖 path_provider 平台插件,
-/// 无法在纯单元测试中直接调用。这里提取并测试其核心纯逻辑:
-/// 1. _escapeHtml - HTML 特殊字符转义
-/// 2. _filterByDateRange - 日期范围过滤
-/// 3. _generateJson - JSON 导出格式
-/// 4. _generateHtml - HTML 导出格式
-
-// 从 ChatExportService 中镜像提取的 _escapeHtml 逻辑
-String escapeHtml(String text) {
-  return text
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#39;');
-}
-
-// 从 ChatExportService 中镜像提取的日期过滤逻辑
-enum ExportDateRange { all, lastWeek, lastMonth, last3Months, custom }
-
-List<MessageEntity> filterByDateRange(
-  List<MessageEntity> messages,
-  ExportDateRange range,
-  DateTime? customStart,
-  DateTime? customEnd,
-) {
-  final now = DateTime.now();
-  DateTime? start;
-
-  switch (range) {
-    case ExportDateRange.all:
-      return messages;
-    case ExportDateRange.lastWeek:
-      start = now.subtract(const Duration(days: 7));
-    case ExportDateRange.lastMonth:
-      start = DateTime(now.year, now.month - 1, now.day);
-    case ExportDateRange.last3Months:
-      start = DateTime(now.year, now.month - 3, now.day);
-    case ExportDateRange.custom:
-      start = customStart;
-  }
-
-  return messages.where((m) {
-    if (start != null && m.timestamp.isBefore(start)) return false;
-    if (customEnd != null && m.timestamp.isAfter(customEnd)) return false;
-    return true;
-  }).toList();
-}
-
-// 从 ChatExportService 中镜像提取的 JSON 生成逻辑
-String generateJson(List<MessageEntity> messages, String roomName) {
-  final data = {
-    'roomName': roomName,
-    'exportedAt': DateTime.now().toIso8601String(),
-    'messageCount': messages.length,
-    'messages': messages
-        .map((m) => {
-              'id': m.id,
-              'sender': m.senderName,
-              'senderId': m.senderId,
-              'content': m.content,
-              'type': m.type.name,
-              'timestamp': m.timestamp.toIso8601String(),
-              'isEdited': m.isEdited,
-              if (m.replyToId != null)
-                'replyTo': {
-                  'id': m.replyToId,
-                  'content': m.replyToContent,
-                  'sender': m.replyToSender,
-                },
-              if (m.metadata != null)
-                'metadata': {
-                  if (m.metadata!.fileName != null)
-                    'fileName': m.metadata!.fileName,
-                  if (m.metadata!.mimeType != null)
-                    'mimeType': m.metadata!.mimeType,
-                  if (m.metadata!.size != null) 'size': m.metadata!.size,
-                  if (m.metadata!.duration != null)
-                    'duration': m.metadata!.duration,
-                },
-            })
-        .toList(),
-  };
-
-  return const JsonEncoder.withIndent('  ').convert(data);
-}
+/// 由于 ChatExportService.exportChat 依赖 path_provider 平台插件，
+/// 单测直接验证它暴露出来的纯逻辑 helper。
 
 MessageEntity createTestMessage({
   String id = '\$event1',
@@ -127,47 +44,47 @@ MessageEntity createTestMessage({
 void main() {
   group('ChatExportService - escapeHtml', () {
     test('should escape ampersand', () {
-      expect(escapeHtml('A & B'), 'A &amp; B');
+      expect(escapeChatExportHtml('A & B'), 'A &amp; B');
     });
 
     test('should escape less-than sign', () {
-      expect(escapeHtml('<script>'), '&lt;script&gt;');
+      expect(escapeChatExportHtml('<script>'), '&lt;script&gt;');
     });
 
     test('should escape greater-than sign', () {
-      expect(escapeHtml('a > b'), 'a &gt; b');
+      expect(escapeChatExportHtml('a > b'), 'a &gt; b');
     });
 
     test('should escape double quotes', () {
-      expect(escapeHtml('say "hello"'), 'say &quot;hello&quot;');
+      expect(escapeChatExportHtml('say "hello"'), 'say &quot;hello&quot;');
     });
 
     test('should escape single quotes', () {
-      expect(escapeHtml("it's"), 'it&#39;s');
+      expect(escapeChatExportHtml("it's"), 'it&#39;s');
     });
 
     test('should escape all special characters at once', () {
       expect(
-        escapeHtml('<script>alert("XSS & \'hack\'")</script>'),
+        escapeChatExportHtml('<script>alert("XSS & \'hack\'")</script>'),
         '&lt;script&gt;alert(&quot;XSS &amp; &#39;hack&#39;&quot;)&lt;/script&gt;',
       );
     });
 
     test('should not modify text without special characters', () {
-      expect(escapeHtml('Hello World'), 'Hello World');
+      expect(escapeChatExportHtml('Hello World'), 'Hello World');
     });
 
     test('should handle empty string', () {
-      expect(escapeHtml(''), '');
+      expect(escapeChatExportHtml(''), '');
     });
 
     test('should handle multiple ampersands', () {
-      expect(escapeHtml('a & b & c'), 'a &amp; b &amp; c');
+      expect(escapeChatExportHtml('a & b & c'), 'a &amp; b &amp; c');
     });
 
     test('should prevent HTML injection in user content', () {
       const malicious = '<img src=x onerror=alert(1)>';
-      final escaped = escapeHtml(malicious);
+      final escaped = escapeChatExportHtml(malicious);
       expect(escaped.contains('<'), false);
       expect(escaped.contains('>'), false);
       expect(escaped, '&lt;img src=x onerror=alert(1)&gt;');
@@ -175,7 +92,7 @@ void main() {
 
     test('should prevent script injection', () {
       const malicious = '<script>document.cookie</script>';
-      final escaped = escapeHtml(malicious);
+      final escaped = escapeChatExportHtml(malicious);
       expect(escaped.contains('<script>'), false);
       expect(escaped, '&lt;script&gt;document.cookie&lt;/script&gt;');
     });
@@ -198,21 +115,27 @@ void main() {
           id: '\$week_ago',
           timestamp: DateTime.now().subtract(const Duration(days: 5)),
         ),
-        createTestMessage(
-          id: '\$today',
-          timestamp: DateTime.now(),
-        ),
+        createTestMessage(id: '\$today', timestamp: DateTime.now()),
       ];
     });
 
     test('should return all messages when range is all', () {
-      final result = filterByDateRange(messages, ExportDateRange.all, null, null);
+      final result = filterMessagesForExport(
+        messages,
+        ExportDateRange.all,
+        null,
+        null,
+      );
       expect(result.length, 4);
     });
 
     test('should filter to last week', () {
-      final result =
-          filterByDateRange(messages, ExportDateRange.lastWeek, null, null);
+      final result = filterMessagesForExport(
+        messages,
+        ExportDateRange.lastWeek,
+        null,
+        null,
+      );
       // Should include messages from last 7 days: $week_ago and $today
       expect(result.length, 2);
       expect(result.any((m) => m.id == '\$today'), true);
@@ -220,16 +143,24 @@ void main() {
     });
 
     test('should filter to last month', () {
-      final result =
-          filterByDateRange(messages, ExportDateRange.lastMonth, null, null);
+      final result = filterMessagesForExport(
+        messages,
+        ExportDateRange.lastMonth,
+        null,
+        null,
+      );
       // Should include messages from last ~30 days: $month_ago, $week_ago, $today
       expect(result.length, 3);
       expect(result.any((m) => m.id == '\$old'), false);
     });
 
     test('should filter to last 3 months', () {
-      final result =
-          filterByDateRange(messages, ExportDateRange.last3Months, null, null);
+      final result = filterMessagesForExport(
+        messages,
+        ExportDateRange.last3Months,
+        null,
+        null,
+      );
       // Should include messages from last ~90 days: $old (100 days) might be excluded
       // $month_ago, $week_ago, $today should be included
       expect(result.any((m) => m.id == '\$month_ago'), true);
@@ -241,8 +172,12 @@ void main() {
       final customStart = DateTime.now().subtract(const Duration(days: 25));
       final customEnd = DateTime.now().subtract(const Duration(days: 3));
 
-      final result = filterByDateRange(
-          messages, ExportDateRange.custom, customStart, customEnd);
+      final result = filterMessagesForExport(
+        messages,
+        ExportDateRange.custom,
+        customStart,
+        customEnd,
+      );
       // Should include only $month_ago (20 days ago) and $week_ago (5 days ago)
       expect(result.length, 2);
       expect(result.any((m) => m.id == '\$month_ago'), true);
@@ -252,23 +187,46 @@ void main() {
     test('should handle custom range with only start date', () {
       final customStart = DateTime.now().subtract(const Duration(days: 6));
 
-      final result = filterByDateRange(
-          messages, ExportDateRange.custom, customStart, null);
+      final result = filterMessagesForExport(
+        messages,
+        ExportDateRange.custom,
+        customStart,
+        null,
+      );
       // Should include $week_ago (5 days ago) and $today
       expect(result.length, 2);
     });
 
     test('should return empty list when no messages match date range', () {
       final futureStart = DateTime.now().add(const Duration(days: 1));
-      final result = filterByDateRange(
-          messages, ExportDateRange.custom, futureStart, null);
+      final result = filterMessagesForExport(
+        messages,
+        ExportDateRange.custom,
+        futureStart,
+        null,
+      );
       expect(result, isEmpty);
     });
 
     test('should handle empty message list', () {
-      final result = filterByDateRange(
-          <MessageEntity>[], ExportDateRange.lastWeek, null, null);
+      final result = filterMessagesForExport(
+        <MessageEntity>[],
+        ExportDateRange.lastWeek,
+        null,
+        null,
+      );
       expect(result, isEmpty);
+    });
+  });
+
+  group('ChatExportService - sorting', () {
+    test('sorts messages from oldest to newest for export', () {
+      final sorted = sortMessagesForExport([
+        createTestMessage(id: '\$new', timestamp: DateTime(2024, 6, 16)),
+        createTestMessage(id: '\$old', timestamp: DateTime(2024, 6, 14)),
+      ]);
+
+      expect(sorted.map((item) => item.id).toList(), ['\$old', '\$new']);
     });
   });
 
@@ -283,7 +241,7 @@ void main() {
         ),
       ];
 
-      final jsonStr = generateJson(messages, 'Test Room');
+      final jsonStr = generateJsonChatExport(messages, 'Test Room');
       final parsed = json.decode(jsonStr) as Map<String, dynamic>;
 
       expect(parsed['roomName'], 'Test Room');
@@ -304,7 +262,7 @@ void main() {
         ),
       ];
 
-      final jsonStr = generateJson(messages, 'Room');
+      final jsonStr = generateJsonChatExport(messages, 'Room');
       final parsed = json.decode(jsonStr) as Map<String, dynamic>;
       final msg = (parsed['messages'] as List).first as Map<String, dynamic>;
 
@@ -326,7 +284,7 @@ void main() {
         ),
       ];
 
-      final jsonStr = generateJson(messages, 'Room');
+      final jsonStr = generateJsonChatExport(messages, 'Room');
       final parsed = json.decode(jsonStr) as Map<String, dynamic>;
       final msg = (parsed['messages'] as List).first as Map<String, dynamic>;
 
@@ -340,7 +298,7 @@ void main() {
     test('should not include reply info when absent', () {
       final messages = [createTestMessage()];
 
-      final jsonStr = generateJson(messages, 'Room');
+      final jsonStr = generateJsonChatExport(messages, 'Room');
       final parsed = json.decode(jsonStr) as Map<String, dynamic>;
       final msg = (parsed['messages'] as List).first as Map<String, dynamic>;
 
@@ -358,7 +316,7 @@ void main() {
         ),
       ];
 
-      final jsonStr = generateJson(messages, 'Room');
+      final jsonStr = generateJsonChatExport(messages, 'Room');
       final parsed = json.decode(jsonStr) as Map<String, dynamic>;
       final msg = (parsed['messages'] as List).first as Map<String, dynamic>;
 
@@ -372,7 +330,7 @@ void main() {
     test('should not include metadata when absent', () {
       final messages = [createTestMessage()];
 
-      final jsonStr = generateJson(messages, 'Room');
+      final jsonStr = generateJsonChatExport(messages, 'Room');
       final parsed = json.decode(jsonStr) as Map<String, dynamic>;
       final msg = (parsed['messages'] as List).first as Map<String, dynamic>;
 
@@ -386,7 +344,7 @@ void main() {
         createTestMessage(id: '\$e3', content: 'Third'),
       ];
 
-      final jsonStr = generateJson(messages, 'Room');
+      final jsonStr = generateJsonChatExport(messages, 'Room');
       final parsed = json.decode(jsonStr) as Map<String, dynamic>;
 
       expect(parsed['messageCount'], 3);
@@ -394,7 +352,7 @@ void main() {
     });
 
     test('should handle empty messages list', () {
-      final jsonStr = generateJson([], 'Empty Room');
+      final jsonStr = generateJsonChatExport([], 'Empty Room');
       final parsed = json.decode(jsonStr) as Map<String, dynamic>;
 
       expect(parsed['messageCount'], 0);
@@ -403,7 +361,7 @@ void main() {
 
     test('should produce pretty-printed JSON with 2-space indentation', () {
       final messages = [createTestMessage()];
-      final jsonStr = generateJson(messages, 'Room');
+      final jsonStr = generateJsonChatExport(messages, 'Room');
 
       // Pretty printed JSON should contain newlines and indentation
       expect(jsonStr.contains('\n'), true);
@@ -415,20 +373,35 @@ void main() {
     test('should escape room name in HTML title', () {
       // Verify that room names with special characters get escaped
       const roomName = '<Script>alert("xss")</Script>';
-      final escaped = escapeHtml(roomName);
+      final escaped = escapeChatExportHtml(roomName);
       expect(escaped.contains('<'), false);
     });
 
     test('should escape sender name in HTML', () {
       const senderName = 'User <admin>';
-      final escaped = escapeHtml(senderName);
+      final escaped = escapeChatExportHtml(senderName);
       expect(escaped, 'User &lt;admin&gt;');
     });
 
     test('should escape message content in HTML', () {
       const content = 'Hello & goodbye <world>';
-      final escaped = escapeHtml(content);
+      final escaped = escapeChatExportHtml(content);
       expect(escaped, 'Hello &amp; goodbye &lt;world&gt;');
+    });
+  });
+
+  group('ChatExportService - TXT export', () {
+    test('includes sender and content in plain text transcript', () {
+      final transcript = generateTextChatExport([
+        createTestMessage(
+          senderName: 'Alice',
+          content: 'Review the doc',
+          timestamp: DateTime(2024, 6, 15, 10, 30),
+        ),
+      ], 'Project Room');
+
+      expect(transcript, contains('Project Room'));
+      expect(transcript, contains('Alice: Review the doc'));
     });
   });
 }

@@ -18,6 +18,101 @@ typedef VoiceRecordCallback = void Function(String path, Duration duration);
 typedef RecordingStateCallback =
     void Function(bool isRecording, bool isCancelled, Duration duration);
 
+class _MarkdownFormatAction {
+  final String prefix;
+  final String suffix;
+  final IconData? icon;
+  final String? label;
+  final String tooltip;
+  final bool bold;
+  final bool italic;
+  final bool strikethrough;
+
+  const _MarkdownFormatAction({
+    required this.prefix,
+    this.suffix = '',
+    required this.tooltip,
+    this.icon,
+    this.label,
+    this.bold = false,
+    this.italic = false,
+    this.strikethrough = false,
+  });
+}
+
+const List<_MarkdownFormatAction> _formatActions = [
+  _MarkdownFormatAction(
+    prefix: '**',
+    suffix: '**',
+    tooltip: 'Bold',
+    label: 'B',
+    bold: true,
+  ),
+  _MarkdownFormatAction(
+    prefix: '*',
+    suffix: '*',
+    tooltip: 'Italic',
+    label: 'I',
+    italic: true,
+  ),
+  _MarkdownFormatAction(
+    prefix: '~~',
+    suffix: '~~',
+    tooltip: 'Strikethrough',
+    label: 'S',
+    strikethrough: true,
+  ),
+  _MarkdownFormatAction(
+    prefix: '`',
+    suffix: '`',
+    tooltip: 'Inline code',
+    label: '<>',
+  ),
+  _MarkdownFormatAction(
+    prefix: '```dart\n',
+    suffix: '\n```',
+    tooltip: 'Code block',
+    label: '{}',
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n> ',
+    tooltip: 'Quote',
+    icon: Icons.format_quote,
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n- [ ] ',
+    tooltip: 'Checklist item',
+    icon: Icons.check_box_outlined,
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n- ',
+    tooltip: 'Bullet list',
+    icon: Icons.format_list_bulleted,
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n1. ',
+    tooltip: 'Numbered list',
+    icon: Icons.format_list_numbered,
+  ),
+  _MarkdownFormatAction(
+    prefix: '[',
+    suffix: '](https://)',
+    tooltip: 'Link',
+    icon: Icons.link,
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n| Column | Value |\n| --- | --- |\n| Item | Detail |\n',
+    tooltip: 'Table',
+    label: '| |',
+  ),
+  _MarkdownFormatAction(
+    prefix:
+        '\n### Meeting Notes\n- Date: \n- Attendees: \n- Agenda:\n  - \n- Notes:\n- Action Items:\n  - [ ] \n',
+    tooltip: 'Meeting template',
+    icon: Icons.calendar_today_outlined,
+  ),
+];
+
 /// 聊天输入栏
 ///
 /// 特点：
@@ -571,7 +666,7 @@ class ChatInputBarState extends State<ChatInputBar> {
   Widget _buildFormattingBar(bool isDark) {
     return Container(
       height: 40,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surface,
         border: Border(
@@ -581,57 +676,44 @@ class ChatInputBarState extends State<ChatInputBar> {
           ),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildFormatButton(
-            label: 'B',
-            prefix: '**',
-            suffix: '**',
-            bold: true,
-          ),
-          _buildFormatButton(
-            label: 'I',
-            prefix: '*',
-            suffix: '*',
-            italic: true,
-          ),
-          _buildFormatButton(
-            label: 'S',
-            prefix: '~~',
-            suffix: '~~',
-            strikethrough: true,
-          ),
-          _buildFormatButton(label: '<>', prefix: '`', suffix: '`'),
-          _buildFormatButton(label: '```', prefix: '```\n', suffix: '\n```'),
-          _buildFormatButton(label: '>', prefix: '\n> ', suffix: ''),
-        ],
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _formatActions.length,
+        itemBuilder: (context, index) {
+          return _buildFormatButton(_formatActions[index]);
+        },
       ),
     );
   }
 
-  Widget _buildFormatButton({
-    required String label,
-    required String prefix,
-    required String suffix,
-    bool bold = false,
-    bool italic = false,
-    bool strikethrough = false,
-  }) {
-    return GestureDetector(
-      onTap: () => _applyMarkdownFormat(prefix, suffix),
-      child: Container(
-        width: 40,
-        height: 32,
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            fontStyle: italic ? FontStyle.italic : FontStyle.normal,
-            decoration: strikethrough ? TextDecoration.lineThrough : null,
-            fontSize: 14,
-          ),
+  Widget _buildFormatButton(_MarkdownFormatAction action) {
+    return Tooltip(
+      message: action.tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => _applyMarkdownFormat(action.prefix, action.suffix),
+        child: Container(
+          width: 40,
+          height: 32,
+          margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          alignment: Alignment.center,
+          child: action.icon != null
+              ? Icon(action.icon, size: 18)
+              : Text(
+                  action.label ?? '',
+                  style: TextStyle(
+                    fontWeight: action.bold
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    fontStyle: action.italic
+                        ? FontStyle.italic
+                        : FontStyle.normal,
+                    decoration: action.strikethrough
+                        ? TextDecoration.lineThrough
+                        : null,
+                    fontSize: 14,
+                  ),
+                ),
         ),
       ),
     );

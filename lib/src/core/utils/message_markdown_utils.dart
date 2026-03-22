@@ -15,6 +15,8 @@ final _markdownPatterns = [
   RegExp(r'\[.+?\]\(.+?\)'),
   RegExp(r'^\s*>\s', multiLine: true),
   RegExp(r'^\s*---\s*$', multiLine: true),
+  RegExp(r'^\|.+\|\s*$', multiLine: true),
+  RegExp(r'^\|?[\s:-]+(\|[\s:-]+)+\|?\s*$', multiLine: true),
 ];
 
 final md.ExtensionSet _safeGitHubMarkdownExtensionSet = md.ExtensionSet(
