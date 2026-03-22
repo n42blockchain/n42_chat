@@ -49,5 +49,6 @@ void main() {
       ),
       findsOneWidget,
     );
+    expect(find.text('Link Previews', skipOffstage: false), findsOneWidget);
   });
 }

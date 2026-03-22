@@ -1,6 +1,8 @@
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
+enum _PhotoSendMode { media, originalFile }
+
 /// 媒体操作相关方法（图片、视频、文件、语音的选择与发送）
 extension _ChatPageMediaActionsMethods on _ChatPageState {
   static const int _maxEncryptedRoomFileBytes = 64 * 1024 * 1024;
@@ -30,11 +32,85 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.commonSelectImageFailed(e.toString()) ?? 'Failed to select media: $e'),
+            content: Text(
+              S.of(context)?.commonSelectImageFailed(e.toString()) ??
+                  'Failed to select media: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
       }
+    }
+  }
+
+  Future<void> _showPhotoPickerOptions() async {
+    final isDark = context.isDarkMode;
+    final selectedMode = await showModalBottomSheet<_PhotoSendMode>(
+      context: context,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: Text(S.of(context)?.contactPhotos ?? 'Photos'),
+              subtitle: const Text(
+                'Send photos and videos in chat-friendly format',
+              ),
+              onTap: () => Navigator.pop(sheetContext, _PhotoSendMode.media),
+            ),
+            ListTile(
+              leading: const Icon(Icons.insert_photo_outlined),
+              title: const Text('Original Images'),
+              subtitle: const Text('Send uncompressed photos as files'),
+              onTap: () =>
+                  Navigator.pop(sheetContext, _PhotoSendMode.originalFile),
+            ),
+            ListTile(
+              leading: const Icon(Icons.close),
+              title: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+              onTap: () => Navigator.pop(sheetContext),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (selectedMode == null) {
+      return;
+    }
+
+    if (selectedMode == _PhotoSendMode.originalFile) {
+      await _pickOriginalImagesAsFiles();
+      return;
+    }
+
+    await _pickImage();
+  }
+
+  Future<void> _pickOriginalImagesAsFiles() async {
+    try {
+      final picker = ImagePicker();
+      final images = await picker.pickMultiImage();
+      if (images.isEmpty) {
+        return;
+      }
+
+      for (final image in images) {
+        await _sendOriginalImageAsFile(image);
+      }
+    } catch (e) {
+      debugLog('Pick original images error: $e');
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to select original images: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
@@ -64,12 +140,14 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       );
       filename = _ensureFilenameMatchesMimeType(filename, mimeType);
 
-      context.read<ChatBloc>().add(SendImageMessage(
-        imageBytes: editedBytes,
-        filename: filename,
-        mimeType: mimeType,
-        selfDestructAfter: _isViewOnce ? 1 : null,
-      ));
+      context.read<ChatBloc>().add(
+        SendImageMessage(
+          imageBytes: editedBytes,
+          filename: filename,
+          mimeType: mimeType,
+          selfDestructAfter: _isViewOnce ? 1 : null,
+        ),
+      );
 
       if (_isViewOnce) {
         setState(() => _isViewOnce = false);
@@ -130,7 +208,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         debugLog('Video picker returned: ${video?.path ?? "null"}');
 
         if (video == null) {
-          debugLog('Video is null - user may have cancelled or recording failed');
+          debugLog(
+            'Video is null - user may have cancelled or recording failed',
+          );
           return;
         }
 
@@ -141,7 +221,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.chatVideoRecordingFailed ?? 'Video recording failed'),
+                content: Text(
+                  S.of(context)?.chatVideoRecordingFailed ??
+                      'Video recording failed',
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -157,7 +240,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.chatVideoRecordingFailed ?? 'Video recording failed'),
+                content: Text(
+                  S.of(context)?.chatVideoRecordingFailed ??
+                      'Video recording failed',
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -172,7 +258,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatCaptureFailed(e.toString()) ?? 'Capture failed: $e'),
+            content: Text(
+              S.of(context)?.chatCaptureFailed(e.toString()) ??
+                  'Capture failed: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -190,7 +279,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatProcessingVideo ?? 'Processing video...'),
+            content: Text(
+              S.of(context)?.chatProcessingVideo ?? 'Processing video...',
+            ),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -208,7 +299,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.chatVideoFileNotExist ?? 'Video file does not exist'),
+                content: Text(
+                  S.of(context)?.chatVideoFileNotExist ??
+                      'Video file does not exist',
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -223,7 +317,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.chatVideoDataEmpty ?? 'Video data is empty'),
+              content: Text(
+                S.of(context)?.chatVideoDataEmpty ?? 'Video data is empty',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -255,9 +351,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
 
       // 确定 MIME 类型
-      final String mimeType = lookupMimeType(filename) ??
-                        lookupMimeType(video.path) ??
-                        'video/mp4';
+      final String mimeType =
+          lookupMimeType(filename) ?? lookupMimeType(video.path) ?? 'video/mp4';
 
       // 检查文件大小（限制 100MB）
       const maxSize = 100 * 1024 * 1024; // 100MB
@@ -265,7 +360,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.chatVideoTooLarge ?? 'Video size cannot exceed 100MB'),
+              content: Text(
+                S.of(context)?.chatVideoTooLarge ??
+                    'Video size cannot exceed 100MB',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -307,13 +405,15 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
       if (!mounted) return;
       // 使用视频消息发送（带缩略图）
-      context.read<ChatBloc>().add(SendVideoMessage(
-        videoBytes: bytes,
-        filename: filename,
-        mimeType: mimeType,
-        thumbnailBytes: thumbnailBytes,
-        selfDestructAfter: _isViewOnce ? 1 : null,
-      ));
+      context.read<ChatBloc>().add(
+        SendVideoMessage(
+          videoBytes: bytes,
+          filename: filename,
+          mimeType: mimeType,
+          thumbnailBytes: thumbnailBytes,
+          selfDestructAfter: _isViewOnce ? 1 : null,
+        ),
+      );
 
       // 发送后重置 View Once 模式
       if (_isViewOnce) {
@@ -326,7 +426,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatSendingVideo ?? 'Sending video...'),
+            content: Text(
+              S.of(context)?.chatSendingVideo ?? 'Sending video...',
+            ),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -337,7 +439,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatSendVideoFailed(e.toString()) ?? 'Failed to send video: $e'),
+            content: Text(
+              S.of(context)?.chatSendVideoFailed(e.toString()) ??
+                  'Failed to send video: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -364,7 +469,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.chatImageFileNotExist ?? 'Image file does not exist'),
+                content: Text(
+                  S.of(context)?.chatImageFileNotExist ??
+                      'Image file does not exist',
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -379,7 +487,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.commonImageDataEmpty ?? 'Image data is empty'),
+              content: Text(
+                S.of(context)?.commonImageDataEmpty ?? 'Image data is empty',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -424,7 +534,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (_autoFaceBlur && !kIsWeb) {
         debugLog('FaceBlur: Auto face blur enabled, processing image...');
         bytes = await FaceBlurUtil.blurFaces(bytes);
-        debugLog('FaceBlur: Processing complete, image size: ${bytes.length} bytes');
+        debugLog(
+          'FaceBlur: Processing complete, image size: ${bytes.length} bytes',
+        );
         mimeType = _resolveMimeType(
           filename: filename,
           sourcePath: image.path,
@@ -440,12 +552,14 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       debugLog('=== Sending image to ChatBloc ===');
 
       if (!mounted) return;
-      context.read<ChatBloc>().add(SendImageMessage(
-        imageBytes: bytes,
-        filename: filename,
-        mimeType: mimeType,
-        selfDestructAfter: _isViewOnce ? 1 : null,
-      ));
+      context.read<ChatBloc>().add(
+        SendImageMessage(
+          imageBytes: bytes,
+          filename: filename,
+          mimeType: mimeType,
+          selfDestructAfter: _isViewOnce ? 1 : null,
+        ),
+      );
 
       // 发送后重置 View Once 模式
       if (_isViewOnce) {
@@ -457,7 +571,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatSendingImage ?? 'Sending image...'),
+            content: Text(
+              S.of(context)?.chatSendingImage ?? 'Sending image...',
+            ),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -468,7 +584,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatSendImageFailed(e.toString()) ?? 'Failed to send image: $e'),
+            content: Text(
+              S.of(context)?.chatSendImageFailed(e.toString()) ??
+                  'Failed to send image: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -502,7 +621,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatPickFileFailed(e.toString()) ?? 'Failed to pick file: $e'),
+            content: Text(
+              S.of(context)?.chatPickFileFailed(e.toString()) ??
+                  'Failed to pick file: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -516,65 +638,26 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
       final fileSize = file.size;
 
-      debugLog('Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType');
+      debugLog(
+        'Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType',
+      );
 
-      final chatBloc = context.read<ChatBloc>();
-      if (widget.conversation.isEncrypted) {
-        if (fileSize > _maxEncryptedRoomFileBytes) {
-          throw Exception(
-            'Encrypted rooms currently support secure file uploads up to 64MB',
-          );
-        }
-
-        Uint8List? secureBytes = file.bytes;
-        if ((secureBytes == null || secureBytes.isEmpty) &&
-            file.path != null &&
-            file.path!.isNotEmpty) {
-          secureBytes = await File(file.path!).readAsBytes();
-        } else if ((secureBytes == null || secureBytes.isEmpty) &&
-            file.readStream != null) {
-          secureBytes = await _readAllBytes(file.readStream!);
-        }
-
-        if (secureBytes == null || secureBytes.isEmpty) {
-          throw Exception('No readable file source available');
-        }
-
-        chatBloc.add(SendFileMessage(
-          fileBytes: secureBytes,
-          filename: filename,
-          mimeType: mimeType,
-          fileSize: fileSize,
-        ));
-      } else if (file.path != null && file.path!.isNotEmpty) {
-        chatBloc.add(SendFileMessage(
-          filename: filename,
-          mimeType: mimeType,
-          filePath: file.path,
-          fileSize: fileSize,
-        ));
-      } else if (file.readStream != null) {
-        chatBloc.add(SendFileMessage(
-          filename: filename,
-          mimeType: mimeType,
-          fileStream: file.readStream,
-          fileSize: fileSize,
-        ));
-      } else if (file.bytes != null && file.bytes!.isNotEmpty) {
-        chatBloc.add(SendFileMessage(
-          fileBytes: file.bytes,
-          filename: filename,
-          mimeType: mimeType,
-          fileSize: fileSize,
-        ));
-      } else {
-        throw Exception('No readable file source available');
-      }
+      await _queueFileMessage(
+        filename: filename,
+        mimeType: mimeType,
+        fileSize: fileSize,
+        fileBytes: file.bytes,
+        filePath: file.path,
+        fileStream: file.readStream,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatFileSending(filename) ?? 'Sending file: $filename'),
+            content: Text(
+              S.of(context)?.chatFileSending(filename) ??
+                  'Sending file: $filename',
+            ),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -584,7 +667,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatSendFileFailed(e.toString()) ?? 'Failed to send file: $e'),
+            content: Text(
+              S.of(context)?.chatSendFileFailed(e.toString()) ??
+                  'Failed to send file: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -592,8 +678,70 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
+  Future<void> _sendOriginalImageAsFile(XFile image) async {
+    try {
+      var filename = image.name.trim();
+      if (filename.isEmpty) {
+        filename = 'image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      }
+
+      Uint8List? imageBytes;
+      String? filePath;
+      if (image.path.isNotEmpty && !kIsWeb) {
+        filePath = image.path;
+      }
+
+      int fileSize;
+      if (filePath != null) {
+        fileSize = await File(filePath).length();
+      } else {
+        imageBytes = await image.readAsBytes();
+        fileSize = imageBytes.length;
+      }
+
+      final mimeType = _resolveMimeType(
+        filename: filename,
+        sourcePath: filePath,
+        headerBytes: imageBytes,
+        fallbackMimeType: 'image/jpeg',
+      );
+      filename = _ensureFilenameMatchesMimeType(filename, mimeType);
+
+      await _queueFileMessage(
+        filename: filename,
+        mimeType: mimeType,
+        fileSize: fileSize,
+        fileBytes: imageBytes,
+        filePath: filePath,
+      );
+
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Sending original image: $filename'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    } catch (e) {
+      debugLog('Send original image as file error: $e');
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send original image: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
   Future<void> _sendVoiceMessage(String path, Duration duration) async {
-    debugLog('Sending voice message: path=$path, duration=${duration.inSeconds}s');
+    debugLog(
+      'Sending voice message: path=$path, duration=${duration.inSeconds}s',
+    );
 
     try {
       final file = File(path);
@@ -602,7 +750,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.chatVoiceFileNotExist ?? 'Voice file does not exist'),
+              content: Text(
+                S.of(context)?.chatVoiceFileNotExist ??
+                    'Voice file does not exist',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -618,7 +769,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.chatVoiceFileEmpty ?? 'Voice file is empty'),
+              content: Text(
+                S.of(context)?.chatVoiceFileEmpty ?? 'Voice file is empty',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -641,15 +794,19 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         mimeType = 'audio/mpeg';
       }
 
-      debugLog('Sending voice: filename=$filename, mimeType=$mimeType, size=${bytes.length}');
+      debugLog(
+        'Sending voice: filename=$filename, mimeType=$mimeType, size=${bytes.length}',
+      );
 
       if (!mounted) return;
-      context.read<ChatBloc>().add(SendVoiceMessage(
-        audioBytes: bytes,
-        filename: filename,
-        duration: duration.inMilliseconds,
-        mimeType: mimeType,
-      ));
+      context.read<ChatBloc>().add(
+        SendVoiceMessage(
+          audioBytes: bytes,
+          filename: filename,
+          duration: duration.inMilliseconds,
+          mimeType: mimeType,
+        ),
+      );
 
       // 删除临时文件
       try {
@@ -662,7 +819,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatSendingVoice ?? 'Sending voice...'),
+            content: Text(
+              S.of(context)?.chatSendingVoice ?? 'Sending voice...',
+            ),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -673,7 +832,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatSendVoiceFailed(e.toString()) ?? 'Failed to send voice: $e'),
+            content: Text(
+              S.of(context)?.chatSendVoiceFailed(e.toString()) ??
+                  'Failed to send voice: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -689,20 +851,107 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     return builder.takeBytes();
   }
 
+  Future<void> _queueFileMessage({
+    required String filename,
+    required String mimeType,
+    required int fileSize,
+    Uint8List? fileBytes,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+  }) async {
+    final chatBloc = context.read<ChatBloc>();
+
+    if (widget.conversation.isEncrypted) {
+      if (fileSize > _maxEncryptedRoomFileBytes) {
+        throw Exception(
+          'Encrypted rooms currently support secure file uploads up to 64MB',
+        );
+      }
+
+      final secureBytes = await _resolveFileBytes(
+        fileBytes: fileBytes,
+        filePath: filePath,
+        fileStream: fileStream,
+      );
+      if (secureBytes == null || secureBytes.isEmpty) {
+        throw Exception('No readable file source available');
+      }
+
+      chatBloc.add(
+        SendFileMessage(
+          fileBytes: secureBytes,
+          filename: filename,
+          mimeType: mimeType,
+          fileSize: fileSize,
+        ),
+      );
+      return;
+    }
+
+    if (filePath != null && filePath.isNotEmpty) {
+      chatBloc.add(
+        SendFileMessage(
+          filename: filename,
+          mimeType: mimeType,
+          filePath: filePath,
+          fileSize: fileSize,
+        ),
+      );
+      return;
+    }
+
+    if (fileStream != null) {
+      chatBloc.add(
+        SendFileMessage(
+          filename: filename,
+          mimeType: mimeType,
+          fileStream: fileStream,
+          fileSize: fileSize,
+        ),
+      );
+      return;
+    }
+
+    if (fileBytes != null && fileBytes.isNotEmpty) {
+      chatBloc.add(
+        SendFileMessage(
+          fileBytes: fileBytes,
+          filename: filename,
+          mimeType: mimeType,
+          fileSize: fileSize,
+        ),
+      );
+      return;
+    }
+
+    throw Exception('No readable file source available');
+  }
+
+  Future<Uint8List?> _resolveFileBytes({
+    Uint8List? fileBytes,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+  }) async {
+    if (fileBytes != null && fileBytes.isNotEmpty) {
+      return fileBytes;
+    }
+    if (filePath != null && filePath.isNotEmpty) {
+      return File(filePath).readAsBytes();
+    }
+    if (fileStream != null) {
+      return _readAllBytes(fileStream);
+    }
+    return null;
+  }
+
   String _resolveMimeType({
     required String filename,
     String? sourcePath,
     Uint8List? headerBytes,
     required String fallbackMimeType,
   }) {
-    return lookupMimeType(
-          sourcePath ?? filename,
-          headerBytes: headerBytes,
-        ) ??
-        lookupMimeType(
-          filename,
-          headerBytes: headerBytes,
-        ) ??
+    return lookupMimeType(sourcePath ?? filename, headerBytes: headerBytes) ??
+        lookupMimeType(filename, headerBytes: headerBytes) ??
         (sourcePath != null ? lookupMimeType(sourcePath) : null) ??
         fallbackMimeType;
   }

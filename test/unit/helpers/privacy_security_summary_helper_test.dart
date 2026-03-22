@@ -31,6 +31,14 @@ void main() {
       );
     });
 
+    test('notes when link previews are disabled', () {
+      const settings = PrivacySettings(showLinkPreviews: false);
+
+      final summary = PrivacySecuritySummaryHelper.networkSummary(settings);
+
+      expect(summary, 'Direct network path · Link previews off');
+    });
+
     test('builds encryption summary for configured backup', () {
       final summary = PrivacySecuritySummaryHelper.encryptionSummary(
         status: E2EEStatus.ready,

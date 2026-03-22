@@ -13,6 +13,7 @@ void main() {
       expect(settings.showReadReceipts, isTrue);
       expect(settings.showTypingIndicator, isTrue);
       expect(settings.hidePhoneNumber, isFalse);
+      expect(settings.showLinkPreviews, isTrue);
       expect(settings.defaultEncryptNewChats, isTrue);
       expect(settings.privateChatMode, isFalse);
       expect(settings.protectIpAddress, isFalse);
@@ -30,6 +31,7 @@ void main() {
         showReadReceipts: false,
         showTypingIndicator: false,
         hidePhoneNumber: true,
+        showLinkPreviews: false,
         defaultEncryptNewChats: false,
         privateChatMode: true,
         protectIpAddress: true,
@@ -46,6 +48,7 @@ void main() {
       expect(settings.showReadReceipts, isFalse);
       expect(settings.showTypingIndicator, isFalse);
       expect(settings.hidePhoneNumber, isTrue);
+      expect(settings.showLinkPreviews, isFalse);
       expect(settings.defaultEncryptNewChats, isFalse);
       expect(settings.privateChatMode, isTrue);
       expect(settings.protectIpAddress, isTrue);
@@ -60,6 +63,7 @@ void main() {
       final updated = original.copyWith(
         showReadReceipts: false,
         showTypingIndicator: false,
+        showLinkPreviews: false,
       );
 
       // Unchanged values
@@ -71,6 +75,7 @@ void main() {
       // Changed values
       expect(updated.showReadReceipts, isFalse);
       expect(updated.showTypingIndicator, isFalse);
+      expect(updated.showLinkPreviews, isFalse);
     });
 
     test('should support copyWith for visibility updates', () {
@@ -116,6 +121,7 @@ void main() {
         showReadReceipts: false,
         showTypingIndicator: false,
         hidePhoneNumber: true,
+        showLinkPreviews: false,
         defaultEncryptNewChats: false,
         privateChatMode: true,
         protectIpAddress: true,
@@ -125,7 +131,7 @@ void main() {
         defaultSelfDestructSeconds: 60,
       );
 
-      expect(settings.props.length, 14);
+      expect(settings.props.length, 15);
       expect(settings.props, contains(VisibilityLevel.contacts));
       expect(settings.props, contains(VisibilityLevel.nobody));
       expect(settings.props, contains(false));

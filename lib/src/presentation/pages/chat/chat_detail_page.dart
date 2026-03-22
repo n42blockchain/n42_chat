@@ -9,7 +9,11 @@ import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_lock_service.dart';
+import '../../../core/services/media_lifecycle_service.dart';
 import '../../../core/services/remark_service.dart';
+import '../../../core/services/storage_cleanup_service.dart';
+import '../../../core/services/storage_manager_service.dart';
+import '../../../core/services/storage_monitor_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -19,14 +23,17 @@ import '../../../domain/repositories/group_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
+import '../../blocs/storage/storage_management_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../contact/contact_detail_page.dart';
+import '../group/group_media_hub_page.dart';
 import '../group/group_settings_page.dart';
-import '../media/media_gallery_page.dart';
 import 'chat_export_page.dart';
 import 'scheduled_messages_page.dart';
+import '../settings/auto_download_settings_page.dart';
 import '../settings/backup_restore_page.dart';
 import '../settings/chat_background_page.dart';
+import '../settings/room_storage_detail_page.dart';
 import '../settings/security_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -772,10 +779,24 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: S.of(context)?.chatMediaGallery ?? 'Media Gallery',
+                  title: 'Files, Media & Links',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () => _openMediaGallery(),
+                  onTap: _openFilesAndLinks,
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: S.of(context)?.autoDownload ?? 'Auto-Download',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _openAutoDownloadSettings,
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: 'Chat Storage',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _openChatStorage,
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
@@ -1572,13 +1593,38 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         });
   }
 
-  /// 打开媒体画廊
-  void _openMediaGallery() {
+  /// 打开文件、媒体与链接中心
+  void _openFilesAndLinks() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => MediaGalleryPage(
+        builder: (_) => GroupMediaHubPage(
           roomId: widget.conversation.id,
-          roomName: widget.conversation.name,
+          groupName: widget.conversation.name,
+        ),
+      ),
+    );
+  }
+
+  void _openAutoDownloadSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const AutoDownloadSettingsPage()),
+    );
+  }
+
+  void _openChatStorage() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider(
+          create: (_) => StorageManagementBloc(
+            storageManager: getIt<StorageManagerService>(),
+            lifecycleService: getIt<MediaLifecycleService>(),
+            cleanupService: getIt<StorageCleanupService>(),
+            monitorService: getIt<StorageMonitorService>(),
+          ),
+          child: RoomStorageDetailPage(
+            roomId: widget.conversation.id,
+            roomName: widget.conversation.name,
+          ),
         ),
       ),
     );

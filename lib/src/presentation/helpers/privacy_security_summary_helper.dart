@@ -52,29 +52,37 @@ class PrivacySecuritySummaryHelper {
   }
 
   static String networkSummary(PrivacySettings settings) {
-    if (settings.useTor) {
-      return 'Tor / Privoxy via ${Uri.parse(kDefaultTorHttpProxy).host}:${Uri.parse(kDefaultTorHttpProxy).port}';
-    }
+    final parts = <String>[];
 
-    if (settings.proxyEnabled) {
+    if (settings.useTor) {
+      parts.add(
+        'Tor / Privoxy via ${Uri.parse(kDefaultTorHttpProxy).host}:${Uri.parse(kDefaultTorHttpProxy).port}',
+      );
+    } else if (settings.proxyEnabled) {
       final proxyUri = resolvePrivacyProxyUri(settings);
       if (proxyUri != null) {
         final hostLabel = proxyUri.hasPort
             ? '${proxyUri.host}:${proxyUri.port}'
             : proxyUri.host;
         if (settings.protectIpAddress) {
-          return 'IP protection through $hostLabel';
+          parts.add('IP protection through $hostLabel');
+        } else {
+          parts.add('Custom proxy through $hostLabel');
         }
-        return 'Custom proxy through $hostLabel';
+      } else {
+        parts.add('Custom proxy enabled, but endpoint is invalid');
       }
-      return 'Custom proxy enabled, but endpoint is invalid';
+    } else if (settings.protectIpAddress) {
+      parts.add('IP protection requested, but no proxy endpoint configured');
+    } else {
+      parts.add('Direct network path');
     }
 
-    if (settings.protectIpAddress) {
-      return 'IP protection requested, but no proxy endpoint configured';
+    if (!settings.showLinkPreviews) {
+      parts.add('Link previews off');
     }
 
-    return 'Direct network path';
+    return parts.join(' · ');
   }
 
   static String encryptionSummary({

@@ -79,6 +79,7 @@ void main() {
       expect(defaults.allowStrangerMessage, isTrue);
       expect(defaults.showReadReceipts, isTrue);
       expect(defaults.showTypingIndicator, isTrue);
+      expect(defaults.showLinkPreviews, isTrue);
     });
 
     test('copyWith changes visibility fields', () {
@@ -96,10 +97,12 @@ void main() {
         allowStrangerMessage: false,
         showReadReceipts: false,
         showTypingIndicator: false,
+        showLinkPreviews: false,
       );
       expect(updated.allowStrangerMessage, isFalse);
       expect(updated.showReadReceipts, isFalse);
       expect(updated.showTypingIndicator, isFalse);
+      expect(updated.showLinkPreviews, isFalse);
     });
 
     test('props equality', () {

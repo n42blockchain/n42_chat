@@ -616,15 +616,14 @@ Avatar: ${contactAvatar ?? ''}''';
             final filename = url.split('/').last.split('\\').last;
 
             if (!mounted) return;
-            // 先发送音频文件
-            context.read<ChatBloc>().add(
-              SendFileMessage(
-                fileBytes: bytes,
-                filename: filename,
-                mimeType: mimeType,
-              ),
+            await _queueFileMessage(
+              filename: filename,
+              mimeType: mimeType,
+              fileSize: bytes.length,
+              fileBytes: bytes,
             );
 
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(

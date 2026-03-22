@@ -328,6 +328,9 @@ class PrivacySettings extends Equatable {
   /// 是否在客户端隐藏手机号展示
   final bool hidePhoneNumber;
 
+  /// 是否为聊天中的链接自动拉取预览
+  final bool showLinkPreviews;
+
   /// 是否默认对新聊天开启端到端加密
   final bool defaultEncryptNewChats;
 
@@ -366,6 +369,7 @@ class PrivacySettings extends Equatable {
     this.showReadReceipts = true,
     this.showTypingIndicator = true,
     this.hidePhoneNumber = false,
+    this.showLinkPreviews = true,
     this.defaultEncryptNewChats = true,
     this.privateChatMode = false,
     this.protectIpAddress = false,
@@ -388,6 +392,7 @@ class PrivacySettings extends Equatable {
     showReadReceipts,
     showTypingIndicator,
     hidePhoneNumber,
+    showLinkPreviews,
     defaultEncryptNewChats,
     privateChatMode,
     protectIpAddress,
@@ -405,6 +410,7 @@ class PrivacySettings extends Equatable {
     bool? showReadReceipts,
     bool? showTypingIndicator,
     bool? hidePhoneNumber,
+    bool? showLinkPreviews,
     bool? defaultEncryptNewChats,
     bool? privateChatMode,
     bool? protectIpAddress,
@@ -421,6 +427,7 @@ class PrivacySettings extends Equatable {
       showReadReceipts: showReadReceipts ?? this.showReadReceipts,
       showTypingIndicator: showTypingIndicator ?? this.showTypingIndicator,
       hidePhoneNumber: hidePhoneNumber ?? this.hidePhoneNumber,
+      showLinkPreviews: showLinkPreviews ?? this.showLinkPreviews,
       defaultEncryptNewChats:
           defaultEncryptNewChats ?? this.defaultEncryptNewChats,
       privateChatMode: privateChatMode ?? this.privateChatMode,

@@ -348,7 +348,7 @@ extension _ChatPageInputMethods on _ChatPageState {
     return ChatMorePanel(
       onPhotoPressed: () {
         _hideMorePanel();
-        _pickImage();
+        _showPhotoPickerOptions();
       },
       onCameraPressed: () {
         _hideMorePanel();
