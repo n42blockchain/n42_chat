@@ -633,7 +633,7 @@ class N42Chat {
     _lastHandledNotificationAt = now;
 
     unawaited(
-      openConversation(roomId).catchError((Object e) {
+      openConversation(roomId, targetMessageId: eventId).catchError((Object e) {
         debugLog('N42Chat: Failed to open notification room $roomId: $e');
       }),
     );
@@ -1324,9 +1324,13 @@ class N42Chat {
   static Future<void> openConversation(
     String roomId, {
     BuildContext? context,
+    String? targetMessageId,
   }) async {
     _ensureInitialized();
-    debugLog('N42Chat: Open conversation - $roomId');
+    debugLog(
+      'N42Chat: Open conversation - $roomId'
+      '${targetMessageId != null ? ' (target=$targetMessageId)' : ''}',
+    );
 
     final ctx = context ?? _navigatorKey?.currentContext;
     if (ctx == null) {
@@ -1382,6 +1386,7 @@ class N42Chat {
                   ],
                   child: ChatPage(
                     conversation: conversation!,
+                    initialTargetMessageId: targetMessageId,
                     onBack: () => Navigator.of(ctx).pop(),
                   ),
                 ),

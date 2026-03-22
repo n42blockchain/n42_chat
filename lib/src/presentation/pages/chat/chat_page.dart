@@ -127,6 +127,9 @@ class ChatPage extends StatefulWidget {
   /// 会话实体
   final ConversationEntity conversation;
 
+  /// 进入会话后需要定位的目标消息 ID
+  final String? initialTargetMessageId;
+
   /// 返回回调
   final VoidCallback? onBack;
 
@@ -136,6 +139,7 @@ class ChatPage extends StatefulWidget {
   const ChatPage({
     super.key,
     required this.conversation,
+    this.initialTargetMessageId,
     this.onBack,
     this.onMorePressed,
   });
@@ -231,6 +235,7 @@ class _ChatPageState extends State<ChatPage> {
   bool _showLinkPreviews = true;
   bool _sessionPrivacyShieldEnabled = false;
   int _privacyPreferencesLoadVersion = 0;
+  String? _pendingInitialTargetMessageId;
 
   @override
   void initState() {
@@ -244,6 +249,7 @@ class _ChatPageState extends State<ChatPage> {
 
     // 初始化聊天室
     context.read<ChatBloc>().add(InitializeChat(widget.conversation.id));
+    _pendingInitialTargetMessageId = widget.initialTargetMessageId;
 
     if (widget.conversation.isGroup) {
       _groupMembersFuture = _loadGroupMembers();
@@ -287,6 +293,9 @@ class _ChatPageState extends State<ChatPage> {
 
     // 加载隐私相关配置（链接预览、私密聊天截图防护）
     unawaited(_loadPrivacyPreferences());
+
+    // 如果是从搜索/通知进入，初始化后尝试跳转到目标消息
+    unawaited(_jumpToInitialTargetMessage());
 
     // 设置当前聊天房间（应用内通知过滤）
     InAppNotificationService.instance.setCurrentChatRoom(
@@ -770,6 +779,26 @@ class _ChatPageState extends State<ChatPage> {
 
   void _navigateToMessage(String eventId) {
     unawaited(_scrollToMessage(eventId));
+  }
+
+  Future<void> _jumpToInitialTargetMessage() async {
+    final targetMessageId = _pendingInitialTargetMessageId;
+    if (targetMessageId == null || targetMessageId.isEmpty) {
+      return;
+    }
+
+    final chatBloc = context.read<ChatBloc>();
+    if (chatBloc.state.roomId != widget.conversation.id) {
+      await chatBloc.stream.firstWhere(
+        (state) => state.roomId == widget.conversation.id,
+      );
+      if (!mounted) {
+        return;
+      }
+    }
+
+    _pendingInitialTargetMessageId = null;
+    await _scrollToMessage(targetMessageId);
   }
 
   Future<bool> _ensureMessageLoaded(String eventId) async {
