@@ -80,6 +80,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     if (selectedMode == null) {
       return;
     }
+    if (!mounted) {
+      return;
+    }
 
     if (selectedMode == _PhotoSendMode.originalFile) {
       await _pickOriginalImagesAsFiles();
@@ -98,6 +101,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
 
       for (final image in images) {
+        if (!mounted) {
+          return;
+        }
         await _sendOriginalImageAsFile(image);
       }
     } catch (e) {
@@ -859,6 +865,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     String? filePath,
     Stream<List<int>>? fileStream,
   }) async {
+    if (!mounted) {
+      return;
+    }
     final chatBloc = context.read<ChatBloc>();
 
     if (widget.conversation.isEncrypted) {
@@ -873,6 +882,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         filePath: filePath,
         fileStream: fileStream,
       );
+      if (!mounted) {
+        return;
+      }
       if (secureBytes == null || secureBytes.isEmpty) {
         throw Exception('No readable file source available');
       }
