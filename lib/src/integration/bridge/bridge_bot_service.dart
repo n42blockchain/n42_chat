@@ -15,6 +15,12 @@ class BridgeBotService {
   final matrix.Client _client;
   final String _homeserverDomain;
 
+  static final RegExp _usernameRegex = RegExp(
+    r'logged in as (.+?)(?:[\s\n]|$)',
+    caseSensitive: false,
+  );
+  static final RegExp _mxcRegex = RegExp(r'mxc://[^\s]+');
+
   /// Stream controller for bridge state changes
   final _stateController =
       StreamController<Map<BridgePlatform, BridgeState>>.broadcast();
@@ -306,12 +312,7 @@ class BridgeBotService {
 
     if (lowerText.contains('logged in') || lowerText.contains('connected')) {
       detectedStatus = BridgeConnectionStatus.connected;
-      // Try to extract username
-      final usernameMatch = RegExp(
-        r'logged in as (.+?)(?:[\s\n]|$)',
-        caseSensitive: false,
-      ).firstMatch(text);
-      remoteUsername = usernameMatch?.group(1);
+      remoteUsername = _usernameRegex.firstMatch(text)?.group(1);
     } else if (lowerText.contains('not logged in') ||
         lowerText.contains('not connected') ||
         lowerText.contains('disconnected')) {
@@ -323,9 +324,7 @@ class BridgeBotService {
       detectedStatus = BridgeConnectionStatus.connecting;
     }
 
-    // Detect QR code URL in mxc:// format
-    final mxcMatch = RegExp(r'mxc://[^\s]+').firstMatch(text);
-    qrCodeUrl = mxcMatch?.group(0);
+    qrCodeUrl = _mxcRegex.firstMatch(text)?.group(0);
 
     return BridgeBotResponse(
       text: text,

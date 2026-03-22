@@ -15,7 +15,7 @@ import '../../../core/utils/debug_log.dart';
 
 /// 位置选择页面（微信风格）
 class ChatLocationPickerPage extends StatefulWidget {
-  const ChatLocationPickerPage();
+  const ChatLocationPickerPage({super.key});
 
   @override
   State<ChatLocationPickerPage> createState() => _ChatLocationPickerPageState();
@@ -501,6 +501,7 @@ class ChatLocationDetailPage extends StatefulWidget {
   final String locationName;
 
   const ChatLocationDetailPage({
+    super.key,
     required this.latitude,
     required this.longitude,
     required this.locationName,

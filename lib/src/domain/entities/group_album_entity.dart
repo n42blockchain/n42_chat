@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+final _whitespaceRegExp = RegExp(r'\s+');
+
 /// 群相册媒体类型
 enum AlbumMediaType {
   /// 图片
@@ -111,7 +113,7 @@ class AlbumMediaEntity extends Equatable {
   /// 获取发送者首字母
   String get senderInitials {
     if (senderName.isEmpty) return '?';
-    final words = senderName.trim().split(RegExp(r'\s+'));
+    final words = senderName.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return senderName.substring(0, senderName.length.clamp(0, 2)).toUpperCase();
     }

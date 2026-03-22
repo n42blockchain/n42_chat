@@ -156,7 +156,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
       ),
       itemBuilder: (context, index) {
         final entry = reversed[index];
-        return _buildHistoryItem(entry, isDark, s, index == reversed.length - 1);
+        return _buildHistoryItem(entry, isDark, s);
       },
     );
   }
@@ -165,7 +165,6 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
     EditHistoryEntry entry,
     bool isDark,
     S? s,
-    bool isOriginal,
   ) {
     final timeStr = _formatTime(entry.editedAt);
 

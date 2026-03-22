@@ -146,7 +146,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     ConversationsUpdated event,
     Emitter<ConversationState> emit,
   ) {
-    final conversations = event.conversations.cast<ConversationEntity>();
+    final conversations = event.conversations;
     final (pinned, normal) = _separateConversations(conversations);
 
     final totalUnread = conversations.fold<int>(

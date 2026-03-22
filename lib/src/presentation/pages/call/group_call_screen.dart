@@ -723,9 +723,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             ),
             child: Icon(
               icon,
-              color: backgroundColor != null || isActive
-                  ? Colors.white
-                  : Colors.white,
+              color: Colors.white,
               size: 24,
             ),
           ),

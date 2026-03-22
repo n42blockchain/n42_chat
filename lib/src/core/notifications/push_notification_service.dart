@@ -71,6 +71,7 @@ class PushNotificationService implements IPushNotificationService {
 
   String? _pushToken;
   bool _isInitialized = false;
+  StreamSubscription<matrix.SyncUpdate>? _syncSubscription;
 
   @override
   Future<void> initialize() async {
@@ -80,7 +81,7 @@ class PushNotificationService implements IPushNotificationService {
     await _initializeLocalNotifications();
 
     // 监听消息更新，发送本地通知
-    _client.onSync.stream.listen(_handleSyncUpdate);
+    _syncSubscription = _client.onSync.stream.listen(_handleSyncUpdate);
 
     _isInitialized = true;
   }

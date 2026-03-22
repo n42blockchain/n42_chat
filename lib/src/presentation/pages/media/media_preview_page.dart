@@ -103,7 +103,8 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
       try {
         final request = http.Request('GET', Uri.parse(url));
         request.headers.addAll(headers);
-        final streamResponse = await http.Client().send(request);
+        final httpClient = http.Client();
+        final streamResponse = await httpClient.send(request);
         if (streamResponse.statusCode == 200) {
           final dir = await getTemporaryDirectory();
           final file = File(
@@ -112,9 +113,11 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
           final sink = file.openWrite();
           await streamResponse.stream.pipe(sink);
           await sink.close();
+          httpClient.close();
           _tempFiles.add(file);
           controller = VideoPlayerController.file(file);
         } else {
+          httpClient.close();
           debugLog(
             'iOS video download returned ${streamResponse.statusCode}, falling back',
           );

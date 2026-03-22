@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'contact_entity.dart';
 import 'token_gate_entity.dart';
 
+final _whitespaceRegExp = RegExp(r'\s+');
+
 /// 群成员角色
 enum GroupRole {
   /// 群主
@@ -115,7 +117,7 @@ class GroupMember extends Equatable {
   String get initials {
     if (displayName.isEmpty) return '?';
 
-    final words = displayName.trim().split(RegExp(r'\s+'));
+    final words = displayName.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return displayName.substring(0, displayName.length.clamp(0, 2)).toUpperCase();
     }

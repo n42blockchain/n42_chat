@@ -1,10 +1,12 @@
+final RegExp _digitRegExp = RegExp(r'\d');
+
 String? maskPhoneNumber(String? phoneNumber) {
   final raw = phoneNumber?.trim();
   if (raw == null || raw.isEmpty) {
     return null;
   }
 
-  final digitMatches = RegExp(r'\d').allMatches(raw).toList();
+  final digitMatches = _digitRegExp.allMatches(raw).toList();
   if (digitMatches.isEmpty) {
     return raw;
   }
@@ -18,7 +20,7 @@ String? maskPhoneNumber(String? phoneNumber) {
 
   for (final rune in raw.runes) {
     final char = String.fromCharCode(rune);
-    final isDigit = RegExp(r'\d').hasMatch(char);
+    final isDigit = _digitRegExp.hasMatch(char);
     if (!isDigit) {
       buffer.write(char);
       continue;

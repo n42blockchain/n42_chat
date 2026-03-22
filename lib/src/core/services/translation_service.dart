@@ -8,6 +8,10 @@ import '../../data/datasources/local/preferences_datasource.dart';
 import 'ai_service.dart';
 import '../utils/debug_log.dart';
 
+final RegExp _chineseDetectRegExp = RegExp(r'[\u4e00-\u9fff]');
+final RegExp _japaneseDetectRegExp = RegExp(r'[\u3040-\u309f\u30a0-\u30ff]');
+final RegExp _koreanDetectRegExp = RegExp(r'[\uac00-\ud7af]');
+
 /// 翻译服务接口
 abstract class ITranslationService {
   /// 翻译文本
@@ -167,93 +171,15 @@ class GoogleTranslationService implements ITranslationService {
 
   @override
   Future<String?> detectLanguage(String text) async {
-    // 简单的语言检测
-    final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-    final containsJapanese = RegExp(
-      r'[\u3040-\u309f\u30a0-\u30ff]',
-    ).hasMatch(text);
-    final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
-
-    if (containsChinese) return 'zh';
-    if (containsJapanese) return 'ja';
-    if (containsKorean) return 'ko';
-
-    // 默认假设是英文
+    if (_chineseDetectRegExp.hasMatch(text)) return 'zh';
+    if (_japaneseDetectRegExp.hasMatch(text)) return 'ja';
+    if (_koreanDetectRegExp.hasMatch(text)) return 'ko';
     return 'en';
   }
 
   @override
   List<TranslationLanguage> getSupportedLanguages() {
-    return const [
-      TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
-      TranslationLanguage(code: 'bn', name: 'Bengali', localizedName: 'বাংলা'),
-      TranslationLanguage(code: 'cs', name: 'Czech', localizedName: 'Čeština'),
-      TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
-      TranslationLanguage(
-        code: 'en',
-        name: 'English',
-        localizedName: 'English',
-      ),
-      TranslationLanguage(
-        code: 'es',
-        name: 'Spanish',
-        localizedName: 'Español',
-      ),
-      TranslationLanguage(
-        code: 'fr',
-        name: 'French',
-        localizedName: 'Français',
-      ),
-      TranslationLanguage(code: 'hi', name: 'Hindi', localizedName: 'हिन्दी'),
-      TranslationLanguage(
-        code: 'id',
-        name: 'Indonesian',
-        localizedName: 'Bahasa Indonesia',
-      ),
-      TranslationLanguage(
-        code: 'it',
-        name: 'Italian',
-        localizedName: 'Italiano',
-      ),
-      TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
-      TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
-      TranslationLanguage(code: 'mr', name: 'Marathi', localizedName: 'मराठी'),
-      TranslationLanguage(code: 'pl', name: 'Polish', localizedName: 'Polski'),
-      TranslationLanguage(
-        code: 'pt',
-        name: 'Portuguese',
-        localizedName: 'Português',
-      ),
-      TranslationLanguage(
-        code: 'ru',
-        name: 'Russian',
-        localizedName: 'Русский',
-      ),
-      TranslationLanguage(
-        code: 'sw',
-        name: 'Swahili',
-        localizedName: 'Kiswahili',
-      ),
-      TranslationLanguage(code: 'ta', name: 'Tamil', localizedName: 'தமிழ்'),
-      TranslationLanguage(code: 'te', name: 'Telugu', localizedName: 'తెలుగు'),
-      TranslationLanguage(code: 'tr', name: 'Turkish', localizedName: 'Türkçe'),
-      TranslationLanguage(
-        code: 'uk',
-        name: 'Ukrainian',
-        localizedName: 'Українська',
-      ),
-      TranslationLanguage(code: 'ur', name: 'Urdu', localizedName: 'اردو'),
-      TranslationLanguage(
-        code: 'vi',
-        name: 'Vietnamese',
-        localizedName: 'Tiếng Việt',
-      ),
-      TranslationLanguage(
-        code: 'zh_TW',
-        name: 'Traditional Chinese',
-        localizedName: '繁體中文',
-      ),
-    ];
+    return _sharedSupportedLanguages;
   }
 }
 
@@ -350,92 +276,44 @@ class AiTranslationService implements ITranslationService {
 
   @override
   Future<String?> detectLanguage(String text) async {
-    final containsChinese = RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
-    final containsJapanese = RegExp(
-      r'[\u3040-\u309f\u30a0-\u30ff]',
-    ).hasMatch(text);
-    final containsKorean = RegExp(r'[\uac00-\ud7af]').hasMatch(text);
-
-    if (containsChinese) return 'zh';
-    if (containsJapanese) return 'ja';
-    if (containsKorean) return 'ko';
+    if (_chineseDetectRegExp.hasMatch(text)) return 'zh';
+    if (_japaneseDetectRegExp.hasMatch(text)) return 'ja';
+    if (_koreanDetectRegExp.hasMatch(text)) return 'ko';
     return 'en';
   }
 
   @override
   List<TranslationLanguage> getSupportedLanguages() {
-    return const [
-      TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
-      TranslationLanguage(code: 'bn', name: 'Bengali', localizedName: 'বাংলা'),
-      TranslationLanguage(code: 'cs', name: 'Czech', localizedName: 'Čeština'),
-      TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
-      TranslationLanguage(
-        code: 'en',
-        name: 'English',
-        localizedName: 'English',
-      ),
-      TranslationLanguage(
-        code: 'es',
-        name: 'Spanish',
-        localizedName: 'Español',
-      ),
-      TranslationLanguage(
-        code: 'fr',
-        name: 'French',
-        localizedName: 'Français',
-      ),
-      TranslationLanguage(code: 'hi', name: 'Hindi', localizedName: 'हिन्दी'),
-      TranslationLanguage(
-        code: 'id',
-        name: 'Indonesian',
-        localizedName: 'Bahasa Indonesia',
-      ),
-      TranslationLanguage(
-        code: 'it',
-        name: 'Italian',
-        localizedName: 'Italiano',
-      ),
-      TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
-      TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
-      TranslationLanguage(code: 'mr', name: 'Marathi', localizedName: 'मराठी'),
-      TranslationLanguage(code: 'pl', name: 'Polish', localizedName: 'Polski'),
-      TranslationLanguage(
-        code: 'pt',
-        name: 'Portuguese',
-        localizedName: 'Português',
-      ),
-      TranslationLanguage(
-        code: 'ru',
-        name: 'Russian',
-        localizedName: 'Русский',
-      ),
-      TranslationLanguage(
-        code: 'sw',
-        name: 'Swahili',
-        localizedName: 'Kiswahili',
-      ),
-      TranslationLanguage(code: 'ta', name: 'Tamil', localizedName: 'தமிழ்'),
-      TranslationLanguage(code: 'te', name: 'Telugu', localizedName: 'తెలుగు'),
-      TranslationLanguage(code: 'tr', name: 'Turkish', localizedName: 'Türkçe'),
-      TranslationLanguage(
-        code: 'uk',
-        name: 'Ukrainian',
-        localizedName: 'Українська',
-      ),
-      TranslationLanguage(code: 'ur', name: 'Urdu', localizedName: 'اردو'),
-      TranslationLanguage(
-        code: 'vi',
-        name: 'Vietnamese',
-        localizedName: 'Tiếng Việt',
-      ),
-      TranslationLanguage(
-        code: 'zh_TW',
-        name: 'Traditional Chinese',
-        localizedName: '繁體中文',
-      ),
-    ];
+    return _sharedSupportedLanguages;
   }
 }
+
+const List<TranslationLanguage> _sharedSupportedLanguages = [
+  TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
+  TranslationLanguage(code: 'bn', name: 'Bengali', localizedName: 'বাংলা'),
+  TranslationLanguage(code: 'cs', name: 'Czech', localizedName: 'Čeština'),
+  TranslationLanguage(code: 'de', name: 'German', localizedName: 'Deutsch'),
+  TranslationLanguage(code: 'en', name: 'English', localizedName: 'English'),
+  TranslationLanguage(code: 'es', name: 'Spanish', localizedName: 'Español'),
+  TranslationLanguage(code: 'fr', name: 'French', localizedName: 'Français'),
+  TranslationLanguage(code: 'hi', name: 'Hindi', localizedName: 'हिन्दी'),
+  TranslationLanguage(code: 'id', name: 'Indonesian', localizedName: 'Bahasa Indonesia'),
+  TranslationLanguage(code: 'it', name: 'Italian', localizedName: 'Italiano'),
+  TranslationLanguage(code: 'ja', name: 'Japanese', localizedName: '日本語'),
+  TranslationLanguage(code: 'ko', name: 'Korean', localizedName: '한국어'),
+  TranslationLanguage(code: 'mr', name: 'Marathi', localizedName: 'मराठी'),
+  TranslationLanguage(code: 'pl', name: 'Polish', localizedName: 'Polski'),
+  TranslationLanguage(code: 'pt', name: 'Portuguese', localizedName: 'Português'),
+  TranslationLanguage(code: 'ru', name: 'Russian', localizedName: 'Русский'),
+  TranslationLanguage(code: 'sw', name: 'Swahili', localizedName: 'Kiswahili'),
+  TranslationLanguage(code: 'ta', name: 'Tamil', localizedName: 'தமிழ்'),
+  TranslationLanguage(code: 'te', name: 'Telugu', localizedName: 'తెలుగు'),
+  TranslationLanguage(code: 'tr', name: 'Turkish', localizedName: 'Türkçe'),
+  TranslationLanguage(code: 'uk', name: 'Ukrainian', localizedName: 'Українська'),
+  TranslationLanguage(code: 'ur', name: 'Urdu', localizedName: 'اردو'),
+  TranslationLanguage(code: 'vi', name: 'Vietnamese', localizedName: 'Tiếng Việt'),
+  TranslationLanguage(code: 'zh_TW', name: 'Traditional Chinese', localizedName: '繁體中文'),
+];
 
 String normalizeTranslationLanguageCode(String code) {
   final trimmed = code.trim();

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'protocol_capabilities.dart';
 import 'protocol_event.dart';
 

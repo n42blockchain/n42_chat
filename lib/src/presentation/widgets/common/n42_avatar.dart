@@ -16,6 +16,16 @@ import '../../../core/utils/debug_log.dart';
 /// - 支持在线状态指示器
 /// - 支持群组九宫格头像
 class N42Avatar extends StatelessWidget {
+  static final RegExp _nonWordCjkPattern = RegExp(r'[^\w\u4e00-\u9fa5]');
+  static final RegExp _whitespacePattern = RegExp(r'\s+');
+  static final CacheManager _avatarCacheManager = CacheManager(
+    Config(
+      'avatar_cache',
+      stalePeriod: const Duration(hours: 1),
+      maxNrOfCacheObjects: 200,
+    ),
+  );
+
   /// 头像URL
   final String? imageUrl;
 
@@ -244,14 +254,7 @@ class N42Avatar extends StatelessWidget {
         imageUrl: imageUrl!,
         fit: BoxFit.cover,
         httpHeaders: headers,
-        // 使用较短的缓存时间确保头像更新
-        cacheManager: CacheManager(
-          Config(
-            'avatar_cache',
-            stalePeriod: const Duration(hours: 1),
-            maxNrOfCacheObjects: 200,
-          ),
-        ),
+        cacheManager: _avatarCacheManager,
         placeholder: (context, url) => _buildFallbackAvatar(),
         errorWidget: (context, url, error) {
           debugLog('N42Avatar: Failed to load image: $url, error: $error');
@@ -340,13 +343,13 @@ class N42Avatar extends StatelessWidget {
 
   String _getInitials(String name) {
     // 过滤掉特殊字符，只保留字母、数字和中文
-    final cleanName = name.replaceAll(RegExp(r'[^\w\u4e00-\u9fa5]'), '').trim();
+    final cleanName = name.replaceAll(_nonWordCjkPattern, '').trim();
 
     if (cleanName.isEmpty) {
       return '';
     }
 
-    final parts = cleanName.split(RegExp(r'\s+'));
+    final parts = cleanName.split(_whitespacePattern);
     if (parts.length >= 2 && parts[0].isNotEmpty && parts[1].isNotEmpty) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }

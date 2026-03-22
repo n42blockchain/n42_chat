@@ -84,7 +84,8 @@ class IncomingCallRingtonePreference {
         label: label,
         sourceKey: sourceKey,
       );
-    } catch (_) {
+    } catch (e) {
+      debugLog('IncomingCallRingtonePreference: Failed to decode stored value - $e');
       return IncomingCallRingtonePreference.system(label: raw);
     }
   }

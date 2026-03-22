@@ -89,12 +89,7 @@ class OnChainNotificationEntity extends Equatable {
     final source = json['source']?.toString() ?? '';
 
     // 解析时间戳
-    DateTime timestamp;
-    try {
-      timestamp = DateTime.parse(epochStr);
-    } catch (_) {
-      timestamp = DateTime.now();
-    }
+    final timestamp = DateTime.tryParse(epochStr) ?? DateTime.now();
 
     // 标题优先用 notification.title，回退到 data.asub
     final notifTitle = (notification['title'] as String? ?? '').trim();

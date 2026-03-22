@@ -25,6 +25,9 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  static final _usernameRegex = RegExp(r'^[a-zA-Z0-9_]+$');
+  static final _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
   final _formKey = GlobalKey<FormState>();
   final _homeserverController = TextEditingController(
     text: N42Chat.config?.defaultHomeserver ?? AppConstants.defaultHomeserver,
@@ -472,7 +475,7 @@ class _RegisterPageState extends State<RegisterPage> {
               return S.of(context)?.authUsernameMaxLength ??
                   'Username must be at most 20 characters';
             }
-            if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+            if (!_usernameRegex.hasMatch(value)) {
               return S.of(context)?.authUsernameFormat ??
                   'Username can only contain letters, numbers, and underscores';
             }
@@ -541,8 +544,7 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             // 邮箱是可选的，但如果填写了需要验证格式
             if (value != null && value.isNotEmpty) {
-              final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-              if (!emailRegex.hasMatch(value)) {
+              if (!_emailRegex.hasMatch(value)) {
                 return S.of(context)?.commonInvalidEmailFormat ??
                     'Please enter a valid email address';
               }

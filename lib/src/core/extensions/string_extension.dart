@@ -1,5 +1,16 @@
 import '../utils/string_utils.dart';
 
+final RegExp _emailRegExp =
+    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+final RegExp _urlRegExp = RegExp(
+  r'^https?://[^\s<>\[\]{}|\\^`"]+',
+  caseSensitive: false,
+);
+final RegExp _htmlTagRegExp = RegExp(r'<[^>]*>');
+final RegExp _unsafeFileNameRegExp = RegExp(r'[<>:"/\\|?*]');
+final RegExp _chineseRegExp = RegExp(r'[\u4e00-\u9fa5]');
+final RegExp _upperLetterRegExp = RegExp(r'[A-Z]');
+
 /// String 扩展方法
 extension StringExtension on String {
   /// 是否为空或仅包含空白
@@ -22,16 +33,12 @@ extension StringExtension on String {
 
   /// 是否是有效的邮箱
   bool get isValidEmail {
-    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-        .hasMatch(this);
+    return _emailRegExp.hasMatch(this);
   }
 
   /// 是否是有效的URL
   bool get isValidUrl {
-    return RegExp(
-      r'^https?://[^\s<>\[\]{}|\\^`"]+',
-      caseSensitive: false,
-    ).hasMatch(this);
+    return _urlRegExp.hasMatch(this);
   }
 
   /// 是否是有效的Matrix用户ID
@@ -68,17 +75,17 @@ extension StringExtension on String {
 
   /// 移除HTML标签
   String get stripHtml {
-    return replaceAll(RegExp(r'<[^>]*>'), '');
+    return replaceAll(_htmlTagRegExp, '');
   }
 
   /// 转换为安全的文件名
   String get asSafeFileName {
-    return replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+    return replaceAll(_unsafeFileNameRegExp, '_');
   }
 
   /// 是否包含中文
   bool get containsChinese {
-    return RegExp(r'[\u4e00-\u9fa5]').hasMatch(this);
+    return _chineseRegExp.hasMatch(this);
   }
 
   /// 获取中文拼音首字母（用于通讯录索引）
@@ -86,7 +93,7 @@ extension StringExtension on String {
   String get firstPinyinLetter {
     if (isEmpty) return '#';
     final first = this[0].toUpperCase();
-    if (RegExp(r'[A-Z]').hasMatch(first)) {
+    if (_upperLetterRegExp.hasMatch(first)) {
       return first;
     }
     // 如果是中文，返回#（实际应转换为拼音）
