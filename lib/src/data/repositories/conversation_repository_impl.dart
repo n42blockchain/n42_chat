@@ -23,10 +23,20 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   @override
   Stream<List<ConversationEntity>> watchConversations() {
-    return _roomDataSource.onRoomsChanged?.map(
-          (rooms) => rooms.map(_mapRoomToEntity).toList(),
-        ) ??
-        const Stream.empty();
+    final roomStream = _roomDataSource.onRoomsChanged;
+    if (roomStream == null) {
+      return const Stream.empty();
+    }
+
+    return _watchMappedRooms<List<matrix.Room>, List<ConversationEntity>>(
+      roomStream: roomStream,
+      mapValue: (rooms) => rooms.map(_mapRoomToEntity).toList(growable: false),
+      hasTypingUsers: (conversations) =>
+          conversations.any((item) => item.hasTypingUsers),
+      refreshValue: () =>
+          _roomDataSource.getSortedRooms().map(_mapRoomToEntity).toList(),
+      timeoutFromRooms: _typingTimeoutFromRooms,
+    );
   }
 
   @override
@@ -38,11 +48,21 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   @override
   Stream<ConversationEntity?> watchConversation(String id) {
-    return _roomDataSource.watchRoom(id)?.map((room) {
-          if (room == null) return null;
-          return _mapRoomToEntity(room);
-        }) ??
-        const Stream.empty();
+    final roomStream = _roomDataSource.watchRoom(id);
+    if (roomStream == null) {
+      return const Stream.empty();
+    }
+
+    return _watchMappedRooms<matrix.Room?, ConversationEntity?>(
+      roomStream: roomStream,
+      mapValue: (room) => room == null ? null : _mapRoomToEntity(room),
+      hasTypingUsers: (conversation) => conversation?.hasTypingUsers ?? false,
+      refreshValue: () {
+        final room = _roomDataSource.getRoomById(id);
+        return room == null ? null : _mapRoomToEntity(room);
+      },
+      timeoutFromRooms: (room) => room?.client.typingIndicatorTimeout,
+    );
   }
 
   @override
@@ -229,6 +249,16 @@ class ConversationRepositoryImpl implements IConversationRepository {
       directUserId = room.directChatMatrixID;
     }
 
+    final currentUserId = room.client.userID;
+    final typingUsers = room.typingUsers
+        .where((user) => user.id != currentUserId)
+        .map((user) {
+          final displayName = user.calcDisplayname().trim();
+          return displayName.isNotEmpty ? displayName : user.id;
+        })
+        .toSet()
+        .toList(growable: false);
+
     return ConversationEntity(
       id: room.id,
       name: _roomDataSource.getRoomDisplayName(room),
@@ -248,8 +278,76 @@ class ConversationRepositoryImpl implements IConversationRepository {
       memberAvatarUrls: memberAvatarUrls,
       memberNames: memberNames,
       memberIds: memberIds,
+      hasTypingUsers: typingUsers.isNotEmpty,
+      typingUsers: typingUsers,
       directUserId: directUserId,
     );
+  }
+
+  Stream<T> _watchMappedRooms<S, T>({
+    required Stream<S> roomStream,
+    required T Function(S value) mapValue,
+    required bool Function(T value) hasTypingUsers,
+    required T Function() refreshValue,
+    required Duration? Function(S value) timeoutFromRooms,
+  }) {
+    late final StreamController<T> controller;
+    StreamSubscription<S>? subscription;
+    Timer? refreshTimer;
+
+    void scheduleRefresh(S value, T mapped) {
+      refreshTimer?.cancel();
+      refreshTimer = null;
+
+      if (!hasTypingUsers(mapped)) {
+        return;
+      }
+
+      final timeout = timeoutFromRooms(value);
+      if (timeout == null) {
+        return;
+      }
+
+      refreshTimer = Timer(timeout + const Duration(milliseconds: 250), () {
+        if (!controller.isClosed) {
+          controller.add(refreshValue());
+        }
+      });
+    }
+
+    controller = StreamController<T>(
+      onListen: () {
+        subscription = roomStream.listen(
+          (value) {
+            final mapped = mapValue(value);
+            if (!controller.isClosed) {
+              controller.add(mapped);
+            }
+            scheduleRefresh(value, mapped);
+          },
+          onError: controller.addError,
+          onDone: () {
+            refreshTimer?.cancel();
+            controller.close();
+          },
+        );
+      },
+      onCancel: () async {
+        refreshTimer?.cancel();
+        await subscription?.cancel();
+      },
+    );
+
+    return controller.stream;
+  }
+
+  Duration? _typingTimeoutFromRooms(List<matrix.Room> rooms) {
+    for (final room in rooms) {
+      if (room.typingUsers.isNotEmpty) {
+        return room.client.typingIndicatorTimeout;
+      }
+    }
+    return null;
   }
 
   /// 获取群成员头像、名称和ID列表（最多17个，用于群详情页显示）

@@ -1,5 +1,7 @@
 // Tests for ConversationRepositoryImpl — core CRUD and unread count operations.
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
@@ -14,14 +16,20 @@ class MockPreferencesDataSource extends Mock implements PreferencesDataSource {}
 
 class MockRoom extends Mock implements matrix.Room {}
 
+class MockClient extends Mock implements matrix.Client {}
+
+class MockUser extends Mock implements matrix.User {}
+
 void main() {
   late ConversationRepositoryImpl repository;
   late MockMatrixRoomDataSource mockRoomDS;
   late MockPreferencesDataSource mockStorageDS;
+  late MockClient mockClient;
 
   setUp(() {
     mockRoomDS = MockMatrixRoomDataSource();
     mockStorageDS = MockPreferencesDataSource();
+    mockClient = MockClient();
     repository = ConversationRepositoryImpl(mockRoomDS, mockStorageDS);
   });
 
@@ -33,6 +41,90 @@ void main() {
 
       expect(result, isEmpty);
       verify(() => mockRoomDS.getSortedRooms()).called(1);
+    });
+
+    test('maps typing users from room state', () async {
+      final room = MockRoom();
+      final user = MockUser();
+
+      when(() => mockRoomDS.getSortedRooms()).thenReturn([room]);
+      when(() => room.id).thenReturn('!room1:matrix.org');
+      when(() => room.isDirectChat).thenReturn(false);
+      when(() => room.membership).thenReturn(matrix.Membership.join);
+      when(() => room.isFavourite).thenReturn(false);
+      when(() => room.lastEvent).thenReturn(null);
+      when(() => room.client).thenReturn(mockClient);
+      when(() => mockClient.userID).thenReturn('@me:matrix.org');
+      when(() => room.typingUsers).thenReturn([user]);
+      when(() => user.id).thenReturn('@alice:matrix.org');
+      when(() => user.calcDisplayname()).thenReturn('Alice');
+      when(() => mockRoomDS.getRoomDisplayName(room)).thenReturn('Group');
+      when(() => mockRoomDS.getRoomAvatarUrl(room)).thenReturn(null);
+      when(() => mockRoomDS.getUnreadCount(room)).thenReturn(0);
+      when(() => mockRoomDS.getHighlightCount(room)).thenReturn(0);
+      when(() => mockRoomDS.isMuted(room)).thenReturn(false);
+      when(() => mockRoomDS.isEncrypted(room)).thenReturn(false);
+      when(() => mockRoomDS.getMemberCount(room)).thenReturn(3);
+      when(() => mockRoomDS.getLastMessagePreview(room)).thenReturn('');
+      when(() => mockRoomDS.getLastMessageTime(room)).thenReturn(null);
+
+      final result = await repository.getConversations();
+
+      expect(result.single.hasTypingUsers, isTrue);
+      expect(result.single.typingUsers, ['Alice']);
+    });
+  });
+
+  group('watchConversations', () {
+    test('emits refresh after typing timeout clears locally', () async {
+      final controller = StreamController<List<matrix.Room>>();
+      final room = MockRoom();
+      final user = MockUser();
+      var typingUsers = <matrix.User>[user];
+
+      when(
+        () => mockRoomDS.onRoomsChanged,
+      ).thenAnswer((_) => controller.stream);
+      when(() => mockRoomDS.getSortedRooms()).thenReturn([room]);
+      when(() => room.id).thenReturn('!room1:matrix.org');
+      when(() => room.isDirectChat).thenReturn(false);
+      when(() => room.membership).thenReturn(matrix.Membership.join);
+      when(() => room.isFavourite).thenReturn(false);
+      when(() => room.lastEvent).thenReturn(null);
+      when(() => room.client).thenReturn(mockClient);
+      when(() => mockClient.userID).thenReturn('@me:matrix.org');
+      when(
+        () => mockClient.typingIndicatorTimeout,
+      ).thenReturn(const Duration(milliseconds: 20));
+      when(() => room.typingUsers).thenAnswer((_) => typingUsers);
+      when(() => user.id).thenReturn('@alice:matrix.org');
+      when(() => user.calcDisplayname()).thenReturn('Alice');
+      when(() => mockRoomDS.getRoomDisplayName(room)).thenReturn('Group');
+      when(() => mockRoomDS.getRoomAvatarUrl(room)).thenReturn(null);
+      when(() => mockRoomDS.getUnreadCount(room)).thenReturn(0);
+      when(() => mockRoomDS.getHighlightCount(room)).thenReturn(0);
+      when(() => mockRoomDS.isMuted(room)).thenReturn(false);
+      when(() => mockRoomDS.isEncrypted(room)).thenReturn(false);
+      when(() => mockRoomDS.getMemberCount(room)).thenReturn(3);
+      when(() => mockRoomDS.getLastMessagePreview(room)).thenReturn('');
+      when(() => mockRoomDS.getLastMessageTime(room)).thenReturn(null);
+
+      final emissions = <List<ConversationEntity>>[];
+      final subscription = repository.watchConversations().listen(
+        emissions.add,
+      );
+
+      controller.add([room]);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(emissions.last.single.typingUsers, ['Alice']);
+
+      typingUsers = <matrix.User>[];
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+
+      expect(emissions.last.single.hasTypingUsers, isFalse);
+
+      await subscription.cancel();
+      await controller.close();
     });
   });
 
@@ -53,6 +145,9 @@ void main() {
       when(() => mockRoom.isDirectChat).thenReturn(true);
       when(() => mockRoom.membership).thenReturn(matrix.Membership.join);
       when(() => mockRoom.isFavourite).thenReturn(false);
+      when(() => mockRoom.client).thenReturn(mockClient);
+      when(() => mockClient.userID).thenReturn('@me:matrix.org');
+      when(() => mockRoom.typingUsers).thenReturn(const <matrix.User>[]);
       when(() => mockRoom.directChatMatrixID).thenReturn(userId);
       when(() => mockRoom.lastEvent).thenReturn(null);
       when(() => mockRoomDS.getRoomDisplayName(mockRoom)).thenReturn('Bob');
