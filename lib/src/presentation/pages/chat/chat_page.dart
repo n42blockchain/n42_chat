@@ -1078,7 +1078,7 @@ class _ChatPageState extends State<ChatPage> {
   void _handlePendingCommand(String command) {
     switch (command) {
       case 'poll':
-        _showPollCreateSheet();
+        _createPoll();
         break;
       case 'welcome':
         Navigator.of(context).push(
@@ -1090,26 +1090,6 @@ class _ChatPageState extends State<ChatPage> {
       default:
         debugLog('ChatPage: Unknown pending command: $command');
     }
-  }
-
-  /// 展示投票创建底部弹窗
-  void _showPollCreateSheet() {
-    showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => const PollCreateSheet(),
-    ).then((result) {
-      if (result != null && mounted) {
-        context.read<ChatBloc>().add(
-          SendPollMessage(
-            question: result['question'] as String,
-            options: List<String>.from(result['options'] as List),
-            maxSelections: result['maxSelections'] as int? ?? 1,
-          ),
-        );
-      }
-    });
   }
 
   Widget _buildScrollToBottomButton() {

@@ -9,6 +9,7 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
 import 'package:n42_chat/src/domain/repositories/group_repository.dart';
 import 'package:n42_chat/src/domain/repositories/message_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_bloc.dart';
@@ -73,7 +74,7 @@ void main() {
     ).thenAnswer((_) async => <String, DateTime>{});
     when(
       () => mockPrefs.getScheduledMessages(any()),
-    ).thenAnswer((_) async => <Map<String, dynamic>>[]);
+    ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
     when(
       () => mockPrefs.shouldShowReadReceipts(),
     ).thenAnswer((_) async => true);
@@ -82,7 +83,13 @@ void main() {
     ).thenAnswer((_) async => true);
     when(
       () => mockPrefs.getDueScheduledMessages(),
-    ).thenAnswer((_) async => <Map<String, dynamic>>[]);
+    ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
+    when(
+      () => mockPrefs.getDefaultSelfDestructSeconds(),
+    ).thenAnswer((_) async => null);
+    when(
+      () => mockPrefs.getTranslationSettings(),
+    ).thenAnswer((_) async => null);
   }
 
   /// Builds a basic bloc (no group repo)
@@ -695,6 +702,115 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       expect(bloc.state.error, isNotNull);
+      await bloc.close();
+    });
+  });
+
+  group('Scheduled rich messages', () {
+    test('saves scheduled poll payload and adds preview message', () async {
+      when(() => mockRepo.getCurrentUserId()).thenAnswer((_) async => '@me:test');
+      when(
+        () => mockPrefs.saveScheduledMessage(
+          roomId: any(named: 'roomId'),
+          messageId: any(named: 'messageId'),
+          text: any(named: 'text'),
+          type: MessageType.poll,
+          payload: any(named: 'payload'),
+          scheduledAt: any(named: 'scheduledAt'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenAnswer((_) async {});
+
+      final bloc = buildBloc();
+      await initBloc(bloc);
+
+      bloc.add(
+        SendScheduledMessage(
+          text: 'Lunch?',
+          type: MessageType.poll,
+          payload: {
+            'options': ['Sushi', 'Pizza'],
+            'maxSelections': 1,
+            'isAnonymous': true,
+          },
+          scheduledAt: DateTime.now().add(const Duration(hours: 1)),
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      verify(
+        () => mockPrefs.saveScheduledMessage(
+          roomId: _roomId,
+          messageId: any(named: 'messageId'),
+          text: 'Lunch?',
+          type: MessageType.poll,
+          payload: {
+            'options': ['Sushi', 'Pizza'],
+            'maxSelections': 1,
+            'isAnonymous': true,
+          },
+          scheduledAt: any(named: 'scheduledAt'),
+          selfDestructAfter: null,
+          mentionedUserIds: const <String>[],
+          mentionsRoom: false,
+        ),
+      ).called(1);
+
+      await bloc.close();
+    });
+
+    test('sends due scheduled poll through repository', () async {
+      when(
+        () => mockPrefs.getDueScheduledMessages(),
+      ).thenAnswer((_) async => [
+        ScheduledMessageDraft(
+          messageId: 'scheduled_poll',
+          roomId: _roomId,
+          text: 'Lunch?',
+          type: MessageType.poll,
+          scheduledAt: DateTime.now().subtract(const Duration(minutes: 1)),
+          createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
+          payload: {
+            'options': ['Sushi', 'Pizza'],
+            'maxSelections': 1,
+            'isAnonymous': true,
+          },
+        ),
+      ]);
+      when(
+        () => mockRepo.sendPollMessage(
+          any(),
+          question: any(named: 'question'),
+          options: any(named: 'options'),
+          maxSelections: any(named: 'maxSelections'),
+          isAnonymous: any(named: 'isAnonymous'),
+        ),
+      ).thenAnswer((_) async => _msg.copyWith(type: MessageType.poll));
+      when(
+        () => mockPrefs.removeScheduledMessage(any(), any()),
+      ).thenAnswer((_) async {});
+
+      final bloc = buildBloc();
+      await initBloc(bloc);
+
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      verify(
+        () => mockRepo.sendPollMessage(
+          _roomId,
+          question: 'Lunch?',
+          options: ['Sushi', 'Pizza'],
+          maxSelections: 1,
+          isAnonymous: true,
+        ),
+      ).called(1);
+      verify(
+        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_poll'),
+      ).called(1);
+
       await bloc.close();
     });
   });

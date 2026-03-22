@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
+import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/domain/entities/user_profile_entity.dart';
 
 void main() {
@@ -1366,8 +1367,8 @@ void main() {
       );
 
       expect(messages.length, equals(1));
-      expect(messages[0]['messageId'], equals('scheduled_1'));
-      expect(messages[0]['text'], equals('圣诞快乐！'));
+      expect(messages[0].messageId, equals('scheduled_1'));
+      expect(messages[0].text, equals('圣诞快乐！'));
     });
 
     test(
@@ -1397,9 +1398,35 @@ void main() {
         '!room1:server.com',
       );
 
-      expect(messages[0]['selfDestructAfter'], equals(60));
-      expect(messages[0]['mentionedUserIds'], contains('@alice:server.com'));
-      expect(messages[0]['mentionsRoom'], equals(true));
+      expect(messages[0].selfDestructAfter, equals(60));
+      expect(messages[0].mentionedUserIds, contains('@alice:server.com'));
+      expect(messages[0].mentionsRoom, equals(true));
+    });
+
+    test('should save scheduled poll payload', () async {
+      final scheduledAt = DateTime(2025, 12, 25, 10, 0, 0);
+
+      await dataSource.saveScheduledMessage(
+        roomId: '!room1:server.com',
+        messageId: 'scheduled_poll',
+        text: 'Lunch?',
+        type: MessageType.poll,
+        payload: {
+          'options': ['Sushi', 'Pizza'],
+          'maxSelections': 1,
+          'isAnonymous': true,
+        },
+        scheduledAt: scheduledAt,
+      );
+
+      final messages = await dataSource.getScheduledMessages(
+        '!room1:server.com',
+      );
+
+      expect(messages.single.type, MessageType.poll);
+      expect(messages.single.pollOptions, ['Sushi', 'Pizza']);
+      expect(messages.single.pollMaxSelections, 1);
+      expect(messages.single.payload['isAnonymous'], isTrue);
     });
 
     test('should remove a scheduled message', () async {
@@ -1427,7 +1454,7 @@ void main() {
         '!room1:server.com',
       );
       expect(messages.length, equals(1));
-      expect(messages[0]['messageId'], equals('scheduled_2'));
+      expect(messages[0].messageId, equals('scheduled_2'));
     });
 
     test('should clear all scheduled messages for a room', () async {

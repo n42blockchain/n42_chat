@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
 import 'package:n42_chat/src/domain/repositories/message_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_event.dart';
@@ -91,7 +92,7 @@ void main() {
     ).thenAnswer((_) async => <String, DateTime>{});
     when(
       () => mockSecureStorage.getScheduledMessages(any()),
-    ).thenAnswer((_) async => <Map<String, dynamic>>[]);
+    ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
     when(
       () => mockSecureStorage.shouldShowReadReceipts(),
     ).thenAnswer((_) async => true);
@@ -100,7 +101,7 @@ void main() {
     ).thenAnswer((_) async => true);
     when(
       () => mockSecureStorage.getDueScheduledMessages(),
-    ).thenAnswer((_) async => <Map<String, dynamic>>[]);
+    ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
     when(
       () => mockSecureStorage.getDefaultSelfDestructSeconds(),
     ).thenAnswer((_) async => null);

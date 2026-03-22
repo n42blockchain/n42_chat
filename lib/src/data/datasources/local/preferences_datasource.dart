@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -796,6 +798,8 @@ class PreferencesDataSource {
     required String roomId,
     required String messageId,
     required String text,
+    MessageType type = MessageType.text,
+    Map<String, dynamic>? payload,
     required DateTime scheduledAt,
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
@@ -816,15 +820,19 @@ class PreferencesDataSource {
           [];
 
       // 添加新的定时消息
-      roomMessages.add({
-        'messageId': messageId,
-        'text': text,
-        'scheduledAt': scheduledAt.toIso8601String(),
-        'selfDestructAfter': selfDestructAfter,
-        'mentionedUserIds': mentionedUserIds,
-        'mentionsRoom': mentionsRoom,
-        'createdAt': DateTime.now().toIso8601String(),
-      });
+      roomMessages.add(
+        ScheduledMessageDraft(
+          messageId: messageId,
+          text: text,
+          type: type,
+          scheduledAt: scheduledAt,
+          createdAt: DateTime.now(),
+          selfDestructAfter: selfDestructAfter,
+          mentionedUserIds: mentionedUserIds ?? const [],
+          mentionsRoom: mentionsRoom,
+          payload: payload ?? const {},
+        ).toJson(),
+      );
 
       allData[roomId] = roomMessages;
 
@@ -839,7 +847,7 @@ class PreferencesDataSource {
   }
 
   /// 获取房间的所有定时消息
-  Future<List<Map<String, dynamic>>> getScheduledMessages(String roomId) async {
+  Future<List<ScheduledMessageDraft>> getScheduledMessages(String roomId) async {
     try {
       final p = await prefs;
       final data = p.getString(_keyScheduledMessages);
@@ -849,7 +857,12 @@ class PreferencesDataSource {
       final roomMessages = allData[roomId] as List<dynamic>?;
       if (roomMessages == null) return [];
 
-      return roomMessages.cast<Map<String, dynamic>>();
+      return roomMessages
+          .whereType<Map<dynamic, dynamic>>()
+          .map((item) => ScheduledMessageDraft.fromJson(
+            Map<String, dynamic>.from(item),
+          ))
+          .toList(growable: false);
     } catch (e) {
       debugLog('Preferences: Failed to read scheduled messages - $e');
       return [];
@@ -857,7 +870,7 @@ class PreferencesDataSource {
   }
 
   /// 获取所有房间的到期定时消息
-  Future<List<Map<String, dynamic>>> getDueScheduledMessages() async {
+  Future<List<ScheduledMessageDraft>> getDueScheduledMessages() async {
     try {
       final p = await prefs;
       final data = p.getString(_keyScheduledMessages);
@@ -865,17 +878,20 @@ class PreferencesDataSource {
 
       final allData = jsonDecode(data) as Map<String, dynamic>;
       final now = DateTime.now();
-      final dueMessages = <Map<String, dynamic>>[];
+      final dueMessages = <ScheduledMessageDraft>[];
 
       for (final entry in allData.entries) {
         final roomId = entry.key;
         final messages = (entry.value as List<dynamic>)
-            .cast<Map<String, dynamic>>();
+            .whereType<Map<dynamic, dynamic>>()
+            .map((item) => ScheduledMessageDraft.fromJson(
+              Map<String, dynamic>.from(item),
+            ));
 
         for (final msg in messages) {
-          final scheduledAt = DateTime.parse(msg['scheduledAt'] as String);
+          final scheduledAt = msg.scheduledAt;
           if (now.isAfter(scheduledAt) || now.isAtSameMomentAs(scheduledAt)) {
-            dueMessages.add({...msg, 'roomId': roomId});
+            dueMessages.add(msg.copyWith(roomId: roomId));
           }
         }
       }
