@@ -43,5 +43,25 @@ void main() {
       expect(preview.content, '[Poll] Lunch?');
       expect(preview.isScheduled, isTrue);
     });
+
+    test('treats image payload with gifUrl as a scheduled GIF', () {
+      final draft = ScheduledMessageDraft.fromJson({
+        'messageId': 'scheduled_gif',
+        'text': 'Celebration',
+        'type': 'image',
+        'scheduledAt': DateTime.utc(2026, 3, 22, 12).toIso8601String(),
+        'createdAt': DateTime.utc(2026, 3, 22, 11).toIso8601String(),
+        'payload': {
+          'gifUrl': 'https://media.giphy.com/media/abc/giphy.gif',
+          'previewUrl': 'https://media.giphy.com/media/abc/preview.gif',
+          'width': 320,
+          'height': 240,
+        },
+      });
+
+      expect(draft.isGif, isTrue);
+      expect(draft.typeLabel, 'GIF');
+      expect(draft.timelinePreviewText, '[GIF] Celebration');
+    });
   });
 }

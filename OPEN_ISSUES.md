@@ -123,13 +123,13 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: the chat layer can send typing notifications and `ChatState` still exposes `typingUsers` / `typingText`, but this round's review did not find a corresponding inbound subscription/update path that populates those fields for the active room. In practice, the UI cannot reliably show who is typing even though the state shape suggests that feature exists.
 - Next step: wire inbound typing events from the Matrix/message datasource into `ChatBloc`, then render and clear room-scoped typing users with proper debounce/expiry semantics.
 
-### MSG-004 Scheduled send still does not cover local media and lightweight rich content beyond polls
+### MSG-004 Scheduled send still does not cover local attachments that require delayed upload
 
 - Severity: M
 - Added: 2026-03-22
 - Evidence: `lib/src/domain/entities/scheduled_message_draft.dart`, `lib/src/presentation/widgets/chat/poll_create_sheet.dart`, `lib/src/presentation/pages/chat/chat_page_more_features.dart`, `lib/src/presentation/pages/chat/chat_page_input.dart`
-- Current state: scheduled send now uses a typed draft model and supports both text composer content and poll drafts, including due-send replay through `ChatBloc`. The remaining gap is richer content that depends on local files or dedicated pickers: image/video/file attachments, stickers, and GIFs still lack a first-class deferred-send entry path.
-- Next step: decide whether the next increment should persist local attachment references safely for delayed upload, or add schedule affordances to sticker/GIF pickers first and keep local-file scheduling out of scope.
+- Current state: scheduled send now uses a typed draft model and supports text, polls, stickers, and remote GIFs, including due-send replay through `ChatBloc` and picker-level schedule affordances for GIF/sticker selection. The remaining gap is content that depends on local file handles or post-pick upload work: image/video/file attachments still cannot be safely persisted and replayed for delayed send.
+- Next step: define a durable local-attachment draft format first, including path validity, permission expiry, thumbnail/metadata preservation, and how delayed upload should fail closed when the source file is no longer readable.
 
 ### CALL-001 Background blur / replacement still lacks a real video processor path
 

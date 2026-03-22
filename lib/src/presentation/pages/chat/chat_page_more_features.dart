@@ -684,6 +684,62 @@ Avatar: ${contactAvatar ?? ''}''';
     }
   }
 
+  void _queueScheduledRichDraft({
+    required String text,
+    required MessageType type,
+    required DateTime scheduledAt,
+    Map<String, dynamic> payload = const {},
+  }) {
+    context.read<ChatBloc>().add(
+      SendScheduledMessage(
+        text: text,
+        type: type,
+        payload: payload,
+        scheduledAt: scheduledAt,
+      ),
+    );
+  }
+
+  Future<void> _pickAndQueueScheduledRichDraft({
+    required String text,
+    required MessageType type,
+    Map<String, dynamic> payload = const {},
+  }) async {
+    final scheduledAt = await showScheduledSendPicker(context);
+    if (!mounted || scheduledAt == null) {
+      return;
+    }
+
+    _queueScheduledRichDraft(
+      text: text,
+      type: type,
+      payload: payload,
+      scheduledAt: scheduledAt,
+    );
+  }
+
+  Map<String, dynamic> _buildStickerPayload(Sticker sticker, String packId) => {
+    'stickerId': sticker.id,
+    'packId': packId,
+    'url': sticker.url,
+    'httpUrl': sticker.httpUrl,
+    'name': sticker.name,
+    'emoji': sticker.emoji,
+    'width': sticker.width,
+    'height': sticker.height,
+    'mimeType': sticker.mimeType,
+    'size': sticker.size,
+  };
+
+  void _hideStickerPicker() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _showStickerPicker = false;
+    });
+  }
+
   /// 创建投票
   void _createPoll() async {
     final result = await showModalBottomSheet<PollComposerResult>(
@@ -695,22 +751,14 @@ Avatar: ${contactAvatar ?? ''}''';
 
     if (result != null && mounted) {
       if (result.action == PollComposerAction.schedule) {
-        final scheduledAt = await showScheduledSendPicker(context);
-        if (!mounted || scheduledAt == null) {
-          return;
-        }
-
-        context.read<ChatBloc>().add(
-          SendScheduledMessage(
-            text: result.question,
-            type: MessageType.poll,
-            payload: {
-              'options': result.options,
-              'maxSelections': result.maxSelections,
-              'isAnonymous': result.isAnonymous,
-            },
-            scheduledAt: scheduledAt,
-          ),
+        await _pickAndQueueScheduledRichDraft(
+          text: result.question,
+          type: MessageType.poll,
+          payload: {
+            'options': result.options,
+            'maxSelections': result.maxSelections,
+            'isAnonymous': result.isAnonymous,
+          },
         );
         return;
       }
@@ -732,16 +780,28 @@ Avatar: ${contactAvatar ?? ''}''';
 
   /// 显示 GIF 选择器
   Future<void> _showGifPicker() async {
-    final gif = await showGifPicker(context);
-    if (gif != null && mounted) {
-      debugLog('ChatPage: Sending GIF - ${gif.title}');
+    final selection = await showGifPicker(context);
+    if (selection != null && mounted) {
+      final payload = selection.scheduledPayload;
+
+      if (selection.scheduledAt != null) {
+        _queueScheduledRichDraft(
+          text: selection.title.trim().isEmpty ? 'GIF' : selection.title,
+          type: MessageType.image,
+          payload: payload,
+          scheduledAt: selection.scheduledAt!,
+        );
+        return;
+      }
+
+      debugLog('ChatPage: Sending GIF - ${selection.title}');
       context.read<ChatBloc>().add(
         SendGifMessage(
-          gifUrl: gif.originalUrl,
-          previewUrl: gif.previewUrl,
-          width: gif.width,
-          height: gif.height,
-          title: gif.title,
+          gifUrl: payload['gifUrl'] as String,
+          previewUrl: payload['previewUrl'] as String?,
+          width: payload['width'] as int?,
+          height: payload['height'] as int?,
+          title: selection.title,
         ),
       );
     }
@@ -762,25 +822,32 @@ Avatar: ${contactAvatar ?? ''}''';
   /// 发送贴纸消息
   void _onStickerSelected(Sticker sticker, String packId) {
     debugLog('ChatPage: Sending sticker ${sticker.id} from pack $packId');
+    final payload = _buildStickerPayload(sticker, packId);
     context.read<ChatBloc>().add(
       SendStickerMessage(
-        stickerId: sticker.id,
-        packId: packId,
-        url: sticker.url,
-        httpUrl: sticker.httpUrl,
-        name: sticker.name,
-        emoji: sticker.emoji,
-        width: sticker.width,
-        height: sticker.height,
-        mimeType: sticker.mimeType,
-        size: sticker.size,
+        stickerId: payload['stickerId'] as String,
+        packId: payload['packId'] as String,
+        url: payload['url'] as String,
+        httpUrl: payload['httpUrl'] as String?,
+        name: payload['name'] as String?,
+        emoji: payload['emoji'] as String?,
+        width: payload['width'] as int?,
+        height: payload['height'] as int?,
+        mimeType: payload['mimeType'] as String?,
+        size: payload['size'] as int?,
       ),
     );
 
-    // 发送后隐藏贴纸面板
-    setState(() {
-      _showStickerPicker = false;
-    });
+    _hideStickerPicker();
+  }
+
+  Future<void> _onStickerLongPressed(Sticker sticker, String packId) async {
+    await _pickAndQueueScheduledRichDraft(
+      text: sticker.name ?? sticker.emoji ?? 'Sticker',
+      type: MessageType.sticker,
+      payload: _buildStickerPayload(sticker, packId),
+    );
+    _hideStickerPicker();
   }
 
   /// 打开贴纸商店

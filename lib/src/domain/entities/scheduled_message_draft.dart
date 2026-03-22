@@ -94,7 +94,13 @@ class ScheduledMessageDraft extends Equatable {
 
   int get pollMaxSelections => payload['maxSelections'] as int? ?? 1;
 
+  bool get isGif => (payload['gifUrl'] as String?)?.isNotEmpty == true;
+
   String get typeLabel {
+    if (isGif) {
+      return 'GIF';
+    }
+
     switch (type) {
       case MessageType.poll:
         return 'Poll';
@@ -106,6 +112,10 @@ class ScheduledMessageDraft extends Equatable {
   }
 
   String get timelinePreviewText {
+    if (isGif) {
+      return text.isEmpty ? '[GIF]' : '[GIF] $text';
+    }
+
     switch (type) {
       case MessageType.poll:
         return '[Poll] $text';
