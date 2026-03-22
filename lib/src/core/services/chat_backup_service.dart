@@ -465,8 +465,7 @@ class ChatBackupService {
           try {
             final archived = await _archiveService!.getArchivedMessages(
               room.id,
-              beforeTimestamp: lastBackupTs > 0 ? null : null,
-              limit: 100000, // 不设限，全量导出
+              limit: 100000,
             );
             for (final a in archived) {
               if (lastBackupTs > 0 && a.originServerTs <= lastBackupTs) {
@@ -511,10 +510,9 @@ class ChatBackupService {
     // 计算内容校验和
     final contentChecksum = sha256.convert(utf8.encode(jsonStr)).toString();
     // 更新 manifest 中的 checksum
-    final dataWithChecksum = backupData;
-    (dataWithChecksum['manifest'] as Map<String, dynamic>)['checksum'] =
+    (backupData['manifest'] as Map<String, dynamic>)['checksum'] =
         contentChecksum;
-    final finalJsonStr = jsonEncode(dataWithChecksum);
+    final finalJsonStr = jsonEncode(backupData);
 
     if (password != null && password.isNotEmpty) {
       final encryptedBytes =

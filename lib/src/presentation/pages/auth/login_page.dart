@@ -172,7 +172,6 @@ class _LoginPageState extends State<LoginPage> {
           }
         },
         builder: (context, state) {
-          final isDarkMode = context.isDarkMode;
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Form(
@@ -183,22 +182,22 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
 
                   // Logo（紧凑版）
-                  _buildCompactLogo(isDarkMode),
+                  _buildCompactLogo(isDark),
 
                   const SizedBox(height: 24),
 
                   // 服务器输入
-                  _buildServerInput(state, isDarkMode),
+                  _buildServerInput(state, isDark),
 
                   const SizedBox(height: 12),
 
                   // 用户名输入
-                  _buildUsernameInput(isDarkMode),
+                  _buildUsernameInput(isDark),
 
                   const SizedBox(height: 12),
 
                   // 密码输入
-                  _buildPasswordInput(isDarkMode),
+                  _buildPasswordInput(isDark),
 
                   const SizedBox(height: 20),
 
@@ -226,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 16),
 
                   // 底部协议
-                  _buildAgreement(isDarkMode),
+                  _buildAgreement(isDark),
                 ],
               ),
             ),
@@ -659,7 +658,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
   
-  void _loginWithBiometric() async {
+  void _loginWithBiometric() {
     // 直接触发生物识别登录
     context.read<AuthBloc>().add(const AuthBiometricLoginRequested());
   }
@@ -696,7 +695,7 @@ class _LoginPageState extends State<LoginPage> {
     context.read<AuthBloc>().add(AuthAppleLoginRequested(homeserver: homeserver));
   }
 
-  void _loginWithSso() async {
+  void _loginWithSso() {
     final homeserver = _homeserverController.text.trim();
     if (homeserver.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -707,7 +706,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
-    
+
     context.read<AuthBloc>().add(AuthSsoLoginRequested(homeserver: homeserver));
   }
 

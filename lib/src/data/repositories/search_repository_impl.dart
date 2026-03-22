@@ -1,5 +1,6 @@
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../core/utils/matrix_utils.dart';
 import '../../domain/entities/contact_entity.dart';
 import '../../domain/entities/conversation_entity.dart';
 import '../../domain/entities/message_entity.dart';
@@ -296,9 +297,13 @@ class SearchRepositoryImpl implements ISearchRepository {
 
   ContactEntity _mapUserToContact(matrix.User user) {
     String? avatarUrl;
-    final client = _clientManager.client;
-    if (user.avatarUrl != null && client != null) {
-      avatarUrl = _buildAvatarHttpUrl(user.avatarUrl.toString(), client);
+    if (user.avatarUrl != null) {
+      avatarUrl = MatrixUtils.mxcToHttp(
+        user.avatarUrl.toString(),
+        client: _clientManager.client,
+        width: 96,
+        height: 96,
+      );
     }
 
     return ContactEntity(
@@ -306,28 +311,6 @@ class SearchRepositoryImpl implements ISearchRepository {
       displayName: user.calcDisplayname(),
       avatarUrl: avatarUrl,
     );
-  }
-  
-  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
-  String? _buildAvatarHttpUrl(String? mxcUrl, matrix.Client client) {
-    if (mxcUrl == null || mxcUrl.isEmpty) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-    
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-      
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-      
-      // 使用认证媒体 API (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
-    } catch (e) {
-      return null;
-    }
   }
 
   ConversationEntity _mapRoomToConversation(matrix.Room room) {
@@ -380,18 +363,12 @@ class SearchRepositoryImpl implements ISearchRepository {
 
   String? _getRoomAvatarUrl(matrix.Room? room) {
     if (room == null) return null;
-    final client = _clientManager.client;
     final avatarMxc = room.avatar?.toString();
-    if (avatarMxc == null || client == null) return null;
-
-    return _buildAvatarHttpUrl(avatarMxc, client);
+    return MatrixUtils.mxcToHttp(
+      avatarMxc,
+      client: _clientManager.client,
+      width: 96,
+      height: 96,
+    );
   }
-}
-
-/// 消息搜索结果
-class MessageSearchResult {
-  final matrix.Event event;
-  final matrix.Room room;
-
-  MessageSearchResult({required this.event, required this.room});
 }

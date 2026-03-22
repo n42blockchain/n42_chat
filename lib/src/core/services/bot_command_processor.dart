@@ -92,7 +92,7 @@ class BotCommandProcessor {
       buffer.writeln('/${cmd.usage.replaceFirst('/', '')}$adminTag');
       buffer.writeln('  ${cmd.description}\n');
     }
-    buffer.writeln('💡 N42 supports ${_chainCount}+ chains — more than any other chat platform.');
+    buffer.writeln('💡 N42 supports $_chainCount+ chains — more than any other chat platform.');
     return BotCommandResult.showPanel(
       title: '🤖 Bot Commands',
       content: buffer.toString(),
@@ -154,10 +154,10 @@ class BotCommandProcessor {
       }
     } catch (e) {
       debugLog('BotCommandProcessor price error: $e');
-      return BotCommandResult.error('Failed to fetch price. Please try again.');
+      return const BotCommandResult.error('Failed to fetch price. Please try again.');
     }
 
-    return BotCommandResult.error('Could not retrieve price data.');
+    return const BotCommandResult.error('Could not retrieve price data.');
   }
 
   BotCommandResult _handleBalance() {
@@ -171,7 +171,7 @@ class BotCommandProcessor {
     final shortAddr = '${address.substring(0, 6)}...${address.substring(address.length - 4)}';
     return BotCommandResult.showPanel(
       title: '👛 Wallet',
-      content: 'Address: $shortAddr\n\nOpen N42 Wallet to view full balances across ${_chainCount}+ chains.',
+      content: 'Address: $shortAddr\n\nOpen N42 Wallet to view full balances across $_chainCount+ chains.',
     );
   }
 

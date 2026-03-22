@@ -29,7 +29,6 @@ class MatrixClientManager {
 
   Client? _client;
   bool _isInitialized = false;
-  bool _isInitializing = false;
   bool _vodozemacInitialized = false;
   Completer<void>? _initCompleter;
 
@@ -91,7 +90,6 @@ class MatrixClientManager {
         );
       }
       _initCompleter = null;
-      _isInitializing = false;
       try {
         await _client!.dispose();
       } catch (e) {
@@ -108,8 +106,6 @@ class MatrixClientManager {
     }
 
     _initCompleter = Completer<void>();
-    _isInitializing = true;
-
     try {
       // 初始化 vodozemac 加密后端（必须在 Client.init() 之前）
       // flutter_rust_bridge 不允许重复初始化，需要单独跟踪状态
@@ -209,7 +205,6 @@ class MatrixClientManager {
       _initCompleter!.completeError(e, stack);
       rethrow;
     } finally {
-      _isInitializing = false;
       _initCompleter = null;
     }
   }

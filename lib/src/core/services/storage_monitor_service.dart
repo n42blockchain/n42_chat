@@ -229,49 +229,28 @@ class StorageMonitorService {
   /// 获取设备剩余空间（字节）
   ///
   /// 通过查询应用文档目录所在卷的可用空间实现。
-  /// 使用 Dart 标准 API `FileSystemEntity.stat()` 不直接提供剩余空间，
-  /// 但可通过 `Process.run` 获取系统级信息。
+  /// iOS/macOS/Android 均使用 `df` 命令解析可用空间。
   Future<int?> _getDeviceFreeSpace() async {
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      if (Platform.isIOS || Platform.isMacOS) {
-        // macOS/iOS: 使用 df 命令获取可用空间
-        final result = await Process.run(
-          'df',
-          ['-k', appDir.path],
-        );
-        if (result.exitCode == 0) {
-          final lines = (result.stdout as String).trim().split('\n');
-          if (lines.length >= 2) {
-            // df -k 输出第二行：Filesystem 1K-blocks Used Available ...
-            final parts = lines[1].split(RegExp(r'\s+'));
-            if (parts.length >= 4) {
-              final availableKB = int.tryParse(parts[3]);
-              if (availableKB != null) {
-                return availableKB * 1024; // 转为字节
-              }
-            }
-          }
-        }
-      } else if (Platform.isAndroid) {
-        // Android: df 也通常可用
-        final result = await Process.run(
-          'df',
-          [appDir.path],
-        );
-        if (result.exitCode == 0) {
-          final lines = (result.stdout as String).trim().split('\n');
-          if (lines.length >= 2) {
-            final parts = lines[1].split(RegExp(r'\s+'));
-            if (parts.length >= 4) {
-              final availableKB = int.tryParse(parts[3]);
-              if (availableKB != null) {
-                return availableKB * 1024;
-              }
-            }
-          }
-        }
+      if (!Platform.isIOS && !Platform.isMacOS && !Platform.isAndroid) {
+        return null;
       }
+
+      final appDir = await getApplicationDocumentsDirectory();
+      final args = Platform.isIOS || Platform.isMacOS
+          ? ['-k', appDir.path]
+          : [appDir.path];
+      final result = await Process.run('df', args);
+      if (result.exitCode != 0) return null;
+
+      final lines = (result.stdout as String).trim().split('\n');
+      if (lines.length < 2) return null;
+
+      final parts = lines[1].split(RegExp(r'\s+'));
+      if (parts.length < 4) return null;
+
+      final availableKB = int.tryParse(parts[3]);
+      return availableKB != null ? availableKB * 1024 : null;
     } catch (e) {
       debugLog('StorageMonitorService: Failed to get device free space: $e');
     }

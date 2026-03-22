@@ -21,6 +21,7 @@ class ChatCallDialog extends StatefulWidget {
   final VoidCallback onEnd;
 
   const ChatCallDialog({
+    super.key,
     required this.contactName,
     required this.isVideoCall,
     required this.onEnd,

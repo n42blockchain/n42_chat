@@ -60,16 +60,12 @@ class _GroupFilesPageState extends State<GroupFilesPage>
         switch (_tabController.index) {
           case 0:
             _currentFilter = null;
-            break;
           case 1:
             _currentFilter = GroupFileType.document;
-            break;
           case 2:
             _currentFilter = GroupFileType.image;
-            break;
           case 3:
             _currentFilter = GroupFileType.video;
-            break;
         }
       });
     }
@@ -273,35 +269,14 @@ class _GroupFilesPageState extends State<GroupFilesPage>
   }
 
   Widget _buildFileIcon(GroupFileEntity file) {
-    IconData icon;
-    Color color;
-
-    switch (file.fileType) {
-      case GroupFileType.image:
-        icon = Icons.image;
-        color = Colors.blue;
-        break;
-      case GroupFileType.video:
-        icon = Icons.videocam;
-        color = Colors.red;
-        break;
-      case GroupFileType.audio:
-        icon = Icons.audiotrack;
-        color = Colors.purple;
-        break;
-      case GroupFileType.document:
-        icon = Icons.description;
-        color = Colors.orange;
-        break;
-      case GroupFileType.archive:
-        icon = Icons.folder_zip;
-        color = Colors.brown;
-        break;
-      case GroupFileType.other:
-        icon = Icons.insert_drive_file;
-        color = Colors.grey;
-        break;
-    }
+    final (IconData icon, Color color) = switch (file.fileType) {
+      GroupFileType.image => (Icons.image, Colors.blue),
+      GroupFileType.video => (Icons.videocam, Colors.red),
+      GroupFileType.audio => (Icons.audiotrack, Colors.purple),
+      GroupFileType.document => (Icons.description, Colors.orange),
+      GroupFileType.archive => (Icons.folder_zip, Colors.brown),
+      GroupFileType.other => (Icons.insert_drive_file, Colors.grey),
+    };
 
     return Container(
       width: 48,

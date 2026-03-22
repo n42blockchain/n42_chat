@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../pages/red_packet/send_red_packet_page.dart';
 
@@ -135,18 +136,10 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
   Future<void> _openRedPacket() async {
     if (_isOpening) return;
     setState(() => _isOpening = true);
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     await _openController.forward();
     widget.onOpen?.call();
-
-    // Post viral message to group chat
-    final viralMsg = widget.onGrabViralMessage?.call();
-    if (viralMsg != null && mounted) {
-      // Schedule after dialog state transition
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // The parent widget handles actually posting via the callback return value
-      });
-    }
+    widget.onGrabViralMessage?.call();
 
     if (mounted) setState(() => _showResult = true);
   }

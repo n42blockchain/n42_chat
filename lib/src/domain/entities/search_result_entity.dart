@@ -48,7 +48,7 @@ class SearchResultItem extends Equatable {
   final String? roomId;
 
   /// 原始数据
-  final dynamic rawData;
+  final Object? rawData;
 
   const SearchResultItem({
     required this.type,

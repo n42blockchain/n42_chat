@@ -295,12 +295,6 @@ class CallNotificationService {
     return (calls as List<dynamic>?) ?? [];
   }
   
-  /// 检查是否有来电权限（主要用于 iOS）
-  Future<bool> checkPermissions() async {
-    // flutter_callkit_incoming 会自动处理权限
-    return true;
-  }
-  
   /// 显示未接来电通知
   Future<void> showMissedCall({
     required String callerId,
@@ -332,12 +326,6 @@ class CallNotificationService {
     
     await FlutterCallkitIncoming.showMissCallNotification(params);
     debugLog('CallNotificationService: Showing missed call from $callerName');
-  }
-  
-  /// 清除未接来电通知
-  Future<void> clearMissedCalls() async {
-    // 实现清除未接来电通知的逻辑
-    debugLog('CallNotificationService: Cleared missed calls');
   }
   
   /// 释放资源

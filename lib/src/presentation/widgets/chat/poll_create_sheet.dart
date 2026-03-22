@@ -4,7 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 
 class PollCreateSheet extends StatefulWidget {
-  const PollCreateSheet();
+  const PollCreateSheet({super.key});
 
   @override
   State<PollCreateSheet> createState() => _PollCreateSheetState();

@@ -14,6 +14,7 @@ class ForwardMessageSheet extends StatefulWidget {
   final void Function(String conversationId) onForwardToChat;
 
   const ForwardMessageSheet({
+    super.key,
     required this.message,
     required this.isDark,
     required this.onForwardToChat,

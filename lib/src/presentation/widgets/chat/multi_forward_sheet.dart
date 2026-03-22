@@ -12,6 +12,7 @@ class MultiForwardSheet extends StatefulWidget {
   final bool isDark;
 
   const MultiForwardSheet({
+    super.key,
     required this.selectedCount,
     required this.isDark,
   });

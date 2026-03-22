@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../theme/n42_chat_theme.dart';
 
 /// BuildContext 扩展方法
 extension ContextExtension on BuildContext {
@@ -120,32 +119,12 @@ extension ContextExtension on BuildContext {
 
   /// 显示错误SnackBar
   void showErrorSnackBar(String message, {Duration duration = const Duration(seconds: 3)}) {
-    final messenger = ScaffoldMessenger.of(this);
-    messenger.clearSnackBars();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: duration,
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.horizontal,
-      ),
-    );
+    showSnackBar(message, duration: duration, backgroundColor: Colors.red);
   }
 
   /// 显示成功SnackBar
   void showSuccessSnackBar(String message, {Duration duration = const Duration(seconds: 2)}) {
-    final messenger = ScaffoldMessenger.of(this);
-    messenger.clearSnackBars();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: duration,
-        backgroundColor: const Color(0xFF07C160),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.horizontal,
-      ),
-    );
+    showSnackBar(message, duration: duration, backgroundColor: const Color(0xFF07C160));
   }
 
   /// 清除所有 SnackBar
@@ -224,15 +203,3 @@ extension ContextExtension on BuildContext {
     }
   }
 }
-
-/// N42ChatTheme BuildContext 扩展
-extension N42ChatThemeExtension on BuildContext {
-  /// 获取N42ChatTheme
-  ///
-  /// 如果没有找到，返回默认的微信浅色主题
-  N42ChatTheme get n42Theme {
-    // TODO: 从InheritedWidget获取
-    return isDarkMode ? N42ChatTheme.wechatDark() : N42ChatTheme.wechatLight();
-  }
-}
-

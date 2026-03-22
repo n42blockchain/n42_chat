@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/matrix_utils.dart';
 import '../../../domain/entities/bot_config_entity.dart';
 import '../../../domain/entities/channel_entity.dart';
 import '../../../domain/entities/content_filter_entity.dart';
@@ -143,33 +144,11 @@ class MatrixGroupDataSource {
     await room.setDescription(topic);
   }
 
-  /// 获取群头像URL（手动构建 HTTP URL）
+  /// 获取群头像URL
   String? getGroupAvatarUrl(String roomId, {int size = 96}) {
     final room = _client?.getRoomById(roomId);
     final avatarMxc = room?.avatar?.toString();
-    return _buildAvatarHttpUrl(avatarMxc, size);
-  }
-  
-  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
-  String? _buildAvatarHttpUrl(String? mxcUrl, int size) {
-    if (mxcUrl == null || mxcUrl.isEmpty || _client == null) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-    
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-      
-      final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-      
-      // 使用认证媒体 API (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$size&height=$size&method=crop';
-    } catch (e) {
-      return null;
-    }
+    return MatrixUtils.mxcToHttp(avatarMxc, client: _client, width: size, height: size);
   }
 
   /// 设置群头像
@@ -676,8 +655,8 @@ class MatrixGroupDataSource {
       if (c.roomId != channelRoomId) return _channelToMap(c);
       return {
         ..._channelToMap(c),
-        if (name != null) 'name': name,
-        if (topic != null) 'topic': topic,
+        'name': ?name,
+        'topic': ?topic,
       };
     }).toList();
     await _client!.setRoomStateWithKey(
@@ -698,7 +677,7 @@ class MatrixGroupDataSource {
         .toList();
     // 重新排序
     for (var i = 0; i < updated.length; i++) {
-      (updated[i] as Map<String, dynamic>)['order'] = i;
+      updated[i]['order'] = i;
     }
     await _client!.setRoomStateWithKey(
       parentRoomId,

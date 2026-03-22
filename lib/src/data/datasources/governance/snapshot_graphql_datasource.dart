@@ -31,7 +31,7 @@ class SnapshotGraphQLDatasource {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'query': query,
-            if (variables != null) 'variables': variables,
+            'variables': ?variables,
           }),
         )
         .timeout(const Duration(seconds: 15));
@@ -102,7 +102,7 @@ class SnapshotGraphQLDatasource {
       'spaceId': spaceId,
       'first': first,
       'skip': skip,
-      if (state != null) 'state': state,
+      'state': ?state,
     });
 
     final proposals = data['proposals'] as List<dynamic>;
@@ -177,7 +177,7 @@ class SnapshotGraphQLDatasource {
       'proposalId': proposalId,
       'first': first,
       'skip': skip,
-      if (voter != null) 'voter': voter,
+      'voter': ?voter,
     });
 
     final votes = data['votes'] as List<dynamic>;

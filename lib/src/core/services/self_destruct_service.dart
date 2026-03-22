@@ -290,12 +290,10 @@ class SelfDestructTimer {
 
   /// 根据秒数获取预设
   static SelfDestructTimer? fromSeconds(int seconds) {
-    try {
-      return presets.firstWhere((p) => p.seconds == seconds);
-    } catch (e) {
-      debugLog('Error: $e');
-      return null;
+    for (final p in presets) {
+      if (p.seconds == seconds) return p;
     }
+    return null;
   }
 
   /// 获取预设名称，如果不是预设则返回格式化时间

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -911,12 +910,4 @@ Future<void> resetDependencies() async {
   await getIt.reset();
 }
 
-/// 检查是否已注册
-bool isRegistered<T extends Object>() => getIt.isRegistered<T>();
-
-/// 扩展方法：简化获取依赖
-extension GetItExtension on GetIt {
-  /// 获取配置
-  N42ChatConfig get config => get<N42ChatConfig>();
-}
 

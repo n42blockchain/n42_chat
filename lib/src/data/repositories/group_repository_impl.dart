@@ -1,8 +1,8 @@
 import 'dart:typed_data';
-import 'dart:async';
 
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../core/utils/matrix_utils.dart';
 import '../../domain/entities/bot_config_entity.dart';
 import '../../domain/entities/channel_entity.dart';
 import '../../domain/entities/content_filter_entity.dart';
@@ -463,9 +463,13 @@ class GroupRepositoryImpl implements IGroupRepository {
     }
 
     String? avatarUrl;
-    final client = _clientManager.client;
-    if (user.avatarUrl != null && client != null) {
-      avatarUrl = _buildAvatarHttpUrl(user.avatarUrl.toString(), client);
+    if (user.avatarUrl != null) {
+      avatarUrl = MatrixUtils.mxcToHttp(
+        user.avatarUrl.toString(),
+        client: _clientManager.client,
+        width: 96,
+        height: 96,
+      );
     }
 
     // 根据 Matrix 用户状态确定成员状态
@@ -481,28 +485,6 @@ class GroupRepositoryImpl implements IGroupRepository {
       powerLevel: powerLevel,
       membershipStatus: membershipStatus,
     );
-  }
-  
-  /// 构建头像 HTTP URL（不再在 URL 中添加 access_token，改用请求头认证）
-  String? _buildAvatarHttpUrl(String? mxcUrl, matrix.Client client) {
-    if (mxcUrl == null || mxcUrl.isEmpty) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-    
-    try {
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-      
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-      
-      // 使用认证媒体 API (Matrix 1.11+)
-      return '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=96&height=96&method=crop';
-    } catch (e) {
-      return null;
-    }
   }
 }
 

@@ -74,13 +74,10 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
       switch (_tabController.index) {
         case 0:
           bloc.add(const ChangeAlbumFilter(AlbumFilter.none));
-          break;
         case 1:
           bloc.add(const ChangeAlbumFilter(AlbumFilter.imagesOnly));
-          break;
         case 2:
           bloc.add(const ChangeAlbumFilter(AlbumFilter.videosOnly));
-          break;
       }
     }
   }
