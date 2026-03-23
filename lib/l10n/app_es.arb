@@ -8,8 +8,12 @@
   "chatCallBack": "Devolver llamada",
   "chatMissedVideoCall": "Videollamada perdida",
   "chatMissedVoiceCall": "Llamada de voz perdida",
+  "chatCallNotAnswered": "No contestada",
+  "chatCallDurationLabel": "Duración de la llamada",
+  "chatVoiceCallCancelled": "Llamada de voz cancelada",
+  "chatVideoCallCancelled": "Videollamada cancelada",
   "commonImage": "[Imagen]",
-  "chatVideo": "[Video]",
+  "chatVideo": "[Vídeo]",
   "chatVoice": "[Voz]",
   "commonFile": "[Archivo]",
   "chatLocation": "[Ubicacion]",
@@ -40,6 +44,7 @@
   "chatCopied": "Copiado",
   "storySendMessageHint": "Enviar un mensaje",
   "commonMicrophonePermissionRequired": "Por favor permite el acceso al microfono",
+  "chatMicrophonePermissionDeniedPermanent": "Se ha denegado el permiso del micrófono. Habilítelo en la configuración del sistema para usar mensajes de voz.",
   "commonStartRecordingFailed": "Error al iniciar grabacion: {error}",
   "commonRecordingTooShort": "Grabacion muy corta",
   "commonStopRecordingFailed": "Error al detener grabacion: {error}",
@@ -85,12 +90,12 @@
       }
     }
   },
-  "commonChat": "Chat",
+  "commonChat": "Charla",
   "commonSettings": "Configuracion",
   "profileEditProfile": "Editar perfil",
   "authLogin": "Iniciar sesion",
   "commonCreateGroup": "Crear grupo",
-  "chatError": "Error",
+  "chatError": "error",
   "commonTransfer": "Transferir",
   "commonReceived": "Recibido",
   "commonRefunded": "Reembolsado",
@@ -99,13 +104,14 @@
   "commonN42RedPacket": "Sobre rojo N42",
   "commonClaimed": "Reclamado",
   "commonAllClaimed": "Todo reclamado",
+  "chatReadAloud": "Leer en voz alta",
   "chatReply": "Responder",
   "commonEdit": "Editar",
   "chatSelectForwardTarget": "Seleccionar destinatario",
   "commonSendCount": "Enviar ({count})",
   "contactN42Id": "ID N42: {id}",
   "profileN42IdTitle": "ID N42",
-  "profileN42Bean": "N42 Bean",
+  "profileN42Bean": "Frijol N42",
   "contactFriendInfo": "Info del amigo",
   "contactFriendInfoDesc": "Agrega notas, telefono, etiquetas, anotaciones, fotos y configura permisos.",
   "commonMoments": "Momentos",
@@ -174,7 +180,7 @@
   "authEnterInviteCode": "Ingresa codigo de invitacion",
   "authAlreadyHaveAccount": "Ya tienes una cuenta?",
   "authLoginNow": "Iniciar sesion ahora",
-  "profileAvatar": "Avatar",
+  "profileAvatar": "avatar",
   "profileStatus": "Estado",
   "commonLoading": "Cargando...",
   "conversationNoConversations": "Sin conversaciones",
@@ -196,7 +202,7 @@
   "contactTryOtherKeywords": "Intenta con otras palabras clave o busqueda global",
   "contactSearchResults": "Resultados de busqueda",
   "contactNewFriends": "Nuevos amigos",
-  "contactChatOnlyFriends": "Chat-only Friends",
+  "contactChatOnlyFriends": "Amigos solo de chat",
   "contactOfficialAccounts": "Cuentas oficiales",
   "contactServiceAccounts": "Cuentas de servicio",
   "contactEnterpriseContacts": "Contactos empresariales",
@@ -234,7 +240,7 @@
   "groupMembersTitle": "Miembros del grupo",
   "groupViewAll": "Ver todo",
   "groupOwner": "Propietario",
-  "groupAdmin": "Admin",
+  "groupAdmin": "administrador",
   "groupInvite": "Invitar",
   "commonGroupAnnouncement": "Anuncio del grupo",
   "commonNotSet": "No establecido",
@@ -255,7 +261,6 @@
   "groupQrCode": "Codigo QR del grupo",
   "commonSearchChatHistory": "Buscar historial de chat",
   "groupIdCopied": "ID del grupo copiado",
-  "commonFeatureInDevelopment": "Funcion en desarrollo...",
   "transferEnterOrPasteAddress": "Ingresa o pega direccion de billetera",
   "transferSelectToken": "Seleccionar token",
   "commonTransferAmount": "Monto de transferencia",
@@ -301,7 +306,7 @@
   "profileInvoiceUpdated": "Factura actualizada",
   "profileDeleteInvoice": "Eliminar factura",
   "profileInvoiceDeleted": "Factura eliminada",
-  "profilePersonal": "Personal",
+  "profilePersonal": "personales",
   "groupSelectAtLeastOne": "Por favor selecciona al menos un miembro",
   "chatFileNotExist": "El archivo no existe",
   "chatSendFailed": "Error al enviar: {error}",
@@ -392,6 +397,7 @@
   "chatCalling": "Llamando...",
   "chatRinging": "Sonando...",
   "chatInCall": "En llamada",
+  "commonFeatureInDevelopment": "Funcion en desarrollo...",
   "chatCollectMessages": "Guardados {count} mensajes",
   "commonMemberCount": "{count} miembros",
   "groupDone": "Listo({count})",
@@ -405,7 +411,7 @@
   "profileServices": "Servicios",
   "commonFavorites": "Favoritos",
   "profileOrdersAndCards": "Pedidos y tarjetas",
-  "profileStickers": "Stickers",
+  "profileStickers": "Pegatinas",
   "profileStatusSetTo": "Estado establecido: {status}",
   "@profileStatusSetTo": {
     "placeholders": {
@@ -418,7 +424,7 @@
   "profilePersonalProfile": "Perfil personal",
   "profileName": "Nombre",
   "profileGender": "Genero",
-  "profileRegion": "Region",
+  "profileRegion": "Región",
   "commonMyQrCode": "Mi codigo QR",
   "profilePoke": "Toque",
   "profileRingtone": "Tono",
@@ -477,7 +483,6 @@
     }
   },
   "authEnterValidServerAddress": "Por favor ingresa una direccion de servidor valida",
-  "authEmailOtp": "OTP por correo",
   "authEnterServerAddressFirst": "Por favor ingresa la direccion del servidor primero",
   "authPasskeyRequiresServer": "El inicio de sesion con Passkey requiere soporte del servidor",
   "authLoginAgreement": "Al iniciar sesion, aceptas ",
@@ -561,22 +566,6 @@
   "chatSaving": "Guardando...",
   "commonShare": "Compartir",
   "chatSaveToGallery": "Guardar en galeria",
-  "chatDownloadFailed": "Descarga fallida: {code}",
-  "@chatDownloadFailed": {
-    "placeholders": {
-      "code": {
-        "type": "String"
-      }
-    }
-  },
-  "commonShareFailed": "Error al compartir: {error}",
-  "@commonShareFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "chatFailedToLoadImage": "Error al cargar imagen",
   "chatVideoRecordingFailed": "Error de grabacion de video. Por favor intenta de nuevo.",
   "profileRedPacket": "Sobre rojo",
@@ -620,7 +609,7 @@
   "transferAmount": "Monto",
   "commonRedPacketCover": "Portada del sobre rojo",
   "commonRedPacketType": "Tipo de sobre rojo",
-  "commonNormalRedPacket": "Normal",
+  "commonNormalRedPacket": "normales",
   "commonLuckyRedPacket": "De la suerte",
   "commonRedPacketCount": "Cantidad de sobres rojos",
   "commonPieces": "piezas",
@@ -727,7 +716,7 @@
   "profileVisibleToFriends24h": "Visible para amigos por 24 horas",
   "profileWriteStatus": "Escribir estado",
   "profileEnterYourStatus": "Ingresa tu estado...",
-  "profileOk": "OK",
+  "profileOk": "bien",
   "qrcodeCameraPermissionRequired": "Se requiere permiso de camara para escanear codigo QR",
   "qrcodeCameraPermissionDenied": "El permiso de camara fue denegado permanentemente. Por favor habilitalo en configuracion del sistema.",
   "qrcodePermissionCheckError": "Error al verificar permiso: {error}",
@@ -769,7 +758,7 @@
   "profileConfirmDeleteAddress": "Estas seguro de que quieres eliminar esta direccion?",
   "profileConfirmDeleteInvoice": "Estas seguro de que quieres eliminar esta factura?",
   "commonGroupOwner": "Propietario",
-  "commonGroupAdmin": "Admin",
+  "commonGroupAdmin": "administrador",
   "groupSearchMembers": "Buscar miembros",
   "groupTotalMembers": "{count} miembros",
   "@groupTotalMembers": {
@@ -846,8 +835,9 @@
   },
   "searchAllResults": "Todo",
   "searchInChat": "Buscar en chat",
-  "searchGroupLabel": "Grupo",
   "searchContactLabel": "Contacto",
+  "searchGroupLabel": "Grupo",
+  "searchConversationLabel": "Conversación",
   "searchMessageLabel": "Mensaje",
   "settingsSecurityTitle": "Seguridad",
   "settingsKeyBackup": "Respaldo de claves",
@@ -917,6 +907,21 @@
   "settingsResetEncryptionTitle": "Restablecer cifrado",
   "settingsResetEncryptionWarning": "Advertencia: Esto eliminara todas tus claves de cifrado. No podras descifrar mensajes cifrados anteriores. Esta accion no se puede deshacer.",
   "settingsReset": "Restablecer",
+  "settingsBackupSuccess": "Claves respaldadas exitosamente",
+  "settingsBackupFailed": "Error en la copia de seguridad",
+  "settingsRecoveryKey": "Clave de recuperación",
+  "settingsRecoveryKeySaveWarning": "Guarde esta clave de recuperación en un lugar seguro. Lo necesitará para restaurar sus mensajes cifrados en un nuevo dispositivo.",
+  "settingsRecoveryKeySaved": "lo he guardado",
+  "settingsRestoreSuccess": "Claves restauradas exitosamente",
+  "settingsRestoreFailed": "Restauración fallida",
+  "settingsPassword": "Contraseña",
+  "settingsEnterRecoveryKey": "Ingrese la clave de recuperación",
+  "settingsEnterPassword": "Introduce la contraseña",
+  "settingsExportSuccess": "Claves exportadas a la copia de seguridad del servidor con éxito",
+  "settingsExportNeedBackupFirst": "Primero cree una copia de seguridad de la clave",
+  "settingsExportFailed": "Exportación fallida",
+  "settingsResetSuccess": "Restablecimiento del cifrado exitoso",
+  "settingsResetFailed": "Error al restablecer",
   "callLeaveMeetingConfirm": "Estas seguro de que quieres salir de la reunion?",
   "chatPokedSomeone": "toco a {name}{suffix}",
   "@chatPokedSomeone": {
@@ -1070,7 +1075,7 @@
   "chatRecentPlayed": "Recientes",
   "chatMyFavorites": "Favoritos",
   "chatNetworkLink": "Enlace",
-  "chatLocalFile": "Local",
+  "chatLocalFile": "locales",
   "chatPasteMusicLink": "Pegar enlace de musica",
   "chatShareMusicButton": "Compartir musica",
   "chatSelectLocalAudio": "Seleccionar archivo de audio local",
@@ -1092,7 +1097,7 @@
     }
   },
   "chatSearchContactsOrGroups": "Buscar contactos o grupos",
-  "chatVideoTitle": "Video",
+  "chatVideoTitle": "Vídeo",
   "chatLoadingText": "Cargando...",
   "chatVideoLoadFailed": "Error al cargar video",
   "chatPlayerInitFailed": "Error de inicializacion del reproductor",
@@ -1277,7 +1282,22 @@
       }
     }
   },
+  "@chatSelectFileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatNoMediaUrlAvailable": "URL de medios no disponible",
+  "chatDownloadFailed": "Descarga fallida: {code}",
+  "@chatDownloadFailed": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "chatErrorWithMessage": "Error: {message}",
   "@chatErrorWithMessage": {
     "placeholders": {
@@ -1288,6 +1308,14 @@
   },
   "chatMusicLinkLabel": "Enlace de musica",
   "chatRedPacketTransferCannotForward": "Los sobres rojos y transferencias no se pueden reenviar",
+  "commonShareFailed": "Error al compartir: {error}",
+  "@commonShareFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "commonTapToRetry": "Toca para reintentar",
   "chatDefaultRedPacketGreeting": "Que la prosperidad te acompañe",
   "groupAllowOthersToSearchAndJoin": "Permitir que otros busquen y se unan",
@@ -1298,54 +1326,117 @@
   "groupEnterGroupAnnouncement": "Ingresa el anuncio del grupo",
   "groupMemberCountClickToCopy": "{count} miembros, haz clic para copiar el ID del grupo",
   "groupNoPermissionToEditGroupName": "No tienes permiso para editar el nombre del grupo",
-  "commonAppleLogin": "Iniciar sesión con Apple",
-  "settingsChangeEmailFailed": "Error al cambiar el correo electrónico",
-  "settingsChangePassword": "Cambiar contraseña",
-  "settingsChangePasswordFailed": "Error al cambiar la contraseña",
-  "settingsChangePasswordInfo": "Después de cambiar la contraseña, se cerrará la sesión y deberá iniciar sesión con la nueva contraseña.",
-  "settingsCodeSentTo": "Código de verificación enviado a",
-  "commonConfirmNewPassword": "Confirmar nueva contraseña",
-  "searchConversationLabel": "Conversación",
-  "settingsCurrentBoundEmail": "Correo electrónico actual vinculado",
-  "settingsCurrentPassword": "Contraseña actual",
-  "settingsDidNotReceiveCode": "¿No recibió el código?",
   "authEmailAddress": "Dirección de correo electrónico",
-  "settingsEmailChangedSuccess": "Correo electrónico cambiado correctamente",
-  "authEmailRecoveryHint": "Se usa para recuperar la contraseña",
-  "settingsEmailSecurityNote": "Su correo electrónico se usa para recuperar la contraseña. Manténgalo seguro.",
-  "settingsEnterCurrentPassword": "Ingrese la contraseña actual",
   "commonEnterEmailAddress": "Ingrese la dirección de correo electrónico",
-  "settingsEnterNewEmail": "Ingrese la nueva dirección de correo electrónico",
-  "settingsEnterNewPassword": "Ingrese la nueva contraseña",
-  "authEnterRegisteredEmail": "Ingrese la dirección de correo electrónico con la que se registró",
-  "authEnterResetCode": "Ingrese el código de restablecimiento",
-  "commonGoogleLogin": "Iniciar sesión con Google",
-  "commonWechat": "WeChat",
+  "authEmailRecoveryHint": "Se usa para recuperar la contraseña",
   "commonInvalidEmailFormat": "Ingrese una dirección de correo electrónico válida",
-  "settingsLanguage": "Idioma",
-  "settingsLanguageChanged": "Idioma cambiado",
-  "settingsNewEmailAddress": "Nueva dirección de correo electrónico",
-  "commonNewPassword": "Nueva contraseña",
-  "settingsNewPasswordMustBeDifferent": "La nueva contraseña debe ser diferente de la contraseña actual",
   "authOptional": "Opcional",
-  "settingsPasswordChanged": "Contraseña cambiada correctamente. Inicie sesión con su nueva contraseña.",
-  "settingsPasswordRequirements": "Requisitos de contraseña:",
-  "authPasswordResetSuccess": "Contraseña restablecida correctamente. Inicie sesión con su nueva contraseña.",
-  "authResetCodeSent": "Código de restablecimiento enviado a {email}",
   "authResetPassword": "Restablecer contraseña",
-  "authResetPasswordFailed": "Error al restablecer la contraseña",
-  "settingsSecurity": "Seguridad",
-  "settingsSecurityNote": "Por seguridad, deberá volver a iniciar sesión en todos los dispositivos después de cambiar la contraseña.",
+  "authEnterRegisteredEmail": "Ingrese la dirección de correo electrónico con la que se registró",
   "authSendResetCode": "Enviar código de restablecimiento",
+  "authResetCodeSent": "Código de restablecimiento enviado a {email}",
+  "@authResetCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authEnterResetCode": "Ingrese el código de restablecimiento",
   "authSetNewPassword": "Establecer nueva contraseña",
+  "commonConfirmNewPassword": "Confirmar nueva contraseña",
+  "commonNewPassword": "Nueva contraseña",
+  "authPasswordResetSuccess": "Contraseña restablecida correctamente. Inicie sesión con su nueva contraseña.",
+  "authResetPasswordFailed": "Error al restablecer la contraseña",
+  "settingsChangePassword": "Cambiar contraseña",
+  "settingsCurrentPassword": "Contraseña actual",
+  "settingsEnterCurrentPassword": "Ingrese la contraseña actual",
+  "settingsEnterNewPassword": "Ingrese la nueva contraseña",
+  "settingsPasswordChanged": "Contraseña cambiada correctamente. Inicie sesión con su nueva contraseña.",
+  "settingsChangePasswordFailed": "Error al cambiar la contraseña",
+  "settingsNewPasswordMustBeDifferent": "La nueva contraseña debe ser diferente de la contraseña actual",
+  "settingsChangePasswordInfo": "Después de cambiar la contraseña, se cerrará la sesión y deberá iniciar sesión con la nueva contraseña.",
+  "settingsPasswordRequirements": "Requisitos de contraseña:",
+  "settingsSecurityNote": "Por seguridad, deberá volver a iniciar sesión en todos los dispositivos después de cambiar la contraseña.",
+  "settingsSecurity": "Seguridad",
+  "settingsCurrentBoundEmail": "Correo electrónico actual vinculado",
+  "settingsNewEmailAddress": "Nueva dirección de correo electrónico",
+  "settingsEnterNewEmail": "Ingrese la nueva dirección de correo electrónico",
   "settingsVerificationCode": "Código de verificación",
   "settingsVerificationCodeSent": "Código de verificación enviado",
+  "settingsCodeSentTo": "Código de verificación enviado a",
+  "settingsDidNotReceiveCode": "¿No recibió el código?",
+  "settingsEmailChangedSuccess": "Correo electrónico cambiado correctamente",
+  "settingsChangeEmailFailed": "Error al cambiar el correo electrónico",
+  "settingsEmailSecurityNote": "Su correo electrónico se usa para recuperar la contraseña. Manténgalo seguro.",
+  "commonGoogleLogin": "Iniciar sesión con Google",
+  "commonAppleLogin": "Iniciar sesión con Apple",
+  "commonWechat": "WeChat",
+  "settingsLanguage": "Idioma",
+  "settingsLanguageChanged": "Idioma cambiado",
+  "settingsTranslation": "Traducción",
+  "settingsTranslateTextTo": "Traducir texto a",
+  "settingsTranslateDescription": "Seleccione el idioma al que desea que se traduzcan los mensajes.",
+  "settingsAutoTranslate": "Traducir automáticamente los mensajes recibidos",
+  "settingsAutoTranslateDescription": "Traduce automáticamente los mensajes recibidos en el chat al idioma seleccionado.",
+  "settingsBiometricLogin": "Inicio biométrico",
+  "authLoginWithBiometric": "Iniciar sesión con {type}",
+  "@authLoginWithBiometric": {
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      }
+    }
+  },
+  "settingsBiometricLoginEnabled": "Inicio biométrico activado",
+  "settingsBiometricLoginDisabled": "Inicio biométrico desactivado",
+  "settingsEnableBiometricLogin": "Activar inicio biométrico",
+  "settingsBiometricEnabled": "Activado - Usa biometría para iniciar sesión",
+  "settingsBiometricDisabled": "Desactivado - Toca para activar",
+  "settingsBiometricNeedRelogin": "Por favor, cierra sesión e inicia sesión de nuevo para activar el inicio biométrico",
+  "authOr": "O",
   "qrcodeCameraPermissionRestricted": "El acceso a la cámara está restringido en este dispositivo",
-  "contactCreateTag": "Create Tag",
-  "contactEnterTagName": "Enter tag name",
-  "contactEditTag": "Edit Tag",
-  "contactDeleteTag": "Delete Tag",
-  "contactDeleteTagConfirm": "Are you sure you want to delete the tag \"{tagName}\"?",
+  "authPasskeyLabel": "Clave de acceso",
+  "authGoogleLabel": "google",
+  "authAppleLabel": "manzana",
+  "authSsoLabel": "SSO",
+  "transferAmountHintZero": "0.00",
+  "commonMatrixIdHint": "@username:server.com",
+  "authServerAddressHint": "https://m.si46.world",
+  "authEmailExampleHint": "example@email.com",
+  "authVerificationCodePlaceholder": "------",
+  "profileEnterPokeSuffixHint": "Introduce el sufijo del toque, p.ej.: en el hombro",
+  "groupAlbum": "Álbum del grupo",
+  "groupFiles": "Archivos del grupo",
+  "groupImages": "Imágenes",
+  "groupVideos": "Vídeos",
+  "groupTotal": "totales",
+  "groupSize": "Tamaño",
+  "groupNoMedia": "Sin medios",
+  "groupNoMediaDescription": "Aún no hay fotos ni videos en este grupo",
+  "groupDocuments": "Documentos",
+  "groupNoFiles": "Sin archivos",
+  "groupNoFilesDescription": "Aún no hay archivos en este grupo",
+  "groupDownloadStarted": "Descargando {filename}...",
+  "@groupDownloadStarted": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
+  "contactNoCommonGroups": "Sin grupos en común",
+  "contactNoCommonGroupsDescription": "No tienen ningún grupo en común",
+  "chatVoiceMessage": "Voz",
+  "chatMessage": "Mensaje",
+  "conversationHideChat": "Ocultar",
+  "settingsQuickReply": "Respuesta rápida",
+  "commonTranslate": "Traducir",
+  "contactCreateTag": "Crear etiqueta",
+  "contactEnterTagName": "Introduzca el nombre de la etiqueta",
+  "contactEditTag": "Editar etiqueta",
+  "contactDeleteTag": "Eliminar etiqueta",
+  "contactDeleteTagConfirm": "¿Está seguro de que desea eliminar la etiqueta \"{tagName}\"?",
   "@contactDeleteTagConfirm": {
     "placeholders": {
       "tagName": {
@@ -1353,39 +1444,39 @@
       }
     }
   },
-  "contactNoTags": "No tags yet",
-  "contactFriendPermissions": "Friend Permissions",
-  "contactSetChatOnly": "Set as Chat-only",
-  "contactChatOnlyDesc": "Can only chat with you, other content will be hidden",
-  "contactHideMyMoments": "Hide My Moments",
-  "contactHideMyMomentsDesc": "This friend cannot see my Moments",
-  "contactHideTheirMoments": "Hide Their Moments",
-  "contactHideTheirMomentsDesc": "Don't see this friend's Moments",
-  "contactHideMyStatus": "Hide My Status",
-  "contactHideMyStatusDesc": "This friend cannot see my status updates",
-  "contactNoChatOnlyFriends": "No chat-only friends",
-  "contactNoOfficialAccounts": "No official accounts",
-  "contactFollowOfficialAccountsDesc": "Follow official accounts to get the latest updates",
-  "contactNoServiceAccounts": "No service accounts",
-  "contactSubscribeServiceAccountsDesc": "Subscribe to service accounts for convenient services",
-  "contactNoEnterpriseContacts": "No enterprise contacts",
-  "contactEnterpriseContactsDesc": "Enterprise contacts will be displayed here",
-  "profileCardPack": "Card Pack",
-  "profileOrders": "Orders",
-  "profileNoOrders": "No orders",
-  "profileOrdersDesc": "Your orders will be displayed here",
-  "profileNoCards": "No cards",
-  "profileCardsDesc": "Your cards will be displayed here",
-  "favoriteEnterTagsHint": "Enter tags separated by commas",
-  "favoriteTagsUpdated": "Tags updated",
-  "favoriteForwardedContent": "Content forwarded",
-  "favoriteEnterNoteContent": "Enter note content",
-  "favoriteNoteAdded": "Note added",
-  "favoriteLinkTitle": "Link title",
+  "contactNoTags": "Aún no hay etiquetas",
+  "contactFriendPermissions": "Permisos de amigos",
+  "contactSetChatOnly": "Establecer como solo chat",
+  "contactChatOnlyDesc": "Solo puedo chatear contigo, el resto del contenido estará oculto.",
+  "contactHideMyMoments": "Ocultar mis momentos",
+  "contactHideMyMomentsDesc": "Este amigo no puede ver mis Momentos",
+  "contactHideTheirMoments": "Ocultar sus momentos",
+  "contactHideTheirMomentsDesc": "No ver los Momentos de este amigo",
+  "contactHideMyStatus": "Ocultar mi estado",
+  "contactHideMyStatusDesc": "Este amigo no puede ver mis actualizaciones de estado.",
+  "contactNoChatOnlyFriends": "No hay amigos solo para chatear",
+  "contactNoOfficialAccounts": "Sin cuentas oficiales",
+  "contactFollowOfficialAccountsDesc": "Siga las cuentas oficiales para obtener las últimas actualizaciones.",
+  "contactNoServiceAccounts": "Sin cuentas de servicio",
+  "contactSubscribeServiceAccountsDesc": "Suscríbase a cuentas de servicio para obtener servicios convenientes",
+  "contactNoEnterpriseContacts": "Sin contactos empresariales",
+  "contactEnterpriseContactsDesc": "Los contactos empresariales se mostrarán aquí",
+  "profileCardPack": "Paquete de cartas",
+  "profileOrders": "Órdenes",
+  "profileNoOrders": "Sin pedidos",
+  "profileOrdersDesc": "Tus pedidos se mostrarán aquí.",
+  "profileNoCards": "sin tarjetas",
+  "profileCardsDesc": "Tus tarjetas se mostrarán aquí.",
+  "favoriteEnterTagsHint": "Introduzca etiquetas separadas por comas",
+  "favoriteTagsUpdated": "Etiquetas actualizadas",
+  "favoriteForwardedContent": "Contenido reenviado",
+  "favoriteEnterNoteContent": "Ingrese el contenido de la nota",
+  "favoriteNoteAdded": "Nota agregada",
+  "favoriteLinkTitle": "Título del enlace",
   "favoriteLinkUrl": "https://",
-  "favoriteLinkAdded": "Link added",
-  "contactPhotoAdded": "Photo added",
-  "contactEnterPhone": "Enter phone number",
+  "favoriteLinkAdded": "Enlace agregado",
+  "contactPhotoAdded": "Foto agregada",
+  "contactEnterPhone": "Introduce el número de teléfono",
   "commonConversationWithId": "Conversacion: {roomId}",
   "commonContactWithId": "Contacto: {userId}",
   "commonDiscover": "Descubrir",
@@ -1404,8 +1495,15 @@
   "settingsDoNotDisturbDescription": "No recibir notificaciones durante el tiempo especificado",
   "settingsStartTime": "Hora de inicio",
   "settingsEndTime": "Hora de fin",
+  "settingsDeleteQuickReply": "Eliminar respuesta rápida",
+  "settingsEditQuickReply": "Editar respuesta rápida",
+  "settingsAddQuickReply": "Añadir respuesta rápida",
+  "settingsManageQuickReplies": "Gestionar respuestas rápidas",
+  "settingsNoQuickReplies": "Sin respuestas rápidas",
+  "settingsDefaultQuickReplies": "Se mostrarán las respuestas rápidas predeterminadas",
   "settingsWhoCanSee": "Quien puede ver",
   "settingsLastSeen": "Ultima vez visto",
+  "settingsHiddenChats": "Chats ocultos",
   "settingsMessagesLabel": "Mensajes",
   "settingsAllowStrangerMessages": "Permitir mensajes de extraños",
   "settingsReceiveMessagesFromNonContacts": "Recibir mensajes de no contactos",
@@ -1436,6 +1534,9 @@
   "settingsOpenSourceLicenses": "Licencias de codigo abierto",
   "settingsFeedbackAndSuggestions": "Comentarios y sugerencias",
   "settingsBuiltOnMatrix": "Basado en el protocolo Matrix",
+  "settingsNoHiddenChats": "Sin chats ocultos",
+  "settingsNoHiddenChatsDescription": "Los chats que ocultes aparecerán aquí",
+  "settingsUnhideChat": "Mostrar",
   "settingsDarkMode": "Modo oscuro",
   "settingsFontSize": "Tamano de fuente",
   "settingsBubbleStyle": "Estilo de burbuja",
@@ -1502,6 +1603,10 @@
   "chatLongitude": "Longitud",
   "groupDescriptionUpdated": "Descripción del grupo actualizada",
   "groupAvatarUpdated": "Avatar del grupo actualizado",
+  "groupVisibilityUpdated": "Visibilidad del grupo actualizada",
+  "groupChannelCreated": "Canal creado",
+  "groupChannelUpdated": "Canal actualizado",
+  "groupChannelDeleted": "Canal eliminado",
   "callDecline": "Rechazar",
   "callAnswer": "Contestar",
   "callIncomingVideoCall": "Videollamada entrante",
@@ -1514,7 +1619,7 @@
   "callLivekitNotConfigured": "LiveKit no configurado",
   "callJoinMeetingFailed": "Error al unirse a la reunion: {error}",
   "callScreenShareFailed": "Error al compartir pantalla: {error}",
-  "profileN42BeanTitle": "N42 Bean",
+  "profileN42BeanTitle": "Frijol N42",
   "profileNoN42Bean": "Sin N42 Bean",
   "profileN42BeanDetails": "Detalles de N42 Bean",
   "profileN42BeanDescription": "N42 Bean es un token para canjear artículos virtuales y servicios en N42. Actualmente disponible para:",
@@ -1556,7 +1661,7 @@
   "profileStatusEating": "Comiendo",
   "profileStatusParenting": "Cuidando ninos",
   "profileStatusSavingWorld": "Salvando el mundo",
-  "profileStatusSelfie": "Selfie",
+  "profileStatusSelfie": "autofoto",
   "profileRest": "Descanso",
   "profileStatusRetreat": "Retiro",
   "profileStatusHome": "En casa",
@@ -1610,8 +1715,22 @@
       }
     }
   },
+  "storyViewers": "Espectadores",
+  "storyNoViewers": "Aún sin espectadores",
+  "storyReplyToStory": "Responder a la historia...",
   "commonCopiedToClipboard": "Copiado al portapapeles",
   "commonMore": "Mas",
+  "commonTranslating": "Traduciendo...",
+  "commonTranslatedFrom": "Traducido de {language}",
+  "@commonTranslatedFrom": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "commonTranslation": "Traducción",
+  "commonTranslationFailed": "Error en la traducción",
   "commonAllRead": "Todo leido",
   "commonReadCount": "{count} leidos",
   "commonYouRecalledMessage": "Retiraste un mensaje",
@@ -1642,135 +1761,568 @@
       }
     }
   },
-  "authAppleLabel": "Apple",
-  "authEmailExampleHint": "example@email.com",
-  "authGoogleLabel": "Google",
-  "authLoginWithBiometric": "Iniciar sesión con {type}",
-  "@authLoginWithBiometric": {
+  "securityDeviceIdRequired": "Se requiere ID del dispositivo",
+  "securityVerificationStartFailed": "No se pudo iniciar la verificación: {error}",
+  "@securityVerificationStartFailed": {
     "placeholders": {
-      "type": {
-        "type": "Object"
-      }
-    }
-  },
-  "authOr": "O",
-  "authPasskeyLabel": "Passkey",
-  "authServerAddressHint": "https://m.si46.world",
-  "authSsoLabel": "SSO",
-  "authVerificationCodePlaceholder": "------",
-  "chatCallDurationLabel": "Duración de la llamada",
-  "chatCallNotAnswered": "No contestada",
-  "chatMessage": "Mensaje",
-  "chatVideoCallCancelled": "Videollamada cancelada",
-  "chatVoiceCallCancelled": "Llamada de voz cancelada",
-  "chatVoiceMessage": "Voz",
-  "commonMatrixIdHint": "@username:server.com",
-  "commonTranslate": "Traducir",
-  "commonTranslatedFrom": "Traducido de {language}",
-  "@commonTranslatedFrom": {
-    "placeholders": {
-      "language": {
+      "error": {
         "type": "String"
       }
     }
   },
-  "commonTranslating": "Traduciendo...",
-  "commonTranslation": "Traducción",
-  "commonTranslationFailed": "Error en la traducción",
-  "contactNoCommonGroups": "Sin grupos en común",
-  "contactNoCommonGroupsDescription": "No tienen ningún grupo en común",
-  "conversationHideChat": "Ocultar",
-  "groupAlbum": "Álbum del grupo",
-  "groupDocuments": "Documentos",
-  "groupDownloadStarted": "Descargando {filename}...",
-  "@groupDownloadStarted": {
+  "securityVerificationFailed": "La verificación falló",
+  "securityVerificationFailedWithReason": "Error de verificación: {reason}",
+  "@securityVerificationFailedWithReason": {
     "placeholders": {
-      "filename": {
+      "reason": {
         "type": "String"
       }
     }
   },
-  "groupFiles": "Archivos del grupo",
-  "groupImages": "Imágenes",
-  "groupNoFiles": "Sin archivos",
-  "groupNoFilesDescription": "Aún no hay archivos en este grupo",
-  "groupNoMedia": "Sin medios",
-  "groupNoMediaDescription": "Aún no hay fotos ni videos en este grupo",
-  "groupSize": "Tamaño",
-  "groupTotal": "Total",
-  "groupVideos": "Videos",
-  "profileEnterPokeSuffixHint": "Introduce el sufijo del toque, p.ej.: en el hombro",
-  "settingsAddQuickReply": "Añadir respuesta rápida",
-  "settingsBiometricDisabled": "Desactivado - Toca para activar",
-  "settingsBiometricEnabled": "Activado - Usa biometría para iniciar sesión",
-  "settingsBiometricLogin": "Inicio biométrico",
-  "settingsBiometricLoginDisabled": "Inicio biométrico desactivado",
-  "settingsBiometricLoginEnabled": "Inicio biométrico activado",
-  "settingsBiometricNeedRelogin": "Por favor, cierra sesión e inicia sesión de nuevo para activar el inicio biométrico",
-  "settingsDefaultQuickReplies": "Se mostrarán las respuestas rápidas predeterminadas",
-  "settingsDeleteQuickReply": "Eliminar respuesta rápida",
-  "settingsEditQuickReply": "Editar respuesta rápida",
-  "settingsEnableBiometricLogin": "Activar inicio biométrico",
-  "settingsHiddenChats": "Chats ocultos",
-  "settingsManageQuickReplies": "Gestionar respuestas rápidas",
-  "settingsNoHiddenChats": "Sin chats ocultos",
-  "settingsNoHiddenChatsDescription": "Los chats que ocultes aparecerán aquí",
-  "settingsNoQuickReplies": "Sin respuestas rápidas",
-  "settingsQuickReply": "Respuesta rápida",
-  "settingsUnhideChat": "Mostrar",
-  "storyNoViewers": "Aún sin espectadores",
-  "storyReplyToStory": "Responder a la historia...",
-  "storyViewers": "Espectadores",
-  "transferAmountHintZero": "0.00",
-  "liveLocation": "Live Location",
-  "stopLiveLocation": "Stop Sharing",
-  "startLiveLocation": "Start Sharing",
-  "selectDuration": "Select Duration",
-  "groupChatFiles": "Chat Files",
-  "groupLinks": "Links",
-  "groupNoLinks": "No links yet",
-  "chatBackground": "Chat Background",
-  "solidColors": "Solid Colors",
-  "gradients": "Gradients",
-  "defaultBackground": "Default",
-  "settingsFontSizeSlider": "Font Size",
-  "autoDownload": "Auto-Download",
-  "images": "Images",
-  "voice": "Voice",
-  "video": "Video",
-  "files": "Files",
-  "mobileData": "Mobile Data",
-  "roaming": "Roaming",
-  "storageManagement": "Storage",
-  "totalUsage": "Total Usage",
-  "cache": "Cache",
-  "other": "Other",
-  "clearCache": "Clear Cache",
-  "cacheCleared": "Cache cleared",
-  "clearCacheFailed": "Failed to clear cache",
-  "confirmClearCache": "Clear all cache data?",
-  "mapView": "Map View",
-  "liveLocationSharingCount": "{count} people sharing location",
-  "minutes15": "15 minutes",
-  "minutes30": "30 minutes",
-  "hour1": "1 hour",
-  "hours8": "8 hours",
-  "personalCard": "Personal Card",
-  "downloadFailed": "Download failed",
-  "locationExpired": "Expired",
-  "secondsRemaining": "{count}s",
-  "minutesRemaining": "{count}min",
-  "hoursMinutesRemaining": "{hours}h {minutes}min",
-  "favoriteMessages": "Favorites",
-  "linksCopied": "Link copied",
-  "noLinksFound": "No links found",
-  "roomStorageRanking": "Room Storage Ranking",
-  "downloadComplete": "Download complete",
-  "downloading": "Downloading...",
-  "draftSaved": "Draft saved",
-  "voiceRecording": "Voice Recording",
-  "searchLocation": "Search Location",
-  "tapToSearch": "Tap to search",
+  "securityEmojiMismatchRejected": "Verificación rechazada: el emoji no coincide",
+  "securityWaitingForDeviceAccept": "Esperando que el otro dispositivo acepte...",
+  "securityVerifyDevice": "Verificar este dispositivo",
+  "securityConfirmEmojiMatch": "Confirma que los emoji a continuación se muestran en ambos dispositivos, en el mismo orden",
+  "securityEmojiDontMatch": "no coinciden",
+  "securityEmojiMatch": "coinciden",
+  "securityWaitingForDeviceConfirm": "Esperando que el otro dispositivo confirme...",
+  "securityVerificationSuccess": "¡Verificación exitosa!",
+  "securityDeviceVerifiedTrusted": "Este dispositivo ahora está verificado y es confiable.",
+  "securityCompareEmoji": "Compara los emoji en ambos dispositivos",
+  "securityCompareNumbers": "Compara los números en ambos dispositivos",
+  "commonTryAgain": "Inténtalo de nuevo",
+  "commonDone": "hecho",
+  "chatExportTitle": "Exportar chat",
+  "chatExportSuccess": "Exportación exitosa",
+  "chatExportFailed": "Error al exportar: {error}",
+  "@chatExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chatExportFormat": "Formato de exportación",
+  "chatExportHtmlDesc": "Legible en cualquier navegador con diseño estilizado.",
+  "chatExportJsonDesc": "Formato de datos estructurados legible por máquina",
+  "chatExportDateRange": "Rango de fechas",
+  "chatExportAll": "Todos los mensajes",
+  "chatExportLastWeek": "Últimos 7 días",
+  "chatExportLastMonth": "El mes pasado",
+  "chatExportLast3Months": "Últimos 3 meses",
+  "chatExportMessageCount": "Mensajes para exportar",
+  "chatExportButton": "Exportar y compartir",
+  "chatMediaGallery": "Galería multimedia",
+  "chatExportHistory": "Exportar historial de chat",
+  "pdfLoadFailed": "No se pudo cargar el PDF",
+  "pdfPageIndicator": "{current} / {total}",
+  "@pdfPageIndicator": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaAll": "Todos",
+  "mediaImages": "Imágenes",
+  "mediaVideos": "Vídeos",
+  "mediaFiles": "Archivos",
+  "mediaAudio": "Audio",
+  "mediaItemsCount": "Artículos {count}",
+  "@mediaItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaNoMediaFound": "No se encontraron medios",
+  "spacesTitle": "Comunidades",
+  "spacesCreate": "Crear comunidad",
+  "spacesJoined": "Se unió",
+  "spacesDiscover": "Descubrir",
+  "spacesNoJoined": "Aún no se ha unido ninguna comunidad",
+  "spacesExplore": "Explorar comunidades",
+  "spacesNoPublic": "No se encontraron comunidades públicas",
+  "spacesJoin": "Unirse",
+  "spacesSubSpaces": "Subcomunidades",
+  "spacesChannels": "Canales",
+  "spacesMembersCount": "Miembros de {count}",
+  "@spacesMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spacesPublic": "Público",
+  "spacesPrivate": "Privado",
+  "spacesSuggested": "sugerido",
+  "spacesChannelsCount": "Canales {count}",
+  "@spacesChannelsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callInCallChat": "Chat durante la llamada",
+  "callMessagesCount": "Mensajes {count}",
+  "@callMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callNoMessagesYet": "Aún no hay mensajes.\nEnvía un mensaje para comenzar.",
+  "callTypeMessage": "Escribe un mensaje...",
+  "callYouSender": "tu",
+  "callChatLabel": "Charla",
+  "chatEdited": "Editado",
+  "chatEditHistory": "Editar historial",
+  "chatOriginalMessage": "Originales",
+  "chatEditedAt": "Editado en {time}",
+  "@chatEditedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "chatViewOnce": "Ver una vez",
+  "chatViewOncePhoto": "Ver una vez la foto",
+  "chatViewOnceVideo": "Ver vídeo una vez",
+  "chatViewOnceViewed": "Visto",
+  "chatViewOnceExpired": "Caducado",
+  "chatViewOnceTap": "Toca para ver",
+  "chatAutoFaceBlur": "Desenfoque facial automático",
+  "chatAutoFaceBlurDesc": "Desenfocar rostros automáticamente al enviar fotos",
+  "threadReplyInThread": "Responder en el hilo",
+  "threadReplies": "{count} responde",
+  "@threadReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "threadReply": "1 respuesta",
+  "threadLatestReply": "Lo último: {preview}",
+  "@threadLatestReply": {
+    "placeholders": {
+      "preview": {
+        "type": "String"
+      }
+    }
+  },
+  "threadTitle": "Hilo",
+  "threadReplyPlaceholder": "Responder en el hilo...",
+  "threadParticipants": "Participantes {count}",
+  "@threadParticipants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceRoomTitle": "Sala de voz",
+  "voiceRoomCreate": "Crear sala de voz",
+  "voiceRoomJoin": "Unirse",
+  "voiceRoomLeave": "salir",
+  "voiceRoomEnd": "Sala final",
+  "voiceRoomRaiseHand": "levantar la mano",
+  "voiceRoomLowerHand": "Mano inferior",
+  "voiceRoomMute": "Silenciar",
+  "voiceRoomUnmute": "Dejar de silenciar",
+  "voiceRoomHost": "Anfitrión",
+  "voiceRoomSpeakers": "Altavoces",
+  "voiceRoomListeners": "Oyentes",
+  "voiceRoomLive": "EN VIVO",
+  "voiceRoomEnded": "Terminado",
+  "voiceRoomScheduled": "Programado",
+  "voiceRoomApprove": "Aprobar",
+  "voiceRoomDemote": "Mover al oyente",
+  "voiceRoomHandRaised": "{name} levantaron la mano",
+  "@voiceRoomHandRaised": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceRoomName": "Nombre de la habitación",
+  "voiceRoomTopic": "Tema (opcional)",
+  "voiceRoomNoActive": "No hay salas de voz activas",
+  "voiceRoomConnecting": "Conectando...",
+  "usernameTitle": "Nombre de usuario",
+  "usernameSet": "Establecer nombre de usuario",
+  "usernameChange": "Cambiar nombre de usuario",
+  "usernamePlaceholder": "Ingrese el nombre de usuario",
+  "usernameAvailable": "Nombre de usuario disponible",
+  "usernameUnavailable": "Nombre de usuario ya tomado",
+  "usernameInvalid": "3-30 caracteres, letras minúsculas, números, guiones bajos. Debe comenzar con una letra.",
+  "usernameReserved": "Este nombre de usuario está reservado",
+  "usernameSaved": "Nombre de usuario guardado",
+  "usernameSearchHint": "Buscar por @nombredeusuario",
+  "ensName": "Nombre ENS",
+  "ensLinked": "Vinculado a la ENS",
+  "ensResolving": "Resolviendo ENS...",
+  "ensNotFound": "Nombre ENS no encontrado",
+  "tokenGateTitle": "Puerta de fichas",
+  "tokenGateEnable": "Habilitar puerta de token",
+  "tokenGateDisable": "Deshabilitar la puerta de tokens",
+  "tokenGateAddRule": "Agregar regla",
+  "tokenGateRemoveRule": "Eliminar regla",
+  "tokenGateContractAddress": "Dirección del contrato",
+  "tokenGateMinBalance": "Saldo Mínimo",
+  "tokenGateTokenId": "ID de token (ERC-1155)",
+  "tokenGateChainId": "ID de cadena",
+  "tokenGateVerifying": "Verificando tenencias de tokens...",
+  "tokenGateVerified": "Verificación aprobada",
+  "tokenGateDenied": "No cumples con los requisitos del token",
+  "tokenGateOperatorAnd": "Debe cumplir TODAS las reglas",
+  "tokenGateOperatorOr": "Debe cumplir CUALQUIER regla",
+  "tokenGateRuleErc20": "Ficha ERC-20",
+  "tokenGateRuleErc721": "NFT (ERC-721)",
+  "tokenGateRuleErc1155": "Token múltiple (ERC-1155)",
+  "tokenGateRuleNative": "Ficha nativa",
+  "tokenGateSaved": "Puerta de token guardada",
+  "tokenGateEnableDescription": "Requerir que los miembros tengan tokens para unirse",
+  "tokenGateOperator": "Lógica de reglas",
+  "tokenGateRules": "Reglas",
+  "tokenGateSymbol": "Símbolo (opcional)",
+  "tokenGateChain": "cadena",
+  "tokenGateTokenStandard": "Estándar de token",
+  "tokenGateDenialMessage": "Mensaje de negación",
+  "tokenGateDenialMessageHint": "Mensaje que se muestra cuando falla la verificación",
+  "tokenGateVerifyTitle": "Verificación de tokens",
+  "tokenGateVerifyPassed": "Verificación aprobada",
+  "tokenGateVerifyFailed": "Verificación fallida",
+  "tokenGateRetryVerify": "Reintentar",
+  "tokenGateRequired": "Requerido",
+  "tokenGateYourBalance": "Tu saldo",
+  "tokenGateRulesActive": "reglas activas",
+  "tokenGateDisabled": "Discapacitado",
+  "ensNotBound": "no obligado",
+  "liveLocation": "Ubicación en vivo",
+  "stopLiveLocation": "dejar de compartir",
+  "startLiveLocation": "Empezar a compartir",
+  "selectDuration": "Seleccionar duración",
+  "groupChatFiles": "Archivos de chat",
+  "groupLinks": "Enlaces",
+  "groupNoLinks": "Aún no hay enlaces",
+  "chatBackground": "Fondo de conversación",
+  "solidColors": "Colores sólidos",
+  "gradients": "Degradados",
+  "defaultBackground": "Predeterminado",
+  "settingsFontSizeSlider": "Tamaño de fuente",
+  "autoDownload": "Descarga automática",
+  "images": "Imágenes",
+  "voice": "Voz",
+  "video": "Vídeo",
+  "files": "Archivos",
+  "mobileData": "Datos móviles",
+  "roaming": "itinerancia",
+  "storageManagement": "Almacenamiento",
+  "totalUsage": "Uso total",
+  "cache": "caché",
+  "other": "Otro",
+  "clearCache": "Borrar caché",
+  "cacheCleared": "Caché borrado",
+  "clearCacheFailed": "No se pudo borrar el caché",
+  "confirmClearCache": "¿Borrar todos los datos del caché?",
+  "mapView": "Vista de mapa",
+  "liveLocationSharingCount": "{count} personas compartiendo ubicación",
+  "@liveLocationSharingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutes15": "15 minutos",
+  "minutes30": "30 minutos",
+  "hour1": "1 hora",
+  "hours8": "8 horas",
+  "personalCard": "Tarjeta personal",
+  "downloadFailed": "Descarga fallida",
+  "locationExpired": "Caducado",
+  "secondsRemaining": "{count} segundos",
+  "@secondsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesRemaining": "{count} minutos",
+  "@minutesRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursMinutesRemaining": "{hours} horas {minutes} minutos",
+  "@hoursMinutesRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteMessages": "Favoritos",
+  "linksCopied": "Enlace copiado",
+  "noLinksFound": "No se encontraron enlaces",
+  "roomStorageRanking": "Clasificación de almacenamiento en habitación",
+  "downloadComplete": "Descarga completa",
+  "downloading": "Descargando...",
+  "draftSaved": "Borrador guardado",
+  "voiceRecording": "Grabación de voz",
+  "searchLocation": "Buscar ubicación",
+  "tapToSearch": "Toca para buscar",
+  "settingsThisDevice": "este dispositivo",
+  "settingsJustNow": "Justo ahora",
+  "settingsDeviceId": "ID del dispositivo",
+  "settingsStatus": "Estado",
+  "settingsLastActive": "Último activo",
+  "settingsIpAddress": "dirección IP",
+  "settingsRenameDevice": "Cambiar nombre del dispositivo",
+  "settingsDeviceNameHint": "Introduzca el nombre del dispositivo",
+  "settingsDeviceRenamed": "Dispositivo renombrado",
+  "settingsRenameFailed": "Error al cambiar el nombre",
+  "settingsRemoteLogout": "Cierre de sesión remoto",
+  "settingsRemoteLogoutConfirm": "¿Está seguro de que desea cerrar sesión en \"{deviceName}\"? Esta acción no se puede deshacer.",
+  "@settingsRemoteLogoutConfirm": {
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsDeviceLoggedOut": "Dispositivo desconectado",
+  "settingsLogoutFailed": "Error al cerrar sesión",
+  "settingsLogout": "Cerrar sesión",
+  "settingsVerifyIdentity": "Verificar identidad",
+  "settingsEnterPasswordToConfirm": "Ingrese su contraseña para confirmar esta acción.",
+  "scheduledSendTitle": "Programar mensaje",
+  "scheduledSendInOneHour": "en 1 hora",
+  "scheduledSendTonight": "Esta noche (8:00 p.m.)",
+  "scheduledSendTomorrowMorning": "Mañana por la mañana (9:00 a.m.)",
+  "scheduledSendCustom": "Elige una fecha y hora",
+  "scheduledMessageLabel": "Programado",
+  "scheduledMessageCancel": "Cancelar mensaje programado",
+  "chatLockTitle": "Bloqueo de chat",
+  "chatLockEnable": "Bloquear este chat",
+  "chatLockDisable": "Desbloquear este chat",
+  "chatLockDescription": "Los chats bloqueados requieren verificación biométrica o PIN para abrirse",
+  "chatLockVerifyTitle": "Chat bloqueado",
+  "chatLockVerifySubtitle": "Verificar para acceder a este chat",
+  "chatLockVerifyFailed": "La verificación falló",
+  "chatLockEnabled": "Chat bloqueado",
+  "chatLockDisabled": "Chat desbloqueado",
+  "chatLockPinTitle": "Introducir PIN",
+  "chatLockPinSetTitle": "Establecer PIN",
+  "chatLockPinConfirmTitle": "Confirmar PIN",
+  "chatLockPinMismatch": "El PIN no coincide",
+  "chatLockUseBiometric": "Usar biométrico",
+  "chatLockUsePin": "Usar PIN",
+  "mediaEditorUndo": "Deshacer",
+  "mediaEditorRedo": "Rehacer",
+  "mediaEditorCrop": "Cultivo",
+  "mediaEditorFilter": "Filtrar",
+  "mediaEditorDraw": "Dibujar",
+  "mediaEditorText": "Texto",
+  "aiAssistant": "Asistente de IA",
+  "aiAssistantWelcome": "¡Hola! Soy el asistente de IA de N42. ¿Le puedo ayudar en algo?",
+  "aiAssistantNotConfigured": "Servicio de IA no configurado",
+  "aiAssistantSettings": "Configuración de IA",
+  "aiAssistantClearHistory": "Borrar historial de chat",
+  "aiAssistantClearHistoryConfirm": "¿Estás seguro de que quieres borrar todo el historial de chat de IA?",
+  "aiAssistantStopGenerating": "dejar de generar",
+  "aiAssistantModel": "modelo",
+  "aiAssistantTemperature": "Temperatura",
+  "aiAssistantMaxTokens": "Fichas máximas",
+  "aiAssistantContextWindow": "ventana contextual",
+  "aiAssistantServiceStatus": "Estado del servicio",
+  "aiAssistantAvailable": "Disponible",
+  "aiAssistantUnavailable": "No disponible",
+  "aiSummarize": "Resumen de IA",
+  "aiSummarizeUnread": "Resumir mensajes no leídos {count}",
+  "@aiSummarizeUnread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummarizeLoading": "Resumiendo...",
+  "aiSummarizeError": "No se pudo resumir",
+  "aiRewrite": "Reescritura de IA",
+  "aiRewriteFormal": "formales",
+  "aiRewriteCasual": "Informal",
+  "aiRewritePlayful": "juguetón",
+  "aiRewriteProfessional": "Profesional",
+  "aiRewriteAccept": "uso",
+  "aiRewriteCancel": "Cancelar",
+  "aiRewriteLoading": "Reescribiendo...",
+  "aiLinkSummary": "Resumen de IA",
+  "aiLinkSummaryAnalyzing": "Analizando...",
+  "chatFolderManagement": "Administrar carpetas",
+  "chatFolderSystem": "Carpetas del sistema",
+  "chatFolderCustom": "Carpetas personalizadas",
+  "chatFolderEmpty": "Aún no hay carpetas personalizadas",
+  "chatFolderCreate": "Crear carpeta",
+  "chatFolderEdit": "Editar carpeta",
+  "chatFolderNameHint": "Nombre de la carpeta",
+  "chatFolderAll": "Todos",
+  "chatFolderUnread": "No leído",
+  "chatFolderPersonal": "personales",
+  "chatFolderGroups": "Grupos",
+  "chatFolderChannels": "Canales",
+  "chatFolderMuted": "silenciado",
+  "storyAddMusic": "Agregar música",
+  "storyChangeMusic": "cambiar musica",
+  "storyBackgroundMusic": "Música de fondo",
+  "storyMusicPreview": "Vista previa (máximo 15 s)",
+  "storyChooseFromDevice": "Elija entre dispositivo",
+  "storyUseThisMusic": "Usa esta música",
+  "authPasskeyNotSupported": "La clave de acceso no es compatible con este dispositivo",
+  "authPasskeyRegister": "Registrar clave de acceso",
+  "authPasskeyNoRegistered": "No hay claves registradas",
+  "authPasskeyRegisterHint": "Registre una clave de acceso para esta cuenta. El inicio de sesión con contraseña independiente se habilitará más adelante.",
+  "authPasskeyNameYours": "Nombra tu clave de acceso",
+  "authPasskeyRegistered": "Clave guardada en esta cuenta",
+  "authPasskeyDeleted": "Clave de acceso eliminada de esta cuenta",
+  "authPasskeyDeleteConfirm": "¿Eliminar la clave de acceso \"{name}\"? Deberá registrarlo nuevamente antes de utilizar el inicio de sesión con contraseña más adelante.",
+  "@authPasskeyDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "momentVisibilityPublic": "Público",
+  "momentVisibilityPrivate": "Privado",
+  "momentVisibilityPartial": "Amigos seleccionados",
+  "momentVisibilityExcluded": "Excluir algunos amigos",
+  "momentUserMoments": "Momentos de {userName}",
+  "@momentUserMoments": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "momentForwardTo": "Reenviar a",
+  "momentForwardSuccess": "Reenviado exitosamente",
+  "momentSelectFriends": "Seleccionar amigos",
+  "momentSelectTags": "Seleccionar por etiquetas",
+  "momentSelectedCount": "Seleccionado ({count})",
+  "@momentSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentNoMomentsYet": "Aún no hay momentos",
+  "momentForwardMoment": "Momento de avance",
+  "momentAddComment": "Añade un comentario...",
+  "momentForwardContent": "[Momento] {content}",
+  "@momentForwardContent": {
+    "placeholders": {
+      "content": {
+        "type": "String"
+      }
+    }
+  },
+  "momentDeleteMoment": "Eliminar momento",
+  "momentDeleteConfirm": "¿Estás seguro de que quieres eliminar este momento?",
+  "momentComment": "Comentario",
+  "momentWriteComment": "Escribe un comentario...",
+  "momentLike": "Me gusta",
+  "momentUnlike": "a diferencia",
+  "momentForward": "Adelante",
+  "momentDelete": "Eliminar",
+  "momentReply": "responder",
+  "momentMoment": "momento",
+  "momentLikesCount": "A {count} le gusta",
+  "@momentLikesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentCommentsCount": "Comentarios sobre {count}",
+  "@momentCommentsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentNoComments": "Aún no hay comentarios",
+  "momentFailedToLoad": "No se pudo cargar la imagen",
+  "momentReplyTo": "Responder a {userName}...",
+  "@momentReplyTo": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "momentNoConversations": "Sin conversaciones",
+  "momentJustNow": "justo ahora",
+  "momentMinutesAgo": "Hace {count}m",
+  "@momentMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentHoursAgo": "Hace {count}h",
+  "@momentHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentDaysAgo": "Hace {count}d",
+  "@momentDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatGroupAnnouncementHint": "Ingresar anuncio de grupo",
+  "chatGroupAnnouncementEmpty": "Sin anuncio",
+  "chatEditNickname": "Editar apodo",
+  "chatNicknameHint": "Introduce tu apodo en este grupo",
+  "contactAddPhoneHint": "Introduce el número de teléfono",
+  "contactNotesHint": "Agregar notas sobre este contacto",
+  "reportTitle": "Informe",
+  "reportReasonSpam": "spam",
+  "reportReasonHarassment": "Acoso",
+  "reportReasonFraud": "fraude",
+  "reportReasonOther": "Otro",
+  "reportSubmitted": "Informe enviado",
+  "reportDescription": "Descripción adicional (opcional)",
+  "qrcodeSaved": "Código QR guardado en el álbum",
+  "chatSendRedPacketInChat": "Por favor envíe el paquete rojo en el chat.",
+  "commonSaveFailed": "Error al guardar",
+  "reportSelectReason": "Por favor seleccione un motivo",
   "gameCenter": "Juegos",
   "gameHighScore": "Récord",
   "gameScore": "Puntuación",
@@ -1783,11 +2335,11 @@
   "gameNoScores": "Sin puntuaciones",
   "game2048": "2048",
   "game2048Desc": "Combina fichas hasta llegar a 2048",
-  "gameBlockDrop": "Block Drop",
+  "gameBlockDrop": "Caída de bloque",
   "gameBlockDropDesc": "Deja caer y elimina líneas",
   "gameMinesweeper": "Buscaminas",
   "gameMinesweeperDesc": "Encuentra todas las celdas seguras",
-  "gameMatch3": "Match 3",
+  "gameMatch3": "Partido 3",
   "gameMatch3Desc": "Conecta 3 o más gemas",
   "gameMinesweeperEasy": "Fácil",
   "gameMinesweeperMedium": "Medio",
@@ -1798,6 +2350,244 @@
   "gameBestTime": "Mejor tiempo",
   "gameNewRecord": "¡Nuevo récord!",
   "gameLines": "Líneas",
+  "storyMyStory": "Mi historia",
+  "storageSmartCleanup": "Limpieza inteligente",
+  "storageOldMediaFiles": "Archivos multimedia antiguos",
+  "storageLargeFiles": "Archivos grandes",
+  "storageAppCache": "Caché de aplicaciones",
+  "storageSettings": "Configuración de almacenamiento",
+  "storageAutoCleanup": "Limpieza automática",
+  "storageAutoCleanupDesc": "Limpiar automáticamente archivos de más de días {days}",
+  "@storageAutoCleanupDesc": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "storageCleanupPeriod": "Período de limpieza",
+  "storagePreserveThumbnails": "Conservar miniaturas",
+  "storagePreserveThumbnailsDesc": "Mantener miniaturas de imágenes durante la limpieza",
+  "storageWarningHigh": "El uso de almacenamiento es alto. Considere la posibilidad de limpiar archivos antiguos.",
+  "storageWarningCritical": "El almacenamiento es críticamente bajo. Por favor, limpie para liberar espacio.",
+  "storageFreed": "{size} liberado (archivos {count})",
+  "@storageFreed": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageDays": "{days} días",
+  "@storageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "storageViewAllRooms": "Ver todas las habitaciones {count}",
+  "@storageViewAllRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageNoFiles": "No se encontraron archivos",
+  "storageFilePinned": "Fijado",
+  "storageDeleteSelected": "¿Eliminar los archivos seleccionados {count}? Se pueden volver a descargar desde el servidor.",
+  "@storageDeleteSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestore": "Copia de seguridad y restauración",
+  "backupCreate": "Crear copia de seguridad",
+  "backupCreateDesc": "Haga una copia de seguridad de su configuración y claves de cifrado. Los mensajes se restaurarán desde el servidor después de volver a iniciar sesión.",
+  "backupIncludeKeys": "Incluir claves de cifrado",
+  "backupIncludeKeysDesc": "Requerido para leer mensajes cifrados",
+  "backupPasswordProtect": "Proteger con contraseña",
+  "backupEnterPassword": "Ingrese la contraseña de respaldo",
+  "backupHistory": "Historial de copias de seguridad",
+  "backupNoBackups": "Aún no hay copias de seguridad",
+  "backupRestore2": "Restaurar",
+  "backupDelete": "Eliminar",
+  "backupDeleteConfirm": "¿Estás seguro de que deseas eliminar esta copia de seguridad? Esto no se puede deshacer.",
+  "backupRestoreFromFile": "Restaurar desde archivo",
+  "backupRestoreFromFileDesc": "Importe un archivo de copia de seguridad .n42 desde otro dispositivo o una copia de seguridad anterior.",
+  "backupChooseFile": "Elija el archivo de copia de seguridad",
+  "backupRestoring": "Restaurando...",
+  "backupCreated": "Copia de seguridad creada: salas {rooms}, mensajes {messages}",
+  "@backupCreated": {
+    "placeholders": {
+      "rooms": {
+        "type": "int"
+      },
+      "messages": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestored": "Configuración {settings} restaurada de las salas {rooms}",
+  "@backupRestored": {
+    "placeholders": {
+      "settings": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
+  "backupFailed": "Error en la copia de seguridad: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPasswordRequired": "Esta copia de seguridad está protegida con contraseña",
+  "blocGroupNotFound": "Grupo no encontrado",
+  "blocGroupMembersInvited": "Miembro(s) invitado(s) de {count}",
+  "@blocGroupMembersInvited": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "blocGroupMemberRemoved": "Miembro eliminado",
+  "blocGroupAdminRemoved": "Administrador eliminado",
+  "blocGroupLeft": "Dejó el grupo",
+  "blocGroupDisbanded": "Grupo disuelto",
+  "blocGroupJoined": "Se unió al grupo",
+  "blocGroupInviteDeclined": "Invitación rechazada",
+  "blocGroupTokenGateUpdated": "Puerta de token actualizada",
+  "blocTransferProcessing": "Procesando transferencia...",
+  "blocTransferCancelled": "Transferencia cancelada",
+  "blocTransferFailed": "Transferencia fallida",
+  "blocPaymentProcessing": "Procesando pago...",
+  "blocPaymentFailed": "Pago fallido",
+  "groupMaxMembers": "Límite de miembros",
+  "groupMaxMembersUnlimited": "Ilimitado",
+  "groupMaxMembersHint": "Ingrese el límite (déjelo vacío para ilimitado)",
+  "groupMaxMembersUpdated": "Límite de miembros actualizado",
+  "groupFull": "El grupo está al límite de su capacidad.",
+  "groupChannels": "Canales temáticos",
+  "groupChannelsEmpty": "Aún no hay canales",
+  "groupChannelsCount": "canales",
+  "groupChannelCreate": "Nuevo canal",
+  "groupChannelName": "Nombre del canal",
+  "groupChannelTopic": "Tema del canal (opcional)",
+  "groupChannelDelete": "Eliminar canal",
+  "groupChannelDeleteConfirm": "¿Eliminar este canal? Todos los mensajes se perderán.",
+  "groupBotSettings": "Configuración de robots",
+  "groupBotEnabled": "Habilitar robot",
+  "groupBotWelcomeMessage": "Plantilla de mensaje de bienvenida",
+  "groupBotWelcomeHint": "Utilice 'nombre' como marcador de posición para el nombre del nuevo miembro",
+  "groupBotConfigUpdated": "Configuración del bot actualizada",
+  "groupContentFilter": "Filtro de contenido",
+  "groupContentFilterEnabled": "Habilitar filtro de palabras clave",
+  "groupContentFilterReplace": "Reemplazar con ***",
+  "groupContentFilterHide": "Ocultar mensaje",
+  "groupContentFilterAddWord": "Agregar palabra clave",
+  "groupContentFilterUpdated": "Filtro de contenido actualizado",
+  "chatSlashCommands": "Comandos",
+  "chatCommandPoll": "/encuesta — Crear una encuesta",
+  "chatCommandAnnounce": "/announce — Enviar anuncio",
+  "chatCommandWelcome": "/welcome — Establecer mensaje de bienvenida",
+  "chatReportMessage": "Informe",
+  "chatReportReason": "Motivo del informe",
+  "chatReportSpam": "spam",
+  "chatReportHarassment": "Acoso",
+  "chatReportInappropriate": "Contenido inapropiado",
+  "chatReportOther": "Otro",
+  "chatReportSuccess": "Informe enviado",
+  "spacesName": "Nombre de la comunidad",
+  "spacesNameHint": "por ej. Comerciantes de criptomonedas",
+  "spacesNameRequired": "El nombre es obligatorio",
+  "spacesDescription": "Descripción",
+  "spacesDescriptionHint": "¿De qué se trata esta comunidad?",
+  "spacesType": "Tipo de comunidad",
+  "spacesPublicDesc": "Cualquiera puede descubrir y unirse.",
+  "spacesPrivateDesc": "Sólo los miembros invitados pueden unirse",
+  "spacesNotFound": "Comunidad no encontrada",
+  "spacesSearch": "Buscar comunidades...",
+  "spacesMembers": "Miembros",
+  "spacesNoChannels": "Aún no hay canales",
+  "spacesLeave": "Salir de la comunidad",
+  "spacesLeaveConfirm": "¿Está seguro de que desea dejar \"{name}\"?",
+  "@spacesLeaveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesDelete": "Eliminar comunidad",
+  "spacesDeleteConfirm": "Esto eliminará permanentemente \"{name}\" y todos sus canales. Esta acción no se puede deshacer.",
+  "@spacesDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesCreateChannel": "Agregar canal",
+  "spacesChannelName": "Nombre del canal",
+  "spacesChannelTopic": "Tema (opcional)",
+  "spacesDeleteChannel": "Eliminar canal",
+  "spacesDeleteChannelConfirm": "¿Está seguro de que desea eliminar \"#{name}\"?",
+  "@spacesDeleteChannelConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesEditName": "Editar nombre",
+  "spacesEditDescription": "Editar descripción",
+  "spacesViewAllMembers": "Ver todos los miembros de {count}",
+  "@spacesViewAllMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spacesKickMemberTitle": "Patada {name}",
+  "@spacesKickMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesBanMemberTitle": "Prohibición {name}",
+  "@spacesBanMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesPromoteAdmin": "Promocionar a administrador",
+  "spacesDemoteAdmin": "Eliminar administrador",
+  "spacesInviteMember": "Invitar miembro",
+  "spacesInviteMemberUserId": "ID de usuario (por ejemplo, @user:server.com)",
+  "spacesSave": "Guardar",
+  "settingsScreenshotProtection": "Protección de captura de pantalla",
+  "settingsScreenshotProtectionDesc": "Evitar capturas de pantalla y grabaciones de pantalla",
+  "chatSelfDestructTimer": "Autodestrucción",
+  "chatTimerPickerTitle": "Temporizador de autodestrucción",
+  "chatTimerOff": "Apagado",
   "onChainNotificationsTitle": "Eventos on-chain",
   "onChainMarkAllRead": "Marcar todo como leído",
   "onChainNoNotifications": "Aún no hay eventos on-chain",
@@ -1807,8 +2597,8 @@
   "chatCommandPrice": "/price — Obtener precio del token",
   "chatCommandBalance": "/balance — Ver saldo de la billetera",
   "chatCommandChains": "/chains — Listar 236+ redes soportadas",
-  "chatMiniApps": "Apps",
-  "miniAppMarketTitle": "Mini Apps",
+  "chatMiniApps": "Aplicaciones",
+  "miniAppMarketTitle": "Miniaplicaciones",
   "miniAppCategoryAll": "Todas",
   "miniAppSearch": "Buscar apps...",
   "miniAppFeatured": "Destacados",
@@ -1860,24 +2650,24 @@
     }
   },
   "web3NoN42AccountTitle": "Sin cuenta N42",
+  "web3NoN42AccountDesc": "Esta dirección de billetera aún no tiene una cuenta N42. Puedes compartir tu enlace de invitación de N42 con ellos para comenzar.",
   "web3ShareInvite": "Compartir invitación",
   "nftPickerTitle": "Seleccionar avatar NFT",
-  "nftPickerTabPopular": "Popular",
+  "nftPickerTabPopular": "populares",
   "nftPickerTabCustom": "Personalizado",
+  "nftPickerChain": "cadena",
+  "nftPickerContract": "Dirección del contrato",
+  "nftPickerTokenId": "ID de token",
   "nftPickerVerifyOwnership": "Verificar propiedad y previsualizar",
   "nftPickerUseAsAvatar": "Usar como avatar",
+  "nftPickerPreview": "Vista previa",
   "nftPickerNotOwned": "No posees este NFT",
+  "nftPickerInvalidTokenId": "ID de token no válido",
+  "nftPickerEnterBoth": "Ingrese la dirección del contrato y el ID del token",
   "nftPickerInfoTitle": "Avatar NFT — Verificado en cadena",
+  "nftPickerInfoDesc": "Vincula un NFT de tu propiedad como tu avatar. Cualquiera puede verificar la propiedad en la cadena. Se muestra con un anillo dorado en N42.",
   "nftPickerPopularCollections": "Colecciones populares",
   "nftPickerWalletHint": "Conecta tu wallet N42 para descubrir automáticamente tus NFT en 236+ cadenas.",
-  "web3NoN42AccountDesc": "This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.",
-  "nftPickerChain": "Chain",
-  "nftPickerContract": "Contract Address",
-  "nftPickerTokenId": "Token ID",
-  "nftPickerPreview": "Preview",
-  "nftPickerInvalidTokenId": "Invalid token ID",
-  "nftPickerEnterBoth": "Enter contract address and token ID",
-  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
   "profileBindNftAvatar": "Vincular avatar NFT",
   "profileChangeAvatar": "Cambiar avatar",
   "groupTopics": "Temas",
@@ -1886,5 +2676,72 @@
   "recoveryKeyReminderTitle": "Protege tus mensajes",
   "recoveryKeyReminderDesc": "Crea una clave de recuperación para sincronizar mensajes cifrados en todos los dispositivos",
   "recoveryKeySetupNow": "Configurar ahora",
-  "recoveryKeyRemindLater": "Recordar después"
+  "recoveryKeyRemindLater": "Recordar después",
+  "channelReadOnly": "Solo los administradores pueden publicar en este canal.",
+  "channelSubscribers": "suscriptores",
+  "channelVerified": "Canal verificado",
+  "redPacketHistory": "Historia del paquete rojo",
+  "redPacketSent": "Enviado",
+  "redPacketReceived": "Recibido",
+  "redPacketExpired": "Caducado",
+  "redPacketClaimed": "Reclamado",
+  "redPacketInsufficientBalance": "Saldo insuficiente",
+  "selfDestructCountdown": "Autodestrucción en {time}",
+  "@selfDestructCountdown": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "messageDestroyed": "Mensaje destruido",
+  "miniAppPermissionDenied": "Permiso denegado: {permission}",
+  "@miniAppPermissionDenied": {
+    "placeholders": {
+      "permission": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSuggestionGasFee": "¿Qué es la tarifa del gas?",
+  "aiSuggestionDefi": "Guía para principiantes de DeFi",
+  "aiSuggestionSecurity": "Cómo comprobar la seguridad del contrato",
+  "aiSuggestionBridge": "Puente entre cadenas",
+  "channelDiscoverTitle": "Descubrir canales",
+  "channelDiscoverSearch": "Buscar canales...",
+  "channelJoin": "Unirse",
+  "channelJoined": "Se unió",
+  "channelCategory": "categoría",
+  "slowModeCooldown": "Modo lento: espera {seconds}s",
+  "@slowModeCooldown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "addressCopyAction": "Copiar dirección",
+  "addressSendMessage": "Enviar mensaje",
+  "addressViewProfile": "Ver perfil",
+  "sendToAddress": "Enviar a la dirección de la billetera",
+  "blocAuthSendVerificationCodeFailed": "No se pudo enviar el código de verificación",
+  "blocAuthServerNoEmailPasswordReset": "Este servidor no admite el restablecimiento de contraseña de correo electrónico",
+  "blocAuthResetPasswordFailed": "No se pudo restablecer la contraseña",
+  "blocAuthChangePasswordFailed": "No se pudo cambiar la contraseña",
+  "blocAuthOldPasswordWrong": "Contraseña actual incorrecta",
+  "blocAuthLoginCancelled": "Inicio de sesión cancelado",
+  "blocAuthGoogleLoginFailed": "Error al iniciar sesión en Google",
+  "blocAuthAppleLoginFailed": "Error al iniciar sesión en Apple",
+  "blocAuthSsoLoginFailed": "Error al iniciar sesión en SSO",
+  "blocAuthFacebookLoginFailed": "Error al iniciar sesión en Facebook",
+  "blocAuthTwitterLoginFailed": "Error al iniciar sesión en Twitter",
+  "blocAuthWeChatLoginFailed": "Error al iniciar sesión en WeChat",
+  "blocAuthWeChatNotConfigured": "Inicio de sesión de WeChat no configurado",
+  "blocAuthWeChatNotInstalled": "Instale WeChat primero",
+  "blocAuthPasswordWrong": "Contraseña incorrecta",
+  "blocAuthEmailAlreadyBound": "Este correo electrónico ya está vinculado a otra cuenta.",
+  "blocAuthChangeEmailFailed": "No se pudo cambiar el correo electrónico",
+  "blocAuthVerificationCodeInvalid": "El código de verificación es incorrecto o ha caducado",
+  "blocAuthSessionExpired": "La sesión expiró, inicie sesión nuevamente",
+  "blocAuthSessionIncomplete": "Datos de sesión incompletos, inicie sesión nuevamente"
 }

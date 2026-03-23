@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/message_markdown_utils.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'markdown_message_widget.dart';
 import 'message_status_indicator.dart';
@@ -48,7 +49,7 @@ class MessageBubble extends StatelessWidget {
 
   /// 头像点击回调
   final VoidCallback? onAvatarTap;
-  
+
   /// 头像双击回调（拍一拍）
   final VoidCallback? onAvatarDoubleTap;
 
@@ -102,8 +103,9 @@ class MessageBubble extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           child: Row(
-            mainAxisAlignment:
-                isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment: isSelf
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 左侧头像（对方消息）
@@ -113,8 +115,9 @@ class MessageBubble extends StatelessWidget {
               // 消息内容
               Flexible(
                 child: Column(
-                  crossAxisAlignment:
-                      isSelf ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  crossAxisAlignment: isSelf
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   children: [
                     // 时间戳
                     if (showTimestamp && timestamp != null)
@@ -144,7 +147,9 @@ class MessageBubble extends StatelessWidget {
                         Flexible(
                           child: ConstrainedBox(
                             constraints: BoxConstraints(maxWidth: maxWidth),
-                            child: noBubble ? _buildNoBubbleContent() : _buildBubble(isDark),
+                            child: noBubble
+                                ? _buildNoBubbleContent()
+                                : _buildBubble(isDark),
                           ),
                         ),
 
@@ -204,7 +209,9 @@ class MessageBubble extends StatelessWidget {
                 httpHeaders: headers,
                 placeholder: (context, url) => _buildDefaultAvatar(),
                 errorWidget: (context, url, error) {
-                  debugLog('MessageBubble: Failed to load avatar: $url, error: $error');
+                  debugLog(
+                    'MessageBubble: Failed to load avatar: $url, error: $error',
+                  );
                   return _buildDefaultAvatar();
                 },
               )
@@ -214,8 +221,9 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildDefaultAvatar() {
-    final initial =
-        avatarName?.isNotEmpty == true ? avatarName![0].toUpperCase() : '?';
+    final initial = avatarName?.isNotEmpty == true
+        ? avatarName![0].toUpperCase()
+        : '?';
     return Container(
       color: _getColorFromName(avatarName ?? ''),
       child: Center(
@@ -238,7 +246,7 @@ class MessageBubble extends StatelessWidget {
     if (onTap == null && onLongPress == null) {
       return child;
     }
-    
+
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -248,7 +256,8 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildBubble(bool isDark) {
-    final bgColor = bubbleColor ??
+    final bgColor =
+        bubbleColor ??
         (isSelf
             ? AppColors.selfBubble(isDark)
             : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther));
@@ -273,10 +282,7 @@ class MessageBubble extends StatelessWidget {
       onLongPress: onLongPress,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: borderRadius,
-        ),
+        decoration: BoxDecoration(color: bgColor, borderRadius: borderRadius),
         child: child,
       ),
     );
@@ -303,11 +309,7 @@ class MessageBubble extends StatelessWidget {
           color: AppColors.error,
           shape: BoxShape.circle,
         ),
-        child: const Icon(
-          Icons.priority_high,
-          size: 14,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.priority_high, size: 14, color: Colors.white),
       ),
     );
   }
@@ -373,13 +375,8 @@ class TextMessageBubble extends StatelessWidget {
           ? MarkdownMessageWidget(text: text, isSelf: isSelf)
           : Text(
               text,
-              style: TextStyle(
-                fontSize: 16,
-                color: textColor,
-                height: 1.4,
-              ),
+              style: TextStyle(fontSize: 16, color: textColor, height: 1.4),
             ),
     );
   }
 }
-

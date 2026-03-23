@@ -88,6 +88,8 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
   Future<void> _forwardTo(ConversationEntity conversation) async {
     final s = S.of(context);
     final commentController = TextEditingController();
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -169,18 +171,24 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
         }
         await messageRepo.sendTextMessage(conversation.id, text);
 
-        if (mounted) {
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
+        if (mounted && navigator.mounted && navigator.canPop()) {
+          navigator.pop();
+        }
+        if (messenger.mounted) {
+          messenger.showSnackBar(
             SnackBar(
               content: Text(s?.momentForwardSuccess ?? 'Forwarded successfully'),
             ),
           );
         }
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.commonRetry ?? 'Forward failed, please try again')),
+        if (messenger.mounted) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                s?.commonRetry ?? 'Forward failed, please try again',
+              ),
+            ),
           );
         }
       }

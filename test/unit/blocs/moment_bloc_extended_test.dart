@@ -114,15 +114,15 @@ void main() {
       build: buildBloc,
       seed: () => const MomentState(hasMore: false),
       act: (bloc) => bloc.add(const LoadMoreMoments()),
-      expect: () => [],
+      expect: () => <MomentState>[],
     );
 
     blocTest<MomentBloc, MomentState>(
       'skips when already loading more',
       build: buildBloc,
-      seed: () => MomentState(hasMore: true, isLoadingMore: true),
+      seed: () => const MomentState(hasMore: true, isLoadingMore: true),
       act: (bloc) => bloc.add(const LoadMoreMoments()),
-      expect: () => [],
+      expect: () => <MomentState>[],
     );
 
     blocTest<MomentBloc, MomentState>(
@@ -280,11 +280,27 @@ void main() {
         content: 'Great photo!',
       )),
       expect: () => [
-        isA<MomentState>().having(
-          (s) => s.moments.firstWhere((m) => m.id == 'm-1').comments.length,
-          'comments.length',
-          1,
-        ),
+        isA<MomentState>()
+            .having(
+              (s) => s.moments.firstWhere((m) => m.id == 'm-1').comments.length,
+              'comments.length',
+              1,
+            )
+            .having(
+              (s) => s.commentSubmissionVersion,
+              'commentSubmissionVersion',
+              1,
+            )
+            .having(
+              (s) => s.commentSubmissionMomentId,
+              'commentSubmissionMomentId',
+              'm-1',
+            )
+            .having(
+              (s) => s.commentSubmissionStatus,
+              'commentSubmissionStatus',
+              MomentCommentSubmissionStatus.success,
+            ),
       ],
       verify: (_) {
         verify(() => mockRepo.commentMoment(
@@ -313,7 +329,23 @@ void main() {
         content: 'Nice!',
       )),
       expect: () => [
-        isA<MomentState>().having((s) => s.hasError, 'hasError', isTrue),
+        isA<MomentState>()
+            .having((s) => s.hasError, 'hasError', isTrue)
+            .having(
+              (s) => s.commentSubmissionVersion,
+              'commentSubmissionVersion',
+              1,
+            )
+            .having(
+              (s) => s.commentSubmissionMomentId,
+              'commentSubmissionMomentId',
+              'm-1',
+            )
+            .having(
+              (s) => s.commentSubmissionStatus,
+              'commentSubmissionStatus',
+              MomentCommentSubmissionStatus.failure,
+            ),
       ],
     );
   });
@@ -449,7 +481,7 @@ void main() {
       'UnsubscribeMoments does not throw and emits nothing',
       build: buildBloc,
       act: (bloc) => bloc.add(const UnsubscribeMoments()),
-      expect: () => [],
+      expect: () => <MomentState>[],
     );
   });
 }

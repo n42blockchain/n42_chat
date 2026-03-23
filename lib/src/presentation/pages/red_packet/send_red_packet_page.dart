@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,7 +18,7 @@ class SendRedPacketPage extends StatefulWidget {
   final int memberCount;
   
   /// 发送回调
-  final void Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
+  final Future<bool> Function(String amount, String token, String greeting, int count, bool isLucky) onSend;
   
   const SendRedPacketPage({
     super.key,
@@ -37,7 +39,10 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   
   String _selectedToken = 'CNY';
   bool _isLucky = false;
+  var _isSending = false;
   int _selectedCoverIndex = 0;
+  RegExp? _cachedAmountRegex;
+  String? _cachedAmountPattern;
 
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
 
@@ -106,7 +111,17 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   
   /// 获取金额输入的正则表达式
   String get _amountPattern => r'^\d*\.?\d{0,' + _decimalPlaces.toString() + r'}';
-  
+
+  RegExp get _amountRegex {
+    final pattern = _amountPattern;
+    if (_cachedAmountPattern == pattern && _cachedAmountRegex != null) {
+      return _cachedAmountRegex!;
+    }
+    _cachedAmountPattern = pattern;
+    _cachedAmountRegex = RegExp(pattern);
+    return _cachedAmountRegex!;
+  }
+
   String get _currencySymbol {
     switch (_selectedToken) {
       case 'CNY':
@@ -160,7 +175,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     super.dispose();
   }
   
-  void _send() {
+  Future<void> _send() async {
+    if (_isSending) return;
+
     final amount = _amountController.text.trim();
     if (amount.isEmpty || _amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -176,15 +193,25 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
       );
       return;
     }
-    
-    widget.onSend(
+
+    setState(() => _isSending = true);
+
+    final success = await widget.onSend(
       amount,
       _selectedToken,
       _greetingController.text.trim(),
       count,
       _isLucky,
     );
-    Navigator.of(context).pop();
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    setState(() => _isSending = false);
   }
   
   @override
@@ -270,7 +297,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           controller: _amountController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(_amountPattern)),
+                            FilteringTextInputFormatter.allow(_amountRegex),
                           ],
                           textAlign: TextAlign.right,
                           style: TextStyle(
@@ -423,7 +450,11 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
-                      onPressed: _amount > 0 ? _send : null,
+                      onPressed: _amount > 0 && !_isSending
+                          ? () {
+                              unawaited(_send());
+                            }
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFE85D04),
                         disabledBackgroundColor: isDark ? const Color(0xFF4A3020) : const Color(0xFFE8D0C0),
@@ -434,13 +465,22 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         ),
                         elevation: 0,
                       ),
-                      child: Text(
-                        S.of(context)?.commonPutMoneyInRedPacket ?? 'Put money in',
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      child: _isSending
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              S.of(context)?.commonPutMoneyInRedPacket ?? 'Put money in',
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                     ),
                   ),
                 ),

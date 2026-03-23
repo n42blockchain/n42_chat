@@ -8,8 +8,12 @@
   "chatCallBack": "Goi lai",
   "chatMissedVideoCall": "Cuoc goi video nho",
   "chatMissedVoiceCall": "Cuoc goi thoai nho",
+  "chatCallNotAnswered": "Không trả lời",
+  "chatCallDurationLabel": "Thời lượng cuộc gọi",
+  "chatVoiceCallCancelled": "Cuộc gọi thoại đã bị huỷ",
+  "chatVideoCallCancelled": "Cuộc gọi video đã bị huỷ",
   "commonImage": "[Hinh anh]",
-  "chatVideo": "[Video]",
+  "chatVideo": "[Băng hình]",
   "chatVoice": "[Tin nhan thoai]",
   "commonFile": "[Tep]",
   "chatLocation": "[Vi tri]",
@@ -40,6 +44,7 @@
   "chatCopied": "Da sao chep",
   "storySendMessageHint": "Gui tin nhan",
   "commonMicrophonePermissionRequired": "Vui long cap quyen truy cap micro",
+  "chatMicrophonePermissionDeniedPermanent": "Quyền sử dụng micrô đã bị từ chối. Vui lòng kích hoạt nó trong cài đặt hệ thống để sử dụng tin nhắn thoại.",
   "commonStartRecordingFailed": "Bat dau ghi am that bai: {error}",
   "commonRecordingTooShort": "Ban ghi qua ngan",
   "commonStopRecordingFailed": "Dung ghi am that bai: {error}",
@@ -99,13 +104,14 @@
   "commonN42RedPacket": "Li xi N42",
   "commonClaimed": "Da nhan",
   "commonAllClaimed": "Da nhan het",
+  "chatReadAloud": "Đọc to",
   "chatReply": "Tra loi",
   "commonEdit": "Chinh sua",
   "chatSelectForwardTarget": "Chon nguoi nhan",
   "commonSendCount": "Gui ({count})",
-  "contactN42Id": "N42 ID: {id}",
-  "profileN42IdTitle": "N42 ID",
-  "profileN42Bean": "N42 Bean",
+  "contactN42Id": "Mã N42: {id}",
+  "profileN42IdTitle": "Mã số N42",
+  "profileN42Bean": "Đậu N42",
   "contactFriendInfo": "Thong tin ban be",
   "contactFriendInfoDesc": "Them ghi chu, dien thoai, the, ghi nhan, anh cua ban be va cai dat quyen.",
   "commonMoments": "Khoang khac",
@@ -196,7 +202,7 @@
   "contactTryOtherKeywords": "Thu tu khoa khac hoac tim kiem toan cau",
   "contactSearchResults": "Ket qua tim kiem",
   "contactNewFriends": "Ban moi",
-  "contactChatOnlyFriends": "Chat-only Friends",
+  "contactChatOnlyFriends": "Bạn bè chỉ trò chuyện",
   "contactOfficialAccounts": "Tai khoan chinh thuc",
   "contactServiceAccounts": "Tai khoan dich vu",
   "contactEnterpriseContacts": "Lien he doanh nghiep",
@@ -255,7 +261,6 @@
   "groupQrCode": "Ma QR nhom",
   "commonSearchChatHistory": "Tim kich su tro chuyen",
   "groupIdCopied": "Da sao chep ID nhom",
-  "commonFeatureInDevelopment": "Tinh nang dang phat trien...",
   "transferEnterOrPasteAddress": "Nhap hoac dan dia chi vi",
   "transferSelectToken": "Chon Token",
   "commonTransferAmount": "So tien chuyen",
@@ -392,6 +397,7 @@
   "chatCalling": "Dang goi...",
   "chatRinging": "Dang reo...",
   "chatInCall": "Dang trong cuoc goi",
+  "commonFeatureInDevelopment": "Tinh nang dang phat trien...",
   "chatCollectMessages": "Da luu {count} tin nhan",
   "commonMemberCount": "{count} thanh vien",
   "groupDone": "Xong({count})",
@@ -477,7 +483,6 @@
     }
   },
   "authEnterValidServerAddress": "Vui long nhap dia chi may chu hop le",
-  "authEmailOtp": "OTP Email",
   "authEnterServerAddressFirst": "Vui long nhap dia chi may chu truoc",
   "authPasskeyRequiresServer": "Dang nhap Passkey can ho tro may chu",
   "authLoginAgreement": "Bang viec dang nhap, ban dong y voi ",
@@ -561,22 +566,6 @@
   "chatSaving": "Dang luu...",
   "commonShare": "Chia se",
   "chatSaveToGallery": "Luu vao Thu vien",
-  "chatDownloadFailed": "Tai xuong that bai: {code}",
-  "@chatDownloadFailed": {
-    "placeholders": {
-      "code": {
-        "type": "String"
-      }
-    }
-  },
-  "commonShareFailed": "Chia se that bai: {error}",
-  "@commonShareFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "chatFailedToLoadImage": "Tai hinh anh that bai",
   "chatVideoRecordingFailed": "Quay video that bai. Vui long thu lai.",
   "profileRedPacket": "Li xi",
@@ -655,7 +644,7 @@
   "transferScanQrToPayMe": "Quet ma QR de thanh toan cho toi",
   "transferMyWalletAddress": "Dia chi vi cua toi",
   "transferCreatePaymentRequest": "Tao yeu cau thanh toan",
-  "profileN42IdLabel": "N42 ID: {id}",
+  "profileN42IdLabel": "Mã N42: {id}",
   "@profileN42IdLabel": {
     "placeholders": {
       "id": {
@@ -727,7 +716,7 @@
   "profileVisibleToFriends24h": "Hien thi voi ban be trong 24 gio",
   "profileWriteStatus": "Viet trang thai",
   "profileEnterYourStatus": "Nhap trang thai...",
-  "profileOk": "OK",
+  "profileOk": "được rồi",
   "qrcodeCameraPermissionRequired": "Can quyen camera de quet ma QR",
   "qrcodeCameraPermissionDenied": "Quyen camera bi tu choi vinh vien. Vui long bat trong cai dat he thong.",
   "qrcodePermissionCheckError": "Loi kiem tra quyen: {error}",
@@ -796,7 +785,6 @@
   "chatMultiChoice": "Chon nhieu",
   "chatEnded": "Ket thuc",
   "chatEndPollButton": "Ket thuc binh chon",
-  "chatEnterPollQuestionHint": "Vui long nhap cau hoi binh chon",
   "chatPollHint": "Binh chon se hien trong chat. Thanh vien nhom co the binh chon.",
   "chatSearchSongOrArtist": "Tim bai hat hoac nghe si",
   "chatNoSongsFound": "Khong tim thay bai hat",
@@ -847,8 +835,9 @@
   },
   "searchAllResults": "Tat ca",
   "searchInChat": "Tim trong tro chuyen",
-  "searchGroupLabel": "Nhom",
   "searchContactLabel": "Lien he",
+  "searchGroupLabel": "Nhom",
+  "searchConversationLabel": "Cuộc trò chuyện",
   "searchMessageLabel": "Tin nhan",
   "settingsSecurityTitle": "Bao mat",
   "settingsKeyBackup": "Sao luu khoa",
@@ -918,6 +907,21 @@
   "settingsResetEncryptionTitle": "Dat lai ma hoa",
   "settingsResetEncryptionWarning": "Canh bao: Hanh dong nay se xoa tat ca khoa ma hoa cua ban. Ban se khong the giai ma tin nhan ma hoa truoc do. Hanh dong nay khong the hoan tac.",
   "settingsReset": "Dat lai",
+  "settingsBackupSuccess": "Đã sao lưu khóa thành công",
+  "settingsBackupFailed": "Sao lưu không thành công",
+  "settingsRecoveryKey": "Khóa khôi phục",
+  "settingsRecoveryKeySaveWarning": "Vui lòng lưu khóa khôi phục này ở nơi an toàn. Bạn sẽ cần nó để khôi phục tin nhắn được mã hóa của mình trên thiết bị mới.",
+  "settingsRecoveryKeySaved": "Tôi đã lưu nó",
+  "settingsRestoreSuccess": "Đã khôi phục khóa thành công",
+  "settingsRestoreFailed": "Khôi phục không thành công",
+  "settingsPassword": "Mật khẩu",
+  "settingsEnterRecoveryKey": "Nhập khóa khôi phục",
+  "settingsEnterPassword": "Nhập mật khẩu",
+  "settingsExportSuccess": "Đã xuất khóa sang bản sao lưu máy chủ thành công",
+  "settingsExportNeedBackupFirst": "Vui lòng tạo bản sao lưu khóa trước",
+  "settingsExportFailed": "Xuất không thành công",
+  "settingsResetSuccess": "Đặt lại mã hóa thành công",
+  "settingsResetFailed": "Đặt lại không thành công",
   "callLeaveMeetingConfirm": "Ban co chac muon roi cuoc hop?",
   "chatPokedSomeone": "da vo vai {name}{suffix}",
   "@chatPokedSomeone": {
@@ -1093,13 +1097,14 @@
     }
   },
   "chatSearchContactsOrGroups": "Tim lien he hoac nhom",
-  "chatVideoTitle": "Video",
+  "chatVideoTitle": "Băng hình",
   "chatLoadingText": "Dang tai...",
   "chatVideoLoadFailed": "Tai video that bai",
   "chatPlayerInitFailed": "Khoi tao trinh phat that bai",
   "chatCreatePollTitle": "Tao binh chon",
   "chatSubmitPoll": "Gui",
   "chatPollQuestionLabel": "Cau hoi binh chon",
+  "chatEnterPollQuestionHint": "Vui long nhap cau hoi binh chon",
   "chatPollOptionsLabel": "Cac lua chon",
   "chatOptionHintWithIndex": "Lua chon {index}",
   "@chatOptionHintWithIndex": {
@@ -1277,7 +1282,22 @@
       }
     }
   },
+  "@chatSelectFileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatNoMediaUrlAvailable": "URL phương tiện không khả dụng",
+  "chatDownloadFailed": "Tai xuong that bai: {code}",
+  "@chatDownloadFailed": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "chatErrorWithMessage": "Lỗi: {message}",
   "@chatErrorWithMessage": {
     "placeholders": {
@@ -1288,6 +1308,14 @@
   },
   "chatMusicLinkLabel": "Liên kết nhạc",
   "chatRedPacketTransferCannotForward": "Lì xì và chuyển khoản không thể chuyển tiếp",
+  "commonShareFailed": "Chia se that bai: {error}",
+  "@commonShareFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "commonTapToRetry": "Nhấn để thử lại",
   "chatDefaultRedPacketGreeting": "Chúc phát tài phát lộc",
   "groupAllowOthersToSearchAndJoin": "Cho phép những người khác tìm kiếm và tham gia",
@@ -1298,54 +1326,117 @@
   "groupEnterGroupAnnouncement": "Nhập thông báo nhóm",
   "groupMemberCountClickToCopy": "{count} thành viên, nhấp để sao chép ID nhóm",
   "groupNoPermissionToEditGroupName": "Bạn không có quyền chỉnh sửa tên nhóm",
-  "commonAppleLogin": "Đăng nhập bằng Apple",
-  "settingsChangeEmailFailed": "Thay đổi email thất bại",
-  "settingsChangePassword": "Đổi mật khẩu",
-  "settingsChangePasswordFailed": "Đổi mật khẩu thất bại",
-  "settingsChangePasswordInfo": "Sau khi đổi mật khẩu, bạn sẽ bị đăng xuất và cần đăng nhập lại bằng mật khẩu mới.",
-  "settingsCodeSentTo": "Mã xác nhận đã gửi đến",
-  "commonConfirmNewPassword": "Xác nhận mật khẩu mới",
-  "searchConversationLabel": "Cuộc trò chuyện",
-  "settingsCurrentBoundEmail": "Email hiện đang liên kết",
-  "settingsCurrentPassword": "Mật khẩu hiện tại",
-  "settingsDidNotReceiveCode": "Không nhận được mã?",
   "authEmailAddress": "Địa chỉ email",
-  "settingsEmailChangedSuccess": "Email đã được thay đổi thành công",
-  "authEmailRecoveryHint": "Dùng để khôi phục mật khẩu",
-  "settingsEmailSecurityNote": "Email của bạn được dùng để khôi phục mật khẩu. Hãy giữ an toàn.",
-  "settingsEnterCurrentPassword": "Nhập mật khẩu hiện tại",
   "commonEnterEmailAddress": "Nhập địa chỉ email",
-  "settingsEnterNewEmail": "Nhập địa chỉ email mới",
-  "settingsEnterNewPassword": "Nhập mật khẩu mới",
-  "authEnterRegisteredEmail": "Nhập địa chỉ email bạn đã đăng ký",
-  "authEnterResetCode": "Nhập mã đặt lại",
-  "commonGoogleLogin": "Đăng nhập bằng Google",
-  "commonWechat": "WeChat",
+  "authEmailRecoveryHint": "Dùng để khôi phục mật khẩu",
   "commonInvalidEmailFormat": "Vui lòng nhập địa chỉ email hợp lệ",
-  "settingsLanguage": "Ngôn ngữ",
-  "settingsLanguageChanged": "Ngôn ngữ đã thay đổi",
-  "settingsNewEmailAddress": "Địa chỉ email mới",
-  "commonNewPassword": "Mật khẩu mới",
-  "settingsNewPasswordMustBeDifferent": "Mật khẩu mới phải khác mật khẩu hiện tại",
   "authOptional": "Tùy chọn",
-  "settingsPasswordChanged": "Mật khẩu đã được thay đổi thành công. Vui lòng đăng nhập bằng mật khẩu mới.",
-  "settingsPasswordRequirements": "Yêu cầu mật khẩu:",
-  "authPasswordResetSuccess": "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập bằng mật khẩu mới.",
-  "authResetCodeSent": "Mã đặt lại đã gửi đến {email}",
   "authResetPassword": "Đặt lại mật khẩu",
-  "authResetPasswordFailed": "Đặt lại mật khẩu thất bại",
-  "settingsSecurity": "Bảo mật",
-  "settingsSecurityNote": "Vì lý do bảo mật, bạn sẽ cần đăng nhập lại trên tất cả thiết bị sau khi đổi mật khẩu.",
+  "authEnterRegisteredEmail": "Nhập địa chỉ email bạn đã đăng ký",
   "authSendResetCode": "Gửi mã đặt lại",
+  "authResetCodeSent": "Mã đặt lại đã gửi đến {email}",
+  "@authResetCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authEnterResetCode": "Nhập mã đặt lại",
   "authSetNewPassword": "Đặt mật khẩu mới",
+  "commonConfirmNewPassword": "Xác nhận mật khẩu mới",
+  "commonNewPassword": "Mật khẩu mới",
+  "authPasswordResetSuccess": "Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập bằng mật khẩu mới.",
+  "authResetPasswordFailed": "Đặt lại mật khẩu thất bại",
+  "settingsChangePassword": "Đổi mật khẩu",
+  "settingsCurrentPassword": "Mật khẩu hiện tại",
+  "settingsEnterCurrentPassword": "Nhập mật khẩu hiện tại",
+  "settingsEnterNewPassword": "Nhập mật khẩu mới",
+  "settingsPasswordChanged": "Mật khẩu đã được thay đổi thành công. Vui lòng đăng nhập bằng mật khẩu mới.",
+  "settingsChangePasswordFailed": "Đổi mật khẩu thất bại",
+  "settingsNewPasswordMustBeDifferent": "Mật khẩu mới phải khác mật khẩu hiện tại",
+  "settingsChangePasswordInfo": "Sau khi đổi mật khẩu, bạn sẽ bị đăng xuất và cần đăng nhập lại bằng mật khẩu mới.",
+  "settingsPasswordRequirements": "Yêu cầu mật khẩu:",
+  "settingsSecurityNote": "Vì lý do bảo mật, bạn sẽ cần đăng nhập lại trên tất cả thiết bị sau khi đổi mật khẩu.",
+  "settingsSecurity": "Bảo mật",
+  "settingsCurrentBoundEmail": "Email hiện đang liên kết",
+  "settingsNewEmailAddress": "Địa chỉ email mới",
+  "settingsEnterNewEmail": "Nhập địa chỉ email mới",
   "settingsVerificationCode": "Mã xác nhận",
   "settingsVerificationCodeSent": "Mã xác nhận đã được gửi",
+  "settingsCodeSentTo": "Mã xác nhận đã gửi đến",
+  "settingsDidNotReceiveCode": "Không nhận được mã?",
+  "settingsEmailChangedSuccess": "Email đã được thay đổi thành công",
+  "settingsChangeEmailFailed": "Thay đổi email thất bại",
+  "settingsEmailSecurityNote": "Email của bạn được dùng để khôi phục mật khẩu. Hãy giữ an toàn.",
+  "commonGoogleLogin": "Đăng nhập bằng Google",
+  "commonAppleLogin": "Đăng nhập bằng Apple",
+  "commonWechat": "WeChat",
+  "settingsLanguage": "Ngôn ngữ",
+  "settingsLanguageChanged": "Ngôn ngữ đã thay đổi",
+  "settingsTranslation": "Dịch thuật",
+  "settingsTranslateTextTo": "Dịch văn bản sang",
+  "settingsTranslateDescription": "Chọn ngôn ngữ bạn muốn dịch tin nhắn sang.",
+  "settingsAutoTranslate": "Tự động dịch tin nhắn đã nhận",
+  "settingsAutoTranslateDescription": "Tự động dịch tin nhắn nhận được trong cuộc trò chuyện sang ngôn ngữ bạn đã chọn.",
+  "settingsBiometricLogin": "Đăng nhập sinh trắc học",
+  "authLoginWithBiometric": "Đăng nhập bằng {type}",
+  "@authLoginWithBiometric": {
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      }
+    }
+  },
+  "settingsBiometricLoginEnabled": "Đăng nhập sinh trắc học đã bật",
+  "settingsBiometricLoginDisabled": "Đăng nhập sinh trắc học đã tắt",
+  "settingsEnableBiometricLogin": "Bật đăng nhập sinh trắc học",
+  "settingsBiometricEnabled": "Đã bật - Dùng sinh trắc học để đăng nhập",
+  "settingsBiometricDisabled": "Đã tắt - Nhấn để bật",
+  "settingsBiometricNeedRelogin": "Vui lòng đăng xuất và đăng nhập lại để bật đăng nhập sinh trắc học",
+  "authOr": "HOẶC",
   "qrcodeCameraPermissionRestricted": "Quyền truy cập camera bị hạn chế trên thiết bị này",
-  "contactCreateTag": "Create Tag",
-  "contactEnterTagName": "Enter tag name",
-  "contactEditTag": "Edit Tag",
-  "contactDeleteTag": "Delete Tag",
-  "contactDeleteTagConfirm": "Are you sure you want to delete the tag \"{tagName}\"?",
+  "authPasskeyLabel": "Mật khẩu",
+  "authGoogleLabel": "Google",
+  "authAppleLabel": "táo",
+  "authSsoLabel": "SSO",
+  "transferAmountHintZero": "0,00",
+  "commonMatrixIdHint": "@username:server.com",
+  "authServerAddressHint": "https://m.si46.world",
+  "authEmailExampleHint": "example@email.com",
+  "authVerificationCodePlaceholder": "------",
+  "profileEnterPokeSuffixHint": "Nhập hậu tố chọc, ví dụ: vào vai",
+  "groupAlbum": "Album nhóm",
+  "groupFiles": "Tệp nhóm",
+  "groupImages": "Hình ảnh",
+  "groupVideos": "Video",
+  "groupTotal": "Tổng cộng",
+  "groupSize": "Kích thước",
+  "groupNoMedia": "Không có phương tiện",
+  "groupNoMediaDescription": "Chưa có ảnh hoặc video nào trong nhóm này",
+  "groupDocuments": "Tài liệu",
+  "groupNoFiles": "Không có tệp",
+  "groupNoFilesDescription": "Chưa có tệp nào trong nhóm này",
+  "groupDownloadStarted": "Đang tải {filename}...",
+  "@groupDownloadStarted": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
+  "contactNoCommonGroups": "Không có nhóm chung",
+  "contactNoCommonGroupsDescription": "Các bạn không có nhóm chung nào",
+  "chatVoiceMessage": "Giọng nói",
+  "chatMessage": "Tin nhắn",
+  "conversationHideChat": "Ẩn",
+  "settingsQuickReply": "Trả lời nhanh",
+  "commonTranslate": "Dịch",
+  "contactCreateTag": "Tạo thẻ",
+  "contactEnterTagName": "Nhập tên thẻ",
+  "contactEditTag": "Chỉnh sửa thẻ",
+  "contactDeleteTag": "Xóa thẻ",
+  "contactDeleteTagConfirm": "Bạn có chắc chắn muốn xóa thẻ \"{tagName}\" không?",
   "@contactDeleteTagConfirm": {
     "placeholders": {
       "tagName": {
@@ -1353,39 +1444,39 @@
       }
     }
   },
-  "contactNoTags": "No tags yet",
-  "contactFriendPermissions": "Friend Permissions",
-  "contactSetChatOnly": "Set as Chat-only",
-  "contactChatOnlyDesc": "Can only chat with you, other content will be hidden",
-  "contactHideMyMoments": "Hide My Moments",
-  "contactHideMyMomentsDesc": "This friend cannot see my Moments",
-  "contactHideTheirMoments": "Hide Their Moments",
-  "contactHideTheirMomentsDesc": "Don't see this friend's Moments",
-  "contactHideMyStatus": "Hide My Status",
-  "contactHideMyStatusDesc": "This friend cannot see my status updates",
-  "contactNoChatOnlyFriends": "No chat-only friends",
-  "contactNoOfficialAccounts": "No official accounts",
-  "contactFollowOfficialAccountsDesc": "Follow official accounts to get the latest updates",
-  "contactNoServiceAccounts": "No service accounts",
-  "contactSubscribeServiceAccountsDesc": "Subscribe to service accounts for convenient services",
-  "contactNoEnterpriseContacts": "No enterprise contacts",
-  "contactEnterpriseContactsDesc": "Enterprise contacts will be displayed here",
-  "profileCardPack": "Card Pack",
-  "profileOrders": "Orders",
-  "profileNoOrders": "No orders",
-  "profileOrdersDesc": "Your orders will be displayed here",
-  "profileNoCards": "No cards",
-  "profileCardsDesc": "Your cards will be displayed here",
-  "favoriteEnterTagsHint": "Enter tags separated by commas",
-  "favoriteTagsUpdated": "Tags updated",
-  "favoriteForwardedContent": "Content forwarded",
-  "favoriteEnterNoteContent": "Enter note content",
-  "favoriteNoteAdded": "Note added",
-  "favoriteLinkTitle": "Link title",
+  "contactNoTags": "Chưa có thẻ nào",
+  "contactFriendPermissions": "Quyền của bạn bè",
+  "contactSetChatOnly": "Đặt ở chế độ chỉ trò chuyện",
+  "contactChatOnlyDesc": "Chỉ có thể trò chuyện với bạn, nội dung khác sẽ bị ẩn",
+  "contactHideMyMoments": "Ẩn khoảnh khắc của tôi",
+  "contactHideMyMomentsDesc": "Người bạn này không thể nhìn thấy Khoảnh khắc của tôi",
+  "contactHideTheirMoments": "Giấu khoảnh khắc của họ",
+  "contactHideTheirMomentsDesc": "Không xem được Khoảnh khắc của người bạn này",
+  "contactHideMyStatus": "Ẩn trạng thái của tôi",
+  "contactHideMyStatusDesc": "Người bạn này không thể xem cập nhật trạng thái của tôi",
+  "contactNoChatOnlyFriends": "Không có bạn bè chỉ trò chuyện",
+  "contactNoOfficialAccounts": "Không có tài khoản chính thức",
+  "contactFollowOfficialAccountsDesc": "Theo dõi các tài khoản chính thức để nhận được thông tin cập nhật mới nhất",
+  "contactNoServiceAccounts": "Không có tài khoản dịch vụ",
+  "contactSubscribeServiceAccountsDesc": "Đăng ký tài khoản dịch vụ để được sử dụng các dịch vụ tiện lợi",
+  "contactNoEnterpriseContacts": "Không có liên hệ doanh nghiệp",
+  "contactEnterpriseContactsDesc": "Địa chỉ liên hệ doanh nghiệp sẽ được hiển thị ở đây",
+  "profileCardPack": "Gói thẻ",
+  "profileOrders": "Đơn đặt hàng",
+  "profileNoOrders": "Không có đơn đặt hàng",
+  "profileOrdersDesc": "Đơn đặt hàng của bạn sẽ được hiển thị ở đây",
+  "profileNoCards": "Không có thẻ",
+  "profileCardsDesc": "Thẻ của bạn sẽ được hiển thị ở đây",
+  "favoriteEnterTagsHint": "Nhập các thẻ được phân tách bằng dấu phẩy",
+  "favoriteTagsUpdated": "Đã cập nhật thẻ",
+  "favoriteForwardedContent": "Nội dung được chuyển tiếp",
+  "favoriteEnterNoteContent": "Nhập nội dung ghi chú",
+  "favoriteNoteAdded": "Đã thêm ghi chú",
+  "favoriteLinkTitle": "Tiêu đề liên kết",
   "favoriteLinkUrl": "https://",
-  "favoriteLinkAdded": "Link added",
-  "contactPhotoAdded": "Photo added",
-  "contactEnterPhone": "Enter phone number",
+  "favoriteLinkAdded": "Đã thêm liên kết",
+  "contactPhotoAdded": "Đã thêm ảnh",
+  "contactEnterPhone": "Nhập số điện thoại",
   "commonConversationWithId": "Cuoc tro chuyen: {roomId}",
   "commonContactWithId": "Lien he: {userId}",
   "commonDiscover": "Kham pha",
@@ -1404,8 +1495,15 @@
   "settingsDoNotDisturbDescription": "Không nhận thông báo trong khoảng thời gian chỉ định",
   "settingsStartTime": "Thoi gian bat dau",
   "settingsEndTime": "Thoi gian ket thuc",
+  "settingsDeleteQuickReply": "Xóa trả lời nhanh",
+  "settingsEditQuickReply": "Sửa trả lời nhanh",
+  "settingsAddQuickReply": "Thêm trả lời nhanh",
+  "settingsManageQuickReplies": "Quản lý trả lời nhanh",
+  "settingsNoQuickReplies": "Không có trả lời nhanh",
+  "settingsDefaultQuickReplies": "Trả lời nhanh mặc định sẽ được hiển thị",
   "settingsWhoCanSee": "Ai co the xem",
   "settingsLastSeen": "Lan cuoi truc tuyen",
+  "settingsHiddenChats": "Cuộc trò chuyện ẩn",
   "settingsMessagesLabel": "Tin nhắn",
   "settingsAllowStrangerMessages": "Cho phép tin nhắn từ người lạ",
   "settingsReceiveMessagesFromNonContacts": "Nhận tin nhắn từ người không có trong danh bạ",
@@ -1436,6 +1534,9 @@
   "settingsOpenSourceLicenses": "Giay phep ma nguon mo",
   "settingsFeedbackAndSuggestions": "Phản hồi và đề xuất",
   "settingsBuiltOnMatrix": "Xay dung tren giao thuc Matrix",
+  "settingsNoHiddenChats": "Không có cuộc trò chuyện ẩn",
+  "settingsNoHiddenChatsDescription": "Các cuộc trò chuyện bạn ẩn sẽ xuất hiện ở đây",
+  "settingsUnhideChat": "Bỏ ẩn",
   "settingsDarkMode": "Chế độ tối",
   "settingsFontSize": "Cỡ chữ",
   "settingsBubbleStyle": "Kiểu bong bóng",
@@ -1502,6 +1603,10 @@
   "chatLongitude": "Kinh do",
   "groupDescriptionUpdated": "Đã cập nhật mô tả nhóm",
   "groupAvatarUpdated": "Đã cập nhật ảnh đại diện nhóm",
+  "groupVisibilityUpdated": "Đã cập nhật chế độ hiển thị nhóm",
+  "groupChannelCreated": "Đã tạo kênh",
+  "groupChannelUpdated": "Đã cập nhật kênh",
+  "groupChannelDeleted": "Đã xóa kênh",
   "callDecline": "Tu choi",
   "callAnswer": "Tra loi",
   "callIncomingVideoCall": "Cuộc gọi video đến",
@@ -1514,7 +1619,7 @@
   "callLivekitNotConfigured": "LiveKit chua duoc cau hinh",
   "callJoinMeetingFailed": "Tham gia cuoc hop that bai: {error}",
   "callScreenShareFailed": "Chia se man hinh that bai: {error}",
-  "profileN42BeanTitle": "N42 Bean",
+  "profileN42BeanTitle": "Đậu N42",
   "profileNoN42Bean": "Không có N42 Bean",
   "profileN42BeanDetails": "Chi tiết N42 Bean",
   "profileN42BeanDescription": "N42 Bean là token dùng để đổi vật phẩm ảo và dịch vụ trong N42. Hiện có thể dùng cho:",
@@ -1610,8 +1715,22 @@
       }
     }
   },
+  "storyViewers": "Người xem",
+  "storyNoViewers": "Chưa có người xem",
+  "storyReplyToStory": "Trả lời trạng thái...",
   "commonCopiedToClipboard": "Da sao chep vao clipboard",
   "commonMore": "Them",
+  "commonTranslating": "Đang dịch...",
+  "commonTranslatedFrom": "Dịch từ {language}",
+  "@commonTranslatedFrom": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "commonTranslation": "Bản dịch",
+  "commonTranslationFailed": "Dịch thất bại",
   "commonAllRead": "Da doc tat ca",
   "commonReadCount": "{count} da doc",
   "commonYouRecalledMessage": "Ban da thu hoi mot tin nhan",
@@ -1642,135 +1761,568 @@
       }
     }
   },
-  "authAppleLabel": "Apple",
-  "authEmailExampleHint": "example@email.com",
-  "authGoogleLabel": "Google",
-  "authLoginWithBiometric": "Đăng nhập bằng {type}",
-  "@authLoginWithBiometric": {
+  "securityDeviceIdRequired": "ID thiết bị là bắt buộc",
+  "securityVerificationStartFailed": "Không thể bắt đầu xác minh: {error}",
+  "@securityVerificationStartFailed": {
     "placeholders": {
-      "type": {
-        "type": "Object"
-      }
-    }
-  },
-  "authOr": "HOẶC",
-  "authPasskeyLabel": "Passkey",
-  "authServerAddressHint": "https://m.si46.world",
-  "authSsoLabel": "SSO",
-  "authVerificationCodePlaceholder": "------",
-  "chatCallDurationLabel": "Thời lượng cuộc gọi",
-  "chatCallNotAnswered": "Không trả lời",
-  "chatMessage": "Tin nhắn",
-  "chatVideoCallCancelled": "Cuộc gọi video đã bị huỷ",
-  "chatVoiceCallCancelled": "Cuộc gọi thoại đã bị huỷ",
-  "chatVoiceMessage": "Giọng nói",
-  "commonMatrixIdHint": "@username:server.com",
-  "commonTranslate": "Dịch",
-  "commonTranslatedFrom": "Dịch từ {language}",
-  "@commonTranslatedFrom": {
-    "placeholders": {
-      "language": {
+      "error": {
         "type": "String"
       }
     }
   },
-  "commonTranslating": "Đang dịch...",
-  "commonTranslation": "Bản dịch",
-  "commonTranslationFailed": "Dịch thất bại",
-  "contactNoCommonGroups": "Không có nhóm chung",
-  "contactNoCommonGroupsDescription": "Các bạn không có nhóm chung nào",
-  "conversationHideChat": "Ẩn",
-  "groupAlbum": "Album nhóm",
-  "groupDocuments": "Tài liệu",
-  "groupDownloadStarted": "Đang tải {filename}...",
-  "@groupDownloadStarted": {
+  "securityVerificationFailed": "Xác minh không thành công",
+  "securityVerificationFailedWithReason": "Xác minh không thành công: {reason}",
+  "@securityVerificationFailedWithReason": {
     "placeholders": {
-      "filename": {
+      "reason": {
         "type": "String"
       }
     }
   },
-  "groupFiles": "Tệp nhóm",
-  "groupImages": "Hình ảnh",
-  "groupNoFiles": "Không có tệp",
-  "groupNoFilesDescription": "Chưa có tệp nào trong nhóm này",
-  "groupNoMedia": "Không có phương tiện",
-  "groupNoMediaDescription": "Chưa có ảnh hoặc video nào trong nhóm này",
-  "groupSize": "Kích thước",
-  "groupTotal": "Tổng cộng",
-  "groupVideos": "Video",
-  "profileEnterPokeSuffixHint": "Nhập hậu tố chọc, ví dụ: vào vai",
-  "settingsAddQuickReply": "Thêm trả lời nhanh",
-  "settingsBiometricDisabled": "Đã tắt - Nhấn để bật",
-  "settingsBiometricEnabled": "Đã bật - Dùng sinh trắc học để đăng nhập",
-  "settingsBiometricLogin": "Đăng nhập sinh trắc học",
-  "settingsBiometricLoginDisabled": "Đăng nhập sinh trắc học đã tắt",
-  "settingsBiometricLoginEnabled": "Đăng nhập sinh trắc học đã bật",
-  "settingsBiometricNeedRelogin": "Vui lòng đăng xuất và đăng nhập lại để bật đăng nhập sinh trắc học",
-  "settingsDefaultQuickReplies": "Trả lời nhanh mặc định sẽ được hiển thị",
-  "settingsDeleteQuickReply": "Xóa trả lời nhanh",
-  "settingsEditQuickReply": "Sửa trả lời nhanh",
-  "settingsEnableBiometricLogin": "Bật đăng nhập sinh trắc học",
-  "settingsHiddenChats": "Cuộc trò chuyện ẩn",
-  "settingsManageQuickReplies": "Quản lý trả lời nhanh",
-  "settingsNoHiddenChats": "Không có cuộc trò chuyện ẩn",
-  "settingsNoHiddenChatsDescription": "Các cuộc trò chuyện bạn ẩn sẽ xuất hiện ở đây",
-  "settingsNoQuickReplies": "Không có trả lời nhanh",
-  "settingsQuickReply": "Trả lời nhanh",
-  "settingsUnhideChat": "Bỏ ẩn",
-  "storyNoViewers": "Chưa có người xem",
-  "storyReplyToStory": "Trả lời trạng thái...",
-  "storyViewers": "Người xem",
-  "transferAmountHintZero": "0.00",
-  "liveLocation": "Live Location",
-  "stopLiveLocation": "Stop Sharing",
-  "startLiveLocation": "Start Sharing",
-  "selectDuration": "Select Duration",
-  "groupChatFiles": "Chat Files",
-  "groupLinks": "Links",
-  "groupNoLinks": "No links yet",
-  "chatBackground": "Chat Background",
-  "solidColors": "Solid Colors",
-  "gradients": "Gradients",
-  "defaultBackground": "Default",
-  "settingsFontSizeSlider": "Font Size",
-  "autoDownload": "Auto-Download",
-  "images": "Images",
-  "voice": "Voice",
-  "video": "Video",
-  "files": "Files",
-  "mobileData": "Mobile Data",
-  "roaming": "Roaming",
-  "storageManagement": "Storage",
-  "totalUsage": "Total Usage",
-  "cache": "Cache",
-  "other": "Other",
-  "clearCache": "Clear Cache",
-  "cacheCleared": "Cache cleared",
-  "clearCacheFailed": "Failed to clear cache",
-  "confirmClearCache": "Clear all cache data?",
-  "mapView": "Map View",
-  "liveLocationSharingCount": "{count} people sharing location",
-  "minutes15": "15 minutes",
-  "minutes30": "30 minutes",
-  "hour1": "1 hour",
-  "hours8": "8 hours",
-  "personalCard": "Personal Card",
-  "downloadFailed": "Download failed",
-  "locationExpired": "Expired",
-  "secondsRemaining": "{count}s",
-  "minutesRemaining": "{count}min",
-  "hoursMinutesRemaining": "{hours}h {minutes}min",
-  "favoriteMessages": "Favorites",
-  "linksCopied": "Link copied",
-  "noLinksFound": "No links found",
-  "roomStorageRanking": "Room Storage Ranking",
-  "downloadComplete": "Download complete",
-  "downloading": "Downloading...",
-  "draftSaved": "Draft saved",
-  "voiceRecording": "Voice Recording",
-  "searchLocation": "Search Location",
-  "tapToSearch": "Tap to search",
+  "securityEmojiMismatchRejected": "Xác minh bị từ chối - biểu tượng cảm xúc không khớp",
+  "securityWaitingForDeviceAccept": "Đang chờ thiết bị kia chấp nhận...",
+  "securityVerifyDevice": "Xác minh thiết bị này",
+  "securityConfirmEmojiMatch": "Xác nhận biểu tượng cảm xúc bên dưới được hiển thị trên cả hai thiết bị, theo cùng một thứ tự",
+  "securityEmojiDontMatch": "Họ không phù hợp",
+  "securityEmojiMatch": "Họ hợp nhau",
+  "securityWaitingForDeviceConfirm": "Đang chờ thiết bị kia xác nhận...",
+  "securityVerificationSuccess": "Xác minh thành công!",
+  "securityDeviceVerifiedTrusted": "Thiết bị này hiện đã được xác minh và tin cậy.",
+  "securityCompareEmoji": "So sánh biểu tượng cảm xúc trên cả hai thiết bị",
+  "securityCompareNumbers": "So sánh các con số trên cả hai thiết bị",
+  "commonTryAgain": "Thử lại",
+  "commonDone": "Xong",
+  "chatExportTitle": "Xuất trò chuyện",
+  "chatExportSuccess": "Xuất thành công",
+  "chatExportFailed": "Xuất không thành công: {error}",
+  "@chatExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chatExportFormat": "Định dạng xuất",
+  "chatExportHtmlDesc": "Có thể đọc được trong bất kỳ trình duyệt nào có bố cục theo kiểu",
+  "chatExportJsonDesc": "Định dạng dữ liệu có cấu trúc có thể đọc được bằng máy",
+  "chatExportDateRange": "Phạm vi ngày",
+  "chatExportAll": "Tất cả tin nhắn",
+  "chatExportLastWeek": "7 ngày qua",
+  "chatExportLastMonth": "Tháng trước",
+  "chatExportLast3Months": "3 tháng qua",
+  "chatExportMessageCount": "Tin nhắn để xuất",
+  "chatExportButton": "Xuất & Chia sẻ",
+  "chatMediaGallery": "Thư viện phương tiện",
+  "chatExportHistory": "Xuất lịch sử trò chuyện",
+  "pdfLoadFailed": "Không tải được PDF",
+  "pdfPageIndicator": "{current} / {total}",
+  "@pdfPageIndicator": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaAll": "Tất cả",
+  "mediaImages": "Hình ảnh",
+  "mediaVideos": "Video",
+  "mediaFiles": "Tập tin",
+  "mediaAudio": "Âm thanh",
+  "mediaItemsCount": "Vật phẩm {count}",
+  "@mediaItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaNoMediaFound": "Không tìm thấy phương tiện nào",
+  "spacesTitle": "Cộng đồng",
+  "spacesCreate": "Tạo cộng đồng",
+  "spacesJoined": "Đã tham gia",
+  "spacesDiscover": "Khám phá",
+  "spacesNoJoined": "Chưa có cộng đồng nào tham gia",
+  "spacesExplore": "Khám phá cộng đồng",
+  "spacesNoPublic": "Không tìm thấy cộng đồng công cộng nào",
+  "spacesJoin": "Tham gia",
+  "spacesSubSpaces": "Tiểu cộng đồng",
+  "spacesChannels": "Kênh",
+  "spacesMembersCount": "Thành viên {count}",
+  "@spacesMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spacesPublic": "công cộng",
+  "spacesPrivate": "Riêng tư",
+  "spacesSuggested": "được đề xuất",
+  "spacesChannelsCount": "Các kênh {count}",
+  "@spacesChannelsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callInCallChat": "Trò chuyện trong cuộc gọi",
+  "callMessagesCount": "Tin nhắn {count}",
+  "@callMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callNoMessagesYet": "Chưa có tin nhắn nào.\nGửi tin nhắn để bắt đầu.",
+  "callTypeMessage": "Nhập tin nhắn...",
+  "callYouSender": "bạn",
+  "callChatLabel": "Trò chuyện",
+  "chatEdited": "Đã chỉnh sửa",
+  "chatEditHistory": "Chỉnh sửa lịch sử",
+  "chatOriginalMessage": "Bản gốc",
+  "chatEditedAt": "Đã chỉnh sửa tại {time}",
+  "@chatEditedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "chatViewOnce": "Xem một lần",
+  "chatViewOncePhoto": "Xem ảnh một lần",
+  "chatViewOnceVideo": "Xem một lần video",
+  "chatViewOnceViewed": "Đã xem",
+  "chatViewOnceExpired": "Đã hết hạn",
+  "chatViewOnceTap": "Nhấn để xem",
+  "chatAutoFaceBlur": "Tự động làm mờ khuôn mặt",
+  "chatAutoFaceBlurDesc": "Tự động làm mờ khuôn mặt khi gửi ảnh",
+  "threadReplyInThread": "Trả lời trong chủ đề",
+  "threadReplies": "{count} trả lời",
+  "@threadReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "threadReply": "1 câu trả lời",
+  "threadLatestReply": "Mới nhất: {preview}",
+  "@threadLatestReply": {
+    "placeholders": {
+      "preview": {
+        "type": "String"
+      }
+    }
+  },
+  "threadTitle": "chủ đề",
+  "threadReplyPlaceholder": "Trả lời trong chủ đề...",
+  "threadParticipants": "Người tham gia {count}",
+  "@threadParticipants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceRoomTitle": "Phòng thoại",
+  "voiceRoomCreate": "Tạo phòng thoại",
+  "voiceRoomJoin": "Tham gia",
+  "voiceRoomLeave": "Rời khỏi",
+  "voiceRoomEnd": "Phòng cuối",
+  "voiceRoomRaiseHand": "Giơ tay",
+  "voiceRoomLowerHand": "Hạ tay",
+  "voiceRoomMute": "Tắt tiếng",
+  "voiceRoomUnmute": "Bật tiếng",
+  "voiceRoomHost": "Máy chủ",
+  "voiceRoomSpeakers": "Loa",
+  "voiceRoomListeners": "Người nghe",
+  "voiceRoomLive": "TRỰC TIẾP",
+  "voiceRoomEnded": "Đã kết thúc",
+  "voiceRoomScheduled": "Đã lên lịch",
+  "voiceRoomApprove": "Phê duyệt",
+  "voiceRoomDemote": "Di chuyển đến Trình nghe",
+  "voiceRoomHandRaised": "{name} giơ tay",
+  "@voiceRoomHandRaised": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceRoomName": "Tên phòng",
+  "voiceRoomTopic": "Chủ đề (tùy chọn)",
+  "voiceRoomNoActive": "Không có phòng thoại đang hoạt động",
+  "voiceRoomConnecting": "Đang kết nối...",
+  "usernameTitle": "Tên người dùng",
+  "usernameSet": "Đặt tên người dùng",
+  "usernameChange": "Thay đổi tên người dùng",
+  "usernamePlaceholder": "Nhập tên người dùng",
+  "usernameAvailable": "Tên người dùng có sẵn",
+  "usernameUnavailable": "Tên người dùng đã được sử dụng",
+  "usernameInvalid": "3-30 ký tự, chữ thường, số, dấu gạch dưới. Phải bắt đầu bằng một chữ cái.",
+  "usernameReserved": "Tên người dùng này được bảo lưu",
+  "usernameSaved": "Đã lưu tên người dùng",
+  "usernameSearchHint": "Tìm kiếm theo @tên người dùng",
+  "ensName": "Tên ENS",
+  "ensLinked": "Đã liên kết với ENS",
+  "ensResolving": "Giải quyết ENS...",
+  "ensNotFound": "Không tìm thấy tên ENS",
+  "tokenGateTitle": "Cổng mã thông báo",
+  "tokenGateEnable": "Kích hoạt Cổng Token",
+  "tokenGateDisable": "Tắt cổng mã thông báo",
+  "tokenGateAddRule": "Thêm quy tắc",
+  "tokenGateRemoveRule": "Xóa quy tắc",
+  "tokenGateContractAddress": "Địa chỉ hợp đồng",
+  "tokenGateMinBalance": "Số dư tối thiểu",
+  "tokenGateTokenId": "ID mã thông báo (ERC-1155)",
+  "tokenGateChainId": "ID chuỗi",
+  "tokenGateVerifying": "Đang xác minh việc nắm giữ mã thông báo...",
+  "tokenGateVerified": "Xác minh đã được thông qua",
+  "tokenGateDenied": "Bạn không đáp ứng các yêu cầu về mã thông báo",
+  "tokenGateOperatorAnd": "Phải đáp ứng TẤT CẢ các quy tắc",
+  "tokenGateOperatorOr": "Phải đáp ứng BẤT KỲ quy tắc nào",
+  "tokenGateRuleErc20": "Mã thông báo ERC-20",
+  "tokenGateRuleErc721": "NFT (ERC-721)",
+  "tokenGateRuleErc1155": "Mã thông báo đa năng (ERC-1155)",
+  "tokenGateRuleNative": "Mã thông báo gốc",
+  "tokenGateSaved": "Đã lưu cổng mã thông báo",
+  "tokenGateEnableDescription": "Yêu cầu thành viên phải giữ token để tham gia",
+  "tokenGateOperator": "Quy tắc logic",
+  "tokenGateRules": "Quy tắc",
+  "tokenGateSymbol": "Biểu tượng (tùy chọn)",
+  "tokenGateChain": "Chuỗi",
+  "tokenGateTokenStandard": "Tiêu chuẩn mã thông báo",
+  "tokenGateDenialMessage": "Tin nhắn từ chối",
+  "tokenGateDenialMessageHint": "Thông báo hiển thị khi xác minh không thành công",
+  "tokenGateVerifyTitle": "Xác minh mã thông báo",
+  "tokenGateVerifyPassed": "Xác minh đã thông qua",
+  "tokenGateVerifyFailed": "Xác minh không thành công",
+  "tokenGateRetryVerify": "Thử lại",
+  "tokenGateRequired": "Bắt buộc",
+  "tokenGateYourBalance": "Số dư của bạn",
+  "tokenGateRulesActive": "quy tắc hoạt động",
+  "tokenGateDisabled": "Đã tắt",
+  "ensNotBound": "Không bị ràng buộc",
+  "liveLocation": "Vị trí trực tiếp",
+  "stopLiveLocation": "Dừng chia sẻ",
+  "startLiveLocation": "Bắt đầu chia sẻ",
+  "selectDuration": "Chọn thời lượng",
+  "groupChatFiles": "Tệp trò chuyện",
+  "groupLinks": "Liên kết",
+  "groupNoLinks": "Chưa có liên kết nào",
+  "chatBackground": "Nền trò chuyện",
+  "solidColors": "Màu sắc đồng nhất",
+  "gradients": "Độ dốc",
+  "defaultBackground": "Mặc định",
+  "settingsFontSizeSlider": "Cỡ chữ",
+  "autoDownload": "Tự động tải xuống",
+  "images": "Hình ảnh",
+  "voice": "Giọng nói",
+  "video": "Băng hình",
+  "files": "Tập tin",
+  "mobileData": "Dữ liệu di động",
+  "roaming": "Chuyển vùng",
+  "storageManagement": "Lưu trữ",
+  "totalUsage": "Tổng mức sử dụng",
+  "cache": "Bộ nhớ đệm",
+  "other": "Khác",
+  "clearCache": "Xóa bộ nhớ đệm",
+  "cacheCleared": "Đã xóa bộ nhớ đệm",
+  "clearCacheFailed": "Không xóa được bộ nhớ đệm",
+  "confirmClearCache": "Xóa tất cả dữ liệu bộ nhớ đệm?",
+  "mapView": "Xem bản đồ",
+  "liveLocationSharingCount": "{count} người chia sẻ vị trí",
+  "@liveLocationSharingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutes15": "15 phút",
+  "minutes30": "30 phút",
+  "hour1": "1 giờ",
+  "hours8": "8 giờ",
+  "personalCard": "Thẻ cá nhân",
+  "downloadFailed": "Tải xuống không thành công",
+  "locationExpired": "Đã hết hạn",
+  "secondsRemaining": "{count}",
+  "@secondsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesRemaining": "{count} phút",
+  "@minutesRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursMinutesRemaining": "{hours} giờ {minutes} phút",
+  "@hoursMinutesRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteMessages": "Yêu thích",
+  "linksCopied": "Đã sao chép liên kết",
+  "noLinksFound": "Không tìm thấy liên kết nào",
+  "roomStorageRanking": "Xếp hạng lưu trữ phòng",
+  "downloadComplete": "Tải xuống hoàn tất",
+  "downloading": "Đang tải xuống...",
+  "draftSaved": "Đã lưu bản nháp",
+  "voiceRecording": "Ghi âm giọng nói",
+  "searchLocation": "Tìm kiếm vị trí",
+  "tapToSearch": "Nhấn để tìm kiếm",
+  "settingsThisDevice": "Thiết bị này",
+  "settingsJustNow": "Vừa rồi",
+  "settingsDeviceId": "ID thiết bị",
+  "settingsStatus": "Trạng thái",
+  "settingsLastActive": "Hoạt động lần cuối",
+  "settingsIpAddress": "địa chỉ IP",
+  "settingsRenameDevice": "Đổi tên thiết bị",
+  "settingsDeviceNameHint": "Nhập tên thiết bị",
+  "settingsDeviceRenamed": "Đã đổi tên thiết bị",
+  "settingsRenameFailed": "Đổi tên không thành công",
+  "settingsRemoteLogout": "Đăng xuất từ xa",
+  "settingsRemoteLogoutConfirm": "Bạn có chắc chắn muốn đăng xuất \"{deviceName}\" không? Không thể hoàn tác hành động này.",
+  "@settingsRemoteLogoutConfirm": {
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsDeviceLoggedOut": "Thiết bị đã đăng xuất",
+  "settingsLogoutFailed": "Đăng xuất không thành công",
+  "settingsLogout": "Đăng xuất",
+  "settingsVerifyIdentity": "Xác minh danh tính",
+  "settingsEnterPasswordToConfirm": "Nhập mật khẩu của bạn để xác nhận hành động này.",
+  "scheduledSendTitle": "Lên lịch nhắn tin",
+  "scheduledSendInOneHour": "trong 1 giờ",
+  "scheduledSendTonight": "Tối nay (8 giờ tối)",
+  "scheduledSendTomorrowMorning": "Sáng mai (9 giờ sáng)",
+  "scheduledSendCustom": "Chọn ngày và giờ",
+  "scheduledMessageLabel": "Đã lên lịch",
+  "scheduledMessageCancel": "Hủy tin nhắn đã lên lịch",
+  "chatLockTitle": "Khóa trò chuyện",
+  "chatLockEnable": "Khóa cuộc trò chuyện này",
+  "chatLockDisable": "Mở khóa cuộc trò chuyện này",
+  "chatLockDescription": "Các cuộc trò chuyện bị khóa yêu cầu xác minh sinh trắc học hoặc mã PIN để mở",
+  "chatLockVerifyTitle": "Đã khóa cuộc trò chuyện",
+  "chatLockVerifySubtitle": "Xác minh để truy cập cuộc trò chuyện này",
+  "chatLockVerifyFailed": "Xác minh không thành công",
+  "chatLockEnabled": "Đã khóa cuộc trò chuyện",
+  "chatLockDisabled": "Đã mở khóa trò chuyện",
+  "chatLockPinTitle": "Nhập mã PIN",
+  "chatLockPinSetTitle": "Đặt mã PIN",
+  "chatLockPinConfirmTitle": "Xác nhận mã PIN",
+  "chatLockPinMismatch": "Mã PIN không khớp",
+  "chatLockUseBiometric": "Sử dụng sinh trắc học",
+  "chatLockUsePin": "Sử dụng mã PIN",
+  "mediaEditorUndo": "Hoàn tác",
+  "mediaEditorRedo": "Làm lại",
+  "mediaEditorCrop": "Cắt",
+  "mediaEditorFilter": "Lọc",
+  "mediaEditorDraw": "Vẽ",
+  "mediaEditorText": "văn bản",
+  "aiAssistant": "Trợ lý AI",
+  "aiAssistantWelcome": "Xin chào! Tôi là Trợ lý AI N42. Tôi có thể giúp gì cho bạn?",
+  "aiAssistantNotConfigured": "Dịch vụ AI chưa được định cấu hình",
+  "aiAssistantSettings": "Cài đặt AI",
+  "aiAssistantClearHistory": "Xóa lịch sử trò chuyện",
+  "aiAssistantClearHistoryConfirm": "Bạn có chắc chắn muốn xóa tất cả lịch sử trò chuyện AI không?",
+  "aiAssistantStopGenerating": "Dừng tạo",
+  "aiAssistantModel": "người mẫu",
+  "aiAssistantTemperature": "Nhiệt độ",
+  "aiAssistantMaxTokens": "Mã thông báo tối đa",
+  "aiAssistantContextWindow": "Cửa sổ ngữ cảnh",
+  "aiAssistantServiceStatus": "Trạng thái dịch vụ",
+  "aiAssistantAvailable": "Có sẵn",
+  "aiAssistantUnavailable": "Không có sẵn",
+  "aiSummarize": "Tóm tắt AI",
+  "aiSummarizeUnread": "Tổng hợp {count} tin nhắn chưa đọc",
+  "@aiSummarizeUnread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummarizeLoading": "Tóm tắt...",
+  "aiSummarizeError": "Không thể tóm tắt",
+  "aiRewrite": "Viết lại AI",
+  "aiRewriteFormal": "chính thức",
+  "aiRewriteCasual": "Bình thường",
+  "aiRewritePlayful": "vui tươi",
+  "aiRewriteProfessional": "chuyên nghiệp",
+  "aiRewriteAccept": "sử dụng",
+  "aiRewriteCancel": "Hủy bỏ",
+  "aiRewriteLoading": "Viết lại...",
+  "aiLinkSummary": "Tóm tắt AI",
+  "aiLinkSummaryAnalyzing": "Đang phân tích...",
+  "chatFolderManagement": "Quản lý thư mục",
+  "chatFolderSystem": "Thư mục hệ thống",
+  "chatFolderCustom": "Thư mục tùy chỉnh",
+  "chatFolderEmpty": "Chưa có thư mục tùy chỉnh nào",
+  "chatFolderCreate": "Tạo thư mục",
+  "chatFolderEdit": "Chỉnh sửa thư mục",
+  "chatFolderNameHint": "Tên thư mục",
+  "chatFolderAll": "Tất cả",
+  "chatFolderUnread": "Chưa đọc",
+  "chatFolderPersonal": "cá nhân",
+  "chatFolderGroups": "Nhóm",
+  "chatFolderChannels": "Kênh",
+  "chatFolderMuted": "Đã tắt tiếng",
+  "storyAddMusic": "Thêm nhạc",
+  "storyChangeMusic": "Thay đổi âm nhạc",
+  "storyBackgroundMusic": "Nhạc nền",
+  "storyMusicPreview": "Xem trước (tối đa 15 giây)",
+  "storyChooseFromDevice": "Chọn từ thiết bị",
+  "storyUseThisMusic": "Sử dụng nhạc này",
+  "authPasskeyNotSupported": "Mật mã không được hỗ trợ trên thiết bị này",
+  "authPasskeyRegister": "Đăng ký mật khẩu",
+  "authPasskeyNoRegistered": "Không có mật mã nào được đăng ký",
+  "authPasskeyRegisterHint": "Đăng ký mật mã cho tài khoản này. Đăng nhập bằng mật mã độc lập sẽ được kích hoạt sau.",
+  "authPasskeyNameYours": "Đặt tên cho mật mã của bạn",
+  "authPasskeyRegistered": "Đã lưu mật mã vào tài khoản này",
+  "authPasskeyDeleted": "Mật mã đã bị xóa khỏi tài khoản này",
+  "authPasskeyDeleteConfirm": "Xóa mật mã \"{name}\"? Bạn sẽ cần phải đăng ký lại trước khi sử dụng mật mã đăng nhập sau này.",
+  "@authPasskeyDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "momentVisibilityPublic": "công cộng",
+  "momentVisibilityPrivate": "Riêng tư",
+  "momentVisibilityPartial": "Bạn bè đã chọn",
+  "momentVisibilityExcluded": "Loại trừ một số bạn bè",
+  "momentUserMoments": "Những khoảnh khắc của {userName}",
+  "@momentUserMoments": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "momentForwardTo": "Chuyển tiếp tới",
+  "momentForwardSuccess": "Đã chuyển tiếp thành công",
+  "momentSelectFriends": "Chọn bạn bè",
+  "momentSelectTags": "Chọn theo Thẻ",
+  "momentSelectedCount": "Đã chọn ({count})",
+  "@momentSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentNoMomentsYet": "Chưa có khoảnh khắc nào",
+  "momentForwardMoment": "Khoảnh khắc chuyển tiếp",
+  "momentAddComment": "Thêm một bình luận...",
+  "momentForwardContent": "[Khoảnh khắc] {content}",
+  "@momentForwardContent": {
+    "placeholders": {
+      "content": {
+        "type": "String"
+      }
+    }
+  },
+  "momentDeleteMoment": "Xóa khoảnh khắc",
+  "momentDeleteConfirm": "Bạn có chắc chắn muốn xóa khoảnh khắc này?",
+  "momentComment": "Bình luận",
+  "momentWriteComment": "Viết bình luận...",
+  "momentLike": "thích",
+  "momentUnlike": "Không giống",
+  "momentForward": "Chuyển tiếp",
+  "momentDelete": "Xóa",
+  "momentReply": "trả lời",
+  "momentMoment": "Khoảnh khắc",
+  "momentLikesCount": "{count} lượt thích",
+  "@momentLikesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentCommentsCount": "{count} bình luận",
+  "@momentCommentsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentNoComments": "Chưa có bình luận nào",
+  "momentFailedToLoad": "Không thể tải hình ảnh",
+  "momentReplyTo": "Trả lời {userName}...",
+  "@momentReplyTo": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "momentNoConversations": "Không có cuộc trò chuyện nào",
+  "momentJustNow": "ngay bây giờ",
+  "momentMinutesAgo": "{count}m trước đây",
+  "@momentMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentHoursAgo": "{count}h trước",
+  "@momentHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentDaysAgo": "{count}d trước",
+  "@momentDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatGroupAnnouncementHint": "Nhập thông báo nhóm",
+  "chatGroupAnnouncementEmpty": "Không có thông báo",
+  "chatEditNickname": "Chỉnh sửa biệt hiệu",
+  "chatNicknameHint": "Nhập biệt hiệu của bạn vào nhóm này",
+  "contactAddPhoneHint": "Nhập số điện thoại",
+  "contactNotesHint": "Thêm ghi chú về liên hệ này",
+  "reportTitle": "Báo cáo",
+  "reportReasonSpam": "Thư rác",
+  "reportReasonHarassment": "Quấy rối",
+  "reportReasonFraud": "Lừa đảo",
+  "reportReasonOther": "Khác",
+  "reportSubmitted": "Đã gửi báo cáo",
+  "reportDescription": "Mô tả bổ sung (tùy chọn)",
+  "qrcodeSaved": "Đã lưu mã QR vào album",
+  "chatSendRedPacketInChat": "Vui lòng gửi gói màu đỏ trong trò chuyện",
+  "commonSaveFailed": "Lưu không thành công",
+  "reportSelectReason": "Vui lòng chọn một lý do",
   "gameCenter": "Trò chơi",
   "gameHighScore": "Tốt nhất",
   "gameScore": "Điểm",
@@ -1783,11 +2335,11 @@
   "gameNoScores": "Chưa có điểm",
   "game2048": "2048",
   "game2048Desc": "Ghép ô để đạt 2048",
-  "gameBlockDrop": "Block Drop",
+  "gameBlockDrop": "Khối thả",
   "gameBlockDropDesc": "Thả và xóa các hàng",
   "gameMinesweeper": "Dò mìn",
   "gameMinesweeperDesc": "Tìm tất cả ô an toàn",
-  "gameMatch3": "Match 3",
+  "gameMatch3": "Trận đấu 3",
   "gameMatch3Desc": "Nối 3 viên đá quý trở lên",
   "gameMinesweeperEasy": "Dễ",
   "gameMinesweeperMedium": "Trung bình",
@@ -1798,6 +2350,244 @@
   "gameBestTime": "Thời gian tốt nhất",
   "gameNewRecord": "Kỷ lục mới!",
   "gameLines": "Hàng",
+  "storyMyStory": "Câu chuyện của tôi",
+  "storageSmartCleanup": "Dọn dẹp thông minh",
+  "storageOldMediaFiles": "Tệp phương tiện cũ",
+  "storageLargeFiles": "Tệp lớn",
+  "storageAppCache": "Bộ đệm ứng dụng",
+  "storageSettings": "Cài đặt lưu trữ",
+  "storageAutoCleanup": "Tự động dọn dẹp",
+  "storageAutoCleanupDesc": "Tự động xóa các tệp cũ hơn {days} ngày",
+  "@storageAutoCleanupDesc": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "storageCleanupPeriod": "Thời gian dọn dẹp",
+  "storagePreserveThumbnails": "Giữ nguyên hình thu nhỏ",
+  "storagePreserveThumbnailsDesc": "Giữ hình thu nhỏ của hình ảnh trong quá trình dọn dẹp",
+  "storageWarningHigh": "Mức sử dụng bộ nhớ cao. Hãy cân nhắc việc dọn dẹp các tập tin cũ.",
+  "storageWarningCritical": "Dung lượng lưu trữ cực kỳ thấp. Hãy dọn dẹp để có không gian trống.",
+  "storageFreed": "Đã giải phóng {size} (tệp {count})",
+  "@storageFreed": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageDays": "{days} ngày",
+  "@storageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "storageViewAllRooms": "Xem tất cả các phòng {count}",
+  "@storageViewAllRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageNoFiles": "Không tìm thấy tập tin nào",
+  "storageFilePinned": "Đã ghim",
+  "storageDeleteSelected": "Xóa các tập tin đã chọn {count}? Chúng có thể được tải xuống lại từ máy chủ.",
+  "@storageDeleteSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestore": "Sao lưu & Khôi phục",
+  "backupCreate": "Tạo bản sao lưu",
+  "backupCreateDesc": "Sao lưu cài đặt và khóa mã hóa của bạn. Tin nhắn sẽ được khôi phục từ máy chủ sau khi đăng nhập lại.",
+  "backupIncludeKeys": "Bao gồm các khóa mã hóa",
+  "backupIncludeKeysDesc": "Cần thiết để đọc tin nhắn được mã hóa",
+  "backupPasswordProtect": "Bảo vệ bằng mật khẩu",
+  "backupEnterPassword": "Nhập mật khẩu dự phòng",
+  "backupHistory": "Lịch sử sao lưu",
+  "backupNoBackups": "Chưa có bản sao lưu nào",
+  "backupRestore2": "Khôi phục",
+  "backupDelete": "Xóa",
+  "backupDeleteConfirm": "Bạn có chắc chắn muốn xóa bản sao lưu này không? Điều này không thể hoàn tác được.",
+  "backupRestoreFromFile": "Khôi phục từ tệp",
+  "backupRestoreFromFileDesc": "Nhập tệp .n42backup từ thiết bị khác hoặc bản sao lưu trước đó.",
+  "backupChooseFile": "Chọn tập tin sao lưu",
+  "backupRestoring": "Đang khôi phục...",
+  "backupCreated": "Đã tạo bản sao lưu: phòng {rooms}, tin nhắn {messages}",
+  "@backupCreated": {
+    "placeholders": {
+      "rooms": {
+        "type": "int"
+      },
+      "messages": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestored": "Đã khôi phục cài đặt {settings} từ các phòng {rooms}",
+  "@backupRestored": {
+    "placeholders": {
+      "settings": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
+  "backupFailed": "Sao lưu không thành công: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPasswordRequired": "Bản sao lưu này được bảo vệ bằng mật khẩu",
+  "blocGroupNotFound": "Không tìm thấy nhóm",
+  "blocGroupMembersInvited": "Đã mời (các) thành viên {count}",
+  "@blocGroupMembersInvited": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "blocGroupMemberRemoved": "Thành viên đã bị xóa",
+  "blocGroupAdminRemoved": "Quản trị viên đã xóa",
+  "blocGroupLeft": "Đã rời nhóm",
+  "blocGroupDisbanded": "Nhóm đã tan rã",
+  "blocGroupJoined": "Đã tham gia nhóm",
+  "blocGroupInviteDeclined": "Lời mời đã bị từ chối",
+  "blocGroupTokenGateUpdated": "Cổng mã thông báo đã được cập nhật",
+  "blocTransferProcessing": "Đang xử lý chuyển...",
+  "blocTransferCancelled": "Đã hủy chuyển khoản",
+  "blocTransferFailed": "Chuyển không thành công",
+  "blocPaymentProcessing": "Đang xử lý thanh toán...",
+  "blocPaymentFailed": "Thanh toán không thành công",
+  "groupMaxMembers": "Giới hạn thành viên",
+  "groupMaxMembersUnlimited": "Không giới hạn",
+  "groupMaxMembersHint": "Nhập giới hạn (để trống nếu không giới hạn)",
+  "groupMaxMembersUpdated": "Đã cập nhật giới hạn thành viên",
+  "groupFull": "Nhóm đã đạt công suất",
+  "groupChannels": "Kênh chủ đề",
+  "groupChannelsEmpty": "Chưa có kênh nào",
+  "groupChannelsCount": "kênh",
+  "groupChannelCreate": "Kênh mới",
+  "groupChannelName": "Tên kênh",
+  "groupChannelTopic": "Chủ đề kênh (tùy chọn)",
+  "groupChannelDelete": "Xóa kênh",
+  "groupChannelDeleteConfirm": "Xóa kênh này? Tất cả tin nhắn sẽ bị mất.",
+  "groupBotSettings": "Cài đặt bot",
+  "groupBotEnabled": "Kích hoạt Bot",
+  "groupBotWelcomeMessage": "Mẫu tin nhắn chào mừng",
+  "groupBotWelcomeHint": "Sử dụng 'tên' làm trình giữ chỗ cho tên thành viên mới",
+  "groupBotConfigUpdated": "Đã cập nhật cài đặt bot",
+  "groupContentFilter": "Bộ lọc nội dung",
+  "groupContentFilterEnabled": "Bật bộ lọc từ khóa",
+  "groupContentFilterReplace": "Thay thế bằng ***",
+  "groupContentFilterHide": "Ẩn tin nhắn",
+  "groupContentFilterAddWord": "Thêm từ khóa",
+  "groupContentFilterUpdated": "Đã cập nhật bộ lọc nội dung",
+  "chatSlashCommands": "Lệnh",
+  "chatCommandPoll": "/polll - Tạo một cuộc thăm dò",
+  "chatCommandAnnounce": "/ thông báo - Gửi thông báo",
+  "chatCommandWelcome": "/Chào mừng - Đặt tin nhắn chào mừng",
+  "chatReportMessage": "Báo cáo",
+  "chatReportReason": "Lý do báo cáo",
+  "chatReportSpam": "Thư rác",
+  "chatReportHarassment": "Quấy rối",
+  "chatReportInappropriate": "Nội dung không phù hợp",
+  "chatReportOther": "Khác",
+  "chatReportSuccess": "Đã gửi báo cáo",
+  "spacesName": "Tên cộng đồng",
+  "spacesNameHint": "ví dụ: Nhà giao dịch tiền điện tử",
+  "spacesNameRequired": "Tên là bắt buộc",
+  "spacesDescription": "Mô tả",
+  "spacesDescriptionHint": "Cộng đồng này nói về cái gì?",
+  "spacesType": "Loại cộng đồng",
+  "spacesPublicDesc": "Bất cứ ai cũng có thể khám phá và tham gia",
+  "spacesPrivateDesc": "Chỉ những thành viên được mời mới có thể tham gia",
+  "spacesNotFound": "Không tìm thấy cộng đồng",
+  "spacesSearch": "Tìm kiếm cộng đồng...",
+  "spacesMembers": "Thành viên",
+  "spacesNoChannels": "Chưa có kênh nào",
+  "spacesLeave": "Rời khỏi cộng đồng",
+  "spacesLeaveConfirm": "Bạn có chắc chắn muốn rời khỏi \"{name}\" không?",
+  "@spacesLeaveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesDelete": "Xóa cộng đồng",
+  "spacesDeleteConfirm": "Thao tác này sẽ xóa vĩnh viễn \"{name}\" và tất cả các kênh của nó. Không thể hoàn tác hành động này.",
+  "@spacesDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesCreateChannel": "Thêm kênh",
+  "spacesChannelName": "Tên kênh",
+  "spacesChannelTopic": "Chủ đề (tùy chọn)",
+  "spacesDeleteChannel": "Xóa kênh",
+  "spacesDeleteChannelConfirm": "Bạn có chắc chắn muốn xóa \"#{name}\" không?",
+  "@spacesDeleteChannelConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesEditName": "Chỉnh sửa tên",
+  "spacesEditDescription": "Chỉnh sửa mô tả",
+  "spacesViewAllMembers": "Xem tất cả thành viên {count}",
+  "@spacesViewAllMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spacesKickMemberTitle": "Đá {name}",
+  "@spacesKickMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesBanMemberTitle": "Cấm {name}",
+  "@spacesBanMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesPromoteAdmin": "Thăng cấp lên quản trị viên",
+  "spacesDemoteAdmin": "Xóa quản trị viên",
+  "spacesInviteMember": "Mời thành viên",
+  "spacesInviteMemberUserId": "ID người dùng (ví dụ: @user:server.com)",
+  "spacesSave": "Lưu",
+  "settingsScreenshotProtection": "Bảo vệ ảnh chụp màn hình",
+  "settingsScreenshotProtectionDesc": "Ngăn chặn ảnh chụp màn hình và ghi màn hình",
+  "chatSelfDestructTimer": "Tự hủy",
+  "chatTimerPickerTitle": "Hẹn giờ tự hủy",
+  "chatTimerOff": "Tắt",
   "onChainNotificationsTitle": "Sự kiện On-chain",
   "onChainMarkAllRead": "Đánh dấu tất cả đã đọc",
   "onChainNoNotifications": "Chưa có sự kiện on-chain",
@@ -1814,9 +2604,9 @@
   "miniAppFeatured": "Nổi bật",
   "miniAppAllApps": "Tất cả ứng dụng",
   "miniAppNoResults": "Không tìm thấy ứng dụng",
-  "slideToPayLabel": "→→→  Slide to confirm",
-  "slideToPayConfirming": "Confirming...",
-  "redPacketBestLuck": "Best Luck",
+  "slideToPayLabel": "→→→ Trượt để xác nhận",
+  "slideToPayConfirming": "Đang xác nhận...",
+  "redPacketBestLuck": "May mắn nhất",
   "redPacketBestLuckCongrats": "You got the best luck! 👑",
   "redPacketStats": "{claimed} / {total} grabbed",
   "@redPacketStats": {
@@ -1830,16 +2620,6 @@
     }
   },
   "redPacketStatsTotal": "Total: {amount} {token}",
-  "@redPacketStatsTotal": {
-    "placeholders": {
-      "amount": {
-        "type": "String"
-      },
-      "token": {
-        "type": "String"
-      }
-    }
-  },
   "redPacketGrabbedViral": "I grabbed a {amount} {token} red packet! 🧧",
   "@redPacketGrabbedViral": {
     "placeholders": {
@@ -1851,17 +2631,17 @@
       }
     }
   },
-  "web3SearchHint": "@matrix:id  •  0x wallet address  •  name.eth",
-  "web3SearchPlaceholder": "Search by ID, wallet, or ENS...",
-  "web3WalletAddress": "Wallet Address",
-  "web3AddressCopied": "Address copied",
-  "web3Copy": "Copy",
-  "web3SendMessage": "Send Message",
-  "web3SendToWallet": "Message Wallet",
-  "web3WalletOnlyHint": "This address has no N42 account yet. Message will be delivered when they join.",
-  "web3NftAvatar": "NFT Avatar",
-  "web3ResolveFailed": "Failed to resolve identity",
-  "web3EnsNotFound": "ENS name \"{name}\" not found",
+  "web3SearchHint": "@matrix:id • Địa chỉ ví 0x • name.eth",
+  "web3SearchPlaceholder": "Tìm kiếm theo ID, ví hoặc ENS...",
+  "web3WalletAddress": "Địa chỉ ví",
+  "web3AddressCopied": "Đã sao chép địa chỉ",
+  "web3Copy": "Sao chép",
+  "web3SendMessage": "Gửi tin nhắn",
+  "web3SendToWallet": "Ví tin nhắn",
+  "web3WalletOnlyHint": "Địa chỉ này chưa có tài khoản N42. Tin nhắn sẽ được gửi khi họ tham gia.",
+  "web3NftAvatar": "Hình đại diện NFT",
+  "web3ResolveFailed": "Không thể giải quyết danh tính",
+  "web3EnsNotFound": "Không tìm thấy tên ENS \"{name}\"",
   "@web3EnsNotFound": {
     "placeholders": {
       "name": {
@@ -1869,32 +2649,109 @@
       }
     }
   },
-  "web3NoN42AccountTitle": "No N42 Account",
-  "web3NoN42AccountDesc": "This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.",
-  "web3ShareInvite": "Share Invite",
-  "nftPickerTitle": "Select NFT Avatar",
-  "nftPickerTabPopular": "Popular",
-  "nftPickerTabCustom": "Custom",
-  "nftPickerChain": "Chain",
-  "nftPickerContract": "Contract Address",
-  "nftPickerTokenId": "Token ID",
-  "nftPickerVerifyOwnership": "Verify Ownership & Preview",
-  "nftPickerUseAsAvatar": "Use as Avatar",
-  "nftPickerPreview": "Preview",
-  "nftPickerNotOwned": "You do not own this NFT",
-  "nftPickerInvalidTokenId": "Invalid token ID",
-  "nftPickerEnterBoth": "Enter contract address and token ID",
-  "nftPickerInfoTitle": "NFT Avatar — Verified On-Chain",
-  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
-  "nftPickerPopularCollections": "Popular Collections",
-  "nftPickerWalletHint": "Connect your N42 wallet to automatically discover your NFTs across 236+ chains.",
-  "profileBindNftAvatar": "Bind NFT Avatar",
-  "profileChangeAvatar": "Change Avatar",
-  "groupTopics": "Topics",
-  "groupTopicsEmpty": "No topics yet",
-  "syncInProgress": "Syncing message history...",
-  "recoveryKeyReminderTitle": "Protect your messages",
-  "recoveryKeyReminderDesc": "Create a recovery key to securely sync encrypted messages across devices",
-  "recoveryKeySetupNow": "Set up now",
-  "recoveryKeyRemindLater": "Remind me later"
+  "web3NoN42AccountTitle": "Không có tài khoản N42",
+  "web3NoN42AccountDesc": "Địa chỉ ví này chưa có tài khoản N42. Bạn có thể chia sẻ liên kết mời N42 của mình với họ để bắt đầu.",
+  "web3ShareInvite": "Chia sẻ Mời",
+  "nftPickerTitle": "Chọn Hình đại diện NFT",
+  "nftPickerTabPopular": "phổ biến",
+  "nftPickerTabCustom": "tùy chỉnh",
+  "nftPickerChain": "Chuỗi",
+  "nftPickerContract": "Địa chỉ hợp đồng",
+  "nftPickerTokenId": "ID mã thông báo",
+  "nftPickerVerifyOwnership": "Xác minh quyền sở hữu và xem trước",
+  "nftPickerUseAsAvatar": "Sử dụng làm Hình đại diện",
+  "nftPickerPreview": "Xem trước",
+  "nftPickerNotOwned": "Bạn không sở hữu NFT này",
+  "nftPickerInvalidTokenId": "ID mã thông báo không hợp lệ",
+  "nftPickerEnterBoth": "Nhập địa chỉ hợp đồng và ID mã thông báo",
+  "nftPickerInfoTitle": "Avatar NFT — Đã được xác minh trên chuỗi",
+  "nftPickerInfoDesc": "Liên kết NFT mà bạn sở hữu làm hình đại diện của mình. Bất cứ ai cũng có thể xác minh quyền sở hữu trên chuỗi. Được trưng bày với một chiếc nhẫn vàng trên N42.",
+  "nftPickerPopularCollections": "Bộ sưu tập phổ biến",
+  "nftPickerWalletHint": "Kết nối ví N42 của bạn để tự động khám phá NFT của bạn trên hơn 236 chuỗi.",
+  "profileBindNftAvatar": "Liên kết hình đại diện NFT",
+  "profileChangeAvatar": "Thay đổi hình đại diện",
+  "groupTopics": "chủ đề",
+  "groupTopicsEmpty": "Chưa có chủ đề nào",
+  "syncInProgress": "Đang đồng bộ hóa lịch sử tin nhắn...",
+  "recoveryKeyReminderTitle": "Bảo vệ tin nhắn của bạn",
+  "recoveryKeyReminderDesc": "Tạo khóa khôi phục để đồng bộ hóa an toàn các tin nhắn được mã hóa trên các thiết bị",
+  "recoveryKeySetupNow": "Thiết lập ngay bây giờ",
+  "recoveryKeyRemindLater": "Nhắc tôi sau",
+  "channelReadOnly": "Chỉ quản trị viên mới có thể đăng bài trên kênh này",
+  "channelSubscribers": "người đăng ký",
+  "channelVerified": "Kênh đã được xác minh",
+  "redPacketHistory": "Lịch sử gói màu đỏ",
+  "redPacketSent": "Đã gửi",
+  "redPacketReceived": "Đã nhận",
+  "redPacketExpired": "Đã hết hạn",
+  "redPacketClaimed": "Đã xác nhận quyền sở hữu",
+  "redPacketInsufficientBalance": "Số dư không đủ",
+  "selfDestructCountdown": "Tự hủy trong {time}",
+  "@selfDestructCountdown": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "messageDestroyed": "Tin nhắn bị hủy",
+  "miniAppPermissionDenied": "Quyền bị từ chối: {permission}",
+  "@miniAppPermissionDenied": {
+    "placeholders": {
+      "permission": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSuggestionGasFee": "Phí gas là gì?",
+  "aiSuggestionDefi": "Hướng dẫn cho người mới bắt đầu DeFi",
+  "aiSuggestionSecurity": "Cách kiểm tra bảo mật hợp đồng",
+  "aiSuggestionBridge": "Cầu nối chuỗi chéo",
+  "channelDiscoverTitle": "Khám phá kênh",
+  "channelDiscoverSearch": "Tìm kiếm kênh...",
+  "channelJoin": "Tham gia",
+  "channelJoined": "Đã tham gia",
+  "channelCategory": "Danh mục",
+  "slowModeCooldown": "Chế độ chậm: chờ {seconds}s",
+  "@slowModeCooldown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "addressCopyAction": "Sao chép địa chỉ",
+  "addressSendMessage": "Gửi tin nhắn",
+  "addressViewProfile": "Xem hồ sơ",
+  "sendToAddress": "Gửi đến địa chỉ ví",
+  "blocAuthSendVerificationCodeFailed": "Không gửi được mã xác minh",
+  "blocAuthServerNoEmailPasswordReset": "Máy chủ này không hỗ trợ đặt lại mật khẩu email",
+  "blocAuthResetPasswordFailed": "Không thể đặt lại mật khẩu",
+  "blocAuthChangePasswordFailed": "Không thể thay đổi mật khẩu",
+  "blocAuthOldPasswordWrong": "Mật khẩu hiện tại không chính xác",
+  "blocAuthLoginCancelled": "Đăng nhập bị hủy",
+  "blocAuthGoogleLoginFailed": "Đăng nhập Google không thành công",
+  "blocAuthAppleLoginFailed": "Đăng nhập Apple không thành công",
+  "blocAuthSsoLoginFailed": "Đăng nhập SSO không thành công",
+  "blocAuthFacebookLoginFailed": "Đăng nhập Facebook không thành công",
+  "blocAuthTwitterLoginFailed": "Đăng nhập Twitter không thành công",
+  "blocAuthWeChatLoginFailed": "Đăng nhập WeChat không thành công",
+  "blocAuthWeChatNotConfigured": "Đăng nhập WeChat không được định cấu hình",
+  "blocAuthWeChatNotInstalled": "Vui lòng cài đặt WeChat trước",
+  "blocAuthPasswordWrong": "Mật khẩu không chính xác",
+  "blocAuthEmailAlreadyBound": "Email này đã được liên kết với một tài khoản khác",
+  "blocAuthChangeEmailFailed": "Không thể thay đổi email",
+  "blocAuthVerificationCodeInvalid": "Mã xác minh không chính xác hoặc đã hết hạn",
+  "blocAuthSessionExpired": "Phiên đã hết hạn, vui lòng đăng nhập lại",
+  "blocAuthSessionIncomplete": "Dữ liệu phiên không đầy đủ, vui lòng đăng nhập lại",
+  "@redPacketStatsTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }

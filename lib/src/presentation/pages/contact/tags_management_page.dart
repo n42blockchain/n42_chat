@@ -98,7 +98,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
           ),
         ],
       ),
-    );
+    ).then((_) => controller.dispose());
   }
 
   void _editTag(int index) {
@@ -134,7 +134,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
           ),
         ],
       ),
-    );
+    ).then((_) => controller.dispose());
   }
 
   void _deleteTag(int index) {

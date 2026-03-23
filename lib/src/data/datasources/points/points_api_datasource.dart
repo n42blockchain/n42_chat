@@ -18,24 +18,24 @@ class PointsApiDatasource {
         _getAccessToken = getAccessToken,
         _httpClient = httpClient ?? http.Client();
 
-  Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        if (_getAccessToken() != null)
-          'Authorization': 'Bearer ${_getAccessToken()}',
-      };
+  Map<String, String> get _headers {
+    final token = _getAccessToken();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
 
   /// Get points balance for a user in a room.
   Future<Map<String, dynamic>> getBalance(
     String userId,
     String roomId,
   ) async {
+    final uri = Uri.parse('$_baseUrl/api/points/balance').replace(
+      queryParameters: {'userId': userId, 'roomId': roomId},
+    );
     final response = await _httpClient
-        .get(
-          Uri.parse(
-            '$_baseUrl/api/points/balance?userId=$userId&roomId=$roomId',
-          ),
-          headers: _headers,
-        )
+        .get(uri, headers: _headers)
         .timeout(const Duration(seconds: 10));
 
     if (response.statusCode != 200) {
@@ -51,14 +51,16 @@ class PointsApiDatasource {
     int limit = 50,
     int offset = 0,
   }) async {
+    final uri = Uri.parse('$_baseUrl/api/points/transactions').replace(
+      queryParameters: {
+        'userId': userId,
+        'roomId': roomId,
+        'limit': limit.toString(),
+        'offset': offset.toString(),
+      },
+    );
     final response = await _httpClient
-        .get(
-          Uri.parse(
-            '$_baseUrl/api/points/transactions'
-            '?userId=$userId&roomId=$roomId&limit=$limit&offset=$offset',
-          ),
-          headers: _headers,
-        )
+        .get(uri, headers: _headers)
         .timeout(const Duration(seconds: 10));
 
     if (response.statusCode != 200) {
@@ -73,13 +75,11 @@ class PointsApiDatasource {
     String roomId, {
     int limit = 50,
   }) async {
+    final uri = Uri.parse('$_baseUrl/api/points/leaderboard').replace(
+      queryParameters: {'roomId': roomId, 'limit': limit.toString()},
+    );
     final response = await _httpClient
-        .get(
-          Uri.parse(
-            '$_baseUrl/api/points/leaderboard?roomId=$roomId&limit=$limit',
-          ),
-          headers: _headers,
-        )
+        .get(uri, headers: _headers)
         .timeout(const Duration(seconds: 10));
 
     if (response.statusCode != 200) {
@@ -118,11 +118,11 @@ class PointsApiDatasource {
 
   /// Get the points configuration for a room.
   Future<Map<String, dynamic>> getConfig(String roomId) async {
+    final uri = Uri.parse('$_baseUrl/api/points/config').replace(
+      queryParameters: {'roomId': roomId},
+    );
     final response = await _httpClient
-        .get(
-          Uri.parse('$_baseUrl/api/points/config?roomId=$roomId'),
-          headers: _headers,
-        )
+        .get(uri, headers: _headers)
         .timeout(const Duration(seconds: 10));
 
     if (response.statusCode != 200) {
@@ -148,11 +148,11 @@ class PointsApiDatasource {
 
   /// Get available redemption items for a room.
   Future<List<Map<String, dynamic>>> getRedemptionItems(String roomId) async {
+    final uri = Uri.parse('$_baseUrl/api/points/redemptions').replace(
+      queryParameters: {'roomId': roomId},
+    );
     final response = await _httpClient
-        .get(
-          Uri.parse('$_baseUrl/api/points/redemptions?roomId=$roomId'),
-          headers: _headers,
-        )
+        .get(uri, headers: _headers)
         .timeout(const Duration(seconds: 10));
 
     if (response.statusCode != 200) {
@@ -191,14 +191,15 @@ class PointsApiDatasource {
     String roomId,
     String actionType,
   ) async {
+    final uri = Uri.parse('$_baseUrl/api/points/daily-count').replace(
+      queryParameters: {
+        'userId': userId,
+        'roomId': roomId,
+        'actionType': actionType,
+      },
+    );
     final response = await _httpClient
-        .get(
-          Uri.parse(
-            '$_baseUrl/api/points/daily-count'
-            '?userId=$userId&roomId=$roomId&actionType=$actionType',
-          ),
-          headers: _headers,
-        )
+        .get(uri, headers: _headers)
         .timeout(const Duration(seconds: 10));
 
     if (response.statusCode != 200) {

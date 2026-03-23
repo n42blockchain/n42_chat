@@ -23,10 +23,20 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   @override
   Stream<List<ConversationEntity>> watchConversations() {
-    return _roomDataSource.onRoomsChanged?.map(
-          (rooms) => rooms.map(_mapRoomToEntity).toList(),
-        ) ??
-        const Stream.empty();
+    final roomStream = _roomDataSource.onRoomsChanged;
+    if (roomStream == null) {
+      return const Stream.empty();
+    }
+
+    return _watchMappedRooms<List<matrix.Room>, List<ConversationEntity>>(
+      roomStream: roomStream,
+      mapValue: (rooms) => rooms.map(_mapRoomToEntity).toList(growable: false),
+      hasTypingUsers: (conversations) =>
+          conversations.any((item) => item.hasTypingUsers),
+      refreshValue: () =>
+          _roomDataSource.getSortedRooms().map(_mapRoomToEntity).toList(),
+      timeoutFromRooms: _typingTimeoutFromRooms,
+    );
   }
 
   @override
@@ -38,16 +48,30 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   @override
   Stream<ConversationEntity?> watchConversation(String id) {
-    return _roomDataSource.watchRoom(id)?.map((room) {
-          if (room == null) return null;
-          return _mapRoomToEntity(room);
-        }) ??
-        const Stream.empty();
+    final roomStream = _roomDataSource.watchRoom(id);
+    if (roomStream == null) {
+      return const Stream.empty();
+    }
+
+    return _watchMappedRooms<matrix.Room?, ConversationEntity?>(
+      roomStream: roomStream,
+      mapValue: (room) => room == null ? null : _mapRoomToEntity(room),
+      hasTypingUsers: (conversation) => conversation?.hasTypingUsers ?? false,
+      refreshValue: () {
+        final room = _roomDataSource.getRoomById(id);
+        return room == null ? null : _mapRoomToEntity(room);
+      },
+      timeoutFromRooms: (room) => room?.client.typingIndicatorTimeout,
+    );
   }
 
   @override
   Future<ConversationEntity> createDirectChat(String userId) async {
-    final roomId = await _roomDataSource.createDirectChat(userId);
+    final encrypted = await _secureStorage.shouldDefaultEncryptNewChats();
+    final roomId = await _roomDataSource.createDirectChat(
+      userId,
+      encrypted: encrypted,
+    );
     final room = _roomDataSource.getRoomById(roomId);
     if (room == null) {
       throw Exception('Failed to create direct chat');
@@ -93,7 +117,31 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   @override
   Future<void> setMuted(String conversationId, bool muted) async {
-    await _roomDataSource.setRoomMuted(conversationId, muted);
+    await setNotificationMode(
+      conversationId,
+      muted
+          ? ConversationNotificationMode.muted
+          : ConversationNotificationMode.allMessages,
+    );
+  }
+
+  @override
+  Future<void> setNotificationMode(
+    String conversationId,
+    ConversationNotificationMode mode,
+  ) async {
+    await _roomDataSource.setRoomNotificationMode(conversationId, mode);
+  }
+
+  @override
+  Future<ConversationNotificationMode> getNotificationMode(
+    String conversationId,
+  ) async {
+    final room = _roomDataSource.getRoomById(conversationId);
+    if (room == null) {
+      return ConversationNotificationMode.allMessages;
+    }
+    return _roomDataSource.getRoomNotificationMode(room);
   }
 
   @override
@@ -154,26 +202,27 @@ class ConversationRepositoryImpl implements IConversationRepository {
   /// 将Matrix Room转换为ConversationEntity
   ConversationEntity _mapRoomToEntity(matrix.Room room) {
     final lastMessageTime = _roomDataSource.getLastMessageTime(room);
-    
+
     // 获取头像和成员信息
     String? avatarUrl;
     List<String?>? memberAvatarUrls;
     List<String>? memberNames;
     List<String>? memberIds;
-    
+
     if (room.isDirectChat) {
       // 私聊：获取对方用户的真实头像
       final partner = _roomDataSource.getDirectChatPartner(room);
       final mxcUrl = partner?.avatarUrl?.toString();
-      
+
       // 只使用用户明确设置的头像（非空且非默认占位图）
       if (mxcUrl != null && mxcUrl.isNotEmpty && mxcUrl.startsWith('mxc://')) {
         // 检查是否是服务器默认头像（跳过 identicon 和其他默认图）
         // tuwunel/Synapse 可能使用不同的默认头像 URL 模式
-        final isDefaultAvatar = mxcUrl.contains('identicon') ||
+        final isDefaultAvatar =
+            mxcUrl.contains('identicon') ||
             mxcUrl.contains('default') ||
             mxcUrl.contains('placeholder');
-        
+
         if (!isDefaultAvatar) {
           avatarUrl = MatrixUtils.mxcToHttp(
             mxcUrl,
@@ -199,7 +248,17 @@ class ConversationRepositoryImpl implements IConversationRepository {
     if (room.isDirectChat) {
       directUserId = room.directChatMatrixID;
     }
-    
+
+    final currentUserId = room.client.userID;
+    final typingUsers = room.typingUsers
+        .where((user) => user.id != currentUserId)
+        .map((user) {
+          final displayName = user.calcDisplayname().trim();
+          return displayName.isNotEmpty ? displayName : user.id;
+        })
+        .toSet()
+        .toList(growable: false);
+
     return ConversationEntity(
       id: room.id,
       name: _roomDataSource.getRoomDisplayName(room),
@@ -219,16 +278,87 @@ class ConversationRepositoryImpl implements IConversationRepository {
       memberAvatarUrls: memberAvatarUrls,
       memberNames: memberNames,
       memberIds: memberIds,
+      hasTypingUsers: typingUsers.isNotEmpty,
+      typingUsers: typingUsers,
       directUserId: directUserId,
     );
   }
-  
+
+  Stream<T> _watchMappedRooms<S, T>({
+    required Stream<S> roomStream,
+    required T Function(S value) mapValue,
+    required bool Function(T value) hasTypingUsers,
+    required T Function() refreshValue,
+    required Duration? Function(S value) timeoutFromRooms,
+  }) {
+    late final StreamController<T> controller;
+    StreamSubscription<S>? subscription;
+    Timer? refreshTimer;
+
+    void scheduleRefresh(S value, T mapped) {
+      refreshTimer?.cancel();
+      refreshTimer = null;
+
+      if (!hasTypingUsers(mapped)) {
+        return;
+      }
+
+      final timeout = timeoutFromRooms(value);
+      if (timeout == null) {
+        return;
+      }
+
+      refreshTimer = Timer(timeout + const Duration(milliseconds: 250), () {
+        if (!controller.isClosed) {
+          controller.add(refreshValue());
+        }
+      });
+    }
+
+    controller = StreamController<T>(
+      onListen: () {
+        subscription = roomStream.listen(
+          (value) {
+            final mapped = mapValue(value);
+            if (!controller.isClosed) {
+              controller.add(mapped);
+            }
+            scheduleRefresh(value, mapped);
+          },
+          onError: controller.addError,
+          onDone: () {
+            refreshTimer?.cancel();
+            controller.close();
+          },
+        );
+      },
+      onCancel: () async {
+        refreshTimer?.cancel();
+        await subscription?.cancel();
+      },
+    );
+
+    return controller.stream;
+  }
+
+  Duration? _typingTimeoutFromRooms(List<matrix.Room> rooms) {
+    for (final room in rooms) {
+      if (room.typingUsers.isNotEmpty) {
+        return room.client.typingIndicatorTimeout;
+      }
+    }
+    return null;
+  }
+
   /// 获取群成员头像、名称和ID列表（最多17个，用于群详情页显示）
   /// 参照微信：包含自己，按加入顺序排列
   ///
   /// 优化：首次渲染时返回空列表，UI 异步加载
   /// 将首次渲染从 800ms 降至约 200ms
-  (List<String?>, List<String>, List<String>) _getGroupMemberInfo(matrix.Room room, {bool lazyLoad = true}) {
+  (List<String?>, List<String>, List<String>) _getGroupMemberInfo(
+    matrix.Room room, {
+    bool lazyLoad = true,
+  }) {
     // 首次渲染使用懒加载模式，返回空列表让 UI 快速显示
     // 后续 UI 层会异步请求完整成员信息
     if (lazyLoad) {
@@ -258,7 +388,8 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
       // 检查是否是用户自定义头像（排除服务器默认头像）
       if (mxcUri != null && mxcUri.isNotEmpty && mxcUri.startsWith('mxc://')) {
-        final isDefaultAvatar = mxcUri.contains('identicon') ||
+        final isDefaultAvatar =
+            mxcUri.contains('identicon') ||
             mxcUri.contains('default') ||
             mxcUri.contains('placeholder');
 
@@ -282,4 +413,3 @@ class ConversationRepositoryImpl implements IConversationRepository {
     return (avatarUrls, names, ids);
   }
 }
-

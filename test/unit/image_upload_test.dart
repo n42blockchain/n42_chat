@@ -116,7 +116,7 @@ void main() {
         'image.png': 'image/png',
         'image.gif': 'image/gif',
         'image.webp': 'image/webp',
-        'image.heic': 'image/jpeg', // HEIC 转换为 JPEG
+        'image.heic': 'image/heic',
         'audio.m4a': 'audio/mp4',
         'audio.mp3': 'audio/mpeg',
         'audio.ogg': 'audio/ogg',
@@ -161,8 +161,10 @@ String _getMimeTypeFromFilename(String filename) {
     return 'image/gif';
   } else if (lowerFilename.endsWith('.webp')) {
     return 'image/webp';
-  } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
-    return 'image/jpeg'; // HEIC/HEIF 通常需要转换
+  } else if (lowerFilename.endsWith('.heic')) {
+    return 'image/heic';
+  } else if (lowerFilename.endsWith('.heif')) {
+    return 'image/heif';
   }
   
   // 音频
@@ -198,4 +200,3 @@ String _ensureExtension(String filename, String defaultExtension) {
   }
   return filename + defaultExtension;
 }
-

@@ -8,6 +8,10 @@
   "chatCallBack": "折り返し電話",
   "chatMissedVideoCall": "不在ビデオ通話",
   "chatMissedVoiceCall": "不在音声通話",
+  "chatCallNotAnswered": "応答なし",
+  "chatCallDurationLabel": "通話時間",
+  "chatVoiceCallCancelled": "音声通話がキャンセルされました",
+  "chatVideoCallCancelled": "ビデオ通話がキャンセルされました",
   "commonImage": "[画像]",
   "chatVideo": "[動画]",
   "chatVoice": "[音声]",
@@ -40,6 +44,7 @@
   "chatCopied": "コピーしました",
   "storySendMessageHint": "メッセージを送信",
   "commonMicrophonePermissionRequired": "マイクの使用を許可してください",
+  "chatMicrophonePermissionDeniedPermanent": "マイクの許可が拒否されました。音声メッセージを使用するには、システム設定で有効にしてください。",
   "commonStartRecordingFailed": "録音の開始に失敗しました: {error}",
   "commonRecordingTooShort": "録音が短すぎます",
   "commonStopRecordingFailed": "録音の停止に失敗しました: {error}",
@@ -99,11 +104,12 @@
   "commonN42RedPacket": "N42レッドパケット",
   "commonClaimed": "受け取り済み",
   "commonAllClaimed": "すべて受け取り済み",
+  "chatReadAloud": "声に出して読む",
   "chatReply": "返信",
   "commonEdit": "編集",
   "chatSelectForwardTarget": "転送先を選択",
   "commonSendCount": "送信 ({count})",
-  "contactN42Id": "N42 ID: {id}",
+  "contactN42Id": "N42 ID:{id}",
   "profileN42IdTitle": "N42 ID",
   "profileN42Bean": "N42ビーン",
   "contactFriendInfo": "友達情報",
@@ -196,7 +202,7 @@
   "contactTryOtherKeywords": "他のキーワードまたはグローバル検索を試してください",
   "contactSearchResults": "検索結果",
   "contactNewFriends": "新しい友達",
-  "contactChatOnlyFriends": "Chat-only Friends",
+  "contactChatOnlyFriends": "チャット専用の友達",
   "contactOfficialAccounts": "公式アカウント",
   "contactServiceAccounts": "サービスアカウント",
   "contactEnterpriseContacts": "企業連絡先",
@@ -255,7 +261,6 @@
   "groupQrCode": "グループQRコード",
   "commonSearchChatHistory": "チャット履歴を検索",
   "groupIdCopied": "グループIDをコピーしました",
-  "commonFeatureInDevelopment": "機能開発中...",
   "transferEnterOrPasteAddress": "ウォレットアドレスを入力または貼り付け",
   "transferSelectToken": "トークンを選択",
   "commonTransferAmount": "送金額",
@@ -392,6 +397,7 @@
   "chatCalling": "発信中...",
   "chatRinging": "呼び出し中...",
   "chatInCall": "通話中",
+  "commonFeatureInDevelopment": "機能開発中...",
   "chatCollectMessages": "{count}件のメッセージをコレクションに追加しました",
   "commonMemberCount": "{count}人のメンバー",
   "groupDone": "完了({count})",
@@ -477,7 +483,6 @@
     }
   },
   "authEnterValidServerAddress": "有効なサーバーアドレスを入力してください",
-  "authEmailOtp": "メールOTP",
   "authEnterServerAddressFirst": "先にサーバーアドレスを入力してください",
   "authPasskeyRequiresServer": "パスキーログインにはサーバーのサポートが必要です",
   "authLoginAgreement": "ログインすることで、以下に同意したものとみなします ",
@@ -561,22 +566,6 @@
   "chatSaving": "保存中...",
   "commonShare": "共有",
   "chatSaveToGallery": "ギャラリーに保存",
-  "chatDownloadFailed": "ダウンロード失敗: {code}",
-  "@chatDownloadFailed": {
-    "placeholders": {
-      "code": {
-        "type": "String"
-      }
-    }
-  },
-  "commonShareFailed": "共有に失敗しました: {error}",
-  "@commonShareFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "chatFailedToLoadImage": "画像の読み込みに失敗しました",
   "chatVideoRecordingFailed": "動画録画に失敗しました。再試行してください。",
   "profileRedPacket": "レッドパケット",
@@ -655,7 +644,7 @@
   "transferScanQrToPayMe": "QRコードをスキャンして支払い",
   "transferMyWalletAddress": "マイウォレットアドレス",
   "transferCreatePaymentRequest": "支払いリクエストを作成",
-  "profileN42IdLabel": "N42 ID: {id}",
+  "profileN42IdLabel": "N42 ID:{id}",
   "@profileN42IdLabel": {
     "placeholders": {
       "id": {
@@ -796,7 +785,6 @@
   "chatMultiChoice": "複数選択",
   "chatEnded": "終了",
   "chatEndPollButton": "投票を終了",
-  "chatEnterPollQuestionHint": "投票の質問を入力してください",
   "chatPollHint": "投票はチャットに表示されます。グループメンバーが投票できます。",
   "chatSearchSongOrArtist": "曲またはアーティストを検索",
   "chatNoSongsFound": "曲が見つかりません",
@@ -846,10 +834,11 @@
     }
   },
   "searchAllResults": "すべて",
-  "searchGroupLabel": "グループ",
-  "searchContactLabel": "連絡先",
-  "searchMessageLabel": "メッセージ",
   "searchInChat": "チャット内を検索",
+  "searchContactLabel": "連絡先",
+  "searchGroupLabel": "グループ",
+  "searchConversationLabel": "会話",
+  "searchMessageLabel": "メッセージ",
   "settingsSecurityTitle": "セキュリティ",
   "settingsKeyBackup": "キーバックアップ",
   "settingsBackupEncryptionKeys": "暗号化キーをバックアップ",
@@ -918,6 +907,21 @@
   "settingsResetEncryptionTitle": "暗号化をリセット",
   "settingsResetEncryptionWarning": "警告: これにより、すべての暗号化キーが削除されます。以前の暗号化されたメッセージを復号化できなくなります。この操作は取り消せません。",
   "settingsReset": "リセット",
+  "settingsBackupSuccess": "キーは正常にバックアップされました",
+  "settingsBackupFailed": "バックアップに失敗しました",
+  "settingsRecoveryKey": "回復キー",
+  "settingsRecoveryKeySaveWarning": "この回復キーを安全な場所に保存してください。新しいデバイスで暗号化されたメッセージを復元するために必要になります。",
+  "settingsRecoveryKeySaved": "保存しました",
+  "settingsRestoreSuccess": "キーは正常に復元されました",
+  "settingsRestoreFailed": "復元に失敗しました",
+  "settingsPassword": "パスワード",
+  "settingsEnterRecoveryKey": "回復キーを入力してください",
+  "settingsEnterPassword": "パスワードを入力してください",
+  "settingsExportSuccess": "キーがサーバー バックアップに正常にエクスポートされました",
+  "settingsExportNeedBackupFirst": "最初にキーのバックアップを作成してください",
+  "settingsExportFailed": "エクスポートに失敗しました",
+  "settingsResetSuccess": "暗号化のリセットが成功しました",
+  "settingsResetFailed": "リセットに失敗しました",
   "callLeaveMeetingConfirm": "ミーティングを退出してもよろしいですか？",
   "chatPokedSomeone": "{name}{suffix}をつついた",
   "@chatPokedSomeone": {
@@ -1100,6 +1104,7 @@
   "chatCreatePollTitle": "投票を作成",
   "chatSubmitPoll": "送信",
   "chatPollQuestionLabel": "投票の質問",
+  "chatEnterPollQuestionHint": "投票の質問を入力してください",
   "chatPollOptionsLabel": "投票オプション",
   "chatOptionHintWithIndex": "オプション {index}",
   "@chatOptionHintWithIndex": {
@@ -1277,7 +1282,22 @@
       }
     }
   },
+  "@chatSelectFileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatNoMediaUrlAvailable": "メディアURLがありません",
+  "chatDownloadFailed": "ダウンロード失敗: {code}",
+  "@chatDownloadFailed": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "chatErrorWithMessage": "エラー: {message}",
   "@chatErrorWithMessage": {
     "placeholders": {
@@ -1288,6 +1308,14 @@
   },
   "chatMusicLinkLabel": "音楽リンク",
   "chatRedPacketTransferCannotForward": "紅包と送金は転送できません",
+  "commonShareFailed": "共有に失敗しました: {error}",
+  "@commonShareFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "commonTapToRetry": "タップして再試行",
   "chatDefaultRedPacketGreeting": "金運上昇、幸福をお祈りします",
   "groupAllowOthersToSearchAndJoin": "他のユーザーが検索して参加することを許可する",
@@ -1298,30 +1326,52 @@
   "groupEnterGroupAnnouncement": "グループお知らせを入力",
   "groupMemberCountClickToCopy": "{count}人、クリックしてグループIDをコピー",
   "groupNoPermissionToEditGroupName": "グループ名を編集する権限がありません",
-  "commonAppleLogin": "Appleでサインイン",
-  "settingsChangeEmailFailed": "メールアドレスの変更に失敗しました",
-  "settingsChangePassword": "パスワードを変更",
-  "settingsChangePasswordFailed": "パスワードの変更に失敗しました",
-  "settingsChangePasswordInfo": "パスワードを変更すると、ログアウトされ、新しいパスワードでログインする必要があります。",
-  "settingsCodeSentTo": "確認コードの送信先",
-  "commonConfirmNewPassword": "新しいパスワードを確認",
-  "searchConversationLabel": "会話",
-  "settingsCurrentBoundEmail": "現在紐付けられているメールアドレス",
-  "settingsCurrentPassword": "現在のパスワード",
-  "settingsDidNotReceiveCode": "コードが届きませんか？",
   "authEmailAddress": "メールアドレス",
-  "settingsEmailChangedSuccess": "メールアドレスが正常に変更されました",
-  "authEmailRecoveryHint": "パスワードの回復に使用されます",
-  "settingsEmailSecurityNote": "メールアドレスはパスワードの回復に使用されます。安全に保管してください。",
-  "settingsEnterCurrentPassword": "現在のパスワードを入力",
   "commonEnterEmailAddress": "メールアドレスを入力",
-  "settingsEnterNewEmail": "新しいメールアドレスを入力",
-  "settingsEnterNewPassword": "新しいパスワードを入力",
-  "authEnterRegisteredEmail": "登録時のメールアドレスを入力してください",
-  "authEnterResetCode": "リセットコードを入力",
-  "commonGoogleLogin": "Googleでサインイン",
-  "commonWechat": "WeChat",
+  "authEmailRecoveryHint": "パスワードの回復に使用されます",
   "commonInvalidEmailFormat": "有効なメールアドレスを入力してください",
+  "authOptional": "任意",
+  "authResetPassword": "パスワードをリセット",
+  "authEnterRegisteredEmail": "登録時のメールアドレスを入力してください",
+  "authSendResetCode": "リセットコードを送信",
+  "authResetCodeSent": "リセットコードを{email}に送信しました",
+  "@authResetCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authEnterResetCode": "リセットコードを入力",
+  "authSetNewPassword": "新しいパスワードを設定",
+  "commonConfirmNewPassword": "新しいパスワードを確認",
+  "commonNewPassword": "新しいパスワード",
+  "authPasswordResetSuccess": "パスワードが正常にリセットされました。新しいパスワードでログインしてください。",
+  "authResetPasswordFailed": "パスワードのリセットに失敗しました",
+  "settingsChangePassword": "パスワードを変更",
+  "settingsCurrentPassword": "現在のパスワード",
+  "settingsEnterCurrentPassword": "現在のパスワードを入力",
+  "settingsEnterNewPassword": "新しいパスワードを入力",
+  "settingsPasswordChanged": "パスワードが正常に変更されました。新しいパスワードでログインしてください。",
+  "settingsChangePasswordFailed": "パスワードの変更に失敗しました",
+  "settingsNewPasswordMustBeDifferent": "新しいパスワードは現在のパスワードと異なる必要があります",
+  "settingsChangePasswordInfo": "パスワードを変更すると、ログアウトされ、新しいパスワードでログインする必要があります。",
+  "settingsPasswordRequirements": "パスワード要件：",
+  "settingsSecurityNote": "セキュリティのため、パスワード変更後はすべてのデバイスで再ログインが必要です。",
+  "settingsSecurity": "セキュリティ",
+  "settingsCurrentBoundEmail": "現在紐付けられているメールアドレス",
+  "settingsNewEmailAddress": "新しいメールアドレス",
+  "settingsEnterNewEmail": "新しいメールアドレスを入力",
+  "settingsVerificationCode": "確認コード",
+  "settingsVerificationCodeSent": "確認コードが送信されました",
+  "settingsCodeSentTo": "確認コードの送信先",
+  "settingsDidNotReceiveCode": "コードが届きませんか？",
+  "settingsEmailChangedSuccess": "メールアドレスが正常に変更されました",
+  "settingsChangeEmailFailed": "メールアドレスの変更に失敗しました",
+  "settingsEmailSecurityNote": "メールアドレスはパスワードの回復に使用されます。安全に保管してください。",
+  "commonGoogleLogin": "Googleでサインイン",
+  "commonAppleLogin": "Appleでサインイン",
+  "commonWechat": "微信",
   "settingsLanguage": "言語",
   "settingsLanguageChanged": "言語が変更されました",
   "settingsTranslation": "翻訳",
@@ -1329,28 +1379,64 @@
   "settingsTranslateDescription": "メッセージを翻訳する言語を選択してください。",
   "settingsAutoTranslate": "受信メッセージを自動翻訳",
   "settingsAutoTranslateDescription": "チャットで受信したメッセージを選択した言語に自動翻訳します。",
-  "settingsNewEmailAddress": "新しいメールアドレス",
-  "commonNewPassword": "新しいパスワード",
-  "settingsNewPasswordMustBeDifferent": "新しいパスワードは現在のパスワードと異なる必要があります",
-  "authOptional": "任意",
-  "settingsPasswordChanged": "パスワードが正常に変更されました。新しいパスワードでログインしてください。",
-  "settingsPasswordRequirements": "パスワード要件：",
-  "authPasswordResetSuccess": "パスワードが正常にリセットされました。新しいパスワードでログインしてください。",
-  "authResetCodeSent": "リセットコードを{email}に送信しました",
-  "authResetPassword": "パスワードをリセット",
-  "authResetPasswordFailed": "パスワードのリセットに失敗しました",
-  "settingsSecurity": "セキュリティ",
-  "settingsSecurityNote": "セキュリティのため、パスワード変更後はすべてのデバイスで再ログインが必要です。",
-  "authSendResetCode": "リセットコードを送信",
-  "authSetNewPassword": "新しいパスワードを設定",
-  "settingsVerificationCode": "確認コード",
-  "settingsVerificationCodeSent": "確認コードが送信されました",
+  "settingsBiometricLogin": "生体認証ログイン",
+  "authLoginWithBiometric": "{type}でログイン",
+  "@authLoginWithBiometric": {
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      }
+    }
+  },
+  "settingsBiometricLoginEnabled": "生体認証ログインが有効になりました",
+  "settingsBiometricLoginDisabled": "生体認証ログインが無効になりました",
+  "settingsEnableBiometricLogin": "生体認証ログインを有効にする",
+  "settingsBiometricEnabled": "有効 - 生体認証でログイン",
+  "settingsBiometricDisabled": "無効 - タップして有効にする",
+  "settingsBiometricNeedRelogin": "生体認証ログインを有効にするには、ログアウトして再度ログインしてください",
+  "authOr": "または",
   "qrcodeCameraPermissionRestricted": "このデバイスではカメラアクセスが制限されています",
-  "contactCreateTag": "Create Tag",
-  "contactEnterTagName": "Enter tag name",
-  "contactEditTag": "Edit Tag",
-  "contactDeleteTag": "Delete Tag",
-  "contactDeleteTagConfirm": "Are you sure you want to delete the tag \"{tagName}\"?",
+  "authPasskeyLabel": "パスキー",
+  "authGoogleLabel": "グーグル",
+  "authAppleLabel": "アップル",
+  "authSsoLabel": "SSO",
+  "transferAmountHintZero": "0.00",
+  "commonMatrixIdHint": "@username:server.com",
+  "authServerAddressHint": "https://m.si46.world",
+  "authEmailExampleHint": "example@email.com",
+  "authVerificationCodePlaceholder": "------",
+  "profileEnterPokeSuffixHint": "つつきの接尾辞を入力、例：肩を",
+  "groupAlbum": "グループアルバム",
+  "groupFiles": "グループファイル",
+  "groupImages": "画像",
+  "groupVideos": "動画",
+  "groupTotal": "合計",
+  "groupSize": "サイズ",
+  "groupNoMedia": "メディアなし",
+  "groupNoMediaDescription": "このグループにはまだ写真や動画がありません",
+  "groupDocuments": "ドキュメント",
+  "groupNoFiles": "ファイルなし",
+  "groupNoFilesDescription": "このグループにはまだファイルがありません",
+  "groupDownloadStarted": "{filename}をダウンロード中...",
+  "@groupDownloadStarted": {
+    "placeholders": {
+      "filename": {
+        "type": "String"
+      }
+    }
+  },
+  "contactNoCommonGroups": "共通のグループはありません",
+  "contactNoCommonGroupsDescription": "共通のグループがありません",
+  "chatVoiceMessage": "音声",
+  "chatMessage": "メッセージ",
+  "conversationHideChat": "非表示",
+  "settingsQuickReply": "クイック返信",
+  "commonTranslate": "翻訳",
+  "contactCreateTag": "タグの作成",
+  "contactEnterTagName": "タグ名を入力してください",
+  "contactEditTag": "タグの編集",
+  "contactDeleteTag": "タグの削除",
+  "contactDeleteTagConfirm": "タグ「{tagName}」を削除してもよろしいですか?",
   "@contactDeleteTagConfirm": {
     "placeholders": {
       "tagName": {
@@ -1358,39 +1444,39 @@
       }
     }
   },
-  "contactNoTags": "No tags yet",
-  "contactFriendPermissions": "Friend Permissions",
-  "contactSetChatOnly": "Set as Chat-only",
-  "contactChatOnlyDesc": "Can only chat with you, other content will be hidden",
-  "contactHideMyMoments": "Hide My Moments",
-  "contactHideMyMomentsDesc": "This friend cannot see my Moments",
-  "contactHideTheirMoments": "Hide Their Moments",
-  "contactHideTheirMomentsDesc": "Don't see this friend's Moments",
-  "contactHideMyStatus": "Hide My Status",
-  "contactHideMyStatusDesc": "This friend cannot see my status updates",
-  "contactNoChatOnlyFriends": "No chat-only friends",
-  "contactNoOfficialAccounts": "No official accounts",
-  "contactFollowOfficialAccountsDesc": "Follow official accounts to get the latest updates",
-  "contactNoServiceAccounts": "No service accounts",
-  "contactSubscribeServiceAccountsDesc": "Subscribe to service accounts for convenient services",
-  "contactNoEnterpriseContacts": "No enterprise contacts",
-  "contactEnterpriseContactsDesc": "Enterprise contacts will be displayed here",
-  "profileCardPack": "Card Pack",
-  "profileOrders": "Orders",
-  "profileNoOrders": "No orders",
-  "profileOrdersDesc": "Your orders will be displayed here",
-  "profileNoCards": "No cards",
-  "profileCardsDesc": "Your cards will be displayed here",
-  "favoriteEnterTagsHint": "Enter tags separated by commas",
-  "favoriteTagsUpdated": "Tags updated",
-  "favoriteForwardedContent": "Content forwarded",
-  "favoriteEnterNoteContent": "Enter note content",
-  "favoriteNoteAdded": "Note added",
-  "favoriteLinkTitle": "Link title",
+  "contactNoTags": "まだタグがありません",
+  "contactFriendPermissions": "友達の権限",
+  "contactSetChatOnly": "チャット専用として設定",
+  "contactChatOnlyDesc": "あなたとのみチャットできます。他のコンテンツは非表示になります",
+  "contactHideMyMoments": "私の瞬間を隠す",
+  "contactHideMyMomentsDesc": "この友達は私のモーメントを見ることができません",
+  "contactHideTheirMoments": "瞬間を隠す",
+  "contactHideTheirMomentsDesc": "この友達のモーメントを表示しない",
+  "contactHideMyStatus": "自分のステータスを隠す",
+  "contactHideMyStatusDesc": "この友人は私のステータス更新を見ることができません",
+  "contactNoChatOnlyFriends": "チャット専用の友達はいません",
+  "contactNoOfficialAccounts": "公式アカウントはありません",
+  "contactFollowOfficialAccountsDesc": "公式アカウントをフォローして最新情報を入手してください",
+  "contactNoServiceAccounts": "サービスアカウントがありません",
+  "contactSubscribeServiceAccountsDesc": "便利なサービスを利用するためのサービスアカウントを購読する",
+  "contactNoEnterpriseContacts": "企業の連絡先はありません",
+  "contactEnterpriseContactsDesc": "企業の連絡先がここに表示されます",
+  "profileCardPack": "カードパック",
+  "profileOrders": "注文",
+  "profileNoOrders": "注文はありません",
+  "profileOrdersDesc": "ご注文はここに表示されます",
+  "profileNoCards": "カードなし",
+  "profileCardsDesc": "ここにカードが表示されます",
+  "favoriteEnterTagsHint": "タグをカンマで区切って入力します",
+  "favoriteTagsUpdated": "タグが更新されました",
+  "favoriteForwardedContent": "転送されたコンテンツ",
+  "favoriteEnterNoteContent": "メモの内容を入力してください",
+  "favoriteNoteAdded": "注記を追加しました",
+  "favoriteLinkTitle": "リンクタイトル",
   "favoriteLinkUrl": "https://",
-  "favoriteLinkAdded": "Link added",
-  "contactPhotoAdded": "Photo added",
-  "contactEnterPhone": "Enter phone number",
+  "favoriteLinkAdded": "リンクを追加しました",
+  "contactPhotoAdded": "写真を追加しました",
+  "contactEnterPhone": "電話番号を入力してください",
   "commonConversationWithId": "会話: {roomId}",
   "commonContactWithId": "連絡先: {userId}",
   "commonDiscover": "発見",
@@ -1409,8 +1495,15 @@
   "settingsDoNotDisturbDescription": "指定時間中は通知を受け取らない",
   "settingsStartTime": "開始時間",
   "settingsEndTime": "終了時間",
+  "settingsDeleteQuickReply": "クイック返信を削除",
+  "settingsEditQuickReply": "クイック返信を編集",
+  "settingsAddQuickReply": "クイック返信を追加",
+  "settingsManageQuickReplies": "クイック返信を管理",
+  "settingsNoQuickReplies": "クイック返信はありません",
+  "settingsDefaultQuickReplies": "デフォルトのクイック返信が表示されます",
   "settingsWhoCanSee": "閲覧可能な人",
   "settingsLastSeen": "最終オンライン",
+  "settingsHiddenChats": "非表示のチャット",
   "settingsMessagesLabel": "メッセージ",
   "settingsAllowStrangerMessages": "知らない人からのメッセージを許可",
   "settingsReceiveMessagesFromNonContacts": "連絡先以外からのメッセージを受け取る",
@@ -1441,6 +1534,9 @@
   "settingsOpenSourceLicenses": "オープンソースライセンス",
   "settingsFeedbackAndSuggestions": "フィードバックと提案",
   "settingsBuiltOnMatrix": "Matrixプロトコルを基盤",
+  "settingsNoHiddenChats": "非表示のチャットはありません",
+  "settingsNoHiddenChatsDescription": "非表示にしたチャットがここに表示されます",
+  "settingsUnhideChat": "再表示",
   "settingsDarkMode": "ダークモード",
   "settingsFontSize": "フォントサイズ",
   "settingsBubbleStyle": "吹き出しスタイル",
@@ -1507,6 +1603,10 @@
   "chatLongitude": "経度",
   "groupDescriptionUpdated": "グループの説明を更新しました",
   "groupAvatarUpdated": "グループのアバターを更新しました",
+  "groupVisibilityUpdated": "グループの公開設定が更新されました",
+  "groupChannelCreated": "チャンネルが作成されました",
+  "groupChannelUpdated": "チャンネルが更新されました",
+  "groupChannelDeleted": "チャンネルが削除されました",
   "callDecline": "拒否",
   "callAnswer": "応答",
   "callIncomingVideoCall": "ビデオ通話の着信",
@@ -1615,8 +1715,22 @@
       }
     }
   },
+  "storyViewers": "閲覧者",
+  "storyNoViewers": "まだ閲覧者はいません",
+  "storyReplyToStory": "ストーリーに返信...",
   "commonCopiedToClipboard": "クリップボードにコピーしました",
   "commonMore": "もっと見る",
+  "commonTranslating": "翻訳中...",
+  "commonTranslatedFrom": "{language}から翻訳",
+  "@commonTranslatedFrom": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "commonTranslation": "翻訳",
+  "commonTranslationFailed": "翻訳に失敗しました",
   "commonAllRead": "すべて既読",
   "commonReadCount": "{count}人が既読",
   "commonYouRecalledMessage": "メッセージを取り消しました",
@@ -1647,135 +1761,568 @@
       }
     }
   },
-  "authAppleLabel": "Apple",
-  "authEmailExampleHint": "example@email.com",
-  "authGoogleLabel": "Google",
-  "authLoginWithBiometric": "{type}でログイン",
-  "@authLoginWithBiometric": {
+  "securityDeviceIdRequired": "デバイスIDは必須です",
+  "securityVerificationStartFailed": "検証の開始に失敗しました: {error}",
+  "@securityVerificationStartFailed": {
     "placeholders": {
-      "type": {
-        "type": "Object"
-      }
-    }
-  },
-  "authOr": "または",
-  "authPasskeyLabel": "パスキー",
-  "authServerAddressHint": "https://m.si46.world",
-  "authSsoLabel": "SSO",
-  "authVerificationCodePlaceholder": "------",
-  "chatCallDurationLabel": "通話時間",
-  "chatCallNotAnswered": "応答なし",
-  "chatMessage": "メッセージ",
-  "chatVideoCallCancelled": "ビデオ通話がキャンセルされました",
-  "chatVoiceCallCancelled": "音声通話がキャンセルされました",
-  "chatVoiceMessage": "音声",
-  "commonMatrixIdHint": "@username:server.com",
-  "commonTranslate": "翻訳",
-  "commonTranslatedFrom": "{language}から翻訳",
-  "@commonTranslatedFrom": {
-    "placeholders": {
-      "language": {
+      "error": {
         "type": "String"
       }
     }
   },
-  "commonTranslating": "翻訳中...",
-  "commonTranslation": "翻訳",
-  "commonTranslationFailed": "翻訳に失敗しました",
-  "contactNoCommonGroups": "共通のグループはありません",
-  "contactNoCommonGroupsDescription": "共通のグループがありません",
-  "conversationHideChat": "非表示",
-  "groupAlbum": "グループアルバム",
-  "groupDocuments": "ドキュメント",
-  "groupDownloadStarted": "{filename}をダウンロード中...",
-  "@groupDownloadStarted": {
+  "securityVerificationFailed": "検証に失敗しました",
+  "securityVerificationFailedWithReason": "検証に失敗しました: {reason}",
+  "@securityVerificationFailedWithReason": {
     "placeholders": {
-      "filename": {
+      "reason": {
         "type": "String"
       }
     }
   },
-  "groupFiles": "グループファイル",
-  "groupImages": "画像",
-  "groupNoFiles": "ファイルなし",
-  "groupNoFilesDescription": "このグループにはまだファイルがありません",
-  "groupNoMedia": "メディアなし",
-  "groupNoMediaDescription": "このグループにはまだ写真や動画がありません",
-  "groupSize": "サイズ",
-  "groupTotal": "合計",
-  "groupVideos": "動画",
-  "profileEnterPokeSuffixHint": "つつきの接尾辞を入力、例：肩を",
-  "settingsAddQuickReply": "クイック返信を追加",
-  "settingsBiometricDisabled": "無効 - タップして有効にする",
-  "settingsBiometricEnabled": "有効 - 生体認証でログイン",
-  "settingsBiometricLogin": "生体認証ログイン",
-  "settingsBiometricLoginDisabled": "生体認証ログインが無効になりました",
-  "settingsBiometricLoginEnabled": "生体認証ログインが有効になりました",
-  "settingsBiometricNeedRelogin": "生体認証ログインを有効にするには、ログアウトして再度ログインしてください",
-  "settingsDefaultQuickReplies": "デフォルトのクイック返信が表示されます",
-  "settingsDeleteQuickReply": "クイック返信を削除",
-  "settingsEditQuickReply": "クイック返信を編集",
-  "settingsEnableBiometricLogin": "生体認証ログインを有効にする",
-  "settingsHiddenChats": "非表示のチャット",
-  "settingsManageQuickReplies": "クイック返信を管理",
-  "settingsNoHiddenChats": "非表示のチャットはありません",
-  "settingsNoHiddenChatsDescription": "非表示にしたチャットがここに表示されます",
-  "settingsNoQuickReplies": "クイック返信はありません",
-  "settingsQuickReply": "クイック返信",
-  "settingsUnhideChat": "再表示",
-  "storyNoViewers": "まだ閲覧者はいません",
-  "storyReplyToStory": "ストーリーに返信...",
-  "storyViewers": "閲覧者",
-  "transferAmountHintZero": "0.00",
-  "liveLocation": "Live Location",
-  "stopLiveLocation": "Stop Sharing",
-  "startLiveLocation": "Start Sharing",
-  "selectDuration": "Select Duration",
-  "groupChatFiles": "Chat Files",
-  "groupLinks": "Links",
-  "groupNoLinks": "No links yet",
-  "chatBackground": "Chat Background",
-  "solidColors": "Solid Colors",
-  "gradients": "Gradients",
-  "defaultBackground": "Default",
-  "settingsFontSizeSlider": "Font Size",
-  "autoDownload": "Auto-Download",
-  "images": "Images",
-  "voice": "Voice",
-  "video": "Video",
-  "files": "Files",
-  "mobileData": "Mobile Data",
-  "roaming": "Roaming",
-  "storageManagement": "Storage",
-  "totalUsage": "Total Usage",
-  "cache": "Cache",
-  "other": "Other",
-  "clearCache": "Clear Cache",
-  "cacheCleared": "Cache cleared",
-  "clearCacheFailed": "Failed to clear cache",
-  "confirmClearCache": "Clear all cache data?",
-  "mapView": "Map View",
-  "liveLocationSharingCount": "{count} people sharing location",
-  "minutes15": "15 minutes",
-  "minutes30": "30 minutes",
-  "hour1": "1 hour",
-  "hours8": "8 hours",
-  "personalCard": "Personal Card",
-  "downloadFailed": "Download failed",
-  "locationExpired": "Expired",
-  "secondsRemaining": "{count}s",
-  "minutesRemaining": "{count}min",
-  "hoursMinutesRemaining": "{hours}h {minutes}min",
-  "favoriteMessages": "Favorites",
-  "linksCopied": "Link copied",
-  "noLinksFound": "No links found",
-  "roomStorageRanking": "Room Storage Ranking",
-  "downloadComplete": "Download complete",
-  "downloading": "Downloading...",
-  "draftSaved": "Draft saved",
-  "voiceRecording": "Voice Recording",
-  "searchLocation": "Search Location",
-  "tapToSearch": "Tap to search",
+  "securityEmojiMismatchRejected": "検証が拒否されました - 絵文字が一致しませんでした",
+  "securityWaitingForDeviceAccept": "他のデバイスが受け入れるのを待っています...",
+  "securityVerifyDevice": "このデバイスを確認する",
+  "securityConfirmEmojiMatch": "以下の絵文字が両方のデバイスに同じ順序で表示されていることを確認します",
+  "securityEmojiDontMatch": "一致しません",
+  "securityEmojiMatch": "一致します",
+  "securityWaitingForDeviceConfirm": "他のデバイスによる確認を待っています...",
+  "securityVerificationSuccess": "検証成功！",
+  "securityDeviceVerifiedTrusted": "このデバイスは現在検証され、信頼されています。",
+  "securityCompareEmoji": "両方のデバイスの絵文字を比較する",
+  "securityCompareNumbers": "両方のデバイスの数値を比較する",
+  "commonTryAgain": "もう一度試してください",
+  "commonDone": "完了",
+  "chatExportTitle": "チャットのエクスポート",
+  "chatExportSuccess": "エクスポートに成功しました",
+  "chatExportFailed": "エクスポートに失敗しました: {error}",
+  "@chatExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chatExportFormat": "エクスポート形式",
+  "chatExportHtmlDesc": "スタイル設定されたレイアウトでどのブラウザでも読むことができます",
+  "chatExportJsonDesc": "機械可読な構造化データ形式",
+  "chatExportDateRange": "日付範囲",
+  "chatExportAll": "すべてのメッセージ",
+  "chatExportLastWeek": "過去 7 日間",
+  "chatExportLastMonth": "先月",
+  "chatExportLast3Months": "過去 3 か月",
+  "chatExportMessageCount": "エクスポートするメッセージ",
+  "chatExportButton": "エクスポートと共有",
+  "chatMediaGallery": "メディアギャラリー",
+  "chatExportHistory": "チャット履歴のエクスポート",
+  "pdfLoadFailed": "PDFの読み込みに失敗しました",
+  "pdfPageIndicator": "{current} / {total}",
+  "@pdfPageIndicator": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaAll": "すべて",
+  "mediaImages": "画像",
+  "mediaVideos": "動画",
+  "mediaFiles": "ファイル",
+  "mediaAudio": "オーディオ",
+  "mediaItemsCount": "{count} アイテム",
+  "@mediaItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaNoMediaFound": "メディアが見つかりませんでした",
+  "spacesTitle": "コミュニティ",
+  "spacesCreate": "コミュニティの作成",
+  "spacesJoined": "参加しました",
+  "spacesDiscover": "発見する",
+  "spacesNoJoined": "まだ参加しているコミュニティはありません",
+  "spacesExplore": "コミュニティを探索する",
+  "spacesNoPublic": "公開コミュニティが見つかりませんでした",
+  "spacesJoin": "参加する",
+  "spacesSubSpaces": "サブコミュニティ",
+  "spacesChannels": "チャンネル",
+  "spacesMembersCount": "{count} メンバー",
+  "@spacesMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spacesPublic": "公共",
+  "spacesPrivate": "プライベート",
+  "spacesSuggested": "提案された",
+  "spacesChannelsCount": "{count} チャンネル",
+  "@spacesChannelsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callInCallChat": "通話中のチャット",
+  "callMessagesCount": "{count} メッセージ",
+  "@callMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callNoMessagesYet": "まだメッセージはありません。\nメッセージを送信して始めてください。",
+  "callTypeMessage": "メッセージを入力してください...",
+  "callYouSender": "あなた",
+  "callChatLabel": "チャット",
+  "chatEdited": "編集済み",
+  "chatEditHistory": "編集履歴",
+  "chatOriginalMessage": "オリジナル",
+  "chatEditedAt": "{time}で編集",
+  "@chatEditedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "chatViewOnce": "一度見る",
+  "chatViewOncePhoto": "写真を一度見る",
+  "chatViewOnceVideo": "ビデオを一度見る",
+  "chatViewOnceViewed": "閲覧済み",
+  "chatViewOnceExpired": "期限切れ",
+  "chatViewOnceTap": "タップして表示",
+  "chatAutoFaceBlur": "自動顔ぼかし",
+  "chatAutoFaceBlurDesc": "写真を送信するときに顔を自動的にぼかします",
+  "threadReplyInThread": "スレッド内で返信する",
+  "threadReplies": "{count} が返信する",
+  "@threadReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "threadReply": "1 件の返信",
+  "threadLatestReply": "最新: {preview}",
+  "@threadLatestReply": {
+    "placeholders": {
+      "preview": {
+        "type": "String"
+      }
+    }
+  },
+  "threadTitle": "スレッド",
+  "threadReplyPlaceholder": "スレッド内で返信...",
+  "threadParticipants": "{count} 参加者",
+  "@threadParticipants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceRoomTitle": "ボイスルーム",
+  "voiceRoomCreate": "ボイスルームの作成",
+  "voiceRoomJoin": "参加する",
+  "voiceRoomLeave": "休暇を取る",
+  "voiceRoomEnd": "エンドルーム",
+  "voiceRoomRaiseHand": "挙手",
+  "voiceRoomLowerHand": "低い手",
+  "voiceRoomMute": "ミュート",
+  "voiceRoomUnmute": "ミュートを解除する",
+  "voiceRoomHost": "ホスト",
+  "voiceRoomSpeakers": "スピーカー",
+  "voiceRoomListeners": "リスナー",
+  "voiceRoomLive": "ライブ",
+  "voiceRoomEnded": "終了しました",
+  "voiceRoomScheduled": "予定されている",
+  "voiceRoomApprove": "承認する",
+  "voiceRoomDemote": "リスナーに移動",
+  "voiceRoomHandRaised": "{name} が手を挙げました",
+  "@voiceRoomHandRaised": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceRoomName": "部屋名",
+  "voiceRoomTopic": "トピック (オプション)",
+  "voiceRoomNoActive": "アクティブボイスルームはありません",
+  "voiceRoomConnecting": "接続中...",
+  "usernameTitle": "ユーザー名",
+  "usernameSet": "ユーザー名の設定",
+  "usernameChange": "ユーザー名の変更",
+  "usernamePlaceholder": "ユーザー名を入力してください",
+  "usernameAvailable": "利用可能なユーザー名",
+  "usernameUnavailable": "ユーザー名はすでに取得されています",
+  "usernameInvalid": "3 ～ 30 文字、小文字、数字、アンダースコア。文字で始める必要があります。",
+  "usernameReserved": "このユーザー名は予約されています",
+  "usernameSaved": "ユーザー名が保存されました",
+  "usernameSearchHint": "@ユーザー名で検索",
+  "ensName": "ENS 名",
+  "ensLinked": "ENSにリンクされています",
+  "ensResolving": "ENS を解決中...",
+  "ensNotFound": "ENS 名が見つかりません",
+  "tokenGateTitle": "トークンゲート",
+  "tokenGateEnable": "トークンゲートを有効にする",
+  "tokenGateDisable": "トークンゲートを無効にする",
+  "tokenGateAddRule": "ルールの追加",
+  "tokenGateRemoveRule": "ルールの削除",
+  "tokenGateContractAddress": "契約住所",
+  "tokenGateMinBalance": "最低残高",
+  "tokenGateTokenId": "トークンID (ERC-1155)",
+  "tokenGateChainId": "チェーンID",
+  "tokenGateVerifying": "トークンの保有を確認しています...",
+  "tokenGateVerified": "検証に合格しました",
+  "tokenGateDenied": "トークンの要件を満たしていません",
+  "tokenGateOperatorAnd": "すべてのルールを満たす必要があります",
+  "tokenGateOperatorOr": "いずれかのルールを満たす必要があります",
+  "tokenGateRuleErc20": "ERC-20トークン",
+  "tokenGateRuleErc721": "NFT (ERC-721)",
+  "tokenGateRuleErc1155": "マルチトークン (ERC-1155)",
+  "tokenGateRuleNative": "ネイティブトークン",
+  "tokenGateSaved": "トークンゲートが保存されました",
+  "tokenGateEnableDescription": "参加するにはメンバーにトークンの保持を要求する",
+  "tokenGateOperator": "ルールロジック",
+  "tokenGateRules": "ルール",
+  "tokenGateSymbol": "記号（オプション）",
+  "tokenGateChain": "チェーン",
+  "tokenGateTokenStandard": "トークン規格",
+  "tokenGateDenialMessage": "拒否メッセージ",
+  "tokenGateDenialMessageHint": "検証に失敗した場合に表示されるメッセージ",
+  "tokenGateVerifyTitle": "トークンの検証",
+  "tokenGateVerifyPassed": "検証に合格しました",
+  "tokenGateVerifyFailed": "検証に失敗しました",
+  "tokenGateRetryVerify": "再試行",
+  "tokenGateRequired": "必須",
+  "tokenGateYourBalance": "あなたの残高",
+  "tokenGateRulesActive": "ルールが有効です",
+  "tokenGateDisabled": "障害者",
+  "ensNotBound": "束縛されていない",
+  "liveLocation": "ライブロケーション",
+  "stopLiveLocation": "共有を停止する",
+  "startLiveLocation": "共有を開始する",
+  "selectDuration": "期間を選択してください",
+  "groupChatFiles": "チャットファイル",
+  "groupLinks": "リンク",
+  "groupNoLinks": "まだリンクがありません",
+  "chatBackground": "チャットの背景",
+  "solidColors": "単色",
+  "gradients": "グラデーション",
+  "defaultBackground": "デフォルト",
+  "settingsFontSizeSlider": "フォントサイズ",
+  "autoDownload": "自動ダウンロード",
+  "images": "画像",
+  "voice": "声",
+  "video": "ビデオ",
+  "files": "ファイル",
+  "mobileData": "モバイルデータ",
+  "roaming": "ローミング",
+  "storageManagement": "ストレージ",
+  "totalUsage": "総使用量",
+  "cache": "キャッシュ",
+  "other": "その他",
+  "clearCache": "キャッシュのクリア",
+  "cacheCleared": "キャッシュがクリアされました",
+  "clearCacheFailed": "キャッシュのクリアに失敗しました",
+  "confirmClearCache": "キャッシュデータをすべてクリアしますか?",
+  "mapView": "マップビュー",
+  "liveLocationSharingCount": "{count} 人が位置情報を共有しています",
+  "@liveLocationSharingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutes15": "15分",
+  "minutes30": "30分",
+  "hour1": "1時間",
+  "hours8": "8時間",
+  "personalCard": "個人カード",
+  "downloadFailed": "ダウンロードに失敗しました",
+  "locationExpired": "期限切れ",
+  "secondsRemaining": "{count} 秒",
+  "@secondsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesRemaining": "{count}分",
+  "@minutesRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursMinutesRemaining": "{hours}h {minutes}分",
+  "@hoursMinutesRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteMessages": "お気に入り",
+  "linksCopied": "リンクがコピーされました",
+  "noLinksFound": "リンクが見つかりませんでした",
+  "roomStorageRanking": "お部屋の収納ランキング",
+  "downloadComplete": "ダウンロード完了",
+  "downloading": "ダウンロード中...",
+  "draftSaved": "下書きが保存されました",
+  "voiceRecording": "音声録音",
+  "searchLocation": "検索場所",
+  "tapToSearch": "タップして検索",
+  "settingsThisDevice": "このデバイス",
+  "settingsJustNow": "たった今",
+  "settingsDeviceId": "デバイスID",
+  "settingsStatus": "ステータス",
+  "settingsLastActive": "最後にアクティブだった",
+  "settingsIpAddress": "IPアドレス",
+  "settingsRenameDevice": "デバイスの名前を変更する",
+  "settingsDeviceNameHint": "デバイス名を入力してください",
+  "settingsDeviceRenamed": "デバイスの名前が変更されました",
+  "settingsRenameFailed": "名前の変更に失敗しました",
+  "settingsRemoteLogout": "リモートログアウト",
+  "settingsRemoteLogoutConfirm": "「{deviceName}」をログアウトしてもよろしいですか?この操作は元に戻すことができません。",
+  "@settingsRemoteLogoutConfirm": {
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsDeviceLoggedOut": "デバイスがログアウトしました",
+  "settingsLogoutFailed": "ログアウトに失敗しました",
+  "settingsLogout": "ログアウト",
+  "settingsVerifyIdentity": "本人確認",
+  "settingsEnterPasswordToConfirm": "このアクションを確認するには、パスワードを入力してください。",
+  "scheduledSendTitle": "スケジュールメッセージ",
+  "scheduledSendInOneHour": "1時間以内",
+  "scheduledSendTonight": "今夜（午後8時）",
+  "scheduledSendTomorrowMorning": "明日の朝（午前9時）",
+  "scheduledSendCustom": "日付と時刻を選択してください",
+  "scheduledMessageLabel": "予定されている",
+  "scheduledMessageCancel": "スケジュールされたメッセージをキャンセルする",
+  "chatLockTitle": "チャットロック",
+  "chatLockEnable": "このチャットをロックする",
+  "chatLockDisable": "このチャットのロックを解除する",
+  "chatLockDescription": "ロックされたチャットを開くには生体認証または PIN 認証が必要です",
+  "chatLockVerifyTitle": "チャットがロックされました",
+  "chatLockVerifySubtitle": "このチャットにアクセスするには確認してください",
+  "chatLockVerifyFailed": "検証に失敗しました",
+  "chatLockEnabled": "チャットがロックされました",
+  "chatLockDisabled": "チャットのロックが解除されました",
+  "chatLockPinTitle": "PINを入力してください",
+  "chatLockPinSetTitle": "暗証番号を設定する",
+  "chatLockPinConfirmTitle": "PINの確認",
+  "chatLockPinMismatch": "PIN が一致しません",
+  "chatLockUseBiometric": "生体認証を使用する",
+  "chatLockUsePin": "PINを使用する",
+  "mediaEditorUndo": "元に戻す",
+  "mediaEditorRedo": "やり直し",
+  "mediaEditorCrop": "作物",
+  "mediaEditorFilter": "フィルター",
+  "mediaEditorDraw": "描く",
+  "mediaEditorText": "テキスト",
+  "aiAssistant": "AIアシスタント",
+  "aiAssistantWelcome": "こんにちは！ N42 AI アシスタントです。どんな御用でしょうか？",
+  "aiAssistantNotConfigured": "AI サービスが構成されていません",
+  "aiAssistantSettings": "AI設定",
+  "aiAssistantClearHistory": "チャット履歴をクリアする",
+  "aiAssistantClearHistoryConfirm": "すべての AI チャット履歴をクリアしてもよろしいですか?",
+  "aiAssistantStopGenerating": "生成を停止する",
+  "aiAssistantModel": "モデル",
+  "aiAssistantTemperature": "温度",
+  "aiAssistantMaxTokens": "最大トークン数",
+  "aiAssistantContextWindow": "コンテキストウィンドウ",
+  "aiAssistantServiceStatus": "サービス状況",
+  "aiAssistantAvailable": "利用可能",
+  "aiAssistantUnavailable": "利用不可",
+  "aiSummarize": "AIの概要",
+  "aiSummarizeUnread": "{count} の未読メッセージを要約する",
+  "@aiSummarizeUnread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummarizeLoading": "要約すると...",
+  "aiSummarizeError": "要約できませんでした",
+  "aiRewrite": "AIリライト",
+  "aiRewriteFormal": "フォーマル",
+  "aiRewriteCasual": "カジュアル",
+  "aiRewritePlayful": "遊び心たっぷり",
+  "aiRewriteProfessional": "プロフェッショナル",
+  "aiRewriteAccept": "使用する",
+  "aiRewriteCancel": "キャンセル",
+  "aiRewriteLoading": "書き換え中...",
+  "aiLinkSummary": "AIの概要",
+  "aiLinkSummaryAnalyzing": "分析中...",
+  "chatFolderManagement": "フォルダーの管理",
+  "chatFolderSystem": "システムフォルダー",
+  "chatFolderCustom": "カスタムフォルダー",
+  "chatFolderEmpty": "カスタムフォルダーはまだありません",
+  "chatFolderCreate": "フォルダーの作成",
+  "chatFolderEdit": "フォルダーの編集",
+  "chatFolderNameHint": "フォルダ名",
+  "chatFolderAll": "すべて",
+  "chatFolderUnread": "未読",
+  "chatFolderPersonal": "個人的な",
+  "chatFolderGroups": "グループ",
+  "chatFolderChannels": "チャンネル",
+  "chatFolderMuted": "ミュート",
+  "storyAddMusic": "音楽を追加する",
+  "storyChangeMusic": "音楽を変更する",
+  "storyBackgroundMusic": "バックグラウンドミュージック",
+  "storyMusicPreview": "プレビュー (最大 15 秒)",
+  "storyChooseFromDevice": "デバイスから選ぶ",
+  "storyUseThisMusic": "この音楽を使用する",
+  "authPasskeyNotSupported": "このデバイスではパスキーがサポートされていません",
+  "authPasskeyRegister": "パスキーの登録",
+  "authPasskeyNoRegistered": "パスキーが登録されていません",
+  "authPasskeyRegisterHint": "このアカウントのパスキーを登録します。スタンドアロン パスキー サインインは後で有効になります。",
+  "authPasskeyNameYours": "パスキーに名前を付けます",
+  "authPasskeyRegistered": "このアカウントに保存されたパスキー",
+  "authPasskeyDeleted": "このアカウントからパスキーが削除されました",
+  "authPasskeyDeleteConfirm": "パスキー「{name}」を削除しますか?後でパスキー サインインを使用する前に、再度登録する必要があります。",
+  "@authPasskeyDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "momentVisibilityPublic": "公共",
+  "momentVisibilityPrivate": "プライベート",
+  "momentVisibilityPartial": "選択した友達",
+  "momentVisibilityExcluded": "一部の友達を除外する",
+  "momentUserMoments": "{userName} の瞬間",
+  "@momentUserMoments": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "momentForwardTo": "に転送",
+  "momentForwardSuccess": "正常に転送されました",
+  "momentSelectFriends": "友達を選択",
+  "momentSelectTags": "タグで選ぶ",
+  "momentSelectedCount": "選択済み ({count})",
+  "@momentSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentNoMomentsYet": "まだ瞬間はありません",
+  "momentForwardMoment": "前進モーメント",
+  "momentAddComment": "コメントを追加...",
+  "momentForwardContent": "[瞬間] {content}",
+  "@momentForwardContent": {
+    "placeholders": {
+      "content": {
+        "type": "String"
+      }
+    }
+  },
+  "momentDeleteMoment": "モーメントを削除",
+  "momentDeleteConfirm": "この瞬間を削除してもよろしいですか?",
+  "momentComment": "コメント",
+  "momentWriteComment": "コメントを書いてください...",
+  "momentLike": "いいね",
+  "momentUnlike": "とは異なります",
+  "momentForward": "進む",
+  "momentDelete": "削除",
+  "momentReply": "返信する",
+  "momentMoment": "瞬間",
+  "momentLikesCount": "{count} の「いいね！」",
+  "@momentLikesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentCommentsCount": "コメント",
+  "@momentCommentsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentNoComments": "まだコメントはありません",
+  "momentFailedToLoad": "画像のロードに失敗しました",
+  "momentReplyTo": "{userName} に返信...",
+  "@momentReplyTo": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "momentNoConversations": "会話なし",
+  "momentJustNow": "たった今",
+  "momentMinutesAgo": "{count}分前",
+  "@momentMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentHoursAgo": "{count}1時間前",
+  "@momentHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "momentDaysAgo": "{count}日前",
+  "@momentDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatGroupAnnouncementHint": "グループアナウンスを入力してください",
+  "chatGroupAnnouncementEmpty": "アナウンスなし",
+  "chatEditNickname": "ニックネームの編集",
+  "chatNicknameHint": "このグループにニックネームを入力してください",
+  "contactAddPhoneHint": "電話番号を入力してください",
+  "contactNotesHint": "この連絡先に関するメモを追加する",
+  "reportTitle": "レポート",
+  "reportReasonSpam": "スパムメール",
+  "reportReasonHarassment": "ハラスメント",
+  "reportReasonFraud": "詐欺",
+  "reportReasonOther": "その他",
+  "reportSubmitted": "レポート提出",
+  "reportDescription": "追加の説明 (オプション)",
+  "qrcodeSaved": "QRコードをアルバムに保存しました",
+  "chatSendRedPacketInChat": "チャットで赤いパケットを送信してください",
+  "commonSaveFailed": "保存に失敗しました",
+  "reportSelectReason": "理由を選択してください",
   "gameCenter": "ゲーム",
   "gameHighScore": "ベスト",
   "gameScore": "スコア",
@@ -1786,7 +2333,7 @@
   "gameResume": "タップで再開",
   "gameConfirmExit": "ゲームを終了しますか？",
   "gameNoScores": "記録なし",
-  "game2048": "2048",
+  "game2048": "2048年",
   "game2048Desc": "タイルを合体させて2048を目指せ",
   "gameBlockDrop": "ブロック落とし",
   "gameBlockDropDesc": "ブロックを落として行を消そう",
@@ -1803,6 +2350,244 @@
   "gameBestTime": "ベストタイム",
   "gameNewRecord": "新記録！",
   "gameLines": "ライン",
+  "storyMyStory": "私の物語",
+  "storageSmartCleanup": "スマートクリーンアップ",
+  "storageOldMediaFiles": "古いメディア ファイル",
+  "storageLargeFiles": "大きなファイル",
+  "storageAppCache": "アプリキャッシュ",
+  "storageSettings": "ストレージ設定",
+  "storageAutoCleanup": "自動クリーンアップ",
+  "storageAutoCleanupDesc": "{days} 日より古いファイルを自動的にクリーンアップします",
+  "@storageAutoCleanupDesc": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "storageCleanupPeriod": "クリーンアップ期間",
+  "storagePreserveThumbnails": "サムネイルを保存する",
+  "storagePreserveThumbnailsDesc": "クリーンアップ中に画像のサムネイルを保持する",
+  "storageWarningHigh": "ストレージの使用率が高い。古いファイルをクリーンアップすることを検討してください。",
+  "storageWarningCritical": "ストレージが非常に不足しています。空き領域までクリーンアップしてください。",
+  "storageFreed": "{size} ({count} ファイル) を解放しました",
+  "@storageFreed": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageDays": "{days} 日",
+  "@storageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "storageViewAllRooms": "{count} の部屋をすべて表示",
+  "@storageViewAllRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storageNoFiles": "ファイルが見つかりません",
+  "storageFilePinned": "固定された",
+  "storageDeleteSelected": "選択した {count} ファイルを削除しますか?サーバーから再ダウンロードできます。",
+  "@storageDeleteSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestore": "バックアップと復元",
+  "backupCreate": "バックアップの作成",
+  "backupCreateDesc": "設定と暗号化キーをバックアップします。再ログイン後、メッセージはサーバーから復元されます。",
+  "backupIncludeKeys": "暗号化キーを含める",
+  "backupIncludeKeysDesc": "暗号化されたメッセージを読み取るために必要です",
+  "backupPasswordProtect": "パスワード保護",
+  "backupEnterPassword": "バックアップパスワードを入力してください",
+  "backupHistory": "バックアップ履歴",
+  "backupNoBackups": "まだバックアップがありません",
+  "backupRestore2": "復元",
+  "backupDelete": "削除",
+  "backupDeleteConfirm": "このバックアップを削除してもよろしいですか?これを元に戻すことはできません。",
+  "backupRestoreFromFile": "ファイルから復元",
+  "backupRestoreFromFileDesc": "別のデバイスまたは以前のバックアップから .n42backup ファイルをインポートします。",
+  "backupChooseFile": "バックアップファイルの選択",
+  "backupRestoring": "復元中...",
+  "backupCreated": "作成されたバックアップ: {rooms} ルーム、{messages} メッセージ",
+  "@backupCreated": {
+    "placeholders": {
+      "rooms": {
+        "type": "int"
+      },
+      "messages": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestored": "{rooms} ルームから {settings} 設定を復元しました",
+  "@backupRestored": {
+    "placeholders": {
+      "settings": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
+  "backupFailed": "バックアップに失敗しました: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPasswordRequired": "このバックアップはパスワードで保護されています",
+  "blocGroupNotFound": "グループが見つかりません",
+  "blocGroupMembersInvited": "{count} メンバーを招待しました",
+  "@blocGroupMembersInvited": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "blocGroupMemberRemoved": "メンバーが削除されました",
+  "blocGroupAdminRemoved": "管理者が削除されました",
+  "blocGroupLeft": "グループを脱退",
+  "blocGroupDisbanded": "グループ解散",
+  "blocGroupJoined": "グループに参加しました",
+  "blocGroupInviteDeclined": "招待が拒否されました",
+  "blocGroupTokenGateUpdated": "トークンゲートが更新されました",
+  "blocTransferProcessing": "転送を処理しています...",
+  "blocTransferCancelled": "転送がキャンセルされました",
+  "blocTransferFailed": "転送に失敗しました",
+  "blocPaymentProcessing": "支払いを処理しています...",
+  "blocPaymentFailed": "支払いに失敗しました",
+  "groupMaxMembers": "会員制限",
+  "groupMaxMembersUnlimited": "無制限",
+  "groupMaxMembersHint": "制限を入力します (無制限の場合は空白のままにします)",
+  "groupMaxMembersUpdated": "会員制限が更新されました",
+  "groupFull": "グループは定員に達しています",
+  "groupChannels": "トピックチャンネル",
+  "groupChannelsEmpty": "まだチャンネルがありません",
+  "groupChannelsCount": "チャンネル",
+  "groupChannelCreate": "新しいチャンネル",
+  "groupChannelName": "チャンネル名",
+  "groupChannelTopic": "チャンネルのトピック (オプション)",
+  "groupChannelDelete": "チャンネルの削除",
+  "groupChannelDeleteConfirm": "このチャンネルを削除しますか?すべてのメッセージが失われます。",
+  "groupBotSettings": "ボットの設定",
+  "groupBotEnabled": "ボットを有効にする",
+  "groupBotWelcomeMessage": "ウェルカムメッセージテンプレート",
+  "groupBotWelcomeHint": "新しいメンバー名のプレースホルダーとして「name」を使用します",
+  "groupBotConfigUpdated": "ボット設定が更新されました",
+  "groupContentFilter": "コンテンツフィルター",
+  "groupContentFilterEnabled": "キーワードフィルターを有効にする",
+  "groupContentFilterReplace": "*** に置き換えます",
+  "groupContentFilterHide": "メッセージを隠す",
+  "groupContentFilterAddWord": "キーワードを追加",
+  "groupContentFilterUpdated": "コンテンツフィルターが更新されました",
+  "chatSlashCommands": "コマンド",
+  "chatCommandPoll": "/poll — 投票を作成します",
+  "chatCommandAnnounce": "/announce — アナウンスを送信する",
+  "chatCommandWelcome": "/welcome — ウェルカム メッセージを設定します",
+  "chatReportMessage": "レポート",
+  "chatReportReason": "報告理由",
+  "chatReportSpam": "スパムメール",
+  "chatReportHarassment": "ハラスメント",
+  "chatReportInappropriate": "不適切なコンテンツ",
+  "chatReportOther": "その他",
+  "chatReportSuccess": "レポート提出",
+  "spacesName": "コミュニティ名",
+  "spacesNameHint": "例:仮想通貨トレーダー",
+  "spacesNameRequired": "名前は必須です",
+  "spacesDescription": "説明",
+  "spacesDescriptionHint": "このコミュニティは何についてのものですか?",
+  "spacesType": "コミュニティタイプ",
+  "spacesPublicDesc": "誰でも見つけて参加できます",
+  "spacesPrivateDesc": "招待されたメンバーのみが参加できます",
+  "spacesNotFound": "コミュニティが見つかりません",
+  "spacesSearch": "コミュニティを検索...",
+  "spacesMembers": "メンバー",
+  "spacesNoChannels": "まだチャンネルがありません",
+  "spacesLeave": "コミュニティを離れる",
+  "spacesLeaveConfirm": "「{name}」を終了してもよろしいですか?",
+  "@spacesLeaveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesDelete": "コミュニティの削除",
+  "spacesDeleteConfirm": "これにより、「{name}」とそのすべてのチャンネルが完全に削除されます。この操作は元に戻すことができません。",
+  "@spacesDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesCreateChannel": "チャンネルの追加",
+  "spacesChannelName": "チャンネル名",
+  "spacesChannelTopic": "トピック (オプション)",
+  "spacesDeleteChannel": "チャンネルの削除",
+  "spacesDeleteChannelConfirm": "「#{name}」を削除してもよろしいですか?",
+  "@spacesDeleteChannelConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesEditName": "名前の編集",
+  "spacesEditDescription": "説明の編集",
+  "spacesViewAllMembers": "{count} メンバーをすべて表示",
+  "@spacesViewAllMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spacesKickMemberTitle": "キック{name}",
+  "@spacesKickMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesBanMemberTitle": "禁止 {name}",
+  "@spacesBanMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spacesPromoteAdmin": "管理者に昇格",
+  "spacesDemoteAdmin": "管理者の削除",
+  "spacesInviteMember": "メンバーを招待する",
+  "spacesInviteMemberUserId": "ユーザーID (例: @user:server.com)",
+  "spacesSave": "保存",
+  "settingsScreenshotProtection": "スクリーンショットの保護",
+  "settingsScreenshotProtectionDesc": "スクリーンショットと画面録画を防止する",
+  "chatSelfDestructTimer": "自爆",
+  "chatTimerPickerTitle": "自爆タイマー",
+  "chatTimerOff": "オフ",
   "onChainNotificationsTitle": "チェーンイベント",
   "onChainMarkAllRead": "すべて既読",
   "onChainNoNotifications": "オンチェーンイベントはまだありません",
@@ -1865,24 +2650,24 @@
     }
   },
   "web3NoN42AccountTitle": "N42 アカウントなし",
+  "web3NoN42AccountDesc": "このウォレット アドレスにはまだ N42 アカウントがありません。 N42 招待リンクを共有して始めることができます。",
   "web3ShareInvite": "招待を共有",
   "nftPickerTitle": "NFT アバターを選択",
   "nftPickerTabPopular": "人気",
   "nftPickerTabCustom": "カスタム",
+  "nftPickerChain": "チェーン",
+  "nftPickerContract": "契約住所",
+  "nftPickerTokenId": "トークンID",
   "nftPickerVerifyOwnership": "所有権を確認してプレビュー",
   "nftPickerUseAsAvatar": "アバターとして使用",
+  "nftPickerPreview": "プレビュー",
   "nftPickerNotOwned": "このNFTを所有していません",
+  "nftPickerInvalidTokenId": "無効なトークンID",
+  "nftPickerEnterBoth": "コントラクトアドレスとトークンIDを入力してください",
   "nftPickerInfoTitle": "NFT アバター — オンチェーン確認済み",
+  "nftPickerInfoDesc": "所有する NFT をアバターとしてバインドします。誰でもオンチェーンで所有権を確認できます。 N42にゴールドのリングを付けて展示。",
   "nftPickerPopularCollections": "人気コレクション",
   "nftPickerWalletHint": "N42 ウォレットを接続して、236 以上のチェーンの NFT を自動検出します。",
-  "web3NoN42AccountDesc": "This wallet address has no N42 account yet. You can share your N42 invite link with them to get started.",
-  "nftPickerChain": "Chain",
-  "nftPickerContract": "Contract Address",
-  "nftPickerTokenId": "Token ID",
-  "nftPickerPreview": "Preview",
-  "nftPickerInvalidTokenId": "Invalid token ID",
-  "nftPickerEnterBoth": "Enter contract address and token ID",
-  "nftPickerInfoDesc": "Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.",
   "profileBindNftAvatar": "NFTアバターをバインド",
   "profileChangeAvatar": "アバターを変更",
   "groupTopics": "トピック",
@@ -1902,8 +2687,22 @@
   "redPacketClaimed": "受領済み",
   "redPacketInsufficientBalance": "残高不足",
   "selfDestructCountdown": "{time}後に削除",
+  "@selfDestructCountdown": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "messageDestroyed": "メッセージは削除されました",
   "miniAppPermissionDenied": "権限がありません：{permission}",
+  "@miniAppPermissionDenied": {
+    "placeholders": {
+      "permission": {
+        "type": "String"
+      }
+    }
+  },
   "aiSuggestionGasFee": "ガス代とは？",
   "aiSuggestionDefi": "DeFi入門",
   "aiSuggestionSecurity": "コントラクトの安全性確認方法",
@@ -1914,8 +2713,35 @@
   "channelJoined": "参加中",
   "channelCategory": "カテゴリ",
   "slowModeCooldown": "スローモード：{seconds}秒お待ちください",
+  "@slowModeCooldown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "addressCopyAction": "アドレスをコピー",
   "addressSendMessage": "メッセージを送る",
   "addressViewProfile": "プロフィールを見る",
-  "sendToAddress": "ウォレットアドレスに送信"
+  "sendToAddress": "ウォレットアドレスに送信",
+  "blocAuthSendVerificationCodeFailed": "確認コードの送信に失敗しました",
+  "blocAuthServerNoEmailPasswordReset": "このサーバーは電子メールのパスワードのリセットをサポートしていません",
+  "blocAuthResetPasswordFailed": "パスワードのリセットに失敗しました",
+  "blocAuthChangePasswordFailed": "パスワードの変更に失敗しました",
+  "blocAuthOldPasswordWrong": "現在のパスワードが正しくありません",
+  "blocAuthLoginCancelled": "ログインがキャンセルされました",
+  "blocAuthGoogleLoginFailed": "Googleログインに失敗しました",
+  "blocAuthAppleLoginFailed": "Apple ログインに失敗しました",
+  "blocAuthSsoLoginFailed": "SSOログインに失敗しました",
+  "blocAuthFacebookLoginFailed": "Facebook ログインに失敗しました",
+  "blocAuthTwitterLoginFailed": "ツイッターのログインに失敗しました",
+  "blocAuthWeChatLoginFailed": "WeChatのログインに失敗しました",
+  "blocAuthWeChatNotConfigured": "WeChat ログインが設定されていません",
+  "blocAuthWeChatNotInstalled": "まずWeChatをインストールしてください",
+  "blocAuthPasswordWrong": "パスワードが間違っています",
+  "blocAuthEmailAlreadyBound": "このメールはすでに別のアカウントにバインドされています",
+  "blocAuthChangeEmailFailed": "メールアドレスの変更に失敗しました",
+  "blocAuthVerificationCodeInvalid": "認証コードが間違っているか、有効期限が切れています",
+  "blocAuthSessionExpired": "セッションが期限切れになりました。もう一度ログインしてください",
+  "blocAuthSessionIncomplete": "セッションデータが不完全です。再度ログインしてください。"
 }

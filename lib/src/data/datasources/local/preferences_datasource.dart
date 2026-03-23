@@ -1,7 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/scheduled_message_draft.dart';
+import '../../../domain/entities/user_profile_entity.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 偏好设置数据源
@@ -11,33 +16,41 @@ import '../../../core/utils/debug_log.dart';
 class PreferencesDataSource {
   static const String _keySettings = 'n42_chat_settings';
   static const String _keyContactRemarks = 'n42_chat_contact_remarks';
-  static const String _keyAppearanceSettings =
-      'n42_chat_appearance_settings';
+  static const String _keyAppearanceSettings = 'n42_chat_appearance_settings';
+  static const String _keyNotificationSettings =
+      'n42_chat_notification_settings';
   static const String _keyStrongReminders = 'n42_chat_strong_reminders';
   static const String _keyLocallyDeletedMessages =
       'n42_chat_locally_deleted_messages';
   static const String _keyMessageDestructionTimes =
       'n42_chat_message_destruction_times';
   static const String _keyPrivacySettings = 'n42_chat_privacy_settings';
-  static const String _keyScheduledMessages =
-      'n42_chat_scheduled_messages';
+  static const String _keyScheduledMessages = 'n42_chat_scheduled_messages';
   static const String _keyMomentSettings = 'n42_chat_moment_settings';
-  static const String _keyHiddenMomentUsers =
-      'n42_chat_hidden_moment_users';
-  static const String _keyBlockedMomentUsers =
-      'n42_chat_blocked_moment_users';
-  static const String _keyMomentLastReadTime =
-      'n42_chat_moment_last_read_time';
+  static const String _keyHiddenMomentUsers = 'n42_chat_hidden_moment_users';
+  static const String _keyBlockedMomentUsers = 'n42_chat_blocked_moment_users';
+  static const String _keyMomentLastReadTime = 'n42_chat_moment_last_read_time';
   static const String _keyHiddenChats = 'n42_chat_hidden_chats';
   static const String _keyQuickReplies = 'n42_chat_quick_replies';
-  static const String _keyTranslationCache =
-      'n42_chat_translation_cache';
-  static const String _keyTranslationSettings =
-      'n42_chat_translation_settings';
-  static const String _keyFavoriteMessages =
-      'n42_chat_favorite_messages';
+  static const String _keyTranslationCache = 'n42_chat_translation_cache';
+  static const String _keyTranslationSettings = 'n42_chat_translation_settings';
+  static const String _keyFavoriteMessages = 'n42_chat_favorite_messages';
   static const String _keyFavoriteMeta = 'n42_chat_favorite_meta';
   static const String _keyChatFolders = 'n42_chat_folders';
+  static const Map<String, bool> defaultAutoDownloadSettings = {
+    'wifi_images': true,
+    'wifi_voice': true,
+    'wifi_video': true,
+    'wifi_files': true,
+    'mobile_images': true,
+    'mobile_voice': true,
+    'mobile_video': false,
+    'mobile_files': false,
+    'roaming_images': false,
+    'roaming_voice': false,
+    'roaming_video': false,
+    'roaming_files': false,
+  };
 
   Completer<SharedPreferences>? _prefsCompleter;
 
@@ -112,6 +125,133 @@ class PreferencesDataSource {
   Future<String?> getThemeMode() async {
     final settings = await getAppearanceSettings();
     return settings?['themeMode'];
+  }
+
+  Future<void> saveAppearanceSettingsModel(AppearanceSettings settings) async {
+    await saveAppearanceSettings(
+      themeMode: _themeModeToStorage(settings.themeMode),
+      fontSize: settings.fontSize.name,
+      chatBackground: settings.chatBackground,
+      bubbleStyle: settings.bubbleStyle.name,
+    );
+  }
+
+  Future<AppearanceSettings> getAppearanceSettingsModel() async {
+    final raw = await getAppearanceSettings();
+    if (raw == null) {
+      return const AppearanceSettings();
+    }
+
+    return AppearanceSettings(
+      themeMode: _parseThemeMode(raw['themeMode']),
+      fontSize: _parseFontSize(raw['fontSize']),
+      chatBackground: raw['chatBackground'],
+      bubbleStyle: _parseBubbleStyle(raw['bubbleStyle']),
+    );
+  }
+
+  // ============================================
+  // 通知设置
+  // ============================================
+
+  Future<void> saveNotificationSettingsModel(
+    NotificationSettings settings,
+  ) async {
+    final p = await prefs;
+    await p.setString(
+      _keyNotificationSettings,
+      jsonEncode({
+        'enabled': settings.enabled,
+        'showPreview': settings.showPreview,
+        'playSound': settings.playSound,
+        'vibrate': settings.vibrate,
+        'doNotDisturb': settings.doNotDisturb,
+        'doNotDisturbStart': settings.doNotDisturbStart,
+        'doNotDisturbEnd': settings.doNotDisturbEnd,
+        'privacyMode': settings.privacyMode.name,
+        'savedAt': DateTime.now().toIso8601String(),
+      }),
+    );
+    debugLog('Preferences: Notification settings saved');
+  }
+
+  Future<NotificationSettings> getNotificationSettingsModel() async {
+    try {
+      final p = await prefs;
+      final data = p.getString(_keyNotificationSettings);
+      if (data == null) {
+        return const NotificationSettings();
+      }
+
+      final json = jsonDecode(data) as Map<String, dynamic>;
+      return NotificationSettings(
+        enabled: json['enabled'] as bool? ?? true,
+        showPreview: json['showPreview'] as bool? ?? true,
+        playSound: json['playSound'] as bool? ?? true,
+        vibrate: json['vibrate'] as bool? ?? true,
+        doNotDisturb: json['doNotDisturb'] as bool? ?? false,
+        doNotDisturbStart: json['doNotDisturbStart'] as String?,
+        doNotDisturbEnd: json['doNotDisturbEnd'] as String?,
+        privacyMode: NotificationPrivacyMode.values.firstWhere(
+          (mode) => mode.name == json['privacyMode'],
+          orElse: () => NotificationPrivacyMode.full,
+        ),
+      );
+    } catch (e) {
+      debugLog('Preferences: Failed to read notification settings - $e');
+      return const NotificationSettings();
+    }
+  }
+
+  ThemeMode _parseThemeMode(String? rawValue) {
+    switch (rawValue?.trim().toLowerCase()) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  FontSize _parseFontSize(String? rawValue) {
+    switch (rawValue?.trim().toLowerCase()) {
+      case 'small':
+        return FontSize.small;
+      case 'large':
+        return FontSize.large;
+      case 'extralarge':
+      case 'extra_large':
+      case 'extra-large':
+        return FontSize.extraLarge;
+      case 'medium':
+      default:
+        return FontSize.medium;
+    }
+  }
+
+  BubbleStyle _parseBubbleStyle(String? rawValue) {
+    switch (rawValue?.trim().toLowerCase()) {
+      case 'modern':
+        return BubbleStyle.modern;
+      case 'classic':
+        return BubbleStyle.classic;
+      case 'wechat':
+      default:
+        return BubbleStyle.wechat;
+    }
+  }
+
+  String _themeModeToStorage(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return 'light';
+      case ThemeMode.dark:
+        return 'dark';
+      case ThemeMode.system:
+        return 'system';
+    }
   }
 
   // ============================================
@@ -279,9 +419,7 @@ class PreferencesDataSource {
 
       return roomData.cast<String>().toSet();
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to read locally deleted messages - $e',
-      );
+      debugLog('Preferences: Failed to read locally deleted messages - $e');
       return {};
     }
   }
@@ -303,7 +441,7 @@ class PreferencesDataSource {
       // 获取当前房间的已删除消息列表
       final currentIds =
           (allData[roomId] as List<dynamic>?)?.cast<String>().toSet() ??
-              <String>{};
+          <String>{};
       currentIds.addAll(messageIds);
 
       // 限制每个房间最多保存 1000 个删除记录
@@ -314,18 +452,13 @@ class PreferencesDataSource {
 
       allData[roomId] = limitedIds;
 
-      await p.setString(
-        _keyLocallyDeletedMessages,
-        jsonEncode(allData),
-      );
+      await p.setString(_keyLocallyDeletedMessages, jsonEncode(allData));
 
       debugLog(
         'Preferences: Marked ${messageIds.length} messages as locally deleted in $roomId',
       );
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to mark messages as locally deleted - $e',
-      );
+      debugLog('Preferences: Failed to mark messages as locally deleted - $e');
     }
   }
 
@@ -342,19 +475,12 @@ class PreferencesDataSource {
       if (allData.isEmpty) {
         await p.remove(_keyLocallyDeletedMessages);
       } else {
-        await p.setString(
-          _keyLocallyDeletedMessages,
-          jsonEncode(allData),
-        );
+        await p.setString(_keyLocallyDeletedMessages, jsonEncode(allData));
       }
 
-      debugLog(
-        'Preferences: Cleared locally deleted messages for $roomId',
-      );
+      debugLog('Preferences: Cleared locally deleted messages for $roomId');
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to clear locally deleted messages - $e',
-      );
+      debugLog('Preferences: Failed to clear locally deleted messages - $e');
     }
   }
 
@@ -378,23 +504,17 @@ class PreferencesDataSource {
       }
 
       // 获取当前房间的销毁时间记录
-      final roomData =
-          (allData[roomId] as Map<String, dynamic>?) ?? {};
+      final roomData = (allData[roomId] as Map<String, dynamic>?) ?? {};
       roomData[messageId] = destroyedAt.toIso8601String();
       allData[roomId] = roomData;
 
-      await p.setString(
-        _keyMessageDestructionTimes,
-        jsonEncode(allData),
-      );
+      await p.setString(_keyMessageDestructionTimes, jsonEncode(allData));
 
       debugLog(
         'Preferences: Set destruction time for message $messageId in $roomId',
       );
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to set message destruction time - $e',
-      );
+      debugLog('Preferences: Failed to set message destruction time - $e');
     }
   }
 
@@ -415,9 +535,7 @@ class PreferencesDataSource {
         return MapEntry(key, DateTime.parse(value as String));
       });
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to read message destruction times - $e',
-      );
+      debugLog('Preferences: Failed to read message destruction times - $e');
       return {};
     }
   }
@@ -458,19 +576,14 @@ class PreferencesDataSource {
       if (allData.isEmpty) {
         await p.remove(_keyMessageDestructionTimes);
       } else {
-        await p.setString(
-          _keyMessageDestructionTimes,
-          jsonEncode(allData),
-        );
+        await p.setString(_keyMessageDestructionTimes, jsonEncode(allData));
       }
 
       debugLog(
         'Preferences: Cleared ${messageIds.length} destruction time records in $roomId',
       );
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to clear message destruction times - $e',
-      );
+      debugLog('Preferences: Failed to clear message destruction times - $e');
     }
   }
 
@@ -487,19 +600,12 @@ class PreferencesDataSource {
       if (allData.isEmpty) {
         await p.remove(_keyMessageDestructionTimes);
       } else {
-        await p.setString(
-          _keyMessageDestructionTimes,
-          jsonEncode(allData),
-        );
+        await p.setString(_keyMessageDestructionTimes, jsonEncode(allData));
       }
 
-      debugLog(
-        'Preferences: Cleared all destruction time records in $roomId',
-      );
+      debugLog('Preferences: Cleared all destruction time records in $roomId');
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to clear all destruction times - $e',
-      );
+      debugLog('Preferences: Failed to clear all destruction times - $e');
     }
   }
 
@@ -522,6 +628,15 @@ class PreferencesDataSource {
     bool allowStrangerMessage = true,
     bool showReadReceipts = true,
     bool showTypingIndicator = true,
+    bool hidePhoneNumber = false,
+    bool showLinkPreviews = true,
+    bool defaultEncryptNewChats = true,
+    bool privateChatMode = false,
+    bool protectIpAddress = false,
+    bool proxyEnabled = false,
+    String? proxyUrl,
+    bool useTor = false,
+    int? defaultSelfDestructSeconds,
   }) async {
     final data = {
       'avatarVisibility': avatarVisibility,
@@ -530,6 +645,15 @@ class PreferencesDataSource {
       'allowStrangerMessage': allowStrangerMessage,
       'showReadReceipts': showReadReceipts,
       'showTypingIndicator': showTypingIndicator,
+      'hidePhoneNumber': hidePhoneNumber,
+      'showLinkPreviews': showLinkPreviews,
+      'defaultEncryptNewChats': defaultEncryptNewChats,
+      'privateChatMode': privateChatMode,
+      'protectIpAddress': protectIpAddress,
+      'proxyEnabled': proxyEnabled,
+      'proxyUrl': proxyUrl?.trim(),
+      'useTor': useTor,
+      'defaultSelfDestructSeconds': defaultSelfDestructSeconds,
       'savedAt': DateTime.now().toIso8601String(),
     };
 
@@ -553,6 +677,62 @@ class PreferencesDataSource {
     }
   }
 
+  /// 获取强类型隐私设置模型
+  Future<PrivacySettings> getPrivacySettingsModel() async {
+    final settings = await getPrivacySettings();
+    if (settings == null) {
+      return const PrivacySettings();
+    }
+
+    return PrivacySettings(
+      avatarVisibility: _parseVisibilityLevel(
+        settings['avatarVisibility']?.toString(),
+      ),
+      statusVisibility: _parseVisibilityLevel(
+        settings['statusVisibility']?.toString(),
+      ),
+      lastSeenVisibility: _parseVisibilityLevel(
+        settings['lastSeenVisibility']?.toString(),
+      ),
+      allowStrangerMessage: (settings['allowStrangerMessage'] as bool?) ?? true,
+      showReadReceipts: (settings['showReadReceipts'] as bool?) ?? true,
+      showTypingIndicator: (settings['showTypingIndicator'] as bool?) ?? true,
+      hidePhoneNumber: (settings['hidePhoneNumber'] as bool?) ?? false,
+      showLinkPreviews: (settings['showLinkPreviews'] as bool?) ?? true,
+      defaultEncryptNewChats:
+          (settings['defaultEncryptNewChats'] as bool?) ?? true,
+      privateChatMode: (settings['privateChatMode'] as bool?) ?? false,
+      protectIpAddress: (settings['protectIpAddress'] as bool?) ?? false,
+      proxyEnabled: (settings['proxyEnabled'] as bool?) ?? false,
+      proxyUrl: settings['proxyUrl']?.toString(),
+      useTor: (settings['useTor'] as bool?) ?? false,
+      defaultSelfDestructSeconds: _readOptionalInt(
+        settings['defaultSelfDestructSeconds'],
+      ),
+    );
+  }
+
+  /// 保存强类型隐私设置模型
+  Future<void> savePrivacySettingsModel(PrivacySettings settings) {
+    return savePrivacySettings(
+      avatarVisibility: settings.avatarVisibility.name,
+      statusVisibility: settings.statusVisibility.name,
+      lastSeenVisibility: settings.lastSeenVisibility.name,
+      allowStrangerMessage: settings.allowStrangerMessage,
+      showReadReceipts: settings.showReadReceipts,
+      showTypingIndicator: settings.showTypingIndicator,
+      hidePhoneNumber: settings.hidePhoneNumber,
+      showLinkPreviews: settings.showLinkPreviews,
+      defaultEncryptNewChats: settings.defaultEncryptNewChats,
+      privateChatMode: settings.privateChatMode,
+      protectIpAddress: settings.protectIpAddress,
+      proxyEnabled: settings.proxyEnabled,
+      proxyUrl: settings.proxyUrl,
+      useTor: settings.useTor,
+      defaultSelfDestructSeconds: settings.defaultSelfDestructSeconds,
+    );
+  }
+
   /// 检查是否应该显示已读回执
   Future<bool> shouldShowReadReceipts() async {
     final settings = await getPrivacySettings();
@@ -563,6 +743,30 @@ class PreferencesDataSource {
   Future<bool> shouldShowTypingIndicator() async {
     final settings = await getPrivacySettings();
     return (settings?['showTypingIndicator'] as bool?) ?? true;
+  }
+
+  /// 新聊天是否默认开启端到端加密
+  Future<bool> shouldDefaultEncryptNewChats() async {
+    final settings = await getPrivacySettings();
+    return (settings?['defaultEncryptNewChats'] as bool?) ?? true;
+  }
+
+  /// 是否启用私密聊天模式
+  Future<bool> isPrivateChatModeEnabled() async {
+    final settings = await getPrivacySettings();
+    return (settings?['privateChatMode'] as bool?) ?? false;
+  }
+
+  /// 是否启用 IP 地址保护
+  Future<bool> shouldProtectIpAddress() async {
+    final settings = await getPrivacySettings();
+    return (settings?['protectIpAddress'] as bool?) ?? false;
+  }
+
+  /// 默认阅后即焚时长（秒）
+  Future<int?> getDefaultSelfDestructSeconds() async {
+    final settings = await getPrivacySettings();
+    return _readOptionalInt(settings?['defaultSelfDestructSeconds']);
   }
 
   /// 更新单个隐私设置项
@@ -594,6 +798,8 @@ class PreferencesDataSource {
     required String roomId,
     required String messageId,
     required String text,
+    MessageType type = MessageType.text,
+    Map<String, dynamic>? payload,
     required DateTime scheduledAt,
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
@@ -610,42 +816,38 @@ class PreferencesDataSource {
 
       // 获取当前房间的定时消息列表
       final roomMessages =
-          (allData[roomId] as List<dynamic>?)
-                  ?.cast<Map<String, dynamic>>() ??
-              [];
+          (allData[roomId] as List<dynamic>?)?.cast<Map<String, dynamic>>() ??
+          [];
 
       // 添加新的定时消息
-      roomMessages.add({
-        'messageId': messageId,
-        'text': text,
-        'scheduledAt': scheduledAt.toIso8601String(),
-        'selfDestructAfter': selfDestructAfter,
-        'mentionedUserIds': mentionedUserIds,
-        'mentionsRoom': mentionsRoom,
-        'createdAt': DateTime.now().toIso8601String(),
-      });
+      roomMessages.add(
+        ScheduledMessageDraft(
+          messageId: messageId,
+          text: text,
+          type: type,
+          scheduledAt: scheduledAt,
+          createdAt: DateTime.now(),
+          selfDestructAfter: selfDestructAfter,
+          mentionedUserIds: mentionedUserIds ?? const [],
+          mentionsRoom: mentionsRoom,
+          payload: payload ?? const {},
+        ).toJson(),
+      );
 
       allData[roomId] = roomMessages;
 
-      await p.setString(
-        _keyScheduledMessages,
-        jsonEncode(allData),
-      );
+      await p.setString(_keyScheduledMessages, jsonEncode(allData));
 
       debugLog(
         'Preferences: Scheduled message saved - $messageId for $scheduledAt',
       );
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to save scheduled message - $e',
-      );
+      debugLog('Preferences: Failed to save scheduled message - $e');
     }
   }
 
   /// 获取房间的所有定时消息
-  Future<List<Map<String, dynamic>>> getScheduledMessages(
-    String roomId,
-  ) async {
+  Future<List<ScheduledMessageDraft>> getScheduledMessages(String roomId) async {
     try {
       final p = await prefs;
       final data = p.getString(_keyScheduledMessages);
@@ -655,17 +857,20 @@ class PreferencesDataSource {
       final roomMessages = allData[roomId] as List<dynamic>?;
       if (roomMessages == null) return [];
 
-      return roomMessages.cast<Map<String, dynamic>>();
+      return roomMessages
+          .whereType<Map<dynamic, dynamic>>()
+          .map((item) => ScheduledMessageDraft.fromJson(
+            Map<String, dynamic>.from(item),
+          ))
+          .toList(growable: false);
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to read scheduled messages - $e',
-      );
+      debugLog('Preferences: Failed to read scheduled messages - $e');
       return [];
     }
   }
 
   /// 获取所有房间的到期定时消息
-  Future<List<Map<String, dynamic>>> getDueScheduledMessages() async {
+  Future<List<ScheduledMessageDraft>> getDueScheduledMessages() async {
     try {
       final p = await prefs;
       final data = p.getString(_keyScheduledMessages);
@@ -673,40 +878,33 @@ class PreferencesDataSource {
 
       final allData = jsonDecode(data) as Map<String, dynamic>;
       final now = DateTime.now();
-      final dueMessages = <Map<String, dynamic>>[];
+      final dueMessages = <ScheduledMessageDraft>[];
 
       for (final entry in allData.entries) {
         final roomId = entry.key;
         final messages = (entry.value as List<dynamic>)
-            .cast<Map<String, dynamic>>();
+            .whereType<Map<dynamic, dynamic>>()
+            .map((item) => ScheduledMessageDraft.fromJson(
+              Map<String, dynamic>.from(item),
+            ));
 
         for (final msg in messages) {
-          final scheduledAt =
-              DateTime.parse(msg['scheduledAt'] as String);
-          if (now.isAfter(scheduledAt) ||
-              now.isAtSameMomentAs(scheduledAt)) {
-            dueMessages.add({
-              ...msg,
-              'roomId': roomId,
-            });
+          final scheduledAt = msg.scheduledAt;
+          if (now.isAfter(scheduledAt) || now.isAtSameMomentAs(scheduledAt)) {
+            dueMessages.add(msg.copyWith(roomId: roomId));
           }
         }
       }
 
       return dueMessages;
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to get due scheduled messages - $e',
-      );
+      debugLog('Preferences: Failed to get due scheduled messages - $e');
       return [];
     }
   }
 
   /// 删除定时消息
-  Future<void> removeScheduledMessage(
-    String roomId,
-    String messageId,
-  ) async {
+  Future<void> removeScheduledMessage(String roomId, String messageId) async {
     try {
       final p = await prefs;
       final data = p.getString(_keyScheduledMessages);
@@ -717,8 +915,7 @@ class PreferencesDataSource {
           ?.cast<Map<String, dynamic>>();
       if (roomMessages == null) return;
 
-      roomMessages
-          .removeWhere((msg) => msg['messageId'] == messageId);
+      roomMessages.removeWhere((msg) => msg['messageId'] == messageId);
 
       if (roomMessages.isEmpty) {
         allData.remove(roomId);
@@ -729,19 +926,12 @@ class PreferencesDataSource {
       if (allData.isEmpty) {
         await p.remove(_keyScheduledMessages);
       } else {
-        await p.setString(
-          _keyScheduledMessages,
-          jsonEncode(allData),
-        );
+        await p.setString(_keyScheduledMessages, jsonEncode(allData));
       }
 
-      debugLog(
-        'Preferences: Scheduled message removed - $messageId',
-      );
+      debugLog('Preferences: Scheduled message removed - $messageId');
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to remove scheduled message - $e',
-      );
+      debugLog('Preferences: Failed to remove scheduled message - $e');
     }
   }
 
@@ -758,19 +948,12 @@ class PreferencesDataSource {
       if (allData.isEmpty) {
         await p.remove(_keyScheduledMessages);
       } else {
-        await p.setString(
-          _keyScheduledMessages,
-          jsonEncode(allData),
-        );
+        await p.setString(_keyScheduledMessages, jsonEncode(allData));
       }
 
-      debugLog(
-        'Preferences: Cleared all scheduled messages for $roomId',
-      );
+      debugLog('Preferences: Cleared all scheduled messages for $roomId');
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to clear scheduled messages - $e',
-      );
+      debugLog('Preferences: Failed to clear scheduled messages - $e');
     }
   }
 
@@ -783,10 +966,7 @@ class PreferencesDataSource {
     bool allowStrangers = false,
     int visibleDays = 0,
   }) async {
-    final data = {
-      'allowStrangers': allowStrangers,
-      'visibleDays': visibleDays,
-    };
+    final data = {'allowStrangers': allowStrangers, 'visibleDays': visibleDays};
     final p = await prefs;
     await p.setString(_keyMomentSettings, jsonEncode(data));
   }
@@ -818,9 +998,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return (jsonDecode(data) as List).cast<String>();
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to read hidden moment users - $e',
-      );
+      debugLog('Preferences: Failed to read hidden moment users - $e');
       return null;
     }
   }
@@ -839,9 +1017,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return (jsonDecode(data) as List).cast<String>();
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to read blocked moment users - $e',
-      );
+      debugLog('Preferences: Failed to read blocked moment users - $e');
       return null;
     }
   }
@@ -860,9 +1036,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return DateTime.parse(data);
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to read moment last read time - $e',
-      );
+      debugLog('Preferences: Failed to read moment last read time - $e');
       return null;
     }
   }
@@ -937,30 +1111,23 @@ class PreferencesDataSource {
   }
 
   List<Map<String, dynamic>> _getDefaultQuickReplies() {
-    const defaults = [
-      '好的',
-      '收到',
-      '稍等',
-      '在忙，稍后回复',
-      '谢谢',
-      '没问题',
-    ];
+    const defaults = ['好的', '收到', '稍等', '在忙，稍后回复', '谢谢', '没问题'];
     return defaults
         .asMap()
         .entries
-        .map((e) => {
-              'id': 'default_${e.key}',
-              'content': e.value,
-              'order': e.key,
-              'isSystem': true,
-            })
+        .map(
+          (e) => {
+            'id': 'default_${e.key}',
+            'content': e.value,
+            'order': e.key,
+            'isSystem': true,
+          },
+        )
         .toList();
   }
 
   /// 保存快捷回复模板列表
-  Future<void> saveQuickReplies(
-    List<Map<String, dynamic>> replies,
-  ) async {
+  Future<void> saveQuickReplies(List<Map<String, dynamic>> replies) async {
     try {
       final p = await prefs;
       await p.setString(_keyQuickReplies, jsonEncode(replies));
@@ -1008,9 +1175,7 @@ class PreferencesDataSource {
         await saveQuickReplies(replies);
       }
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to update quick reply last used - $e',
-      );
+      debugLog('Preferences: Failed to update quick reply last used - $e');
     }
   }
 
@@ -1045,9 +1210,7 @@ class PreferencesDataSource {
 
       await p.setString(_keyTranslationCache, jsonEncode(cache));
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to save translation cache - $e',
-      );
+      debugLog('Preferences: Failed to save translation cache - $e');
     }
   }
 
@@ -1065,9 +1228,7 @@ class PreferencesDataSource {
       final key = '${messageId}_$targetLanguage';
       return cache[key] as String?;
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to read translation cache - $e',
-      );
+      debugLog('Preferences: Failed to read translation cache - $e');
       return null;
     }
   }
@@ -1080,9 +1241,7 @@ class PreferencesDataSource {
       if (data == null) return null;
       return jsonDecode(data) as Map<String, dynamic>;
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to read translation settings - $e',
-      );
+      debugLog('Preferences: Failed to read translation settings - $e');
       return null;
     }
   }
@@ -1107,14 +1266,9 @@ class PreferencesDataSource {
       current['updatedAt'] = DateTime.now().toIso8601String();
 
       final p = await prefs;
-      await p.setString(
-        _keyTranslationSettings,
-        jsonEncode(current),
-      );
+      await p.setString(_keyTranslationSettings, jsonEncode(current));
     } catch (e) {
-      debugLog(
-        'Preferences: Failed to save translation settings - $e',
-      );
+      debugLog('Preferences: Failed to save translation settings - $e');
     }
   }
 
@@ -1123,10 +1277,7 @@ class PreferencesDataSource {
   // ============================================
 
   /// 设置聊天背景
-  Future<void> setChatBackground(
-    String roomId,
-    String backgroundPath,
-  ) async {
+  Future<void> setChatBackground(String roomId, String backgroundPath) async {
     final p = await prefs;
     await p.setString('n42_chat_background_$roomId', backgroundPath);
   }
@@ -1171,27 +1322,25 @@ class PreferencesDataSource {
   // ============================================
 
   /// 保存自动下载设置
-  Future<void> saveAutoDownloadSettings(
-    Map<String, dynamic> settings,
-  ) async {
+  Future<void> saveAutoDownloadSettings(Map<String, dynamic> settings) async {
     final p = await prefs;
-    await p.setString(
-      'n42_chat_auto_download_settings',
-      jsonEncode(settings),
-    );
+    await p.setString('n42_chat_auto_download_settings', jsonEncode(settings));
   }
 
   /// 获取自动下载设置
   Future<Map<String, dynamic>> getAutoDownloadSettings() async {
     final p = await prefs;
     final value = p.getString('n42_chat_auto_download_settings');
-    if (value == null || value.isEmpty) return {};
+    if (value == null || value.isEmpty) {
+      return Map<String, dynamic>.from(defaultAutoDownloadSettings);
+    }
 
     try {
-      return jsonDecode(value) as Map<String, dynamic>;
+      final decoded = jsonDecode(value) as Map<String, dynamic>;
+      return {...defaultAutoDownloadSettings, ...decoded};
     } catch (e) {
       // 兼容旧的 key=value 格式
-      final map = <String, dynamic>{};
+      final map = <String, dynamic>{...defaultAutoDownloadSettings};
       for (final pair in value.split(',')) {
         final parts = pair.split('=');
         if (parts.length == 2) {
@@ -1295,9 +1444,7 @@ class PreferencesDataSource {
   // ============================================
 
   /// 保存聊天文件夹列表
-  Future<void> saveChatFolders(
-    List<Map<String, dynamic>> folders,
-  ) async {
+  Future<void> saveChatFolders(List<Map<String, dynamic>> folders) async {
     final p = await prefs;
     await p.setString(_keyChatFolders, jsonEncode(folders));
   }
@@ -1315,4 +1462,24 @@ class PreferencesDataSource {
       return [];
     }
   }
+}
+
+VisibilityLevel _parseVisibilityLevel(String? value) {
+  return VisibilityLevel.values.firstWhere(
+    (level) => level.name == value,
+    orElse: () => VisibilityLevel.everyone,
+  );
+}
+
+int? _readOptionalInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value > 0 ? value : null;
+  if (value is num) return value > 0 ? value.toInt() : null;
+  if (value is String) {
+    final parsed = int.tryParse(value);
+    if (parsed != null && parsed > 0) {
+      return parsed;
+    }
+  }
+  return null;
 }

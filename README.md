@@ -26,12 +26,16 @@
 | 账号注册 | 支持邀请码注册 | ✅ |
 | 邮箱绑定 | 注册时绑定邮箱，用于找回密码 | ✅ |
 | 生物识别登录 | 支持指纹/Face ID 快速登录 | ✅ |
-| 邮箱验证码登录 | OTP 方式登录 | ✅ |
-| 第三方登录 | Google、Apple、SSO | ✅ |
+| Passkey 管理 | 可在安全设置中注册/删除，独立登录入口未开放 | ⏳ |
+| 邮箱验证码登录 | 独立登录入口未开放 | ⏳ |
+| 第三方登录 | Google（Android）、Apple（iOS/macOS）、SSO | ✅ |
 | 密码重置 | 通过绑定邮箱重置密码 | ✅ |
 | 密码修改 | 登录后修改密码 | ✅ |
 | 会话恢复 | 自动恢复上次登录会话 | ✅ |
 | 多账号管理 | 支持多个账号切换 | ✅ |
+
+> 当前 Passkey 仅开放账号内管理；邮箱验证码接口保留，但登录首页未暴露独立入口。
+> `Facebook / Twitter / WeChat` 代码链路保留为实验能力，默认登录页不暴露，待宿主完成平台配置后再开启。
 
 ### 💬 消息功能
 
@@ -415,10 +419,13 @@ N42Chat.initialize(N42ChatConfig(
 | `login(...)` | 用户名密码登录 |
 | `loginWithToken(...)` | Token登录 |
 | `logout()` | 登出 |
+| `purgeLocalData()` | 清理本地会话与缓存 |
 | `isLoggedIn` | 登录状态 |
 | `currentUser` | 当前用户 |
+| `authStatusStream` | 认证状态流 |
 | `unreadCountStream` | 未读消息流 |
 | `openConversation(roomId)` | 打开会话 |
+| `openUserProfile(userId)` | 打开用户资料 |
 | `createDirectMessage(userId)` | 创建私聊 |
 | `registerPushNotifications()` | 注册推送通知 |
 | `dispose()` | 释放资源 |

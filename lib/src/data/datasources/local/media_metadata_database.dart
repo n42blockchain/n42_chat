@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -62,12 +63,22 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
   MediaMetadataDatabase._internal(super.e);
 
   static MediaMetadataDatabase? _instance;
+  static Completer<MediaMetadataDatabase>? _initCompleter;
 
   /// 获取单例实例
   static Future<MediaMetadataDatabase> getInstance() async {
     if (_instance != null) return _instance!;
-    _instance = MediaMetadataDatabase._internal(await _openConnection());
-    return _instance!;
+    if (_initCompleter != null) return _initCompleter!.future;
+    _initCompleter = Completer<MediaMetadataDatabase>();
+    try {
+      _instance = MediaMetadataDatabase._internal(await _openConnection());
+      _initCompleter!.complete(_instance!);
+      return _instance!;
+    } catch (e, s) {
+      _initCompleter!.completeError(e, s);
+      _initCompleter = null;
+      rethrow;
+    }
   }
 
   /// 测试用构造函数
@@ -189,12 +200,15 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
     String? roomId,
     String? fileCategory,
     int? minFileSizeBytes,
+    bool preserveThumbnails = true,
   }) async {
     final query = select(mediaFiles)
       ..where((t) {
         var expr = t.isCleaned.equals(false) &
-            t.isThumbnail.equals(false) &
             t.isPinned.equals(false);
+        if (preserveThumbnails) {
+          expr = expr & t.isThumbnail.equals(false);
+        }
         if (olderThanDays != null) {
           final cutoff =
               DateTime.now().subtract(Duration(days: olderThanDays));
@@ -279,7 +293,9 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
   }
 
   /// 获取总媒体统计
-  Future<TotalMediaStats> getTotalStats() async {
+  Future<TotalMediaStats> getTotalStats({
+    bool preserveThumbnails = true,
+  }) async {
     final query = selectOnly(mediaFiles)
       ..where(mediaFiles.isCleaned.equals(false))
       ..addColumns([
@@ -288,9 +304,14 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
       ]);
     final row = await query.getSingleOrNull();
     final cleanableQuery = selectOnly(mediaFiles)
-      ..where(mediaFiles.isCleaned.equals(false) &
-          mediaFiles.isThumbnail.equals(false) &
-          mediaFiles.isPinned.equals(false))
+      ..where(() {
+        var expr = mediaFiles.isCleaned.equals(false) &
+            mediaFiles.isPinned.equals(false);
+        if (preserveThumbnails) {
+          expr = expr & mediaFiles.isThumbnail.equals(false);
+        }
+        return expr;
+      }())
       ..addColumns([mediaFiles.fileSize.sum()]);
     final cleanableRow = await cleanableQuery.getSingleOrNull();
 

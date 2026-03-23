@@ -22,26 +22,31 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     on<PointsUpdateConfig>(_onUpdateConfig);
     on<PointsLoadRedemptionItems>(_onLoadRedemptionItems);
     on<PointsRedeemItem>(_onRedeemItem);
+    on<PointsClearRedemptionFeedback>(_onClearRedemptionFeedback);
   }
 
   Future<void> _onLoadBalance(
     PointsLoadBalance event,
     Emitter<PointsState> emit,
   ) async {
-    emit(state.copyWith(status: PointsStatus.loading));
+    emit(state.copyWith(
+      balanceStatus: PointsLoadStatus.loading,
+      balanceErrorMessage: null,
+    ));
     try {
       final balance = await _repository.getBalance(
         event.userId,
         event.roomId,
       );
       emit(state.copyWith(
-        status: PointsStatus.loaded,
         balance: balance,
+        balanceStatus: PointsLoadStatus.loaded,
+        balanceErrorMessage: null,
       ));
     } catch (e) {
       emit(state.copyWith(
-        status: PointsStatus.error,
-        errorMessage: e.toString(),
+        balanceStatus: PointsLoadStatus.error,
+        balanceErrorMessage: e.toString(),
       ));
     }
   }
@@ -50,20 +55,24 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     PointsLoadTransactions event,
     Emitter<PointsState> emit,
   ) async {
-    emit(state.copyWith(status: PointsStatus.loading));
+    emit(state.copyWith(
+      transactionsStatus: PointsLoadStatus.loading,
+      transactionsErrorMessage: null,
+    ));
     try {
       final transactions = await _repository.getTransactions(
         event.userId,
         event.roomId,
       );
       emit(state.copyWith(
-        status: PointsStatus.loaded,
         transactions: transactions,
+        transactionsStatus: PointsLoadStatus.loaded,
+        transactionsErrorMessage: null,
       ));
     } catch (e) {
       emit(state.copyWith(
-        status: PointsStatus.error,
-        errorMessage: e.toString(),
+        transactionsStatus: PointsLoadStatus.error,
+        transactionsErrorMessage: e.toString(),
       ));
     }
   }
@@ -72,17 +81,21 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     PointsLoadLeaderboard event,
     Emitter<PointsState> emit,
   ) async {
-    emit(state.copyWith(status: PointsStatus.loading));
+    emit(state.copyWith(
+      leaderboardStatus: PointsLoadStatus.loading,
+      leaderboardErrorMessage: null,
+    ));
     try {
       final leaderboard = await _repository.getLeaderboard(event.roomId);
       emit(state.copyWith(
-        status: PointsStatus.loaded,
         leaderboard: leaderboard,
+        leaderboardStatus: PointsLoadStatus.loaded,
+        leaderboardErrorMessage: null,
       ));
     } catch (e) {
       emit(state.copyWith(
-        status: PointsStatus.error,
-        errorMessage: e.toString(),
+        leaderboardStatus: PointsLoadStatus.error,
+        leaderboardErrorMessage: e.toString(),
       ));
     }
   }
@@ -129,17 +142,21 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     PointsLoadRedemptionItems event,
     Emitter<PointsState> emit,
   ) async {
-    emit(state.copyWith(status: PointsStatus.loading));
+    emit(state.copyWith(
+      redemptionItemsStatus: PointsLoadStatus.loading,
+      redemptionItemsErrorMessage: null,
+    ));
     try {
       final items = await _repository.getRedemptionItems(event.roomId);
       emit(state.copyWith(
-        status: PointsStatus.loaded,
         redemptionItems: items,
+        redemptionItemsStatus: PointsLoadStatus.loaded,
+        redemptionItemsErrorMessage: null,
       ));
     } catch (e) {
       emit(state.copyWith(
-        status: PointsStatus.error,
-        errorMessage: e.toString(),
+        redemptionItemsStatus: PointsLoadStatus.error,
+        redemptionItemsErrorMessage: e.toString(),
       ));
     }
   }
@@ -148,34 +165,86 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     PointsRedeemItem event,
     Emitter<PointsState> emit,
   ) async {
-    emit(state.copyWith(status: PointsStatus.redeeming));
+    emit(state.copyWith(
+      redemptionStatus: PointsRedemptionStatus.inProgress,
+      redeemingItemId: event.itemId,
+      redemptionErrorMessage: null,
+    ));
     try {
       await _repository.redeemItem(
         userId: event.userId,
         roomId: event.roomId,
         itemId: event.itemId,
       );
+    } catch (e) {
+      emit(state.copyWith(
+        redemptionStatus: PointsRedemptionStatus.failed,
+        redeemingItemId: null,
+        redemptionErrorMessage: e.toString(),
+      ));
+      return;
+    }
 
-      // Refresh balance and redemption items after successful redemption
-      final balance = await _repository.getBalance(
+    var balance = state.balance;
+    var transactions = state.transactions;
+    var items = state.redemptionItems;
+    var balanceRefreshSucceeded = false;
+    var transactionsRefreshSucceeded = false;
+    var itemsRefreshSucceeded = false;
+
+    try {
+      balance = await _repository.getBalance(event.userId, event.roomId);
+      balanceRefreshSucceeded = true;
+    } catch (_) {}
+
+    try {
+      transactions = await _repository.getTransactions(
         event.userId,
         event.roomId,
       );
-      final items = await _repository.getRedemptionItems(event.roomId);
+      transactionsRefreshSucceeded = true;
+    } catch (_) {}
 
-      // Emit `redeemed` as a one-shot status. The UI layer (BlocListener)
-      // should react to this status (e.g., show a snackbar) and then
-      // trigger a fresh PointsLoadBalance to reset to `loaded`.
-      emit(state.copyWith(
-        status: PointsStatus.redeemed,
-        balance: balance,
-        redemptionItems: items,
-      ));
-    } catch (e) {
-      emit(state.copyWith(
-        status: PointsStatus.error,
-        errorMessage: e.toString(),
-      ));
-    }
+    try {
+      items = await _repository.getRedemptionItems(event.roomId);
+      itemsRefreshSucceeded = true;
+    } catch (_) {}
+
+    emit(state.copyWith(
+      status: PointsStatus.loaded,
+      balance: balance,
+      balanceStatus: balanceRefreshSucceeded
+          ? PointsLoadStatus.loaded
+          : state.balanceStatus,
+      balanceErrorMessage:
+          balanceRefreshSucceeded ? null : state.balanceErrorMessage,
+      transactions: transactions,
+      transactionsStatus: transactionsRefreshSucceeded
+          ? PointsLoadStatus.loaded
+          : state.transactionsStatus,
+      transactionsErrorMessage:
+          transactionsRefreshSucceeded ? null : state.transactionsErrorMessage,
+      redemptionItems: items,
+      redemptionItemsStatus: itemsRefreshSucceeded
+          ? PointsLoadStatus.loaded
+          : state.redemptionItemsStatus,
+      redemptionItemsErrorMessage: itemsRefreshSucceeded
+          ? null
+          : state.redemptionItemsErrorMessage,
+      redemptionStatus: PointsRedemptionStatus.succeeded,
+      redeemingItemId: null,
+      redemptionErrorMessage: null,
+    ));
+  }
+
+  Future<void> _onClearRedemptionFeedback(
+    PointsClearRedemptionFeedback event,
+    Emitter<PointsState> emit,
+  ) async {
+    emit(state.copyWith(
+      redemptionStatus: PointsRedemptionStatus.idle,
+      redeemingItemId: null,
+      redemptionErrorMessage: null,
+    ));
   }
 }

@@ -69,7 +69,9 @@ void main() {
     });
 
     test('withVirtualBackground factory should set correct mode', () {
-      final config = BackgroundProcessingConfig.withVirtualBackground('https://example.com/bg.jpg');
+      final config = BackgroundProcessingConfig.withVirtualBackground(
+        'https://example.com/bg.jpg',
+      );
 
       expect(config.mode, BackgroundMode.virtualBackground);
       expect(config.virtualBackgroundUrl, 'https://example.com/bg.jpg');
@@ -89,9 +91,7 @@ void main() {
         blurRadius: 0.5,
       );
 
-      final modified = original.copyWith(
-        blurRadius: 0.8,
-      );
+      final modified = original.copyWith(blurRadius: 0.8);
 
       expect(modified.mode, BackgroundMode.blur);
       expect(modified.blurRadius, 0.8);
@@ -121,16 +121,21 @@ void main() {
       config.virtualBackgroundUrl = null;
     });
 
-    test('backgroundProcessing getter should return BackgroundProcessingConfig', () {
-      final bgConfig = config.backgroundProcessing;
+    test(
+      'backgroundProcessing getter should return BackgroundProcessingConfig',
+      () {
+        final bgConfig = config.backgroundProcessing;
 
-      expect(bgConfig, isA<BackgroundProcessingConfig>());
-      expect(bgConfig.mode, config.backgroundMode);
-      expect(bgConfig.blurRadius, config.backgroundBlurRadius);
-    });
+        expect(bgConfig, isA<BackgroundProcessingConfig>());
+        expect(bgConfig.mode, config.backgroundMode);
+        expect(bgConfig.blurRadius, config.backgroundBlurRadius);
+      },
+    );
 
     test('setBackgroundProcessing should update config values', () {
-      final newConfig = BackgroundProcessingConfig.withVirtualBackground('https://example.com/bg.jpg');
+      final newConfig = BackgroundProcessingConfig.withVirtualBackground(
+        'https://example.com/bg.jpg',
+      );
 
       config.setBackgroundProcessing(newConfig);
 
@@ -157,7 +162,7 @@ void main() {
     test('should create with default values', () {
       const config = CallRecordingConfig();
 
-      expect(config.enabled, true);
+      expect(config.enabled, false);
       expect(config.autoStart, false);
       expect(config.sampleRate, 44100);
       expect(config.bitRate, 128000);
@@ -186,7 +191,7 @@ void main() {
     test('static defaultConfig should have standard values', () {
       const config = CallRecordingConfig.defaultConfig;
 
-      expect(config.enabled, true);
+      expect(config.enabled, false);
       expect(config.autoStart, false);
       expect(config.sampleRate, 44100);
     });
@@ -213,15 +218,9 @@ void main() {
     });
 
     test('copyWith should create new instance with updated values', () {
-      const original = CallRecordingConfig(
-        enabled: true,
-        autoStart: false,
-      );
+      const original = CallRecordingConfig(enabled: true, autoStart: false);
 
-      final modified = original.copyWith(
-        autoStart: true,
-        maxDuration: 1800,
-      );
+      final modified = original.copyWith(autoStart: true, maxDuration: 1800);
 
       expect(modified.enabled, true);
       expect(modified.autoStart, true);
@@ -234,7 +233,7 @@ void main() {
       const config = CallRecordingConfig();
       final str = config.toString();
 
-      expect(str, contains('enabled: true'));
+      expect(str, contains('enabled: false'));
       expect(str, contains('autoStart: false'));
       expect(str, contains('sampleRate: 44100'));
     });
@@ -281,15 +280,18 @@ void main() {
   // Audio Processing Tests
   // ============================================
   group('AudioProcessingConfig', () {
-    test('should create with default values (all enabled except enhanced mode)', () {
-      const config = AudioProcessingConfig();
+    test(
+      'should create with default values (all enabled except enhanced mode)',
+      () {
+        const config = AudioProcessingConfig();
 
-      expect(config.noiseSuppression, true);
-      expect(config.echoCancellation, true);
-      expect(config.autoGainControl, true);
-      expect(config.highPassFilter, true);
-      expect(config.enhancedMode, false);
-    });
+        expect(config.noiseSuppression, true);
+        expect(config.echoCancellation, true);
+        expect(config.autoGainControl, true);
+        expect(config.highPassFilter, true);
+        expect(config.enhancedMode, false);
+      },
+    );
 
     test('should create with custom values', () {
       const config = AudioProcessingConfig(

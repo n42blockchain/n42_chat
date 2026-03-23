@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
@@ -16,10 +17,7 @@ import '../../../n42_chat.dart';
 class GroupMembersPage extends StatefulWidget {
   final String roomId;
 
-  const GroupMembersPage({
-    super.key,
-    required this.roomId,
-  });
+  const GroupMembersPage({super.key, required this.roomId});
 
   @override
   State<GroupMembersPage> createState() => _GroupMembersPageState();
@@ -54,11 +52,18 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         listener: (context, state) {
           if (state.status == GroupStatus.error && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
+              SnackBar(
+                content: Text(resolveBlocMessage(context, state.errorMessage!)),
+              ),
             );
-          } else if (state.status == GroupStatus.success && state.successMessage != null) {
+          } else if (state.status == GroupStatus.success &&
+              state.successMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(resolveBlocMessage(context, state.successMessage!))),
+              SnackBar(
+                content: Text(
+                  resolveBlocMessage(context, state.successMessage!),
+                ),
+              ),
             );
           }
         },
@@ -87,9 +92,13 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     // 搜索过滤
     if (_searchQuery.isNotEmpty) {
       members = members
-          .where((m) =>
-              m.displayName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              m.userId.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .where(
+            (m) =>
+                m.displayName.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                m.userId.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
           .toList();
     }
 
@@ -124,10 +133,13 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           alignment: Alignment.centerLeft,
           child: Text(
-            S.of(context)?.groupTotalMembers(state.currentGroup!.memberCount) ?? '${state.currentGroup!.memberCount} members',
+            S.of(context)?.groupTotalMembers(state.currentGroup!.memberCount) ??
+                '${state.currentGroup!.memberCount} members',
             style: TextStyle(
               fontSize: 13,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
           ),
         ),
@@ -178,10 +190,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 ),
                 child: Text(
                   S.of(context)?.commonGroupOwner ?? 'Owner',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.white,
-                  ),
+                  style: const TextStyle(fontSize: 10, color: Colors.white),
                 ),
               ),
             ] else if (member.isAdmin) ...[
@@ -194,10 +203,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 ),
                 child: Text(
                   S.of(context)?.commonGroupAdmin ?? 'Admin',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.white,
-                  ),
+                  style: const TextStyle(fontSize: 10, color: Colors.white),
                 ),
               ),
             ],
@@ -207,7 +213,9 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           member.userId,
           style: TextStyle(
             fontSize: 13,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
         onTap: () => _showMemberOptions(member, group),
@@ -216,8 +224,10 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
   }
 
   void _showMemberOptions(GroupMember member, GroupEntity group) {
-    final canManage = group.canKick && !member.isOwner;
-    final canSetAdmin = group.isOwner && !member.isOwner;
+    final myUserId = MatrixClientManager.instance.client?.userID;
+    final isSelf = member.userId == myUserId;
+    final canManage = _canManageMember(group, member, isSelf: isSelf);
+    final canSetAdmin = group.isOwner && !member.isOwner && !isSelf;
 
     showModalBottomSheet<void>(
       context: context,
@@ -228,27 +238,41 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             // 查看资料
             ListTile(
               leading: const Icon(Icons.person_outline),
-              title: Text(S.of(this.context)?.groupViewProfile ?? 'View Profile'),
+              title: Text(
+                S.of(this.context)?.groupViewProfile ?? 'View Profile',
+              ),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.of(this.context).pushNamed('/profile/${member.userId}');
+                N42Chat.openUserProfile(member.userId, context: this.context);
               },
             ),
 
             // 发送消息
             ListTile(
               leading: const Icon(Icons.chat_bubble_outline),
-              title: Text(S.of(this.context)?.commonSendMessage ?? 'Send Message'),
+              title: Text(
+                S.of(this.context)?.commonSendMessage ?? 'Send Message',
+              ),
               onTap: () async {
+                final pageContext = this.context;
+                final messenger = ScaffoldMessenger.of(pageContext);
+                final l10n = S.of(pageContext);
                 Navigator.pop(context);
                 try {
-                  final roomId = await N42Chat.createDirectMessage(member.userId);
-                  if (!this.context.mounted) return;
-                  await N42Chat.openConversation(roomId, context: this.context);
+                  final roomId = await N42Chat.createDirectMessage(
+                    member.userId,
+                  );
+                  if (!mounted || !pageContext.mounted) return;
+                  await N42Chat.openConversation(roomId, context: pageContext);
                 } catch (e) {
-                  if (!this.context.mounted) return;
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    SnackBar(content: Text(S.of(this.context)?.commonFeatureInDevelopment('') ?? 'Feature in development...')),
+                  if (!mounted || !pageContext.mounted) return;
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        l10n?.commonFeatureInDevelopment('') ??
+                            'Feature in development...',
+                      ),
+                    ),
                   );
                 }
               },
@@ -260,19 +284,21 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 leading: Icon(
                   member.isAdmin ? Icons.remove_moderator : Icons.add_moderator,
                 ),
-                title: Text(member.isAdmin
-                    ? (S.of(this.context)?.groupRemoveAdmin ?? 'Remove Admin')
-                    : (S.of(this.context)?.groupSetAsAdmin ?? 'Set as Admin')),
+                title: Text(
+                  member.isAdmin
+                      ? (S.of(this.context)?.groupRemoveAdmin ?? 'Remove Admin')
+                      : (S.of(this.context)?.groupSetAsAdmin ?? 'Set as Admin'),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   if (member.isAdmin) {
                     this.context.read<GroupBloc>().add(
-                          RemoveAdmin(widget.roomId, member.userId),
-                        );
+                      RemoveAdmin(widget.roomId, member.userId),
+                    );
                   } else {
                     this.context.read<GroupBloc>().add(
-                          SetAsAdmin(widget.roomId, member.userId),
-                        );
+                      SetAsAdmin(widget.roomId, member.userId),
+                    );
                   }
                 },
               ),
@@ -281,7 +307,11 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             if (canManage)
               ListTile(
                 leading: const Icon(Icons.person_remove, color: Colors.red),
-                title: Text(S.of(this.context)?.chatRemoveFromGroup ?? 'Remove from Group', style: const TextStyle(color: Colors.red)),
+                title: Text(
+                  S.of(this.context)?.chatRemoveFromGroup ??
+                      'Remove from Group',
+                  style: const TextStyle(color: Colors.red),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _confirmKickMember(member);
@@ -293,12 +323,31 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     );
   }
 
+  bool _canManageMember(
+    GroupEntity group,
+    GroupMember member, {
+    required bool isSelf,
+  }) {
+    if (!group.canKick || isSelf || member.isOwner) {
+      return false;
+    }
+
+    if (group.isOwner) {
+      return true;
+    }
+
+    return !member.isAdmin;
+  }
+
   void _confirmKickMember(GroupMember member) {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.groupRemoveMember ?? 'Remove Member'),
-        content: Text(S.of(context)?.groupConfirmRemoveMember(member.displayName) ?? 'Are you sure you want to remove "${member.displayName}" from the group?'),
+        content: Text(
+          S.of(context)?.groupConfirmRemoveMember(member.displayName) ??
+              'Are you sure you want to remove "${member.displayName}" from the group?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -308,14 +357,16 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<GroupBloc>().add(
-                    KickMember(widget.roomId, member.userId),
-                  );
+                KickMember(widget.roomId, member.userId),
+              );
             },
-            child: Text(S.of(context)?.commonRemove ?? 'Remove', style: const TextStyle(color: Colors.red)),
+            child: Text(
+              S.of(context)?.commonRemove ?? 'Remove',
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
     );
   }
 }
-

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -15,6 +16,16 @@ import '../../../core/utils/debug_log.dart';
 /// - 支持在线状态指示器
 /// - 支持群组九宫格头像
 class N42Avatar extends StatelessWidget {
+  static final RegExp _nonWordCjkPattern = RegExp(r'[^\w\u4e00-\u9fa5]');
+  static final RegExp _whitespacePattern = RegExp(r'\s+');
+  static final CacheManager _avatarCacheManager = CacheManager(
+    Config(
+      'avatar_cache',
+      stalePeriod: const Duration(hours: 1),
+      maxNrOfCacheObjects: 200,
+    ),
+  );
+
   /// 头像URL
   final String? imageUrl;
 
@@ -48,6 +59,9 @@ class N42Avatar extends StatelessWidget {
   /// 是否是 NFT 头像（显示金色边框和 NFT 徽章）
   final bool isNftAvatar;
 
+  /// 头像装饰样式
+  final AvatarDecorationPreset decorationPreset;
+
   const N42Avatar({
     super.key,
     this.imageUrl,
@@ -61,11 +75,29 @@ class N42Avatar extends StatelessWidget {
     this.localImagePath,
     this.placeholderIcon = Icons.person,
     this.isNftAvatar = false,
+    this.decorationPreset = AvatarDecorationPreset.none,
   });
+
+  bool get _hasDecoration => decorationPreset != AvatarDecorationPreset.none;
+
+  double get _visualSize {
+    var extra = 0.0;
+    if (_hasDecoration) {
+      extra += 4;
+    }
+    if (isNftAvatar) {
+      extra += 5;
+    }
+    return size + extra;
+  }
 
   @override
   Widget build(BuildContext context) {
     Widget avatar = _buildAvatar();
+
+    if (_hasDecoration) {
+      avatar = _buildDecorationWrapper(avatar);
+    }
 
     // NFT 头像：金色渐变边框 + NFT 徽章
     if (isNftAvatar) {
@@ -74,14 +106,44 @@ class N42Avatar extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          avatar,
-          if (showOnlineStatus) _buildOnlineIndicator(),
-          if (isNftAvatar) _buildNftBadge(),
+      child: SizedBox(
+        width: _visualSize,
+        height: _visualSize,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(child: Center(child: avatar)),
+            if (showOnlineStatus) _buildOnlineIndicator(),
+            if (_hasDecoration) _buildDecorationBadge(),
+            if (isNftAvatar) _buildNftBadge(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDecorationWrapper(Widget avatar) {
+    final spec = _decorationSpec(decorationPreset);
+    return Container(
+      width: size + 4,
+      height: size + 4,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: spec.colors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(borderRadius + 4),
+        boxShadow: [
+          BoxShadow(
+            color: spec.colors.first.withValues(alpha: 0.28),
+            blurRadius: 10,
+            spreadRadius: 1,
+          ),
         ],
       ),
+      padding: const EdgeInsets.all(2),
+      child: avatar,
     );
   }
 
@@ -135,6 +197,29 @@ class N42Avatar extends StatelessWidget {
     );
   }
 
+  Widget _buildDecorationBadge() {
+    final spec = _decorationSpec(decorationPreset);
+    final badgeSize = size * 0.3;
+    return Positioned(
+      left: -2,
+      top: -2,
+      child: Container(
+        width: badgeSize,
+        height: badgeSize,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: spec.colors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 1),
+        ),
+        child: Icon(spec.icon, size: badgeSize * 0.52, color: Colors.white),
+      ),
+    );
+  }
+
   Widget _buildAvatar() {
     return Container(
       width: size,
@@ -150,10 +235,12 @@ class N42Avatar extends StatelessWidget {
 
   Widget _buildContent() {
     // 如果有名字但没有图片URL，直接显示字母头像
-    if ((imageUrl == null || imageUrl!.isEmpty) && name != null && name!.isNotEmpty) {
+    if ((imageUrl == null || imageUrl!.isEmpty) &&
+        name != null &&
+        name!.isNotEmpty) {
       return _buildInitialsAvatar();
     }
-    
+
     // 优先显示网络图片
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       // 获取认证头（用于需要认证的 Matrix 媒体）
@@ -162,19 +249,12 @@ class N42Avatar extends StatelessWidget {
       if (accessToken != null && accessToken.isNotEmpty) {
         headers['Authorization'] = 'Bearer $accessToken';
       }
-      
+
       return CachedNetworkImage(
         imageUrl: imageUrl!,
         fit: BoxFit.cover,
         httpHeaders: headers,
-        // 使用较短的缓存时间确保头像更新
-        cacheManager: CacheManager(
-          Config(
-            'avatar_cache',
-            stalePeriod: const Duration(hours: 1),
-            maxNrOfCacheObjects: 200,
-          ),
-        ),
+        cacheManager: _avatarCacheManager,
         placeholder: (context, url) => _buildFallbackAvatar(),
         errorWidget: (context, url, error) {
           debugLog('N42Avatar: Failed to load image: $url, error: $error');
@@ -201,7 +281,7 @@ class N42Avatar extends StatelessWidget {
     // 默认头像
     return _buildDefaultAvatar();
   }
-  
+
   /// 回退头像：优先显示字母头像，否则显示默认图标
   Widget _buildFallbackAvatar() {
     if (name != null && name!.isNotEmpty) {
@@ -209,7 +289,6 @@ class N42Avatar extends StatelessWidget {
     }
     return _buildDefaultAvatar();
   }
-
 
   Widget _buildDefaultAvatar() {
     return Container(
@@ -224,12 +303,12 @@ class N42Avatar extends StatelessWidget {
 
   Widget _buildInitialsAvatar() {
     final initials = _getInitials(name!);
-    
+
     // 如果获取不到有效字母，显示默认图标
     if (initials.isEmpty) {
       return _buildDefaultAvatar();
     }
-    
+
     return Container(
       color: backgroundColor ?? _getColorFromName(name!),
       child: Center(
@@ -248,18 +327,15 @@ class N42Avatar extends StatelessWidget {
   Widget _buildOnlineIndicator() {
     final indicatorSize = size * 0.25;
     return Positioned(
-      right: 0,
-      bottom: 0,
+      right: -1,
+      bottom: -1,
       child: Container(
         width: indicatorSize,
         height: indicatorSize,
         decoration: BoxDecoration(
           color: isOnline ? AppColors.online : AppColors.offline,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: 2,
-          ),
+          border: Border.all(color: Colors.white, width: 2),
         ),
       ),
     );
@@ -267,17 +343,17 @@ class N42Avatar extends StatelessWidget {
 
   String _getInitials(String name) {
     // 过滤掉特殊字符，只保留字母、数字和中文
-    final cleanName = name.replaceAll(RegExp(r'[^\w\u4e00-\u9fa5]'), '').trim();
-    
+    final cleanName = name.replaceAll(_nonWordCjkPattern, '').trim();
+
     if (cleanName.isEmpty) {
       return '';
     }
-    
-    final parts = cleanName.split(RegExp(r'\s+'));
+
+    final parts = cleanName.split(_whitespacePattern);
     if (parts.length >= 2 && parts[0].isNotEmpty && parts[1].isNotEmpty) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
-    
+
     // 返回第一个字符
     return cleanName.substring(0, 1).toUpperCase();
   }
@@ -289,10 +365,42 @@ class N42Avatar extends StatelessWidget {
   Color _getColorFromName(String name) {
     return AppColorPalettes.getAvatarColor(name);
   }
+
+  _AvatarDecorationSpec _decorationSpec(AvatarDecorationPreset preset) {
+    return switch (preset) {
+      AvatarDecorationPreset.none => const _AvatarDecorationSpec(
+        colors: [Color(0xFF9AA0A6), Color(0xFF9AA0A6)],
+        icon: Icons.circle,
+      ),
+      AvatarDecorationPreset.aurora => const _AvatarDecorationSpec(
+        colors: [Color(0xFF00C2FF), Color(0xFF7C4DFF)],
+        icon: Icons.auto_awesome,
+      ),
+      AvatarDecorationPreset.arcade => const _AvatarDecorationSpec(
+        colors: [Color(0xFFFF7A18), Color(0xFFFF3D81)],
+        icon: Icons.sports_esports,
+      ),
+      AvatarDecorationPreset.blossom => const _AvatarDecorationSpec(
+        colors: [Color(0xFFFF9AA2), Color(0xFFFFC3A0)],
+        icon: Icons.local_florist,
+      ),
+      AvatarDecorationPreset.cosmic => const _AvatarDecorationSpec(
+        colors: [Color(0xFF00B894), Color(0xFF0984E3)],
+        icon: Icons.bolt,
+      ),
+    };
+  }
+}
+
+class _AvatarDecorationSpec {
+  final List<Color> colors;
+  final IconData icon;
+
+  const _AvatarDecorationSpec({required this.colors, required this.icon});
 }
 
 /// 群组头像（微信风格九宫格样式）
-/// 
+///
 /// 布局规则（参照微信）：
 /// - 1人：居中显示
 /// - 2人：左右并排
@@ -318,7 +426,7 @@ class N42GroupAvatar extends StatelessWidget {
 
   /// 点击回调
   final VoidCallback? onTap;
-  
+
   /// 背景色
   final Color? backgroundColor;
 
@@ -358,53 +466,54 @@ class N42GroupAvatar extends StatelessWidget {
     final count = memberAvatars.length.clamp(1, 9);
     final layout = _getLayout(count);
     final rowCount = layout.length;
-    
+
     // 计算每个头像的列数（取最大行的列数）
     final maxCols = layout.reduce((a, b) => a > b ? a : b);
-    
+
     // 间距和内边距（微信风格：紧凑）
     const double gap = 1.5;
     const double padding = 2.0;
-    
+
     // 计算每个头像的尺寸（基于最大列数）
     final availableSize = containerSize - padding * 2;
     final itemSize = (availableSize - gap * (maxCols - 1)) / maxCols;
-    
+
     // 计算总高度
     final totalHeight = itemSize * rowCount + gap * (rowCount - 1);
     // 垂直居中偏移
     final verticalOffset = (availableSize - totalHeight) / 2;
-    
+
     int avatarIndex = 0;
-    
+
     // 构建行列表
     final rows = <Widget>[];
-    
+
     for (int rowIdx = 0; rowIdx < rowCount; rowIdx++) {
       final itemsInRow = layout[rowIdx];
       // 计算该行的宽度
       final rowWidth = itemsInRow * itemSize + (itemsInRow - 1) * gap;
       // 水平居中偏移
       final horizontalOffset = (availableSize - rowWidth) / 2;
-      
+
       final rowChildren = <Widget>[];
-      
+
       for (int colIdx = 0; colIdx < itemsInRow; colIdx++) {
         if (avatarIndex >= count) break;
-        
-        final avatarUrl = avatarIndex < memberAvatars.length 
-            ? memberAvatars[avatarIndex] 
+
+        final avatarUrl = avatarIndex < memberAvatars.length
+            ? memberAvatars[avatarIndex]
             : null;
         final name = memberNames != null && avatarIndex < memberNames!.length
             ? memberNames![avatarIndex]
             : null;
-        
+
         if (colIdx > 0) {
           rowChildren.add(const SizedBox(width: gap));
         }
-        
+
         // 使用唯一 key 强制刷新每个成员头像
-        final uniqueKey = '${name ?? ''}_${avatarUrl ?? 'no_avatar'}_$avatarIndex';
+        final uniqueKey =
+            '${name ?? ''}_${avatarUrl ?? 'no_avatar'}_$avatarIndex';
         rowChildren.add(
           ClipRRect(
             key: ValueKey(uniqueKey),
@@ -422,14 +531,14 @@ class N42GroupAvatar extends StatelessWidget {
             ),
           ),
         );
-        
+
         avatarIndex++;
       }
-      
+
       if (rowIdx > 0) {
         rows.add(const SizedBox(height: gap));
       }
-      
+
       rows.add(
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -442,7 +551,7 @@ class N42GroupAvatar extends StatelessWidget {
         ),
       );
     }
-    
+
     return Container(
       padding: const EdgeInsets.all(padding),
       child: Column(
@@ -482,4 +591,3 @@ class N42GroupAvatar extends StatelessWidget {
     }
   }
 }
-

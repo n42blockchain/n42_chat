@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -37,6 +39,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
 
   DateTime _startTime = DateTime.now().add(const Duration(hours: 1));
   DateTime _endTime = DateTime.now().add(const Duration(days: 3));
+  bool _submitInFlight = false;
 
   @override
   void dispose() {
@@ -129,7 +132,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     );
   }
 
-  void _submitProposal() {
+  Future<void> _submitProposal() async {
     if (!_formKey.currentState!.validate()) return;
 
     final choices = _choiceControllers
@@ -145,7 +148,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     }
 
     // Confirm submission
-    showDialog<bool>(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Create Proposal'),
@@ -165,20 +168,21 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
           ),
         ],
       ),
-    ).then((confirmed) {
-      if (confirmed == true && mounted) {
-        context.read<GovernanceBloc>().add(
-              GovernanceCreateProposal(
-                spaceId: widget.spaceId,
-                title: _titleController.text.trim(),
-                body: _bodyController.text.trim(),
-                choices: choices,
-                startTime: _startTime,
-                endTime: _endTime,
-              ),
-            );
-      }
-    });
+    );
+
+    if (confirmed == true && mounted) {
+      setState(() => _submitInFlight = true);
+      context.read<GovernanceBloc>().add(
+            GovernanceCreateProposal(
+              spaceId: widget.spaceId,
+              title: _titleController.text.trim(),
+              body: _bodyController.text.trim(),
+              choices: choices,
+              startTime: _startTime,
+              endTime: _endTime,
+            ),
+          );
+    }
   }
 
   @override
@@ -193,17 +197,21 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
         elevation: 0.5,
       ),
       body: BlocConsumer<GovernanceBloc, GovernanceState>(
+        listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
-          if (state.status == GovernanceStatus.created) {
+          if (_submitInFlight && state.status == GovernanceStatus.created) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Proposal created successfully!'),
                 backgroundColor: AppColors.success,
               ),
             );
-            Navigator.of(context).pop();
-          } else if (state.status == GovernanceStatus.error &&
+            _submitInFlight = false;
+            Navigator.of(context).pop(true);
+          } else if (_submitInFlight &&
+              state.status == GovernanceStatus.error &&
               state.errorMessage != null) {
+            setState(() => _submitInFlight = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
@@ -213,7 +221,8 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
           }
         },
         builder: (context, state) {
-          final isCreating = state.status == GovernanceStatus.creating;
+          final isCreating =
+              _submitInFlight && state.status == GovernanceStatus.creating;
 
           return Stack(
             children: [
@@ -541,7 +550,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: isCreating ? null : _submitProposal,
+        onPressed: isCreating
+            ? null
+            : () {
+                unawaited(_submitProposal());
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor:

@@ -2,15 +2,19 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' show min;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
+import 'package:mime/mime.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../core/services/speech_to_text_service.dart';
 import '../../../core/services/translation_service.dart';
+import '../../../core/utils/content_filter_utils.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
-import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'chat_event.dart';
@@ -41,6 +45,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   // 定时发送检查定时器
   Timer? _scheduledMessageTimer;
+
+  // 输入状态过期刷新定时器
+  Timer? _typingUsersTimer;
 
   // 已本地删除的消息ID集合（防止被消息订阅恢复）
   final Set<String> _locallyDeletedMessageIds = {};
@@ -79,12 +86,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     IGroupRepository? groupRepository,
     ITranslationService? translationService,
     MatrixClientManager? clientManager,
-  })  : _messageRepository = messageRepository,
-        _secureStorage = secureStorage,
-        _groupRepository = groupRepository,
-        _translationService = translationService,
-        _clientManager = clientManager,
-        super(ChatState.initial()) {
+  }) : _messageRepository = messageRepository,
+       _secureStorage = secureStorage,
+       _groupRepository = groupRepository,
+       _translationService = translationService,
+       _clientManager = clientManager,
+       super(ChatState.initial()) {
     // 消息加载/订阅/更新
     on<InitializeChat>(_onInitializeChat);
     on<LoadMessages>(onLoadMessages);
@@ -92,6 +99,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SubscribeMessages>(onSubscribeMessages);
     on<UnsubscribeMessages>(onUnsubscribeMessages);
     on<MessagesUpdated>(onMessagesUpdated);
+    on<TypingUsersUpdated>(onTypingUsersUpdated);
     on<DisposeChat>(onDisposeChat);
 
     // 消息发送（各类型）
@@ -165,6 +173,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 房间信息（频道/权限）
     on<RoomInfoLoaded>(_onRoomInfoLoaded);
+    on<ContentFilterLoaded>(_onContentFilterLoaded);
+    on<ScheduledMessagesPreviewLoaded>(_onScheduledMessagesPreviewLoaded);
+    on<RecipientLanguageDetected>(_onRecipientLanguageDetected);
+  }
+
+  Future<int?> _resolveSelfDestructAfter(int? explicitValue) async {
+    if (explicitValue != null) {
+      return explicitValue > 0 ? explicitValue : null;
+    }
+
+    final defaultSeconds = await _secureStorage.getDefaultSelfDestructSeconds();
+    if (defaultSeconds == null || defaultSeconds <= 0) {
+      return null;
+    }
+    return defaultSeconds;
   }
 
   /// 处理销毁时间加载完成事件
@@ -174,7 +197,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     final updatedMessages = state.messages.map((msg) {
       final destroyedAt = event.destructionTimes[msg.id];
-      if (destroyedAt != null && msg.isSelfDestructing && !msg.isDestructionStarted) {
+      if (destroyedAt != null &&
+          msg.isSelfDestructing &&
+          !msg.isDestructionStarted) {
         return msg.copyWith(destroyedAt: destroyedAt);
       }
       return msg;
@@ -188,6 +213,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _pollResponsesSubscription?.cancel();
     _destructionTimer?.cancel();
     _scheduledMessageTimer?.cancel();
+    _typingUsersTimer?.cancel();
     _syncStatusSubscription?.cancel();
     _retryTimer?.cancel();
     return super.close();
@@ -208,7 +234,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _loadDeletedMessageIds(event.roomId);
 
     // 立即显示界面，不等待网络
-    emit(state.copyWith(roomId: event.roomId, isLoading: false, clearError: true));
+    emit(
+      state.copyWith(roomId: event.roomId, isLoading: false, clearError: true),
+    );
 
     // 先尝试快速加载本地缓存消息
     try {
@@ -223,12 +251,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
             .where((m) => !_locallyDeletedMessageIds.contains(m.id))
             .toList();
 
-        emit(state.copyWith(
-          messages: filteredMessages,
-          isLoading: false,
-          hasMore: true,
-        ));
-        debugLog('ChatBloc: Displayed ${filteredMessages.length} cached messages instantly');
+        emit(
+          state.copyWith(
+            messages: filteredMessages,
+            isLoading: false,
+            hasMore: true,
+          ),
+        );
+        debugLog(
+          'ChatBloc: Displayed ${filteredMessages.length} cached messages instantly',
+        );
       }
     } catch (e) {
       debugLog('ChatBloc: Failed to load cached messages: $e');
@@ -262,7 +294,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     setupAutoRetry();
 
     // 加载关键词过滤配置
-    _loadContentFilter(event.roomId, emit);
+    _loadContentFilter(event.roomId);
 
     // 加载翻译设置
     _loadTranslationSettings();
@@ -271,12 +303,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _loadRoomInfo(event.roomId);
   }
 
-  void _loadContentFilter(String roomId, Emitter<ChatState> emit) {
+  void _loadContentFilter(String roomId) {
     Future.microtask(() async {
       try {
         final filter = await _groupRepository?.getContentFilter(roomId);
         if (!isClosed) {
-          emit(state.copyWith(contentFilter: filter));
+          add(ContentFilterLoaded(filter));
         }
       } catch (e) {
         // content filter 不影响聊天主流程，静默忽略错误
@@ -284,18 +316,29 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     });
   }
 
+  void _onContentFilterLoaded(
+    ContentFilterLoaded event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(state.copyWith(contentFilter: event.config));
+  }
+
   void _loadTranslationSettings() {
     Future.microtask(() async {
       try {
         final settings = await _secureStorage.getTranslationSettings();
         if (!isClosed && settings != null) {
-          add(TranslationSettingsLoaded(
-            autoTranslate: settings['autoTranslate'] as bool? ?? false,
-            defaultTargetLanguage:
+          add(
+            TranslationSettingsLoaded(
+              autoTranslate: settings['autoTranslate'] as bool? ?? false,
+              defaultTargetLanguage: normalizeTranslationLanguageCode(
                 settings['defaultTargetLanguage'] as String? ??
                     getDeviceLanguageCode(),
-            smartReplyTranslate: settings['smartReplyTranslate'] as bool? ?? false,
-          ));
+              ),
+              smartReplyTranslate:
+                  settings['smartReplyTranslate'] as bool? ?? false,
+            ),
+          );
         }
       } catch (e) {
         debugLog('ChatBloc: Failed to load translation settings: $e');
@@ -318,7 +361,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _loadSavedDestructionTimes(String roomId) {
     Future.microtask(() async {
       try {
-        final destructionTimes = await _secureStorage.getMessageDestructionTimes(roomId);
+        final destructionTimes = await _secureStorage
+            .getMessageDestructionTimes(roomId);
         if (destructionTimes.isEmpty || isClosed) return;
         add(DestructionTimesLoaded(destructionTimes));
       } catch (e) {
@@ -350,9 +394,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _loadDeletedMessageIds(String roomId) {
     Future.microtask(() async {
       try {
-        final persistedDeletedIds = await _messageRepository.getLocallyDeletedMessageIds(roomId);
+        final persistedDeletedIds = await _messageRepository
+            .getLocallyDeletedMessageIds(roomId);
         _locallyDeletedMessageIds.addAll(persistedDeletedIds);
-        debugLog('ChatBloc: Loaded ${persistedDeletedIds.length} locally deleted message IDs from storage');
+        debugLog(
+          'ChatBloc: Loaded ${persistedDeletedIds.length} locally deleted message IDs from storage',
+        );
       } catch (e) {
         debugLog('ChatBloc: Failed to load locally deleted message IDs: $e');
       }
@@ -376,17 +423,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         if (pollEventId == null) return;
 
         if (type == 'vote') {
-          final answers = (response['answers'] as List<dynamic>?)
-              ?.cast<String>() ?? [];
+          final answers =
+              (response['answers'] as List<dynamic>?)?.cast<String>() ?? [];
           final senderId = response['senderId'] as String? ?? '';
           final isCurrentUser = response['isCurrentUser'] as bool? ?? false;
 
-          add(PollResponseReceived(
-            pollEventId: pollEventId,
-            selectedOptionIds: answers,
-            senderId: senderId,
-            isCurrentUser: isCurrentUser,
-          ));
+          add(
+            PollResponseReceived(
+              pollEventId: pollEventId,
+              selectedOptionIds: answers,
+              senderId: senderId,
+              isCurrentUser: isCurrentUser,
+            ),
+          );
         } else if (type == 'end') {
           add(PollEnded(pollEventId: pollEventId));
         }
@@ -412,44 +461,39 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _loadScheduledMessages(String roomId) {
     Future.microtask(() async {
       try {
-        final scheduledMessages = await _secureStorage.getScheduledMessages(roomId);
+        final scheduledMessages = await _secureStorage.getScheduledMessages(
+          roomId,
+        );
         if (scheduledMessages.isEmpty || isClosed) return;
 
         // 获取当前用户ID
         final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
 
         // 为每个定时消息创建临时消息实体显示在UI中
-        final tempMessages = <MessageEntity>[];
-        for (final msg in scheduledMessages) {
-          final scheduledAt = DateTime.parse(msg['scheduledAt'] as String);
-
-          tempMessages.add(MessageEntity(
-            id: msg['messageId'] as String,
-            roomId: roomId,
-            senderId: currentUserId,
-            senderName: 'Me',
-            content: msg['text'] as String,
-            type: MessageType.text,
-            timestamp: DateTime.parse(msg['createdAt'] as String),
-            status: MessageStatus.sending,
-            isFromMe: true,
-            scheduledAt: scheduledAt,
-            selfDestructAfter: msg['selfDestructAfter'] as int?,
-            mentionedUserIds: (msg['mentionedUserIds'] as List<dynamic>?)?.cast<String>() ?? [],
-            mentionsRoom: msg['mentionsRoom'] as bool? ?? false,
-          ));
-        }
+        final tempMessages = scheduledMessages
+            .map(
+              (draft) => draft.toPreviewMessage(
+                roomId: roomId,
+                senderId: currentUserId,
+              ),
+            )
+            .toList(growable: false);
 
         if (tempMessages.isNotEmpty && !isClosed) {
-          // 将定时消息添加到消息列表末尾（按时间排序）
-          final allMessages = [...state.messages, ...tempMessages];
-          allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-          // ignore: invalid_use_of_visible_for_testing_member
-          emit(state.copyWith(messages: allMessages));
+          add(ScheduledMessagesPreviewLoaded(tempMessages));
         }
       } catch (e) {
         debugLog('ChatBloc: Failed to load scheduled messages: $e');
       }
     });
+  }
+
+  void _onScheduledMessagesPreviewLoaded(
+    ScheduledMessagesPreviewLoaded event,
+    Emitter<ChatState> emit,
+  ) {
+    final allMessages = [...state.messages, ...event.previewMessages];
+    allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    emit(state.copyWith(messages: allMessages));
   }
 }

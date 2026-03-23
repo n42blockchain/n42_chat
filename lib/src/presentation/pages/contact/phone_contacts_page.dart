@@ -5,6 +5,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/contact_sync_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 手机通讯录匹配页面
@@ -71,15 +72,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
 
   Future<void> _startDirectChat(String userId) async {
     try {
-      final clientManager = getIt<MatrixClientManager>();
-      final client = clientManager.client;
-
-      if (client == null) {
-        _showError('Chat service not connected');
-        return;
-      }
-
-      final roomId = await client.startDirectChat(userId);
+      final roomId = await getIt<IContactRepository>().startDirectChat(userId);
 
       if (mounted) {
         Navigator.of(context).pop(roomId);
@@ -92,10 +85,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
   void _showError(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: AppColors.error,
-        ),
+        SnackBar(content: Text(message), backgroundColor: AppColors.error),
       );
     }
   }
@@ -106,9 +96,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      appBar: const N42AppBar(
-        title: 'From Contacts',
-      ),
+      appBar: const N42AppBar(title: 'From Contacts'),
       body: _buildBody(isDark),
     );
   }
@@ -160,7 +148,9 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               'To find friends from your contacts, please allow access to your contacts.',
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -170,7 +160,10 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
               ),
               child: const Text('Allow Access'),
             ),
@@ -187,24 +180,19 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: AppColors.error,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               _errorMessage ?? 'Unknown error',
               style: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            TextButton(
-              onPressed: _loadContacts,
-              child: const Text('Retry'),
-            ),
+            TextButton(onPressed: _loadContacts, child: const Text('Retry')),
           ],
         ),
       ),
@@ -237,7 +225,9 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               'None of your contacts are using this app yet. Invite them to join!',
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -274,7 +264,9 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 'Found ${_matchedContacts.length} matches from your contacts',
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
                 ),
               ),
             ],
@@ -297,8 +289,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
 
   Widget _buildMatchTile(MatchedContact match, bool isDark) {
     final phoneContact = match.phoneContact;
-    final displayName = match.matrixDisplayName ??
-        phoneContact.displayName;
+    final displayName = match.matrixDisplayName ?? phoneContact.displayName;
 
     return ListTile(
       leading: Stack(
@@ -322,11 +313,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                   width: 2,
                 ),
               ),
-              child: const Icon(
-                Icons.contacts,
-                size: 12,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.contacts, size: 12, color: Colors.white),
             ),
           ),
         ],
@@ -345,7 +332,9 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             match.matrixUserId,
             style: TextStyle(
               fontSize: 12,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
           ),
           if (phoneContact.displayName != displayName)

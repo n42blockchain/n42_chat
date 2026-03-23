@@ -50,12 +50,15 @@ void main() {
 
   group('BackgroundMode enum', () {
     test('has none, blur, virtualBackground, solidColor', () {
-      expect(BackgroundMode.values, containsAll([
-        BackgroundMode.none,
-        BackgroundMode.blur,
-        BackgroundMode.virtualBackground,
-        BackgroundMode.solidColor,
-      ]));
+      expect(
+        BackgroundMode.values,
+        containsAll([
+          BackgroundMode.none,
+          BackgroundMode.blur,
+          BackgroundMode.virtualBackground,
+          BackgroundMode.solidColor,
+        ]),
+      );
     });
 
     test('four values total', () {
@@ -118,13 +121,16 @@ void main() {
   });
 
   group('AudioProcessingConfig.toWebRTCConstraints', () {
-    test('includes echoCancellation, noiseSuppression, autoGainControl keys', () {
-      const config = AudioProcessingConfig();
-      final constraints = config.toWebRTCConstraints();
-      expect(constraints['echoCancellation'], isTrue);
-      expect(constraints['noiseSuppression'], isTrue);
-      expect(constraints['autoGainControl'], isTrue);
-    });
+    test(
+      'includes echoCancellation, noiseSuppression, autoGainControl keys',
+      () {
+        const config = AudioProcessingConfig();
+        final constraints = config.toWebRTCConstraints();
+        expect(constraints['echoCancellation'], isTrue);
+        expect(constraints['noiseSuppression'], isTrue);
+        expect(constraints['autoGainControl'], isTrue);
+      },
+    );
 
     test('disabled preset returns false for all', () {
       const config = AudioProcessingConfig.disabled;
@@ -197,7 +203,9 @@ void main() {
 
   group('BackgroundProcessingConfig factory constructors', () {
     test('withVirtualBackground sets mode and url', () {
-      final config = BackgroundProcessingConfig.withVirtualBackground('https://bg.png');
+      final config = BackgroundProcessingConfig.withVirtualBackground(
+        'https://bg.png',
+      );
       expect(config.mode, BackgroundMode.virtualBackground);
       expect(config.virtualBackgroundUrl, 'https://bg.png');
     });
@@ -232,7 +240,10 @@ void main() {
     });
 
     test('isVirtualBackgroundMode is false for blur', () {
-      expect(BackgroundProcessingConfig.lightBlur.isVirtualBackgroundMode, isFalse);
+      expect(
+        BackgroundProcessingConfig.lightBlur.isVirtualBackgroundMode,
+        isFalse,
+      );
     });
   });
 
@@ -240,7 +251,10 @@ void main() {
     const base = BackgroundProcessingConfig();
 
     test('replaces mode', () {
-      expect(base.copyWith(mode: BackgroundMode.blur).mode, BackgroundMode.blur);
+      expect(
+        base.copyWith(mode: BackgroundMode.blur).mode,
+        BackgroundMode.blur,
+      );
     });
 
     test('replaces blurRadius', () {
@@ -260,8 +274,8 @@ void main() {
   group('CallRecordingConfig defaults', () {
     const config = CallRecordingConfig();
 
-    test('enabled defaults to true', () {
-      expect(config.enabled, isTrue);
+    test('enabled defaults to false until recording backend is wired', () {
+      expect(config.enabled, isFalse);
     });
 
     test('autoStart defaults to false', () {
@@ -288,7 +302,7 @@ void main() {
   group('CallRecordingConfig presets', () {
     test('defaultConfig matches default constructor', () {
       const dc = CallRecordingConfig.defaultConfig;
-      expect(dc.enabled, isTrue);
+      expect(dc.enabled, isFalse);
       expect(dc.autoStart, isFalse);
       expect(dc.sampleRate, 44100);
     });
@@ -327,7 +341,7 @@ void main() {
 
     test('original unchanged after copyWith', () {
       base.copyWith(enabled: false);
-      expect(base.enabled, isTrue);
+      expect(base.enabled, isFalse);
     });
   });
 
@@ -358,14 +372,17 @@ void main() {
       expect(VoIPConfig().hasLiveKitConfig, isFalse);
     });
 
-    test('getIceServers returns public STUN servers when no TURN configured', () {
-      final servers = VoIPConfig().getIceServers();
-      expect(servers, isNotEmpty);
-      // All servers should be STUN (no credentials)
-      for (final s in servers) {
-        expect(s['urls'], startsWith('stun:'));
-      }
-    });
+    test(
+      'getIceServers returns public STUN servers when no TURN configured',
+      () {
+        final servers = VoIPConfig().getIceServers();
+        expect(servers, isNotEmpty);
+        // All servers should be STUN (no credentials)
+        for (final s in servers) {
+          expect(s['urls'], startsWith('stun:'));
+        }
+      },
+    );
 
     test('publicStunServers is a non-empty const list', () {
       expect(VoIPConfig.publicStunServers, isNotEmpty);
@@ -385,22 +402,40 @@ void main() {
     });
 
     test('updateFromTurnResponse updates ttl when provided', () {
-      VoIPConfig().updateFromTurnResponse({'uris': ['turn:x.com'], 'ttl': 3600});
+      VoIPConfig().updateFromTurnResponse({
+        'uris': ['turn:x.com'],
+        'ttl': 3600,
+      });
       expect(VoIPConfig().turnTtl, 3600);
     });
 
-    test('updateFromTurnResponse with empty uris list leaves hasTurnConfig false', () {
-      VoIPConfig().updateFromTurnResponse({'uris': <String>[], 'username': 'u', 'password': 'p'});
-      expect(VoIPConfig().hasTurnConfig, isFalse);
-    });
+    test(
+      'updateFromTurnResponse with empty uris list leaves hasTurnConfig false',
+      () {
+        VoIPConfig().updateFromTurnResponse({
+          'uris': <String>[],
+          'username': 'u',
+          'password': 'p',
+        });
+        expect(VoIPConfig().hasTurnConfig, isFalse);
+      },
+    );
 
-    test('updateFromTurnResponse without username leaves turnUsername null', () {
-      VoIPConfig().updateFromTurnResponse({'uris': ['turn:x.com']});
-      expect(VoIPConfig().turnUsername, isNull);
-    });
+    test(
+      'updateFromTurnResponse without username leaves turnUsername null',
+      () {
+        VoIPConfig().updateFromTurnResponse({
+          'uris': ['turn:x.com'],
+        });
+        expect(VoIPConfig().turnUsername, isNull);
+      },
+    );
 
     test('updateFromTurnResponse with ttl=0 stores zero', () {
-      VoIPConfig().updateFromTurnResponse({'uris': ['turn:x.com'], 'ttl': 0});
+      VoIPConfig().updateFromTurnResponse({
+        'uris': ['turn:x.com'],
+        'ttl': 0,
+      });
       expect(VoIPConfig().turnTtl, 0);
     });
 
@@ -411,8 +446,9 @@ void main() {
         'password': 'p',
       });
       final servers = VoIPConfig().getIceServers();
-      final turnServers = servers.where((s) =>
-          (s['urls'] as String).startsWith('turn:')).toList();
+      final turnServers = servers
+          .where((s) => (s['urls'] as String).startsWith('turn:'))
+          .toList();
       expect(turnServers, isNotEmpty);
     });
 
@@ -473,20 +509,28 @@ void main() {
     });
 
     test('setBackgroundProcessing updates backgroundMode', () {
-      VoIPConfig().setBackgroundProcessing(BackgroundProcessingConfig.lightBlur);
+      VoIPConfig().setBackgroundProcessing(
+        BackgroundProcessingConfig.lightBlur,
+      );
       expect(VoIPConfig().backgroundMode, BackgroundMode.blur);
     });
 
-    test('setUp restores audio defaults between tests (order-independence check)', () {
-      // Verify setUp correctly restores audio flags mutated by setAudioProcessing.
-      // If setUp were incomplete, this test would fail when run after
-      // "setAudioProcessing updates fields".
-      expect(VoIPConfig().enableNoiseSuppression, isTrue);
-      expect(VoIPConfig().enableEnhancedAudioMode, isFalse);
-    });
+    test(
+      'setUp restores audio defaults between tests (order-independence check)',
+      () {
+        // Verify setUp correctly restores audio flags mutated by setAudioProcessing.
+        // If setUp were incomplete, this test would fail when run after
+        // "setAudioProcessing updates fields".
+        expect(VoIPConfig().enableNoiseSuppression, isTrue);
+        expect(VoIPConfig().enableEnhancedAudioMode, isFalse);
+      },
+    );
 
-    test('setUp restores background defaults between tests (order-independence check)', () {
-      expect(VoIPConfig().backgroundMode, BackgroundMode.none);
-    });
+    test(
+      'setUp restores background defaults between tests (order-independence check)',
+      () {
+        expect(VoIPConfig().backgroundMode, BackgroundMode.none);
+      },
+    );
   });
 }

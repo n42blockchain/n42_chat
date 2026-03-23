@@ -36,9 +36,9 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   }
 
   void _loadLeaderboard() {
-    context
-        .read<PointsBloc>()
-        .add(PointsLoadLeaderboard(roomId: widget.roomId));
+    final bloc = context.read<PointsBloc>();
+    bloc.add(PointsLoadLeaderboard(roomId: widget.roomId));
+    bloc.add(PointsLoadConfig(roomId: widget.roomId));
   }
 
   @override
@@ -55,13 +55,29 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
       ),
       body: BlocBuilder<PointsBloc, PointsState>(
         builder: (context, state) {
-          if (state.isLoading && state.leaderboard.isEmpty) {
+          final config = state.config;
+          if (config != null && !config.isEnabled) {
+            return _buildUnavailableState(
+              isDark,
+              message: 'Points are disabled in this room.',
+            );
+          }
+
+          if (config != null && !config.showLeaderboard) {
+            return _buildUnavailableState(
+              isDark,
+              message: 'Leaderboard is disabled in this room.',
+            );
+          }
+
+          if (state.leaderboardStatus == PointsLoadStatus.loading &&
+              state.leaderboard.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state.status == PointsStatus.error &&
+          if (state.leaderboardStatus == PointsLoadStatus.error &&
               state.leaderboard.isEmpty) {
-            return _buildErrorState(state.errorMessage, isDark);
+            return _buildErrorState(state.leaderboardErrorMessage, isDark);
           }
 
           if (state.leaderboard.isEmpty) {
@@ -189,6 +205,31 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildUnavailableState(bool isDark, {required String message}) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.block_outlined, size: 48, color: AppColors.warning),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

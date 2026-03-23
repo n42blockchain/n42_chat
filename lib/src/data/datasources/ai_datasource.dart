@@ -15,27 +15,41 @@ class AiDatasource implements AiService {
   final String _baseUrl;
   final String _apiKey;
   final String _defaultModel;
+  final bool _useProxyEndpoint;
+
+  static final _newlineRegExp = RegExp(r'[\r\n]+');
+  static final _arrayRegExp = RegExp(r'\[[\s\S]*\]');
+  static final _listPrefixRegExp = RegExp(r'^[-*•\d\.)\s]+');
+  static final _trailingSlashRegExp = RegExp(r'/$');
 
   AiDatasource({
     required String baseUrl,
     required String apiKey,
     String defaultModel = 'gpt-4o-mini',
+    bool useProxyEndpoint = false,
     Dio? dio,
-  })  : _baseUrl = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl,
-        _apiKey = apiKey,
-        _defaultModel = defaultModel,
-        _dio = dio ?? Dio() {
+  }) : _baseUrl = baseUrl.endsWith('/')
+           ? baseUrl.substring(0, baseUrl.length - 1)
+           : baseUrl,
+       _apiKey = apiKey,
+       _defaultModel = defaultModel,
+       _useProxyEndpoint = useProxyEndpoint,
+       _dio = dio ?? Dio() {
     _dio.options.baseUrl = _baseUrl;
     _dio.options.headers = {
-      'Authorization': 'Bearer $_apiKey',
       'Content-Type': 'application/json',
+      if (_apiKey.isNotEmpty) 'Authorization': 'Bearer $_apiKey',
     };
     _dio.options.connectTimeout = const Duration(seconds: 30);
     _dio.options.receiveTimeout = const Duration(minutes: 3);
   }
 
   @override
-  bool get isAvailable => _apiKey.isNotEmpty && _baseUrl.isNotEmpty;
+  bool get isAvailable =>
+      _baseUrl.isNotEmpty && (_apiKey.isNotEmpty || _useProxyEndpoint);
+
+  String get _chatCompletionsUrl =>
+      _useProxyEndpoint ? _baseUrl : _buildChatCompletionsUrl();
 
   /// 消息总字符数上限（约 ~32k tokens）
   static const int _maxTotalCharacters = 128000;
@@ -71,7 +85,7 @@ class AiDatasource implements AiService {
 
     try {
       final response = await _dio.post<ResponseBody>(
-        '/v1/chat/completions',
+        _chatCompletionsUrl,
         data: {
           'model': model ?? _defaultModel,
           'messages': allMessages,
@@ -85,48 +99,51 @@ class AiDatasource implements AiService {
       if (response.data == null) {
         throw const AiServiceException('Empty response from server');
       }
-      final stream = response.data!.stream;
-      final buffer = StringBuffer();
+      final lines = utf8.decoder
+          .bind(response.data!.stream)
+          .transform(const LineSplitter());
 
-      await for (final chunk in stream) {
-        buffer.write(utf8.decode(chunk));
+      await for (final rawLine in lines) {
+        final line = rawLine.trim();
+        if (line.isEmpty || line.startsWith(':')) continue;
+        if (!line.startsWith('data: ')) continue;
 
-        // 处理 SSE 数据
-        var bufferStr = buffer.toString();
-        while (bufferStr.contains('\n')) {
-          final newlineIndex = bufferStr.indexOf('\n');
-          final line = bufferStr.substring(0, newlineIndex).trim();
-          bufferStr = bufferStr.substring(newlineIndex + 1);
-          buffer
-            ..clear()
-            ..write(bufferStr);
+        final data = line.substring(6).trim();
+        if (data == '[DONE]') return;
 
-          if (line.isEmpty || line.startsWith(':')) continue;
-          if (!line.startsWith('data: ')) continue;
+        Map<String, dynamic> json;
+        try {
+          json = jsonDecode(data) as Map<String, dynamic>;
+        } catch (e) {
+          // 跳过无法解析的行
+          debugLog('AiDatasource: Failed to parse SSE data: $e');
+          continue;
+        }
 
-          final data = line.substring(6).trim();
-          if (data == '[DONE]') return;
+        final errorMessage = _extractInlineErrorMessage(json);
+        if (errorMessage != null) {
+          throw AiServiceException(errorMessage);
+        }
 
-          try {
-            final json = jsonDecode(data) as Map<String, dynamic>;
-            final choices = json['choices'] as List<dynamic>?;
-            if (choices == null || choices.isEmpty) continue;
+        final choices = json['choices'] as List<dynamic>?;
+        if (choices == null || choices.isEmpty) continue;
 
-            final delta = choices[0]['delta'] as Map<String, dynamic>?;
-            final content = delta?['content'] as String?;
-            if (content != null) {
-              yield content;
-            }
-          } catch (e) {
-            // 跳过无法解析的行
-            debugLog('AiDatasource: Failed to parse SSE data: $e');
-          }
+        final delta = choices[0]['delta'] as Map<String, dynamic>?;
+        final content =
+            _extractMessageText(delta?['content']) ??
+            _extractMessageText(delta?['text']);
+        if (content != null && content.isNotEmpty) {
+          yield content;
         }
       }
     } on DioException catch (e) {
       debugLog('AiDatasource: Stream completion error: ${e.message}');
       final errorMsg = _parseErrorMessage(e);
       throw AiServiceException(errorMsg);
+    } catch (e) {
+      if (e is AiServiceException) rethrow;
+      debugLog('AiDatasource: Stream completion read error: $e');
+      throw AiServiceException('Failed to read streaming response: $e');
     }
   }
 
@@ -148,7 +165,7 @@ class AiDatasource implements AiService {
 
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '/v1/chat/completions',
+        _chatCompletionsUrl,
         data: {
           'model': model ?? _defaultModel,
           'messages': allMessages,
@@ -167,7 +184,10 @@ class AiDatasource implements AiService {
         throw const AiServiceException('No choices in response');
       }
       final message = choices[0]['message'] as Map<String, dynamic>?;
-      final content = message?['content'] as String? ?? '';
+      final content =
+          _extractMessageText(message?['content']) ??
+          _extractMessageText(message?['text']) ??
+          '';
       final usage = data['usage'] as Map<String, dynamic>?;
 
       return AiCompletionResult(
@@ -261,6 +281,30 @@ class AiDatasource implements AiService {
     return result.text.trim();
   }
 
+  @override
+  Future<List<String>> suggestReplies(
+    List<AiMessage> messages, {
+    int count = 3,
+    String? language,
+  }) async {
+    final safeCount = count.clamp(1, 6);
+    final languageInstruction = language == null || language.trim().isEmpty
+        ? 'Use the same language as the conversation.'
+        : 'Write every suggestion in $language.';
+    final result = await completion(
+      messages,
+      systemPrompt:
+          'You generate short smart-reply suggestions for a chat conversation. '
+          'Return a JSON array with exactly $safeCount strings. '
+          'Each suggestion must be natural, standalone, and under 60 characters. '
+          '$languageInstruction '
+          'Do not include numbering, markdown, quotes, or explanations.',
+      temperature: 0.5,
+      maxTokens: 256,
+    );
+    return _parseReplySuggestions(result.text, expectedCount: safeCount);
+  }
+
   String _parseErrorMessage(DioException e) {
     if (e.response?.data != null) {
       try {
@@ -283,6 +327,149 @@ class AiDatasource implements AiService {
       DioExceptionType.connectionError => 'Connection failed',
       _ => e.message ?? 'Unknown error',
     };
+  }
+
+  String? _extractInlineErrorMessage(Map<String, dynamic> data) {
+    final error = data['error'];
+    if (error is String && error.isNotEmpty) {
+      return error;
+    }
+    if (error is Map<String, dynamic>) {
+      final message = error['message'];
+      if (message is String && message.isNotEmpty) {
+        return message;
+      }
+    }
+    return null;
+  }
+
+  String? _extractMessageText(dynamic content) {
+    if (content is String) {
+      return content;
+    }
+    if (content is List) {
+      final buffer = StringBuffer();
+      for (final part in content) {
+        final text = _extractTextPart(part);
+        if (text != null && text.isNotEmpty) {
+          buffer.write(text);
+        }
+      }
+      final combined = buffer.toString();
+      return combined.isEmpty ? null : combined;
+    }
+    return _extractTextPart(content);
+  }
+
+  String? _extractTextPart(dynamic part) {
+    if (part is String) {
+      return part;
+    }
+    if (part is! Map<String, dynamic>) {
+      return null;
+    }
+
+    final directText = part['text'];
+    if (directText is String && directText.isNotEmpty) {
+      return directText;
+    }
+    if (directText is Map<String, dynamic>) {
+      final value = directText['value'];
+      if (value is String && value.isNotEmpty) {
+        return value;
+      }
+    }
+
+    final nestedContent = part['content'];
+    if (nestedContent is String && nestedContent.isNotEmpty) {
+      return nestedContent;
+    }
+
+    return null;
+  }
+
+  List<String> _parseReplySuggestions(
+    String raw, {
+    required int expectedCount,
+  }) {
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) return const [];
+
+    final parsedJson = _tryParseSuggestionJson(trimmed);
+    if (parsedJson.isNotEmpty) {
+      return parsedJson.take(expectedCount).toList();
+    }
+
+    final suggestions = trimmed
+        .split(_newlineRegExp)
+        .map((line) => _stripReplyListPrefix(line.trim()))
+        .where((line) => line.isNotEmpty)
+        .fold<List<String>>(<String>[], (list, line) {
+          if (!list.contains(line)) {
+            list.add(line);
+          }
+          return list;
+        });
+    return suggestions.take(expectedCount).toList();
+  }
+
+  List<String> _tryParseSuggestionJson(String raw) {
+    List<String> normalize(List<dynamic> values) {
+      return values
+          .whereType<String>()
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
+          .fold<List<String>>(<String>[], (list, item) {
+            if (!list.contains(item)) {
+              list.add(item);
+            }
+            return list;
+          });
+    }
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List<dynamic>) {
+        return normalize(decoded);
+      }
+    } catch (_) {
+      final arrayMatch = _arrayRegExp.firstMatch(raw);
+      if (arrayMatch == null) {
+        return const [];
+      }
+      try {
+        final decoded = jsonDecode(arrayMatch.group(0)!);
+        if (decoded is List<dynamic>) {
+          return normalize(decoded);
+        }
+      } catch (_) {
+        return const [];
+      }
+    }
+    return const [];
+  }
+
+  String _stripReplyListPrefix(String line) {
+    return line.replaceFirst(_listPrefixRegExp, '').trim();
+  }
+
+  String _buildChatCompletionsUrl() {
+    final baseUri = Uri.tryParse(_baseUrl);
+    if (baseUri == null) return '$_baseUrl/v1/chat/completions';
+
+    final normalizedPath = baseUri.path.replaceFirst(_trailingSlashRegExp, '');
+    final endpointPath = switch (normalizedPath) {
+      '' => '/v1/chat/completions',
+      '/v1' => '/v1/chat/completions',
+      '/chat/completions' => '/v1/chat/completions',
+      final String path when path.endsWith('/v1/chat/completions') => path,
+      final String path when path.endsWith('/v1') => '$path/chat/completions',
+      final String path => '$path/v1/chat/completions',
+    };
+
+    return baseUri
+        .replace(path: endpointPath, queryParameters: null)
+        .toString();
   }
 
   @override

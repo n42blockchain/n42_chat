@@ -3,22 +3,25 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/common_widgets.dart';
 
+typedef UserProfileChatStartedCallback =
+    Future<void> Function(String roomId, BuildContext context);
+
 /// 用户资料页面
 class UserProfilePage extends StatefulWidget {
   final String userId;
+  final UserProfileChatStartedCallback? onChatStarted;
 
-  const UserProfilePage({
-    super.key,
-    required this.userId,
-  });
+  const UserProfilePage({super.key, required this.userId, this.onChatStarted});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -27,6 +30,7 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   ContactEntity? _contact;
   bool _isLoading = true;
+  bool _isSavingRemark = false;
   String? _error;
 
   @override
@@ -36,6 +40,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future<void> _loadUserProfile() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _error = null;
@@ -54,6 +59,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         );
 
         if (contact != null) {
+          if (!mounted) return;
           setState(() {
             _contact = contact;
             _isLoading = false;
@@ -62,16 +68,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
         }
       }
 
-      // 如果本地没有，则需要从仓库获取
-      // 这里简化处理，创建一个基本的ContactEntity
+      final repository = getIt<IContactRepository>();
+      final remoteContact = await repository.getContactById(widget.userId);
+      if (!mounted) return;
+
       setState(() {
-        _contact = ContactEntity(
-          userId: widget.userId,
-          displayName: widget.userId.split(':').first.replaceFirst('@', ''),
-        );
+        _contact =
+            remoteContact ??
+            ContactEntity(
+              userId: widget.userId,
+              displayName: widget.userId.split(':').first.replaceFirst('@', ''),
+            );
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -87,13 +98,46 @@ class _UserProfilePageState extends State<UserProfilePage> {
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       body: BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state.status == ContactStatus.chatStarted && state.startedChatUserId == widget.userId) {
-            // 导航到聊天页面
-            Navigator.of(context).pushReplacementNamed('/chat/${state.startedChatRoomId}');
-          } else if (state.status == ContactStatus.error) {
+          if (state.status == ContactStatus.chatStarted &&
+              state.startedChatUserId == widget.userId) {
+            final roomId = state.startedChatRoomId;
+            if (roomId == null || roomId.isEmpty) {
+              return;
+            }
+
+            if (widget.onChatStarted != null) {
+              widget.onChatStarted!(roomId, context);
+              return;
+            }
+
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop(roomId);
+            }
+          } else if (state.status == ContactStatus.remarkUpdated &&
+              state.updatedRemarkUserId == widget.userId) {
+            final updatedRemark = state.updatedRemark;
+            setState(() {
+              _isSavingRemark = false;
+              _contact = _contact?.copyWith(remark: updatedRemark);
+            });
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? '')),
+              SnackBar(
+                content: Text(
+                  updatedRemark == null || updatedRemark.isEmpty
+                      ? (S.of(context)?.profileRemarkCleared ?? 'Remark cleared')
+                      : (S.of(context)?.profileRemarkSaved ?? 'Remark saved'),
+                ),
+              ),
             );
+          } else if (state.status == ContactStatus.error) {
+            if (_isSavingRemark) {
+              setState(() {
+                _isSavingRemark = false;
+              });
+            }
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage ?? '')));
           }
         },
         child: _buildBody(isDark),
@@ -123,30 +167,26 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
 
     if (_contact == null) {
-      return Center(child: Text(S.of(context)?.profileUserNotExist ?? 'User does not exist'));
+      return Center(
+        child: Text(
+          S.of(context)?.profileUserNotExist ?? 'User does not exist',
+        ),
+      );
     }
 
     return CustomScrollView(
       slivers: [
         // 个人资料头部
-        SliverToBoxAdapter(
-          child: _buildProfileHeader(isDark),
-        ),
+        SliverToBoxAdapter(child: _buildProfileHeader(isDark)),
 
         // 信息区块
-        SliverToBoxAdapter(
-          child: _buildInfoSection(isDark),
-        ),
+        SliverToBoxAdapter(child: _buildInfoSection(isDark)),
 
         // 操作按钮
-        SliverToBoxAdapter(
-          child: _buildActionButtons(isDark),
-        ),
+        SliverToBoxAdapter(child: _buildActionButtons(isDark)),
 
         // 更多选项
-        SliverToBoxAdapter(
-          child: _buildMoreOptions(isDark),
-        ),
+        SliverToBoxAdapter(child: _buildMoreOptions(isDark)),
       ],
     );
   }
@@ -210,7 +250,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             color: AppColors.success,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                              color: isDark
+                                  ? AppColors.surfaceDark
+                                  : AppColors.surface,
                               width: 2,
                             ),
                           ),
@@ -237,9 +279,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       const SizedBox(height: 4),
                       GestureDetector(
                         onTap: () {
-                          Clipboard.setData(ClipboardData(text: contact.userId));
+                          Clipboard.setData(
+                            ClipboardData(text: contact.userId),
+                          );
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(S.of(context)?.profileUserIdCopied ?? 'User ID copied')),
+                            SnackBar(
+                              content: Text(
+                                S.of(context)?.profileUserIdCopied ??
+                                    'User ID copied',
+                              ),
+                            ),
                           );
                         },
                         child: Row(
@@ -321,8 +370,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
             contact.isOnline
                 ? (S.of(context)?.profileOnline ?? 'Online')
                 : (contact.formattedLastActive.isNotEmpty
-                    ? contact.formattedLastActive
-                    : (S.of(context)?.profileOffline ?? 'Offline')),
+                      ? contact.formattedLastActive
+                      : (S.of(context)?.profileOffline ?? 'Offline')),
             isDark,
             statusColor: contact.isOnline ? AppColors.success : null,
           ),
@@ -338,8 +387,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildInfoTile(String label, String value, bool isDark,
-      {Color? statusColor}) {
+  Widget _buildInfoTile(
+    String label,
+    String value,
+    bool isDark, {
+    Color? statusColor,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -348,7 +401,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
             label,
             style: TextStyle(
               fontSize: 15,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
           ),
           const Spacer(),
@@ -399,7 +454,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
               type: N42ButtonType.secondary,
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.profileVoiceCallFeatureInDev ?? 'Voice call feature in development...')),
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.profileVoiceCallFeatureInDev ??
+                          'Voice call feature in development...',
+                    ),
+                  ),
                 );
               },
               icon: Icons.call_outlined,
@@ -421,7 +481,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
             title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
             trailing: Icon(
               Icons.chevron_right,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
             onTap: _setRemark,
           ),
@@ -435,14 +497,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
           // 加入黑名单
           ListTile(
             title: Text(
-              context.read<ContactBloc>().state.contacts
-                          .any((c) => c.userId == widget.userId && c.isBlocked)
-                  ? (S.of(context)?.profileRemoveFromBlacklist ?? 'Remove from Blacklist')
-                  : (S.of(context)?.profileAddToBlacklist ?? 'Add to Blacklist'),
+              context.read<ContactBloc>().state.contacts.any(
+                    (c) => c.userId == widget.userId && c.isBlocked,
+                  )
+                  ? (S.of(context)?.profileRemoveFromBlacklist ??
+                        'Remove from Blacklist')
+                  : (S.of(context)?.profileAddToBlacklist ??
+                        'Add to Blacklist'),
             ),
             trailing: Icon(
               Icons.chevron_right,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
             onTap: _toggleBlock,
           ),
@@ -458,7 +525,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
             title: Text(S.of(context)?.commonReport ?? 'Report'),
             trailing: Icon(
               Icons.chevron_right,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
             onTap: _report,
           ),
@@ -496,21 +565,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 final remark = controller.text.trim();
                 Navigator.pop(dialogContext);
 
-                // 保存备注
-                context.read<ContactBloc>().add(SetContactRemark(
-                  widget.userId,
-                  remark.isEmpty ? null : remark,
-                ));
-
-                // 更新本地状态
                 setState(() {
-                  _contact = _contact?.copyWith(remark: remark.isEmpty ? null : remark);
+                  _isSavingRemark = true;
                 });
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(remark.isEmpty
-                      ? (S.of(context)?.profileRemarkCleared ?? 'Remark cleared')
-                      : (S.of(context)?.profileRemarkSaved ?? 'Remark saved'))),
+                context.read<ContactBloc>().add(
+                  SetContactRemark(
+                    widget.userId,
+                    remark.isEmpty ? null : remark,
+                  ),
                 );
               },
               child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
@@ -522,18 +584,26 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _toggleBlock() {
-    final isBlocked = context.read<ContactBloc>().state.contacts
-            .any((c) => c.userId == widget.userId && c.isBlocked);
+    final isBlocked = context.read<ContactBloc>().state.contacts.any(
+      (c) => c.userId == widget.userId && c.isBlocked,
+    );
 
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(isBlocked
-            ? (S.of(context)?.profileRemoveFromBlacklist ?? 'Remove from Blacklist')
-            : (S.of(context)?.profileAddToBlacklist ?? 'Add to Blacklist')),
-        content: Text(isBlocked
-            ? (S.of(context)?.profileConfirmRemoveBlacklist ?? 'Are you sure you want to remove this user from blacklist?')
-            : (S.of(context)?.profileConfirmAddBlacklist ?? 'Are you sure you want to add this user to blacklist? You will not receive messages from them.')),
+        title: Text(
+          isBlocked
+              ? (S.of(context)?.profileRemoveFromBlacklist ??
+                    'Remove from Blacklist')
+              : (S.of(context)?.profileAddToBlacklist ?? 'Add to Blacklist'),
+        ),
+        content: Text(
+          isBlocked
+              ? (S.of(context)?.profileConfirmRemoveBlacklist ??
+                    'Are you sure you want to remove this user from blacklist?')
+              : (S.of(context)?.profileConfirmAddBlacklist ??
+                    'Are you sure you want to add this user to blacklist? You will not receive messages from them.'),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -548,9 +618,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 context.read<ContactBloc>().add(IgnoreUser(widget.userId));
               }
             },
-            child: Text(isBlocked
-                ? (S.of(context)?.commonRemove ?? 'Remove')
-                : (S.of(context)?.commonAdd ?? 'Add')),
+            child: Text(
+              isBlocked
+                  ? (S.of(context)?.commonRemove ?? 'Remove')
+                  : (S.of(context)?.commonAdd ?? 'Add'),
+            ),
           ),
         ],
       ),
@@ -559,7 +631,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   void _report() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context)?.profileReportFeatureInDev ?? 'Report feature in development...')),
+      SnackBar(
+        content: Text(
+          S.of(context)?.profileReportFeatureInDev ??
+              'Report feature in development...',
+        ),
+      ),
     );
   }
 
@@ -572,11 +649,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
           children: [
             ListTile(
               leading: const Icon(Icons.share),
-              title: Text(S.of(context)?.profileShareContactCard ?? 'Share Contact Card'),
+              title: Text(
+                S.of(context)?.profileShareContactCard ?? 'Share Contact Card',
+              ),
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.profileShareFeatureInDev ?? 'Share feature in development...')),
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.profileShareFeatureInDev ??
+                          'Share feature in development...',
+                    ),
+                  ),
                 );
               },
             ),
@@ -586,7 +670,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.profileQrCodeFeatureInDev ?? 'QR code feature in development...')),
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.profileQrCodeFeatureInDev ??
+                          'QR code feature in development...',
+                    ),
+                  ),
                 );
               },
             ),
@@ -596,4 +685,3 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 }
-

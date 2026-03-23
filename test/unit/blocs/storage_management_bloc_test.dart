@@ -77,7 +77,9 @@ void main() {
       build: buildBloc,
       seed: () => const StorageManagementState(),
       setUp: () {
-        when(() => mockCleanup.getRecommendations()).thenAnswer(
+        when(() => mockCleanup.getRecommendations(
+              preserveThumbnails: any(named: 'preserveThumbnails'),
+            )).thenAnswer(
           (_) async => [
             const CleanupRecommendation(
               type: CleanupRecommendationType.cache,
@@ -101,7 +103,9 @@ void main() {
       build: buildBloc,
       seed: () => const StorageManagementState(),
       setUp: () {
-        when(() => mockCleanup.getRecommendations())
+        when(() => mockCleanup.getRecommendations(
+              preserveThumbnails: any(named: 'preserveThumbnails'),
+            ))
             .thenThrow(Exception('DB error'));
       },
       act: (bloc) => bloc.add(const LoadRecommendations()),
@@ -215,14 +219,16 @@ void main() {
   // ─────────────────────────────────────────────────
 
   group('ClearCache', () {
-    void _stubLoadStorageInfo() {
+    void stubLoadStorageInfo() {
       when(() => mockStorageManager.getStorageUsage())
           .thenAnswer((_) async => const StorageInfo());
       when(() => mockMonitor.checkStorageStatus())
           .thenAnswer((_) async => const StorageStatus());
       when(() => mockMonitor.getStorageConfig())
           .thenAnswer((_) async => const StorageConfig());
-      when(() => mockCleanup.getRecommendations())
+      when(() => mockCleanup.getRecommendations(
+            preserveThumbnails: any(named: 'preserveThumbnails'),
+          ))
           .thenAnswer((_) async => []);
       when(() => mockStorageManager.getRoomStorageRanking())
           .thenAnswer((_) async => []);
@@ -236,7 +242,7 @@ void main() {
       seed: () => const StorageManagementState(),
       setUp: () {
         when(() => mockStorageManager.clearCache()).thenAnswer((_) async {});
-        _stubLoadStorageInfo();
+        stubLoadStorageInfo();
       },
       act: (bloc) => bloc.add(const ClearCache()),
       expect: () => [
@@ -294,7 +300,7 @@ void main() {
         const ToggleFilePinned(filePath: '/tmp/file.jpg', pinned: true),
       ),
       // no state emitted on success
-      expect: () => [],
+      expect: () => const <StorageManagementState>[],
       verify: (bloc) {
         verify(() => mockLifecycle.togglePinned('/tmp/file.jpg', true)).called(1);
       },

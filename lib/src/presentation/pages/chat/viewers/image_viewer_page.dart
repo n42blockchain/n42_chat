@@ -12,6 +12,7 @@ import 'package:saver_gallery/saver_gallery.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../../core/utils/debug_log.dart';
 
@@ -39,13 +40,13 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     setState(() => _isSaving = true);
 
     try {
-      // 下载图片
+      final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+        widget.imageUrl,
+        client: MatrixClientManager.instance.client,
+      );
       final response = await http.get(
         Uri.parse(widget.imageUrl),
-        headers: {
-          if (MatrixClientManager.instance.client?.accessToken != null)
-            'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -60,14 +61,18 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
           if (result.isSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.commonSavedToGallery ?? 'Saved to gallery'),
+                content: Text(
+                  S.of(context)?.commonSavedToGallery ?? 'Saved to gallery',
+                ),
                 backgroundColor: Colors.green,
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.commonFailedToSave ?? 'Failed to save'),
+                content: Text(
+                  S.of(context)?.commonFailedToSave ?? 'Failed to save',
+                ),
                 backgroundColor: Colors.red,
               ),
             );
@@ -77,7 +82,12 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.chatDownloadFailed(response.statusCode.toString()) ?? 'Download failed: ${response.statusCode}'),
+              content: Text(
+                S
+                        .of(context)
+                        ?.chatDownloadFailed(response.statusCode.toString()) ??
+                    'Download failed: ${response.statusCode}',
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -88,7 +98,9 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatErrorWithMessage(e.toString()) ?? 'Error: $e'),
+            content: Text(
+              S.of(context)?.chatErrorWithMessage(e.toString()) ?? 'Error: $e',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -102,13 +114,13 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   Future<void> _shareImage() async {
     try {
-      // 下载图片到临时文件
+      final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+        widget.imageUrl,
+        client: MatrixClientManager.instance.client,
+      );
       final response = await http.get(
         Uri.parse(widget.imageUrl),
-        headers: {
-          if (MatrixClientManager.instance.client?.accessToken != null)
-            'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -118,7 +130,9 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         await tempFile.writeAsBytes(response.bodyBytes);
 
         // 分享
-        await SharePlus.instance.share(ShareParams(files: [XFile(tempFile.path)]));
+        await SharePlus.instance.share(
+          ShareParams(files: [XFile(tempFile.path)]),
+        );
 
         // 清理临时文件
         await tempDir.delete(recursive: true);
@@ -128,7 +142,10 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.commonShareFailed(e.toString()) ?? 'Share failed: $e'),
+            content: Text(
+              S.of(context)?.commonShareFailed(e.toString()) ??
+                  'Share failed: $e',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -138,6 +155,10 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+      widget.imageUrl,
+      client: MatrixClientManager.instance.client,
+    );
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
@@ -188,7 +209,10 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                   children: [
                     const Icon(Icons.download, color: Colors.white, size: 20),
                     const SizedBox(width: 12),
-                    Text(S.of(context)?.chatSaveToGallery ?? 'Save to Gallery', style: const TextStyle(color: Colors.white)),
+                    Text(
+                      S.of(context)?.chatSaveToGallery ?? 'Save to Gallery',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ],
                 ),
               ),
@@ -198,7 +222,10 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                   children: [
                     const Icon(Icons.share, color: Colors.white, size: 20),
                     const SizedBox(width: 12),
-                    Text(S.of(context)?.commonShare ?? 'Share', style: const TextStyle(color: Colors.white)),
+                    Text(
+                      S.of(context)?.commonShare ?? 'Share',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ],
                 ),
               ),
@@ -217,10 +244,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
               child: CachedNetworkImage(
                 imageUrl: widget.imageUrl,
                 fit: BoxFit.contain,
-                httpHeaders: {
-                  if (MatrixClientManager.instance.client?.accessToken != null)
-                    'Authorization': 'Bearer ${MatrixClientManager.instance.client!.accessToken}',
-                },
+                httpHeaders: headers,
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(color: Colors.white),
                 ),
@@ -229,7 +253,11 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                   children: [
                     const Icon(Icons.error, color: Colors.red, size: 48),
                     const SizedBox(height: 16),
-                    Text(S.of(context)?.chatFailedToLoadImage ?? 'Failed to load image', style: const TextStyle(color: Colors.white)),
+                    Text(
+                      S.of(context)?.chatFailedToLoadImage ??
+                          'Failed to load image',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ],
                 ),
               ),

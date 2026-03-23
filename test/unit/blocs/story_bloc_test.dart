@@ -23,7 +23,10 @@ StoryEntity _makeStory({String id = 's-1', bool isViewed = false}) {
   );
 }
 
-UserStories _makeUserStories({String userId = '@alice:s', List<StoryEntity>? stories}) {
+UserStories _makeUserStories({
+  String userId = '@alice:s',
+  List<StoryEntity>? stories,
+}) {
   return UserStories(
     userId: userId,
     userName: 'Alice',
@@ -57,10 +60,12 @@ void main() {
       'emits loading → loaded on success',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.getStories())
-            .thenAnswer((_) async => [_makeUserStories()]);
-        when(() => mockRepo.getMyStories())
-            .thenAnswer((_) async => [_makeStory(id: 'mine')]);
+        when(
+          () => mockRepo.getStories(),
+        ).thenAnswer((_) async => [_makeUserStories()]);
+        when(
+          () => mockRepo.getMyStories(),
+        ).thenAnswer((_) async => [_makeStory(id: 'mine')]);
       },
       act: (bloc) => bloc.add(const LoadStories()),
       expect: () => [
@@ -76,10 +81,10 @@ void main() {
       'emits loading → error on failure',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.getStories())
-            .thenThrow(Exception('Failed to load'));
-        when(() => mockRepo.getMyStories())
-            .thenAnswer((_) async => []);
+        when(
+          () => mockRepo.getStories(),
+        ).thenThrow(Exception('Failed to load'));
+        when(() => mockRepo.getMyStories()).thenAnswer((_) async => []);
       },
       act: (bloc) => bloc.add(const LoadStories()),
       expect: () => [
@@ -99,7 +104,7 @@ void main() {
         when(() => mockRepo.getMyStories()).thenAnswer((_) async => []);
       },
       act: (bloc) => bloc.add(const LoadStories()),
-      expect: () => [],
+      expect: () => <StoryState>[],
     );
   });
 
@@ -116,14 +121,14 @@ void main() {
             textColor: any(named: 'textColor'),
           ),
         ).thenAnswer((_) async => _makeStory(id: 'new-story'));
-        when(() => mockRepo.getStories())
-            .thenAnswer((_) async => [_makeUserStories()]);
-        when(() => mockRepo.getMyStories())
-            .thenAnswer((_) async => [_makeStory(id: 'new-story')]);
+        when(
+          () => mockRepo.getStories(),
+        ).thenAnswer((_) async => [_makeUserStories()]);
+        when(
+          () => mockRepo.getMyStories(),
+        ).thenAnswer((_) async => [_makeStory(id: 'new-story')]);
       },
-      act: (bloc) => bloc.add(
-        const PostStory(content: 'Hello, Stories!'),
-      ),
+      act: (bloc) => bloc.add(const PostStory(content: 'Hello, Stories!')),
       expect: () => [
         isA<StoryState>().having((s) => s.isPosting, 'isPosting', isTrue),
         isA<StoryState>().having((s) => s.isPosting, 'isPosting', isFalse),
@@ -189,6 +194,26 @@ void main() {
         when(() => mockRepo.getMyStories()).thenAnswer((_) async => []);
       },
       act: (bloc) => bloc.add(const DeleteStory('s-1')),
+      expect: () => [
+        isA<StoryState>()
+            .having(
+              (s) => s.deleteActionVersion,
+              'deleteActionVersion',
+              1,
+            )
+            .having(
+              (s) => s.deleteActionStoryId,
+              'deleteActionStoryId',
+              's-1',
+            )
+            .having(
+              (s) => s.deleteActionStatus,
+              'deleteActionStatus',
+              StoryDeleteActionStatus.success,
+            ),
+        isA<StoryState>().having((s) => s.isLoading, 'isLoading', isTrue),
+        isA<StoryState>().having((s) => s.isLoading, 'isLoading', isFalse),
+      ],
       verify: (_) {
         verify(() => mockRepo.deleteStory('s-1')).called(1);
       },
@@ -198,12 +223,29 @@ void main() {
       'emits error when deleteStory throws',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.deleteStory(any()))
-            .thenThrow(Exception('Cannot delete'));
+        when(
+          () => mockRepo.deleteStory(any()),
+        ).thenThrow(Exception('Cannot delete'));
       },
       act: (bloc) => bloc.add(const DeleteStory('s-1')),
       expect: () => [
-        isA<StoryState>().having((s) => s.hasError, 'hasError', isTrue),
+        isA<StoryState>()
+            .having((s) => s.hasError, 'hasError', isTrue)
+            .having(
+              (s) => s.deleteActionVersion,
+              'deleteActionVersion',
+              1,
+            )
+            .having(
+              (s) => s.deleteActionStoryId,
+              'deleteActionStoryId',
+              's-1',
+            )
+            .having(
+              (s) => s.deleteActionStatus,
+              'deleteActionStatus',
+              StoryDeleteActionStatus.failure,
+            ),
       ],
     );
   });
@@ -216,7 +258,9 @@ void main() {
         when(() => mockRepo.recordView(any())).thenAnswer((_) async {});
       },
       seed: () => StoryState(
-        userStories: [_makeUserStories(stories: [_makeStory(id: 's-1', isViewed: false)])],
+        userStories: [
+          _makeUserStories(stories: [_makeStory(id: 's-1', isViewed: false)]),
+        ],
       ),
       act: (bloc) => bloc.add(const ViewStory('s-1')),
       expect: () => [
@@ -232,12 +276,11 @@ void main() {
       'emits error when recordView throws but does not block UX',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.recordView(any()))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockRepo.recordView(any()),
+        ).thenThrow(Exception('Network error'));
       },
-      seed: () => StoryState(
-        userStories: [_makeUserStories()],
-      ),
+      seed: () => StoryState(userStories: [_makeUserStories()]),
       act: (bloc) => bloc.add(const ViewStory('s-1')),
       expect: () => [
         isA<StoryState>().having((s) => s.hasError, 'hasError', isTrue),
@@ -249,12 +292,39 @@ void main() {
     blocTest<StoryBloc, StoryState>(
       'updates userStories list',
       build: buildBloc,
+      act: (bloc) => bloc.add(StoriesUpdated([_makeUserStories()])),
+      expect: () => [
+        isA<StoryState>().having(
+          (s) => s.userStories.length,
+          'userStories.length',
+          1,
+        ),
+      ],
+    );
+
+    blocTest<StoryBloc, StoryState>(
+      'keeps myStories in sync when currentUserId is known',
+      build: buildBloc,
+      seed: () => StoryState(
+        currentUserId: '@alice:s',
+        myStories: [_makeStory(id: 'old-mine')],
+      ),
       act: (bloc) => bloc.add(
-        StoriesUpdated([_makeUserStories()]),
+        StoriesUpdated([
+          _makeUserStories(
+            userId: '@alice:s',
+            stories: [_makeStory(id: 'fresh-mine')],
+          ),
+        ]),
       ),
       expect: () => [
         isA<StoryState>()
-            .having((s) => s.userStories.length, 'userStories.length', 1),
+            .having((s) => s.userStories.length, 'userStories.length', 1)
+            .having(
+              (s) => s.myStories.map((story) => story.id).toList(),
+              'myStories.ids',
+              ['fresh-mine'],
+            ),
       ],
     );
   });

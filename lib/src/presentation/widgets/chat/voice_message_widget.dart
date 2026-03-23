@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 语音转文字回调
-typedef VoiceToTextCallback = Future<String?> Function(String voiceUrl);
+typedef VoiceToTextCallback = Future<String?> Function();
 
 /// 语音消息组件
 ///
@@ -37,8 +38,20 @@ class VoiceMessageWidget extends StatefulWidget {
   /// 语音转文字回调
   final VoiceToTextCallback? onConvertToText;
 
+  /// 请求外部触发转文字
+  final VoidCallback? onRequestTranscription;
+
   /// 转换后的文字（如果已经转换过）
   final String? convertedText;
+
+  /// 是否正在由外部状态管理转文字
+  final bool isTranscribing;
+
+  /// 外部转文字是否失败
+  final bool transcriptionFailed;
+
+  /// 语音服务（测试或宿主注入）
+  final VoiceService? voiceService;
 
   const VoiceMessageWidget({
     super.key,
@@ -48,7 +61,11 @@ class VoiceMessageWidget extends StatefulWidget {
     this.isRead = true,
     this.onTap,
     this.onConvertToText,
+    this.onRequestTranscription,
     this.convertedText,
+    this.isTranscribing = false,
+    this.transcriptionFailed = false,
+    this.voiceService,
   });
 
   @override
@@ -58,8 +75,9 @@ class VoiceMessageWidget extends StatefulWidget {
 class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  final VoiceService _voiceService = VoiceService();
-  
+  late final VoiceService _voiceService;
+  late final bool _ownsVoiceService;
+
   bool _isPlaying = false;
   bool _isConverting = false;
   String? _convertedText;
@@ -68,25 +86,35 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   @override
   void initState() {
     super.initState();
+    _voiceService =
+        widget.voiceService ??
+        (getIt.isRegistered<VoiceService>()
+            ? getIt<VoiceService>()
+            : VoiceService());
+    _ownsVoiceService =
+        widget.voiceService == null && !getIt.isRegistered<VoiceService>();
+    unawaited(_voiceService.initialize());
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-    
+
     _convertedText = widget.convertedText;
 
     // 监听播放状态
     _playbackSubscription = _voiceService.playbackStateStream.listen((state) {
       if (mounted) {
-        final isThisPlaying = state.isPlaying && 
-            state.url != null && 
+        final isThisPlaying =
+            state.isPlaying &&
+            state.url != null &&
             state.url == widget.voiceUrl;
-        
+
         if (_isPlaying != isThisPlaying) {
           setState(() {
             _isPlaying = isThisPlaying;
           });
-          
+
           if (_isPlaying) {
             _animationController.repeat();
           } else {
@@ -110,6 +138,9 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   void dispose() {
     _playbackSubscription?.cancel();
     _animationController.dispose();
+    if (_ownsVoiceService) {
+      unawaited(_voiceService.dispose());
+    }
     super.dispose();
   }
 
@@ -125,26 +156,31 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   }
 
   void _handleTap() {
-    debugLog('VoiceMessageWidget: _handleTap called, voiceUrl=${widget.voiceUrl}, isSelf=${widget.isSelf}');
-    
+    debugLog(
+      'VoiceMessageWidget: _handleTap called, voiceUrl=${widget.voiceUrl}, isSelf=${widget.isSelf}',
+    );
+
     if (widget.onTap != null) {
       widget.onTap!();
       return;
     }
-    
+
     // 默认播放逻辑
     if (widget.voiceUrl == null || widget.voiceUrl!.isEmpty) {
       debugLog('VoiceMessageWidget: voiceUrl is null or empty, cannot play');
       // 提示用户
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.commonVoiceLoading ?? 'Voice loading, please try again later'),
+          content: Text(
+            S.of(context)?.commonVoiceLoading ??
+                'Voice loading, please try again later',
+          ),
           duration: const Duration(seconds: 1),
         ),
       );
       return;
     }
-    
+
     if (_isPlaying) {
       debugLog('VoiceMessageWidget: stopping playback');
       _voiceService.stop();
@@ -155,16 +191,25 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   }
 
   Future<void> _convertToText() async {
-    if (_isConverting || widget.onConvertToText == null || widget.voiceUrl == null) {
+    if (_isConverting || widget.isTranscribing) {
       return;
     }
-    
+
+    if (widget.onRequestTranscription != null) {
+      widget.onRequestTranscription!();
+      return;
+    }
+
+    if (widget.onConvertToText == null) {
+      return;
+    }
+
     setState(() {
       _isConverting = true;
     });
-    
+
     try {
-      final text = await widget.onConvertToText!(widget.voiceUrl!);
+      final text = await widget.onConvertToText!();
       if (mounted && text != null) {
         setState(() {
           _convertedText = text;
@@ -174,7 +219,9 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.commonVoiceToTextFailed ?? 'Voice to text failed'),
+            content: Text(
+              S.of(context)?.commonVoiceToTextFailed ?? 'Voice to text failed',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -192,17 +239,37 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   Widget build(BuildContext context) {
     final width = _calculateWidth();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = widget.isSelf ? AppColors.sentText(isDark) : AppColors.primary;
-    final textColor = widget.isSelf ? AppColors.sentText(isDark) : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+    final iconColor = widget.isSelf
+        ? AppColors.sentText(isDark)
+        : AppColors.primary;
+    final textColor = widget.isSelf
+        ? AppColors.sentText(isDark)
+        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+    final isConverting = _isConverting || widget.isTranscribing;
+    final canConvertToText =
+        widget.onRequestTranscription != null || widget.onConvertToText != null;
+    final convertLabel = isConverting
+        ? '...'
+        : widget.transcriptionFailed
+        ? (S.of(context)?.commonRetry ?? 'Retry')
+        : (S.of(context)?.commonConvertToText ?? 'To text');
+    final convertColor = widget.transcriptionFailed
+        ? AppColors.error
+        : AppColors.textSecondary;
 
     return Column(
-      crossAxisAlignment: 
-          widget.isSelf ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: widget.isSelf
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
         // 语音消息主体
         GestureDetector(
           onTap: _handleTap,
-          onLongPress: widget.onConvertToText != null ? _showContextMenu : null,
+          onLongPress:
+              (widget.onConvertToText != null ||
+                  widget.onRequestTranscription != null)
+              ? _showContextMenu
+              : null,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -222,17 +289,16 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
               SizedBox(
                 width: width,
                 child: Row(
-                  mainAxisAlignment:
-                      widget.isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
+                  mainAxisAlignment: widget.isSelf
+                      ? MainAxisAlignment.end
+                      : MainAxisAlignment.start,
                   children: [
                     // 左侧图标（对方消息）
                     if (!widget.isSelf)
                       AnimatedBuilder(
                         animation: _animationController,
-                        builder: (context, child) => _buildVoiceIcon(
-                          iconColor,
-                          isReversed: false,
-                        ),
+                        builder: (context, child) =>
+                            _buildVoiceIcon(iconColor, isReversed: false),
                       ),
 
                     // 时长
@@ -240,10 +306,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
                         '${widget.duration}"',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: textColor,
-                        ),
+                        style: TextStyle(fontSize: 16, color: textColor),
                       ),
                     ),
 
@@ -251,10 +314,8 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                     if (widget.isSelf)
                       AnimatedBuilder(
                         animation: _animationController,
-                        builder: (context, child) => _buildVoiceIcon(
-                          iconColor,
-                          isReversed: true,
-                        ),
+                        builder: (context, child) =>
+                            _buildVoiceIcon(iconColor, isReversed: true),
                       ),
                   ],
                 ),
@@ -274,7 +335,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
             ],
           ),
         ),
-        
+
         // 转换的文字
         if (_convertedText != null && _convertedText!.isNotEmpty)
           Padding(
@@ -291,44 +352,47 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                   fontSize: 14,
                   color: widget.isSelf
                       ? AppColors.sentText(isDark)
-                      : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                      : (isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimary),
                   height: 1.4,
                 ),
               ),
             ),
           ),
-          
+
         // 转文字按钮（仅在没有转换文字时显示）
-        if (_convertedText == null && widget.onConvertToText != null)
+        if (_convertedText == null && canConvertToText)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: GestureDetector(
-              onTap: _isConverting ? null : _convertToText,
+              onTap: isConverting ? null : _convertToText,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (_isConverting)
+                  if (isConverting)
                     const SizedBox(
                       width: 12,
                       height: 12,
                       child: CircularProgressIndicator(
                         strokeWidth: 1.5,
-                        valueColor: AlwaysStoppedAnimation(AppColors.textSecondary),
+                        valueColor: AlwaysStoppedAnimation(
+                          AppColors.textSecondary,
+                        ),
                       ),
                     )
                   else
-                    const Icon(
-                      Icons.text_fields,
+                    Icon(
+                      widget.transcriptionFailed
+                          ? Icons.refresh
+                          : Icons.text_fields,
                       size: 14,
-                      color: AppColors.textSecondary,
+                      color: convertColor,
                     ),
                   const SizedBox(width: 4),
                   Text(
-                    _isConverting ? '...' : (S.of(context)?.commonConvertToText ?? 'To text'),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    ),
+                    convertLabel,
+                    style: TextStyle(fontSize: 12, color: convertColor),
                   ),
                 ],
               ),
@@ -339,6 +403,15 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
   }
 
   void _showContextMenu() {
+    final isConverting = _isConverting || widget.isTranscribing;
+    final canConvertToText =
+        widget.onRequestTranscription != null || widget.onConvertToText != null;
+    final convertLabel = isConverting
+        ? '...'
+        : widget.transcriptionFailed
+        ? (S.of(context)?.commonRetry ?? 'Retry')
+        : (S.of(context)?.commonConvertToText ?? 'To text');
+
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -360,10 +433,14 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              if (_convertedText == null)
+              if (_convertedText == null && canConvertToText)
                 ListTile(
-                  leading: const Icon(Icons.text_fields),
-                  title: Text(S.of(context)?.commonConvertToText ?? 'To text'),
+                  leading: Icon(
+                    widget.transcriptionFailed
+                        ? Icons.refresh
+                        : Icons.text_fields,
+                  ),
+                  title: Text(convertLabel),
                   onTap: () {
                     Navigator.pop(ctx);
                     _convertToText();
@@ -386,11 +463,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
     if (!_isPlaying) {
       return Transform.flip(
         flipX: isReversed,
-        child: Icon(
-          Icons.wifi,
-          size: 20,
-          color: color,
-        ),
+        child: Icon(Icons.wifi, size: 20, color: color),
       );
     }
 
@@ -451,27 +524,15 @@ class _VoiceWavePainter extends CustomPainter {
 
     // 第一条线（最短）
     paint.color = color.withValues(alpha: line1Opacity);
-    canvas.drawLine(
-      Offset(4, centerY - 3),
-      Offset(4, centerY + 3),
-      paint,
-    );
+    canvas.drawLine(Offset(4, centerY - 3), Offset(4, centerY + 3), paint);
 
     // 第二条线（中等）
     paint.color = color.withValues(alpha: line2Opacity);
-    canvas.drawLine(
-      Offset(9, centerY - 5),
-      Offset(9, centerY + 5),
-      paint,
-    );
+    canvas.drawLine(Offset(9, centerY - 5), Offset(9, centerY + 5), paint);
 
     // 第三条线（最长）
     paint.color = color.withValues(alpha: line3Opacity);
-    canvas.drawLine(
-      Offset(14, centerY - 7),
-      Offset(14, centerY + 7),
-      paint,
-    );
+    canvas.drawLine(Offset(14, centerY - 7), Offset(14, centerY + 7), paint);
   }
 
   @override

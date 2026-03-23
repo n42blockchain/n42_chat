@@ -1,12 +1,15 @@
 /// 多种认证方式服务
 ///
-/// 支持 Passkey、邮箱 OTP、第三方登录等认证方式
+/// 封装多种认证相关能力。
+/// 当前第三方登录可直接用于登录流程；Passkey 和邮箱 OTP 主要用于账号能力接线与后续扩展。
 library;
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -22,15 +25,15 @@ import '../../core/utils/debug_log.dart';
 
 /// 认证方式
 enum AuthMethod {
-  password,     // 密码登录
-  passkey,      // Passkey / WebAuthn
-  emailOtp,     // 邮箱验证码
-  google,       // Google 登录
-  apple,        // Apple 登录
-  facebook,     // Facebook 登录
-  twitter,      // Twitter 登录
-  wechat,       // 微信登录
-  sso,          // Matrix SSO
+  password, // 密码登录
+  passkey, // Passkey / WebAuthn（设置页可管理，独立登录入口未开放）
+  emailOtp, // 邮箱验证码（基础接口已接线，独立登录入口未开放）
+  google, // Google 登录
+  apple, // Apple 登录
+  facebook, // Facebook 登录
+  twitter, // Twitter 登录
+  wechat, // 微信登录
+  sso, // Matrix SSO
 }
 
 /// 第三方登录结果
@@ -42,7 +45,7 @@ class SocialLoginResult {
   final String? displayName;
   final String? photoUrl;
   final Map<String, dynamic>? extra;
-  
+
   SocialLoginResult({
     required this.provider,
     this.idToken,
@@ -60,21 +63,21 @@ class PasskeyCredential {
   final String publicKey;
   final String userId;
   final String? displayName;
-  
+
   PasskeyCredential({
     required this.credentialId,
     required this.publicKey,
     required this.userId,
     this.displayName,
   });
-  
+
   Map<String, dynamic> toJson() => {
     'credentialId': credentialId,
     'publicKey': publicKey,
     'userId': userId,
     'displayName': displayName,
   };
-  
+
   factory PasskeyCredential.fromJson(Map<String, dynamic> json) {
     return PasskeyCredential(
       credentialId: json['credentialId'] as String,
@@ -109,25 +112,31 @@ class SsoProvider {
   });
 
   /// 是否为 Google 登录
-  bool get isGoogle => brand == 'google' || name.toLowerCase().contains('google');
+  bool get isGoogle =>
+      brand == 'google' || name.toLowerCase().contains('google');
 
   /// 是否为 Apple 登录
   bool get isApple => brand == 'apple' || name.toLowerCase().contains('apple');
 
   /// 是否为 GitHub 登录
-  bool get isGitHub => brand == 'github' || name.toLowerCase().contains('github');
+  bool get isGitHub =>
+      brand == 'github' || name.toLowerCase().contains('github');
 
   /// 是否为 GitLab 登录
-  bool get isGitLab => brand == 'gitlab' || name.toLowerCase().contains('gitlab');
+  bool get isGitLab =>
+      brand == 'gitlab' || name.toLowerCase().contains('gitlab');
 
   /// 是否为 Facebook 登录
-  bool get isFacebook => brand == 'facebook' || name.toLowerCase().contains('facebook');
+  bool get isFacebook =>
+      brand == 'facebook' || name.toLowerCase().contains('facebook');
 
   /// 是否为 Twitter 登录
-  bool get isTwitter => brand == 'twitter' || name.toLowerCase().contains('twitter');
+  bool get isTwitter =>
+      brand == 'twitter' || name.toLowerCase().contains('twitter');
 
   /// 是否为微信登录
-  bool get isWeChat => brand == 'wechat' || name.toLowerCase().contains('wechat');
+  bool get isWeChat =>
+      brand == 'wechat' || name.toLowerCase().contains('wechat');
 
   @override
   String toString() => 'SsoProvider(id: $id, name: $name, brand: $brand)';
@@ -145,6 +154,7 @@ class AuthMethodsService {
 
   // Google Sign In
   GoogleSignIn? _googleSignIn;
+  bool _googleInitialized = false;
 
   // Twitter 配置
   String? _twitterApiKey;
@@ -156,11 +166,12 @@ class AuthMethodsService {
   String? _weChatUniversalLink;
   bool _weChatInitialized = false;
   Completer<SocialLoginResult?>? _weChatLoginCompleter;
-  
+  WeChatResponseSubscriber? _weChatResponseListener;
+
   // ============================================
   // 初始化
   // ============================================
-  
+
   Future<void> initialize({
     String? googleClientId,
     String? googleServerClientId,
@@ -178,10 +189,23 @@ class AuthMethodsService {
     _passkeyInitialized = true;
     debugLog('AuthMethodsService: Passkey config initialized');
 
-    // 初始化 Google Sign In (google_sign_in 7.x 使用 singleton 模式)
-    // GoogleSignIn 7.x 不再需要手动初始化，使用 GoogleSignIn.instance
-    _googleSignIn = GoogleSignIn.instance;
-    debugLog('AuthMethodsService: Google Sign In initialized');
+    // 初始化 Google Sign In
+    if (!_googleInitialized) {
+      try {
+        _googleSignIn = GoogleSignIn.instance;
+        await _googleSignIn!.initialize(
+          clientId: googleClientId,
+          serverClientId: googleServerClientId,
+        );
+        _googleInitialized = true;
+        debugLog('AuthMethodsService: Google Sign In initialized');
+      } catch (e) {
+        _googleInitialized = false;
+        debugLog(
+          'AuthMethodsService: Google Sign In init fallback to default config - $e',
+        );
+      }
+    }
 
     // 初始化 Twitter 配置
     _twitterApiKey = twitterApiKey;
@@ -200,30 +224,28 @@ class AuthMethodsService {
           appId: _weChatAppId!,
           universalLink: _weChatUniversalLink!,
         );
-        _weChatInitialized = await Fluwx().isWeChatInstalled;
-        if (_weChatInitialized) {
-          // 监听微信登录响应
-          Fluwx().addSubscriber((response) {
-            if (response is WeChatAuthResponse) {
-              _handleWeChatAuthResponse(response);
-            }
-          });
+        _weChatInitialized = true;
+        _ensureWeChatResponseListener();
+        final isInstalled = await Fluwx().isWeChatInstalled;
+        if (isInstalled) {
           debugLog('AuthMethodsService: WeChat SDK initialized');
         } else {
           debugLog('AuthMethodsService: WeChat not installed');
         }
       } catch (e) {
+        _removeWeChatResponseListener();
+        _weChatInitialized = false;
         debugLog('AuthMethodsService: WeChat init failed - $e');
       }
     }
 
     debugLog('AuthMethodsService: Initialized');
   }
-  
+
   // ============================================
   // Passkey / WebAuthn
   // ============================================
-  
+
   /// 检查是否支持 Passkey
   Future<bool> isPasskeySupported() async {
     try {
@@ -233,7 +255,7 @@ class AuthMethodsService {
       return false;
     }
   }
-  
+
   /// 从服务端请求 Passkey 注册挑战
   ///
   /// [homeserver] Matrix 服务器地址
@@ -244,28 +266,36 @@ class AuthMethodsService {
     String? accessToken,
   }) async {
     try {
-      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/register/challenge');
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
+      final uri = Uri.parse(
+        '$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/register/challenge',
+      );
+      final headers = <String, String>{'Content-Type': 'application/json'};
       if (accessToken != null) {
         headers['Authorization'] = 'Bearer $accessToken';
       }
 
-      final response = await http.post(uri, headers: headers, body: jsonEncode({
-        'user_id': userId,
-        'rp_id': _passkeyRpId,
-        'rp_name': 'N42 Chat',
-      }));
+      final response = await http.post(
+        uri,
+        headers: headers,
+        body: jsonEncode({
+          'user_id': userId,
+          'rp_id': _passkeyRpId,
+          'rp_name': 'N42 Chat',
+        }),
+      );
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;
       }
 
-      debugLog('AuthMethodsService: Challenge request failed: ${response.statusCode}');
+      debugLog(
+        'AuthMethodsService: Challenge request failed: ${response.statusCode}',
+      );
       return null;
     } catch (e) {
-      debugLog('AuthMethodsService: requestPasskeyRegistrationChallenge failed: $e');
+      debugLog(
+        'AuthMethodsService: requestPasskeyRegistrationChallenge failed: $e',
+      );
       return null;
     }
   }
@@ -334,23 +364,29 @@ class AuthMethodsService {
     String? accessToken,
   }) async {
     try {
-      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/register/complete');
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
+      final uri = Uri.parse(
+        '$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/register/complete',
+      );
+      final headers = <String, String>{'Content-Type': 'application/json'};
       if (accessToken != null) {
         headers['Authorization'] = 'Bearer $accessToken';
       }
 
-      final response = await http.post(uri, headers: headers, body: jsonEncode({
-        'credential_id': credential.credentialId,
-        'public_key': credential.publicKey,
-        'user_id': credential.userId,
-        'display_name': credential.displayName,
-      }));
+      final response = await http.post(
+        uri,
+        headers: headers,
+        body: jsonEncode({
+          'credential_id': credential.credentialId,
+          'public_key': credential.publicKey,
+          'user_id': credential.userId,
+          'display_name': credential.displayName,
+        }),
+      );
 
       if (response.statusCode != 200) {
-        debugLog('AuthMethodsService: Submit registration failed: ${response.statusCode}');
+        debugLog(
+          'AuthMethodsService: Submit registration failed: ${response.statusCode}',
+        );
       }
     } catch (e) {
       debugLog('AuthMethodsService: _submitPasskeyRegistration failed: $e');
@@ -370,14 +406,15 @@ class AuthMethodsService {
       // 使用 MethodChannel 调用原生 API
       const channel = MethodChannel('n42.chat/passkey');
 
-      final result = await channel.invokeMethod<Map<dynamic, dynamic>>('createCredential', {
-        'rpId': rpId,
-        'rpName': rpName,
-        'userId': userId,
-        'userName': username,
-        'displayName': displayName,
-        'challenge': challenge,
-      });
+      final result = await channel
+          .invokeMethod<Map<dynamic, dynamic>>('createCredential', {
+            'rpId': rpId,
+            'rpName': rpName,
+            'userId': userId,
+            'userName': username,
+            'displayName': displayName,
+            'challenge': challenge,
+          });
 
       if (result == null) return null;
 
@@ -392,7 +429,9 @@ class AuthMethodsService {
         debugLog('AuthMethodsService: User canceled passkey creation');
         return null;
       }
-      debugLog('AuthMethodsService: Platform passkey error: ${e.code} - ${e.message}');
+      debugLog(
+        'AuthMethodsService: Platform passkey error: ${e.code} - ${e.message}',
+      );
       rethrow;
     } catch (e) {
       debugLog('AuthMethodsService: _createPasskeyCredential failed: $e');
@@ -457,11 +496,12 @@ class AuthMethodsService {
     try {
       const channel = MethodChannel('n42.chat/passkey');
 
-      final result = await channel.invokeMethod<Map<dynamic, dynamic>>('getAssertion', {
-        'rpId': rpId,
-        'challenge': challenge,
-        'allowedCredentials': allowedCredentials ?? [],
-      });
+      final result = await channel
+          .invokeMethod<Map<dynamic, dynamic>>('getAssertion', {
+            'rpId': rpId,
+            'challenge': challenge,
+            'allowedCredentials': allowedCredentials ?? [],
+          });
 
       if (result == null) return null;
 
@@ -477,7 +517,9 @@ class AuthMethodsService {
         debugLog('AuthMethodsService: User canceled passkey authentication');
         return null;
       }
-      debugLog('AuthMethodsService: Platform passkey auth error: ${e.code} - ${e.message}');
+      debugLog(
+        'AuthMethodsService: Platform passkey auth error: ${e.code} - ${e.message}',
+      );
       rethrow;
     } catch (e) {
       debugLog('AuthMethodsService: _getPasskeyAssertion failed: $e');
@@ -491,7 +533,9 @@ class AuthMethodsService {
     required Map<String, dynamic> assertion,
   }) async {
     try {
-      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/login');
+      final uri = Uri.parse(
+        '$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/login',
+      );
       final response = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
@@ -502,7 +546,9 @@ class AuthMethodsService {
         return jsonDecode(response.body) as Map<String, dynamic>;
       }
 
-      debugLog('AuthMethodsService: Passkey login failed: ${response.statusCode}');
+      debugLog(
+        'AuthMethodsService: Passkey login failed: ${response.statusCode}',
+      );
       return null;
     } catch (e) {
       debugLog('AuthMethodsService: _submitPasskeyAuthentication failed: $e');
@@ -515,7 +561,9 @@ class AuthMethodsService {
     required String homeserver,
   }) async {
     try {
-      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/login/challenge');
+      final uri = Uri.parse(
+        '$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/login/challenge',
+      );
       final response = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
@@ -538,10 +586,13 @@ class AuthMethodsService {
     required String accessToken,
   }) async {
     try {
-      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/credentials');
-      final response = await http.get(uri, headers: {
-        'Authorization': 'Bearer $accessToken',
-      });
+      final uri = Uri.parse(
+        '$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/credentials',
+      );
+      final response = await http.get(
+        uri,
+        headers: {'Authorization': 'Bearer $accessToken'},
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -564,21 +615,24 @@ class AuthMethodsService {
     required String credentialId,
   }) async {
     try {
-      final uri = Uri.parse('$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/credentials/$credentialId');
-      final response = await http.delete(uri, headers: {
-        'Authorization': 'Bearer $accessToken',
-      });
+      final uri = Uri.parse(
+        '$homeserver/_matrix/client/unstable/org.matrix.msc3824/auth/webauthn/credentials/$credentialId',
+      );
+      final response = await http.delete(
+        uri,
+        headers: {'Authorization': 'Bearer $accessToken'},
+      );
       return response.statusCode == 200;
     } catch (e) {
       debugLog('AuthMethodsService: deletePasskey failed: $e');
       return false;
     }
   }
-  
+
   // ============================================
   // 邮箱 OTP
   // ============================================
-  
+
   /// 请求发送邮箱验证码
   ///
   /// 调用 Matrix homeserver 的邮箱验证 API。
@@ -594,9 +648,9 @@ class AuthMethodsService {
     required String homeserver,
   }) async {
     try {
-      debugLog('AuthMethodsService: Requesting email OTP for $email');
+      debugLog('AuthMethodsService: Requesting email OTP for [redacted]');
 
-      final clientSecret = 'n42_${DateTime.now().millisecondsSinceEpoch}';
+      final clientSecret = _generateSecureClientSecret();
       final uri = Uri.parse(
         '$homeserver/_matrix/client/v3/register/email/requestToken',
       );
@@ -621,7 +675,9 @@ class AuthMethodsService {
         return {'sid': sid, 'clientSecret': clientSecret};
       }
 
-      debugLog('AuthMethodsService: Email OTP request failed: ${response.statusCode} ${response.body}');
+      debugLog(
+        'AuthMethodsService: Email OTP request failed: ${response.statusCode} ${response.body}',
+      );
       return null;
     } catch (e) {
       debugLog('AuthMethodsService: Request email OTP failed: $e');
@@ -664,31 +720,29 @@ class AuthMethodsService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['success'] == true) {
-          return {
-            'verified': true,
-            'email': email,
-            'sid': data['sid'],
-          };
+          return {'verified': true, 'email': email, 'sid': data['sid']};
         }
       }
 
-      debugLog('AuthMethodsService: OTP verification failed: ${response.statusCode}');
+      debugLog(
+        'AuthMethodsService: OTP verification failed: ${response.statusCode}',
+      );
       return null;
     } catch (e) {
       debugLog('AuthMethodsService: Verify email OTP failed: $e');
       rethrow;
     }
   }
-  
+
   // ============================================
   // Google 登录
   // ============================================
-  
+
   /// 检查是否支持 Google 登录
   bool isGoogleSignInAvailable() {
-    return _googleSignIn != null;
+    return _googleSignIn != null && _googleInitialized;
   }
-  
+
   /// Google 登录
   /// google_sign_in 7.x API 变更:
   /// - 使用 GoogleSignIn.instance singleton
@@ -702,6 +756,8 @@ class AuthMethodsService {
     try {
       debugLog('AuthMethodsService: Starting Google Sign In');
 
+      await _googleSignIn!.signOut();
+
       // google_sign_in 7.x: 使用 authenticate() 方法
       final account = await _googleSignIn!.authenticate(
         scopeHint: ['email', 'profile', 'openid'],
@@ -712,9 +768,8 @@ class AuthMethodsService {
       // 获取 access token (需要单独请求 authorization)
       String? accessToken;
       try {
-        final authorization = await account.authorizationClient.authorizationForScopes(
-          ['email', 'profile', 'openid'],
-        );
+        final authorization = await account.authorizationClient
+            .authorizationForScopes(['email', 'profile', 'openid']);
         accessToken = authorization?.accessToken;
       } catch (e) {
         debugLog('AuthMethodsService: Failed to get access token: $e');
@@ -722,9 +777,15 @@ class AuthMethodsService {
 
       debugLog('AuthMethodsService: Google Sign In success: ${account.email}');
 
+      final idToken = auth.idToken;
+      if ((idToken == null || idToken.isEmpty) &&
+          (accessToken == null || accessToken.isEmpty)) {
+        throw Exception('Google Sign In did not return any usable token');
+      }
+
       return SocialLoginResult(
         provider: 'google',
-        idToken: auth.idToken,
+        idToken: idToken,
         accessToken: accessToken,
         email: account.email,
         displayName: account.displayName,
@@ -743,16 +804,16 @@ class AuthMethodsService {
       rethrow;
     }
   }
-  
+
   /// Google 登出
   Future<void> signOutGoogle() async {
     await _googleSignIn?.signOut();
   }
-  
+
   // ============================================
   // Apple 登录
   // ============================================
-  
+
   /// 检查是否支持 Apple 登录
   Future<bool> isAppleSignInAvailable() async {
     if (!Platform.isIOS && !Platform.isMacOS) {
@@ -760,30 +821,35 @@ class AuthMethodsService {
     }
     return await SignInWithApple.isAvailable();
   }
-  
+
   /// Apple 登录
   Future<SocialLoginResult?> signInWithApple() async {
     try {
       debugLog('AuthMethodsService: Starting Apple Sign In');
-      
+
+      final rawNonce = _generateNonce();
+      final hashedNonce = _sha256OfString(rawNonce);
+
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
+        nonce: hashedNonce,
       );
-      
+
       debugLog('AuthMethodsService: Apple Sign In success');
-      
+
       return SocialLoginResult(
         provider: 'apple',
         idToken: credential.identityToken,
         accessToken: credential.authorizationCode,
         email: credential.email,
-        displayName: credential.givenName != null 
+        displayName: credential.givenName != null
             ? '${credential.givenName} ${credential.familyName ?? ''}'.trim()
             : null,
         extra: {
+          'rawNonce': rawNonce,
           'userIdentifier': credential.userIdentifier,
           'state': credential.state,
         },
@@ -794,7 +860,7 @@ class AuthMethodsService {
       rethrow;
     }
   }
-  
+
   // ============================================
   // Facebook 登录
   // ============================================
@@ -839,7 +905,9 @@ class AuthMethodsService {
         debugLog('AuthMethodsService: Facebook Sign In cancelled');
         return null;
       } else {
-        debugLog('AuthMethodsService: Facebook Sign In failed: ${result.message}');
+        debugLog(
+          'AuthMethodsService: Facebook Sign In failed: ${result.message}',
+        );
         throw Exception(result.message ?? 'Facebook login failed');
       }
     } catch (e, stackTrace) {
@@ -905,7 +973,9 @@ class AuthMethodsService {
           return null;
 
         case TwitterLoginStatus.error:
-          debugLog('AuthMethodsService: Twitter Sign In error: ${authResult.errorMessage}');
+          debugLog(
+            'AuthMethodsService: Twitter Sign In error: ${authResult.errorMessage}',
+          );
           throw Exception(authResult.errorMessage ?? 'Twitter login failed');
 
         default:
@@ -936,6 +1006,9 @@ class AuthMethodsService {
   Future<SocialLoginResult?> signInWithWeChat() async {
     if (!_weChatInitialized) {
       throw Exception('WeChat SDK not initialized');
+    }
+    if (_weChatLoginCompleter != null && !_weChatLoginCompleter!.isCompleted) {
+      throw StateError('WeChat login already in progress');
     }
 
     final isInstalled = await Fluwx().isWeChatInstalled;
@@ -976,10 +1049,13 @@ class AuthMethodsService {
       debugLog('AuthMethodsService: WeChat Sign In failed: $e');
       debugLog('Stack: $stackTrace');
       // 只有在 Completer 未完成时才调用 completeError
-      if (_weChatLoginCompleter != null && !_weChatLoginCompleter!.isCompleted) {
+      if (_weChatLoginCompleter != null &&
+          !_weChatLoginCompleter!.isCompleted) {
         _weChatLoginCompleter!.completeError(e);
       }
       rethrow;
+    } finally {
+      _weChatLoginCompleter = null;
     }
   }
 
@@ -993,16 +1069,18 @@ class AuthMethodsService {
       debugLog('AuthMethodsService: WeChat auth success');
 
       // 微信登录成功，返回 code 供后端换取 access_token
-      _weChatLoginCompleter!.complete(SocialLoginResult(
-        provider: 'wechat',
-        accessToken: response.code,  // 这是授权码，需要后端换取 access_token
-        extra: {
-          'code': response.code,
-          'state': response.state,
-          'country': response.country,
-          'lang': response.lang,
-        },
-      ));
+      _weChatLoginCompleter!.complete(
+        SocialLoginResult(
+          provider: 'wechat',
+          accessToken: response.code, // 这是授权码，需要后端换取 access_token
+          extra: {
+            'code': response.code,
+            'state': response.state,
+            'country': response.country,
+            'lang': response.lang,
+          },
+        ),
+      );
     } else {
       debugLog('AuthMethodsService: WeChat auth failed: ${response.errStr}');
       if (response.errCode == -2) {
@@ -1019,9 +1097,9 @@ class AuthMethodsService {
   // ============================================
   // Matrix SSO
   // ============================================
-  
+
   /// 获取 Matrix SSO 登录 URL
-  /// 
+  ///
   /// [homeserver] Matrix 服务器地址
   /// [redirectUrl] 回调 URL
   String getSsoLoginUrl({
@@ -1031,7 +1109,7 @@ class AuthMethodsService {
     final encodedRedirect = Uri.encodeComponent(redirectUrl);
     return '$homeserver/_matrix/client/v3/login/sso/redirect?redirectUrl=$encodedRedirect';
   }
-  
+
   /// 获取支持的 SSO 提供商列表
   ///
   /// [homeserver] Matrix 服务器地址
@@ -1060,26 +1138,24 @@ class AuthMethodsService {
                 flow['identity_providers'] as List<dynamic>?;
             if (identityProviders != null) {
               for (final provider in identityProviders) {
-                providers.add(SsoProvider(
-                  id: provider['id'] as String? ?? '',
-                  name: provider['name'] as String? ?? 'SSO',
-                  icon: provider['icon'] as String?,
-                  brand: provider['brand'] as String?,
-                ));
+                providers.add(
+                  SsoProvider(
+                    id: provider['id'] as String? ?? '',
+                    name: provider['name'] as String? ?? 'SSO',
+                    icon: provider['icon'] as String?,
+                    brand: provider['brand'] as String?,
+                  ),
+                );
               }
             }
             // 如果没有 identity_providers，说明是单一 SSO 登录
             if (identityProviders == null || identityProviders.isEmpty) {
-              providers.add(const SsoProvider(
-                id: 'sso',
-                name: 'SSO Login',
-              ));
+              providers.add(const SsoProvider(id: 'sso', name: 'SSO Login'));
             }
           }
         }
 
-        debugLog(
-            'AuthMethodsService: Found ${providers.length} SSO providers');
+        debugLog('AuthMethodsService: Found ${providers.length} SSO providers');
         return providers;
       }
 
@@ -1103,22 +1179,72 @@ class AuthMethodsService {
     final encodedRedirect = Uri.encodeComponent(redirectUrl);
     return '$homeserver/_matrix/client/v3/login/sso/redirect/$providerId?redirectUrl=$encodedRedirect';
   }
-  
+
   // ============================================
   // 工具方法
   // ============================================
-  
+
   /// 清理所有登录状态
   Future<void> signOutAll() async {
     await signOutGoogle();
     await signOutFacebook();
   }
 
+  /// Generate a cryptographically secure client secret for Matrix APIs.
+  /// Uses 32 bytes of randomness (base64url-encoded) instead of a predictable timestamp.
+  String _generateSecureClientSecret() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(32, (_) => random.nextInt(256));
+    return 'n42_${base64UrlEncode(bytes)}';
+  }
+
+  String _generateNonce() {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(
+      32,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
+  }
+
+  String _sha256OfString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
+  void _ensureWeChatResponseListener() {
+    if (_weChatResponseListener != null) {
+      return;
+    }
+
+    _weChatResponseListener = (response) {
+      if (response is WeChatAuthResponse) {
+        _handleWeChatAuthResponse(response);
+      }
+    };
+    Fluwx().addSubscriber(_weChatResponseListener!);
+  }
+
+  void _removeWeChatResponseListener() {
+    if (_weChatResponseListener == null) {
+      return;
+    }
+    Fluwx().removeSubscriber(_weChatResponseListener!);
+    _weChatResponseListener = null;
+  }
+
   /// 释放资源
   void dispose() {
+    if (_weChatLoginCompleter != null && !_weChatLoginCompleter!.isCompleted) {
+      _weChatLoginCompleter!.complete(null);
+    }
+    _removeWeChatResponseListener();
     _passkeyInitialized = false;
     _passkeyRpId = null;
     _googleSignIn = null;
+    _googleInitialized = false;
     _twitterApiKey = null;
     _twitterApiSecret = null;
     _twitterRedirectUri = null;
@@ -1128,4 +1254,3 @@ class AuthMethodsService {
     _weChatLoginCompleter = null;
   }
 }
-

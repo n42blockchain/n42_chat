@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -37,7 +35,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   /// 防抖转换器
   EventTransformer<T> _debounce<T>(Duration duration) {
-    return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
+    return (events, mapper) => events.debounceTime(duration).switchMap(mapper);
   }
 
   Future<void> _onPerformSearch(
@@ -55,17 +53,22 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     emit(SearchLoading(query, type: event.type));
 
     try {
-      final results = await _searchRepository.searchGlobal(
-        query,
-        type: event.type,
-      );
+      final results = event.filter == null || event.filter!.isEmpty
+          ? await _searchRepository.searchGlobal(query, type: event.type)
+          : await _searchRepository.searchGlobal(
+              query,
+              type: event.type,
+              filter: event.filter,
+            );
       final history = await _searchRepository.getRecentSearches();
 
-      emit(SearchLoaded(
-        results: results,
-        selectedType: event.type ?? SearchResultType.all,
-        recentSearches: history,
-      ));
+      emit(
+        SearchLoaded(
+          results: results,
+          selectedType: event.type ?? SearchResultType.all,
+          recentSearches: history,
+        ),
+      );
     } catch (e) {
       emit(SearchError(e.toString()));
     }
@@ -90,9 +93,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     if (event.roomId != null) {
-      add(SearchInChat(event.roomId!, event.query));
+      add(SearchInChat(event.roomId!, event.query, filter: event.filter));
     } else {
-      add(PerformSearch(event.query, type: SearchResultType.message));
+      add(
+        PerformSearch(
+          event.query,
+          type: SearchResultType.message,
+          filter: event.filter,
+        ),
+      );
     }
   }
 
@@ -139,10 +148,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     }
   }
 
-  void _onChangeSearchType(
-    ChangeSearchType event,
-    Emitter<SearchState> emit,
-  ) {
+  void _onChangeSearchType(ChangeSearchType event, Emitter<SearchState> emit) {
     if (state is SearchLoaded) {
       final currentState = state as SearchLoaded;
       emit(currentState.copyWith(selectedType: event.type));
@@ -156,22 +162,31 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final query = event.query.trim();
 
     if (query.isEmpty) {
-      emit(ChatSearchState(
-        results: ChatSearchResults(roomId: event.roomId),
-      ));
+      emit(ChatSearchState(results: ChatSearchResults(roomId: event.roomId)));
       return;
     }
 
-    emit(ChatSearchState(
-      results: ChatSearchResults(roomId: event.roomId, query: query),
-      isSearching: true,
-    ));
+    emit(
+      ChatSearchState(
+        results: ChatSearchResults(
+          roomId: event.roomId,
+          query: query,
+          filter: event.filter == null || event.filter!.isEmpty
+              ? null
+              : event.filter,
+        ),
+        isSearching: true,
+      ),
+    );
 
     try {
-      final results = await _searchRepository.searchInChat(
-        event.roomId,
-        query,
-      );
+      final results = event.filter == null || event.filter!.isEmpty
+          ? await _searchRepository.searchInChat(event.roomId, query)
+          : await _searchRepository.searchInChat(
+              event.roomId,
+              query,
+              filter: event.filter,
+            );
       emit(ChatSearchState(results: results));
     } catch (e) {
       emit(SearchError(e.toString()));
@@ -185,11 +200,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (state is ChatSearchState) {
       final currentState = state as ChatSearchState;
       if (currentState.results.hasNext) {
-        emit(currentState.copyWith(
-          results: currentState.results.copyWith(
-            currentIndex: currentState.results.currentIndex + 1,
+        emit(
+          currentState.copyWith(
+            results: currentState.results.copyWith(
+              currentIndex: currentState.results.currentIndex + 1,
+            ),
           ),
-        ));
+        );
       }
     }
   }
@@ -201,11 +218,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (state is ChatSearchState) {
       final currentState = state as ChatSearchState;
       if (currentState.results.hasPrevious) {
-        emit(currentState.copyWith(
-          results: currentState.results.copyWith(
-            currentIndex: currentState.results.currentIndex - 1,
+        emit(
+          currentState.copyWith(
+            results: currentState.results.copyWith(
+              currentIndex: currentState.results.currentIndex - 1,
+            ),
           ),
-        ));
+        );
       }
     }
   }
@@ -217,11 +236,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (state is ChatSearchState) {
       final currentState = state as ChatSearchState;
       if (event.index >= 0 && event.index < currentState.results.totalCount) {
-        emit(currentState.copyWith(
-          results: currentState.results.copyWith(
-            currentIndex: event.index,
+        emit(
+          currentState.copyWith(
+            results: currentState.results.copyWith(currentIndex: event.index),
           ),
-        ));
+        );
       }
     }
   }
@@ -247,4 +266,3 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     }
   }
 }
-

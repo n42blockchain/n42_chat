@@ -3,8 +3,28 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 
+enum PollComposerAction { sendNow, schedule }
+
+class PollComposerResult {
+  final String question;
+  final List<String> options;
+  final int maxSelections;
+  final bool isAnonymous;
+  final PollComposerAction action;
+
+  const PollComposerResult({
+    required this.question,
+    required this.options,
+    required this.maxSelections,
+    required this.isAnonymous,
+    required this.action,
+  });
+}
+
 class PollCreateSheet extends StatefulWidget {
-  const PollCreateSheet({super.key});
+  final bool allowScheduling;
+
+  const PollCreateSheet({super.key, this.allowScheduling = true});
 
   @override
   State<PollCreateSheet> createState() => _PollCreateSheetState();
@@ -45,7 +65,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
     }
   }
 
-  void _submit() {
+  void _submit(PollComposerAction action) {
     final question = _questionController.text.trim();
     if (question.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,12 +86,16 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
       return;
     }
 
-    Navigator.pop(context, {
-      'question': question,
-      'options': options,
-      'maxSelections': _maxSelections,
-      'isAnonymous': _isAnonymous,
-    });
+    Navigator.pop(
+      context,
+      PollComposerResult(
+        question: question,
+        options: options,
+        maxSelections: _maxSelections,
+        isAnonymous: _isAnonymous,
+        action: action,
+      ),
+    );
   }
 
   @override
@@ -118,15 +142,31 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                     ),
                   ),
                 ),
-                TextButton(
-                  onPressed: _submit,
-                  child: Text(
-                    S.of(context)?.chatSubmitPoll ?? 'Submit',
-                    style: const TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.w600,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.allowScheduling)
+                      TextButton(
+                        onPressed: () => _submit(PollComposerAction.schedule),
+                        child: const Text(
+                          'Schedule',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    TextButton(
+                      onPressed: () => _submit(PollComposerAction.sendNow),
+                      child: Text(
+                        S.of(context)?.chatSubmitPoll ?? 'Submit',
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../services/voip/incoming_call_ringtone_preference.dart';
 import '../../../services/ringtone/system_ringtone_service.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -20,6 +22,7 @@ class RingtoneSelectPage extends StatefulWidget {
 
 class RingtoneSelectPageState extends State<RingtoneSelectPage> {
   late String _selectedRingtone;
+  String? _selectedRingtoneKey;
   String? _playingRingtone;
   bool _isLoading = true;
   bool _hasLoadedRingtones = false;
@@ -50,6 +53,8 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
       // 该权限仅用于访问用户设备上的音乐文件，而非系统铃声
       final s = S.of(context);
       final systemRingtones = await _ringtoneService.getAvailableRingtones();
+      final storedPreference =
+          await IncomingCallRingtonePreference.loadIfPresent();
 
       final ringtoneItems = <RingtoneItem>[];
 
@@ -61,6 +66,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
           icon: ringtone.isDefault ? Icons.music_note : Icons.audiotrack,
           uri: ringtone.uri,
           isSystemRingtone: true,
+          isDefault: ringtone.isDefault,
         ));
       }
 
@@ -82,8 +88,15 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
       ));
 
       if (mounted) {
+        final selectedItem =
+            _resolveSelectedItem(ringtoneItems, storedPreference) ??
+            ringtoneItems.where(
+              (item) => item.name == _selectedRingtone,
+            ).firstOrNull;
         setState(() {
           _ringtones = ringtoneItems;
+          _selectedRingtoneKey = selectedItem?.key ?? ringtoneItems.firstOrNull?.key;
+          _selectedRingtone = selectedItem?.name ?? _selectedRingtone;
           _isLoading = false;
         });
       }
@@ -232,8 +245,40 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
     }
   }
 
+  RingtoneItem? _resolveSelectedItem(
+    List<RingtoneItem> items,
+    IncomingCallRingtonePreference? preference,
+  ) {
+    if (preference == null) return null;
+
+    final key = switch (preference.mode) {
+      IncomingCallRingtoneMode.silent => 'silent',
+      IncomingCallRingtoneMode.vibrate => 'vibrate',
+      IncomingCallRingtoneMode.system => preference.sourceKey,
+    };
+
+    if (key != null && key.isNotEmpty) {
+      final byKey = items.where((item) => item.key == key).firstOrNull;
+      if (byKey != null) return byKey;
+    }
+
+    return items.where((item) => item.name == preference.label).firstOrNull;
+  }
+
   /// 确认保存
-  void _confirmSave() {
+  Future<void> _confirmSave() async {
+    final selectedItem = _ringtones.where(
+      (item) => item.key == _selectedRingtoneKey,
+    ).firstOrNull;
+    if (selectedItem != null) {
+      await IncomingCallRingtonePreference.saveSelection(
+        key: selectedItem.key,
+        label: selectedItem.name,
+        isSystemRingtone: selectedItem.isSystemRingtone,
+        isDefault: selectedItem.isDefault,
+      );
+    }
+    if (!mounted) return;
     Navigator.pop(context, _selectedRingtone);
   }
 
@@ -319,7 +364,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                   itemCount: _ringtones.length,
                   itemBuilder: (context, index) {
                     final ringtone = _ringtones[index];
-                    final isSelected = ringtone.name == _selectedRingtone;
+                    final isSelected = ringtone.key == _selectedRingtoneKey;
                     final isPlaying = ringtone.name == _playingRingtone;
 
                     return Container(
@@ -384,6 +429,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                         onTap: () {
                           setState(() {
                             _selectedRingtone = ringtone.name;
+                            _selectedRingtoneKey = ringtone.key;
                           });
                           // 选中后自动试听
                           _playRingtone(ringtone);
@@ -403,6 +449,7 @@ class RingtoneItem {
   final IconData icon;
   final String? uri;
   final bool isSystemRingtone;
+  final bool isDefault;
 
   const RingtoneItem({
     required this.key,
@@ -410,6 +457,6 @@ class RingtoneItem {
     required this.icon,
     this.uri,
     this.isSystemRingtone = false,
+    this.isDefault = false,
   });
 }
-

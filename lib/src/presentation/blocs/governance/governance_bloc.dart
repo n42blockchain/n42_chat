@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../domain/entities/governance/proposal_entity.dart';
 import '../../../domain/repositories/governance_repository.dart';
 import 'governance_event.dart';
 import 'governance_state.dart';
@@ -11,6 +12,10 @@ import '../../../core/utils/debug_log.dart';
 /// through the [IGovernanceRepository] interface.
 class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
   final IGovernanceRepository _repository;
+
+  static final _exceptionPrefixRe = RegExp(r'^Exception:\s*');
+  static final _stateErrorPrefixRe = RegExp(r'^StateError:\s*');
+  static final _longHexRe = RegExp(r'[a-fA-F0-9]{20,}');
 
   GovernanceBloc({required IGovernanceRepository repository})
       : _repository = repository,
@@ -47,6 +52,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
     emit(state.copyWith(
       status: GovernanceStatus.loading,
       filterState: event.filterState,
+      isLoadingMoreProposals: false,
     ));
     try {
       final proposals = await _repository.getProposals(
@@ -57,12 +63,14 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
         status: GovernanceStatus.loaded,
         proposals: proposals,
         hasMoreProposals: proposals.length >= 20,
+        isLoadingMoreProposals: false,
       ));
     } catch (e, stackTrace) {
       debugLog('Failed to load proposals: $e\n$stackTrace');
       emit(state.copyWith(
         status: GovernanceStatus.error,
         errorMessage: _formatError(e),
+        isLoadingMoreProposals: false,
       ));
     }
   }
@@ -71,21 +79,24 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
     GovernanceLoadMoreProposals event,
     Emitter<GovernanceState> emit,
   ) async {
-    final currentSpace = state.space;
-    if (!state.hasMoreProposals || currentSpace == null) return;
+    if (!state.hasMoreProposals || state.isLoadingMoreProposals) return;
+
+    emit(state.copyWith(isLoadingMoreProposals: true));
 
     try {
       final moreProposals = await _repository.getProposals(
-        currentSpace.id,
+        event.spaceId,
         state: state.filterState,
         skip: state.proposals.length,
       );
       emit(state.copyWith(
         proposals: [...state.proposals, ...moreProposals],
         hasMoreProposals: moreProposals.length >= 20,
+        isLoadingMoreProposals: false,
       ));
     } catch (e) {
       debugLog('Failed to load more proposals: $e');
+      emit(state.copyWith(isLoadingMoreProposals: false));
     }
   }
 
@@ -99,6 +110,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
       final votes = await _repository.getVotes(event.proposalId);
       emit(state.copyWith(
         status: GovernanceStatus.loaded,
+        proposals: _mergeProposalIntoList(state.proposals, proposal),
         selectedProposal: proposal,
         votes: votes,
       ));
@@ -128,6 +140,7 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
       final votes = await _repository.getVotes(event.proposalId);
       emit(state.copyWith(
         status: GovernanceStatus.voted,
+        proposals: _mergeProposalIntoList(state.proposals, proposal),
         selectedProposal: proposal,
         votes: votes,
       ));
@@ -170,15 +183,29 @@ class GovernanceBloc extends Bloc<GovernanceEvent, GovernanceState> {
     final message = error.toString();
     // Remove Exception/Error prefix for cleaner display
     final cleaned = message
-        .replaceAll(RegExp(r'^Exception:\s*'), '')
-        .replaceAll(RegExp(r'^StateError:\s*'), '');
+        .replaceAll(_exceptionPrefixRe, '')
+        .replaceAll(_stateErrorPrefixRe, '');
     // Strip potential API keys or tokens (hex strings > 20 chars)
     final sanitized =
-        cleaned.replaceAll(RegExp(r'[a-fA-F0-9]{20,}'), '[redacted]');
+        cleaned.replaceAll(_longHexRe, '[redacted]');
     // Cap length to prevent overly verbose error messages in UI
     if (sanitized.length > 200) {
       return '${sanitized.substring(0, 200)}...';
     }
     return sanitized;
+  }
+
+  List<ProposalEntity> _mergeProposalIntoList(
+    List<ProposalEntity> proposals,
+    ProposalEntity proposal,
+  ) {
+    final index = proposals.indexWhere((item) => item.id == proposal.id);
+    if (index == -1) {
+      return proposals;
+    }
+
+    final updated = List<ProposalEntity>.from(proposals);
+    updated[index] = proposal;
+    return updated;
   }
 }

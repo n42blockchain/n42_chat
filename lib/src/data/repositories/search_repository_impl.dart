@@ -1,6 +1,5 @@
 import 'package:matrix/matrix.dart' as matrix;
 
-import '../../core/utils/matrix_utils.dart';
 import '../../domain/entities/contact_entity.dart';
 import '../../domain/entities/conversation_entity.dart';
 import '../../domain/entities/message_entity.dart';
@@ -11,6 +10,7 @@ import '../../core/services/username_service.dart';
 import '../datasources/matrix/matrix_search_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../../core/utils/debug_log.dart';
+import '../../core/utils/matrix_utils.dart';
 
 /// 搜索仓库实现
 class SearchRepositoryImpl implements ISearchRepository {
@@ -19,21 +19,19 @@ class SearchRepositoryImpl implements ISearchRepository {
   final EnsCacheService? _ensCacheService;
   final UsernameService? _usernameService;
 
-  // 本地搜索历史
-  final List<String> _searchHistory = [];
-
   SearchRepositoryImpl(
     this._searchDataSource,
     this._clientManager, {
     EnsCacheService? ensCacheService,
     UsernameService? usernameService,
-  })  : _ensCacheService = ensCacheService,
-        _usernameService = usernameService;
+  }) : _ensCacheService = ensCacheService,
+       _usernameService = usernameService;
 
   @override
   Future<SearchResults> searchGlobal(
     String query, {
     SearchResultType? type,
+    MessageSearchFilter? filter,
     int limit = 50,
   }) async {
     if (query.trim().isEmpty) {
@@ -53,7 +51,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       contacts = await searchContacts(query, limit: limit ~/ 4);
       groups = await searchGroups(query, limit: limit ~/ 4);
       conversations = await searchConversations(query, limit: limit ~/ 4);
-      messages = await searchMessages(query, limit: limit ~/ 4);
+      messages = await searchMessages(query, limit: limit ~/ 4, filter: filter);
     } else {
       switch (type) {
         case SearchResultType.contact:
@@ -66,7 +64,7 @@ class SearchRepositoryImpl implements ISearchRepository {
           conversations = await searchConversations(query, limit: limit);
           break;
         case SearchResultType.message:
-          messages = await searchMessages(query, limit: limit);
+          messages = await searchMessages(query, limit: limit, filter: filter);
           break;
         case SearchResultType.all:
           break;
@@ -79,11 +77,15 @@ class SearchRepositoryImpl implements ISearchRepository {
       conversations: conversations,
       messages: messages,
       query: query,
+      messageFilter: filter == null || filter.isEmpty ? null : filter,
     );
   }
 
   @override
-  Future<List<SearchResultItem>> searchContacts(String query, {int limit = 20}) async {
+  Future<List<SearchResultItem>> searchContacts(
+    String query, {
+    int limit = 20,
+  }) async {
     final results = <SearchResultItem>[];
 
     // @username 搜索
@@ -91,15 +93,19 @@ class SearchRepositoryImpl implements ISearchRepository {
       final usernameQuery = query.substring(1);
       if (usernameQuery.isNotEmpty) {
         try {
-          final usernameResults = await _usernameService.searchUsernames(usernameQuery);
+          final usernameResults = await _usernameService.searchUsernames(
+            usernameQuery,
+          );
           for (final usernameResult in usernameResults) {
-            results.add(SearchResultItem(
-              type: SearchResultType.contact,
-              id: usernameResult.userId,
-              title: '@${usernameResult.username}',
-              subtitle: usernameResult.userId,
-              matchedKeyword: query,
-            ));
+            results.add(
+              SearchResultItem(
+                type: SearchResultType.contact,
+                id: usernameResult.userId,
+                title: '@${usernameResult.username}',
+                subtitle: usernameResult.userId,
+                matchedKeyword: query,
+              ),
+            );
           }
         } catch (e) {
           debugLog('SearchRepository: Username search failed: $e');
@@ -112,13 +118,16 @@ class SearchRepositoryImpl implements ISearchRepository {
       try {
         final address = await _ensCacheService.resolveEnsName(query);
         if (address != null) {
-          results.add(SearchResultItem(
-            type: SearchResultType.contact,
-            id: 'ens:$query',
-            title: query,
-            subtitle: '${address.substring(0, 6)}...${address.substring(address.length - 4)}',
-            matchedKeyword: query,
-          ));
+          results.add(
+            SearchResultItem(
+              type: SearchResultType.contact,
+              id: 'ens:$query',
+              title: query,
+              subtitle:
+                  '${address.substring(0, 6)}...${address.substring(address.length - 4)}',
+              matchedKeyword: query,
+            ),
+          );
         }
       } catch (e) {
         debugLog('SearchRepository: ENS search failed: $e');
@@ -127,10 +136,12 @@ class SearchRepositoryImpl implements ISearchRepository {
 
     // 常规本地联系人搜索
     final users = _searchDataSource.searchLocalContacts(query);
-    results.addAll(users.take(limit).map((user) {
-      final contact = _mapUserToContact(user);
-      return SearchResultItem.fromContact(contact, matchedKeyword: query);
-    }));
+    results.addAll(
+      users.take(limit).map((user) {
+        final contact = _mapUserToContact(user);
+        return SearchResultItem.fromContact(contact, matchedKeyword: query);
+      }),
+    );
 
     return results.take(limit).toList();
   }
@@ -138,27 +149,47 @@ class SearchRepositoryImpl implements ISearchRepository {
   /// 检查查询是否为 ENS 域名格式
   bool _isEnsQuery(String query) {
     final lower = query.toLowerCase().trim();
-    const ensSuffixes = ['.eth', '.n42', '.xyz', '.app', '.luxe', '.kred', '.art'];
+    const ensSuffixes = [
+      '.eth',
+      '.n42',
+      '.xyz',
+      '.app',
+      '.luxe',
+      '.kred',
+      '.art',
+    ];
     return ensSuffixes.any((suffix) => lower.endsWith(suffix));
   }
 
   @override
-  Future<List<SearchResultItem>> searchGroups(String query, {int limit = 20}) async {
+  Future<List<SearchResultItem>> searchGroups(
+    String query, {
+    int limit = 20,
+  }) async {
     final rooms = _searchDataSource.searchLocalGroups(query);
 
     return rooms.take(limit).map((room) {
       final conversation = _mapRoomToConversation(room);
-      return SearchResultItem.fromConversation(conversation, matchedKeyword: query);
+      return SearchResultItem.fromConversation(
+        conversation,
+        matchedKeyword: query,
+      );
     }).toList();
   }
 
   @override
-  Future<List<SearchResultItem>> searchConversations(String query, {int limit = 20}) async {
+  Future<List<SearchResultItem>> searchConversations(
+    String query, {
+    int limit = 20,
+  }) async {
     final rooms = _searchDataSource.searchLocalConversations(query);
 
     return rooms.take(limit).map((room) {
       final conversation = _mapRoomToConversation(room);
-      return SearchResultItem.fromConversation(conversation, matchedKeyword: query);
+      return SearchResultItem.fromConversation(
+        conversation,
+        matchedKeyword: query,
+      );
     }).toList();
   }
 
@@ -167,14 +198,22 @@ class SearchRepositoryImpl implements ISearchRepository {
     String query, {
     int limit = 50,
     String? roomId,
+    MessageSearchFilter? filter,
   }) async {
     if (roomId != null) {
       // 在指定房间搜索
-      final events = await _searchDataSource.searchMessagesInRoom(
-        roomId,
-        query,
-        limit: limit,
-      );
+      final events = filter == null || filter.isEmpty
+          ? await _searchDataSource.searchMessagesInRoom(
+              roomId,
+              query,
+              limit: limit,
+            )
+          : await _searchDataSource.searchMessagesInRoom(
+              roomId,
+              query,
+              filter: filter,
+              limit: limit,
+            );
 
       final room = _clientManager.client?.getRoomById(roomId);
       final roomName = room?.getLocalizedDisplayname() ?? '未知会话';
@@ -192,10 +231,13 @@ class SearchRepositoryImpl implements ISearchRepository {
       }).toList();
     } else {
       // 全局搜索消息
-      final results = await _searchDataSource.searchMessagesGlobally(
-        query,
-        limit: limit,
-      );
+      final results = filter == null || filter.isEmpty
+          ? await _searchDataSource.searchMessagesGlobally(query, limit: limit)
+          : await _searchDataSource.searchMessagesGlobally(
+              query,
+              filter: filter,
+              limit: limit,
+            );
 
       return results.map((result) {
         final message = _mapEventToMessage(result.event);
@@ -216,17 +258,25 @@ class SearchRepositoryImpl implements ISearchRepository {
   Future<ChatSearchResults> searchInChat(
     String roomId,
     String query, {
+    MessageSearchFilter? filter,
     int limit = 50,
   }) async {
     if (query.trim().isEmpty) {
       return ChatSearchResults(roomId: roomId);
     }
 
-    final events = await _searchDataSource.searchMessagesInRoom(
-      roomId,
-      query,
-      limit: limit,
-    );
+    final events = filter == null || filter.isEmpty
+        ? await _searchDataSource.searchMessagesInRoom(
+            roomId,
+            query,
+            limit: limit,
+          )
+        : await _searchDataSource.searchMessagesInRoom(
+            roomId,
+            query,
+            filter: filter,
+            limit: limit,
+          );
 
     final messages = events.map(_mapEventToMessage).toList();
 
@@ -236,6 +286,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       roomId: roomId,
       currentIndex: messages.isNotEmpty ? 0 : -1,
       hasMore: messages.length >= limit,
+      filter: filter == null || filter.isEmpty ? null : filter,
     );
   }
 
@@ -245,11 +296,19 @@ class SearchRepositoryImpl implements ISearchRepository {
     int limit = 50,
   }) async {
     // 加载更多结果
-    final events = await _searchDataSource.searchMessagesInRoom(
-      currentResults.roomId,
-      currentResults.query,
-      limit: currentResults.messages.length + limit,
-    );
+    final filter = currentResults.filter;
+    final events = filter == null || filter.isEmpty
+        ? await _searchDataSource.searchMessagesInRoom(
+            currentResults.roomId,
+            currentResults.query,
+            limit: currentResults.messages.length + limit,
+          )
+        : await _searchDataSource.searchMessagesInRoom(
+            currentResults.roomId,
+            currentResults.query,
+            filter: filter,
+            limit: currentResults.messages.length + limit,
+          );
 
     final messages = events.map(_mapEventToMessage).toList();
 
@@ -261,34 +320,22 @@ class SearchRepositoryImpl implements ISearchRepository {
 
   @override
   Future<List<String>> getRecentSearches({int limit = 10}) async {
-    return _searchHistory.take(limit).toList();
+    return _searchDataSource.getRecentSearches(limit: limit);
   }
 
   @override
   Future<void> saveSearchQuery(String query) async {
-    final trimmed = query.trim();
-    if (trimmed.isEmpty) return;
-
-    // 移除重复项
-    _searchHistory.remove(trimmed);
-
-    // 添加到开头
-    _searchHistory.insert(0, trimmed);
-
-    // 保持最多20条
-    if (_searchHistory.length > 20) {
-      _searchHistory.removeLast();
-    }
+    await _searchDataSource.saveSearchQuery(query.trim());
   }
 
   @override
   Future<void> deleteSearchQuery(String query) async {
-    _searchHistory.remove(query);
+    await _searchDataSource.deleteSearchQuery(query);
   }
 
   @override
   Future<void> clearSearchHistory() async {
-    _searchHistory.clear();
+    await _searchDataSource.clearSearchHistory();
   }
 
   // ============================================
@@ -297,12 +344,12 @@ class SearchRepositoryImpl implements ISearchRepository {
 
   ContactEntity _mapUserToContact(matrix.User user) {
     String? avatarUrl;
-    if (user.avatarUrl != null) {
-      avatarUrl = MatrixUtils.mxcToHttp(
-        user.avatarUrl.toString(),
-        client: _clientManager.client,
-        width: 96,
-        height: 96,
+    final client = _clientManager.client;
+    if (user.avatarUrl != null && client != null) {
+      avatarUrl = MatrixUtils.getAvatarUrl(
+        user.avatarUrl,
+        client: client,
+        size: 96,
       );
     }
 
@@ -324,7 +371,9 @@ class SearchRepositoryImpl implements ISearchRepository {
       lastMessage: lastEvent?.body,
       lastMessageTime: lastEvent?.originServerTs,
       unreadCount: room.notificationCount,
-      type: room.isDirectChat ? ConversationType.direct : ConversationType.group,
+      type: room.isDirectChat
+          ? ConversationType.direct
+          : ConversationType.group,
       memberCount: room.summary.mJoinedMemberCount ?? 0,
     );
   }
@@ -363,12 +412,15 @@ class SearchRepositoryImpl implements ISearchRepository {
 
   String? _getRoomAvatarUrl(matrix.Room? room) {
     if (room == null) return null;
-    final avatarMxc = room.avatar?.toString();
-    return MatrixUtils.mxcToHttp(
-      avatarMxc,
-      client: _clientManager.client,
-      width: 96,
-      height: 96,
-    );
+    final client = _clientManager.client;
+    return MatrixUtils.getAvatarUrl(room.avatar, client: client, size: 96);
   }
+}
+
+/// 消息搜索结果
+class MessageSearchResult {
+  final matrix.Event event;
+  final matrix.Room room;
+
+  MessageSearchResult({required this.event, required this.room});
 }

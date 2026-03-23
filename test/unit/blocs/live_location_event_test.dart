@@ -7,6 +7,20 @@ import 'package:n42_chat/src/domain/entities/live_location_entity.dart';
 import 'package:n42_chat/src/presentation/blocs/live_location/live_location_event.dart';
 
 void main() {
+  group('ObserveLiveLocationRoom', () {
+    test('stores roomId', () {
+      const e = ObserveLiveLocationRoom(roomId: '!room:server');
+      expect(e.roomId, '!room:server');
+    });
+
+    test('same roomId → equal', () {
+      expect(
+        const ObserveLiveLocationRoom(roomId: '!r:s'),
+        equals(const ObserveLiveLocationRoom(roomId: '!r:s')),
+      );
+    });
+  });
+
   // ─────────────────────────────────────────────────
   // StartLiveLocation
   // ─────────────────────────────────────────────────
@@ -158,6 +172,26 @@ void main() {
         durationMinutes: 60,
       );
       expect(LiveLocationUpdated(loc), isA<LiveLocationEvent>());
+    });
+  });
+
+  group('LiveLocationSnapshotReceived', () {
+    test('stores roomId and locations', () {
+      final loc = LiveLocationEntity(
+        userId: '@u:s',
+        displayName: 'User',
+        latitude: 1,
+        longitude: 2,
+        updatedAt: DateTime.utc(2024, 1, 1),
+        expiresAt: DateTime.utc(2024, 1, 1, 1),
+        durationMinutes: 60,
+      );
+      final e = LiveLocationSnapshotReceived(
+        roomId: '!room:server',
+        locations: [loc],
+      );
+      expect(e.roomId, '!room:server');
+      expect(e.locations, [loc]);
     });
   });
 

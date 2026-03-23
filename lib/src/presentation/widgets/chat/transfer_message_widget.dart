@@ -11,7 +11,7 @@ class TransferMessageWidget extends StatelessWidget {
   final String currency;
 
   /// 转账状态
-  final TransferStatus status;
+  final TransferMessageStatus status;
 
   /// 转账备注
   final String? note;
@@ -49,67 +49,296 @@ class TransferMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _PaymentCardFrame(
+      onTap: onTap,
+      backgroundColor: _getBackgroundColor(),
+      iconBackgroundColor: _getIconBackgroundColor(),
+      icon: _getIcon(),
+      textColor: _getTextColor(),
+      title: '$_currencySymbol$amount',
+      subtitle: _getStatusText(context),
+      note: note,
+      footerLabel: S.of(context)?.commonTransfer ?? 'Transfer',
+    );
+  }
+
+  Color _getBackgroundColor() {
+    switch (status) {
+      case TransferMessageStatus.pending:
+        return const Color(0xFFF9A825);
+      case TransferMessageStatus.completed:
+        return const Color(0xFFF9A825);
+      case TransferMessageStatus.failed:
+      case TransferMessageStatus.cancelled:
+      case TransferMessageStatus.expired:
+        return const Color(0xFFE0E0E0);
+    }
+  }
+
+  Color _getIconBackgroundColor() {
+    switch (status) {
+      case TransferMessageStatus.pending:
+      case TransferMessageStatus.completed:
+        return Colors.white.withValues(alpha: 0.25);
+      case TransferMessageStatus.failed:
+      case TransferMessageStatus.cancelled:
+      case TransferMessageStatus.expired:
+        return Colors.grey.withValues(alpha: 0.2);
+    }
+  }
+
+  IconData _getIcon() {
+    switch (status) {
+      case TransferMessageStatus.pending:
+        return Icons.access_time;
+      case TransferMessageStatus.completed:
+        return Icons.check;
+      case TransferMessageStatus.failed:
+        return Icons.error_outline;
+      case TransferMessageStatus.cancelled:
+        return Icons.close;
+      case TransferMessageStatus.expired:
+        return Icons.schedule;
+    }
+  }
+
+  Color _getTextColor() {
+    switch (status) {
+      case TransferMessageStatus.pending:
+      case TransferMessageStatus.completed:
+        return Colors.white;
+      case TransferMessageStatus.failed:
+      case TransferMessageStatus.cancelled:
+      case TransferMessageStatus.expired:
+        return const Color(0xFF666666);
+    }
+  }
+
+  String _getStatusText(BuildContext context) {
+    switch (status) {
+      case TransferMessageStatus.pending:
+        return isSelf
+            ? (S.of(context)?.commonWaitingToReceive ?? 'Waiting to receive')
+            : (S.of(context)?.commonTapToClaim ?? 'Tap to claim');
+      case TransferMessageStatus.completed:
+        return isSelf
+            ? (S.of(context)?.commonHasBeenReceived ?? 'Has been received')
+            : (S.of(context)?.commonReceivedTransfer ?? 'Received Transfer');
+      case TransferMessageStatus.failed:
+        return 'Transfer failed';
+      case TransferMessageStatus.cancelled:
+        return 'Transfer cancelled';
+      case TransferMessageStatus.expired:
+        return S.of(context)?.commonExpired ?? 'Expired';
+    }
+  }
+}
+
+/// 转账状态
+enum TransferMessageStatus { pending, completed, failed, cancelled, expired }
+
+/// 收款请求消息组件
+class PaymentRequestMessageWidget extends StatelessWidget {
+  final String amount;
+  final String currency;
+  final PaymentRequestMessageStatus status;
+  final String? note;
+  final bool isSelf;
+  final VoidCallback? onTap;
+
+  const PaymentRequestMessageWidget({
+    super.key,
+    required this.amount,
+    required this.currency,
+    required this.status,
+    this.note,
+    required this.isSelf,
+    this.onTap,
+  });
+
+  String get _currencySymbol {
+    switch (currency.toUpperCase()) {
+      case 'CNY':
+        return '¥';
+      case 'ETH':
+        return 'Ξ';
+      case 'BTC':
+        return '₿';
+      case 'USDT':
+        return '\$';
+      default:
+        return '';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _PaymentCardFrame(
+      onTap: onTap,
+      backgroundColor: _getBackgroundColor(),
+      iconBackgroundColor: _getIconBackgroundColor(),
+      icon: _getIcon(),
+      textColor: _getTextColor(),
+      title: '$_currencySymbol$amount',
+      subtitle: _getStatusText(context),
+      note: note,
+      footerLabel:
+          S.of(context)?.transferSendPaymentRequest ?? 'Payment Request',
+    );
+  }
+
+  Color _getBackgroundColor() {
+    switch (status) {
+      case PaymentRequestMessageStatus.pending:
+        return const Color(0xFF2D9CDB);
+      case PaymentRequestMessageStatus.paid:
+        return const Color(0xFFF9A825);
+      case PaymentRequestMessageStatus.expired:
+        return const Color(0xFFE0E0E0);
+    }
+  }
+
+  Color _getIconBackgroundColor() {
+    switch (status) {
+      case PaymentRequestMessageStatus.pending:
+      case PaymentRequestMessageStatus.paid:
+        return Colors.white.withValues(alpha: 0.25);
+      case PaymentRequestMessageStatus.expired:
+        return Colors.grey.withValues(alpha: 0.2);
+    }
+  }
+
+  IconData _getIcon() {
+    switch (status) {
+      case PaymentRequestMessageStatus.pending:
+        return Icons.payments_outlined;
+      case PaymentRequestMessageStatus.paid:
+        return Icons.check;
+      case PaymentRequestMessageStatus.expired:
+        return Icons.schedule;
+    }
+  }
+
+  Color _getTextColor() {
+    switch (status) {
+      case PaymentRequestMessageStatus.pending:
+      case PaymentRequestMessageStatus.paid:
+        return Colors.white;
+      case PaymentRequestMessageStatus.expired:
+        return const Color(0xFF666666);
+    }
+  }
+
+  String _getStatusText(BuildContext context) {
+    switch (status) {
+      case PaymentRequestMessageStatus.pending:
+        return isSelf
+            ? (S.of(context)?.commonWaitingToReceive ?? 'Waiting to receive')
+            : (S.of(context)?.commonPayment ?? 'Payment');
+      case PaymentRequestMessageStatus.paid:
+        return isSelf
+            ? (S.of(context)?.commonReceivedTransfer ?? 'Received Transfer')
+            : (S.of(context)?.commonReceived ?? 'Received');
+      case PaymentRequestMessageStatus.expired:
+        return S.of(context)?.commonExpired ?? 'Expired';
+    }
+  }
+}
+
+enum PaymentRequestMessageStatus { pending, paid, expired }
+
+class _PaymentCardFrame extends StatelessWidget {
+  final Color backgroundColor;
+  final Color iconBackgroundColor;
+  final IconData icon;
+  final Color textColor;
+  final String title;
+  final String subtitle;
+  final String? note;
+  final String footerLabel;
+  final VoidCallback? onTap;
+
+  const _PaymentCardFrame({
+    required this.backgroundColor,
+    required this.iconBackgroundColor,
+    required this.icon,
+    required this.textColor,
+    required this.title,
+    required this.subtitle,
+    required this.note,
+    required this.footerLabel,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 240,
         decoration: BoxDecoration(
-          color: _getBackgroundColor(),
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 主体内容
             Container(
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  // 勾选图标
                   Container(
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: _getIconBackgroundColor(),
+                      color: iconBackgroundColor,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      status == TransferStatus.received ? Icons.check : Icons.access_time,
+                      icon,
                       size: 20,
-                      color: _getTextColor().withValues(alpha: 0.8),
+                      color: textColor.withValues(alpha: 0.85),
                     ),
                   ),
                   const SizedBox(width: 10),
-
-                  // 金额和状态
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '$_currencySymbol$amount',
+                          title,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: _getTextColor(),
+                            color: textColor,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          _getStatusText(context),
+                          subtitle,
                           style: TextStyle(
                             fontSize: 12,
-                            color: _getTextColor().withValues(alpha: 0.7),
+                            color: textColor.withValues(alpha: 0.75),
                           ),
                         ),
+                        if (note?.isNotEmpty == true) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            note!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: textColor.withValues(alpha: 0.85),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-
-            // 底部标签
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -120,10 +349,10 @@ class TransferMessageWidget extends StatelessWidget {
                 ),
               ),
               child: Text(
-                S.of(context)?.commonTransfer ?? 'Transfer',
+                footerLabel,
                 style: TextStyle(
                   fontSize: 11,
-                  color: _getTextColor().withValues(alpha: 0.5),
+                  color: textColor.withValues(alpha: 0.55),
                 ),
               ),
             ),
@@ -132,65 +361,6 @@ class TransferMessageWidget extends StatelessWidget {
       ),
     );
   }
-
-  Color _getBackgroundColor() {
-    switch (status) {
-      case TransferStatus.pending:
-        return const Color(0xFFF9A825);
-      case TransferStatus.received:
-        return const Color(0xFFF9A825);
-      case TransferStatus.refunded:
-      case TransferStatus.expired:
-        return const Color(0xFFE0E0E0);
-    }
-  }
-
-  Color _getIconBackgroundColor() {
-    switch (status) {
-      case TransferStatus.pending:
-      case TransferStatus.received:
-        return Colors.white.withValues(alpha: 0.25);
-      case TransferStatus.refunded:
-      case TransferStatus.expired:
-        return Colors.grey.withValues(alpha: 0.2);
-    }
-  }
-
-  Color _getTextColor() {
-    switch (status) {
-      case TransferStatus.pending:
-      case TransferStatus.received:
-        return Colors.white;
-      case TransferStatus.refunded:
-      case TransferStatus.expired:
-        return const Color(0xFF666666);
-    }
-  }
-
-  String _getStatusText(BuildContext context) {
-    switch (status) {
-      case TransferStatus.pending:
-        return isSelf
-            ? (S.of(context)?.commonWaitingToReceive ?? 'Waiting to receive')
-            : (S.of(context)?.commonTapToClaim ?? 'Tap to claim');
-      case TransferStatus.received:
-        return isSelf
-            ? (S.of(context)?.commonHasBeenReceived ?? 'Has been received')
-            : (S.of(context)?.commonReceived ?? 'Received');
-      case TransferStatus.refunded:
-        return S.of(context)?.commonRefunded ?? 'Refunded';
-      case TransferStatus.expired:
-        return S.of(context)?.commonExpired ?? 'Expired';
-    }
-  }
-}
-
-/// 转账状态
-enum TransferStatus {
-  pending,
-  received,
-  refunded,
-  expired,
 }
 
 /// 红包消息组件（仿微信）
@@ -206,7 +376,7 @@ class RedPacketMessageWidget extends StatelessWidget {
 
   /// 点击回调
   final VoidCallback? onTap;
-  
+
   /// 红包封面背景图URL
   final String? coverImageUrl;
 
@@ -222,13 +392,13 @@ class RedPacketMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isOpened = status != RedPacketStatus.pending;
-    
+
     // 已领取的红包使用浅棕色背景（类似微信）
-    final bgColor = isOpened 
+    final bgColor = isOpened
         ? const Color(0xFFD4B896) // 已领取：浅棕色/米色
         : const Color(0xFFE64340); // 未领取：红色
-    
-    final textColor = isOpened 
+
+    final textColor = isOpened
         ? const Color(0xFF8B7355) // 已领取：深棕色文字
         : Colors.white; // 未领取：白色文字
 
@@ -264,7 +434,9 @@ class RedPacketMessageWidget extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              note ?? (S.of(context)?.chatRedPacketGreeting ?? 'Best wishes'),
+                              note ??
+                                  (S.of(context)?.chatRedPacketGreeting ??
+                                      'Best wishes'),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -292,7 +464,10 @@ class RedPacketMessageWidget extends StatelessWidget {
 
                 // 底部标签区域
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.05),
                   ),
@@ -306,7 +481,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             // 封面图片覆盖层（仅未领取时显示）
             if (coverImageUrl != null && !isOpened)
               Positioned.fill(
@@ -324,7 +499,7 @@ class RedPacketMessageWidget extends StatelessWidget {
       ),
     );
   }
-  
+
   /// 红包图标（圆形勾选或红包图标）
   Widget _buildRedPacketIcon(bool isOpened) {
     // 已领取：显示勾选图标（类似转账消息）
@@ -336,14 +511,10 @@ class RedPacketMessageWidget extends StatelessWidget {
           color: Colors.white.withValues(alpha: 0.25),
           shape: BoxShape.circle,
         ),
-        child: const Icon(
-          Icons.check,
-          size: 22,
-          color: Color(0xFF8B7355),
-        ),
+        child: const Icon(Icons.check, size: 22, color: Color(0xFF8B7355)),
       );
     }
-    
+
     // 未领取：显示红包图标
     return Container(
       width: 40,
@@ -390,9 +561,4 @@ class RedPacketMessageWidget extends StatelessWidget {
 }
 
 /// 红包状态
-enum RedPacketStatus {
-  pending,
-  opened,
-  expired,
-  empty,
-}
+enum RedPacketStatus { pending, opened, expired, empty }

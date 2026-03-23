@@ -3,9 +3,11 @@ import '../../domain/entities/social/social_connection.dart';
 import '../../domain/entities/social/social_profile.dart';
 import '../../domain/entities/social/social_recommendation.dart';
 import '../../domain/repositories/social_graph_repository.dart';
+import '../../core/utils/debug_log.dart';
 import '../datasources/social/debank_datasource.dart';
 import '../datasources/social/on_chain_identity_datasource.dart';
 import '../models/social/debank_portfolio_model.dart';
+import '../models/social/social_similarity_model.dart';
 
 /// Implementation of [ISocialGraphRepository].
 ///
@@ -17,28 +19,24 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
   final OnChainIdentityDatasource _identity;
   final SocialGraphService _graphService;
 
+  static final _evmAddressRegExp = RegExp(r'^0x[0-9a-fA-F]{40}$');
+  static final _whitespaceRegExp = RegExp(r'\s');
+
   SocialGraphRepositoryImpl({
     required DeBankDatasource debank,
     required OnChainIdentityDatasource identity,
     required SocialGraphService graphService,
-  })  : _debank = debank,
-        _identity = identity,
-        _graphService = graphService;
+  }) : _debank = debank,
+       _identity = identity,
+       _graphService = graphService;
 
-  /// Validate that [address] looks like a plausible blockchain address.
-  ///
-  /// Accepts EVM (0x-prefixed, 42 chars) and other common formats.
-  /// This is a lightweight check to catch obvious bad input before
-  /// making network calls.
   bool _isValidAddress(String address) {
     if (address.isEmpty) return false;
-    // EVM addresses: 0x + 40 hex chars
     if (address.startsWith('0x')) {
       return address.length == 42 &&
-          RegExp(r'^0x[0-9a-fA-F]{40}$').hasMatch(address);
+          _evmAddressRegExp.hasMatch(address);
     }
-    // Non-EVM addresses: at least 20 chars, no whitespace
-    return address.length >= 20 && !address.contains(RegExp(r'\s'));
+    return address.length >= 20 && !address.contains(_whitespaceRegExp);
   }
 
   @override
@@ -47,16 +45,25 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
       throw ArgumentError('Invalid address: $address');
     }
 
-    // Fetch portfolio, chains, and identities in parallel
-    final results = await Future.wait([
-      _debank.getUserPortfolio(address),
-      _debank.getUsedChains(address),
-      _identity.getReverseIdentities(address),
-    ]);
+    final portfolioFuture = _withFallback(
+      () => _debank.getUserPortfolio(address),
+      const DeBankPortfolioModel(),
+      'getUserPortfolio($address)',
+    );
+    final chainsFuture = _withFallback(
+      () => _debank.getUsedChains(address),
+      const <String>[],
+      'getUsedChains($address)',
+    );
+    final identitiesFuture = _withFallback(
+      () => _identity.getReverseIdentities(address),
+      const <String, String?>{},
+      'getReverseIdentities($address)',
+    );
 
-    final portfolio = results[0] as DeBankPortfolioModel;
-    final chains = results[1] as List<String>;
-    final identities = results[2] as Map<String, String?>;
+    final portfolio = await portfolioFuture;
+    final chains = await chainsFuture;
+    final identities = await identitiesFuture;
 
     return SocialProfile(
       address: address,
@@ -75,7 +82,13 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
 
     // Connections are derived from the recommendation engine
     final recommendations = await getRecommendations(address, limit: 50);
-    return recommendations.expand((r) => r.connections).toList();
+    final deduped = <String, SocialConnection>{};
+    for (final connection in recommendations.expand((r) => r.connections)) {
+      final key =
+          '${connection.fromAddress.toLowerCase()}|${connection.toAddress.toLowerCase()}|${connection.type.name}';
+      deduped.putIfAbsent(key, () => connection);
+    }
+    return deduped.values.toList(growable: false);
   }
 
   @override
@@ -91,7 +104,7 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
   }
 
   @override
-  Future<double> calculateSimilarity(
+  Future<SocialSimilarityModel> calculateSimilarity(
     String addressA,
     String addressB,
   ) async {
@@ -101,19 +114,40 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
     if (!_isValidAddress(addressB)) {
       throw ArgumentError('Invalid addressB: $addressB');
     }
-
-    final result = await _graphService.calculateSimilarity(addressA, addressB);
-    return result.totalScore;
+    return _graphService.calculateSimilarity(addressA, addressB);
   }
 
   @override
   Future<List<SocialProfile>> searchProfiles(String query) async {
-    // Try resolving the query as ENS, Lens, or Farcaster in parallel
-    final results = await Future.wait([
-      _identity.resolveENS(query),
-      _identity.resolveLensHandle(query),
-      _identity.resolveFarcaster(query),
-    ]);
+    final normalizedQuery = query.trim();
+    if (normalizedQuery.isEmpty) {
+      return [];
+    }
+
+    if (_isValidAddress(normalizedQuery)) {
+      try {
+        return [await getProfile(normalizedQuery)];
+      } catch (_) {
+        return [SocialProfile(address: normalizedQuery)];
+      }
+    }
+
+    final ensFuture = _withFallback<String?>(
+      () => _identity.resolveENS(normalizedQuery),
+      null,
+      'resolveENS($normalizedQuery)',
+    );
+    final lensFuture = _withFallback<String?>(
+      () => _identity.resolveLensHandle(normalizedQuery),
+      null,
+      'resolveLensHandle($normalizedQuery)',
+    );
+    final farcasterFuture = _withFallback<String?>(
+      () => _identity.resolveFarcaster(normalizedQuery),
+      null,
+      'resolveFarcaster($normalizedQuery)',
+    );
+    final results = await Future.wait([ensFuture, lensFuture, farcasterFuture]);
 
     final profiles = <SocialProfile>[];
     final seen = <String>{};
@@ -140,5 +174,18 @@ class SocialGraphRepositoryImpl implements ISocialGraphRepository {
   void dispose() {
     _debank.dispose();
     _identity.dispose();
+  }
+
+  Future<T> _withFallback<T>(
+    Future<T> Function() loader,
+    T fallback,
+    String label,
+  ) async {
+    try {
+      return await loader();
+    } catch (e) {
+      debugLog('SocialGraphRepository: $label failed: $e');
+      return fallback;
+    }
   }
 }

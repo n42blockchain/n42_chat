@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+final _whitespaceRegExp = RegExp(r'\s+');
+
 /// 动态可见性
 enum MomentVisibility {
   /// 公开（所有好友可见）
@@ -356,7 +358,7 @@ class MomentEntity extends Equatable {
   /// 获取用户名首字母
   String get userInitials {
     if (userName.isEmpty) return '?';
-    final words = userName.trim().split(RegExp(r'\s+'));
+    final words = userName.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return userName.substring(0, userName.length.clamp(0, 2)).toUpperCase();
     }

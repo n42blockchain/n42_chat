@@ -1,47 +1,69 @@
 import 'package:equatable/equatable.dart';
 
+final _whitespaceRegExp = RegExp(r'\s+');
+
 /// 消息类型
 enum MessageType {
   /// 文本消息
   text,
+
   /// 图片消息
   image,
+
   /// 语音消息
   voice,
+
   /// 音频消息（别名）
   audio,
+
   /// 视频消息
   video,
+
   /// 文件消息
   file,
+
   /// 位置消息
   location,
+
   /// 贴纸/表情
   sticker,
+
   /// 系统消息
   system,
+
   /// 通知消息（入群、退群等）
   notice,
+
   /// 已加密（无法解密）
   encrypted,
+
   /// 已撤回
   redacted,
+
   /// 转账消息
   transfer,
+
   /// 收款请求
   paymentRequest,
+
   /// 红包
   redPacket,
+
   /// 投票
   poll,
+
   /// 音乐分享
   music,
+
   /// 语音通话
   voiceCall,
+
   /// 视频通话
   videoCall,
+
   /// 联系人名片
   contactCard,
+
   /// 未知类型
   unknown,
 }
@@ -50,12 +72,16 @@ enum MessageType {
 enum MessageStatus {
   /// 发送中
   sending,
+
   /// 已发送
   sent,
+
   /// 已送达
   delivered,
+
   /// 已读
   read,
+
   /// 发送失败
   failed,
 }
@@ -252,7 +278,7 @@ class MessageEntity extends Equatable {
   bool get isScheduledTimeReached {
     if (scheduledAt == null) return false;
     return DateTime.now().isAfter(scheduledAt!) ||
-           DateTime.now().isAtSameMomentAs(scheduledAt!);
+        DateTime.now().isAtSameMomentAs(scheduledAt!);
   }
 
   /// 获取距离定时发送的剩余秒数
@@ -271,9 +297,11 @@ class MessageEntity extends Equatable {
   /// 获取发送者首字母
   String get senderInitials {
     if (senderName.isEmpty) return '?';
-    final words = senderName.trim().split(RegExp(r'\s+'));
+    final words = senderName.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
-      return senderName.substring(0, senderName.length.clamp(0, 2)).toUpperCase();
+      return senderName
+          .substring(0, senderName.length.clamp(0, 2))
+          .toUpperCase();
     }
     return words
         .where((w) => w.isNotEmpty)
@@ -284,38 +312,38 @@ class MessageEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        roomId,
-        senderId,
-        senderName,
-        senderAvatarUrl,
-        content,
-        formattedContent,
-        type,
-        timestamp,
-        status,
-        isFromMe,
-        replyToId,
-        replyToContent,
-        replyToSender,
-        isEdited,
-        editedAt,
-        metadata,
-        reactions,
-        readBy,
-        mentionedUserIds,
-        mentionsRoom,
-        selfDestructAfter,
-        destroyedAt,
-        scheduledAt,
-        threadRootId,
-        threadReplyCount,
-        threadLatestReply,
-        threadLatestReplySender,
-        threadLatestReplyTimestamp,
-        isBotMessage,
-        threadUnreadCount,
-      ];
+    id,
+    roomId,
+    senderId,
+    senderName,
+    senderAvatarUrl,
+    content,
+    formattedContent,
+    type,
+    timestamp,
+    status,
+    isFromMe,
+    replyToId,
+    replyToContent,
+    replyToSender,
+    isEdited,
+    editedAt,
+    metadata,
+    reactions,
+    readBy,
+    mentionedUserIds,
+    mentionsRoom,
+    selfDestructAfter,
+    destroyedAt,
+    scheduledAt,
+    threadRootId,
+    threadReplyCount,
+    threadLatestReply,
+    threadLatestReplySender,
+    threadLatestReplyTimestamp,
+    isBotMessage,
+    threadUnreadCount,
+  ];
 
   MessageEntity copyWith({
     String? id,
@@ -378,8 +406,10 @@ class MessageEntity extends Equatable {
       threadRootId: threadRootId ?? this.threadRootId,
       threadReplyCount: threadReplyCount ?? this.threadReplyCount,
       threadLatestReply: threadLatestReply ?? this.threadLatestReply,
-      threadLatestReplySender: threadLatestReplySender ?? this.threadLatestReplySender,
-      threadLatestReplyTimestamp: threadLatestReplyTimestamp ?? this.threadLatestReplyTimestamp,
+      threadLatestReplySender:
+          threadLatestReplySender ?? this.threadLatestReplySender,
+      threadLatestReplyTimestamp:
+          threadLatestReplyTimestamp ?? this.threadLatestReplyTimestamp,
       isBotMessage: isBotMessage ?? this.isBotMessage,
       threadUnreadCount: threadUnreadCount ?? this.threadUnreadCount,
     );
@@ -398,10 +428,13 @@ class MessageEntity extends Equatable {
 enum TranscriptionStatus {
   /// 尚未开始转录
   none,
+
   /// 正在转录中
   transcribing,
+
   /// 转录成功
   success,
+
   /// 转录失败
   failed,
 }
@@ -496,6 +529,18 @@ class MessageMetadata extends Equatable {
   /// 交易哈希
   final String? txHash;
 
+  /// 收款请求 ID
+  final String? paymentRequestId;
+
+  /// 收款地址
+  final String? paymentReceiverAddress;
+
+  /// 收款请求过期时间
+  final DateTime? paymentRequestExpiresAt;
+
+  /// 红包 ID（用于领取和查询真实红包状态）
+  final String? redPacketId;
+
   // ============================================
   // 投票属性
   // ============================================
@@ -586,6 +631,10 @@ class MessageMetadata extends Equatable {
     this.token,
     this.transferStatus,
     this.txHash,
+    this.paymentRequestId,
+    this.paymentReceiverAddress,
+    this.paymentRequestExpiresAt,
+    this.redPacketId,
     this.pollQuestion,
     this.pollOptions,
     this.pollOptionIds,
@@ -631,128 +680,50 @@ class MessageMetadata extends Equatable {
 
   @override
   List<Object?> get props => [
-        mediaUrl,
-        httpUrl,
-        thumbnailUrl,
-        mimeType,
-        size,
-        width,
-        height,
-        duration,
-        fileName,
-        isPlayed,
-        waveform,
-        transcription,
-        transcriptionStatus,
-        latitude,
-        longitude,
-        locationName,
-        amount,
-        token,
-        transferStatus,
-        txHash,
-        pollQuestion,
-        pollOptions,
-        pollOptionIds,
-        myVotes,
-        voteCounts,
-        totalVoters,
-        maxSelections,
-        pollEnded,
-        isAnonymousPoll,
-        musicTitle,
-        musicArtist,
-        musicUrl,
-        musicCover,
-        callDuration,
-        callEnded,
-        isMissedCall,
-        callEndReason,
-        callRoomId,
-        callPeerId,
-      ];
-
-  MessageMetadata copyWith({
-    String? mediaUrl,
-    String? httpUrl,
-    String? thumbnailUrl,
-    String? mimeType,
-    int? size,
-    int? width,
-    int? height,
-    int? duration,
-    String? fileName,
-    bool? isPlayed,
-    List<int>? waveform,
-    String? transcription,
-    TranscriptionStatus? transcriptionStatus,
-    double? latitude,
-    double? longitude,
-    String? locationName,
-    String? amount,
-    String? token,
-    String? transferStatus,
-    String? txHash,
-    String? pollQuestion,
-    List<String>? pollOptions,
-    List<String>? pollOptionIds,
-    List<String>? myVotes,
-    Map<String, int>? voteCounts,
-    int? totalVoters,
-    int? maxSelections,
-    bool? pollEnded,
-    bool? isAnonymousPoll,
-    String? musicTitle,
-    String? musicArtist,
-    String? musicUrl,
-    String? musicCover,
-    int? callDuration,
-    bool? callEnded,
-    bool? isMissedCall,
-    String? callEndReason,
-    String? callRoomId,
-    String? callPeerId,
-  }) => MessageMetadata(
-    mediaUrl: mediaUrl ?? this.mediaUrl,
-    httpUrl: httpUrl ?? this.httpUrl,
-    thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
-    mimeType: mimeType ?? this.mimeType,
-    size: size ?? this.size,
-    width: width ?? this.width,
-    height: height ?? this.height,
-    duration: duration ?? this.duration,
-    fileName: fileName ?? this.fileName,
-    isPlayed: isPlayed ?? this.isPlayed,
-    waveform: waveform ?? this.waveform,
-    transcription: transcription ?? this.transcription,
-    transcriptionStatus: transcriptionStatus ?? this.transcriptionStatus,
-    latitude: latitude ?? this.latitude,
-    longitude: longitude ?? this.longitude,
-    locationName: locationName ?? this.locationName,
-    amount: amount ?? this.amount,
-    token: token ?? this.token,
-    transferStatus: transferStatus ?? this.transferStatus,
-    txHash: txHash ?? this.txHash,
-    pollQuestion: pollQuestion ?? this.pollQuestion,
-    pollOptions: pollOptions ?? this.pollOptions,
-    pollOptionIds: pollOptionIds ?? this.pollOptionIds,
-    myVotes: myVotes ?? this.myVotes,
-    voteCounts: voteCounts ?? this.voteCounts,
-    totalVoters: totalVoters ?? this.totalVoters,
-    maxSelections: maxSelections ?? this.maxSelections,
-    pollEnded: pollEnded ?? this.pollEnded,
-    isAnonymousPoll: isAnonymousPoll ?? this.isAnonymousPoll,
-    musicTitle: musicTitle ?? this.musicTitle,
-    musicArtist: musicArtist ?? this.musicArtist,
-    musicUrl: musicUrl ?? this.musicUrl,
-    musicCover: musicCover ?? this.musicCover,
-    callDuration: callDuration ?? this.callDuration,
-    callEnded: callEnded ?? this.callEnded,
-    isMissedCall: isMissedCall ?? this.isMissedCall,
-    callEndReason: callEndReason ?? this.callEndReason,
-    callRoomId: callRoomId ?? this.callRoomId,
-    callPeerId: callPeerId ?? this.callPeerId,
-  );
+    mediaUrl,
+    httpUrl,
+    thumbnailUrl,
+    mimeType,
+    size,
+    width,
+    height,
+    duration,
+    fileName,
+    isPlayed,
+    waveform,
+    transcription,
+    transcriptionStatus,
+    latitude,
+    longitude,
+    locationName,
+    amount,
+    token,
+    transferStatus,
+    txHash,
+    paymentRequestId,
+    paymentReceiverAddress,
+    paymentRequestExpiresAt,
+    redPacketId,
+    pollQuestion,
+    pollOptions,
+    pollOptionIds,
+    myVotes,
+    voteCounts,
+    totalVoters,
+    maxSelections,
+    pollEnded,
+    isAnonymousPoll,
+    musicTitle,
+    musicArtist,
+    musicUrl,
+    musicCover,
+    callDuration,
+    callEnded,
+    isMissedCall,
+    callEndReason,
+    callRoomId,
+    callPeerId,
+  ];
 
   /// Create a copy with updated poll fields
   MessageMetadata copyWithPoll({
@@ -761,21 +732,158 @@ class MessageMetadata extends Equatable {
     int? totalVoters,
     List<String>? myVotes,
     bool? isAnonymousPoll,
-  }) => copyWith(
-    pollEnded: pollEnded,
-    voteCounts: voteCounts,
-    totalVoters: totalVoters,
-    myVotes: myVotes,
-    isAnonymousPoll: isAnonymousPoll,
+  }) => MessageMetadata(
+    pollQuestion: pollQuestion,
+    pollOptions: pollOptions,
+    pollOptionIds: pollOptionIds,
+    maxSelections: maxSelections,
+    pollEnded: pollEnded ?? this.pollEnded,
+    isAnonymousPoll: isAnonymousPoll ?? this.isAnonymousPoll,
+    voteCounts: voteCounts ?? this.voteCounts,
+    totalVoters: totalVoters ?? this.totalVoters,
+    myVotes: myVotes ?? this.myVotes,
+    mediaUrl: mediaUrl,
+    httpUrl: httpUrl,
+    thumbnailUrl: thumbnailUrl,
+    mimeType: mimeType,
+    size: size,
+    width: width,
+    height: height,
+    duration: duration,
+    fileName: fileName,
+    isPlayed: isPlayed,
+    waveform: waveform,
+    transcription: transcription,
+    transcriptionStatus: transcriptionStatus,
+    latitude: latitude,
+    longitude: longitude,
+    locationName: locationName,
+    amount: amount,
+    token: token,
+    transferStatus: transferStatus,
+    txHash: txHash,
+    paymentRequestId: paymentRequestId,
+    paymentReceiverAddress: paymentReceiverAddress,
+    paymentRequestExpiresAt: paymentRequestExpiresAt,
+    redPacketId: redPacketId,
+    musicTitle: musicTitle,
+    musicArtist: musicArtist,
+    musicUrl: musicUrl,
+    musicCover: musicCover,
+    callDuration: callDuration,
+    callEnded: callEnded,
+    isMissedCall: isMissedCall,
+    callEndReason: callEndReason,
+    callRoomId: callRoomId,
+    callPeerId: callPeerId,
   );
 
   /// Create a copy with updated transcription fields
   MessageMetadata copyWithTranscription({
     String? transcription,
     TranscriptionStatus? transcriptionStatus,
-  }) => copyWith(
+  }) => MessageMetadata(
+    mediaUrl: mediaUrl,
+    httpUrl: httpUrl,
+    thumbnailUrl: thumbnailUrl,
+    mimeType: mimeType,
+    size: size,
+    width: width,
+    height: height,
+    duration: duration,
+    fileName: fileName,
+    isPlayed: isPlayed,
+    waveform: waveform,
+    transcription: transcription ?? this.transcription,
+    transcriptionStatus: transcriptionStatus ?? this.transcriptionStatus,
+    latitude: latitude,
+    longitude: longitude,
+    locationName: locationName,
+    amount: amount,
+    token: token,
+    transferStatus: transferStatus,
+    txHash: txHash,
+    paymentRequestId: paymentRequestId,
+    paymentReceiverAddress: paymentReceiverAddress,
+    paymentRequestExpiresAt: paymentRequestExpiresAt,
+    redPacketId: redPacketId,
+    pollQuestion: pollQuestion,
+    pollOptions: pollOptions,
+    pollOptionIds: pollOptionIds,
+    maxSelections: maxSelections,
+    pollEnded: pollEnded,
+    isAnonymousPoll: isAnonymousPoll,
+    voteCounts: voteCounts,
+    totalVoters: totalVoters,
+    myVotes: myVotes,
+    musicTitle: musicTitle,
+    musicArtist: musicArtist,
+    musicUrl: musicUrl,
+    musicCover: musicCover,
+    callDuration: callDuration,
+    callEnded: callEnded,
+    isMissedCall: isMissedCall,
+    callEndReason: callEndReason,
+    callRoomId: callRoomId,
+    callPeerId: callPeerId,
+  );
+
+  /// Create a copy with updated transfer/payment fields
+  MessageMetadata copyWithTransfer({
+    String? amount,
+    String? token,
+    String? transferStatus,
+    String? txHash,
+    String? paymentRequestId,
+    String? paymentReceiverAddress,
+    DateTime? paymentRequestExpiresAt,
+    String? redPacketId,
+  }) => MessageMetadata(
+    mediaUrl: mediaUrl,
+    httpUrl: httpUrl,
+    thumbnailUrl: thumbnailUrl,
+    mimeType: mimeType,
+    size: size,
+    width: width,
+    height: height,
+    duration: duration,
+    fileName: fileName,
+    isPlayed: isPlayed,
+    waveform: waveform,
     transcription: transcription,
     transcriptionStatus: transcriptionStatus,
+    latitude: latitude,
+    longitude: longitude,
+    locationName: locationName,
+    amount: amount ?? this.amount,
+    token: token ?? this.token,
+    transferStatus: transferStatus ?? this.transferStatus,
+    txHash: txHash ?? this.txHash,
+    paymentRequestId: paymentRequestId ?? this.paymentRequestId,
+    paymentReceiverAddress:
+        paymentReceiverAddress ?? this.paymentReceiverAddress,
+    paymentRequestExpiresAt:
+        paymentRequestExpiresAt ?? this.paymentRequestExpiresAt,
+    redPacketId: redPacketId ?? this.redPacketId,
+    pollQuestion: pollQuestion,
+    pollOptions: pollOptions,
+    pollOptionIds: pollOptionIds,
+    myVotes: myVotes,
+    voteCounts: voteCounts,
+    totalVoters: totalVoters,
+    maxSelections: maxSelections,
+    pollEnded: pollEnded,
+    isAnonymousPoll: isAnonymousPoll,
+    musicTitle: musicTitle,
+    musicArtist: musicArtist,
+    musicUrl: musicUrl,
+    musicCover: musicCover,
+    callDuration: callDuration,
+    callEnded: callEnded,
+    isMissedCall: isMissedCall,
+    callEndReason: callEndReason,
+    callRoomId: callRoomId,
+    callPeerId: callPeerId,
   );
 
   /// 是否是匿名投票
@@ -813,4 +921,3 @@ class MessageReaction extends Equatable {
   @override
   List<Object?> get props => [key, userIds, isMe];
 }
-

@@ -46,6 +46,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
     bloc.add(
       PointsLoadTransactions(userId: widget.userId, roomId: widget.roomId),
     );
+    bloc.add(PointsLoadConfig(roomId: widget.roomId));
   }
 
   @override
@@ -69,12 +70,16 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
       ),
       body: BlocBuilder<PointsBloc, PointsState>(
         builder: (context, state) {
-          if (state.isLoading && state.balance == null) {
+          final showInitialBalanceLoading =
+              state.balanceStatus == PointsLoadStatus.loading &&
+                  state.balance == null;
+          if (showInitialBalanceLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state.status == PointsStatus.error && state.balance == null) {
-            return _buildErrorState(state.errorMessage, isDark);
+          if (state.balanceStatus == PointsLoadStatus.error &&
+              state.balance == null) {
+            return _buildErrorState(state.balanceErrorMessage, isDark);
           }
 
           return RefreshIndicator(
@@ -87,18 +92,29 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 const SizedBox(height: 16),
                 _buildQuickStats(state, isDark),
                 const SizedBox(height: 16),
-                _buildActionButtons(isDark),
+                _buildActionSection(state, isDark),
                 const SizedBox(height: 24),
                 _buildRecentTransactionsHeader(isDark),
                 const SizedBox(height: 8),
-                ...state.transactions
+                if (state.transactionsStatus == PointsLoadStatus.loading &&
+                    state.transactions.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (state.transactionsStatus == PointsLoadStatus.error &&
+                    state.transactions.isEmpty)
+                  _buildTransactionsError(state.transactionsErrorMessage, isDark)
+                else ...state.transactions
                     .take(10)
                     .map((tx) => _TransactionTile(
                           transaction: tx,
                           isDark: isDark,
-                        ))
-                    ,
-                if (state.transactions.isEmpty) _buildEmptyTransactions(isDark),
+                        )),
+                if (state.transactionsStatus != PointsLoadStatus.loading &&
+                    state.transactionsStatus != PointsLoadStatus.error &&
+                    state.transactions.isEmpty)
+                  _buildEmptyTransactions(isDark),
               ],
             ),
           );
@@ -226,9 +242,37 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   // Action buttons
   // ---------------------------------------------------------------------------
 
-  Widget _buildActionButtons(bool isDark) {
-    return Row(
-      children: [
+  Widget _buildActionSection(PointsState state, bool isDark) {
+    final config = state.config;
+    if (config != null && !config.isEnabled) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.pause_circle_outline, color: AppColors.warning),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Points are disabled in this room.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final actions = <Widget>[
+      if (config?.showLeaderboard ?? true)
         Expanded(
           child: _ActionButton(
             icon: Icons.emoji_events_outlined,
@@ -237,15 +281,25 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             onTap: () => _navigateToLeaderboard(),
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _ActionButton(
-            icon: Icons.storefront_outlined,
-            label: 'Redeem',
-            isDark: isDark,
-            onTap: () => _navigateToRedemption(),
-          ),
+      Expanded(
+        child: _ActionButton(
+          icon: Icons.storefront_outlined,
+          label: 'Redeem',
+          isDark: isDark,
+          onTap: () => _navigateToRedemption(),
         ),
+      ),
+    ];
+
+    if (actions.length == 1) {
+      return Row(children: actions);
+    }
+
+    return Row(
+      children: [
+        actions.first,
+        const SizedBox(width: 12),
+        actions.last,
       ],
     );
   }
@@ -296,6 +350,55 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                     ? AppColors.textTertiaryDark
                     : AppColors.textTertiary,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTransactionsError(String? errorMessage, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Center(
+        child: Column(
+          children: [
+            const Icon(Icons.error_outline, color: AppColors.error, size: 32),
+            const SizedBox(height: 8),
+            Text(
+              'Failed to load recent activity',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
+            ),
+            if (errorMessage != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                errorMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: () => context.read<PointsBloc>().add(
+                    PointsLoadTransactions(
+                      userId: widget.userId,
+                      roomId: widget.roomId,
+                    ),
+                  ),
+              child: const Text('Retry'),
             ),
           ],
         ),

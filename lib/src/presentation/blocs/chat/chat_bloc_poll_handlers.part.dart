@@ -17,6 +17,7 @@ extension ChatBlocPollHandlers on ChatBloc {
         question: event.question,
         options: event.options,
         maxSelections: event.maxSelections,
+        isAnonymous: event.isAnonymous,
       );
 
       if (message != null) {

@@ -4,6 +4,7 @@ import '../../../domain/entities/message_entity.dart';
 
 class FavoriteState extends Equatable {
   static const _sentinel = Object();
+  static final _linkRegExp = RegExp(r'https?://');
 
   final List<MessageEntity> favorites;
   final String? filterType;
@@ -36,7 +37,7 @@ class FavoriteState extends Equatable {
           result = result
               .where((f) =>
                   f.type == MessageType.text &&
-                  f.content.contains(RegExp(r'https?://')))
+                  f.content.contains(_linkRegExp))
               .toList();
           break;
         case 'file':

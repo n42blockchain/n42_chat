@@ -18,7 +18,11 @@ class ContactRepositoryImpl implements IContactRepository {
   /// 备注缓存
   Map<String, String> _remarkCache = {};
 
-  ContactRepositoryImpl(this._contactDataSource, this._storageDataSource, this._momentDataSource);
+  ContactRepositoryImpl(
+    this._contactDataSource,
+    this._storageDataSource,
+    this._momentDataSource,
+  );
 
   /// 加载备注缓存
   Future<void> _loadRemarkCache() async {
@@ -27,15 +31,15 @@ class ContactRepositoryImpl implements IContactRepository {
 
   /// 用户ID到房间ID的映射缓存
   Map<String, String> _directRoomIdMap = {};
-  
+
   @override
   Future<List<ContactEntity>> getContacts() async {
     // 先加载备注缓存
     await _loadRemarkCache();
-    
+
     // 获取用户ID到房间ID的映射
     _directRoomIdMap = _contactDataSource.getDirectChatRoomIdMap();
-    
+
     final users = _contactDataSource.getDirectChatContacts();
     return users.map(_mapUserToEntity).toList()
       ..sort((a, b) => a.sortKey.compareTo(b.sortKey));
@@ -57,6 +61,7 @@ class ContactRepositoryImpl implements IContactRepository {
 
   @override
   Future<ContactEntity?> getContactById(String userId) async {
+    await _loadRemarkCache();
     final profile = await _contactDataSource.getUserProfile(userId);
     if (profile == null) return null;
 
@@ -77,7 +82,10 @@ class ContactRepositoryImpl implements IContactRepository {
   }
 
   @override
-  Future<List<ContactEntity>> searchUsers(String query, {int limit = 20}) async {
+  Future<List<ContactEntity>> searchUsers(
+    String query, {
+    int limit = 20,
+  }) async {
     if (query.trim().isEmpty) return [];
 
     final profiles = await _contactDataSource.searchUsers(query, limit: limit);
@@ -97,13 +105,19 @@ class ContactRepositoryImpl implements IContactRepository {
 
   @override
   Future<String> startDirectChat(String userId) async {
-    final roomId = await _contactDataSource.startDirectChat(userId);
+    final encrypted = await _storageDataSource.shouldDefaultEncryptNewChats();
+    final roomId = await _contactDataSource.startDirectChat(
+      userId,
+      encrypted: encrypted,
+    );
 
     // 发起聊天时，也邀请对方加入我的 Moment 房间
     try {
       await _momentDataSource.inviteFriendToMomentRoom(userId);
     } catch (e) {
-      debugLog('ContactRepository: Failed to invite to moment room after startDirectChat: $e');
+      debugLog(
+        'ContactRepository: Failed to invite to moment room after startDirectChat: $e',
+      );
     }
 
     return roomId;
@@ -170,7 +184,8 @@ class ContactRepositoryImpl implements IContactRepository {
         try {
           final profile = await _contactDataSource.getUserProfile(inviter);
           if (profile != null) {
-            if (profile.displayName != null && profile.displayName!.isNotEmpty) {
+            if (profile.displayName != null &&
+                profile.displayName!.isNotEmpty) {
               displayName = profile.displayName!;
             }
             // Also get avatar from profile if not already set
@@ -190,13 +205,15 @@ class ContactRepositoryImpl implements IContactRepository {
         displayName = 'Unknown User';
       }
 
-      requests.add(FriendRequest(
-        id: room.id,
-        userId: inviter ?? '',
-        userName: displayName,
-        userAvatarUrl: avatarUrl,
-        requestTime: null, // StrippedStateEvent doesn't have originServerTs
-      ));
+      requests.add(
+        FriendRequest(
+          id: room.id,
+          userId: inviter ?? '',
+          userName: displayName,
+          userAvatarUrl: avatarUrl,
+          requestTime: null, // StrippedStateEvent doesn't have originServerTs
+        ),
+      );
     }
 
     return requests;
@@ -213,7 +230,9 @@ class ContactRepositoryImpl implements IContactRepository {
 
     // 3. 邀请好友加入我的 Moment 房间（使好友能看到我的朋友圈）
     if (friendUserId != null) {
-      debugLog('ContactRepository: Inviting friend $friendUserId to moment room');
+      debugLog(
+        'ContactRepository: Inviting friend $friendUserId to moment room',
+      );
       try {
         await _momentDataSource.inviteFriendToMomentRoom(friendUserId);
       } catch (e) {
@@ -270,15 +289,20 @@ class ContactRepositoryImpl implements IContactRepository {
   }
 
   @override
-  Future<void> setMyStatus(String? statusMessage) async {
-    await _contactDataSource.setUserStatus(statusMessage);
+  Future<void> setMyStatus(String? statusMessage, {Duration? expiresIn}) async {
+    await _contactDataSource.setCurrentUserStatus(
+      statusMessage,
+      expiresAt: expiresIn == null
+          ? null
+          : DateTime.now().toUtc().add(expiresIn),
+    );
   }
 
   @override
   Future<String?> getMyStatus() async {
     final myUserId = _contactDataSource.currentUserId;
     if (myUserId == null) return null;
-    return await _contactDataSource.getUserStatusMessage(myUserId);
+    return await _contactDataSource.getCurrentUserStatusMessage();
   }
 
   // ============================================
@@ -298,6 +322,7 @@ class ContactRepositoryImpl implements IContactRepository {
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
       remark: remark,
+      isBlocked: _contactDataSource.isUserIgnored(user.id),
       directRoomId: directRoomId,
       isFriend: directRoomId != null,
     );
@@ -316,6 +341,7 @@ class ContactRepositoryImpl implements IContactRepository {
       // 在线状态需要异步获取，这里默认离线
       presence: PresenceStatus.offline,
       remark: remark,
+      isBlocked: _contactDataSource.isUserIgnored(userId),
       directRoomId: directRoomId,
       isFriend: directRoomId != null,
     );
@@ -357,4 +383,3 @@ class ContactRepositoryImpl implements IContactRepository {
     await _storageDataSource.setContactRemark(userId, null);
   }
 }
-

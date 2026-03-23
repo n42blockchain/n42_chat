@@ -63,7 +63,14 @@ class CreateGroup extends GroupEvent {
   });
 
   @override
-  List<Object?> get props => [name, inviteUserIds, topic, isPublic, enableEncryption, avatar];
+  List<Object?> get props => [
+    name,
+    inviteUserIds,
+    topic,
+    isPublic,
+    enableEncryption,
+    avatar,
+  ];
 }
 
 /// 更新群名称
@@ -88,6 +95,17 @@ class UpdateGroupTopic extends GroupEvent {
   List<Object?> get props => [roomId, topic];
 }
 
+/// 更新群公告
+class UpdateGroupAnnouncement extends GroupEvent {
+  final String roomId;
+  final String announcement;
+
+  const UpdateGroupAnnouncement(this.roomId, this.announcement);
+
+  @override
+  List<Object?> get props => [roomId, announcement];
+}
+
 /// 更新群头像
 class UpdateGroupAvatar extends GroupEvent {
   final String roomId;
@@ -97,6 +115,17 @@ class UpdateGroupAvatar extends GroupEvent {
 
   @override
   List<Object?> get props => [roomId, avatar];
+}
+
+/// 更新群可见性
+class UpdateGroupVisibility extends GroupEvent {
+  final String roomId;
+  final bool isPublic;
+
+  const UpdateGroupVisibility(this.roomId, this.isPublic);
+
+  @override
+  List<Object?> get props => [roomId, isPublic];
 }
 
 /// 邀请成员
@@ -263,15 +292,17 @@ class CreateChannel extends GroupEvent {
   final String parentRoomId;
   final String name;
   final String? topic;
+  final String? category;
 
   const CreateChannel({
     required this.parentRoomId,
     required this.name,
     this.topic,
+    this.category,
   });
 
   @override
-  List<Object?> get props => [parentRoomId, name, topic];
+  List<Object?> get props => [parentRoomId, name, topic, category];
 }
 
 /// 更新子频道
@@ -280,16 +311,24 @@ class UpdateChannel extends GroupEvent {
   final String channelRoomId;
   final String? name;
   final String? topic;
+  final String? category;
 
   const UpdateChannel({
     required this.parentRoomId,
     required this.channelRoomId,
     this.name,
     this.topic,
+    this.category,
   });
 
   @override
-  List<Object?> get props => [parentRoomId, channelRoomId, name, topic];
+  List<Object?> get props => [
+    parentRoomId,
+    channelRoomId,
+    name,
+    topic,
+    category,
+  ];
 }
 
 /// 删除子频道
@@ -326,4 +365,3 @@ class MemberJoined extends GroupEvent {
   @override
   List<Object?> get props => [roomId, userId];
 }
-

@@ -51,30 +51,24 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
   ) async {
     if (state.isLoading) return;
 
-    emit(state.copyWith(
-      isLoading: true,
-      clearError: true,
-    ));
+    emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final moments = await _momentRepository.getMoments(
-        limit: event.limit,
-      );
+      final moments = await _momentRepository.getMoments(limit: event.limit);
 
       final unreadCount = await _momentRepository.getUnreadMomentCount();
 
-      emit(state.copyWith(
-        moments: moments,
-        isLoading: false,
-        hasMore: moments.length >= event.limit,
-        lastMomentId: moments.isNotEmpty ? moments.last.id : null,
-        unreadCount: unreadCount,
-      ));
+      emit(
+        state.copyWith(
+          moments: moments,
+          isLoading: false,
+          hasMore: moments.length >= event.limit,
+          lastMomentId: moments.isNotEmpty ? moments.last.id : null,
+          unreadCount: unreadCount,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      ));
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }
   }
 
@@ -102,17 +96,18 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         );
       }
 
-      emit(state.copyWith(
-        moments: [...state.moments, ...moreMoments],
-        isLoadingMore: false,
-        hasMore: moreMoments.length >= 20,
-        lastMomentId: moreMoments.isNotEmpty ? moreMoments.last.id : state.lastMomentId,
-      ));
+      emit(
+        state.copyWith(
+          moments: [...state.moments, ...moreMoments],
+          isLoadingMore: false,
+          hasMore: moreMoments.length >= 20,
+          lastMomentId: moreMoments.isNotEmpty
+              ? moreMoments.last.id
+              : state.lastMomentId,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoadingMore: false,
-        errorMessage: e.toString(),
-      ));
+      emit(state.copyWith(isLoadingMore: false, errorMessage: e.toString()));
     }
   }
 
@@ -129,16 +124,15 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         limit: event.limit,
       );
 
-      emit(state.copyWith(
-        moments: moments,
-        isLoading: false,
-        hasMore: moments.length >= event.limit,
-      ));
+      emit(
+        state.copyWith(
+          moments: moments,
+          isLoading: false,
+          hasMore: moments.length >= event.limit,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      ));
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }
   }
 
@@ -147,7 +141,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     PostTextMoment event,
     Emitter<MomentState> emit,
   ) async {
-    emit(state.copyWith(isPosting: true, postingProgress: 0.0));
+    emit(
+      state.copyWith(isPosting: true, postingProgress: 0.0, clearError: true),
+    );
 
     try {
       final moment = await _momentRepository.postTextMoment(
@@ -157,16 +153,15 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         visibilityUserIds: event.visibilityUserIds,
       );
 
-      emit(state.copyWith(
-        moments: [moment, ...state.moments],
-        isPosting: false,
-        postingProgress: 1.0,
-      ));
+      emit(
+        state.copyWith(
+          moments: [moment, ...state.moments],
+          isPosting: false,
+          postingProgress: 1.0,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isPosting: false,
-        errorMessage: e.toString(),
-      ));
+      emit(state.copyWith(isPosting: false, errorMessage: e.toString()));
     }
   }
 
@@ -175,17 +170,21 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     PostImageMoment event,
     Emitter<MomentState> emit,
   ) async {
-    emit(state.copyWith(isPosting: true, postingProgress: 0.0));
+    emit(
+      state.copyWith(isPosting: true, postingProgress: 0.0, clearError: true),
+    );
 
     try {
       final mediaInputs = event.images
-          .map((img) => MomentMediaInput(
-                bytes: img.bytes,
-                filename: img.filename,
-                mimeType: img.mimeType,
-                width: img.width,
-                height: img.height,
-              ))
+          .map(
+            (img) => MomentMediaInput(
+              bytes: img.bytes,
+              filename: img.filename,
+              mimeType: img.mimeType,
+              width: img.width,
+              height: img.height,
+            ),
+          )
           .toList();
 
       final moment = await _momentRepository.postImageMoment(
@@ -196,16 +195,15 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         visibilityUserIds: event.visibilityUserIds,
       );
 
-      emit(state.copyWith(
-        moments: [moment, ...state.moments],
-        isPosting: false,
-        postingProgress: 1.0,
-      ));
+      emit(
+        state.copyWith(
+          moments: [moment, ...state.moments],
+          isPosting: false,
+          postingProgress: 1.0,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isPosting: false,
-        errorMessage: e.toString(),
-      ));
+      emit(state.copyWith(isPosting: false, errorMessage: e.toString()));
     }
   }
 
@@ -214,7 +212,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     PostVideoMoment event,
     Emitter<MomentState> emit,
   ) async {
-    emit(state.copyWith(isPosting: true, postingProgress: 0.0));
+    emit(
+      state.copyWith(isPosting: true, postingProgress: 0.0, clearError: true),
+    );
 
     try {
       final videoInput = MomentMediaInput(
@@ -235,16 +235,15 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         visibilityUserIds: event.visibilityUserIds,
       );
 
-      emit(state.copyWith(
-        moments: [moment, ...state.moments],
-        isPosting: false,
-        postingProgress: 1.0,
-      ));
+      emit(
+        state.copyWith(
+          moments: [moment, ...state.moments],
+          isPosting: false,
+          postingProgress: 1.0,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isPosting: false,
-        errorMessage: e.toString(),
-      ));
+      emit(state.copyWith(isPosting: false, errorMessage: e.toString()));
     }
   }
 
@@ -256,11 +255,24 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     try {
       await _momentRepository.deleteMoment(event.momentId);
 
-      emit(state.copyWith(
-        moments: state.moments.where((m) => m.id != event.momentId).toList(),
-      ));
+      emit(
+        state.copyWith(
+          moments: state.moments.where((m) => m.id != event.momentId).toList(),
+          clearError: true,
+          deleteActionVersion: state.deleteActionVersion + 1,
+          deleteActionMomentId: event.momentId,
+          deleteActionStatus: MomentDeleteActionStatus.success,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(errorMessage: e.toString()));
+      emit(
+        state.copyWith(
+          errorMessage: e.toString(),
+          deleteActionVersion: state.deleteActionVersion + 1,
+          deleteActionMomentId: event.momentId,
+          deleteActionStatus: MomentDeleteActionStatus.failure,
+        ),
+      );
     }
   }
 
@@ -274,7 +286,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
     _pendingLikeOps.add(event.momentId);
 
     // 乐观更新：同时更新 isLikedByMe 和 likes 列表
-    final currentUserId = MatrixClientManager.instance.client?.userID ?? '';
+    final client = MatrixClientManager.instance.client;
+    final currentUserId = client?.userID ?? '';
+    // Extract localpart from @user:server format
     final currentUserName = currentUserId.startsWith('@')
         ? currentUserId.substring(1).split(':').first
         : currentUserId;
@@ -314,10 +328,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         return m;
       }).toList();
 
-      emit(state.copyWith(
-        moments: revertedMoments,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(moments: revertedMoments, errorMessage: e.toString()),
+      );
     } finally {
       _pendingLikeOps.remove(event.momentId);
     }
@@ -354,10 +367,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
       await _momentRepository.unlikeMoment(event.momentId);
     } catch (e) {
       // 回滚到原始状态（恢复完整的 likes 列表）
-      emit(state.copyWith(
-        moments: originalMoments,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(moments: originalMoments, errorMessage: e.toString()),
+      );
     } finally {
       _pendingLikeOps.remove(event.momentId);
     }
@@ -384,9 +396,24 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
         return m;
       }).toList();
 
-      emit(state.copyWith(moments: updatedMoments));
+      emit(
+        state.copyWith(
+          moments: updatedMoments,
+          clearError: true,
+          commentSubmissionVersion: state.commentSubmissionVersion + 1,
+          commentSubmissionMomentId: event.momentId,
+          commentSubmissionStatus: MomentCommentSubmissionStatus.success,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(errorMessage: e.toString()));
+      emit(
+        state.copyWith(
+          errorMessage: e.toString(),
+          commentSubmissionVersion: state.commentSubmissionVersion + 1,
+          commentSubmissionMomentId: event.momentId,
+          commentSubmissionStatus: MomentCommentSubmissionStatus.failure,
+        ),
+      );
     }
   }
 
@@ -428,11 +455,9 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
   ) async {
     await _momentsSubscription?.cancel();
 
-    _momentsSubscription = _momentRepository.watchMoments().listen(
-      (moments) {
-        add(MomentsUpdated(moments));
-      },
-    );
+    _momentsSubscription = _momentRepository.watchMoments().listen((moments) {
+      add(MomentsUpdated(moments));
+    });
   }
 
   /// 取消订阅动态更新
@@ -445,10 +470,7 @@ class MomentBloc extends Bloc<MomentEvent, MomentState> {
   }
 
   /// 动态列表更新
-  void _onMomentsUpdated(
-    MomentsUpdated event,
-    Emitter<MomentState> emit,
-  ) {
+  void _onMomentsUpdated(MomentsUpdated event, Emitter<MomentState> emit) {
     emit(state.copyWith(moments: event.moments));
   }
 

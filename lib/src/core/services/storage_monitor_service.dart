@@ -107,8 +107,10 @@ class StorageMonitorService {
   Future<StorageStatus> checkStorageStatus() async {
     try {
       final storageInfo = await _storageManager.getStorageUsage();
-      final mediaStats = await _lifecycleService.getTotalStats();
       final config = await getStorageConfig();
+      final mediaStats = await _lifecycleService.getTotalStats(
+        preserveThumbnails: config.preserveThumbnails,
+      );
 
       // 获取设备剩余空间
       int? deviceFree;

@@ -6,8 +6,10 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 
 import '../../data/datasources/local/media_metadata_database.dart';
+import '../../data/datasources/matrix/matrix_client_manager.dart';
 import 'download_service.dart';
 import '../utils/debug_log.dart';
+import '../utils/matrix_utils.dart';
 
 /// 媒体文件清理结果
 class CleanupResult {
@@ -22,10 +24,10 @@ class CleanupResult {
   });
 
   CleanupResult operator +(CleanupResult other) => CleanupResult(
-        filesDeleted: filesDeleted + other.filesDeleted,
-        bytesFreed: bytesFreed + other.bytesFreed,
-        errors: errors + other.errors,
-      );
+    filesDeleted: filesDeleted + other.filesDeleted,
+    bytesFreed: bytesFreed + other.bytesFreed,
+    errors: errors + other.errors,
+  );
 }
 
 /// 媒体文件生命周期管理服务
@@ -40,8 +42,8 @@ class MediaLifecycleService {
   MediaLifecycleService({
     required MediaMetadataDatabase db,
     DownloadService? downloadService,
-  })  : _db = db,
-        _downloadService = downloadService;
+  }) : _db = db,
+       _downloadService = downloadService;
 
   // ============================================
   // 注册与追踪
@@ -75,20 +77,22 @@ class MediaLifecycleService {
         }
       }
 
-      await _db.registerFile(MediaFilesCompanion(
-        filePath: Value(filePath),
-        mxcUrl: Value(mxcUrl),
-        roomId: Value(roomId),
-        eventId: Value(eventId),
-        fileCategory: Value(category),
-        mimeType: Value(mimeType ?? lookupMimeType(filePath)),
-        fileSize: Value(actualSize),
-        isThumbnail: Value(isThumbnail),
-        downloadedAt: Value(now),
-        lastAccessedAt: Value(now),
-        isCleaned: const Value(false),
-        isPinned: const Value(false),
-      ));
+      await _db.registerFile(
+        MediaFilesCompanion(
+          filePath: Value(filePath),
+          mxcUrl: Value(mxcUrl),
+          roomId: Value(roomId),
+          eventId: Value(eventId),
+          fileCategory: Value(category),
+          mimeType: Value(mimeType ?? lookupMimeType(filePath)),
+          fileSize: Value(actualSize),
+          isThumbnail: Value(isThumbnail),
+          downloadedAt: Value(now),
+          lastAccessedAt: Value(now),
+          isCleaned: const Value(false),
+          isPinned: const Value(false),
+        ),
+      );
     } catch (e) {
       debugLog('MediaLifecycleService: Failed to register file: $e');
     }
@@ -118,8 +122,10 @@ class MediaLifecycleService {
   }
 
   /// 获取总媒体统计
-  Future<TotalMediaStats> getTotalStats() async {
-    return _db.getTotalStats();
+  Future<TotalMediaStats> getTotalStats({
+    bool preserveThumbnails = true,
+  }) async {
+    return _db.getTotalStats(preserveThumbnails: preserveThumbnails);
   }
 
   /// 获取房间内的媒体文件列表
@@ -145,12 +151,14 @@ class MediaLifecycleService {
     String? roomId,
     String? fileCategory,
     int? minFileSizeBytes,
+    bool preserveThumbnails = true,
   }) async {
     return _db.getCleanableFiles(
       olderThanDays: olderThanDays,
       roomId: roomId,
       fileCategory: fileCategory,
       minFileSizeBytes: minFileSizeBytes,
+      preserveThumbnails: preserveThumbnails,
     );
   }
 
@@ -197,9 +205,11 @@ class MediaLifecycleService {
     bool preserveThumbnails = true,
   }) async {
     debugLog(
-        'MediaLifecycleService: Auto cleanup started (older than $olderThanDays days)');
+      'MediaLifecycleService: Auto cleanup started (older than $olderThanDays days)',
+    );
     final files = await _db.getCleanableFiles(
       olderThanDays: olderThanDays,
+      preserveThumbnails: preserveThumbnails,
     );
 
     if (files.isEmpty) {
@@ -210,7 +220,8 @@ class MediaLifecycleService {
     final paths = files.map((f) => f.filePath).toList();
     final result = await cleanupFiles(paths);
     debugLog(
-        'MediaLifecycleService: Cleaned ${result.filesDeleted} files, freed ${result.bytesFreed} bytes');
+      'MediaLifecycleService: Cleaned ${result.filesDeleted} files, freed ${result.bytesFreed} bytes',
+    );
     return result;
   }
 
@@ -219,17 +230,24 @@ class MediaLifecycleService {
     try {
       final record = await _db.getCleanedFile(filePath);
       if (record == null || record.mxcUrl.isEmpty) {
-        debugLog(
-            'MediaLifecycleService: No mxcUrl for redownload: $filePath');
+        debugLog('MediaLifecycleService: No mxcUrl for redownload: $filePath');
         return null;
       }
 
       // 通过 DownloadService 下载，传递 metadata 以确保重新注册到生命周期管理
       if (_downloadService != null) {
-        await _downloadService.download(
-          url: record.mxcUrl,
+        final downloadUrl = _resolveDownloadUrl(record.mxcUrl);
+        if (downloadUrl == null || downloadUrl.isEmpty) {
+          debugLog(
+            'MediaLifecycleService: Failed to resolve download URL: ${record.mxcUrl}',
+          );
+          return null;
+        }
+        final taskId = await _downloadService.download(
+          url: downloadUrl,
           savePath: filePath,
           fileName: p.basename(filePath),
+          headers: _buildAuthHeaders(downloadUrl),
           metadata: {
             'roomId': record.roomId,
             if (record.eventId != null) 'eventId': record.eventId!,
@@ -238,6 +256,13 @@ class MediaLifecycleService {
             'isThumbnail': record.isThumbnail.toString(),
           },
         );
+        final task = await _downloadService.waitForTaskCompletion(taskId);
+        if (task.status != DownloadStatus.completed) {
+          debugLog(
+            'MediaLifecycleService: Redownload task failed: ${task.error ?? task.status.name}',
+          );
+          return null;
+        }
         return filePath;
       }
       return null;
@@ -245,6 +270,24 @@ class MediaLifecycleService {
       debugLog('MediaLifecycleService: Redownload failed: $e');
       return null;
     }
+  }
+
+  String? _resolveDownloadUrl(String url) {
+    if (!url.startsWith('mxc://')) {
+      return url;
+    }
+    return MatrixUtils.getMediaDownloadUrl(
+      url,
+      client: MatrixClientManager.instance.client,
+    );
+  }
+
+  Map<String, String>? _buildAuthHeaders(String url) {
+    final headers = MatrixUtils.buildAuthenticatedMediaHeaders(
+      url,
+      client: MatrixClientManager.instance.client,
+    );
+    return headers.isEmpty ? null : headers;
   }
 
   // ============================================
@@ -293,12 +336,29 @@ class MediaLifecycleService {
     if (mime.startsWith('audio/')) return 'audio';
 
     final ext = p.extension(filePath).toLowerCase();
-    const imageExts = {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'};
+    const imageExts = {
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.gif',
+      '.webp',
+      '.bmp',
+      '.svg',
+    };
     const videoExts = {'.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv'};
     const audioExts = {'.mp3', '.ogg', '.wav', '.m4a', '.aac', '.flac'};
     const docExts = {
-      '.pdf', '.doc', '.docx', '.xls', '.xlsx',
-      '.ppt', '.pptx', '.txt', '.csv', '.zip', '.rar',
+      '.pdf',
+      '.doc',
+      '.docx',
+      '.xls',
+      '.xlsx',
+      '.ppt',
+      '.pptx',
+      '.txt',
+      '.csv',
+      '.zip',
+      '.rar',
     };
 
     if (imageExts.contains(ext)) return 'image';

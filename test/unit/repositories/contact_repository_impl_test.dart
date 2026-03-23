@@ -20,6 +20,8 @@ class MockUser extends Mock implements matrix.User {}
 
 class MockRoom extends Mock implements matrix.Room {}
 
+class MockProfile extends Mock implements matrix.Profile {}
+
 void main() {
   late ContactRepositoryImpl repository;
   late MockMatrixContactDataSource mockContactDS;
@@ -41,8 +43,7 @@ void main() {
     test('returns empty list when no contacts', () async {
       when(() => mockContactDS.getDirectChatContacts()).thenReturn([]);
       when(() => mockContactDS.getDirectChatRoomIdMap()).thenReturn({});
-      when(() => mockStorageDS.getContactRemarks())
-          .thenAnswer((_) async => {});
+      when(() => mockStorageDS.getContactRemarks()).thenAnswer((_) async => {});
 
       final contacts = await repository.getContacts();
 
@@ -58,21 +59,27 @@ void main() {
       when(() => user1.avatarUrl).thenReturn(null);
       when(() => mockContactDS.getUserDisplayName(user1)).thenReturn('Bob');
       when(() => mockContactDS.getUserAvatarUrl(user1)).thenReturn(null);
+      when(
+        () => mockContactDS.isUserIgnored('@bob:matrix.org'),
+      ).thenReturn(false);
 
       when(() => user2.id).thenReturn('@alice:matrix.org');
       when(() => user2.displayName).thenReturn('Alice');
       when(() => user2.avatarUrl).thenReturn(null);
       when(() => mockContactDS.getUserDisplayName(user2)).thenReturn('Alice');
       when(() => mockContactDS.getUserAvatarUrl(user2)).thenReturn(null);
+      when(
+        () => mockContactDS.isUserIgnored('@alice:matrix.org'),
+      ).thenReturn(true);
 
-      when(() => mockContactDS.getDirectChatContacts())
-          .thenReturn([user1, user2]);
+      when(
+        () => mockContactDS.getDirectChatContacts(),
+      ).thenReturn([user1, user2]);
       when(() => mockContactDS.getDirectChatRoomIdMap()).thenReturn({
         '@bob:matrix.org': '!r1:matrix.org',
         '@alice:matrix.org': '!r2:matrix.org',
       });
-      when(() => mockStorageDS.getContactRemarks())
-          .thenAnswer((_) async => {});
+      when(() => mockStorageDS.getContactRemarks()).thenAnswer((_) async => {});
 
       final contacts = await repository.getContacts();
 
@@ -80,6 +87,8 @@ void main() {
       // Sorted alphabetically: Alice before Bob
       expect(contacts[0].displayName, 'Alice');
       expect(contacts[1].displayName, 'Bob');
+      expect(contacts[0].isBlocked, isTrue);
+      expect(contacts[1].isBlocked, isFalse);
     });
   });
 
@@ -88,15 +97,23 @@ void main() {
       const userId = '@alice:matrix.org';
       const roomId = '!dm1:matrix.org';
 
-      when(() => mockContactDS.startDirectChat(userId))
-          .thenAnswer((_) async => roomId);
-      when(() => mockMomentDS.inviteFriendToMomentRoom(userId))
-          .thenAnswer((_) async {});
+      when(
+        () => mockStorageDS.shouldDefaultEncryptNewChats(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockContactDS.startDirectChat(userId, encrypted: true),
+      ).thenAnswer((_) async => roomId);
+      when(
+        () => mockMomentDS.inviteFriendToMomentRoom(userId),
+      ).thenAnswer((_) async {});
 
       final result = await repository.startDirectChat(userId);
 
       expect(result, roomId);
-      verify(() => mockContactDS.startDirectChat(userId)).called(1);
+      verify(() => mockStorageDS.shouldDefaultEncryptNewChats()).called(1);
+      verify(
+        () => mockContactDS.startDirectChat(userId, encrypted: true),
+      ).called(1);
       verify(() => mockMomentDS.inviteFriendToMomentRoom(userId)).called(1);
     });
 
@@ -104,21 +121,59 @@ void main() {
       const userId = '@alice:matrix.org';
       const roomId = '!dm1:matrix.org';
 
-      when(() => mockContactDS.startDirectChat(userId))
-          .thenAnswer((_) async => roomId);
-      when(() => mockMomentDS.inviteFriendToMomentRoom(userId))
-          .thenThrow(Exception('Moment room error'));
+      when(
+        () => mockStorageDS.shouldDefaultEncryptNewChats(),
+      ).thenAnswer((_) async => false);
+      when(
+        () => mockContactDS.startDirectChat(userId, encrypted: false),
+      ).thenAnswer((_) async => roomId);
+      when(
+        () => mockMomentDS.inviteFriendToMomentRoom(userId),
+      ).thenThrow(Exception('Moment room error'));
 
       final result = await repository.startDirectChat(userId);
 
       expect(result, roomId);
+      verify(
+        () => mockContactDS.startDirectChat(userId, encrypted: false),
+      ).called(1);
+    });
+  });
+
+  group('getContactById', () {
+    test('loads remark cache before mapping remote profile', () async {
+      final profile = MockProfile();
+      const userId = '@alice:matrix.org';
+
+      when(
+        () => mockStorageDS.getContactRemarks(),
+      ).thenAnswer((_) async => {userId: 'Alice Remark'});
+      when(
+        () => mockContactDS.getUserProfile(userId),
+      ).thenAnswer((_) async => profile);
+      when(() => profile.displayName).thenReturn('Alice');
+      when(
+        () => mockContactDS.getProfileAvatarUrl(profile),
+      ).thenReturn('https://cdn.example/avatar.png');
+      when(
+        () => mockContactDS.getDirectChatRoomId(userId),
+      ).thenReturn('!dm-alice:matrix.org');
+      when(() => mockContactDS.isUserIgnored(userId)).thenReturn(true);
+
+      final contact = await repository.getContactById(userId);
+
+      expect(contact, isNotNull);
+      expect(contact!.remark, 'Alice Remark');
+      expect(contact.avatarUrl, 'https://cdn.example/avatar.png');
+      expect(contact.directRoomId, '!dm-alice:matrix.org');
+      expect(contact.isFriend, isTrue);
+      expect(contact.isBlocked, isTrue);
     });
   });
 
   group('getPendingFriendRequests', () {
     test('returns empty list when no invites', () async {
-      when(() => mockContactDS.getPendingInvites())
-          .thenReturn([]);
+      when(() => mockContactDS.getPendingInvites()).thenReturn([]);
 
       final requests = await repository.getPendingFriendRequests();
 
@@ -129,12 +184,54 @@ void main() {
   group('acceptFriendRequest', () {
     test('delegates to datasource', () async {
       const roomId = '!invite1:matrix.org';
-      when(() => mockContactDS.acceptInvite(roomId))
-          .thenAnswer((_) async {});
+      when(() => mockContactDS.acceptInvite(roomId)).thenAnswer((_) async {});
 
       await repository.acceptFriendRequest(roomId);
 
       verify(() => mockContactDS.acceptInvite(roomId)).called(1);
+    });
+  });
+
+  group('status', () {
+    test('setMyStatus forwards a 24h-style expiry when requested', () async {
+      DateTime? capturedExpiry;
+      when(
+        () => mockContactDS.setCurrentUserStatus(
+          any(),
+          expiresAt: any(named: 'expiresAt'),
+        ),
+      ).thenAnswer((invocation) async {
+        capturedExpiry = invocation.namedArguments[#expiresAt] as DateTime?;
+      });
+
+      final before = DateTime.now().toUtc();
+      await repository.setMyStatus(
+        'Gaming',
+        expiresIn: const Duration(hours: 24),
+      );
+
+      final after = DateTime.now().toUtc();
+      expect(capturedExpiry, isNotNull);
+      expect(
+        capturedExpiry!.isAfter(before.add(const Duration(hours: 23))),
+        isTrue,
+      );
+      expect(
+        capturedExpiry!.isBefore(after.add(const Duration(hours: 25))),
+        isTrue,
+      );
+    });
+
+    test('getMyStatus uses current-user timed status path', () async {
+      when(() => mockContactDS.currentUserId).thenReturn('@me:matrix.org');
+      when(
+        () => mockContactDS.getCurrentUserStatusMessage(),
+      ).thenAnswer((_) async => 'Busy');
+
+      final result = await repository.getMyStatus();
+
+      expect(result, 'Busy');
+      verify(() => mockContactDS.getCurrentUserStatusMessage()).called(1);
     });
   });
 }

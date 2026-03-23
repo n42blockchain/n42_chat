@@ -21,6 +21,7 @@ class MatrixPollHandler {
     required String question,
     required List<String> options,
     int maxSelections = 1,
+    bool isAnonymous = false,
   }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) {
@@ -47,9 +48,9 @@ class MatrixPollHandler {
           'question': {
             'org.matrix.msc1767.text': question,
           },
-          'kind': maxSelections == 1
-              ? 'org.matrix.msc3381.poll.disclosed'
-              : 'org.matrix.msc3381.poll.undisclosed',
+          'kind': isAnonymous
+              ? 'org.matrix.msc3381.poll.undisclosed'
+              : 'org.matrix.msc3381.poll.disclosed',
           'max_selections': maxSelections == 0 ? options.length : maxSelections,
           'answers': pollOptions,
         },

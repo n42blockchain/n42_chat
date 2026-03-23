@@ -2,7 +2,8 @@
 // conversation_bloc_test.dart:
 //   SubscribeConversations, UnsubscribeConversations,
 //   ClearSearch, CreateGroupChat,
-//   SetConversationHidden, LoadHiddenConversations
+//   SetConversationHidden, LoadHiddenConversations,
+//   ClearNewConversationNavigation
 
 import 'dart:async';
 
@@ -22,8 +23,11 @@ class _MockPrefs extends Mock implements PreferencesDataSource {}
 
 const _roomA = ConversationEntity(id: '!a:s', name: 'Alpha');
 const _roomB = ConversationEntity(id: '!b:s', name: 'Beta', isPinned: true);
-const _roomHidden =
-    ConversationEntity(id: '!h:s', name: 'Hidden', isHidden: true);
+const _roomHidden = ConversationEntity(
+  id: '!h:s',
+  name: 'Hidden',
+  isHidden: true,
+);
 
 void main() {
   late _MockConvRepo mockRepo;
@@ -33,44 +37,47 @@ void main() {
     mockRepo = _MockConvRepo();
     mockPrefs = _MockPrefs();
     // Default: no hidden chats
-    when(() => mockPrefs.getHiddenChatIds())
-        .thenAnswer((_) async => <String>{});
+    when(
+      () => mockPrefs.getHiddenChatIds(),
+    ).thenAnswer((_) async => <String>{});
   });
 
   ConversationBloc buildBloc() => ConversationBloc(
-        conversationRepository: mockRepo,
-        storageDataSource: mockPrefs,
-      );
+    conversationRepository: mockRepo,
+    storageDataSource: mockPrefs,
+  );
 
   // ─────────────────────────────────────────────────
   // SubscribeConversations / UnsubscribeConversations
   // ─────────────────────────────────────────────────
 
   group('SubscribeConversations', () {
-    test('starts watching and emits ConversationsUpdated on new data', () async {
-      final controller =
-          StreamController<List<ConversationEntity>>.broadcast();
-      when(() => mockRepo.watchConversations())
-          .thenAnswer((_) => controller.stream);
-      when(() => mockPrefs.getHiddenChatIds())
-          .thenAnswer((_) async => <String>{});
+    test(
+      'starts watching and emits ConversationsUpdated on new data',
+      () async {
+        final controller =
+            StreamController<List<ConversationEntity>>.broadcast();
+        when(
+          () => mockRepo.watchConversations(),
+        ).thenAnswer((_) => controller.stream);
+        when(
+          () => mockPrefs.getHiddenChatIds(),
+        ).thenAnswer((_) async => <String>{});
 
-      final bloc = buildBloc();
-      addTearDown(bloc.close);
+        final bloc = buildBloc();
+        addTearDown(bloc.close);
 
-      bloc.add(const SubscribeConversations());
-      await Future<void>.delayed(const Duration(milliseconds: 50));
+        bloc.add(const SubscribeConversations());
+        await Future<void>.delayed(const Duration(milliseconds: 50));
 
-      controller.add([_roomA]);
-      await Future<void>.delayed(const Duration(milliseconds: 50));
+        controller.add([_roomA]);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
 
-      expect(
-        bloc.state.conversations.any((c) => c.id == '!a:s'),
-        isTrue,
-      );
+        expect(bloc.state.conversations.any((c) => c.id == '!a:s'), isTrue);
 
-      await controller.close();
-    });
+        await controller.close();
+      },
+    );
   });
 
   group('UnsubscribeConversations', () {
@@ -78,7 +85,7 @@ void main() {
       'does not throw and emits no states',
       build: buildBloc,
       act: (bloc) => bloc.add(const UnsubscribeConversations()),
-      expect: () => [],
+      expect: () => <ConversationState>[],
     );
   });
 
@@ -117,34 +124,46 @@ void main() {
       'emits newConversationId on success then refreshes',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.createGroupChat(
-              name: any(named: 'name'),
-              topic: any(named: 'topic'),
-              memberIds: any(named: 'memberIds'),
-              encrypted: any(named: 'encrypted'),
-            )).thenAnswer((_) async =>
-            const ConversationEntity(id: '!group:s', name: 'My Group'));
-        when(() => mockRepo.getConversations())
-            .thenAnswer((_) async => []);
+        when(
+          () => mockRepo.createGroupChat(
+            name: any(named: 'name'),
+            topic: any(named: 'topic'),
+            memberIds: any(named: 'memberIds'),
+            encrypted: any(named: 'encrypted'),
+          ),
+        ).thenAnswer(
+          (_) async =>
+              const ConversationEntity(id: '!group:s', name: 'My Group'),
+        );
+        when(() => mockRepo.getConversations()).thenAnswer((_) async => []);
       },
-      act: (bloc) => bloc.add(const CreateGroupChat(
-        name: 'My Group',
-        memberIds: ['@alice:s', '@bob:s'],
-      )),
+      act: (bloc) => bloc.add(
+        const CreateGroupChat(
+          name: 'My Group',
+          memberIds: ['@alice:s', '@bob:s'],
+        ),
+      ),
       expect: () => [
         isA<ConversationState>()
-            .having((s) => s.newConversationId, 'newConversationId', '!group:s'),
+            .having((s) => s.newConversationId, 'newConversationId', '!group:s')
+            .having(
+              (s) => s.conversations.any((c) => c.id == '!group:s'),
+              'group inserted before refresh',
+              isTrue,
+            ),
         // RefreshConversations is dispatched internally; allow any loading state
         isA<ConversationState>(),
         isA<ConversationState>(),
       ],
       verify: (_) {
-        verify(() => mockRepo.createGroupChat(
-              name: 'My Group',
-              topic: any(named: 'topic'),
-              memberIds: ['@alice:s', '@bob:s'],
-              encrypted: any(named: 'encrypted'),
-            )).called(1);
+        verify(
+          () => mockRepo.createGroupChat(
+            name: 'My Group',
+            topic: any(named: 'topic'),
+            memberIds: ['@alice:s', '@bob:s'],
+            encrypted: any(named: 'encrypted'),
+          ),
+        ).called(1);
       },
     );
 
@@ -152,17 +171,17 @@ void main() {
       'emits error on repository failure',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.createGroupChat(
-              name: any(named: 'name'),
-              topic: any(named: 'topic'),
-              memberIds: any(named: 'memberIds'),
-              encrypted: any(named: 'encrypted'),
-            )).thenThrow(Exception('create group error'));
+        when(
+          () => mockRepo.createGroupChat(
+            name: any(named: 'name'),
+            topic: any(named: 'topic'),
+            memberIds: any(named: 'memberIds'),
+            encrypted: any(named: 'encrypted'),
+          ),
+        ).thenThrow(Exception('create group error'));
       },
-      act: (bloc) => bloc.add(const CreateGroupChat(
-        name: 'Broken Group',
-        memberIds: [],
-      )),
+      act: (bloc) =>
+          bloc.add(const CreateGroupChat(name: 'Broken Group', memberIds: [])),
       expect: () => [
         isA<ConversationState>().having(
           (s) => s.error,
@@ -188,7 +207,9 @@ void main() {
       setUp: () {
         when(() => mockPrefs.hideChat(any())).thenAnswer((_) async {});
       },
-      act: (bloc) => bloc.add(const SetConversationHidden(conversationId: '!a:s', hidden: true)),
+      act: (bloc) => bloc.add(
+        const SetConversationHidden(conversationId: '!a:s', hidden: true),
+      ),
       expect: () => [
         isA<ConversationState>()
             .having(
@@ -217,14 +238,15 @@ void main() {
       setUp: () {
         when(() => mockPrefs.unhideChat(any())).thenAnswer((_) async {});
       },
-      act: (bloc) => bloc.add(const SetConversationHidden(conversationId: '!h:s', hidden: false)),
+      act: (bloc) => bloc.add(
+        const SetConversationHidden(conversationId: '!h:s', hidden: false),
+      ),
       expect: () => [
-        isA<ConversationState>()
-            .having(
-              (s) => s.hiddenConversations.any((c) => c.id == '!h:s'),
-              'room removed from hiddenConversations',
-              isFalse,
-            ),
+        isA<ConversationState>().having(
+          (s) => s.hiddenConversations.any((c) => c.id == '!h:s'),
+          'room removed from hiddenConversations',
+          isFalse,
+        ),
       ],
       verify: (_) {
         verify(() => mockPrefs.unhideChat('!h:s')).called(1);
@@ -236,10 +258,13 @@ void main() {
       build: buildBloc,
       seed: () => const ConversationState(conversations: [_roomA]),
       setUp: () {
-        when(() => mockPrefs.hideChat(any()))
-            .thenThrow(Exception('storage error'));
+        when(
+          () => mockPrefs.hideChat(any()),
+        ).thenThrow(Exception('storage error'));
       },
-      act: (bloc) => bloc.add(const SetConversationHidden(conversationId: '!a:s', hidden: true)),
+      act: (bloc) => bloc.add(
+        const SetConversationHidden(conversationId: '!a:s', hidden: true),
+      ),
       expect: () => [
         isA<ConversationState>().having(
           (s) => s.error,
@@ -259,15 +284,20 @@ void main() {
       'loads hidden conversations from storage + repository',
       build: buildBloc,
       setUp: () {
-        when(() => mockPrefs.getHiddenChatIds())
-            .thenAnswer((_) async => {'!h:s'});
-        when(() => mockRepo.getConversations())
-            .thenAnswer((_) async => [_roomA, _roomHidden]);
+        when(
+          () => mockPrefs.getHiddenChatIds(),
+        ).thenAnswer((_) async => {'!h:s'});
+        when(
+          () => mockRepo.getConversations(),
+        ).thenAnswer((_) async => [_roomA, _roomHidden]);
       },
       act: (bloc) => bloc.add(const LoadHiddenConversations()),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.isLoadingHidden, 'isLoadingHidden', isTrue),
+        isA<ConversationState>().having(
+          (s) => s.isLoadingHidden,
+          'isLoadingHidden',
+          isTrue,
+        ),
         isA<ConversationState>()
             .having((s) => s.isLoadingHidden, 'isLoadingHidden', isFalse)
             .having(
@@ -282,18 +312,44 @@ void main() {
       'emits error when repository throws',
       build: buildBloc,
       setUp: () {
-        when(() => mockPrefs.getHiddenChatIds())
-            .thenAnswer((_) async => {'!h:s'});
-        when(() => mockRepo.getConversations())
-            .thenThrow(Exception('network error'));
+        when(
+          () => mockPrefs.getHiddenChatIds(),
+        ).thenAnswer((_) async => {'!h:s'});
+        when(
+          () => mockRepo.getConversations(),
+        ).thenThrow(Exception('network error'));
       },
       act: (bloc) => bloc.add(const LoadHiddenConversations()),
       expect: () => [
-        isA<ConversationState>()
-            .having((s) => s.isLoadingHidden, 'isLoadingHidden', isTrue),
+        isA<ConversationState>().having(
+          (s) => s.isLoadingHidden,
+          'isLoadingHidden',
+          isTrue,
+        ),
         isA<ConversationState>()
             .having((s) => s.isLoadingHidden, 'isLoadingHidden', isFalse)
             .having((s) => s.error, 'error', contains('Failed to load hidden')),
+      ],
+    );
+  });
+
+  // ─────────────────────────────────────────────────
+  // ClearNewConversationNavigation
+  // ─────────────────────────────────────────────────
+
+  group('ClearNewConversationNavigation', () {
+    blocTest<ConversationBloc, ConversationState>(
+      'clears one-shot navigation flag without mutating conversations',
+      build: buildBloc,
+      seed: () => const ConversationState(
+        conversations: [_roomA],
+        newConversationId: '!a:s',
+      ),
+      act: (bloc) => bloc.add(const ClearNewConversationNavigation()),
+      expect: () => [
+        isA<ConversationState>()
+            .having((s) => s.newConversationId, 'newConversationId', isNull)
+            .having((s) => s.conversations.length, 'conversation count', 1),
       ],
     );
   });

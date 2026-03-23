@@ -1347,9 +1347,6 @@ class SEn extends S {
       'Please enter a valid server address';
 
   @override
-  String get authEmailOtp => 'Email OTP';
-
-  @override
   String get authEnterServerAddressFirst => 'Please enter server address first';
 
   @override
@@ -3359,6 +3356,18 @@ class SEn extends S {
   String get groupAvatarUpdated => 'Group avatar updated';
 
   @override
+  String get groupVisibilityUpdated => 'Group visibility updated';
+
+  @override
+  String get groupChannelCreated => 'Channel created';
+
+  @override
+  String get groupChannelUpdated => 'Channel updated';
+
+  @override
+  String get groupChannelDeleted => 'Channel deleted';
+
+  @override
   String get callDecline => 'Decline';
 
   @override
@@ -4711,20 +4720,20 @@ class SEn extends S {
 
   @override
   String get authPasskeyRegisterHint =>
-      'Register a passkey for passwordless login';
+      'Register a passkey for this account. Standalone passkey sign-in will be enabled later.';
 
   @override
   String get authPasskeyNameYours => 'Name your Passkey';
 
   @override
-  String get authPasskeyRegistered => 'Passkey registered successfully';
+  String get authPasskeyRegistered => 'Passkey saved to this account';
 
   @override
-  String get authPasskeyDeleted => 'Passkey deleted';
+  String get authPasskeyDeleted => 'Passkey removed from this account';
 
   @override
   String authPasskeyDeleteConfirm(String name) {
-    return 'Delete passkey \"$name\"? You will no longer be able to use it to log in.';
+    return 'Delete passkey \"$name\"? You will need to register it again before using passkey sign-in later.';
   }
 
   @override
@@ -5737,16 +5746,4 @@ class SEn extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'Session data incomplete, please login again';
-
-  @override
-  String get blocAuthPasskeyNotImplemented =>
-      'Passkey login is not yet available';
-
-  @override
-  String get blocAuthPasskeyRegisterNotImplemented =>
-      'Passkey registration is not yet available';
-
-  @override
-  String get blocAuthEmailOtpNotImplemented =>
-      'Email OTP login is not yet available';
 }

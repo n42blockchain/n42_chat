@@ -150,3 +150,7 @@ class LoadHiddenConversations extends ConversationEvent {
   const LoadHiddenConversations();
 }
 
+/// 清除新建会话导航信号
+class ClearNewConversationNavigation extends ConversationEvent {
+  const ClearNewConversationNavigation();
+}

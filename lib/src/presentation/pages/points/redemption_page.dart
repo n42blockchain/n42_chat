@@ -39,6 +39,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
     final bloc = context.read<PointsBloc>();
     bloc.add(PointsLoadRedemptionItems(roomId: widget.roomId));
     bloc.add(PointsLoadBalance(userId: widget.userId, roomId: widget.roomId));
+    bloc.add(PointsLoadConfig(roomId: widget.roomId));
   }
 
   @override
@@ -54,26 +55,50 @@ class _RedemptionPageState extends State<RedemptionPage> {
         elevation: 0.5,
       ),
       body: BlocConsumer<PointsBloc, PointsState>(
+        listenWhen: (previous, current) =>
+            previous.redemptionStatus != current.redemptionStatus,
         listener: (context, state) {
-          if (state.status == PointsStatus.redeemed) {
+          if (state.redemptionStatus == PointsRedemptionStatus.succeeded) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Item redeemed successfully!'),
                 backgroundColor: AppColors.success,
               ),
             );
-          } else if (state.status == PointsStatus.error) {
+            context
+                .read<PointsBloc>()
+                .add(const PointsClearRedemptionFeedback());
+          } else if (state.redemptionStatus == PointsRedemptionStatus.failed) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? 'Redemption failed'),
+                content: Text(
+                  state.redemptionErrorMessage ?? 'Redemption failed',
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
+            context
+                .read<PointsBloc>()
+                .add(const PointsClearRedemptionFeedback());
           }
         },
         builder: (context, state) {
-          if (state.isLoading && state.redemptionItems.isEmpty) {
+          final config = state.config;
+          if (config != null && !config.isEnabled) {
+            return _buildUnavailableState(
+              isDark,
+              message: 'Points are disabled in this room.',
+            );
+          }
+
+          if (state.redemptionItemsStatus == PointsLoadStatus.loading &&
+              state.redemptionItems.isEmpty) {
             return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.redemptionItemsStatus == PointsLoadStatus.error &&
+              state.redemptionItems.isEmpty) {
+            return _buildErrorState(state.redemptionItemsErrorMessage, isDark);
           }
 
           return RefreshIndicator(
@@ -108,7 +133,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
                             item: item,
                             canAfford: canAfford,
                             isRedeeming:
-                                state.status == PointsStatus.redeeming,
+                                state.redemptionStatus ==
+                                        PointsRedemptionStatus.inProgress &&
+                                    state.redeemingItemId == item.id,
+                            isBusy: state.redemptionStatus ==
+                                PointsRedemptionStatus.inProgress,
                             isDark: isDark,
                             onRedeem: () =>
                                 _showRedeemConfirmation(context, item, canAfford),
@@ -202,6 +231,75 @@ class _RedemptionPageState extends State<RedemptionPage> {
     );
   }
 
+  Widget _buildErrorState(String? errorMessage, bool isDark) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const SizedBox(height: 16),
+            Text(
+              'Failed to load rewards',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              ),
+            ),
+            if (errorMessage != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                errorMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+            const SizedBox(height: 24),
+            OutlinedButton(
+              onPressed: _loadItems,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUnavailableState(bool isDark, {required String message}) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.block_outlined, size: 48, color: AppColors.warning),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showRedeemConfirmation(
     BuildContext context,
     RedemptionItem item,
@@ -276,6 +374,7 @@ class _RedemptionCard extends StatelessWidget {
   final RedemptionItem item;
   final bool canAfford;
   final bool isRedeeming;
+  final bool isBusy;
   final bool isDark;
   final VoidCallback onRedeem;
 
@@ -283,13 +382,14 @@ class _RedemptionCard extends StatelessWidget {
     required this.item,
     required this.canAfford,
     required this.isRedeeming,
+    required this.isBusy,
     required this.isDark,
     required this.onRedeem,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = !item.canRedeem || !canAfford || isRedeeming;
+    final isDisabled = !item.canRedeem || !canAfford || isBusy;
 
     return Container(
       decoration: BoxDecoration(

@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../domain/entities/group_album_entity.dart';
 import '../../../domain/entities/group_file_entity.dart';
+import '../../../domain/entities/live_location_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'matrix_client_manager.dart';
 import 'message/matrix_event_mapper.dart';
@@ -42,6 +45,7 @@ class MatrixMessageDataSource {
 
   /// 获取Matrix客户端
   matrix.Client? get _client => _clientManager.client;
+  String? get currentUserId => _client?.userID;
 
   // ============================================
   // 消息获取
@@ -79,10 +83,7 @@ class MatrixMessageDataSource {
   }
 
   /// 加载更多历史消息
-  Future<bool> loadMoreMessages(
-    String roomId, {
-    int count = 50,
-  }) async {
+  Future<bool> loadMoreMessages(String roomId, {int count = 50}) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return false;
 
@@ -104,6 +105,91 @@ class MatrixMessageDataSource {
     return await room.getEventById(eventId);
   }
 
+  List<LiveLocationEntity> getActiveLiveLocations(String roomId) {
+    final room = _client?.getRoomById(roomId);
+    if (room == null) return const [];
+
+    final shareStates = room.states['n42.live_location'];
+    if (shareStates == null || shareStates.isEmpty) {
+      return const [];
+    }
+
+    final updateStates = room.states['n42.live_location.update'] ?? const {};
+    final memberStates = room.states[matrix.EventTypes.RoomMember] ?? const {};
+    final now = DateTime.now();
+    final locations = <LiveLocationEntity>[];
+
+    for (final entry in shareStates.entries) {
+      final userId = entry.key;
+      final sharingEvent = entry.value;
+      final sharingContent = sharingEvent.content;
+      if (sharingContent['sharing'] != true) {
+        continue;
+      }
+
+      final expiresAt =
+          DateTime.tryParse(sharingContent['expires_at'] as String? ?? '') ??
+          DateTime.tryParse(sharingContent['started_at'] as String? ?? '') ??
+          now;
+      if (!expiresAt.isAfter(now)) {
+        continue;
+      }
+
+      final updateEvent = updateStates[userId];
+      final updateContent = updateEvent?.content;
+      final latitude = _toDouble(updateContent?['latitude']);
+      final longitude = _toDouble(updateContent?['longitude']);
+      if (latitude == null || longitude == null) {
+        continue;
+      }
+
+      final updatedAt =
+          DateTime.tryParse(updateContent?['updated_at'] as String? ?? '') ??
+          DateTime.tryParse(sharingContent['started_at'] as String? ?? '') ??
+          now;
+      final durationMinutes =
+          _toInt(sharingContent['duration_minutes']) ??
+          expiresAt.difference(updatedAt).inMinutes.clamp(1, 1440).toInt();
+
+      final memberEvent = memberStates[userId];
+      final memberContent = memberEvent?.content ?? const <String, dynamic>{};
+      final avatarUrl = memberContent['avatar_url'] as String?;
+      final httpAvatarUrl = avatarUrl != null && avatarUrl.startsWith('mxc://')
+          ? _eventMapper.getMediaUrl(avatarUrl)?.toString()
+          : avatarUrl;
+
+      locations.add(
+        LiveLocationEntity(
+          userId: userId,
+          displayName: memberContent['displayname'] as String? ?? userId,
+          avatarUrl: httpAvatarUrl,
+          latitude: latitude,
+          longitude: longitude,
+          accuracy: _toDouble(updateContent?['accuracy']),
+          updatedAt: updatedAt,
+          expiresAt: expiresAt,
+          durationMinutes: durationMinutes,
+        ),
+      );
+    }
+
+    locations.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return locations;
+  }
+
+  Stream<List<LiveLocationEntity>> watchLiveLocations(String roomId) async* {
+    yield getActiveLiveLocations(roomId);
+
+    final syncStream = _client?.onSync.stream;
+    if (syncStream == null) {
+      return;
+    }
+
+    await for (final _ in syncStream) {
+      yield getActiveLiveLocations(roomId);
+    }
+  }
+
   // ============================================
   // 消息发送
   // ============================================
@@ -116,7 +202,8 @@ class MatrixMessageDataSource {
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
   }) => _sender.sendTextMessage(
-    roomId, text,
+    roomId,
+    text,
     selfDestructAfter: selfDestructAfter,
     mentionedUserIds: mentionedUserIds,
     mentionsRoom: mentionsRoom,
@@ -174,16 +261,22 @@ class MatrixMessageDataSource {
   /// 发送文件消息
   Future<String?> sendFileMessage(
     String roomId, {
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
   }) => _sender.sendFileMessage(
     roomId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
     selfDestructAfter: selfDestructAfter,
+    filePath: filePath,
+    fileStream: fileStream,
+    fileSize: fileSize,
   );
 
   /// 发送位置消息
@@ -254,6 +347,13 @@ class MatrixMessageDataSource {
     content: content,
   );
 
+  /// 发送自定义房间事件（不直接展示为聊天消息）
+  Future<String> sendRoomEvent({
+    required String roomId,
+    required String type,
+    required Map<String, dynamic> content,
+  }) => _sender.sendRoomEvent(roomId: roomId, type: type, content: content);
+
   /// 重发消息
   Future<bool> resendMessage(String roomId, String eventId) =>
       _sender.resendMessage(roomId, eventId);
@@ -295,8 +395,18 @@ class MatrixMessageDataSource {
   Future<String?> replyToMessage(
     String roomId,
     String replyToEventId,
-    String text,
-  ) => _operations.replyToMessage(roomId, replyToEventId, text);
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  }) => _operations.replyToMessage(
+    roomId,
+    replyToEventId,
+    text,
+    selfDestructAfter: selfDestructAfter,
+    mentionedUserIds: mentionedUserIds,
+    mentionsRoom: mentionsRoom,
+  );
 
   /// 编辑消息
   Future<String?> editMessage(
@@ -306,11 +416,8 @@ class MatrixMessageDataSource {
   ) => _operations.editMessage(roomId, originalEventId, newText);
 
   /// 添加消息表情回应
-  Future<bool> addReaction(
-    String roomId,
-    String eventId,
-    String emoji,
-  ) => _operations.addReaction(roomId, eventId, emoji);
+  Future<bool> addReaction(String roomId, String eventId, String emoji) =>
+      _operations.addReaction(roomId, eventId, emoji);
 
   // ============================================
   // 消息已读状态
@@ -346,11 +453,13 @@ class MatrixMessageDataSource {
     required String question,
     required List<String> options,
     int maxSelections = 1,
+    bool isAnonymous = false,
   }) => _pollHandler.sendPollMessage(
     roomId,
     question: question,
     options: options,
     maxSelections: maxSelections,
+    isAnonymous: isAnonymous,
   );
 
   /// 发送转发的投票快照
@@ -388,12 +497,16 @@ class MatrixMessageDataSource {
       _pollHandler.endPoll(roomId, pollEventId);
 
   /// 获取消息的反应聚合结果
-  Future<Map<String, dynamic>?> getReactionAggregations(String roomId, String eventId) =>
-      _pollHandler.getReactionAggregations(roomId, eventId);
+  Future<Map<String, dynamic>?> getReactionAggregations(
+    String roomId,
+    String eventId,
+  ) => _pollHandler.getReactionAggregations(roomId, eventId);
 
   /// 获取投票的聚合结果
-  Future<Map<String, dynamic>?> getPollAggregations(String roomId, String pollEventId) =>
-      _pollHandler.getPollAggregations(roomId, pollEventId);
+  Future<Map<String, dynamic>?> getPollAggregations(
+    String roomId,
+    String pollEventId,
+  ) => _pollHandler.getPollAggregations(roomId, pollEventId);
 
   // ============================================
   // 消息监听
@@ -408,34 +521,36 @@ class MatrixMessageDataSource {
 
   /// 监听投票响应事件
   Stream<Map<String, dynamic>>? watchPollResponses(String roomId) {
-    return _client?.onTimelineEvent.stream.where((event) {
-      return event.room.id == roomId &&
-          (event.type == 'org.matrix.msc3381.poll.response' ||
-           event.type == 'org.matrix.msc3381.poll.end');
-    }).map((event) {
-      final type = event.type;
-      final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
-      final pollEventId = relatesTo?['event_id'] as String?;
+    return _client?.onTimelineEvent.stream
+        .where((event) {
+          return event.room.id == roomId &&
+              (event.type == 'org.matrix.msc3381.poll.response' ||
+                  event.type == 'org.matrix.msc3381.poll.end');
+        })
+        .map((event) {
+          final type = event.type;
+          final relatesTo =
+              event.content['m.relates_to'] as Map<String, dynamic>?;
+          final pollEventId = relatesTo?['event_id'] as String?;
 
-      if (type == 'org.matrix.msc3381.poll.response') {
-        final pollResponse = event.content['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
-        final answers = pollResponse?['answers'] as List<dynamic>?;
-        final senderId = event.senderId;
+          if (type == 'org.matrix.msc3381.poll.response') {
+            final pollResponse =
+                event.content['org.matrix.msc3381.poll.response']
+                    as Map<String, dynamic>?;
+            final answers = pollResponse?['answers'] as List<dynamic>?;
+            final senderId = event.senderId;
 
-        return {
-          'type': 'vote',
-          'pollEventId': pollEventId,
-          'answers': answers ?? [],
-          'senderId': senderId,
-          'isCurrentUser': senderId == _client?.userID,
-        };
-      } else {
-        return {
-          'type': 'end',
-          'pollEventId': pollEventId,
-        };
-      }
-    });
+            return {
+              'type': 'vote',
+              'pollEventId': pollEventId,
+              'answers': answers ?? [],
+              'senderId': senderId,
+              'isCurrentUser': senderId == _client?.userID,
+            };
+          } else {
+            return {'type': 'end', 'pollEventId': pollEventId};
+          }
+        });
   }
 
   /// 监听消息发送状态
@@ -490,6 +605,23 @@ class MatrixMessageDataSource {
   Future<void> stopLiveLocation(String roomId) =>
       _operations.stopLiveLocation(roomId);
 
+  double? _toDouble(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    }
+    return double.tryParse(value?.toString() ?? '');
+  }
+
+  int? _toInt(dynamic value) {
+    if (value is int) {
+      return value;
+    }
+    if (value is num) {
+      return value.toInt();
+    }
+    return int.tryParse(value?.toString() ?? '');
+  }
+
   // ============================================
   // 群相册媒体获取
   // ============================================
@@ -526,7 +658,8 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
   }) => _threadHandler.sendThreadImageMessage(
-    roomId, threadRootEventId,
+    roomId,
+    threadRootEventId,
     imageBytes: imageBytes,
     filename: filename,
     mimeType: mimeType,
@@ -540,7 +673,8 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
   }) => _threadHandler.sendThreadFileMessage(
-    roomId, threadRootEventId,
+    roomId,
+    threadRootEventId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
@@ -553,7 +687,8 @@ class MatrixMessageDataSource {
     int limit = 50,
     String? fromToken,
   }) => _threadHandler.getThreadMessages(
-    roomId, threadRootEventId,
+    roomId,
+    threadRootEventId,
     limit: limit,
     fromToken: fromToken,
   );

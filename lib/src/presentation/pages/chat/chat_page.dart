@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -10,7 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -19,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/in_app_notification_service.dart';
+import '../../../core/services/screenshot_protection_service.dart';
 import '../../../core/services/self_destruct_service.dart';
 import '../../../core/utils/face_blur_util.dart';
 import '../../../core/theme/chat_background_presets.dart';
@@ -30,6 +32,8 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/download_service.dart';
 import '../../../core/services/red_packet_service.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
+import '../../../core/utils/payment_request_status_utils.dart';
 import '../../../domain/entities/red_packet_entity.dart';
 import '../media/media_editor_page.dart';
 import '../../../core/services/remark_service.dart';
@@ -37,9 +41,13 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/mini_app_entity.dart';
+import '../../../domain/entities/transfer_entity.dart';
 import '../../../domain/repositories/auth_repository.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
+import '../../../domain/repositories/transfer_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/chat_state.dart';
@@ -48,6 +56,7 @@ import '../../blocs/message_action/message_action_event.dart' as action_event;
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/search/search_bloc.dart';
+import '../../blocs/transfer/transfer_bloc.dart';
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/gif_picker.dart';
 import '../../widgets/chat/sticker_picker.dart';
@@ -59,24 +68,31 @@ import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../contact/contact_detail_page.dart';
 import '../search/chat_search_bar.dart';
+import '../search/chat_search_page.dart';
 import 'chat_detail_page.dart';
 import '../favorite/favorite_list_page.dart';
 import 'message_item.dart';
 import 'live_location_page.dart';
 import 'thread_detail_page.dart';
 import '../../widgets/chat/quick_reply_sheet.dart';
+import '../../widgets/chat/scheduled_send_picker.dart';
 import '../settings/quick_replies_page.dart';
 import '../ai/ai_assistant_page.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/services/translation_service.dart';
+import '../../helpers/ai_reply_suggestion_helper.dart';
+import '../../helpers/chat_mention_helper.dart';
+import '../../helpers/mini_app_launcher_helper.dart';
 import '../../widgets/chat/ai_summary_bubble.dart';
 import '../../../domain/repositories/ai_repository.dart';
 import '../../widgets/chat/ai_rewrite_bar.dart';
+import '../../widgets/chat/ai_smart_reply_bar.dart';
 import '../../widgets/chat/translated_message.dart';
+import 'viewers/image_viewer_page.dart';
 import 'viewers/pdf_viewer_page.dart';
-import 'image_viewer_page.dart';
+import 'viewers/text_document_preview_page.dart';
 import 'location_picker_page.dart';
-import 'video_player_page.dart';
+import 'viewers/video_player_page.dart';
 import '../../widgets/chat/chat_confirm_sheets.dart';
 import '../../widgets/chat/contact_card_select_sheet.dart';
 import '../../widgets/chat/contact_select_dialog.dart';
@@ -93,6 +109,8 @@ import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../group/group_topics_page.dart';
 import '../group/bot_settings_page.dart';
+import '../transfer/receive_page.dart';
+import '../transfer/transfer_page.dart';
 import '../../../core/utils/debug_log.dart';
 
 part 'chat_page_app_bar.dart';
@@ -110,6 +128,9 @@ class ChatPage extends StatefulWidget {
   /// 会话实体
   final ConversationEntity conversation;
 
+  /// 进入会话后需要定位的目标消息 ID
+  final String? initialTargetMessageId;
+
   /// 返回回调
   final VoidCallback? onBack;
 
@@ -119,6 +140,7 @@ class ChatPage extends StatefulWidget {
   const ChatPage({
     super.key,
     required this.conversation,
+    this.initialTargetMessageId,
     this.onBack,
     this.onMorePressed,
   });
@@ -148,7 +170,8 @@ class _ChatPageState extends State<ChatPage> {
   final Map<String, GlobalKey> _messageKeys = {};
 
   // ChatInputBar 的 GlobalKey，用于调用取消录音方法
-  final GlobalKey<ChatInputBarState> _inputBarKey = GlobalKey<ChatInputBarState>();
+  final GlobalKey<ChatInputBarState> _inputBarKey =
+      GlobalKey<ChatInputBarState>();
 
   // 撤回的消息ID，用于显示"重新编辑"
   final Set<String> _recalledMessageIds = {};
@@ -168,6 +191,9 @@ class _ChatPageState extends State<ChatPage> {
   bool _showMentionPicker = false;
   int _mentionTriggerPosition = -1; // @ 符号的位置
   String _mentionSearchQuery = ''; // @ 后面输入的搜索关键词
+  List<ChatMentionSelection> _composerMentions = const [];
+  Future<List<ChatMentionMember>>? _groupMembersFuture;
+  List<ChatMentionMember> _groupMembers = const [];
 
   // View Once 模式（阅后即焚媒体）
   bool _isViewOnce = false;
@@ -197,12 +223,20 @@ class _ChatPageState extends State<ChatPage> {
   // AI 群聊消息摘要状态
   String? _aiSummaryResult;
   bool _isAiSummarizing = false;
+  List<String> _smartReplySuggestions = const [];
+  bool _isLoadingSmartReplySuggestions = false;
+  String? _smartReplyAnchorMessageId;
+  String? _dismissedSmartReplyAnchorMessageId;
 
   // 聊天背景 key（如 solid_0, gradient_1, default 等）
   String? _backgroundKey;
 
   // 消息字体大小
   double _messageFontSize = 16.0;
+  bool _showLinkPreviews = true;
+  bool _sessionPrivacyShieldEnabled = false;
+  int _privacyPreferencesLoadVersion = 0;
+  String? _pendingInitialTargetMessageId;
 
   @override
   void initState() {
@@ -216,6 +250,11 @@ class _ChatPageState extends State<ChatPage> {
 
     // 初始化聊天室
     context.read<ChatBloc>().add(InitializeChat(widget.conversation.id));
+    _pendingInitialTargetMessageId = widget.initialTargetMessageId;
+
+    if (widget.conversation.isGroup) {
+      _groupMembersFuture = _loadGroupMembers();
+    }
 
     // 获取当前用户ID
     _loadCurrentUserId();
@@ -233,7 +272,9 @@ class _ChatPageState extends State<ChatPage> {
     _inputFocusNode.addListener(_onInputFocusChanged);
 
     // 监听备注更新
-    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((
+      event,
+    ) {
       // 如果是当前会话的联系人备注更新，刷新界面
       final targetUserId = _otherUserId ?? widget.conversation.id;
       if (event.userId == targetUserId && mounted) {
@@ -251,8 +292,16 @@ class _ChatPageState extends State<ChatPage> {
     // 加载草稿
     _loadDraft();
 
+    // 加载隐私相关配置（链接预览、私密聊天截图防护）
+    unawaited(_loadPrivacyPreferences());
+
+    // 如果是从搜索/通知进入，初始化后尝试跳转到目标消息
+    unawaited(_jumpToInitialTargetMessage());
+
     // 设置当前聊天房间（应用内通知过滤）
-    InAppNotificationService.instance.setCurrentChatRoom(widget.conversation.id);
+    InAppNotificationService.instance.setCurrentChatRoom(
+      widget.conversation.id,
+    );
 
     // 设置通话错误回调
     N42Chat.callManager?.onError = _handleCallError;
@@ -267,7 +316,9 @@ class _ChatPageState extends State<ChatPage> {
 
     switch (errorCode) {
       case 'call_not_initialized':
-        message = l10n?.chatCallServiceNotInitialized ?? 'Call service not initialized';
+        message =
+            l10n?.chatCallServiceNotInitialized ??
+            'Call service not initialized';
         break;
       case 'already_in_call':
         message = l10n?.chatAlreadyInCall ?? 'Already in a call';
@@ -280,6 +331,21 @@ class _ChatPageState extends State<ChatPage> {
         break;
       case 'connection_failed':
         message = l10n?.commonConnectionFailed ?? 'Connection failed';
+        break;
+      case 'meeting_not_initialized':
+        message =
+            l10n?.chatCallServiceNotInitialized ??
+            'Call service not initialized';
+        break;
+      case 'livekit_not_configured':
+        message =
+            l10n?.callLivekitNotConfigured ??
+            'Group call service not configured';
+        break;
+      case 'livekit_token_fetch_failed':
+        message =
+            l10n?.callJoinMeetingFailed('token') ??
+            'Failed to prepare group call';
         break;
       case 'call_rejected':
         message = l10n?.chatCallRejected ?? 'Call rejected';
@@ -302,7 +368,9 @@ class _ChatPageState extends State<ChatPage> {
 
     // 直接使用 conversation.directUserId
     _otherUserId = widget.conversation.directUserId;
-    debugLog('ChatPage: directUserId=$_otherUserId for room ${widget.conversation.id}');
+    debugLog(
+      'ChatPage: directUserId=$_otherUserId for room ${widget.conversation.id}',
+    );
   }
 
   void _onInputFocusChanged() {
@@ -373,6 +441,41 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  Future<void> _loadPrivacyPreferences() async {
+    final loadVersion = ++_privacyPreferencesLoadVersion;
+    try {
+      final storage = getIt<PreferencesDataSource>();
+      final privacySettings = await storage.getPrivacySettingsModel();
+      if (!mounted || loadVersion != _privacyPreferencesLoadVersion) {
+        return;
+      }
+      if (_showLinkPreviews != privacySettings.showLinkPreviews) {
+        setState(() => _showLinkPreviews = privacySettings.showLinkPreviews);
+      }
+
+      final shouldProtect =
+          privacySettings.privateChatMode &&
+          (widget.conversation.type == ConversationType.direct ||
+              widget.conversation.isEncrypted);
+      if (!shouldProtect) {
+        return;
+      }
+
+      await ScreenshotProtectionService.instance.initialize();
+      if (!mounted || loadVersion != _privacyPreferencesLoadVersion) {
+        return;
+      }
+      await ScreenshotProtectionService.instance.enableForSession();
+      if (!mounted || loadVersion != _privacyPreferencesLoadVersion) {
+        await ScreenshotProtectionService.instance.restoreDefault();
+        return;
+      }
+      _sessionPrivacyShieldEnabled = true;
+    } catch (e) {
+      debugLog('ChatPage: Failed to apply privacy session protection: $e');
+    }
+  }
+
   /// 保存草稿
   void _saveDraft() {
     final storage = getIt<PreferencesDataSource>();
@@ -400,6 +503,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    _privacyPreferencesLoadVersion++;
+
     // 清除当前活跃房间
     N42Chat.pushService?.setActiveRoom(null);
 
@@ -432,6 +537,9 @@ class _ChatPageState extends State<ChatPage> {
     FaceBlurUtil.dispose();
 
     // 释放资源
+    if (_sessionPrivacyShieldEnabled) {
+      unawaited(ScreenshotProtectionService.instance.restoreDefault());
+    }
     _scrollController.dispose();
     _inputController.dispose();
     _inputFocusNode.dispose();
@@ -466,6 +574,16 @@ class _ChatPageState extends State<ChatPage> {
   void _sendMessage(String text) {
     if (text.trim().isEmpty) return;
 
+    final mentionPayload = ChatMentionHelper.buildPayload(
+      text: text,
+      selections: _composerMentions,
+      members: _groupMembers,
+    );
+
+    if (_smartReplySuggestions.isNotEmpty || _isLoadingSmartReplySuggestions) {
+      _dismissAiSmartReplyBar();
+    }
+
     // 斜杠命令拦截（编辑模式下不拦截）
     final chatBloc = context.read<ChatBloc>();
     final editingMsg = chatBloc.state.editingMessage;
@@ -475,30 +593,40 @@ class _ChatPageState extends State<ChatPage> {
         !text.startsWith('/ ') &&
         text.length > 1) {
       _inputController.clear();
+      _clearComposerMentions();
       _processBotCommand(text);
       return;
     }
 
     if (editingMsg != null) {
       final actionBloc = getIt<MessageActionBloc>();
-      actionBloc.add(action_event.EditMessage(
-        widget.conversation.id,
-        editingMsg.id,
-        text,
-      ));
+      actionBloc.add(
+        action_event.EditMessage(widget.conversation.id, editingMsg.id, text),
+      );
       chatBloc.add(const SetEditTarget(null));
     } else {
-      chatBloc.add(SendTextMessage(
-        text,
-        selfDestructAfter: _selfDestructAfter,
-      ));
+      chatBloc.add(
+        SendTextMessage(
+          text,
+          selfDestructAfter: _selfDestructAfter,
+          mentionedUserIds: mentionPayload.mentionedUserIds,
+          mentionsRoom: mentionPayload.mentionsRoom,
+        ),
+      );
     }
     _inputController.clear();
+    _clearComposerMentions();
   }
 
   /// 处理 Bot 斜杠命令
   Future<void> _processBotCommand(String text) async {
-    final processor = BotCommandProcessor(walletBridge: getIt<IWalletBridge>());
+    final config = N42Chat.config;
+    final processor = BotCommandProcessor(
+      walletBridge: getIt<IWalletBridge>(),
+      priceApiBase: config?.marketBaseUrl ?? 'https://api.coingecko.com/api/v3',
+      authToken: config?.proxyAuthToken,
+      useProxyEndpoint: config?.marketUseProxyEndpoint ?? false,
+    );
     final result = await processor.processRaw(text);
 
     if (!mounted) return;
@@ -537,8 +665,28 @@ class _ChatPageState extends State<ChatPage> {
     // 发送正在输入状态
     context.read<ChatBloc>().add(SendTypingNotification(text.isNotEmpty));
 
+    if (text.trim().isNotEmpty) {
+      if (_smartReplySuggestions.isNotEmpty ||
+          _isLoadingSmartReplySuggestions) {
+        setState(() {
+          _resetAiSmartReplyState();
+        });
+      }
+    } else {
+      _handleSmartReplyStateChanged(context.read<ChatBloc>().state);
+    }
+
     // 检测 @ 提醒（仅群聊）
     if (widget.conversation.isGroup) {
+      final prunedMentions = ChatMentionHelper.pruneSelections(
+        text,
+        _composerMentions,
+      );
+      if (!listEquals(prunedMentions, _composerMentions)) {
+        setState(() {
+          _composerMentions = prunedMentions;
+        });
+      }
       _checkMentionTrigger(text);
     }
   }
@@ -546,44 +694,20 @@ class _ChatPageState extends State<ChatPage> {
   /// 检测 @ 触发
   void _checkMentionTrigger(String text) {
     final cursorPos = _inputController.selection.baseOffset;
-
-    if (cursorPos < 0) {
+    final trigger = ChatMentionHelper.findTrigger(
+      text: text,
+      cursorOffset: cursorPos,
+    );
+    if (trigger == null) {
       _hideMentionPicker();
       return;
     }
 
-    // 获取光标前的文本
-    final textBeforeCursor = cursorPos <= text.length
-        ? text.substring(0, cursorPos)
-        : text;
-
-    // 查找最后一个 @ 符号
-    final lastAtIndex = textBeforeCursor.lastIndexOf('@');
-
-    if (lastAtIndex >= 0) {
-      // 检查 @ 前面是否是空格或行首（确保是新的 @ 提醒）
-      final isValidTrigger = lastAtIndex == 0 ||
-          textBeforeCursor[lastAtIndex - 1] == ' ' ||
-          textBeforeCursor[lastAtIndex - 1] == '\n';
-
-      if (isValidTrigger) {
-        // 获取 @ 后面的搜索关键词（不包含空格）
-        final searchPart = textBeforeCursor.substring(lastAtIndex + 1);
-
-        // 如果 @ 后面没有空格，说明用户还在输入中，显示选择器
-        if (!searchPart.contains(' ')) {
-          setState(() {
-            _showMentionPicker = true;
-            _mentionTriggerPosition = lastAtIndex;
-            _mentionSearchQuery = searchPart;
-          });
-          return;
-        }
-      }
-    }
-
-    // 没有有效的 @ 触发，隐藏选择器
-    _hideMentionPicker();
+    setState(() {
+      _showMentionPicker = true;
+      _mentionTriggerPosition = trigger.triggerPosition;
+      _mentionSearchQuery = trigger.query;
+    });
   }
 
   /// 隐藏 @ 选择器
@@ -597,45 +721,136 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  void _clearComposerMentions() {
+    if (_composerMentions.isEmpty && !_showMentionPicker) {
+      return;
+    }
+    setState(() {
+      _composerMentions = const [];
+      _showMentionPicker = false;
+      _mentionTriggerPosition = -1;
+      _mentionSearchQuery = '';
+    });
+  }
+
   /// 选择要 @ 的成员
-  void _onMentionMemberSelected(String memberName, String memberId) {
+  void _onMentionSuggestionSelected(ChatMentionSuggestion suggestion) {
     if (_mentionTriggerPosition < 0) return;
 
     final text = _inputController.text;
     final cursorPos = _inputController.selection.baseOffset;
-
-    // 替换 @搜索词 为 @成员名
-    final beforeAt = text.substring(0, _mentionTriggerPosition);
-    final afterCursor = cursorPos <= text.length ? text.substring(cursorPos) : '';
-
-    final mention = '@$memberName ';
-    final newText = beforeAt + mention + afterCursor;
-    final newCursorPos = beforeAt.length + mention.length;
-
-    _inputController.text = newText;
-    _inputController.selection = TextSelection.fromPosition(
-      TextPosition(offset: newCursorPos),
+    final insertion = ChatMentionHelper.applySuggestion(
+      text: text,
+      triggerPosition: _mentionTriggerPosition,
+      cursorOffset: cursorPos,
+      suggestion: suggestion,
     );
 
-    _hideMentionPicker();
+    _inputController.text = insertion.text;
+    _inputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: insertion.cursorOffset),
+    );
+
+    setState(() {
+      _composerMentions = ChatMentionHelper.mergeSelection(
+        selections: _composerMentions,
+        selection: insertion.selection,
+      );
+      _showMentionPicker = false;
+      _mentionTriggerPosition = -1;
+      _mentionSearchQuery = '';
+    });
     _inputFocusNode.requestFocus();
   }
 
   void _toggleSearch() {
+    final shouldShowSearchBar = !_showSearchBar;
     setState(() {
-      _showSearchBar = !_showSearchBar;
-      if (!_showSearchBar) {
+      _showSearchBar = shouldShowSearchBar;
+      if (_showSearchBar) {
+        _resetAiSmartReplyState();
+      } else {
         _highlightedMessageId = null;
       }
     });
+    if (!shouldShowSearchBar && _inputController.text.trim().isEmpty) {
+      _handleSmartReplyStateChanged(context.read<ChatBloc>().state);
+    }
   }
 
   void _navigateToMessage(String eventId) {
-    _scrollToMessage(eventId);
+    unawaited(_scrollToMessage(eventId));
+  }
+
+  Future<void> _jumpToInitialTargetMessage() async {
+    final targetMessageId = _pendingInitialTargetMessageId;
+    if (targetMessageId == null || targetMessageId.isEmpty) {
+      return;
+    }
+
+    final chatBloc = context.read<ChatBloc>();
+    if (chatBloc.state.roomId != widget.conversation.id) {
+      await chatBloc.stream.firstWhere(
+        (state) => state.roomId == widget.conversation.id,
+      );
+      if (!mounted) {
+        return;
+      }
+    }
+
+    _pendingInitialTargetMessageId = null;
+    await _scrollToMessage(targetMessageId);
+  }
+
+  Future<bool> _ensureMessageLoaded(String eventId) async {
+    final chatBloc = context.read<ChatBloc>();
+    var currentState = chatBloc.state;
+    if (currentState.messages.any((message) => message.id == eventId)) {
+      return true;
+    }
+
+    var attempts = 0;
+    var lastMessageCount = currentState.messages.length;
+
+    while (mounted && currentState.hasMore && attempts < 8) {
+      attempts++;
+
+      if (!currentState.isLoadingMore) {
+        chatBloc.add(const LoadMoreMessages());
+      }
+
+      currentState = await chatBloc.stream.firstWhere(
+        (state) => !state.isLoadingMore,
+      );
+      if (!mounted) {
+        return false;
+      }
+
+      if (currentState.messages.any((message) => message.id == eventId)) {
+        return true;
+      }
+
+      if (currentState.messages.length <= lastMessageCount) {
+        break;
+      }
+      lastMessageCount = currentState.messages.length;
+    }
+
+    return false;
   }
 
   /// 滚动到指定消息并高亮显示
-  void _scrollToMessage(String eventId) async {
+  Future<void> _scrollToMessage(String eventId) async {
+    final isLoaded = await _ensureMessageLoaded(eventId);
+    if (!mounted || !isLoaded) {
+      return;
+    }
+
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) {
+      return;
+    }
+
     // 先检查消息是否在当前视图中
     final messageKey = _messageKeys[eventId];
     if (messageKey?.currentContext != null) {
@@ -655,11 +870,13 @@ class _ChatPageState extends State<ChatPage> {
 
       if (index != -1) {
         // 使用估算位置滚动
-        unawaited(_scrollController.animateTo(
-          index * 80.0, // 估算每条消息高度
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        ));
+        unawaited(
+          _scrollController.animateTo(
+            index * 80.0, // 估算每条消息高度
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          ),
+        );
         // 滚动后延迟设置高亮
         Future.delayed(const Duration(milliseconds: 350), () {
           if (mounted) {
@@ -697,27 +914,10 @@ class _ChatPageState extends State<ChatPage> {
 
   /// 将 mxc:// URL 转换为 HTTP URL
   String? _convertMxcToHttpUrl(String? mxcUrl) {
-    if (mxcUrl == null || mxcUrl.isEmpty) return null;
-    if (!mxcUrl.startsWith('mxc://')) return mxcUrl;
-
-    try {
-      final client = MatrixClientManager.instance.client;
-      if (client == null) return null;
-
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      if (homeserver.isEmpty) return null;
-
-      final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-
-      if (serverName.isEmpty || mediaId.isEmpty) return null;
-
-      return '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
-    } catch (e) {
-      debugLog('_convertMxcToHttpUrl error: $e');
-      return null;
-    }
+    return mx_utils.MatrixUtils.getMediaDownloadUrl(
+      mxcUrl,
+      client: MatrixClientManager.instance.client,
+    );
   }
 
   String _formatTime(DateTime time) {
@@ -744,7 +944,10 @@ class _ChatPageState extends State<ChatPage> {
       final name = widget.conversation.name;
       // 如果群名为空或为默认值，显示成员数
       if (name.isEmpty || name == 'Empty Chat' || name == 'empty chat') {
-        return S.of(context)?.chatGroupChatCount(widget.conversation.memberCount) ?? 'Group Chat(${widget.conversation.memberCount})';
+        return S
+                .of(context)
+                ?.chatGroupChatCount(widget.conversation.memberCount) ??
+            'Group Chat(${widget.conversation.memberCount})';
       }
       return name;
     }
@@ -752,7 +955,10 @@ class _ChatPageState extends State<ChatPage> {
     // 私聊：直接使用 conversation.directUserId 获取备注名
     final otherUserId = widget.conversation.directUserId;
     if (otherUserId != null) {
-      return RemarkService.instance.getDisplayName(otherUserId, widget.conversation.name);
+      return RemarkService.instance.getDisplayName(
+        otherUserId,
+        widget.conversation.name,
+      );
     }
 
     // 如果名称为空或为默认值，返回简化的用户ID或默认文本
@@ -773,8 +979,14 @@ class _ChatPageState extends State<ChatPage> {
           final shouldOpen = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: Text(S.of(context)?.chatLocationServiceNotEnabled ?? 'Location service is not enabled'),
-              content: Text(S.of(context)?.chatEnableLocationService ?? 'Please enable location service to use this feature'),
+              title: Text(
+                S.of(context)?.chatLocationServiceNotEnabled ??
+                    'Location service is not enabled',
+              ),
+              content: Text(
+                S.of(context)?.chatEnableLocationService ??
+                    'Please enable location service to use this feature',
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
@@ -782,7 +994,9 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
-                  child: Text(S.of(context)?.chatGoToSettings ?? 'Go to Settings'),
+                  child: Text(
+                    S.of(context)?.chatGoToSettings ?? 'Go to Settings',
+                  ),
                 ),
               ],
             ),
@@ -802,7 +1016,10 @@ class _ChatPageState extends State<ChatPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.chatLocationPermissionRequired ?? 'Location permission is required for this feature'),
+                content: Text(
+                  S.of(context)?.chatLocationPermissionRequired ??
+                      'Location permission is required for this feature',
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -815,7 +1032,10 @@ class _ChatPageState extends State<ChatPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.chatLocationPermissionDeniedPermanent ?? 'Location permission has been permanently denied. Please enable it in settings.'),
+              content: Text(
+                S.of(context)?.chatLocationPermissionDeniedPermanent ??
+                    'Location permission has been permanently denied. Please enable it in settings.',
+              ),
               backgroundColor: AppColors.error,
             ),
           );
@@ -831,16 +1051,24 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   /// 加载群成员
-  Future<List<Map<String, String>>> _loadGroupMembers() async {
+  Future<List<ChatMentionMember>> _loadGroupMembers() async {
     try {
       final groupRepository = getIt<IGroupRepository>();
-      final members = await groupRepository.getGroupMembers(widget.conversation.id);
+      final members = await groupRepository.getGroupMembers(
+        widget.conversation.id,
+      );
 
-      return members.map((m) => {
-        'id': m.userId,
-        'name': m.displayName.isNotEmpty ? m.displayName : m.userId,
-        'avatarUrl': m.avatarUrl ?? '',
-      }).toList();
+      final mappedMembers = members
+          .map(
+            (m) => ChatMentionMember(
+              id: m.userId,
+              name: m.displayName.isNotEmpty ? m.displayName : m.userId,
+              avatarUrl: m.avatarUrl ?? '',
+            ),
+          )
+          .toList();
+      _groupMembers = mappedMembers;
+      return mappedMembers;
     } catch (e) {
       debugLog('Error loading group members: $e');
       return [];
@@ -851,7 +1079,7 @@ class _ChatPageState extends State<ChatPage> {
   void _handlePendingCommand(String command) {
     switch (command) {
       case 'poll':
-        _showPollCreateSheet();
+        _createPoll();
         break;
       case 'welcome':
         Navigator.of(context).push(
@@ -863,24 +1091,6 @@ class _ChatPageState extends State<ChatPage> {
       default:
         debugLog('ChatPage: Unknown pending command: $command');
     }
-  }
-
-  /// 展示投票创建底部弹窗
-  void _showPollCreateSheet() {
-    showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => const PollCreateSheet(),
-    ).then((result) {
-      if (result != null && mounted) {
-        context.read<ChatBloc>().add(SendPollMessage(
-          question: result['question'] as String,
-          options: List<String>.from(result['options'] as List),
-          maxSelections: result['maxSelections'] as int? ?? 1,
-        ));
-      }
-    });
   }
 
   Widget _buildScrollToBottomButton() {
@@ -911,7 +1121,9 @@ class _ChatPageState extends State<ChatPage> {
     final Widget content = Stack(
       children: [
         Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: isDark
+              ? AppColors.backgroundDark
+              : AppColors.background,
           appBar: _buildAppBar(isDark),
           body: Column(
             children: [
@@ -956,18 +1168,27 @@ class _ChatPageState extends State<ChatPage> {
               if (!_isMultiSelectMode) _buildEditPreview(),
 
               // @ 提醒成员选择器（群聊时）
-              if (_showMentionPicker && !_isMultiSelectMode) _buildMentionPicker(),
+              if (_showMentionPicker && !_isMultiSelectMode)
+                _buildMentionPicker(),
 
               // AI 改写栏
-              if (_showRewriteBar && !_isMultiSelectMode)
-                _buildAiRewriteBar(),
+              if (_showRewriteBar && !_isMultiSelectMode) _buildAiRewriteBar(),
+
+              if (!_showSearchBar &&
+                  !_isMultiSelectMode &&
+                  !_showRewriteBar &&
+                  (_smartReplySuggestions.isNotEmpty ||
+                      _isLoadingSmartReplySuggestions))
+                _buildAiSmartReplyBar(),
 
               // View Once 提示条
               if (_isViewOnce && !_isMultiSelectMode && !_showSearchBar)
                 _buildViewOnceIndicator(),
 
               // 阅后即焚定时器提示条
-              if (_selfDestructAfter != null && !_isMultiSelectMode && !_showSearchBar)
+              if (_selfDestructAfter != null &&
+                  !_isMultiSelectMode &&
+                  !_showSearchBar)
                 _buildSelfDestructTimerBar(),
 
               // 多选模式下显示操作栏，否则显示输入栏
@@ -980,7 +1201,8 @@ class _ChatPageState extends State<ChatPage> {
               if (_showEmojiPicker && !_isMultiSelectMode) _buildEmojiPicker(),
 
               // 贴纸选择器
-              if (_showStickerPicker && !_isMultiSelectMode) _buildStickerPicker(),
+              if (_showStickerPicker && !_isMultiSelectMode)
+                _buildStickerPicker(),
 
               // 更多功能面板（仅在非多选模式下）
               if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
@@ -1005,6 +1227,12 @@ class _ChatPageState extends State<ChatPage> {
           _handlePendingCommand(command);
         },
       ),
+      BlocListener<ChatBloc, ChatState>(
+        listenWhen: (prev, curr) => prev.messages != curr.messages,
+        listener: (context, state) {
+          _handleSmartReplyStateChanged(state);
+        },
+      ),
     ];
 
     if (hasContactBloc) {
@@ -1022,10 +1250,7 @@ class _ChatPageState extends State<ChatPage> {
       );
     }
 
-    return MultiBlocListener(
-      listeners: listeners,
-      child: content,
-    );
+    return MultiBlocListener(listeners: listeners, child: content);
   }
 }
 

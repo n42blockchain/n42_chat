@@ -37,7 +37,9 @@ class MatrixMetadataExtractor {
     // 音频信息
     if (event.messageType == matrix.MessageTypes.Audio) {
       final httpUrl = _convertMxcToHttp(mxcUrl);
-      debugLog('Audio message metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, senderId=${event.senderId}, status=${event.status}');
+      debugLog(
+        'Audio message metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, senderId=${event.senderId}, status=${event.status}',
+      );
       return MessageMetadata(
         mediaUrl: mxcUrl,
         httpUrl: httpUrl,
@@ -50,8 +52,14 @@ class MatrixMetadataExtractor {
     // 视频信息
     if (event.messageType == matrix.MessageTypes.Video) {
       final httpUrl = _convertMxcToHttp(mxcUrl);
-      final thumbnailHttpUrl = _convertMxcToHttp(thumbnailMxc, width: 400, height: 400);
-      debugLog('Video metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, thumbnailMxc=$thumbnailMxc, thumbnailHttpUrl=$thumbnailHttpUrl');
+      final thumbnailHttpUrl = _convertMxcToHttp(
+        thumbnailMxc,
+        width: 400,
+        height: 400,
+      );
+      debugLog(
+        'Video metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, thumbnailMxc=$thumbnailMxc, thumbnailHttpUrl=$thumbnailHttpUrl',
+      );
       return MessageMetadata(
         mediaUrl: mxcUrl,
         httpUrl: httpUrl,
@@ -112,6 +120,7 @@ class MatrixMetadataExtractor {
         amount: event.content['amount'] as String?,
         token: event.content['token'] as String?,
         transferStatus: event.content['status'] as String?,
+        redPacketId: event.content['red_packet_id'] as String?,
       );
     }
 
@@ -121,6 +130,21 @@ class MatrixMetadataExtractor {
         amount: event.content['amount'] as String?,
         token: event.content['token'] as String?,
         transferStatus: event.content['status'] as String?,
+        txHash: event.content['tx_hash'] as String?,
+      );
+    }
+
+    // 收款请求信息
+    if (event.content['msgtype'] == 'n42.payment_request') {
+      final expiresAtMillis = event.content['expires_at'] as num?;
+      return MessageMetadata(
+        amount: event.content['amount'] as String?,
+        token: event.content['token'] as String?,
+        paymentRequestId: event.content['request_id'] as String?,
+        paymentReceiverAddress: event.content['receiver_address'] as String?,
+        paymentRequestExpiresAt: expiresAtMillis != null
+            ? DateTime.fromMillisecondsSinceEpoch(expiresAtMillis.toInt())
+            : null,
       );
     }
 
@@ -139,7 +163,9 @@ class MatrixMetadataExtractor {
       final duration = event.content['duration'] as int? ?? 0;
       final isMissed = event.content['missed'] as bool? ?? false;
 
-      debugLog('_extractMetadataWithHttpUrl: n42.call.record - duration=$duration, missed=$isMissed');
+      debugLog(
+        '_extractMetadataWithHttpUrl: n42.call.record - duration=$duration, missed=$isMissed',
+      );
 
       return MessageMetadata(
         callDuration: duration,
@@ -158,12 +184,15 @@ class MatrixMetadataExtractor {
       // 判断是否是未接来电
       // 常见的未接来电原因：invite_timeout, user_busy, no_answer
       // 如果有通话时长，则不是未接来电
-      final isMissed = duration == 0 && (
-                       reason == 'invite_timeout' ||
-                       reason == 'no_answer' ||
-                       reason == 'user_hangup' && event.senderId != _client?.userID);
+      final isMissed =
+          duration == 0 &&
+          (reason == 'invite_timeout' ||
+              reason == 'no_answer' ||
+              reason == 'user_hangup' && event.senderId != _client?.userID);
 
-      debugLog('_extractMetadataWithHttpUrl: m.call.hangup - reason=$reason, duration=$duration, isMissed=$isMissed');
+      debugLog(
+        '_extractMetadataWithHttpUrl: m.call.hangup - reason=$reason, duration=$duration, isMissed=$isMissed',
+      );
 
       return MessageMetadata(
         callDuration: duration,
@@ -179,7 +208,9 @@ class MatrixMetadataExtractor {
     // 这对于 mautrix-wechat 等 bridge 发送的消息很重要
     if (mxcUrl != null && mxcUrl.isNotEmpty) {
       final mimeType = info?['mimetype'] as String? ?? '';
-      debugLog('_extractMetadataWithHttpUrl fallback: mxcUrl=$mxcUrl, mimeType=$mimeType');
+      debugLog(
+        '_extractMetadataWithHttpUrl fallback: mxcUrl=$mxcUrl, mimeType=$mimeType',
+      );
 
       // 根据 MIME 类型返回适当的元数据
       if (mimeType.startsWith('image/')) {
@@ -191,7 +222,11 @@ class MatrixMetadataExtractor {
           height: info?['h'] as int?,
           size: info?['size'] as int?,
           mimeType: mimeType,
-          thumbnailUrl: _convertMxcToHttp(thumbnailMxc, width: 400, height: 400),
+          thumbnailUrl: _convertMxcToHttp(
+            thumbnailMxc,
+            width: 400,
+            height: 400,
+          ),
         );
       }
 
@@ -205,7 +240,11 @@ class MatrixMetadataExtractor {
           duration: info?['duration'] as int?,
           size: info?['size'] as int?,
           mimeType: mimeType,
-          thumbnailUrl: _convertMxcToHttp(thumbnailMxc, width: 400, height: 400),
+          thumbnailUrl: _convertMxcToHttp(
+            thumbnailMxc,
+            width: 400,
+            height: 400,
+          ),
         );
       }
 
@@ -221,7 +260,9 @@ class MatrixMetadataExtractor {
       }
 
       // 如果有 URL 但无法确定类型，作为文件处理
-      debugLog('_extractMetadataWithHttpUrl: has url but unknown type, treating as file');
+      debugLog(
+        '_extractMetadataWithHttpUrl: has url but unknown type, treating as file',
+      );
       return MessageMetadata(
         mediaUrl: mxcUrl,
         httpUrl: _convertMxcToHttp(mxcUrl),
@@ -237,14 +278,17 @@ class MatrixMetadataExtractor {
   /// 提取投票消息元数据
   MessageMetadata? extractPollMetadata(matrix.Event event) {
     try {
-      final pollStart = event.content['org.matrix.msc3381.poll.start'] as Map<String, dynamic>?;
+      final pollStart =
+          event.content['org.matrix.msc3381.poll.start']
+              as Map<String, dynamic>?;
       if (pollStart == null) return null;
 
       // 提取问题
       final questionData = pollStart['question'] as Map<String, dynamic>?;
-      final question = questionData?['org.matrix.msc1767.text'] as String? ??
-                       questionData?['body'] as String? ??
-                       event.body;
+      final question =
+          questionData?['org.matrix.msc1767.text'] as String? ??
+          questionData?['body'] as String? ??
+          event.body;
 
       // 提取选项
       final answers = pollStart['answers'] as List<dynamic>?;
@@ -263,7 +307,9 @@ class MatrixMetadataExtractor {
       }
 
       // 提取投票设置
+      final kind = pollStart['kind'] as String?;
       final maxSelections = pollStart['max_selections'] as int? ?? 1;
+      final isAnonymousPoll = kind == 'org.matrix.msc3381.poll.undisclosed';
 
       // 从聚合事件中获取投票统计
       final voteCounts = <String, int>{};
@@ -285,7 +331,8 @@ class MatrixMetadataExtractor {
           final relations = unsigned['m.relations'] as Map<String, dynamic>?;
           if (relations != null) {
             // 查找 m.reference 关系（投票响应使用 m.reference）
-            final references = relations['m.reference'] as Map<String, dynamic>?;
+            final references =
+                relations['m.reference'] as Map<String, dynamic>?;
             if (references != null) {
               final chunk = references['chunk'] as List<dynamic>?;
               if (chunk != null) {
@@ -297,14 +344,17 @@ class MatrixMetadataExtractor {
                     final itemType = item['type'] as String?;
                     if (itemType == 'org.matrix.msc3381.poll.response') {
                       final senderId = item['sender'] as String?;
-                      final originServerTs = item['origin_server_ts'] as int? ?? 0;
+                      final originServerTs =
+                          item['origin_server_ts'] as int? ?? 0;
 
                       if (senderId != null) {
                         // 只保留每个用户的最新投票
                         final existingVote = userVotes[senderId];
-                        final existingTs = existingVote?['origin_server_ts'] as int? ?? 0;
+                        final existingTs =
+                            existingVote?['origin_server_ts'] as int? ?? 0;
 
-                        if (existingVote == null || originServerTs > existingTs) {
+                        if (existingVote == null ||
+                            originServerTs > existingTs) {
                           userVotes[senderId] = item;
                         }
                       }
@@ -319,17 +369,22 @@ class MatrixMetadataExtractor {
                   final senderId = entry.key;
                   final item = entry.value;
                   final content = item['content'] as Map<String, dynamic>?;
-                  final response = content?['org.matrix.msc3381.poll.response'] as Map<String, dynamic>?;
+                  final response =
+                      content?['org.matrix.msc3381.poll.response']
+                          as Map<String, dynamic>?;
 
                   if (response != null) {
-                    final selectedAnswers = response['answers'] as List<dynamic>?;
+                    final selectedAnswers =
+                        response['answers'] as List<dynamic>?;
 
                     if (selectedAnswers != null && selectedAnswers.isNotEmpty) {
                       voters.add(senderId);
 
                       for (final answerId in selectedAnswers) {
-                        if (answerId is String && voteCounts.containsKey(answerId)) {
-                          voteCounts[answerId] = (voteCounts[answerId] ?? 0) + 1;
+                        if (answerId is String &&
+                            voteCounts.containsKey(answerId)) {
+                          voteCounts[answerId] =
+                              (voteCounts[answerId] ?? 0) + 1;
                         }
                       }
 
@@ -354,10 +409,12 @@ class MatrixMetadataExtractor {
       }
 
       // 检查是否是转发的投票快照
-      final forwardedPoll = event.content['n42.forwarded_poll'] as Map<String, dynamic>?;
+      final forwardedPoll =
+          event.content['n42.forwarded_poll'] as Map<String, dynamic>?;
       if (forwardedPoll != null) {
         // 使用转发投票中的投票结果
-        final forwardedVoteCounts = forwardedPoll['vote_counts'] as Map<String, dynamic>?;
+        final forwardedVoteCounts =
+            forwardedPoll['vote_counts'] as Map<String, dynamic>?;
         final forwardedTotalVoters = forwardedPoll['total_voters'] as int? ?? 0;
         final forwardedEnded = forwardedPoll['ended'] as bool? ?? true;
 
@@ -376,6 +433,7 @@ class MatrixMetadataExtractor {
           pollOptionIds: optionIds,
           maxSelections: maxSelections,
           pollEnded: forwardedEnded, // 转发的投票始终标记为已结束
+          isAnonymousPoll: isAnonymousPoll,
           voteCounts: voteCounts,
           totalVoters: forwardedTotalVoters,
           myVotes: myVotes, // 转发的投票不包含用户的投票记录
@@ -388,6 +446,7 @@ class MatrixMetadataExtractor {
         pollOptionIds: optionIds,
         maxSelections: maxSelections,
         pollEnded: pollEnded,
+        isAnonymousPoll: isAnonymousPoll,
         voteCounts: voteCounts,
         totalVoters: voters.length,
         myVotes: myVotes,

@@ -692,11 +692,16 @@ class LiveKitService extends ChangeNotifier {
 
     // 活跃说话人变化
     _roomListener!.on<ActiveSpeakersChangedEvent>((event) {
-      for (final speaker in event.speakers) {
-        final participant = _participants[speaker.identity];
-        if (participant != null) {
-          _participants[speaker.identity] = participant.copyWith(isSpeaking: true);
-          onActiveSpeakerChanged?.call(_participants[speaker.identity]!);
+      final activeSpeakerIds = <String>{
+        for (final speaker in event.speakers) speaker.identity,
+      };
+      for (final entry in _participants.entries) {
+        final isSpeaking = activeSpeakerIds.contains(entry.key);
+        if (entry.value.isSpeaking != isSpeaking) {
+          _participants[entry.key] = entry.value.copyWith(isSpeaking: isSpeaking);
+          if (isSpeaking) {
+            onActiveSpeakerChanged?.call(_participants[entry.key]!);
+          }
         }
       }
       _notifyParticipantsChanged();

@@ -4,19 +4,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/group_entity.dart';
+import '../../../domain/repositories/group_repository.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
+import '../../blocs/contact/contact_bloc.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'bot_settings_page.dart';
 import 'content_filter_settings_page.dart';
-import 'group_channels_page.dart';
+import 'group_members_page.dart';
 import 'group_media_hub_page.dart';
+import 'group_topics_page.dart';
+import 'invite_members_page.dart';
+import 'token_gate_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../n42_chat.dart';
 
 /// 群设置页面
 class GroupSettingsPage extends StatefulWidget {
@@ -49,18 +56,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         if (state.status == GroupStatus.error && state.errorMessage != null) {
           final s = S.of(context);
           String message = state.errorMessage!;
-          if (message.contains('do not have permission') || message.contains('permission')) {
-            message = s?.groupNoPermissionToEditGroupName ?? message;
+          if (message.contains('do not have permission') ||
+              message.contains('permission')) {
+            message = s?.chatNoPermissionToModify ?? message;
           } else {
             message = resolveBlocMessage(context, message);
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(message), backgroundColor: Colors.red),
           );
-        } else if (state.status == GroupStatus.success && state.successMessage != null) {
+        } else if (state.status == GroupStatus.success &&
+            state.successMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(resolveBlocMessage(context, state.successMessage!)),
@@ -72,14 +78,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       builder: (context, state) {
         if (state.isLoading) {
           return Scaffold(
-            appBar: N42AppBar(title: S.of(context)?.groupProfile ?? 'Group Info'),
+            appBar: N42AppBar(
+              title: S.of(context)?.groupProfile ?? 'Group Info',
+            ),
             body: const N42Loading(),
           );
         }
 
         if (state.currentGroup == null) {
           return Scaffold(
-            appBar: N42AppBar(title: S.of(context)?.groupProfile ?? 'Group Info'),
+            appBar: N42AppBar(
+              title: S.of(context)?.groupProfile ?? 'Group Info',
+            ),
             body: N42EmptyState(
               icon: Icons.error_outline,
               title: S.of(context)?.commonLoadFailed ?? 'Load failed',
@@ -139,7 +149,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         children: [
           // 群头像
           GestureDetector(
-            onTap: group.canChangeSettings ? () => _changeAvatar() : null,
+            onTap: group.canEditAvatar ? () => _changeAvatar() : null,
             child: Stack(
               children: [
                 N42Avatar(
@@ -147,7 +157,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   name: group.name,
                   size: 64,
                 ),
-                if (group.canChangeSettings)
+                if (group.canEditAvatar)
                   Positioned(
                     right: 0,
                     bottom: 0,
@@ -177,13 +187,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    debugLog('Group name tapped: canChangeSettings=${group.canChangeSettings}, myRole=${group.myRole}');
-                    if (group.canChangeSettings) {
+                    debugLog(
+                      'Group name tapped: canChangeSettings=${group.canChangeSettings}, myRole=${group.myRole}',
+                    );
+                    if (group.canEditName) {
                       _editGroupName(group);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(S.of(context)?.groupNoPermissionToEditGroupName ?? 'You do not have permission to edit group name'),
+                          content: Text(
+                            S.of(context)?.groupNoPermissionToEditGroupName ??
+                                'You do not have permission to edit group name',
+                          ),
                           duration: const Duration(seconds: 2),
                         ),
                       );
@@ -197,14 +212,16 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : AppColors.textPrimary,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        group.canChangeSettings ? Icons.edit : Icons.lock_outline,
+                        group.canEditName ? Icons.edit : Icons.lock_outline,
                         size: 16,
                         color: isDark
                             ? AppColors.textSecondaryDark
@@ -218,11 +235,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: group.roomId));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(S.of(context)?.groupIdCopied ?? 'Group ID copied')),
+                      SnackBar(
+                        content: Text(
+                          S.of(context)?.groupIdCopied ?? 'Group ID copied',
+                        ),
+                      ),
                     );
                   },
                   child: Text(
-                    S.of(context)?.groupMemberCountClickToCopy(group.memberCount) ?? '${group.memberCount} members - Click to copy group ID',
+                    S
+                            .of(context)
+                            ?.groupMemberCountClickToCopy(group.memberCount) ??
+                        '${group.memberCount} members - Click to copy group ID',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark
@@ -257,7 +281,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                S.of(context)?.commonGroupMembers(group.memberCount) ?? 'Group Members (${group.memberCount})',
+                S.of(context)?.commonGroupMembers(group.memberCount) ??
+                    'Group Members (${group.memberCount})',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -289,7 +314,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
   Widget _buildMemberItem(GroupMember member) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed('/profile/${member.userId}'),
+      onTap: () => N42Chat.openUserProfile(member.userId, context: context),
       child: Column(
         children: [
           Stack(
@@ -304,17 +329,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   right: -2,
                   bottom: -2,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       S.of(context)?.commonGroupOwner ?? 'Owner',
-                      style: const TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(fontSize: 8, color: Colors.white),
                     ),
                   ),
                 )
@@ -323,17 +348,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   right: -2,
                   bottom: -2,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       S.of(context)?.commonGroupAdmin ?? 'Admin',
-                      style: const TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(fontSize: 8, color: Colors.white),
                     ),
                   ),
                 ),
@@ -384,165 +409,191 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   }
 
   Widget _buildSettingsSection(GroupEntity group, bool isDark) {
-    return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
-      child: Column(
-        children: [
-          // 聊天文件
-          ListTile(
-            leading: const Icon(Icons.folder_outlined),
-            title: Text(S.of(context)?.groupChatFiles ?? 'Chat Files'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => GroupMediaHubPage(
+    final widgets = <Widget>[
+      // 聊天文件
+      ListTile(
+        leading: const Icon(Icons.folder_outlined),
+        title: Text(S.of(context)?.groupChatFiles ?? 'Chat Files'),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => GroupMediaHubPage(
+                roomId: widget.roomId,
+                groupName: group.name,
+              ),
+            ),
+          );
+        },
+      ),
+      _buildSettingsDivider(isDark),
+      ListTile(
+        leading: const Icon(Icons.link_outlined),
+        title: const Text('Invite Link'),
+        subtitle: Text(
+          group.isPublic
+              ? 'Share a join link for this room'
+              : 'Share a room reference with invited members',
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => _showInviteLinkActions(group),
+      ),
+      _buildSettingsDivider(isDark),
+      ListTile(
+        leading: const Icon(Icons.forum_outlined),
+        title: Text(S.of(context)?.groupChannels ?? 'Topic Channels'),
+        subtitle: Text(
+          group.canManageChannels
+              ? 'Browse topics and manage channel structure'
+              : 'Browse grouped topics and channel threads',
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => GroupTopicsPage(roomId: widget.roomId),
+            ),
+          );
+        },
+      ),
+      _buildSettingsDivider(isDark),
+      // 群公告
+      ListTile(
+        title: Text(
+          S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
+        ),
+        subtitle: Text(
+          group.announcement?.isNotEmpty == true
+              ? group.announcement!
+              : S.of(context)?.commonNotSet ?? 'Not set',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: group.canEditDescription ? () => _editAnnouncement(group) : null,
+      ),
+      _buildSettingsDivider(isDark),
+      // 群描述
+      ListTile(
+        title: Text(S.of(context)?.groupDescription ?? 'Group Description'),
+        subtitle: Text(
+          group.topic?.isNotEmpty == true
+              ? group.topic!
+              : S.of(context)?.commonNotSet ?? 'Not set',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: group.canEditDescription ? () => _editTopic(group) : null,
+      ),
+    ];
+
+    final managementTiles = <Widget>[
+      if (group.canChangeVisibility)
+        SwitchListTile(
+          title: Text(S.of(context)?.groupPublicGroup ?? 'Public Group'),
+          subtitle: Text(
+            S.of(context)?.groupAllowOthersToSearchAndJoin ??
+                'Allow others to search and join',
+          ),
+          value: group.isPublic,
+          onChanged: (value) {
+            context.read<GroupBloc>().add(
+              UpdateGroupVisibility(widget.roomId, value),
+            );
+          },
+        ),
+      if (group.canManageBot)
+        ListTile(
+          leading: const Icon(Icons.smart_toy_outlined),
+          title: Text(S.of(context)?.groupBotSettings ?? 'Bot Settings'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => BotSettingsPage(roomId: widget.roomId),
+              ),
+            );
+          },
+        ),
+      if (group.canManageContentFilter)
+        ListTile(
+          leading: const Icon(Icons.filter_list),
+          title: Text(S.of(context)?.groupContentFilter ?? 'Content Filter'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) =>
+                    ContentFilterSettingsPage(roomId: widget.roomId),
+              ),
+            );
+          },
+        ),
+      if (group.canManageMemberLimit)
+        ListTile(
+          leading: const Icon(Icons.people_outline),
+          title: Text(S.of(context)?.groupMaxMembers ?? 'Member Limit'),
+          subtitle: Text(
+            group.maxMembers == null
+                ? (S.of(context)?.groupMaxMembersUnlimited ?? 'Unlimited')
+                : '${group.memberCount} / ${group.maxMembers}',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => _showMaxMembersDialog(group),
+        ),
+      if (group.canManageTokenGate)
+        ListTile(
+          leading: Icon(
+            Icons.token,
+            color: group.tokenGate?.enabled == true
+                ? const Color(0xFF5298FF)
+                : null,
+          ),
+          title: Text(S.of(context)?.tokenGateTitle ?? 'Token Gate'),
+          subtitle: Text(
+            group.tokenGate?.enabled == true
+                ? ('${group.tokenGate!.rules.length} ${S.of(context)?.tokenGateRulesActive ?? 'rules active'}')
+                : (S.of(context)?.tokenGateDisabled ?? 'Disabled'),
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<bool>(
+                builder: (_) => BlocProvider.value(
+                  value: context.read<GroupBloc>(),
+                  child: TokenGateSettingsPage(
                     roomId: widget.roomId,
-                    groupName: group.name,
+                    currentConfig: group.tokenGate,
                   ),
                 ),
-              );
-            },
-          ),
-
-          Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
-
-          // 群公告
-          ListTile(
-            title: Text(S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement'),
-            subtitle: Text(
-              group.announcement?.isNotEmpty == true
-                  ? group.announcement!
-                  : S.of(context)?.commonNotSet ?? 'Not set',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => _editAnnouncement(group),
-          ),
-
-          Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
-
-          // 群描述
-          ListTile(
-            title: Text(S.of(context)?.groupDescription ?? 'Group Description'),
-            subtitle: Text(
-              group.topic?.isNotEmpty == true ? group.topic! : S.of(context)?.commonNotSet ?? 'Not set',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: group.canChangeSettings ? () => _editTopic(group) : null,
-          ),
-
-          if (group.canChangeSettings) ...[
-            Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
-
-            // 群可见性
-            SwitchListTile(
-              title: Text(S.of(context)?.groupPublicGroup ?? 'Public Group'),
-              subtitle: Text(S.of(context)?.groupAllowOthersToSearchAndJoin ?? 'Allow others to search and join'),
-              value: group.isPublic,
-              onChanged: (value) {
-                // TODO: 实现
-              },
-            ),
-
-            Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
-
-            // 话题频道
-            ListTile(
-              leading: const Icon(Icons.forum_outlined),
-              title: Text(S.of(context)?.groupChannels ?? 'Topic Channels'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => GroupChannelsPage(roomId: widget.roomId),
-                  ),
-                );
-              },
-            ),
-
-            Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
-
-            // Bot 设置（仅管理员可见）
-            if (group.canChangeSettings) ...[
-              ListTile(
-                leading: const Icon(Icons.smart_toy_outlined),
-                title: Text(S.of(context)?.groupBotSettings ?? 'Bot Settings'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => BotSettingsPage(roomId: widget.roomId),
-                    ),
-                  );
-                },
               ),
-              Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
-            ],
+            );
+          },
+        ),
+    ];
 
-            // 关键词过滤（仅管理员可见）
-            if (group.canChangeSettings) ...[
-              ListTile(
-                leading: const Icon(Icons.filter_list),
-                title: Text(S.of(context)?.groupContentFilter ?? 'Content Filter'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ContentFilterSettingsPage(roomId: widget.roomId),
-                    ),
-                  );
-                },
-              ),
-              Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
-            ],
+    if (managementTiles.isNotEmpty) {
+      widgets.add(_buildSettingsDivider(isDark));
+      for (var i = 0; i < managementTiles.length; i++) {
+        widgets.add(managementTiles[i]);
+        if (i != managementTiles.length - 1) {
+          widgets.add(_buildSettingsDivider(isDark));
+        }
+      }
+    }
 
-            // 群人数上限
-            ListTile(
-              leading: const Icon(Icons.people_outline),
-              title: Text(S.of(context)?.groupMaxMembers ?? 'Member Limit'),
-              subtitle: Text(
-                group.maxMembers == null
-                    ? (S.of(context)?.groupMaxMembersUnlimited ?? 'Unlimited')
-                    : '${group.memberCount} / ${group.maxMembers}',
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showMaxMembersDialog(group),
-            ),
+    return Container(
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      child: Column(children: widgets),
+    );
+  }
 
-            Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
-
-            // 代币门控
-            ListTile(
-              leading: Icon(
-                Icons.token,
-                color: group.tokenGate?.enabled == true
-                    ? const Color(0xFF5298FF)
-                    : null,
-              ),
-              title: Text(S.of(context)?.tokenGateTitle ?? 'Token Gate'),
-              subtitle: Text(
-                group.tokenGate?.enabled == true
-                    ? ('${group.tokenGate!.rules.length} ${S.of(context)?.tokenGateRulesActive ?? 'rules active'}')
-                    : (S.of(context)?.tokenGateDisabled ?? 'Disabled'),
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.of(context).pushNamed(
-                  '/tokenGateSettings',
-                  arguments: {
-                    'roomId': widget.roomId,
-                    'config': group.tokenGate,
-                  },
-                );
-              },
-            ),
-          ],
-        ],
-      ),
+  Widget _buildSettingsDivider(bool isDark) {
+    return Divider(
+      height: 1,
+      indent: 16,
+      color: isDark ? AppColors.dividerDark : AppColors.divider,
     );
   }
 
@@ -553,17 +604,25 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         children: [
           // 清空聊天记录
           ListTile(
-            title: Text(S.of(context)?.commonClearChatHistory ?? 'Clear Chat History'),
+            title: Text(
+              S.of(context)?.commonClearChatHistory ?? 'Clear Chat History',
+            ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _clearChatHistory(),
           ),
 
-          Divider(height: 1, indent: 16, color: isDark ? AppColors.dividerDark : AppColors.divider),
+          Divider(
+            height: 1,
+            indent: 16,
+            color: isDark ? AppColors.dividerDark : AppColors.divider,
+          ),
 
           // 退出/解散群聊
           ListTile(
             title: Text(
-              group.isOwner ? (S.of(context)?.commonDissolveGroup ?? 'Dissolve Group') : (S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
+              group.isOwner
+                  ? (S.of(context)?.commonDissolveGroup ?? 'Dissolve Group')
+                  : (S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
               style: const TextStyle(color: Colors.red),
             ),
             onTap: () {
@@ -613,7 +672,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               final name = controller.text.trim();
               if (name.isNotEmpty) {
                 Navigator.pop(dialogContext);
-                context.read<GroupBloc>().add(UpdateGroupName(widget.roomId, name));
+                context.read<GroupBloc>().add(
+                  UpdateGroupName(widget.roomId, name),
+                );
               }
             },
             child: Text(S.of(context)?.commonConfirm ?? 'OK'),
@@ -628,11 +689,15 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.groupEditGroupDescription ?? 'Edit Group Description'),
+        title: Text(
+          S.of(context)?.groupEditGroupDescription ?? 'Edit Group Description',
+        ),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: S.of(context)?.groupEnterGroupDescription ?? 'Enter group description',
+            hintText:
+                S.of(context)?.groupEnterGroupDescription ??
+                'Enter group description',
             border: const OutlineInputBorder(),
           ),
           maxLines: 3,
@@ -647,8 +712,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<GroupBloc>().add(
-                    UpdateGroupTopic(widget.roomId, controller.text.trim()),
-                  );
+                UpdateGroupTopic(widget.roomId, controller.text.trim()),
+              );
             },
             child: Text(S.of(context)?.commonConfirm ?? 'OK'),
           ),
@@ -662,11 +727,16 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.groupEditGroupAnnouncement ?? 'Edit Group Announcement'),
+        title: Text(
+          S.of(context)?.groupEditGroupAnnouncement ??
+              'Edit Group Announcement',
+        ),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            hintText: S.of(context)?.groupEnterGroupAnnouncement ?? 'Enter group announcement',
+            hintText:
+                S.of(context)?.groupEnterGroupAnnouncement ??
+                'Enter group announcement',
             border: const OutlineInputBorder(),
           ),
           maxLines: 5,
@@ -680,10 +750,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              // 群公告使用 topic 实现
               context.read<GroupBloc>().add(
-                    UpdateGroupTopic(widget.roomId, controller.text.trim()),
-                  );
+                UpdateGroupAnnouncement(widget.roomId, controller.text.trim()),
+              );
             },
             child: Text(S.of(context)?.groupPublish ?? 'Publish'),
           ),
@@ -707,7 +776,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               controller: controller,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: S.of(context)?.groupMaxMembersHint ?? 'Enter limit (leave empty for unlimited)',
+                hintText:
+                    S.of(context)?.groupMaxMembersHint ??
+                    'Enter limit (leave empty for unlimited)',
                 border: const OutlineInputBorder(),
               ),
               autofocus: true,
@@ -724,7 +795,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               Navigator.pop(dialogContext);
               final text = controller.text.trim();
               final value = text.isEmpty ? null : int.tryParse(text);
-              context.read<GroupBloc>().add(SetMaxMembers(widget.roomId, value));
+              context.read<GroupBloc>().add(
+                SetMaxMembers(widget.roomId, value),
+              );
             },
             child: Text(S.of(context)?.commonConfirm ?? 'OK'),
           ),
@@ -734,19 +807,67 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   }
 
   void _navigateToMemberList(GroupEntity group) {
-    Navigator.of(context).pushNamed('/group/members/${group.roomId}');
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider.value(
+          value: context.read<GroupBloc>(),
+          child: GroupMembersPage(roomId: group.roomId),
+        ),
+      ),
+    );
   }
 
   void _inviteMembers() {
-    Navigator.of(context).pushNamed('/group/invite/${widget.roomId}');
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: context.read<GroupBloc>()),
+            BlocProvider(create: (_) => getIt<ContactBloc>()),
+          ],
+          child: InviteMembersPage(roomId: widget.roomId),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showInviteLinkActions(GroupEntity group) async {
+    await showResolvedShareableLinkActions(
+      context,
+      resolveLink: () => _resolveGroupInviteLink(group),
+      presentation: _buildGroupInvitePresentation(group),
+    );
+  }
+
+  Future<String> _resolveGroupInviteLink(GroupEntity group) {
+    return getIt<IGroupRepository>().getGroupInviteLink(group.roomId);
+  }
+
+  ShareableLinkPresentation _buildGroupInvitePresentation(GroupEntity group) {
+    return ShareableLinkPresentation(
+      entityName: group.name,
+      linkLabel: 'Invite Link',
+      qrCodeTitle: S.of(context)?.groupQrCode ?? 'Group QR Code',
+      qrCodeSubtitle: group.isPublic
+          ? 'Scan to join this group directly'
+          : 'Scan to share this room reference with invited members',
+      errorPrefix: 'Failed to load invite link',
+      copySuccessMessage: 'Invite link copied',
+      icon: group.isChannel ? Icons.campaign_outlined : Icons.group_outlined,
+    );
   }
 
   void _clearChatHistory() {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.commonClearChatHistory ?? 'Clear Chat History'),
-        content: Text(S.of(context)?.groupConfirmClearChatHistory ?? 'Are you sure you want to clear chat history? This action cannot be undone.'),
+        title: Text(
+          S.of(context)?.commonClearChatHistory ?? 'Clear Chat History',
+        ),
+        content: Text(
+          S.of(context)?.groupConfirmClearChatHistory ??
+              'Are you sure you want to clear chat history? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -757,10 +878,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               Navigator.pop(dialogContext);
               widget.onClearHistory?.call();
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(S.of(context)?.commonChatHistoryCleared ?? 'Chat history cleared')),
+                SnackBar(
+                  content: Text(
+                    S.of(context)?.commonChatHistoryCleared ??
+                        'Chat history cleared',
+                  ),
+                ),
               );
             },
-            child: Text(S.of(context)?.commonClear ?? 'Clear', style: const TextStyle(color: Colors.red)),
+            child: Text(
+              S.of(context)?.commonClear ?? 'Clear',
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -772,7 +901,10 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
-        content: Text(S.of(context)?.commonConfirmLeaveGroup(group.name) ?? 'Are you sure you want to leave "${group.name}"?'),
+        content: Text(
+          S.of(context)?.commonConfirmLeaveGroup(group.name) ??
+              'Are you sure you want to leave "${group.name}"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -784,7 +916,10 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               context.read<GroupBloc>().add(LeaveGroup(widget.roomId));
               Navigator.of(context).pop();
             },
-            child: Text(S.of(context)?.commonLeave ?? 'Leave', style: const TextStyle(color: Colors.red)),
+            child: Text(
+              S.of(context)?.commonLeave ?? 'Leave',
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -796,7 +931,10 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.commonDissolveGroup ?? 'Dissolve Group'),
-        content: Text(S.of(context)?.commonConfirmDissolveGroup(group.name) ?? 'Are you sure you want to dissolve "${group.name}"? This action cannot be undone.'),
+        content: Text(
+          S.of(context)?.commonConfirmDissolveGroup(group.name) ??
+              'Are you sure you want to dissolve "${group.name}"? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -808,7 +946,10 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               context.read<GroupBloc>().add(DeleteGroup(widget.roomId));
               Navigator.of(context).pop();
             },
-            child: Text(S.of(context)?.commonDissolve ?? 'Dissolve', style: const TextStyle(color: Colors.red)),
+            child: Text(
+              S.of(context)?.commonDissolve ?? 'Dissolve',
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -825,20 +966,29 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             ListTile(
               leading: const Icon(Icons.qr_code),
               title: Text(S.of(context)?.groupQrCode ?? 'Group QR Code'),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(sheetContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.commonFeatureInDevelopment('') ?? 'Feature in development')),
+                await showResolvedShareableLinkQrPage(
+                  context,
+                  resolveLink: () => _resolveGroupInviteLink(group),
+                  presentation: _buildGroupInvitePresentation(group),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: Text(S.of(context)?.commonSearchChatHistory ?? 'Search Chat History'),
+              title: Text(
+                S.of(context)?.commonSearchChatHistory ?? 'Search Chat History',
+              ),
               onTap: () {
                 Navigator.pop(sheetContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context)?.commonFeatureInDevelopment('') ?? 'Feature in development')),
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.commonFeatureInDevelopment('') ??
+                          'Feature in development',
+                    ),
+                  ),
                 );
               },
             ),
@@ -848,4 +998,3 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     );
   }
 }
-

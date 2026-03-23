@@ -30,6 +30,7 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
   late final TabController _tabController;
   final Set<String> _selectedFiles = {};
   String? _currentCategory;
+  bool _deleteRequested = false;
 
   static const _tabs = ['All', 'Images', 'Videos', 'Files'];
   static const _categories = [null, 'image', 'video', 'document'];
@@ -95,7 +96,21 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
           tabs: _tabs.map((t) => Tab(text: t)).toList(),
         ),
       ),
-      body: BlocBuilder<StorageManagementBloc, StorageManagementState>(
+      body: BlocConsumer<StorageManagementBloc, StorageManagementState>(
+        listenWhen: (previous, current) =>
+            _deleteRequested &&
+            (previous.isCleaning != current.isCleaning ||
+                previous.lastCleanupResult != current.lastCleanupResult ||
+                previous.error != current.error),
+        listener: (context, state) {
+          if (!_deleteRequested || state.isCleaning) return;
+          setState(() {
+            _deleteRequested = false;
+            if (state.error == null && state.lastCleanupResult != null) {
+              _selectedFiles.clear();
+            }
+          });
+        },
         builder: (context, state) {
           return Column(
             children: [
@@ -150,13 +165,10 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
+              setState(() => _deleteRequested = true);
               context.read<StorageManagementBloc>().add(
-                    DeleteSelectedFiles(_selectedFiles.toList()),
-                  );
-              setState(() => _selectedFiles.clear());
-              // 刷新列表
-              context.read<StorageManagementBloc>().add(
-                    LoadRoomMediaDetail(
+                    DeleteSelectedFiles(
+                      _selectedFiles.toList(),
                       roomId: widget.roomId,
                       filterCategory: _currentCategory,
                     ),

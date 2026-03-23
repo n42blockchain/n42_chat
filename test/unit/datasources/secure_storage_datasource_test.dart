@@ -27,19 +27,23 @@ void main() {
     store.clear();
     dataSource = SecureStorageDataSource(storage: mockStorage);
 
-    when(() => mockStorage.write(
-              key: any(named: 'key'),
-              value: any(named: 'value'),
-            ))
-        .thenAnswer((inv) async {
+    when(
+      () => mockStorage.write(
+        key: any(named: 'key'),
+        value: any(named: 'value'),
+      ),
+    ).thenAnswer((inv) async {
       store[inv.namedArguments[#key] as String] =
           inv.namedArguments[#value] as String;
     });
 
-    when(() => mockStorage.read(key: any(named: 'key')))
-        .thenAnswer((inv) async => store[inv.namedArguments[#key] as String]);
+    when(
+      () => mockStorage.read(key: any(named: 'key')),
+    ).thenAnswer((inv) async => store[inv.namedArguments[#key] as String]);
 
-    when(() => mockStorage.delete(key: any(named: 'key'))).thenAnswer((inv) async {
+    when(() => mockStorage.delete(key: any(named: 'key'))).thenAnswer((
+      inv,
+    ) async {
       store.remove(inv.namedArguments[#key] as String);
     });
 
@@ -109,7 +113,6 @@ void main() {
       final saved = await dataSource.saveCredentials(
         homeserver: 'https://server.com',
         username: 'alice',
-        password: 's3cr3t',
       );
       expect(saved, isTrue);
 
@@ -117,7 +120,7 @@ void main() {
       expect(creds, isNotNull);
       expect(creds!['homeserver'], 'https://server.com');
       expect(creds['username'], 'alice');
-      expect(creds['password'], 's3cr3t');
+      expect(creds.containsKey('password'), isFalse);
     });
 
     test('getCredentials returns null when nothing is stored', () async {
@@ -129,7 +132,6 @@ void main() {
       await dataSource.saveCredentials(
         homeserver: 'https://s.com',
         username: 'u',
-        password: 'p',
       );
       expect(await dataSource.hasCredentials(), isTrue);
     });
@@ -144,7 +146,6 @@ void main() {
       await dataSource.saveCredentials(
         homeserver: 'https://s.com',
         username: 'u',
-        password: 'p',
       );
       await dataSource.clearCredentials();
       expect(await dataSource.getCredentials(), isNull);
@@ -231,6 +232,25 @@ void main() {
     });
   });
 
+  group('room bot webhook secret', () {
+    test('saves and retrieves a room webhook secret', () async {
+      await dataSource.saveRoomBotWebhookSecret('!room:s.com', 'secret-value');
+
+      final secret = await dataSource.getRoomBotWebhookSecret('!room:s.com');
+
+      expect(secret, 'secret-value');
+    });
+
+    test('clears the room webhook secret when value is empty', () async {
+      await dataSource.saveRoomBotWebhookSecret('!room:s.com', 'secret-value');
+      await dataSource.saveRoomBotWebhookSecret('!room:s.com', '');
+
+      final secret = await dataSource.getRoomBotWebhookSecret('!room:s.com');
+
+      expect(secret, isNull);
+    });
+  });
+
   // ─────────────────────────────────────────────────────────────────────────
   // Biometric settings
   // ─────────────────────────────────────────────────────────────────────────
@@ -270,7 +290,10 @@ void main() {
         homeserver: 'https://my.server.com',
         username: 'alice',
       );
-      expect(await dataSource.getBiometricHomeserver(), 'https://my.server.com');
+      expect(
+        await dataSource.getBiometricHomeserver(),
+        'https://my.server.com',
+      );
     });
 
     test('getBiometricSettings returns null when nothing stored', () async {
@@ -323,7 +346,6 @@ void main() {
       await dataSource.saveCredentials(
         homeserver: 'https://s.com',
         username: 'u',
-        password: 'p',
       );
 
       await dataSource.clearAll();
@@ -344,11 +366,12 @@ void main() {
     });
 
     test('returns false when storage throws', () async {
-      when(() => mockStorage.write(
-                key: any(named: 'key'),
-                value: any(named: 'value'),
-              ))
-          .thenThrow(Exception('Keychain error'));
+      when(
+        () => mockStorage.write(
+          key: any(named: 'key'),
+          value: any(named: 'value'),
+        ),
+      ).thenThrow(Exception('Keychain error'));
       expect(await dataSource.isAvailable(), isFalse);
     });
   });

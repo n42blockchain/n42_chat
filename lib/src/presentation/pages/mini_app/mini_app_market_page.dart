@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/mini_app_entity.dart';
-import 'mini_app_page.dart';
+import '../../helpers/mini_app_launcher_helper.dart';
 
 /// Mini App 市场页面
 ///
@@ -12,8 +14,13 @@ import 'mini_app_page.dart';
 class MiniAppMarketPage extends StatefulWidget {
   /// 当前聊天室 ID（传给 Mini App Bridge）
   final String roomId;
+  final MiniAppCategory? initialCategory;
 
-  const MiniAppMarketPage({super.key, required this.roomId});
+  const MiniAppMarketPage({
+    super.key,
+    required this.roomId,
+    this.initialCategory,
+  });
 
   @override
   State<MiniAppMarketPage> createState() => _MiniAppMarketPageState();
@@ -25,19 +32,22 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
   final _searchController = TextEditingController();
   String _searchQuery = '';
 
-  static const _categories = [
+  static final List<MiniAppCategory?> _categories = [
     null, // All
-    MiniAppCategory.defi,
-    MiniAppCategory.nft,
-    MiniAppCategory.finance,
-    MiniAppCategory.games,
-    MiniAppCategory.tools,
+    ...MiniAppCategory.values,
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _categories.length, vsync: this);
+    final initialIndex = widget.initialCategory == null
+        ? 0
+        : _categories.indexOf(widget.initialCategory);
+    _tabController = TabController(
+      length: _categories.length,
+      vsync: this,
+      initialIndex: initialIndex < 0 ? 0 : initialIndex,
+    );
   }
 
   @override
@@ -53,11 +63,9 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
-        backgroundColor:
-            isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
         title: Text(
           l10n?.miniAppMarketTitle ?? 'Mini Apps',
@@ -77,8 +85,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
               : AppColors.textSecondary,
           tabs: [
             Tab(text: l10n?.miniAppCategoryAll ?? 'All'),
-            ...MiniAppCategory.values
-                .map((c) => Tab(text: c.label)),
+            ...MiniAppCategory.values.map((c) => Tab(text: c.label)),
           ],
         ),
       ),
@@ -91,12 +98,9 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: l10n?.miniAppSearch ?? 'Search apps...',
-                prefixIcon:
-                    const Icon(Icons.search, color: AppColors.primary),
+                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                 filled: true,
-                fillColor: isDark
-                    ? AppColors.surfaceDark
-                    : AppColors.surface,
+                fillColor: isDark ? AppColors.surfaceDark : AppColors.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -118,11 +122,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
     );
   }
 
-  Widget _buildAppList(
-    MiniAppCategory? category,
-    bool isDark,
-    S? l10n,
-  ) {
+  Widget _buildAppList(MiniAppCategory? category, bool isDark, S? l10n) {
     var apps = category == null
         ? BuiltInMiniApps.all
         : BuiltInMiniApps.byCategory(category);
@@ -130,9 +130,11 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
     if (_searchQuery.isNotEmpty) {
       final q = _searchQuery.toLowerCase();
       apps = apps
-          .where((a) =>
-              a.name.toLowerCase().contains(q) ||
-              a.description.toLowerCase().contains(q))
+          .where(
+            (a) =>
+                a.name.toLowerCase().contains(q) ||
+                a.description.toLowerCase().contains(q),
+          )
           .toList();
     }
 
@@ -166,11 +168,13 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
           ),
           const SizedBox(height: 12),
         ],
-        ...apps.map((app) => _AppListTile(
-              app: app,
-              isDark: isDark,
-              onTap: () => _openApp(app),
-            )),
+        ...apps.map(
+          (app) => _AppListTile(
+            app: app,
+            isDark: isDark,
+            onTap: () => _openApp(app),
+          ),
+        ),
       ],
     );
   }
@@ -194,13 +198,12 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: featured.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) =>
-                _FeaturedCard(
-                  app: featured[index],
-                  isDark: isDark,
-                  onTap: () => _openApp(featured[index]),
-                ),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (context, index) => _FeaturedCard(
+              app: featured[index],
+              isDark: isDark,
+              onTap: () => _openApp(featured[index]),
+            ),
           ),
         ),
       ],
@@ -208,10 +211,11 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
   }
 
   void _openApp(MiniAppEntity app) {
-    Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (_) => MiniAppPage(app: app, roomId: widget.roomId),
+    unawaited(
+      MiniAppLauncherHelper.openApp<void>(
+        context,
+        app: app,
+        roomId: widget.roomId,
       ),
     );
   }
@@ -251,8 +255,7 @@ class _AppListTile extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: _categoryColor(app.category)
-                      .withValues(alpha: 0.12),
+                  color: _categoryColor(app.category).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -283,10 +286,11 @@ class _AppListTile extends StatelessWidget {
                         if (app.isBuiltIn)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
-                              color:
-                                  AppColors.primary.withValues(alpha: 0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: const Text(
@@ -423,22 +427,24 @@ class _FeaturedCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 Color _categoryColor(MiniAppCategory category) => switch (category) {
-      MiniAppCategory.defi => Colors.blue,
-      MiniAppCategory.nft => Colors.deepPurple,
-      MiniAppCategory.games => Colors.orange,
-      MiniAppCategory.tools => Colors.teal,
-      MiniAppCategory.social => Colors.pink,
-      MiniAppCategory.finance => Colors.green,
-    };
+  MiniAppCategory.defi => Colors.blue,
+  MiniAppCategory.nft => Colors.deepPurple,
+  MiniAppCategory.commerce => Colors.amber,
+  MiniAppCategory.games => Colors.orange,
+  MiniAppCategory.tools => Colors.teal,
+  MiniAppCategory.social => Colors.pink,
+  MiniAppCategory.finance => Colors.green,
+};
 
 IconData _categoryIcon(MiniAppCategory category) => switch (category) {
-      MiniAppCategory.defi => Icons.swap_horiz_rounded,
-      MiniAppCategory.nft => Icons.image_outlined,
-      MiniAppCategory.games => Icons.sports_esports_outlined,
-      MiniAppCategory.tools => Icons.build_outlined,
-      MiniAppCategory.social => Icons.people_outlined,
-      MiniAppCategory.finance => Icons.account_balance_wallet_outlined,
-    };
+  MiniAppCategory.defi => Icons.swap_horiz_rounded,
+  MiniAppCategory.nft => Icons.image_outlined,
+  MiniAppCategory.commerce => Icons.storefront_outlined,
+  MiniAppCategory.games => Icons.sports_esports_outlined,
+  MiniAppCategory.tools => Icons.build_outlined,
+  MiniAppCategory.social => Icons.people_outlined,
+  MiniAppCategory.finance => Icons.account_balance_wallet_outlined,
+};
 
 extension on Widget {
   Widget expanded() => Expanded(child: this);

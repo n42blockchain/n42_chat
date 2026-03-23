@@ -19,9 +19,9 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   ConversationBloc({
     required IConversationRepository conversationRepository,
     required PreferencesDataSource storageDataSource,
-  })  : _conversationRepository = conversationRepository,
-        _storageDataSource = storageDataSource,
-        super(ConversationState.initial()) {
+  }) : _conversationRepository = conversationRepository,
+       _storageDataSource = storageDataSource,
+       super(ConversationState.initial()) {
     on<LoadConversations>(_onLoadConversations);
     on<RefreshConversations>(_onRefreshConversations);
     on<SubscribeConversations>(_onSubscribeConversations);
@@ -37,6 +37,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     on<ConversationsUpdated>(_onConversationsUpdated);
     on<SetConversationHidden>(_onSetHidden);
     on<LoadHiddenConversations>(_onLoadHiddenConversations);
+    on<ClearNewConversationNavigation>(_onClearNewConversationNavigation);
   }
 
   @override
@@ -58,18 +59,22 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
       final (pinned, normal) = _separateConversations(conversations);
 
-      emit(state.copyWith(
-        conversations: conversations,
-        pinnedConversations: pinned,
-        normalConversations: normal,
-        isLoading: false,
-        totalUnreadCount: totalUnread,
-      ));
+      emit(
+        state.copyWith(
+          conversations: conversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+          isLoading: false,
+          totalUnreadCount: totalUnread,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        error: 'Failed to load conversations: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: 'Failed to load conversations: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -86,18 +91,22 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
       final (pinned, normal) = _separateConversations(conversations);
 
-      emit(state.copyWith(
-        conversations: conversations,
-        pinnedConversations: pinned,
-        normalConversations: normal,
-        isRefreshing: false,
-        totalUnreadCount: totalUnread,
-      ));
+      emit(
+        state.copyWith(
+          conversations: conversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+          isRefreshing: false,
+          totalUnreadCount: totalUnread,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isRefreshing: false,
-        error: 'Refresh failed: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isRefreshing: false,
+          error: 'Refresh failed: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -111,16 +120,16 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     _conversationsSubscription = _conversationRepository
         .watchConversations()
         .listen(
-      (conversations) {
-        // 防止在 BLoC 关闭后添加事件
-        if (!isClosed) {
-          add(ConversationsUpdated(conversations));
-        }
-      },
-      onError: (Object error) {
-        debugLog('ConversationBloc: Conversations stream error: $error');
-      },
-    );
+          (conversations) {
+            // 防止在 BLoC 关闭后添加事件
+            if (!isClosed) {
+              add(ConversationsUpdated(conversations));
+            }
+          },
+          onError: (Object error) {
+            debugLog('ConversationBloc: Conversations stream error: $error');
+          },
+        );
   }
 
   /// 取消订阅
@@ -137,19 +146,22 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     ConversationsUpdated event,
     Emitter<ConversationState> emit,
   ) {
-    final (pinned, normal) = _separateConversations(event.conversations);
+    final conversations = event.conversations;
+    final (pinned, normal) = _separateConversations(conversations);
 
-    final totalUnread = event.conversations.fold<int>(
+    final totalUnread = conversations.fold<int>(
       0,
       (sum, conv) => sum + conv.unreadCount,
     );
 
-    emit(state.copyWith(
-      conversations: event.conversations,
-      pinnedConversations: pinned,
-      normalConversations: normal,
-      totalUnreadCount: totalUnread,
-    ));
+    emit(
+      state.copyWith(
+        conversations: conversations,
+        pinnedConversations: pinned,
+        normalConversations: normal,
+        totalUnreadCount: totalUnread,
+      ),
+    );
   }
 
   /// 搜索会话
@@ -160,11 +172,13 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     final query = event.query.trim();
 
     if (query.isEmpty) {
-      emit(state.copyWith(
-        isSearching: false,
-        searchQuery: null,
-        clearFilteredConversations: true,
-      ));
+      emit(
+        state.copyWith(
+          isSearching: false,
+          searchQuery: null,
+          clearFilteredConversations: true,
+        ),
+      );
       return;
     }
 
@@ -174,22 +188,19 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       final results = await _conversationRepository.searchConversations(query);
       emit(state.copyWith(filteredConversations: results));
     } catch (e) {
-      emit(state.copyWith(
-        error: 'Search failed: ${e.toString()}',
-      ));
+      emit(state.copyWith(error: 'Search failed: ${e.toString()}'));
     }
   }
 
   /// 清除搜索
-  void _onClearSearch(
-    ClearSearch event,
-    Emitter<ConversationState> emit,
-  ) {
-    emit(state.copyWith(
-      isSearching: false,
-      searchQuery: null,
-      clearFilteredConversations: true,
-    ));
+  void _onClearSearch(ClearSearch event, Emitter<ConversationState> emit) {
+    emit(
+      state.copyWith(
+        isSearching: false,
+        searchQuery: null,
+        clearFilteredConversations: true,
+      ),
+    );
   }
 
   /// 设置免打扰
@@ -210,11 +221,13 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
       final (pinned, normal) = _separateConversations(updatedConversations);
 
-      emit(state.copyWith(
-        conversations: updatedConversations,
-        pinnedConversations: pinned,
-        normalConversations: normal,
-      ));
+      emit(
+        state.copyWith(
+          conversations: updatedConversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(error: 'Setting failed: ${e.toString()}'));
     }
@@ -227,7 +240,9 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   ) async {
     try {
       await _conversationRepository.setPinned(
-          event.conversationId, event.pinned);
+        event.conversationId,
+        event.pinned,
+      );
 
       // 乐观更新本地状态
       final updatedConversations = state.conversations.map((conv) {
@@ -239,11 +254,13 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
       final (pinned, normal) = _separateConversations(updatedConversations);
 
-      emit(state.copyWith(
-        conversations: updatedConversations,
-        pinnedConversations: pinned,
-        normalConversations: normal,
-      ));
+      emit(
+        state.copyWith(
+          conversations: updatedConversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(error: 'Setting failed: ${e.toString()}'));
     }
@@ -270,10 +287,12 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         (sum, conv) => sum + conv.unreadCount,
       );
 
-      emit(state.copyWith(
-        conversations: updatedConversations,
-        totalUnreadCount: totalUnread,
-      ));
+      emit(
+        state.copyWith(
+          conversations: updatedConversations,
+          totalUnreadCount: totalUnread,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(error: 'Mark as read failed: ${e.toString()}'));
     }
@@ -294,11 +313,13 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
       final (pinned, normal) = _separateConversations(updatedConversations);
 
-      emit(state.copyWith(
-        conversations: updatedConversations,
-        pinnedConversations: pinned,
-        normalConversations: normal,
-      ));
+      emit(
+        state.copyWith(
+          conversations: updatedConversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(error: 'Delete failed: ${e.toString()}'));
     }
@@ -310,10 +331,29 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     Emitter<ConversationState> emit,
   ) async {
     try {
-      final conversation =
-          await _conversationRepository.createDirectChat(event.userId);
+      final conversation = await _conversationRepository.createDirectChat(
+        event.userId,
+      );
 
-      emit(state.copyWith(newConversationId: conversation.id));
+      final updatedConversations = _upsertConversation(
+        state.conversations,
+        conversation,
+      );
+      final (pinned, normal) = _separateConversations(updatedConversations);
+      final totalUnread = updatedConversations.fold<int>(
+        0,
+        (sum, conv) => sum + conv.unreadCount,
+      );
+
+      emit(
+        state.copyWith(
+          conversations: updatedConversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+          totalUnreadCount: totalUnread,
+          newConversationId: conversation.id,
+        ),
+      );
 
       // 触发刷新
       add(const RefreshConversations());
@@ -335,7 +375,25 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         encrypted: event.encrypted,
       );
 
-      emit(state.copyWith(newConversationId: conversation.id));
+      final updatedConversations = _upsertConversation(
+        state.conversations,
+        conversation,
+      );
+      final (pinned, normal) = _separateConversations(updatedConversations);
+      final totalUnread = updatedConversations.fold<int>(
+        0,
+        (sum, conv) => sum + conv.unreadCount,
+      );
+
+      emit(
+        state.copyWith(
+          conversations: updatedConversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+          totalUnreadCount: totalUnread,
+          newConversationId: conversation.id,
+        ),
+      );
 
       // 触发刷新
       add(const RefreshConversations());
@@ -392,12 +450,14 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         updatedHidden = [...state.hiddenConversations, conversation];
       }
 
-      emit(state.copyWith(
-        conversations: updatedConversations,
-        pinnedConversations: pinned,
-        normalConversations: normal,
-        hiddenConversations: updatedHidden,
-      ));
+      emit(
+        state.copyWith(
+          conversations: updatedConversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+          hiddenConversations: updatedHidden,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(error: 'Hide failed: ${e.toString()}'));
     }
@@ -430,19 +490,42 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
       final (pinned, normal) = _separateConversations(updatedConversations);
 
-      emit(state.copyWith(
-        conversations: updatedConversations,
-        pinnedConversations: pinned,
-        normalConversations: normal,
-        hiddenConversations: hiddenConversations,
-        isLoadingHidden: false,
-      ));
+      emit(
+        state.copyWith(
+          conversations: updatedConversations,
+          pinnedConversations: pinned,
+          normalConversations: normal,
+          hiddenConversations: hiddenConversations,
+          isLoadingHidden: false,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoadingHidden: false,
-        error: 'Failed to load hidden conversations: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isLoadingHidden: false,
+          error: 'Failed to load hidden conversations: ${e.toString()}',
+        ),
+      );
     }
   }
-}
 
+  void _onClearNewConversationNavigation(
+    ClearNewConversationNavigation event,
+    Emitter<ConversationState> emit,
+  ) {
+    if (state.newConversationId == null) {
+      return;
+    }
+    emit(state.copyWith(clearNewConversationId: true));
+  }
+
+  List<ConversationEntity> _upsertConversation(
+    List<ConversationEntity> conversations,
+    ConversationEntity conversation,
+  ) {
+    return <ConversationEntity>[
+      conversation,
+      ...conversations.where((item) => item.id != conversation.id),
+    ];
+  }
+}

@@ -4,10 +4,26 @@ import 'package:equatable/equatable.dart';
 enum ConversationType {
   /// 私聊
   direct,
+
   /// 群聊
   group,
+
   /// 空间 (Space)
   space,
+}
+
+final _whitespaceRegExp = RegExp(r'\s+');
+
+/// 会话通知模式
+enum ConversationNotificationMode {
+  /// 所有消息都提醒
+  allMessages,
+
+  /// 仅 @提及 或 @room 时提醒
+  mentionsOnly,
+
+  /// 完全静音
+  muted,
 }
 
 /// 会话实体
@@ -171,7 +187,7 @@ class ConversationEntity extends Equatable {
   String get initials {
     if (name.isEmpty) return '?';
 
-    final words = name.trim().split(RegExp(r'\s+'));
+    final words = name.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return name.substring(0, name.length.clamp(0, 2)).toUpperCase();
     }
@@ -185,34 +201,34 @@ class ConversationEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        avatarUrl,
-        lastMessage,
-        lastMessageTime,
-        lastMessageSenderId,
-        lastMessageSenderName,
-        unreadCount,
-        highlightCount,
-        type,
-        isEncrypted,
-        isPinned,
-        isMuted,
-        isStrongReminder,
-        isMarkedAsRead,
-        topic,
-        memberCount,
-        memberAvatarUrls,
-        memberNames,
-        memberIds,
-        hasTypingUsers,
-        typingUsers,
-        draft,
-        isLowPriority,
-        isInvite,
-        directUserId,
-        isHidden,
-      ];
+    id,
+    name,
+    avatarUrl,
+    lastMessage,
+    lastMessageTime,
+    lastMessageSenderId,
+    lastMessageSenderName,
+    unreadCount,
+    highlightCount,
+    type,
+    isEncrypted,
+    isPinned,
+    isMuted,
+    isStrongReminder,
+    isMarkedAsRead,
+    topic,
+    memberCount,
+    memberAvatarUrls,
+    memberNames,
+    memberIds,
+    hasTypingUsers,
+    typingUsers,
+    draft,
+    isLowPriority,
+    isInvite,
+    directUserId,
+    isHidden,
+  ];
 
   ConversationEntity copyWith({
     String? id,
@@ -250,7 +266,8 @@ class ConversationEntity extends Equatable {
       lastMessage: lastMessage ?? this.lastMessage,
       lastMessageTime: lastMessageTime ?? this.lastMessageTime,
       lastMessageSenderId: lastMessageSenderId ?? this.lastMessageSenderId,
-      lastMessageSenderName: lastMessageSenderName ?? this.lastMessageSenderName,
+      lastMessageSenderName:
+          lastMessageSenderName ?? this.lastMessageSenderName,
       unreadCount: unreadCount ?? this.unreadCount,
       highlightCount: highlightCount ?? this.highlightCount,
       type: type ?? this.type,
@@ -274,4 +291,3 @@ class ConversationEntity extends Equatable {
     );
   }
 }
-

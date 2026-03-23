@@ -60,10 +60,10 @@ class QuickReplyEntity extends Equatable {
       order: json['order'] as int? ?? 0,
       isSystem: json['isSystem'] as bool? ?? false,
       lastUsed: json['lastUsed'] != null
-          ? DateTime.parse(json['lastUsed'] as String)
+          ? DateTime.tryParse(json['lastUsed'] as String)
           : null,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+          ? DateTime.tryParse(json['createdAt'] as String)
           : null,
     );
   }
