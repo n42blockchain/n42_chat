@@ -178,12 +178,6 @@ class _StatusPageState extends State<StatusPage> {
   }
 
   @override
-  void dispose() {
-    _customController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final categories = _getCategories(context);
     return Scaffold(
