@@ -39,10 +39,27 @@ void main() {
         n42Username: '@bob',
         walletAddress: '0x1234',
         ensName: 'bob.eth',
+        nftContractAddress: '0xabc',
+        nftTokenId: 42,
+        nftChainId: 1,
+        nftImageUrl: 'https://example.com/nft.png',
       );
       expect(user.isCurrentUser, isTrue);
       expect(user.gender, 'male');
       expect(user.ensName, 'bob.eth');
+      expect(user.hasNftAvatar, isTrue);
+    });
+  });
+
+  group('UserEntity.hasNftAvatar', () {
+    test('returns false when nft metadata is incomplete', () {
+      const user = UserEntity(
+        userId: '@alice:matrix.org',
+        displayName: 'Alice',
+        nftContractAddress: '0xabc',
+        nftTokenId: 1,
+      );
+      expect(user.hasNftAvatar, isFalse);
     });
   });
 
@@ -161,6 +178,21 @@ void main() {
       expect(copy.userId, '@alice:s');
       expect(copy.displayName, 'Alicia');
       expect(copy.gender, 'female');
+    });
+
+    test('retains nft fields when copying', () {
+      const original = UserEntity(
+        userId: '@alice:s',
+        displayName: 'Alice',
+        nftContractAddress: '0xabc',
+        nftTokenId: 7,
+        nftChainId: 1,
+        nftImageUrl: 'https://example.com/7.png',
+      );
+      final copy = original.copyWith(displayName: 'Alicia');
+      expect(copy.nftContractAddress, '0xabc');
+      expect(copy.nftTokenId, 7);
+      expect(copy.hasNftAvatar, isTrue);
     });
 
     test('retains all fields when nothing specified', () {

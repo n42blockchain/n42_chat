@@ -8,10 +8,13 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/avatar_decoration_preset.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import 'avatar_studio_page.dart';
 import 'profile_address_manage_page.dart';
 import 'profile_invoice_manage_page.dart';
 import 'profile_ringtone_select_page.dart';
@@ -20,7 +23,7 @@ import 'n42_bean_page.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 个人资料编辑页面
-/// 
+///
 /// 微信风格的个人资料设置页面
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -29,9 +32,23 @@ class ProfileEditPage extends StatefulWidget {
   State<ProfileEditPage> createState() => _ProfileEditPageState();
 }
 
+enum _PendingProfileOperation {
+  avatar,
+  displayName,
+  gender,
+  region,
+  pokeText,
+  signature,
+  ringtone,
+}
+
 class _ProfileEditPageState extends State<ProfileEditPage> {
   final ImagePicker _imagePicker = ImagePicker();
-  bool _isUploading = false;
+  _PendingProfileOperation? _pendingOperation;
+  String? _pendingSuccessMessage;
+  String? _pendingErrorFallback;
+
+  bool get _isUploading => _pendingOperation == _PendingProfileOperation.avatar;
 
   @override
   void initState() {
@@ -46,25 +63,41 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        debugLog('ProfileEditPage: AuthState changed - status: ${state.status}, isUploading: $_isUploading');
-        
-        // 监听状态变化
-        if (_isUploading) {
-          if (state.status == AuthStatus.authenticated) {
-            debugLog('ProfileEditPage: Avatar upload succeeded');
-            setState(() => _isUploading = false);
+        debugLog(
+          'ProfileEditPage: AuthState changed - status: ${state.status}, pendingOperation: $_pendingOperation',
+        );
+
+        if (_pendingOperation == null) {
+          return;
+        }
+
+        if (state.status == AuthStatus.authenticated) {
+          final successMessage = _pendingSuccessMessage;
+          setState(() {
+            _pendingOperation = null;
+            _pendingSuccessMessage = null;
+            _pendingErrorFallback = null;
+          });
+          if (successMessage != null && successMessage.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.profileAvatarUpdated ?? 'Avatar updated'),
+                content: Text(successMessage),
                 backgroundColor: Colors.green,
               ),
             );
-          } else if (state.status == AuthStatus.error) {
-            debugLog('ProfileEditPage: Avatar upload failed - ${state.errorMessage}');
-            setState(() => _isUploading = false);
+          }
+        } else if (state.status == AuthStatus.error) {
+          final errorMessage = state.errorMessage ?? _pendingErrorFallback;
+          debugLog('ProfileEditPage: Profile operation failed - $errorMessage');
+          setState(() {
+            _pendingOperation = null;
+            _pendingSuccessMessage = null;
+            _pendingErrorFallback = null;
+          });
+          if (errorMessage != null && errorMessage.isNotEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? (S.of(context)?.profileAvatarUploadFailed ?? 'Avatar upload failed')),
+                content: Text(errorMessage),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -73,9 +106,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       },
       builder: (context, state) {
         final user = state.user;
-        
+
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5),
+          backgroundColor: isDark
+              ? AppColors.backgroundDark
+              : const Color(0xFFF5F5F5),
           appBar: N42AppBar(
             title: S.of(context)?.profilePersonalProfile ?? 'Personal Profile',
             backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
@@ -83,7 +118,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           body: ListView(
             children: [
               const SizedBox(height: 10),
-              
+
               // 基本信息区块
               _buildSection(
                 isDark: isDark,
@@ -106,6 +141,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                             name: user?.displayName ?? '',
                             imageUrl: user?.avatarUrl,
                             size: 60,
+                            isNftAvatar: user?.hasNftAvatar ?? false,
+                            decorationPreset:
+                                user?.avatarDecorationPreset ??
+                                AvatarDecorationPreset.none,
                           ),
                         const SizedBox(width: 8),
                         const Icon(
@@ -117,16 +156,26 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     onTap: _pickAvatar,
                   ),
                   _buildDivider(isDark),
-                  
+
+                  _buildListTile(
+                    isDark: isDark,
+                    title: 'Avatar Studio',
+                    value: _avatarStudioLabel(user),
+                    onTap: _openAvatarStudio,
+                  ),
+                  _buildDivider(isDark),
+
                   // 名字
                   _buildListTile(
                     isDark: isDark,
                     title: S.of(context)?.profileName ?? 'Name',
-                    value: user?.displayName ?? (S.of(context)?.commonNotSet ?? 'Not Set'),
+                    value:
+                        user?.displayName ??
+                        (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: () => _editDisplayName(user?.displayName),
                   ),
                   _buildDivider(isDark),
-                  
+
                   // 性别
                   _buildListTile(
                     isDark: isDark,
@@ -135,19 +184,21 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     onTap: _selectGender,
                   ),
                   _buildDivider(isDark),
-                  
+
                   // 地区
                   _buildListTile(
                     isDark: isDark,
                     title: S.of(context)?.profileRegion ?? 'Region',
-                    value: user?.region ?? (S.of(context)?.commonNotSet ?? 'Not Set'),
+                    value:
+                        user?.region ??
+                        (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: _selectRegion,
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 10),
-              
+
               // 账号信息区块
               _buildSection(
                 isDark: isDark,
@@ -160,7 +211,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     showArrow: false,
                   ),
                   _buildDivider(isDark),
-                  
+
                   // 我的二维码
                   _buildListTile(
                     isDark: isDark,
@@ -171,7 +222,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         Icon(
                           Icons.qr_code,
                           size: 20,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondary,
                         ),
                         const SizedBox(width: 8),
                         const Icon(
@@ -184,9 +237,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 10),
-              
+
               // 其他信息区块
               _buildSection(
                 isDark: isDark,
@@ -195,23 +248,27 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   _buildListTile(
                     isDark: isDark,
                     title: S.of(context)?.profilePoke ?? 'Poke',
-                    value: user?.pokeText?.isNotEmpty == true ? user!.pokeText! : (S.of(context)?.commonNotSet ?? 'Not Set'),
+                    value: user?.pokeText?.isNotEmpty == true
+                        ? user!.pokeText!
+                        : (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: () => _editPokeText(user?.pokeText),
                   ),
                   _buildDivider(isDark),
-                  
+
                   // 签名
                   _buildListTile(
                     isDark: isDark,
                     title: S.of(context)?.profileSignature ?? 'Signature',
-                    value: user?.signature ?? (S.of(context)?.commonNotSet ?? 'Not Set'),
+                    value:
+                        user?.signature ??
+                        (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: () => _editSignature(user?.signature),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 10),
-              
+
               // 更多设置区块
               _buildSection(
                 isDark: isDark,
@@ -220,14 +277,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   _buildListTile(
                     isDark: isDark,
                     title: S.of(context)?.profileRingtone ?? 'Ringtone',
-                    value: user?.ringtone ?? (S.of(context)?.profileDefaultRingtone ?? 'Default Ringtone'),
+                    value:
+                        user?.ringtone ??
+                        (S.of(context)?.profileDefaultRingtone ??
+                            'Default Ringtone'),
                     onTap: () => _selectRingtone(user?.ringtone),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 10),
-              
+
               // 地址与发票区块
               _buildSection(
                 isDark: isDark,
@@ -239,7 +299,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     onTap: _manageAddresses,
                   ),
                   _buildDivider(isDark),
-                  
+
                   // 我的发票抬头
                   _buildListTile(
                     isDark: isDark,
@@ -248,9 +308,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 10),
-              
+
               // N42 Bean区块
               _buildSection(
                 isDark: isDark,
@@ -262,7 +322,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 40),
             ],
           ),
@@ -271,17 +331,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-  Widget _buildSection({
-    required bool isDark,
-    required List<Widget> children,
-  }) {
+  Widget _buildSection({required bool isDark, required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surface,
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
@@ -304,7 +359,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               title,
               style: TextStyle(
                 fontSize: 16,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
               ),
             ),
             const SizedBox(width: 16),
@@ -322,7 +379,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           value,
                           style: TextStyle(
                             fontSize: 16,
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                            color: isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.right,
@@ -367,6 +426,32 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     }
   }
 
+  String _avatarStudioLabel(UserEntity? user) {
+    final parts = <String>[
+      if (user?.hasNftAvatar ?? false) 'NFT',
+      if ((user?.avatarDecorationPreset ?? AvatarDecorationPreset.none) !=
+          AvatarDecorationPreset.none)
+        (user?.avatarDecorationPreset ?? AvatarDecorationPreset.none)
+            .displayName,
+    ];
+
+    return parts.isEmpty ? 'Customize' : parts.join(' · ');
+  }
+
+  void _dispatchProfileOperation({
+    required _PendingProfileOperation operation,
+    String? successMessage,
+    String? errorFallback,
+    required void Function(AuthBloc bloc) dispatch,
+  }) {
+    setState(() {
+      _pendingOperation = operation;
+      _pendingSuccessMessage = successMessage;
+      _pendingErrorFallback = errorFallback;
+    });
+    dispatch(context.read<AuthBloc>());
+  }
+
   Future<void> _pickAvatar() async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
@@ -381,7 +466,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: Text(S.of(context)?.profileChooseFromGallery ?? 'Choose from Gallery'),
+              title: Text(
+                S.of(context)?.profileChooseFromGallery ??
+                    'Choose from Gallery',
+              ),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             const SizedBox(height: 8),
@@ -399,7 +487,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     try {
       debugLog('ProfileEditPage: Picking image from $source');
-      
+
       final XFile? image = await _imagePicker.pickImage(
         source: source,
         maxWidth: 512,
@@ -412,16 +500,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         return;
       }
 
-      debugLog('ProfileEditPage: Image selected: ${image.path}, name: ${image.name}');
-      
-      setState(() => _isUploading = true);
+      debugLog(
+        'ProfileEditPage: Image selected: ${image.path}, name: ${image.name}',
+      );
 
       final bytes = await image.readAsBytes();
       debugLog('ProfileEditPage: Image bytes: ${bytes.length}');
 
       if (!mounted) return;
       if (bytes.isEmpty) {
-        throw Exception(S.of(context)?.commonImageDataEmpty ?? 'Image data is empty');
+        throw Exception(
+          S.of(context)?.commonImageDataEmpty ?? 'Image data is empty',
+        );
       }
 
       // 确保文件名有正确的扩展名
@@ -433,19 +523,28 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
       debugLog('ProfileEditPage: Uploading avatar with filename: $filename');
 
-      // 上传头像 - BlocConsumer 会监听状态变化并显示结果
-      context.read<AuthBloc>().add(UpdateAvatar(
-        avatarBytes: bytes,
-        filename: filename,
-      ));
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.avatar,
+        successMessage: S.of(context)?.profileAvatarUpdated ?? 'Avatar updated',
+        errorFallback:
+            S.of(context)?.profileAvatarUploadFailed ?? 'Avatar upload failed',
+        dispatch: (bloc) =>
+            bloc.add(UpdateAvatar(avatarBytes: bytes, filename: filename)),
+      );
     } catch (e, stackTrace) {
       debugLog('ProfileEditPage: Pick image error: $e');
       debugLog('ProfileEditPage: Stack trace: $stackTrace');
       if (mounted) {
-        setState(() => _isUploading = false);
+        setState(() {
+          _pendingOperation = null;
+          _pendingSuccessMessage = null;
+          _pendingErrorFallback = null;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.commonSelectImageFailed ?? 'Failed to select image'}: $e'),
+            content: Text(
+              '${S.of(context)?.commonSelectImageFailed ?? 'Failed to select image'}: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -483,7 +582,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     if (result != null && result.isNotEmpty && result != currentName) {
       if (!mounted) return;
-      context.read<AuthBloc>().add(UpdateDisplayName(result));
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.displayName,
+        errorFallback: 'Update nickname failed',
+        dispatch: (bloc) => bloc.add(UpdateDisplayName(result)),
+      );
     }
   }
 
@@ -495,17 +598,26 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: Text(S.of(context)?.profileMale ?? 'Male', textAlign: TextAlign.center),
+              title: Text(
+                S.of(context)?.profileMale ?? 'Male',
+                textAlign: TextAlign.center,
+              ),
               onTap: () => Navigator.pop(context, 'male'),
             ),
             const Divider(height: 1),
             ListTile(
-              title: Text(S.of(context)?.profileFemale ?? 'Female', textAlign: TextAlign.center),
+              title: Text(
+                S.of(context)?.profileFemale ?? 'Female',
+                textAlign: TextAlign.center,
+              ),
               onTap: () => Navigator.pop(context, 'female'),
             ),
             const Divider(height: 1),
             ListTile(
-              title: Text(S.of(context)?.commonCancel ?? 'Cancel', textAlign: TextAlign.center),
+              title: Text(
+                S.of(context)?.commonCancel ?? 'Cancel',
+                textAlign: TextAlign.center,
+              ),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -514,13 +626,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (result != null && mounted) {
-      context.read<AuthBloc>().add(UpdateUserProfile(gender: result));
-      final genderText = result == 'male' ? (S.of(context)?.profileMale ?? 'Male') : (S.of(context)?.profileFemale ?? 'Female');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.profileGenderSetTo(genderText) ?? 'Gender set to: $genderText'),
-          duration: const Duration(seconds: 1),
-        ),
+      final genderText = result == 'male'
+          ? (S.of(context)?.profileMale ?? 'Male')
+          : (S.of(context)?.profileFemale ?? 'Female');
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.gender,
+        successMessage:
+            S.of(context)?.profileGenderSetTo(genderText) ??
+            'Gender set to: $genderText',
+        errorFallback: 'Update profile failed',
+        dispatch: (bloc) => bloc.add(UpdateUserProfile(gender: result)),
       );
     }
   }
@@ -528,8 +643,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   Future<void> _selectRegion() async {
     // 世界著名城市 - 按地区分类
     final regions = [
-      'North America', 'Europe', 'Asia', 'Oceania',
-      'South America', 'Middle East', 'Africa',
+      'North America',
+      'Europe',
+      'Asia',
+      'Oceania',
+      'South America',
+      'Middle East',
+      'Africa',
     ];
 
     final province = await showModalBottomSheet<String>(
@@ -545,9 +665,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: AppColors.divider),
-                ),
+                border: Border(bottom: BorderSide(color: AppColors.divider)),
               ),
               child: Row(
                 children: [
@@ -624,12 +742,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         );
 
         if (city != null && mounted) {
-          context.read<AuthBloc>().add(UpdateUserProfile(region: city));
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(S.of(context)?.profileRegionSetTo(city) ?? 'Region set to: $city'),
-              duration: const Duration(seconds: 1),
-            ),
+          _dispatchProfileOperation(
+            operation: _PendingProfileOperation.region,
+            successMessage:
+                S.of(context)?.profileRegionSetTo(city) ??
+                'Region set to: $city',
+            errorFallback: 'Update profile failed',
+            dispatch: (bloc) => bloc.add(UpdateUserProfile(region: city)),
           );
         }
       }
@@ -639,13 +758,65 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   List<String> _getCitiesForRegion(String region) {
     // 世界著名城市数据
     final Map<String, List<String>> cityData = {
-      'North America': ['New York', 'Los Angeles', 'Chicago', 'San Francisco', 'Miami', 'Toronto', 'Vancouver', 'Mexico City'],
-      'Europe': ['London', 'Paris', 'Berlin', 'Rome', 'Madrid', 'Amsterdam', 'Barcelona', 'Vienna', 'Prague', 'Zurich'],
-      'Asia': ['Tokyo', 'Singapore', 'Hong Kong', 'Seoul', 'Shanghai', 'Beijing', 'Bangkok', 'Mumbai', 'Taipei', 'Osaka'],
+      'North America': [
+        'New York',
+        'Los Angeles',
+        'Chicago',
+        'San Francisco',
+        'Miami',
+        'Toronto',
+        'Vancouver',
+        'Mexico City',
+      ],
+      'Europe': [
+        'London',
+        'Paris',
+        'Berlin',
+        'Rome',
+        'Madrid',
+        'Amsterdam',
+        'Barcelona',
+        'Vienna',
+        'Prague',
+        'Zurich',
+      ],
+      'Asia': [
+        'Tokyo',
+        'Singapore',
+        'Hong Kong',
+        'Seoul',
+        'Shanghai',
+        'Beijing',
+        'Bangkok',
+        'Mumbai',
+        'Taipei',
+        'Osaka',
+      ],
       'Oceania': ['Sydney', 'Melbourne', 'Auckland', 'Brisbane', 'Perth'],
-      'South America': ['São Paulo', 'Rio de Janeiro', 'Buenos Aires', 'Lima', 'Bogotá', 'Santiago'],
-      'Middle East': ['Dubai', 'Abu Dhabi', 'Tel Aviv', 'Istanbul', 'Doha', 'Riyadh'],
-      'Africa': ['Cape Town', 'Cairo', 'Johannesburg', 'Nairobi', 'Casablanca', 'Lagos'],
+      'South America': [
+        'São Paulo',
+        'Rio de Janeiro',
+        'Buenos Aires',
+        'Lima',
+        'Bogotá',
+        'Santiago',
+      ],
+      'Middle East': [
+        'Dubai',
+        'Abu Dhabi',
+        'Tel Aviv',
+        'Istanbul',
+        'Doha',
+        'Riyadh',
+      ],
+      'Africa': [
+        'Cape Town',
+        'Cairo',
+        'Johannesburg',
+        'Nairobi',
+        'Casablanca',
+        'Lagos',
+      ],
     };
     return cityData[region] ?? [];
   }
@@ -673,9 +844,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               autofocus: true,
               maxLength: 50,
               decoration: InputDecoration(
-                hintText: S.of(context)?.profileEnterPokeSuffixHint ?? 'Enter poke suffix, e.g.: on the shoulder',
+                hintText:
+                    S.of(context)?.profileEnterPokeSuffixHint ??
+                    'Enter poke suffix, e.g.: on the shoulder',
                 border: const OutlineInputBorder(),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -702,12 +878,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (result != null && mounted) {
-      context.read<AuthBloc>().add(UpdateUserProfile(pokeText: result));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.isEmpty ? (S.of(context)?.profilePokeCleared ?? 'Poke cleared') : (S.of(context)?.profilePokeSetTo(result) ?? 'Poke set to: poked me$result')),
-          duration: const Duration(seconds: 1),
-        ),
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.pokeText,
+        successMessage: result.isEmpty
+            ? (S.of(context)?.profilePokeCleared ?? 'Poke cleared')
+            : (S.of(context)?.profilePokeSetTo(result) ??
+                  'Poke set to: poked me$result'),
+        errorFallback: 'Update profile failed',
+        dispatch: (bloc) => bloc.add(UpdateUserProfile(pokeText: result)),
       );
     }
   }
@@ -724,7 +902,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           maxLength: 50,
           maxLines: 3,
           decoration: InputDecoration(
-            hintText: S.of(context)?.profileIntroduceYourself ?? 'A sentence to introduce yourself',
+            hintText:
+                S.of(context)?.profileIntroduceYourself ??
+                'A sentence to introduce yourself',
           ),
         ),
         actions: [
@@ -741,12 +921,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     if (result != null && result != currentSignature && mounted) {
-      context.read<AuthBloc>().add(UpdateUserProfile(signature: result));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.isEmpty ? (S.of(context)?.profileSignatureCleared ?? 'Signature cleared') : (S.of(context)?.profileSignatureUpdated ?? 'Signature updated')),
-          duration: const Duration(seconds: 1),
-        ),
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.signature,
+        successMessage: result.isEmpty
+            ? (S.of(context)?.profileSignatureCleared ?? 'Signature cleared')
+            : (S.of(context)?.profileSignatureUpdated ?? 'Signature updated'),
+        errorFallback: 'Update profile failed',
+        dispatch: (bloc) => bloc.add(UpdateUserProfile(signature: result)),
       );
     }
   }
@@ -790,7 +971,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                S.of(context)?.profileScanToAddFriend ?? 'Scan the QR code above to add me as a friend',
+                S.of(context)?.profileScanToAddFriend ??
+                    'Scan the QR code above to add me as a friend',
                 style: const TextStyle(fontSize: 12),
               ),
             ],
@@ -804,46 +986,54 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute<String>(
         builder: (context) => RingtoneSelectPage(
-          currentRingtone: currentRingtone ?? (S.of(context)?.profileDefaultRingtone ?? 'Default Ringtone'),
+          currentRingtone:
+              currentRingtone ??
+              (S.of(context)?.profileDefaultRingtone ?? 'Default Ringtone'),
         ),
       ),
     );
 
     if (result != null && result != currentRingtone && mounted) {
-      context.read<AuthBloc>().add(UpdateUserProfile(ringtone: result));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(S.of(context)?.profileRingtoneSetTo(result) ?? 'Ringtone set to: $result'),
-          duration: const Duration(seconds: 1),
-        ),
+      _dispatchProfileOperation(
+        operation: _PendingProfileOperation.ringtone,
+        successMessage:
+            S.of(context)?.profileRingtoneSetTo(result) ??
+            'Ringtone set to: $result',
+        errorFallback: 'Update profile failed',
+        dispatch: (bloc) => bloc.add(UpdateUserProfile(ringtone: result)),
       );
     }
   }
 
-  Future<void> _manageAddresses() async {
+  Future<void> _openAvatarStudio() async {
+    final authBloc = context.read<AuthBloc>();
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (context) => const AddressManagePage(),
+        builder: (_) => BlocProvider.value(
+          value: authBloc,
+          child: const AvatarStudioPage(),
+        ),
       ),
+    );
+  }
+
+  Future<void> _manageAddresses() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (context) => const AddressManagePage()),
     );
   }
 
   Future<void> _manageInvoices() async {
     await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => const InvoiceManagePage(),
-      ),
+      MaterialPageRoute<void>(builder: (context) => const InvoiceManagePage()),
     );
   }
 
   Future<void> _openN42Bean() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => const N42BeanPage(),
-      ),
-    );
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (context) => const N42BeanPage()));
   }
-
 }
 
 /// 地址管理页面

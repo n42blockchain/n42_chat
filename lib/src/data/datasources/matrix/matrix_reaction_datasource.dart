@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:matrix/matrix.dart' as matrix;
 
 import 'matrix_client_manager.dart';
+import 'message/matrix_text_message_content.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// Matrix消息反应数据源
@@ -12,11 +15,7 @@ class MatrixReactionDataSource {
   matrix.Client? get _client => _clientManager.client;
 
   /// 添加emoji反应
-  Future<void> addReaction(
-    String roomId,
-    String eventId,
-    String emoji,
-  ) async {
+  Future<void> addReaction(String roomId, String eventId, String emoji) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) throw Exception('Room not found');
 
@@ -44,8 +43,12 @@ class MatrixReactionDataSource {
     final currentUserId = _client!.userID;
 
     for (final event in timeline.events) {
+      if (event.redactedBecause != null) {
+        continue;
+      }
       if (event.type == 'm.reaction' && event.senderId == currentUserId) {
-        final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
+        final relatesTo =
+            event.content['m.relates_to'] as Map<String, dynamic>?;
         if (relatesTo != null &&
             relatesTo['event_id'] == eventId &&
             relatesTo['key'] == emoji) {
@@ -66,22 +69,28 @@ class MatrixReactionDataSource {
     if (room == null) return {};
 
     final timeline = await room.getTimeline();
-    final reactions = <String, List<String>>{};
+    final reactions = <String, Set<String>>{};
 
     for (final event in timeline.events) {
+      if (event.redactedBecause != null) {
+        continue;
+      }
       if (event.type == 'm.reaction') {
-        final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
+        final relatesTo =
+            event.content['m.relates_to'] as Map<String, dynamic>?;
         if (relatesTo != null && relatesTo['event_id'] == eventId) {
           final emoji = relatesTo['key'] as String?;
           if (emoji != null) {
-            reactions.putIfAbsent(emoji, () => []);
+            reactions.putIfAbsent(emoji, () => <String>{});
             reactions[emoji]!.add(event.senderId);
           }
         }
       }
     }
 
-    return reactions;
+    return reactions.map(
+      (emoji, userIds) => MapEntry(emoji, userIds.toList(growable: false)),
+    );
   }
 
   /// 回复消息
@@ -95,12 +104,15 @@ class MatrixReactionDataSource {
     if (room == null) throw Exception('Room not found');
 
     // 获取原消息
-    final timeline = await room.getTimeline();
-    matrix.Event? originalEvent;
-    for (final event in timeline.events) {
-      if (event.eventId == originalEventId) {
-        originalEvent = event;
-        break;
+    matrix.Event? originalEvent = await room.getEventById(originalEventId);
+
+    if (originalEvent == null) {
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        if (event.eventId == originalEventId) {
+          originalEvent = event;
+          break;
+        }
       }
     }
 
@@ -108,30 +120,12 @@ class MatrixReactionDataSource {
       throw Exception('Original message not found');
     }
 
-    // 构建回复格式
-    final senderName = originalEvent.senderFromMemoryOrFallback.calcDisplayname();
-    final originalBody = originalEvent.body;
+    final replyContent = buildTextMessageContent(content);
+    if (formattedContent != null && formattedContent.isNotEmpty) {
+      replyContent['formatted_body'] = formattedContent;
+    }
 
-    // 富文本格式的回复
-    final formattedBody = formattedContent ??
-        '<mx-reply><blockquote><a href="https://matrix.to/#/${room.id}/$originalEventId">In reply to</a> <a href="https://matrix.to/#/${originalEvent.senderId}">$senderName</a><br/>$originalBody</blockquote></mx-reply>$content';
-
-    // 纯文本格式的回复
-    final plainBody = '> <${originalEvent.senderId}> $originalBody\n\n$content';
-
-    final eventId = await room.sendEvent({
-      'msgtype': 'm.text',
-      'body': plainBody,
-      'format': 'org.matrix.custom.html',
-      'formatted_body': formattedBody,
-      'm.relates_to': {
-        'm.in_reply_to': {
-          'event_id': originalEventId,
-        },
-      },
-    });
-
-    return eventId;
+    return room.sendEvent(replyContent, inReplyTo: originalEvent);
   }
 
   /// 编辑消息
@@ -144,24 +138,12 @@ class MatrixReactionDataSource {
     final room = _client?.getRoomById(roomId);
     if (room == null) throw Exception('Room not found');
 
-    final eventId = await room.sendEvent({
-      'msgtype': 'm.text',
-      'body': '* $newContent',
-      'm.new_content': {
-        'msgtype': 'm.text',
-        'body': newContent,
-        if (formattedContent != null) ...{
-          'format': 'org.matrix.custom.html',
-          'formatted_body': formattedContent,
-        },
-      },
-      'm.relates_to': {
-        'rel_type': 'm.replace',
-        'event_id': originalEventId,
-      },
-    });
+    final content = buildTextMessageContent(newContent);
+    if (formattedContent != null && formattedContent.isNotEmpty) {
+      content['formatted_body'] = formattedContent;
+    }
 
-    return eventId;
+    return room.sendEvent(content, editEventId: originalEventId);
   }
 
   /// 撤回消息
@@ -170,7 +152,9 @@ class MatrixReactionDataSource {
     String eventId, {
     String? reason,
   }) async {
-    debugLog('MatrixReactionDataSource: redactMessage called - roomId=$roomId, eventId=$eventId, reason=$reason');
+    debugLog(
+      'MatrixReactionDataSource: redactMessage called - roomId=$roomId, eventId=$eventId, reason=$reason',
+    );
 
     final room = _client?.getRoomById(roomId);
     if (room == null) {
@@ -181,7 +165,9 @@ class MatrixReactionDataSource {
     try {
       debugLog('MatrixReactionDataSource: Calling room.redactEvent...');
       final result = await room.redactEvent(eventId, reason: reason);
-      debugLog('MatrixReactionDataSource: redactEvent completed, result=$result');
+      debugLog(
+        'MatrixReactionDataSource: redactEvent completed, result=$result',
+      );
     } catch (e, stackTrace) {
       debugLog('MatrixReactionDataSource: redactEvent failed: $e');
       debugLog('MatrixReactionDataSource: Stack: $stackTrace');
@@ -225,46 +211,54 @@ class MatrixReactionDataSource {
 
     switch (msgType) {
       case matrix.MessageTypes.Text:
-        newEventId = await toRoom.sendTextEvent(originalEvent.body);
+      case matrix.MessageTypes.Notice:
+      case matrix.MessageTypes.Emote:
+        final forwardText = originalEvent.calcUnlocalizedBody(
+          hideReply: true,
+          hideEdit: true,
+          plaintextBody: true,
+          removeMarkdown: false,
+        );
+        newEventId = await toRoom.sendEvent(
+          buildTextMessageContent(forwardText),
+        );
         break;
       case matrix.MessageTypes.Image:
       case matrix.MessageTypes.Video:
       case matrix.MessageTypes.Audio:
       case matrix.MessageTypes.File:
-        // 复制媒体消息 - 确保包含所有必要的字段
-        final content = <String, dynamic>{
-          'msgtype': msgType,
-          'body': originalEvent.body,
-        };
-
-        // 添加 URL（必须）
-        final url = originalEvent.content['url'];
-        if (url != null) {
-          content['url'] = url;
-        }
-
-        // 添加 info（包含媒体元数据）
-        final info = originalEvent.content['info'];
-        if (info != null) {
-          content['info'] = info;
-        }
-
-        // 对于文件类型，添加 filename
-        if (msgType == matrix.MessageTypes.File) {
-          final filename = originalEvent.content['filename'];
-          if (filename != null) {
-            content['filename'] = filename;
-          }
-        }
-
-        newEventId = await toRoom.sendEvent(content);
+      case matrix.MessageTypes.Location:
+        newEventId = await toRoom.sendEvent(
+          _cloneForwardContent(originalEvent.content),
+        );
+        break;
+      case matrix.MessageTypes.Sticker:
+        newEventId = await toRoom.sendEvent(
+          _cloneForwardContent(originalEvent.content),
+          type: matrix.EventTypes.Sticker,
+        );
         break;
       default:
         // 作为文本转发
-        newEventId = await toRoom.sendTextEvent(originalEvent.body);
+        newEventId = await toRoom.sendTextEvent(
+          originalEvent.calcUnlocalizedBody(
+            hideReply: true,
+            hideEdit: true,
+            plaintextBody: true,
+            removeMarkdown: false,
+          ),
+        );
     }
 
     return newEventId;
+  }
+
+  Map<String, dynamic> _cloneForwardContent(Map<String, dynamic> content) {
+    final cloned = jsonDecode(jsonEncode(content)) as Map<String, dynamic>;
+    cloned.remove('m.relates_to');
+    cloned.remove('m.new_content');
+    cloned.remove('m.mentions');
+    return cloned;
   }
 
   /// 检查用户是否可以撤回消息
@@ -310,18 +304,21 @@ class MatrixReactionDataSource {
       final entries = <EditHistoryEntry>[];
 
       // 添加原始版本
-      entries.add(EditHistoryEntry(
-        content: originalEvent.body,
-        editedAt: originalEvent.originServerTs,
-        editorId: originalEvent.senderId,
-        isOriginal: true,
-      ));
+      entries.add(
+        EditHistoryEntry(
+          content: originalEvent.body,
+          editedAt: originalEvent.originServerTs,
+          editorId: originalEvent.senderId,
+          isOriginal: true,
+        ),
+      );
 
       // 通过 timeline 查找所有编辑事件
       final timeline = await room.getTimeline();
       for (final event in timeline.events) {
         // 查找 m.replace 类型的关系事件，并且目标是我们的消息
-        final relatesTo = event.content['m.relates_to'] as Map<String, dynamic>?;
+        final relatesTo =
+            event.content['m.relates_to'] as Map<String, dynamic>?;
         if (relatesTo == null) continue;
 
         final relType = relatesTo['rel_type'] as String?;
@@ -329,15 +326,18 @@ class MatrixReactionDataSource {
 
         if (relType == 'm.replace' && targetEventId == eventId) {
           // 提取编辑后的内容
-          final newContent = event.content['m.new_content'] as Map<String, dynamic>?;
+          final newContent =
+              event.content['m.new_content'] as Map<String, dynamic>?;
           final body = newContent?['body'] as String? ?? event.body;
 
-          entries.add(EditHistoryEntry(
-            content: body,
-            editedAt: event.originServerTs,
-            editorId: event.senderId,
-            isOriginal: false,
-          ));
+          entries.add(
+            EditHistoryEntry(
+              content: body,
+              editedAt: event.originServerTs,
+              editorId: event.senderId,
+              isOriginal: false,
+            ),
+          );
         }
       }
 
@@ -372,4 +372,3 @@ class EditHistoryEntry {
     this.isOriginal = false,
   });
 }
-

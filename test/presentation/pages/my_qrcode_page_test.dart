@@ -5,12 +5,17 @@ import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
+import 'package:n42_chat/src/domain/entities/avatar_decoration_preset.dart';
+import 'package:n42_chat/src/domain/entities/user_entity.dart';
+import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/presentation/pages/qrcode/my_qrcode_page.dart';
 
 class MockMatrixClientManager extends Mock implements MatrixClientManager {
   @override
   matrix.Client? get client => null;
 }
+
+class MockAuthRepository extends Mock implements IAuthRepository {}
 
 Widget buildTestWidget(Widget child, {ThemeData? theme}) {
   return MaterialApp(
@@ -24,26 +29,37 @@ Widget buildTestWidget(Widget child, {ThemeData? theme}) {
 
 void main() {
   late MockMatrixClientManager mockClientManager;
+  late MockAuthRepository mockAuthRepository;
 
   setUp(() {
     mockClientManager = MockMatrixClientManager();
+    mockAuthRepository = MockAuthRepository();
 
     // 注册 GetIt 依赖
     if (getIt.isRegistered<MatrixClientManager>()) {
       getIt.unregister<MatrixClientManager>();
     }
+    if (getIt.isRegistered<IAuthRepository>()) {
+      getIt.unregister<IAuthRepository>();
+    }
     getIt.registerSingleton<MatrixClientManager>(mockClientManager);
+    getIt.registerSingleton<IAuthRepository>(mockAuthRepository);
+    when(
+      () => mockAuthRepository.getCurrentUserProfile(),
+    ).thenAnswer((_) async => null);
   });
 
   tearDown(() {
     if (getIt.isRegistered<MatrixClientManager>()) {
       getIt.unregister<MatrixClientManager>();
     }
+    if (getIt.isRegistered<IAuthRepository>()) {
+      getIt.unregister<IAuthRepository>();
+    }
   });
 
   group('MyQRCodePage', () {
-    testWidgets('renders with loading state when no user info',
-        (tester) async {
+    testWidgets('renders with loading state when no user info', (tester) async {
       // 使用较大的屏幕尺寸避免 overflow 错误
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
@@ -118,8 +134,9 @@ void main() {
       expect(find.text('Share'), findsOneWidget);
     });
 
-    testWidgets('tapping more_horiz shows bottom sheet options',
-        (tester) async {
+    testWidgets('tapping more_horiz shows bottom sheet options', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -152,8 +169,9 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('RepaintBoundary wraps QR content for screenshot',
-        (tester) async {
+    testWidgets('RepaintBoundary wraps QR content for screenshot', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1080, 1920);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -163,6 +181,30 @@ void main() {
       await tester.pump();
 
       expect(find.byType(RepaintBoundary), findsWidgets);
+    });
+
+    testWidgets('uses shared auth profile avatar decoration when available', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      when(() => mockAuthRepository.getCurrentUserProfile()).thenAnswer(
+        (_) async => const UserEntity(
+          userId: '@alice:example.org',
+          displayName: 'Alice',
+          avatarUrl: null,
+          avatarDecorationPreset: AvatarDecorationPreset.arcade,
+        ),
+      );
+
+      await tester.pumpWidget(buildTestWidget(const MyQRCodePage()));
+      await tester.pump();
+
+      expect(find.text('Alice'), findsOneWidget);
+      expect(find.byIcon(Icons.sports_esports), findsOneWidget);
     });
   });
 }

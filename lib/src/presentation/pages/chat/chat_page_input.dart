@@ -32,11 +32,9 @@ extension _ChatPageInputMethods on _ChatPageState {
             ),
             const SizedBox(width: 8),
             Text(
-              S.of(context)?.channelReadOnly ?? 'Only admins can post in this channel',
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade500,
-              ),
+              S.of(context)?.channelReadOnly ??
+                  'Only admins can post in this channel',
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
             ),
           ],
         ),
@@ -56,20 +54,16 @@ extension _ChatPageInputMethods on _ChatPageState {
       onMorePressed: _onMorePressed,
       onQuickReplyPressed: _onQuickReplyPressed,
       onCommandPoll: _createPoll,
-      onScheduledSend: (scheduledAt) {
-        final text = _inputController.text.trim();
-        if (text.isNotEmpty) {
-          context.read<ChatBloc>().add(SendScheduledMessage(
-            text: text,
-            scheduledAt: scheduledAt,
-          ));
-        }
-      },
+      onScheduledSend: _scheduleComposerText,
     );
   }
 
   /// 录音状态变化处理
-  void _onRecordingStateChanged(bool isRecording, bool isCancelled, Duration duration) {
+  void _onRecordingStateChanged(
+    bool isRecording,
+    bool isCancelled,
+    Duration duration,
+  ) {
     setState(() {
       _isRecording = isRecording;
       _isRecordingCancelled = isCancelled;
@@ -96,12 +90,17 @@ extension _ChatPageInputMethods on _ChatPageState {
                   width: 140,
                   height: 140,
                   decoration: BoxDecoration(
-                    color: _isRecordingCancelled ? AppColors.error : AppColors.primary,
+                    color: _isRecordingCancelled
+                        ? AppColors.error
+                        : AppColors.primary,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: (_isRecordingCancelled ? AppColors.error : AppColors.primary)
-                            .withValues(alpha: 0.4),
+                        color:
+                            (_isRecordingCancelled
+                                    ? AppColors.error
+                                    : AppColors.primary)
+                                .withValues(alpha: 0.4),
                         blurRadius: 30,
                         spreadRadius: 10,
                       ),
@@ -130,7 +129,10 @@ extension _ChatPageInputMethods on _ChatPageState {
                 const SizedBox(height: 40),
                 // 提示文字
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: _isRecordingCancelled
                         ? AppColors.error.withValues(alpha: 0.2)
@@ -139,10 +141,14 @@ extension _ChatPageInputMethods on _ChatPageState {
                   ),
                   child: Text(
                     _isRecordingCancelled
-                        ? (S.of(context)?.chatReleaseToCancel ?? 'Release to cancel')
-                        : (S.of(context)?.chatReleaseToSend ?? 'Release to send, swipe up to cancel'),
+                        ? (S.of(context)?.chatReleaseToCancel ??
+                              'Release to cancel')
+                        : (S.of(context)?.chatReleaseToSend ??
+                              'Release to send, swipe up to cancel'),
                     style: TextStyle(
-                      color: _isRecordingCancelled ? AppColors.error : Colors.white,
+                      color: _isRecordingCancelled
+                          ? AppColors.error
+                          : Colors.white,
                       fontSize: 16,
                     ),
                   ),
@@ -171,6 +177,7 @@ extension _ChatPageInputMethods on _ChatPageState {
   Widget _buildStickerPicker() {
     return StickerPicker(
       onStickerSelected: _onStickerSelected,
+      onStickerLongPressed: _onStickerLongPressed,
       onOpenStore: _openStickerStore,
     );
   }
@@ -198,7 +205,11 @@ extension _ChatPageInputMethods on _ChatPageState {
           ),
           GestureDetector(
             onTap: () => setState(() => _selfDestructAfter = null),
-            child: const Icon(Icons.close, size: 18, color: AppColors.textTertiary),
+            child: const Icon(
+              Icons.close,
+              size: 18,
+              color: AppColors.textTertiary,
+            ),
           ),
         ],
       ),
@@ -247,19 +258,21 @@ extension _ChatPageInputMethods on _ChatPageState {
               ),
               const Divider(height: 1),
               // 预设时间列表
-              ...SelfDestructTimer.presets.map((preset) => ListTile(
-                    leading: Icon(
-                      Icons.timer_outlined,
-                      color: _selfDestructAfter == preset.seconds
-                          ? Colors.orange
-                          : null,
-                    ),
-                    title: Text(preset.name),
-                    trailing: _selfDestructAfter == preset.seconds
-                        ? const Icon(Icons.check, color: Colors.orange)
+              ...SelfDestructTimer.presets.map(
+                (preset) => ListTile(
+                  leading: Icon(
+                    Icons.timer_outlined,
+                    color: _selfDestructAfter == preset.seconds
+                        ? Colors.orange
                         : null,
-                    onTap: () => Navigator.pop(ctx, preset.seconds),
-                  )),
+                  ),
+                  title: Text(preset.name),
+                  trailing: _selfDestructAfter == preset.seconds
+                      ? const Icon(Icons.check, color: Colors.orange)
+                      : null,
+                  onTap: () => Navigator.pop(ctx, preset.seconds),
+                ),
+              ),
             ],
           ),
         ),
@@ -299,7 +312,11 @@ extension _ChatPageInputMethods on _ChatPageState {
                 _isViewOnce = false;
               });
             },
-            child: const Icon(Icons.close, size: 18, color: AppColors.textTertiary),
+            child: const Icon(
+              Icons.close,
+              size: 18,
+              color: AppColors.textTertiary,
+            ),
           ),
         ],
       ),
@@ -307,10 +324,22 @@ extension _ChatPageInputMethods on _ChatPageState {
   }
 
   Widget _buildMorePanel() {
+    final shopApp = MiniAppLauncherHelper.findBuiltInAppById(
+      MiniAppLauncherHelper.shopAppId,
+    );
+
     return ChatMorePanel(
       onPhotoPressed: () {
         _hideMorePanel();
-        _pickImage();
+        _showPhotoPickerOptions();
+      },
+      onPhotoLongPress: () async {
+        _hideMorePanel();
+        final scheduledAt = await showScheduledSendPicker(context);
+        if (!mounted || scheduledAt == null) {
+          return;
+        }
+        await _showPhotoPickerOptions(scheduledAt: scheduledAt);
       },
       onCameraPressed: () {
         _hideMorePanel();
@@ -336,6 +365,14 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _pickFile();
       },
+      onFileLongPress: () async {
+        _hideMorePanel();
+        final scheduledAt = await showScheduledSendPicker(context);
+        if (!mounted || scheduledAt == null) {
+          return;
+        }
+        await _pickFile(scheduledAt: scheduledAt);
+      },
       onContactCardPressed: () {
         _hideMorePanel();
         _sendContactCard();
@@ -348,14 +385,15 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _shareMusic();
       },
-      onCouponPressed: () {
+      onReceivePressed: () {
         _hideMorePanel();
-        _selectCoupon();
+        _openReceive();
       },
-      onGiftPressed: () {
+      onShopPressed: () {
         _hideMorePanel();
-        _sendGift();
+        _openCommerceHub();
       },
+      shopLabel: shopApp?.name,
       onPollPressed: () {
         _hideMorePanel();
         _createPoll();
@@ -378,9 +416,8 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         Navigator.of(context).push(
           MaterialPageRoute<void>(
-            builder: (context) => LiveLocationPage(
-              roomId: widget.conversation.id,
-            ),
+            builder: (context) =>
+                LiveLocationPage(roomId: widget.conversation.id),
           ),
         );
       },
@@ -391,10 +428,16 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _showSelfDestructTimerPicker();
       },
-      onAiAssistantPressed: getIt.isRegistered<IAiRepository>() ? () {
+      onScheduledPressed: () {
         _hideMorePanel();
-        _openAiAssistant();
-      } : null,
+        _openScheduledComposerPicker();
+      },
+      onAiAssistantPressed: getIt.isRegistered<IAiRepository>()
+          ? () {
+              _hideMorePanel();
+              _openAiAssistant();
+            }
+          : null,
       onMiniAppsPressed: () {
         _hideMorePanel();
         _openMiniApps();
@@ -402,10 +445,57 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
   }
 
-  void _openMiniApps() {
+  void _scheduleComposerText(DateTime scheduledAt) {
+    final text = _inputController.text.trim();
+    if (text.isEmpty) {
+      return;
+    }
+
+    final mentionPayload = ChatMentionHelper.buildPayload(
+      text: text,
+      selections: _composerMentions,
+      members: _groupMembers,
+    );
+    context.read<ChatBloc>().add(
+      SendScheduledMessage(
+        text: text,
+        scheduledAt: scheduledAt,
+        mentionedUserIds: mentionPayload.mentionedUserIds,
+        mentionsRoom: mentionPayload.mentionsRoom,
+      ),
+    );
+    _clearComposerMentions();
+  }
+
+  Future<void> _openScheduledComposerPicker() async {
+    final text = _inputController.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter a message before scheduling'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
+
+    final scheduledAt = await showScheduledSendPicker(context);
+    if (!mounted || scheduledAt == null) {
+      return;
+    }
+
+    _scheduleComposerText(scheduledAt);
+    _inputController.clear();
+    _inputFocusNode.requestFocus();
+  }
+
+  void _openMiniApps({MiniAppCategory? initialCategory}) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => MiniAppMarketPage(roomId: widget.conversation.id),
+        builder: (_) => MiniAppMarketPage(
+          roomId: widget.conversation.id,
+          initialCategory: initialCategory,
+        ),
       ),
     );
   }
@@ -457,11 +547,15 @@ extension _ChatPageInputMethods on _ChatPageState {
         if (selection.isValid && selection.isCollapsed) {
           // 有光标位置
           final cursorPos = selection.baseOffset;
-          newText = text.substring(0, cursorPos) + emoji + text.substring(cursorPos);
+          newText =
+              text.substring(0, cursorPos) + emoji + text.substring(cursorPos);
           newCursorPos = cursorPos + emoji.length;
         } else if (selection.isValid && !selection.isCollapsed) {
           // 有选中文本，替换选中的文本
-          newText = text.substring(0, selection.start) + emoji + text.substring(selection.end);
+          newText =
+              text.substring(0, selection.start) +
+              emoji +
+              text.substring(selection.end);
           newCursorPos = selection.start + emoji.length;
         } else {
           // 没有光标，添加到末尾
@@ -499,7 +593,9 @@ extension _ChatPageInputMethods on _ChatPageState {
           }
         } else if (selection.isValid && !selection.isCollapsed) {
           // 有选中文本，删除选中的文本
-          final newText = text.substring(0, selection.start) + text.substring(selection.end);
+          final newText =
+              text.substring(0, selection.start) +
+              text.substring(selection.end);
           _inputController.text = newText;
           _inputController.selection = TextSelection.fromPosition(
             TextPosition(offset: selection.start),
@@ -529,12 +625,10 @@ extension _ChatPageInputMethods on _ChatPageState {
       constraints: const BoxConstraints(maxHeight: 200),
       decoration: BoxDecoration(
         color: bgColor,
-        border: Border(
-          top: BorderSide(color: borderColor, width: 0.5),
-        ),
+        border: Border(top: BorderSide(color: borderColor, width: 0.5)),
       ),
-      child: FutureBuilder<List<Map<String, String>>>(
-        future: _loadGroupMembers(),
+      child: FutureBuilder<List<ChatMentionMember>>(
+        future: _groupMembersFuture ??= _loadGroupMembers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -546,16 +640,13 @@ extension _ChatPageInputMethods on _ChatPageState {
           }
 
           final members = snapshot.data ?? [];
+          final suggestions = ChatMentionHelper.buildSuggestions(
+            members: members,
+            currentUserId: _currentUserId,
+            query: _mentionSearchQuery,
+          );
 
-          // 过滤成员
-          final filteredMembers = _mentionSearchQuery.isEmpty
-              ? members
-              : members.where((m) {
-                  final name = m['name']?.toLowerCase() ?? '';
-                  return name.contains(_mentionSearchQuery.toLowerCase());
-                }).toList();
-
-          if (filteredMembers.isEmpty) {
+          if (suggestions.isEmpty) {
             return Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
@@ -570,22 +661,20 @@ extension _ChatPageInputMethods on _ChatPageState {
           return ListView.builder(
             shrinkWrap: true,
             padding: EdgeInsets.zero,
-            itemCount: filteredMembers.length,
+            itemCount: suggestions.length,
             itemBuilder: (context, index) {
-              final member = filteredMembers[index];
-              final name = member['name'] ?? '';
-              final avatarUrl = member['avatarUrl'] ?? '';
-              final userId = member['id'] ?? '';
-
-              // 排除自己
-              if (userId == _currentUserId) {
-                return const SizedBox.shrink();
-              }
+              final suggestion = suggestions[index];
+              final name = suggestion.displayName;
+              final avatarUrl = suggestion.avatarUrl;
+              final isRoomMention = suggestion.mentionsRoom;
 
               return InkWell(
-                onTap: () => _onMentionMemberSelected(name, userId),
+                onTap: () => _onMentionSuggestionSelected(suggestion),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(color: borderColor, width: 0.5),
@@ -593,34 +682,56 @@ extension _ChatPageInputMethods on _ChatPageState {
                   ),
                   child: Row(
                     children: [
-                      // 头像
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: Colors.grey[300],
-                        backgroundImage: avatarUrl.isNotEmpty
+                        backgroundColor: isRoomMention
+                            ? AppColors.primary.withValues(alpha: 0.12)
+                            : Colors.grey[300],
+                        backgroundImage: !isRoomMention && avatarUrl.isNotEmpty
                             ? NetworkImage(avatarUrl)
                             : null,
-                        child: avatarUrl.isEmpty
-                            ? Text(
-                                name.isNotEmpty ? name[0].toUpperCase() : '?',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                        child: isRoomMention
+                            ? const Icon(
+                                Icons.alternate_email,
+                                size: 18,
+                                color: AppColors.primary,
                               )
-                            : null,
+                            : (avatarUrl.isEmpty
+                                  ? Text(
+                                      name.isNotEmpty
+                                          ? name[0].toUpperCase()
+                                          : '?',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )
+                                  : null),
                       ),
                       const SizedBox(width: 12),
-                      // 名称
                       Expanded(
-                        child: Text(
-                          name,
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 15,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(color: textColor, fontSize: 15),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (suggestion.subtitle != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Text(
+                                  suggestion.subtitle!,
+                                  style: TextStyle(
+                                    color: subtextColor,
+                                    fontSize: 12,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ],
@@ -650,6 +761,9 @@ extension _ChatPageInputMethods on _ChatPageState {
         );
       },
       storageDataSource: getIt<PreferencesDataSource>(),
+      smartReplyLoader: getIt.isRegistered<AiService>()
+          ? _loadAiSmartReplies
+          : null,
     );
   }
 }

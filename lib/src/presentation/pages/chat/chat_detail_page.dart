@@ -5,21 +5,36 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/encryption/e2ee_manager.dart';
+import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_lock_service.dart';
+import '../../../core/services/media_lifecycle_service.dart';
 import '../../../core/services/remark_service.dart';
+import '../../../core/services/storage_cleanup_service.dart';
+import '../../../core/services/storage_manager_service.dart';
+import '../../../core/services/storage_monitor_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
+import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
+import '../../blocs/storage/storage_management_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../contact/contact_detail_page.dart';
+import '../group/group_media_hub_page.dart';
 import '../group/group_settings_page.dart';
-import '../media/media_gallery_page.dart';
 import 'chat_export_page.dart';
+import 'scheduled_messages_page.dart';
+import '../settings/auto_download_settings_page.dart';
+import '../settings/backup_restore_page.dart';
 import '../settings/chat_background_page.dart';
+import '../settings/room_storage_detail_page.dart';
+import '../settings/security_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 聊天详情页面（仿微信）
@@ -40,7 +55,8 @@ class ChatDetailPage extends StatefulWidget {
   final void Function(String userId)? onRemoveMember;
 
   /// 点击成员头像的回调（返回true表示是好友，可以直接聊天）
-  final void Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
+  final void Function(String userId, String displayName, String? avatarUrl)?
+  onMemberTap;
 
   /// 清空聊天记录的回调
   final VoidCallback? onClearHistory;
@@ -62,9 +78,10 @@ class ChatDetailPage extends StatefulWidget {
 
 class _ChatDetailPageState extends State<ChatDetailPage> {
   bool _isPinned = false;
-  bool _isMuted = false;
   bool _isStrongReminder = false;
   bool _isChatLocked = false;
+  ConversationNotificationMode _notificationMode =
+      ConversationNotificationMode.allMessages;
 
   // 群名称（可编辑）
   late String _groupName;
@@ -78,9 +95,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   void initState() {
     super.initState();
     _isPinned = widget.conversation.isPinned;
-    _isMuted = widget.conversation.isMuted;
+    _notificationMode = widget.conversation.isMuted
+        ? ConversationNotificationMode.muted
+        : ConversationNotificationMode.allMessages;
     _groupName = widget.conversation.name;
 
+    _loadNotificationModeStatus();
     // 加载强提醒状态
     _loadStrongReminderStatus();
 
@@ -88,10 +108,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     _loadChatLockStatus();
 
     // 监听备注更新
-    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((
+      event,
+    ) {
       final targetUserId = widget.conversation.directUserId;
       if (targetUserId != null && event.userId == targetUserId && mounted) {
-        debugLog('ChatDetailPage: Remark updated for $targetUserId, refreshing UI');
+        debugLog(
+          'ChatDetailPage: Remark updated for $targetUserId, refreshing UI',
+        );
         setState(() {});
       }
     });
@@ -101,7 +125,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   Future<void> _loadStrongReminderStatus() async {
     try {
       final repository = getIt<IConversationRepository>();
-      final isStrongReminder = await repository.getStrongReminder(widget.conversation.id);
+      final isStrongReminder = await repository.getStrongReminder(
+        widget.conversation.id,
+      );
       if (mounted) {
         setState(() {
           _isStrongReminder = isStrongReminder;
@@ -111,9 +137,23 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       debugLog('ChatDetailPage: Failed to load strong reminder status: $e');
     }
   }
-  
+
+  Future<void> _loadNotificationModeStatus() async {
+    try {
+      final repository = getIt<IConversationRepository>();
+      final mode = await repository.getNotificationMode(widget.conversation.id);
+      if (mounted) {
+        setState(() => _notificationMode = mode);
+      }
+    } catch (e) {
+      debugLog('ChatDetailPage: Failed to load notification mode: $e');
+    }
+  }
+
   Future<void> _loadChatLockStatus() async {
-    final isLocked = await _chatLockService.isChatLocked(widget.conversation.id);
+    final isLocked = await _chatLockService.isChatLocked(
+      widget.conversation.id,
+    );
     if (mounted) {
       setState(() => _isChatLocked = isLocked);
     }
@@ -134,11 +174,16 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       // 弹出 PIN 设置对话框
       if (mounted) {
         final pin = await _showSetPinDialog();
+        if (!mounted || pin == null) {
+          return;
+        }
         await _chatLockService.lockChat(widget.conversation.id, pin: pin);
         if (mounted) {
           setState(() => _isChatLocked = true);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.chatLockEnabled ?? 'Chat locked')),
+            SnackBar(
+              content: Text(S.of(context)?.chatLockEnabled ?? 'Chat locked'),
+            ),
           );
         }
       }
@@ -165,7 +210,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         if (mounted) {
           setState(() => _isChatLocked = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.chatLockDisabled ?? 'Chat unlocked')),
+            SnackBar(
+              content: Text(S.of(context)?.chatLockDisabled ?? 'Chat unlocked'),
+            ),
           );
         }
       }
@@ -302,7 +349,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     if (ctx.mounted) Navigator.pop(ctx, true);
                   } else {
                     setDialogState(() {
-                      error = l10n?.chatLockVerifyFailed ?? 'Verification failed';
+                      error =
+                          l10n?.chatLockVerifyFailed ?? 'Verification failed';
                       pinController.clear();
                     });
                   }
@@ -323,12 +371,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     _remarkSubscription?.cancel();
     super.dispose();
   }
-  
+
   /// 获取对方用户ID
   String? _getOtherUserId() {
     return widget.conversation.directUserId;
   }
-  
+
   /// 获取显示名称（私聊时优先使用备注名）
   String _getDisplayName() {
     // 群聊直接使用会话名称
@@ -339,32 +387,113 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     // 私聊：直接使用 conversation.directUserId 获取备注名
     final otherUserId = widget.conversation.directUserId;
     if (otherUserId != null) {
-      return RemarkService.instance.getDisplayName(otherUserId, widget.conversation.name);
+      return RemarkService.instance.getDisplayName(
+        otherUserId,
+        widget.conversation.name,
+      );
     }
 
     return widget.conversation.name;
   }
 
-  /// 更新免打扰状态
-  Future<void> _updateMuteStatus(bool muted) async {
+  /// 更新通知模式
+  Future<void> _updateNotificationMode(
+    ConversationNotificationMode mode,
+  ) async {
+    final previousMode = _notificationMode;
     try {
       final repository = getIt<IConversationRepository>();
-      await repository.setMuted(widget.conversation.id, muted);
-      debugLog('ChatDetailPage: Mute status updated to $muted');
+      await repository.setNotificationMode(widget.conversation.id, mode);
+      debugLog('ChatDetailPage: Notification mode updated to $mode');
     } catch (e) {
-      debugLog('ChatDetailPage: Failed to update mute status: $e');
+      debugLog('ChatDetailPage: Failed to update notification mode: $e');
       // 恢复原状态
       if (mounted) {
-        setState(() {
-          _isMuted = !muted;
-        });
+        setState(() => _notificationMode = previousMode);
       }
+    }
+  }
+
+  String _notificationModeLabel() {
+    switch (_notificationMode) {
+      case ConversationNotificationMode.allMessages:
+        return 'All Messages';
+      case ConversationNotificationMode.mentionsOnly:
+        return 'Mentions Only';
+      case ConversationNotificationMode.muted:
+        return S.of(context)?.commonMute ?? 'Mute';
+    }
+  }
+
+  Future<void> _showNotificationModeSheet() async {
+    final isDark = context.isDarkMode;
+    final textColor = isDark ? Colors.white : Colors.black;
+    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+
+    final selected = await showModalBottomSheet<ConversationNotificationMode>(
+      context: context,
+      backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text('All Messages', style: TextStyle(color: textColor)),
+              subtitle: Text(
+                'Notify for every new message in this chat',
+                style: TextStyle(color: secondaryTextColor),
+              ),
+              trailing:
+                  _notificationMode == ConversationNotificationMode.allMessages
+                  ? const Icon(Icons.check, color: AppColors.primary)
+                  : null,
+              onTap: () =>
+                  Navigator.pop(ctx, ConversationNotificationMode.allMessages),
+            ),
+            ListTile(
+              title: Text('Mentions Only', style: TextStyle(color: textColor)),
+              subtitle: Text(
+                'Only notify when you are mentioned or @room is used',
+                style: TextStyle(color: secondaryTextColor),
+              ),
+              trailing:
+                  _notificationMode == ConversationNotificationMode.mentionsOnly
+                  ? const Icon(Icons.check, color: AppColors.primary)
+                  : null,
+              onTap: () =>
+                  Navigator.pop(ctx, ConversationNotificationMode.mentionsOnly),
+            ),
+            ListTile(
+              title: Text(
+                S.of(context)?.commonMute ?? 'Mute',
+                style: TextStyle(color: textColor),
+              ),
+              subtitle: Text(
+                'Disable notifications for this chat on all devices',
+                style: TextStyle(color: secondaryTextColor),
+              ),
+              trailing: _notificationMode == ConversationNotificationMode.muted
+                  ? const Icon(Icons.check, color: AppColors.primary)
+                  : null,
+              onTap: () =>
+                  Navigator.pop(ctx, ConversationNotificationMode.muted),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (selected != null && selected != _notificationMode) {
+      setState(() => _notificationMode = selected);
+      await _updateNotificationMode(selected);
     }
   }
 
   /// 更新置顶状态
   Future<void> _updatePinnedStatus(bool pinned) async {
-    debugLog('ChatDetailPage: _updatePinnedStatus called with pinned=$pinned, roomId=${widget.conversation.id}');
+    debugLog(
+      'ChatDetailPage: _updatePinnedStatus called with pinned=$pinned, roomId=${widget.conversation.id}',
+    );
     try {
       final repository = getIt<IConversationRepository>();
       await repository.setPinned(widget.conversation.id, pinned);
@@ -403,7 +532,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     if (!widget.canChangeSettings) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.chatNoPermissionToModify ?? 'You do not have permission to modify'),
+          content: Text(
+            S.of(context)?.chatNoPermissionToModify ??
+                'You do not have permission to modify',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -428,8 +560,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           style: TextStyle(color: isDark ? Colors.white : Colors.black),
           decoration: InputDecoration(
             hintText: S.of(context)?.commonEnterGroupName ?? 'Enter group name',
-            hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
-            counterStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+            hintStyle: TextStyle(
+              color: isDark ? Colors.white54 : Colors.black54,
+            ),
+            counterStyle: TextStyle(
+              color: isDark ? Colors.white54 : Colors.black54,
+            ),
           ),
         ),
         actions: [
@@ -462,7 +598,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.chatGroupNameUpdated ?? 'Group name updated'),
+            content: Text(
+              S.of(context)?.chatGroupNameUpdated ?? 'Group name updated',
+            ),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -490,7 +628,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
 
     final isGroup = widget.conversation.type == ConversationType.group;
-    
+
     // 检查 ContactBloc 是否可用
     bool hasContactBloc = false;
     try {
@@ -604,21 +742,27 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
+                    title:
+                        S.of(context)?.commonGroupAnnouncement ??
+                        'Group Announcement',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () => _showGroupAnnouncementDialog(),
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: S.of(context)?.chatGroupManagement ?? 'Group Management',
+                    title:
+                        S.of(context)?.chatGroupManagement ??
+                        'Group Management',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () => _openGroupSettings(),
                   ),
                   _buildDivider(dividerColor),
                   _buildMenuItem(
-                    title: S.of(context)?.chatMyNicknameInGroup ?? 'My Nickname in Group',
+                    title:
+                        S.of(context)?.chatMyNicknameInGroup ??
+                        'My Nickname in Group',
                     textColor: textColor,
                     secondaryTextColor: secondaryTextColor,
                     onTap: () => _showEditNicknameDialog(),
@@ -626,24 +770,62 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   _buildDivider(dividerColor),
                 ],
                 _buildMenuItem(
-                  title: S.of(context)?.commonSearchChatHistory ?? 'Search Chat History',
+                  title:
+                      S.of(context)?.commonSearchChatHistory ??
+                      'Search Chat History',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _searchChatHistory(),
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: S.of(context)?.chatMediaGallery ?? 'Media Gallery',
+                  title: 'Files, Media & Links',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
-                  onTap: () => _openMediaGallery(),
+                  onTap: _openFilesAndLinks,
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: S.of(context)?.chatExportHistory ?? 'Export Chat History',
+                  title: S.of(context)?.autoDownload ?? 'Auto-Download',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _openAutoDownloadSettings,
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: 'Chat Storage',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _openChatStorage,
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title:
+                      S.of(context)?.chatExportHistory ?? 'Export Chat History',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _openChatExport(),
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: 'Scheduled Messages',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: () => _openScheduledMessages(),
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: 'Backup & Restore',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _openBackupRestore,
+                ),
+                _buildDivider(dividerColor),
+                _buildMenuItem(
+                  title: 'Encryption Keys & Devices',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _openSecuritySettings,
                 ),
               ],
             ),
@@ -655,17 +837,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
-                _buildSwitchItem(
-                  title: S.of(context)?.commonMute ?? 'Mute',
-                  value: _isMuted,
+                _buildMenuItem(
+                  title:
+                      S.of(context)?.settingsMessageNotifications ??
+                      'Message Notifications',
+                  value: _notificationModeLabel(),
                   textColor: textColor,
-                  onChanged: (value) {
-                    setState(() {
-                      _isMuted = value;
-                    });
-                    // 持久化设置
-                    _updateMuteStatus(value);
-                  },
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: _showNotificationModeSheet,
                 ),
                 _buildDivider(dividerColor),
                 _buildSwitchItem(
@@ -714,16 +893,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.chatSetChatBackground ?? 'Set Chat Background',
+                  title:
+                      S.of(context)?.chatSetChatBackground ??
+                      'Set Chat Background',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {
                     Navigator.push<void>(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ChatBackgroundPage(
-                          roomId: widget.conversation.id,
-                        ),
+                        builder: (_) =>
+                            ChatBackgroundPage(roomId: widget.conversation.id),
                       ),
                     );
                   },
@@ -739,7 +919,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.commonClearChatHistory ?? 'Clear Chat History',
+                  title:
+                      S.of(context)?.commonClearChatHistory ??
+                      'Clear Chat History',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _showClearConfirm(),
@@ -768,19 +950,20 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         ),
       ),
     );
-    
+
     // 如果有 ContactBloc，用 BlocListener 包装
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state.status == ContactStatus.remarkUpdated || state.status == ContactStatus.loaded) {
+          if (state.status == ContactStatus.remarkUpdated ||
+              state.status == ContactStatus.loaded) {
             if (mounted) setState(() {});
           }
         },
         child: scaffold,
       );
     }
-    
+
     return scaffold;
   }
 
@@ -808,9 +991,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
-                color: context.isDarkMode
-                    ? Colors.white70
-                    : Colors.black54,
+                color: context.isDarkMode ? Colors.white70 : Colors.black54,
               ),
             ),
           ],
@@ -833,11 +1014,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       final memberName = names.length > i ? names[i] : '';
       final memberAvatar = avatars[i];
 
-      members.add(_buildMemberItem(
-        avatarUrl: memberAvatar,
-        name: memberName,
-        onTap: () => _onMemberTap(memberId, memberName, memberAvatar),
-      ));
+      members.add(
+        _buildMemberItem(
+          avatarUrl: memberAvatar,
+          name: memberName,
+          onTap: () => _onMemberTap(memberId, memberName, memberAvatar),
+        ),
+      );
     }
 
     return members;
@@ -881,10 +1064,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           );
 
           if (contactBloc != null) {
-            return BlocProvider.value(
-              value: contactBloc,
-              child: page,
-            );
+            return BlocProvider.value(value: contactBloc, child: page);
           }
           return page;
         },
@@ -1013,9 +1193,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           bottom: BorderSide(color: dividerColor, width: 0.5),
         ),
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
@@ -1036,10 +1214,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               flex: 2,
               child: Text(
                 title,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
-                ),
+                style: TextStyle(fontSize: 16, color: textColor),
               ),
             ),
             if (value != null)
@@ -1047,20 +1222,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 flex: 3,
                 child: Text(
                   value,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: secondaryTextColor,
-                  ),
+                  style: TextStyle(fontSize: 15, color: secondaryTextColor),
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
                 ),
               ),
             const SizedBox(width: 4),
-            Icon(
-              Icons.chevron_right,
-              color: secondaryTextColor,
-              size: 20,
-            ),
+            Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
           ],
         ),
       ),
@@ -1077,7 +1245,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          debugLog('ChatDetailPage: Switch row tapped for $title, current value: $value');
+          debugLog(
+            'ChatDetailPage: Switch row tapped for $title, current value: $value',
+          );
           onChanged(!value);
         },
         child: Padding(
@@ -1087,16 +1257,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: textColor,
-                  ),
+                  style: TextStyle(fontSize: 16, color: textColor),
                 ),
               ),
               Switch.adaptive(
                 value: value,
                 onChanged: (newValue) {
-                  debugLog('ChatDetailPage: Switch widget toggled for $title to $newValue');
+                  debugLog(
+                    'ChatDetailPage: Switch widget toggled for $title to $newValue',
+                  );
                   onChanged(newValue);
                 },
                 activeTrackColor: AppColors.primary,
@@ -1135,14 +1304,20 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 maxLines: 5,
                 style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
-                  hintText: S.of(context)?.chatGroupAnnouncementHint ?? 'Enter group announcement',
-                  hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+                  hintText:
+                      S.of(context)?.chatGroupAnnouncementHint ??
+                      'Enter group announcement',
+                  hintStyle: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.black54,
+                  ),
                   border: const OutlineInputBorder(),
                 ),
               )
             : Text(
                 S.of(context)?.chatGroupAnnouncementEmpty ?? 'No announcement',
-                style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
               ),
         actions: [
           TextButton(
@@ -1150,7 +1325,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               controller.dispose();
               Navigator.pop(ctx);
             },
-            child: Text(canEdit ? (S.of(context)?.commonCancel ?? 'Cancel') : (S.of(context)?.commonConfirm ?? 'OK')),
+            child: Text(
+              canEdit
+                  ? (S.of(context)?.commonCancel ?? 'Cancel')
+                  : (S.of(context)?.commonConfirm ?? 'OK'),
+            ),
           ),
           if (canEdit)
             TextButton(
@@ -1160,7 +1339,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 Navigator.pop(ctx);
                 try {
                   final groupRepository = getIt<IGroupRepository>();
-                  await groupRepository.setGroupAnnouncement(widget.conversation.id, announcement);
+                  await groupRepository.setGroupAnnouncement(
+                    widget.conversation.id,
+                    announcement,
+                  );
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -1173,7 +1355,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(S.of(context)?.chatUpdateFailed ?? 'Update failed'),
+                        content: Text(
+                          S.of(context)?.chatUpdateFailed ?? 'Update failed',
+                        ),
                         backgroundColor: AppColors.error,
                       ),
                     );
@@ -1215,9 +1399,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           maxLength: 30,
           style: TextStyle(color: isDark ? Colors.white : Colors.black),
           decoration: InputDecoration(
-            hintText: S.of(context)?.chatNicknameHint ?? 'Enter your nickname in this group',
-            hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
-            counterStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+            hintText:
+                S.of(context)?.chatNicknameHint ??
+                'Enter your nickname in this group',
+            hintStyle: TextStyle(
+              color: isDark ? Colors.white54 : Colors.black54,
+            ),
+            counterStyle: TextStyle(
+              color: isDark ? Colors.white54 : Colors.black54,
+            ),
           ),
         ),
         actions: [
@@ -1275,33 +1465,44 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             groupValue: selectedReason,
             onChanged: (val) => setDialogState(() => selectedReason = val),
             child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ...[
-                S.of(context)?.reportReasonSpam ?? 'Spam',
-                S.of(context)?.reportReasonHarassment ?? 'Harassment',
-                S.of(context)?.reportReasonFraud ?? 'Fraud',
-                S.of(context)?.reportReasonOther ?? 'Other',
-              ].map((reason) => RadioListTile<String>(
-                title: Text(reason, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
-                value: reason,
-                activeColor: AppColors.primary,
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-              )),
-              const SizedBox(height: 8),
-              TextField(
-                controller: descController,
-                maxLines: 2,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  hintText: S.of(context)?.reportDescription ?? 'Additional description (optional)',
-                  hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
-                  border: const OutlineInputBorder(),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...[
+                  S.of(context)?.reportReasonSpam ?? 'Spam',
+                  S.of(context)?.reportReasonHarassment ?? 'Harassment',
+                  S.of(context)?.reportReasonFraud ?? 'Fraud',
+                  S.of(context)?.reportReasonOther ?? 'Other',
+                ].map(
+                  (reason) => RadioListTile<String>(
+                    title: Text(
+                      reason,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    value: reason,
+                    activeColor: AppColors.primary,
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: descController,
+                  maxLines: 2,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: InputDecoration(
+                    hintText:
+                        S.of(context)?.reportDescription ??
+                        'Additional description (optional)',
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white54 : Colors.black54,
+                    ),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -1316,7 +1517,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 if (selectedReason == null) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
                     SnackBar(
-                      content: Text(S.of(context)?.reportSelectReason ?? 'Please select a reason'),
+                      content: Text(
+                        S.of(context)?.reportSelectReason ??
+                            'Please select a reason',
+                      ),
                       duration: const Duration(seconds: 1),
                     ),
                   );
@@ -1326,7 +1530,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(S.of(context)?.reportSubmitted ?? 'Report submitted'),
+                    content: Text(
+                      S.of(context)?.reportSubmitted ?? 'Report submitted',
+                    ),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -1344,11 +1550,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final otherUserId = _getOtherUserId();
     if (otherUserId == null) {
       // 无法获取用户ID，使用房间ID作为后备
-      debugLog('ChatDetailPage: Cannot get other user ID, using room ID as fallback');
+      debugLog(
+        'ChatDetailPage: Cannot get other user ID, using room ID as fallback',
+      );
     }
-    
+
     final userId = otherUserId ?? widget.conversation.id;
-    
+
     // 获取当前的 ContactBloc
     ContactBloc? contactBloc;
     try {
@@ -1358,41 +1566,65 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       debugLog('Error: $e');
     }
 
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (ctx) {
-          final page = ContactDetailPage(
-            userId: userId,
-            displayName: _getDisplayName(),
-            avatarUrl: widget.conversation.avatarUrl,
-            onSendMessage: () {
-              Navigator.of(ctx).pop();
-              Navigator.of(context).pop();
-            },
-          );
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute<void>(
+            builder: (ctx) {
+              final page = ContactDetailPage(
+                userId: userId,
+                displayName: _getDisplayName(),
+                avatarUrl: widget.conversation.avatarUrl,
+                onSendMessage: () {
+                  Navigator.of(ctx).pop();
+                  Navigator.of(context).pop();
+                },
+              );
 
-          if (contactBloc != null) {
-            return BlocProvider.value(
-              value: contactBloc,
-              child: page,
-            );
-          }
-          return page;
-        },
-      ),
-    ).then((_) {
-      // 返回时刷新显示名称
-      if (mounted) setState(() {});
-    });
+              if (contactBloc != null) {
+                return BlocProvider.value(value: contactBloc, child: page);
+              }
+              return page;
+            },
+          ),
+        )
+        .then((_) {
+          // 返回时刷新显示名称
+          if (mounted) setState(() {});
+        });
   }
 
-  /// 打开媒体画廊
-  void _openMediaGallery() {
+  /// 打开文件、媒体与链接中心
+  void _openFilesAndLinks() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => MediaGalleryPage(
+        builder: (_) => GroupMediaHubPage(
           roomId: widget.conversation.id,
-          roomName: widget.conversation.name,
+          groupName: widget.conversation.name,
+        ),
+      ),
+    );
+  }
+
+  void _openAutoDownloadSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const AutoDownloadSettingsPage()),
+    );
+  }
+
+  void _openChatStorage() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider(
+          create: (_) => StorageManagementBloc(
+            storageManager: getIt<StorageManagerService>(),
+            lifecycleService: getIt<MediaLifecycleService>(),
+            cleanupService: getIt<StorageCleanupService>(),
+            monitorService: getIt<StorageMonitorService>(),
+          ),
+          child: RoomStorageDetailPage(
+            roomId: widget.conversation.id,
+            roomName: widget.conversation.name,
+          ),
         ),
       ),
     );
@@ -1400,11 +1632,62 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 打开聊天记录导出
   void _openChatExport() {
+    List<MessageEntity> initialMessages = const [];
+    try {
+      initialMessages = context
+          .read<ChatBloc>()
+          .state
+          .messages
+          .where((message) => message.scheduledAt == null)
+          .toList(growable: false);
+    } catch (e) {
+      debugLog('ChatDetailPage: Failed to read ChatBloc for export: $e');
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ChatExportPage(
           roomId: widget.conversation.id,
           roomName: widget.conversation.name,
+          messages: initialMessages,
+        ),
+      ),
+    );
+  }
+
+  void _openScheduledMessages() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ScheduledMessagesPage(
+          roomId: widget.conversation.id,
+          roomName: widget.conversation.name,
+        ),
+      ),
+    );
+  }
+
+  void _openBackupRestore() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const BackupRestorePage()));
+  }
+
+  void _openSecuritySettings() {
+    final client = MatrixClientManager.instance.client;
+    if (client == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Encryption service is not available yet'),
+        ),
+      );
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SecuritySettingsPage(
+          e2eeManager: E2EEManager(client),
+          keyBackupService: KeyBackupService(client),
         ),
       ),
     );
@@ -1414,8 +1697,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.chatClearChatHistoryTitle ?? 'Clear Chat History'),
-        content: Text(S.of(context)?.chatClearHistoryConfirm ?? 'Are you sure you want to clear all chat history? This action cannot be undone.'),
+        title: Text(
+          S.of(context)?.chatClearChatHistoryTitle ?? 'Clear Chat History',
+        ),
+        content: Text(
+          S.of(context)?.chatClearHistoryConfirm ??
+              'Are you sure you want to clear all chat history? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -1427,7 +1715,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               widget.onClearHistory?.call();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(S.of(context)?.commonChatHistoryCleared ?? 'Chat history cleared'),
+                  content: Text(
+                    S.of(context)?.commonChatHistoryCleared ??
+                        'Chat history cleared',
+                  ),
                   duration: const Duration(seconds: 1),
                 ),
               );
@@ -1447,7 +1738,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 class _GroupMemberListPage extends StatefulWidget {
   final String roomId;
   final String roomName;
-  final void Function(String userId, String displayName, String? avatarUrl)? onMemberTap;
+  final void Function(String userId, String displayName, String? avatarUrl)?
+  onMemberTap;
 
   const _GroupMemberListPage({
     required this.roomId,
@@ -1485,12 +1777,16 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
 
       if (mounted) {
         setState(() {
-          _members = members.map((m) => {
-            'id': m.userId,
-            'name': m.displayName,
-            'avatarUrl': m.avatarUrl,
-            'role': m.role.name,
-          }).toList();
+          _members = members
+              .map(
+                (m) => {
+                  'id': m.userId,
+                  'name': m.displayName,
+                  'avatarUrl': m.avatarUrl,
+                  'role': m.role.name,
+                },
+              )
+              .toList();
           _filteredMembers = _members;
           _isLoading = false;
         });
@@ -1512,7 +1808,8 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
         _filteredMembers = _members.where((m) {
           final name = (m['name'] as String?)?.toLowerCase() ?? '';
           final id = (m['id'] as String?)?.toLowerCase() ?? '';
-          return name.contains(query.toLowerCase()) || id.contains(query.toLowerCase());
+          return name.contains(query.toLowerCase()) ||
+              id.contains(query.toLowerCase());
         }).toList();
       }
     });
@@ -1536,7 +1833,8 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          S.of(context)?.commonGroupMembers(_members.length) ?? 'Members (${_members.length})',
+          S.of(context)?.commonGroupMembers(_members.length) ??
+              'Members (${_members.length})',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -1556,7 +1854,8 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
               onChanged: _filterMembers,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: S.of(context)?.chatSearchMemberHint ?? 'Search members',
+                hintText:
+                    S.of(context)?.chatSearchMemberHint ?? 'Search members',
                 hintStyle: TextStyle(color: secondaryTextColor),
                 prefixIcon: Icon(Icons.search, color: secondaryTextColor),
                 filled: true,
@@ -1565,7 +1864,10 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
@@ -1574,77 +1876,92 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _filteredMembers.isEmpty
-                    ? Center(
-                        child: Text(
-                          _searchQuery.isEmpty
-                              ? (S.of(context)?.chatNoMembers ?? 'No members')
-                              : (S.of(context)?.chatNoMatchingMembers ?? 'No matching members found'),
-                          style: TextStyle(color: secondaryTextColor),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: _filteredMembers.length,
-                        itemBuilder: (context, index) {
-                          final member = _filteredMembers[index];
-                          final name = member['name'] as String? ?? (S.of(context)?.commonUnknownMember ?? 'Unknown');
-                          final id = member['id'] as String? ?? '';
-                          final avatarUrl = member['avatarUrl'] as String?;
-                          final role = member['role'] as String?;
+                ? Center(
+                    child: Text(
+                      _searchQuery.isEmpty
+                          ? (S.of(context)?.chatNoMembers ?? 'No members')
+                          : (S.of(context)?.chatNoMatchingMembers ??
+                                'No matching members found'),
+                      style: TextStyle(color: secondaryTextColor),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: _filteredMembers.length,
+                    itemBuilder: (context, index) {
+                      final member = _filteredMembers[index];
+                      final name =
+                          member['name'] as String? ??
+                          (S.of(context)?.commonUnknownMember ?? 'Unknown');
+                      final id = member['id'] as String? ?? '';
+                      final avatarUrl = member['avatarUrl'] as String?;
+                      final role = member['role'] as String?;
 
-                          return ListTile(
-                            leading: N42Avatar(
-                              imageUrl: avatarUrl,
-                              name: name,
-                              size: 44,
-                              borderRadius: 6,
+                      return ListTile(
+                        leading: N42Avatar(
+                          imageUrl: avatarUrl,
+                          name: name,
+                          size: 44,
+                          borderRadius: 6,
+                        ),
+                        title: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                name,
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            title: Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    name,
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                            if (role == 'owner') ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  S.of(context)?.commonGroupOwner ?? 'Owner',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.orange,
                                   ),
                                 ),
-                                if (role == 'owner') ...[
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.orange.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      S.of(context)?.commonGroupOwner ?? 'Owner',
-                                      style: const TextStyle(fontSize: 10, color: Colors.orange),
-                                    ),
+                              ),
+                            ] else if (role == 'admin') ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  S.of(context)?.commonGroupAdmin ?? 'Admin',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.blue,
                                   ),
-                                ] else if (role == 'admin') ...[
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      S.of(context)?.commonGroupAdmin ?? 'Admin',
-                                      style: const TextStyle(fontSize: 10, color: Colors.blue),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                            onTap: () {
-                              widget.onMemberTap?.call(id, name, avatarUrl);
-                            },
-                          );
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        onTap: () {
+                          widget.onMemberTap?.call(id, name, avatarUrl);
                         },
-                      ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

@@ -14,6 +14,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../../core/utils/debug_log.dart';
 
@@ -22,11 +23,7 @@ class VideoPlayerPage extends StatefulWidget {
   final String videoUrl;
   final String? thumbnailUrl;
 
-  const VideoPlayerPage({
-    super.key,
-    required this.videoUrl,
-    this.thumbnailUrl,
-  });
+  const VideoPlayerPage({super.key, required this.videoUrl, this.thumbnailUrl});
 
   @override
   State<VideoPlayerPage> createState() => _VideoPlayerPageState();
@@ -56,20 +53,10 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         throw Exception('Video URL is empty');
       }
 
-      // 获取 access token
-      String? accessToken;
-      try {
-        final matrixManager = getIt<MatrixClientManager>();
-        accessToken = matrixManager.client?.accessToken;
-        debugLog('Access token obtained: ${accessToken != null ? 'Yes (${accessToken.length} chars)' : 'No'}');
-      } catch (e) {
-        debugLog('Failed to get access token: $e');
-      }
-
-      final headers = <String, String>{};
-      if (accessToken != null) {
-        headers['Authorization'] = 'Bearer $accessToken';
-      }
+      final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+        widget.videoUrl,
+        client: getIt<MatrixClientManager>().client,
+      );
 
       // 创建视频控制器
       // iOS AVFoundation 在 HTTP 重定向时会丢弃 Authorization header，
@@ -81,19 +68,24 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         debugLog('iOS: streaming download with auth headers to temp file...');
         final request = http.Request('GET', Uri.parse(widget.videoUrl));
         request.headers.addAll(headers);
-        final streamResponse = await http.Client().send(request);
+        final httpClient = http.Client();
+        final streamResponse = await httpClient.send(request);
         if (streamResponse.statusCode != 200) {
-          throw Exception('Video download failed: ${streamResponse.statusCode}');
+          httpClient.close();
+          throw Exception(
+            'Video download failed: ${streamResponse.statusCode}',
+          );
         }
         final dir = await getTemporaryDirectory();
         final file = File(
-            '${dir.path}/video_${DateTime.now().millisecondsSinceEpoch}.mp4');
+          '${dir.path}/video_${DateTime.now().millisecondsSinceEpoch}.mp4',
+        );
         final sink = file.openWrite();
         await streamResponse.stream.pipe(sink);
         await sink.close();
+        httpClient.close();
         _tempVideoFile = file;
-        debugLog(
-            'iOS: temp file ready, size: ${await file.length()} bytes');
+        debugLog('iOS: temp file ready, size: ${await file.length()} bytes');
         _controller = VideoPlayerController.file(file);
       } else {
         _controller = VideoPlayerController.networkUrl(
@@ -119,7 +111,11 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             ? CachedNetworkImage(
                 imageUrl: widget.thumbnailUrl!,
                 fit: BoxFit.cover,
-                httpHeaders: headers,
+                httpHeaders:
+                    mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+                      widget.thumbnailUrl,
+                      client: getIt<MatrixClientManager>().client,
+                    ),
               )
             : Container(color: Colors.black),
         errorBuilder: (ctx, errorMessage) => Center(
@@ -171,7 +167,10 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(S.of(context)?.chatVideoTitle ?? 'Video', style: const TextStyle(color: Colors.white)),
+        title: Text(
+          S.of(context)?.chatVideoTitle ?? 'Video',
+          style: const TextStyle(color: Colors.white),
+        ),
         elevation: 0,
       ),
       body: Center(
@@ -181,41 +180,48 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                 children: [
                   const CircularProgressIndicator(color: Colors.white),
                   const SizedBox(height: 16),
-                  Text(S.of(context)?.chatLoadingText ?? 'Loading...', style: const TextStyle(color: Colors.white)),
+                  Text(
+                    S.of(context)?.chatLoadingText ?? 'Loading...',
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ],
               )
             : _error != null
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error, color: Colors.red, size: 48),
-                      const SizedBox(height: 16),
-                      Text(
-                        '${S.of(context)?.chatVideoLoadFailed ?? 'Video load failed'}\n$_error',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _isLoading = true;
-                            _error = null;
-                          });
-                          _initializePlayer();
-                        },
-                        child: Text(S.of(context)?.chatRetryButton ?? 'Retry'),
-                      ),
-                    ],
-                  )
-                : _chewieController != null
-                    ? AspectRatio(
-                        aspectRatio: _controller.value.aspectRatio > 0
-                            ? _controller.value.aspectRatio
-                            : 16 / 9,
-                        child: Chewie(controller: _chewieController!),
-                      )
-                    : Text(S.of(context)?.chatPlayerInitFailed ?? 'Player initialization failed', style: const TextStyle(color: Colors.white)),
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, color: Colors.red, size: 48),
+                  const SizedBox(height: 16),
+                  Text(
+                    '${S.of(context)?.chatVideoLoadFailed ?? 'Video load failed'}\n$_error',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _isLoading = true;
+                        _error = null;
+                      });
+                      _initializePlayer();
+                    },
+                    child: Text(S.of(context)?.chatRetryButton ?? 'Retry'),
+                  ),
+                ],
+              )
+            : _chewieController != null
+            ? AspectRatio(
+                aspectRatio: _controller.value.aspectRatio > 0
+                    ? _controller.value.aspectRatio
+                    : 16 / 9,
+                child: Chewie(controller: _chewieController!),
+              )
+            : Text(
+                S.of(context)?.chatPlayerInitFailed ??
+                    'Player initialization failed',
+                style: const TextStyle(color: Colors.white),
+              ),
       ),
     );
   }

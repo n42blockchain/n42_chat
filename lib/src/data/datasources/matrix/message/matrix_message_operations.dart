@@ -1,6 +1,7 @@
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../matrix_client_manager.dart';
+import 'matrix_text_message_content.dart';
 import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 消息操作
@@ -18,7 +19,11 @@ class MatrixMessageOperations {
   // ============================================
 
   /// 撤回消息
-  Future<bool> redactMessage(String roomId, String eventId, {String? reason}) async {
+  Future<bool> redactMessage(
+    String roomId,
+    String eventId, {
+    String? reason,
+  }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return false;
 
@@ -106,18 +111,31 @@ class MatrixMessageOperations {
   Future<String?> replyToMessage(
     String roomId,
     String replyToEventId,
-    String text,
-  ) async {
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  }) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return null;
 
     final replyEvent = await room.getEventById(replyToEventId);
     if (replyEvent == null) return null;
 
-    return await room.sendTextEvent(
+    final content = buildTextMessageContent(
       text,
-      inReplyTo: replyEvent,
+      selfDestructAfter: selfDestructAfter,
+      mentionedUserIds: mentionedUserIds,
+      mentionsRoom: mentionsRoom,
+      replySenderId: replyEvent.senderId,
+      currentUserId: _client?.userID,
     );
+
+    if (!hasExtendedTextMetadata(content)) {
+      return await room.sendTextEvent(text, inReplyTo: replyEvent);
+    }
+
+    return await room.sendEvent(content, inReplyTo: replyEvent);
   }
 
   /// 编辑消息
@@ -132,18 +150,11 @@ class MatrixMessageOperations {
     final originalEvent = await room.getEventById(originalEventId);
     if (originalEvent == null) return null;
 
-    return await room.sendTextEvent(
-      newText,
-      editEventId: originalEventId,
-    );
+    return await room.sendTextEvent(newText, editEventId: originalEventId);
   }
 
   /// 添加消息表情回应
-  Future<bool> addReaction(
-    String roomId,
-    String eventId,
-    String emoji,
-  ) async {
+  Future<bool> addReaction(String roomId, String eventId, String emoji) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return false;
 
@@ -211,11 +222,15 @@ class MatrixMessageOperations {
       if (stateEvent != null) {
         final content = stateEvent.content;
         final pokeText = content['pokeText'] as String?;
-        debugLog('MatrixMessageDataSource: Found pokeText for $userId: $pokeText');
+        debugLog(
+          'MatrixMessageDataSource: Found pokeText for $userId: $pokeText',
+        );
         return pokeText;
       }
 
-      debugLog('MatrixMessageDataSource: No pokeText found for $userId in room $roomId');
+      debugLog(
+        'MatrixMessageDataSource: No pokeText found for $userId in room $roomId',
+      );
       return null;
     } catch (e) {
       debugLog('MatrixMessageDataSource: Failed to get member pokeText: $e');
@@ -243,7 +258,9 @@ class MatrixMessageOperations {
         _client!.userID!,
         {'pokeText': pokeText},
       );
-      debugLog('MatrixMessageDataSource: Set pokeText in room $roomId: $pokeText');
+      debugLog(
+        'MatrixMessageDataSource: Set pokeText in room $roomId: $pokeText',
+      );
     } catch (e) {
       debugLog('MatrixMessageDataSource: Failed to set member pokeText: $e');
     }
@@ -259,19 +276,15 @@ class MatrixMessageOperations {
     if (room == null) return;
 
     try {
-      await _client!.setRoomStateWithKey(
-        roomId,
-        'n42.live_location',
-        _client!.userID!,
-        {
-          'sharing': true,
-          'duration_minutes': durationMinutes,
-          'started_at': DateTime.now().toIso8601String(),
-          'expires_at': DateTime.now()
-              .add(Duration(minutes: durationMinutes))
-              .toIso8601String(),
-        },
-      );
+      await _client!
+          .setRoomStateWithKey(roomId, 'n42.live_location', _client!.userID!, {
+            'sharing': true,
+            'duration_minutes': durationMinutes,
+            'started_at': DateTime.now().toIso8601String(),
+            'expires_at': DateTime.now()
+                .add(Duration(minutes: durationMinutes))
+                .toIso8601String(),
+          });
     } catch (e) {
       debugLog('MatrixMessageDataSource: Failed to start live location: $e');
       rethrow;
@@ -291,9 +304,9 @@ class MatrixMessageOperations {
         'n42.live_location.update',
         _client!.userID!,
         {
-          'latitude': latitude,
-          'longitude': longitude,
-          'accuracy': ?accuracy,
+          'latitude': latitude.toStringAsFixed(6),
+          'longitude': longitude.toStringAsFixed(6),
+          'accuracy': ?accuracy?.toStringAsFixed(2),
           'updated_at': DateTime.now().toIso8601String(),
         },
       );
@@ -309,9 +322,7 @@ class MatrixMessageOperations {
         roomId,
         'n42.live_location',
         _client!.userID!,
-        {
-          'sharing': false,
-        },
+        {'sharing': false},
       );
     } catch (e) {
       debugLog('MatrixMessageDataSource: Failed to stop live location: $e');

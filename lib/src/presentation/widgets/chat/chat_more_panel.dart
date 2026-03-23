@@ -9,10 +9,13 @@ import '../../../core/theme/app_colors.dart';
 /// 微信风格的底部功能面板，包含：
 /// - 照片、拍摄、视频通话、位置
 /// - 红包、转账、文件、名片
-/// - 收藏、音乐、卡券等（可滑动）
+/// - 收藏、音乐、收款、商店等（可滑动）
 class ChatMorePanel extends StatefulWidget {
   /// 选择照片回调
   final VoidCallback? onPhotoPressed;
+
+  /// 长按照片回调
+  final VoidCallback? onPhotoLongPress;
 
   /// 拍摄回调
   final VoidCallback? onCameraPressed;
@@ -35,6 +38,9 @@ class ChatMorePanel extends StatefulWidget {
   /// 文件回调
   final VoidCallback? onFilePressed;
 
+  /// 长按文件回调
+  final VoidCallback? onFileLongPress;
+
   /// 名片回调
   final VoidCallback? onContactCardPressed;
 
@@ -44,12 +50,15 @@ class ChatMorePanel extends StatefulWidget {
   /// 音乐回调
   final VoidCallback? onMusicPressed;
 
-  /// 卡券回调
-  final VoidCallback? onCouponPressed;
+  /// 收款回调
+  final VoidCallback? onReceivePressed;
 
-  /// 礼物回调
-  final VoidCallback? onGiftPressed;
-  
+  /// 商店回调
+  final VoidCallback? onShopPressed;
+
+  /// 商店标签
+  final String? shopLabel;
+
   /// 投票回调
   final VoidCallback? onPollPressed;
 
@@ -77,6 +86,9 @@ class ChatMorePanel extends StatefulWidget {
   /// 阅后即焚定时器回调
   final VoidCallback? onSelfDestructTimerPressed;
 
+  /// 定时发送回调
+  final VoidCallback? onScheduledPressed;
+
   /// 当前阅后即焚定时器（秒，null 表示关闭）
   final int? selfDestructAfter;
 
@@ -86,6 +98,7 @@ class ChatMorePanel extends StatefulWidget {
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
+    this.onPhotoLongPress,
     this.onCameraPressed,
     this.onVideoCallPressed,
     this.onLocationPressed,
@@ -93,11 +106,13 @@ class ChatMorePanel extends StatefulWidget {
     this.onRedPacketPressed,
     this.onTransferPressed,
     this.onFilePressed,
+    this.onFileLongPress,
     this.onContactCardPressed,
     this.onFavoritePressed,
     this.onMusicPressed,
-    this.onCouponPressed,
-    this.onGiftPressed,
+    this.onReceivePressed,
+    this.onShopPressed,
+    this.shopLabel,
     this.onPollPressed,
     this.onGifPressed,
     this.onStickerPressed,
@@ -107,6 +122,7 @@ class ChatMorePanel extends StatefulWidget {
     this.isFaceBlur = false,
     this.onAiAssistantPressed,
     this.onSelfDestructTimerPressed,
+    this.onScheduledPressed,
     this.selfDestructAfter,
     this.onMiniAppsPressed,
   });
@@ -170,145 +186,149 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                 controller: _pageController,
                 children: [
                   // 第一页
-                  _buildPage(
-                    context,
-                    isDark,
-                    [
-                      _MoreItem(
-                        icon: Icons.photo_library_outlined,
-                        label: S.of(context)?.contactPhotos ?? 'Photos',
-                        onTap: widget.onPhotoPressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.camera_alt_outlined,
-                        label: S.of(context)?.commonTakePhoto ?? 'Camera',
-                        onTap: widget.onCameraPressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.videocam_outlined,
-                        label: S.of(context)?.chatVideoCall ?? 'Video Call',
-                        onTap: widget.onVideoCallPressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.location_on_outlined,
-                        label: S.of(context)?.commonLocationLabel ?? 'Location',
-                        onTap: widget.onLocationPressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.card_giftcard,
-                        label: S.of(context)?.profileRedPacket ?? 'Red Packet',
-                        onTap: widget.onRedPacketPressed,
-                        iconColor: AppColors.redPacket,
-                      ),
-                      _MoreItem(
-                        icon: Icons.swap_horiz,
-                        label: S.of(context)?.commonTransfer ?? 'Transfer',
-                        onTap: widget.onTransferPressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.apps_rounded,
-                        label: S.of(context)?.chatMiniApps ?? 'Apps',
-                        onTap: widget.onMiniAppsPressed,
-                        iconColor: Colors.indigo,
-                      ),
-                      _MoreItem(
-                        icon: Icons.folder_outlined,
-                        label: S.of(context)?.commonFileLabel ?? 'File',
-                        onTap: widget.onFilePressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.person_outline,
-                        label: S.of(context)?.searchContactLabel ?? 'Contact',
-                        onTap: widget.onContactCardPressed,
-                      ),
-                    ],
-                  ),
+                  _buildPage(context, isDark, [
+                    _MoreItem(
+                      icon: Icons.photo_library_outlined,
+                      label: S.of(context)?.contactPhotos ?? 'Photos',
+                      onTap: widget.onPhotoPressed,
+                      onLongPress: widget.onPhotoLongPress,
+                    ),
+                    _MoreItem(
+                      icon: Icons.camera_alt_outlined,
+                      label: S.of(context)?.commonTakePhoto ?? 'Camera',
+                      onTap: widget.onCameraPressed,
+                    ),
+                    _MoreItem(
+                      icon: Icons.videocam_outlined,
+                      label: S.of(context)?.chatVideoCall ?? 'Video Call',
+                      onTap: widget.onVideoCallPressed,
+                    ),
+                    _MoreItem(
+                      icon: Icons.location_on_outlined,
+                      label: S.of(context)?.commonLocationLabel ?? 'Location',
+                      onTap: widget.onLocationPressed,
+                    ),
+                    _MoreItem(
+                      icon: Icons.card_giftcard,
+                      label: S.of(context)?.profileRedPacket ?? 'Red Packet',
+                      onTap: widget.onRedPacketPressed,
+                      iconColor: AppColors.redPacket,
+                    ),
+                    _MoreItem(
+                      icon: Icons.swap_horiz,
+                      label: S.of(context)?.commonTransfer ?? 'Transfer',
+                      onTap: widget.onTransferPressed,
+                    ),
+                    _MoreItem(
+                      icon: Icons.apps_rounded,
+                      label: S.of(context)?.chatMiniApps ?? 'Apps',
+                      onTap: widget.onMiniAppsPressed,
+                      iconColor: Colors.indigo,
+                    ),
+                    _MoreItem(
+                      icon: Icons.folder_outlined,
+                      label: S.of(context)?.commonFileLabel ?? 'File',
+                      onTap: widget.onFilePressed,
+                      onLongPress: widget.onFileLongPress,
+                    ),
+                    _MoreItem(
+                      icon: Icons.person_outline,
+                      label: S.of(context)?.searchContactLabel ?? 'Contact',
+                      onTap: widget.onContactCardPressed,
+                    ),
+                  ]),
                   // 第二页
-                  _buildPage(
-                    context,
-                    isDark,
-                    [
-                      _MoreItem(
-                        icon: Icons.star_outline,
-                        label: S.of(context)?.commonFavorites ?? 'Favorites',
-                        onTap: widget.onFavoritePressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.music_note_outlined,
-                        label: S.of(context)?.commonMusic ?? 'Music',
-                        onTap: widget.onMusicPressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.confirmation_num_outlined,
-                        label: S.of(context)?.commonCoupon ?? 'Coupon',
-                        onTap: widget.onCouponPressed,
-                      ),
-                      _MoreItem(
-                        icon: Icons.redeem,
-                        label: S.of(context)?.commonGift ?? 'Gift',
-                        onTap: widget.onGiftPressed,
-                        iconColor: AppColors.error,
-                      ),
-                      _MoreItem(
-                        icon: Icons.poll_outlined,
-                        label: S.of(context)?.commonPoll ?? 'Poll',
-                        onTap: widget.onPollPressed,
-                        iconColor: AppColors.primary,
-                      ),
-                      _MoreItem(
-                        icon: Icons.gif_box_outlined,
-                        label: 'GIF',
-                        onTap: widget.onGifPressed,
-                        iconColor: AppColors.textLink,
-                      ),
-                      _MoreItem(
-                        icon: Icons.emoji_emotions_outlined,
-                        label: S.of(context)?.profileStickers ?? 'Stickers',
-                        onTap: widget.onStickerPressed,
-                        iconColor: Colors.orange,
-                      ),
-                      _MoreItem(
-                        icon: widget.isViewOnce ? Icons.timer : Icons.timer_outlined,
-                        label: S.of(context)?.chatViewOnce ?? 'View Once',
-                        onTap: widget.onViewOncePressed,
-                        iconColor: widget.isViewOnce ? AppColors.primary : null,
-                      ),
-                    ],
-                  ),
+                  _buildPage(context, isDark, [
+                    _MoreItem(
+                      icon: Icons.star_outline,
+                      label: S.of(context)?.commonFavorites ?? 'Favorites',
+                      onTap: widget.onFavoritePressed,
+                    ),
+                    _MoreItem(
+                      icon: Icons.music_note_outlined,
+                      label: S.of(context)?.commonMusic ?? 'Music',
+                      onTap: widget.onMusicPressed,
+                    ),
+                    _MoreItem(
+                      icon: Icons.request_quote_outlined,
+                      label: S.of(context)?.transferReceive ?? 'Receive',
+                      onTap: widget.onReceivePressed,
+                      iconColor: Colors.green,
+                    ),
+                    _MoreItem(
+                      icon: Icons.storefront_outlined,
+                      label: widget.shopLabel ?? 'Shop',
+                      onTap: widget.onShopPressed,
+                      iconColor: Colors.amber,
+                    ),
+                    _MoreItem(
+                      icon: Icons.poll_outlined,
+                      label: S.of(context)?.commonPoll ?? 'Poll',
+                      onTap: widget.onPollPressed,
+                      iconColor: AppColors.primary,
+                    ),
+                    _MoreItem(
+                      icon: Icons.gif_box_outlined,
+                      label: 'GIF',
+                      onTap: widget.onGifPressed,
+                      iconColor: AppColors.textLink,
+                    ),
+                    _MoreItem(
+                      icon: Icons.emoji_emotions_outlined,
+                      label: S.of(context)?.profileStickers ?? 'Stickers',
+                      onTap: widget.onStickerPressed,
+                      iconColor: Colors.orange,
+                    ),
+                    _MoreItem(
+                      icon: widget.isViewOnce
+                          ? Icons.timer
+                          : Icons.timer_outlined,
+                      label: S.of(context)?.chatViewOnce ?? 'View Once',
+                      onTap: widget.onViewOncePressed,
+                      iconColor: widget.isViewOnce ? AppColors.primary : null,
+                    ),
+                  ]),
                   // 第三页（设置类）
-                  _buildPage(
-                    context,
-                    isDark,
-                    [
+                  _buildPage(context, isDark, [
+                    _MoreItem(
+                      icon: widget.isFaceBlur
+                          ? Icons.face_retouching_natural
+                          : Icons.face,
+                      label: S.of(context)?.chatAutoFaceBlur ?? 'Face Blur',
+                      onTap: widget.onFaceBlurPressed,
+                      iconColor: widget.isFaceBlur ? AppColors.primary : null,
+                    ),
+                    _MoreItem(
+                      icon: Icons.share_location,
+                      label: S.of(context)?.liveLocation ?? 'Live Location',
+                      onTap: widget.onLiveLocationPressed,
+                      iconColor: Colors.teal,
+                    ),
+                    _MoreItem(
+                      icon: widget.selfDestructAfter != null
+                          ? Icons.timer
+                          : Icons.timer_outlined,
+                      label: S.of(context)?.chatSelfDestructTimer ?? 'Timer',
+                      onTap: widget.onSelfDestructTimerPressed,
+                      iconColor: widget.selfDestructAfter != null
+                          ? Colors.orange
+                          : null,
+                    ),
+                    _MoreItem(
+                      icon: Icons.schedule_outlined,
+                      label:
+                          S.of(context)?.scheduledMessageLabel ?? 'Scheduled',
+                      onTap: widget.onScheduledPressed,
+                      iconColor: AppColors.primary,
+                    ),
+                    if (widget.onAiAssistantPressed != null)
                       _MoreItem(
-                        icon: widget.isFaceBlur ? Icons.face_retouching_natural : Icons.face,
-                        label: S.of(context)?.chatAutoFaceBlur ?? 'Face Blur',
-                        onTap: widget.onFaceBlurPressed,
-                        iconColor: widget.isFaceBlur ? AppColors.primary : null,
+                        icon: Icons.auto_awesome,
+                        label: S.of(context)?.aiAssistant ?? 'AI',
+                        onTap: widget.onAiAssistantPressed,
+                        iconColor: Colors.deepPurple,
                       ),
-                      _MoreItem(
-                        icon: Icons.share_location,
-                        label: S.of(context)?.liveLocation ?? 'Live Location',
-                        onTap: widget.onLiveLocationPressed,
-                        iconColor: Colors.teal,
-                      ),
-                      _MoreItem(
-                        icon: widget.selfDestructAfter != null
-                            ? Icons.timer
-                            : Icons.timer_outlined,
-                        label: S.of(context)?.chatSelfDestructTimer ?? 'Timer',
-                        onTap: widget.onSelfDestructTimerPressed,
-                        iconColor: widget.selfDestructAfter != null ? Colors.orange : null,
-                      ),
-                      if (widget.onAiAssistantPressed != null)
-                        _MoreItem(
-                          icon: Icons.auto_awesome,
-                          label: S.of(context)?.aiAssistant ?? 'AI',
-                          onTap: widget.onAiAssistantPressed,
-                          iconColor: Colors.deepPurple,
-                        ),
-                    ],
-                  ),
+                  ]),
                 ],
               ),
             ),
@@ -317,19 +337,22 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(3, (index) => Padding(
-                  padding: EdgeInsets.only(left: index > 0 ? 6 : 0),
-                  child: Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: _currentPage == index
-                          ? AppColors.textSecondary
-                          : AppColors.textTertiary,
-                      shape: BoxShape.circle,
+                children: List.generate(
+                  3,
+                  (index) => Padding(
+                    padding: EdgeInsets.only(left: index > 0 ? 6 : 0),
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: _currentPage == index
+                            ? AppColors.textSecondary
+                            : AppColors.textTertiary,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
-                )),
+                ),
               ),
             ),
           ],
@@ -383,10 +406,13 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
 
   Widget _buildItem(BuildContext context, _MoreItem item, bool isDark) {
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final defaultIconColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final defaultIconColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return GestureDetector(
       onTap: item.onTap,
+      onLongPress: item.onLongPress,
       child: SizedBox(
         width: 70,
         child: Column(
@@ -410,7 +436,9 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
               item.label,
               style: TextStyle(
                 fontSize: 11,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -426,12 +454,14 @@ class _MoreItem {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final Color? iconColor;
 
   const _MoreItem({
     required this.icon,
     required this.label,
     this.onTap,
+    this.onLongPress,
     this.iconColor,
   });
 }

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:matrix/matrix.dart' as matrix;
 
@@ -48,8 +49,10 @@ class MatrixMediaSender {
         actualMimeType = 'image/gif';
       } else if (lowerFilename.endsWith('.webp')) {
         actualMimeType = 'image/webp';
-      } else if (lowerFilename.endsWith('.heic') || lowerFilename.endsWith('.heif')) {
-        actualMimeType = 'image/jpeg';
+      } else if (lowerFilename.endsWith('.heic')) {
+        actualMimeType = 'image/heic';
+      } else if (lowerFilename.endsWith('.heif')) {
+        actualMimeType = 'image/heif';
       }
 
       debugLog('MIME type: $actualMimeType');
@@ -330,15 +333,18 @@ class MatrixMediaSender {
   /// 使用 Matrix SDK 内置方法或手动上传
   Future<String?> sendFileMessage(
     String roomId, {
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
   }) async {
     debugLog('=== MatrixMessageDataSource.sendFileMessage start ===');
     debugLog('roomId: $roomId');
     debugLog('filename: $filename');
-    debugLog('fileBytes.length: ${fileBytes.length}');
+    debugLog('fileSize: ${fileSize ?? fileBytes?.length ?? 0}');
 
     try {
       if (_client == null) {
@@ -354,6 +360,61 @@ class MatrixMediaSender {
       }
 
       final actualMimeType = mimeType ?? 'application/octet-stream';
+      final effectiveSize = fileSize ??
+          fileBytes?.length ??
+          (filePath != null ? await File(filePath).length() : null);
+
+      if (room.encrypted &&
+          _client!.fileEncryptionEnabled &&
+          (filePath != null || fileStream != null)) {
+        throw UnsupportedError(
+          'Encrypted rooms require bytes-based file uploads to preserve attachment encryption',
+        );
+      }
+
+      if (filePath != null || fileStream != null) {
+        Uri? mxcUri;
+        if (filePath != null) {
+          mxcUri = await _uploader.uploadFileAuthenticated(
+            filePath,
+            contentLength: effectiveSize ?? await File(filePath).length(),
+            filename: filename,
+            contentType: actualMimeType,
+          );
+        } else if (fileStream != null && effectiveSize != null) {
+          mxcUri = await _uploader.uploadStreamAuthenticated(
+            fileStream,
+            contentLength: effectiveSize,
+            filename: filename,
+            contentType: actualMimeType,
+          );
+        }
+
+        if (mxcUri == null) {
+          throw Exception('上传文件失败：无法获取 MXC URI');
+        }
+
+        final content = <String, dynamic>{
+          'msgtype': 'm.file',
+          'body': filename,
+          'filename': filename,
+          'url': mxcUri.toString(),
+          'info': {
+            'mimetype': actualMimeType,
+            'size': ?effectiveSize,
+          },
+          if (selfDestructAfter != null)
+            'n42.self_destruct': {'seconds': selfDestructAfter},
+        };
+
+        final result = await room.sendEvent(content);
+        debugLog('=== sendFileMessage completed successfully (streaming method) ===');
+        return result;
+      }
+
+      if (fileBytes == null) {
+        throw Exception('文件内容为空');
+      }
 
       // 方法1: 使用 SDK 内置的 sendFileEvent
       debugLog('Trying SDK sendFileEvent for file...');
@@ -398,7 +459,7 @@ class MatrixMediaSender {
         'url': mxcUri.toString(),
         'info': {
           'mimetype': actualMimeType,
-          'size': fileBytes.length,
+          'size': effectiveSize ?? fileBytes.length,
         },
         if (selfDestructAfter != null)
           'n42.self_destruct': {'seconds': selfDestructAfter},

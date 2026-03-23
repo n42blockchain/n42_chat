@@ -10,6 +10,7 @@ abstract class ISearchRepository {
   Future<SearchResults> searchGlobal(
     String query, {
     SearchResultType? type,
+    MessageSearchFilter? filter,
     int limit = 50,
   });
 
@@ -20,13 +21,17 @@ abstract class ISearchRepository {
   Future<List<SearchResultItem>> searchGroups(String query, {int limit = 20});
 
   /// 搜索会话
-  Future<List<SearchResultItem>> searchConversations(String query, {int limit = 20});
+  Future<List<SearchResultItem>> searchConversations(
+    String query, {
+    int limit = 20,
+  });
 
   /// 搜索消息
   Future<List<SearchResultItem>> searchMessages(
     String query, {
     int limit = 50,
     String? roomId,
+    MessageSearchFilter? filter,
   });
 
   // ============================================
@@ -37,6 +42,7 @@ abstract class ISearchRepository {
   Future<ChatSearchResults> searchInChat(
     String roomId,
     String query, {
+    MessageSearchFilter? filter,
     int limit = 50,
   });
 
@@ -62,4 +68,3 @@ abstract class ISearchRepository {
   /// 清除所有搜索历史
   Future<void> clearSearchHistory();
 }
-

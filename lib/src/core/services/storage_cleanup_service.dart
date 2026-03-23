@@ -1,7 +1,7 @@
-
 import '../constants/app_constants.dart';
 import 'media_lifecycle_service.dart';
 import 'storage_manager_service.dart';
+import '../../data/datasources/local/media_metadata_database.dart';
 import '../utils/debug_log.dart';
 
 /// 清理建议类型
@@ -58,79 +58,111 @@ class StorageCleanupService {
   StorageCleanupService({
     required MediaLifecycleService lifecycleService,
     required StorageManagerService storageManager,
-  })  : _lifecycleService = lifecycleService,
-        _storageManager = storageManager;
+  }) : _lifecycleService = lifecycleService,
+       _storageManager = storageManager;
 
   /// 生成清理建议列表（按可释放空间排序）
-  Future<List<CleanupRecommendation>> getRecommendations() async {
+  Future<List<CleanupRecommendation>> getRecommendations({
+    bool preserveThumbnails = true,
+  }) async {
     final recommendations = <CleanupRecommendation>[];
 
     try {
       // 1. 旧媒体建议（90天以上未访问）
       final oldFiles = await _lifecycleService.getCleanableFiles(
         olderThanDays: StorageConstants.defaultCleanupDays,
+        preserveThumbnails: preserveThumbnails,
       );
       if (oldFiles.isNotEmpty) {
-        final totalSize = oldFiles.fold<int>(0, (sum, f) => sum + f.fileSize);
-        recommendations.add(CleanupRecommendation(
-          type: CleanupRecommendationType.oldMedia,
-          title: 'Old Media Files',
-          description:
-              '${oldFiles.length} files not accessed in ${StorageConstants.defaultCleanupDays}+ days',
-          estimatedBytes: totalSize,
-          fileCount: oldFiles.length,
-          filePaths: oldFiles.map((f) => f.filePath).toList(),
-        ));
+        int totalSize = 0;
+        for (final f in oldFiles) {
+          totalSize += f.fileSize;
+        }
+        recommendations.add(
+          CleanupRecommendation(
+            type: CleanupRecommendationType.oldMedia,
+            title: 'Old Media Files',
+            description:
+                '${oldFiles.length} files not accessed in ${StorageConstants.defaultCleanupDays}+ days',
+            estimatedBytes: totalSize,
+            fileCount: oldFiles.length,
+            filePaths: oldFiles.map((f) => f.filePath).toList(),
+          ),
+        );
       }
 
       // 2. 大文件建议（10MB+）
       final largeFiles = await _lifecycleService.getCleanableFiles(
         minFileSizeBytes: StorageConstants.largeFileThreshold,
+        preserveThumbnails: preserveThumbnails,
       );
       if (largeFiles.isNotEmpty) {
-        final totalSize = largeFiles.fold<int>(0, (sum, f) => sum + f.fileSize);
-        recommendations.add(CleanupRecommendation(
-          type: CleanupRecommendationType.largeFiles,
-          title: 'Large Files',
-          description:
-              '${largeFiles.length} files larger than 10MB',
-          estimatedBytes: totalSize,
-          fileCount: largeFiles.length,
-          filePaths: largeFiles.map((f) => f.filePath).toList(),
-        ));
+        int totalSize = 0;
+        for (final f in largeFiles) {
+          totalSize += f.fileSize;
+        }
+        recommendations.add(
+          CleanupRecommendation(
+            type: CleanupRecommendationType.largeFiles,
+            title: 'Large Files',
+            description: '${largeFiles.length} files larger than 10MB',
+            estimatedBytes: totalSize,
+            fileCount: largeFiles.length,
+            filePaths: largeFiles.map((f) => f.filePath).toList(),
+          ),
+        );
       }
 
       // 3. 缓存建议
       final storageInfo = await _storageManager.getStorageUsage();
       if (storageInfo.cacheSize > 0) {
-        recommendations.add(CleanupRecommendation(
-          type: CleanupRecommendationType.cache,
-          title: 'App Cache',
-          description: 'Temporary files and cached data',
-          estimatedBytes: storageInfo.cacheSize,
-          fileCount: 0,
-        ));
+        recommendations.add(
+          CleanupRecommendation(
+            type: CleanupRecommendationType.cache,
+            title: 'App Cache',
+            description: 'Temporary files and cached data',
+            estimatedBytes: storageInfo.cacheSize,
+            fileCount: 0,
+          ),
+        );
       }
 
       // 4. 房间维度建议（占用前5的房间）
       final roomStats = await _lifecycleService.getAllRoomStats();
       for (final stat in roomStats.take(5)) {
-        if (stat.totalSize > 1024 * 1024) {
-          // 至少 1MB
-          recommendations.add(CleanupRecommendation(
-            type: CleanupRecommendationType.roomSpecific,
-            title: stat.roomId,
-            description: '${stat.totalCount} files',
-            estimatedBytes: stat.totalSize,
-            fileCount: stat.totalCount,
-            roomId: stat.roomId,
-          ));
+        final cleanableFiles = await _lifecycleService.getCleanableFiles(
+          roomId: stat.roomId,
+          preserveThumbnails: preserveThumbnails,
+        );
+        if (cleanableFiles.isEmpty) {
+          continue;
+        }
+
+        var cleanableSize = 0;
+        for (final file in cleanableFiles) {
+          cleanableSize += file.fileSize;
+        }
+
+        if (cleanableSize > 1024 * 1024) {
+          // 至少 1MB 的可清理内容
+          recommendations.add(
+            CleanupRecommendation(
+              type: CleanupRecommendationType.roomSpecific,
+              title: stat.roomId,
+              description: '${cleanableFiles.length} cleanable files',
+              estimatedBytes: cleanableSize,
+              fileCount: cleanableFiles.length,
+              roomId: stat.roomId,
+              filePaths: cleanableFiles.map((f) => f.filePath).toList(),
+            ),
+          );
         }
       }
 
       // 按可释放空间降序排列
       recommendations.sort(
-          (a, b) => b.estimatedBytes.compareTo(a.estimatedBytes));
+        (a, b) => b.estimatedBytes.compareTo(a.estimatedBytes),
+      );
     } catch (e) {
       debugLog('StorageCleanupService: Failed to get recommendations: $e');
     }
@@ -140,11 +172,13 @@ class StorageCleanupService {
 
   /// 执行单条建议
   Future<CleanupResult> executeRecommendation(
-      CleanupRecommendation recommendation) async {
+    CleanupRecommendation recommendation, {
+    bool preserveThumbnails = true,
+  }) async {
     switch (recommendation.type) {
       case CleanupRecommendationType.oldMedia:
       case CleanupRecommendationType.largeFiles:
-        return _lifecycleService.cleanupFiles(recommendation.filePaths);
+        return _cleanupFilesAndInvalidate(recommendation.filePaths);
       case CleanupRecommendationType.cache:
         await _storageManager.clearCache();
         return CleanupResult(
@@ -153,7 +187,10 @@ class StorageCleanupService {
         );
       case CleanupRecommendationType.roomSpecific:
         if (recommendation.roomId != null) {
-          return cleanupByRoom(roomId: recommendation.roomId!);
+          return cleanupByRoom(
+            roomId: recommendation.roomId!,
+            preserveThumbnails: preserveThumbnails,
+          );
         }
         return const CleanupResult();
     }
@@ -164,6 +201,7 @@ class StorageCleanupService {
     required String roomId,
     List<String>? fileCategories,
     DateTime? olderThan,
+    bool preserveThumbnails = true,
   }) async {
     var result = const CleanupResult();
 
@@ -175,11 +213,14 @@ class StorageCleanupService {
           olderThanDays: olderThan != null
               ? DateTime.now().difference(olderThan).inDays
               : null,
+          preserveThumbnails: preserveThumbnails,
         );
         if (files.isNotEmpty) {
-          result = result +
-              await _lifecycleService
-                  .cleanupFiles(files.map((f) => f.filePath).toList());
+          result =
+              result +
+              await _cleanupFilesAndInvalidate(
+                files.map((f) => f.filePath).toList(),
+              );
         }
       }
     } else {
@@ -188,10 +229,12 @@ class StorageCleanupService {
         olderThanDays: olderThan != null
             ? DateTime.now().difference(olderThan).inDays
             : null,
+        preserveThumbnails: preserveThumbnails,
       );
       if (files.isNotEmpty) {
-        result = await _lifecycleService
-            .cleanupFiles(files.map((f) => f.filePath).toList());
+        result = await _cleanupFilesAndInvalidate(
+          files.map((f) => f.filePath).toList(),
+        );
       }
     }
 
@@ -203,31 +246,78 @@ class StorageCleanupService {
     DateTime? startDate,
     DateTime? endDate,
     List<String>? fileCategories,
+    bool preserveThumbnails = true,
   }) async {
-    final olderThanDays =
-        endDate != null ? DateTime.now().difference(endDate).inDays : null;
+    if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+      return const CleanupResult();
+    }
 
     if (fileCategories != null && fileCategories.isNotEmpty) {
       var result = const CleanupResult();
       for (final category in fileCategories) {
-        final files = await _lifecycleService.getCleanableFiles(
-          olderThanDays: olderThanDays,
+        final files = await _getDateRangeCleanableFiles(
+          startDate: startDate,
+          endDate: endDate,
           fileCategory: category,
+          preserveThumbnails: preserveThumbnails,
         );
         if (files.isNotEmpty) {
-          result = result +
-              await _lifecycleService
-                  .cleanupFiles(files.map((f) => f.filePath).toList());
+          result =
+              result +
+              await _cleanupFilesAndInvalidate(
+                files.map((f) => f.filePath).toList(),
+              );
         }
       }
       return result;
     }
 
-    final files = await _lifecycleService.getCleanableFiles(
-      olderThanDays: olderThanDays,
+    final files = await _getDateRangeCleanableFiles(
+      startDate: startDate,
+      endDate: endDate,
+      preserveThumbnails: preserveThumbnails,
     );
     if (files.isEmpty) return const CleanupResult();
-    return _lifecycleService
-        .cleanupFiles(files.map((f) => f.filePath).toList());
+    return _cleanupFilesAndInvalidate(files.map((f) => f.filePath).toList());
+  }
+
+  Future<List<MediaFile>> _getDateRangeCleanableFiles({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? fileCategory,
+    bool preserveThumbnails = true,
+  }) async {
+    final olderThanDays = endDate != null
+        ? (() {
+            final diff = DateTime.now().difference(endDate).inDays;
+            return diff < 0 ? 0 : diff;
+          })()
+        : null;
+    final files = await _lifecycleService.getCleanableFiles(
+      olderThanDays: olderThanDays,
+      fileCategory: fileCategory,
+      preserveThumbnails: preserveThumbnails,
+    );
+
+    return files.where((file) {
+      final accessedAt = file.lastAccessedAt;
+      if (startDate != null && accessedAt.isBefore(startDate)) {
+        return false;
+      }
+      if (endDate != null && accessedAt.isAfter(endDate)) {
+        return false;
+      }
+      return true;
+    }).toList();
+  }
+
+  Future<CleanupResult> _cleanupFilesAndInvalidate(
+    List<String> filePaths,
+  ) async {
+    final result = await _lifecycleService.cleanupFiles(filePaths);
+    if (result.filesDeleted > 0 || result.bytesFreed > 0) {
+      _storageManager.invalidateCache();
+    }
+    return result;
   }
 }

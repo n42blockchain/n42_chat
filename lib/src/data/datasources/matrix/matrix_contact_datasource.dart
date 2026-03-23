@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/timed_status_utils.dart';
 import '../../../core/utils/matrix_utils.dart';
 import 'matrix_client_manager.dart';
 
@@ -39,7 +42,7 @@ class MatrixContactDataSource {
 
     return contacts.values.toList();
   }
-  
+
   /// 获取所有私聊联系人及其房间ID（用于备注名查找）
   Map<String, String> getDirectChatRoomIdMap() {
     final roomIdMap = <String, String>{};
@@ -68,7 +71,8 @@ class MatrixContactDataSource {
       final participants = room.getParticipants();
       for (final participant in participants) {
         final participantId = participant.id;
-        if (participantId != _client?.userID && !users.containsKey(participantId)) {
+        if (participantId != _client?.userID &&
+            !users.containsKey(participantId)) {
           final user = room.unsafeGetUserFromMemoryOrFallback(participantId);
           users[participantId] = user;
         }
@@ -79,14 +83,14 @@ class MatrixContactDataSource {
   }
 
   /// 搜索用户
-  Future<List<matrix.Profile>> searchUsers(String query, {int limit = 20}) async {
+  Future<List<matrix.Profile>> searchUsers(
+    String query, {
+    int limit = 20,
+  }) async {
     if (_client == null || query.trim().isEmpty) return [];
 
     try {
-      final result = await _client!.searchUserDirectory(
-        query,
-        limit: limit,
-      );
+      final result = await _client!.searchUserDirectory(query, limit: limit);
       return result.results;
     } catch (e) {
       return [];
@@ -111,14 +115,20 @@ class MatrixContactDataSource {
 
   /// 获取用户头像URL
   String? getUserAvatarUrl(matrix.User user, {int size = 96}) {
-    final avatarMxc = user.avatarUrl?.toString();
-    return MatrixUtils.mxcToHttp(avatarMxc, client: _client, width: size, height: size);
+    return MatrixUtils.getAvatarUrl(
+      user.avatarUrl,
+      client: _client,
+      size: size,
+    );
   }
 
   /// 获取Profile头像URL
   String? getProfileAvatarUrl(matrix.Profile profile, {int size = 96}) {
-    final avatarMxc = profile.avatarUrl?.toString();
-    return MatrixUtils.mxcToHttp(avatarMxc, client: _client, width: size, height: size);
+    return MatrixUtils.getAvatarUrl(
+      profile.avatarUrl,
+      client: _client,
+      size: size,
+    );
   }
 
   // ============================================
@@ -136,12 +146,12 @@ class MatrixContactDataSource {
   }
 
   /// 创建或获取与用户的私聊
-  Future<String> startDirectChat(String userId) async {
+  Future<String> startDirectChat(String userId, {bool encrypted = true}) async {
     if (_client == null) {
       throw Exception('Matrix client not initialized');
     }
 
-    return await _client!.startDirectChat(userId);
+    return await _client!.startDirectChat(userId, enableEncryption: encrypted);
   }
 
   /// 忽略用户
@@ -197,22 +207,84 @@ class MatrixContactDataSource {
 
   /// 设置当前用户的状态消息
   Future<void> setUserStatus(String? statusMessage) async {
+    await _setStatusMessage(statusMessage);
+  }
+
+  Future<void> setCurrentUserStatus(
+    String? statusMessage, {
+    DateTime? expiresAt,
+    bool preserveCurrentPresence = false,
+  }) async {
     if (_client == null) return;
-    await _client!.setPresence(
-      _client!.userID!,
-      matrix.PresenceType.online,
-      statusMsg: statusMessage,
+    await _setStatusMessage(
+      statusMessage,
+      preserveCurrentPresence: preserveCurrentPresence,
     );
+    await _client!.setAccountData(_client!.userID!, 'n42.user.status', {
+      ...TimedStatusMetadata(
+        message: statusMessage,
+        expiresAt: expiresAt,
+      ).toJson(),
+    });
+  }
+
+  Future<String?> getCurrentUserStatusMessage() async {
+    final client = _client;
+    if (client == null || client.userID == null) {
+      return null;
+    }
+
+    try {
+      final raw = await client.getAccountData(
+        client.userID!,
+        'n42.user.status',
+      );
+      final metadata = TimedStatusMetadata.fromJson(raw);
+      if (metadata.isExpired) {
+        await setCurrentUserStatus(null, preserveCurrentPresence: true);
+        return null;
+      }
+      if (metadata.hasMessage) {
+        return metadata.message;
+      }
+    } catch (_) {
+      // Fallback to presence status when account-data metadata is absent or invalid.
+    }
+
+    return await getUserStatusMessage(client.userID!);
   }
 
   /// 设置当前用户的在线状态
-  Future<void> setPresenceStatus(matrix.PresenceType presenceType, {String? statusMessage}) async {
+  Future<void> setPresenceStatus(
+    matrix.PresenceType presenceType, {
+    String? statusMessage,
+  }) async {
     if (_client == null) return;
     await _client!.setPresence(
       _client!.userID!,
       presenceType,
       statusMsg: statusMessage,
     );
+  }
+
+  Future<void> _setStatusMessage(
+    String? statusMessage, {
+    bool preserveCurrentPresence = false,
+  }) async {
+    final client = _client;
+    final userId = client?.userID;
+    if (client == null || userId == null) return;
+
+    var presenceType = matrix.PresenceType.online;
+    if (preserveCurrentPresence) {
+      try {
+        presenceType = (await client.fetchCurrentPresence(userId)).presence;
+      } catch (_) {
+        // Fall back to online when the current presence cannot be resolved.
+      }
+    }
+
+    await client.setPresence(userId, presenceType, statusMsg: statusMessage);
   }
 
   // ============================================
@@ -222,9 +294,11 @@ class MatrixContactDataSource {
   /// 获取待处理的邀请
   List<matrix.Room> getPendingInvites() {
     return _client?.rooms
-            .where((room) =>
-                room.membership == matrix.Membership.invite &&
-                room.isDirectChat)
+            .where(
+              (room) =>
+                  room.membership == matrix.Membership.invite &&
+                  room.isDirectChat,
+            )
             .toList() ??
         [];
   }
@@ -284,28 +358,22 @@ class MatrixContactDataSource {
   }) async {
     final userId = _client?.userID;
     if (_client == null || userId == null) return;
-    await _client!.setAccountData(
-      userId,
-      _nftAvatarEventType,
-      {
-        'contract_address': contractAddress,
-        'token_id': tokenId,
-        'chain_id': chainId,
-        'image_url': imageUrl,
-        'updated_at': DateTime.now().toIso8601String(),
-      },
-    );
+    await _client!.setAccountData(userId, _nftAvatarEventType, {
+      'contract_address': contractAddress,
+      'token_id': tokenId,
+      'chain_id': chainId,
+      'image_url': imageUrl,
+      'updated_at': DateTime.now().toIso8601String(),
+    });
   }
 
   /// 清除 NFT 头像数据
   Future<void> clearNftAvatarData() async {
     final userId = _client?.userID;
     if (_client == null || userId == null) return;
-    await _client!.setAccountData(
-      userId,
-      _nftAvatarEventType,
-      {'cleared': true},
-    );
+    await _client!.setAccountData(userId, _nftAvatarEventType, {
+      'cleared': true,
+    });
   }
 
   // ============================================
@@ -319,4 +387,3 @@ class MatrixContactDataSource {
   Stream<matrix.CachedPresence>? get onPresenceChanged =>
       _client?.onPresenceChanged.stream;
 }
-

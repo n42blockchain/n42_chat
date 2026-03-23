@@ -1,5 +1,9 @@
 import 'package:equatable/equatable.dart';
 
+import 'avatar_decoration_preset.dart';
+
+final _whitespaceRegExp = RegExp(r'\s+');
+
 /// 用户实体
 ///
 /// 表示Matrix用户的基本信息
@@ -43,6 +47,21 @@ class UserEntity extends Equatable {
   /// ENS 域名
   final String? ensName;
 
+  /// 头像装饰样式
+  final AvatarDecorationPreset avatarDecorationPreset;
+
+  /// NFT 合约地址
+  final String? nftContractAddress;
+
+  /// NFT Token ID
+  final int? nftTokenId;
+
+  /// NFT 所在链 ID
+  final int? nftChainId;
+
+  /// NFT 头像图片 URL
+  final String? nftImageUrl;
+
   const UserEntity({
     required this.userId,
     required this.displayName,
@@ -57,7 +76,16 @@ class UserEntity extends Equatable {
     this.n42Username,
     this.walletAddress,
     this.ensName,
+    this.avatarDecorationPreset = AvatarDecorationPreset.none,
+    this.nftContractAddress,
+    this.nftTokenId,
+    this.nftChainId,
+    this.nftImageUrl,
   });
+
+  /// 当前是否正在使用 NFT 头像
+  bool get hasNftAvatar =>
+      nftContractAddress != null && nftTokenId != null && nftImageUrl != null;
 
   /// 获取用户名部分 (@user:server.com -> user)
   String get username {
@@ -90,7 +118,7 @@ class UserEntity extends Equatable {
     final name = effectiveDisplayName;
     if (name.isEmpty) return '?';
 
-    final words = name.trim().split(RegExp(r'\s+'));
+    final words = name.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return name.substring(0, name.length.clamp(0, 2)).toUpperCase();
     }
@@ -104,20 +132,25 @@ class UserEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        userId,
-        displayName,
-        avatarUrl,
-        statusMessage,
-        isCurrentUser,
-        gender,
-        region,
-        signature,
-        pokeText,
-        ringtone,
-        n42Username,
-        walletAddress,
-        ensName,
-      ];
+    userId,
+    displayName,
+    avatarUrl,
+    statusMessage,
+    isCurrentUser,
+    gender,
+    region,
+    signature,
+    pokeText,
+    ringtone,
+    n42Username,
+    walletAddress,
+    ensName,
+    avatarDecorationPreset,
+    nftContractAddress,
+    nftTokenId,
+    nftChainId,
+    nftImageUrl,
+  ];
 
   UserEntity copyWith({
     String? userId,
@@ -133,6 +166,11 @@ class UserEntity extends Equatable {
     String? n42Username,
     String? walletAddress,
     String? ensName,
+    AvatarDecorationPreset? avatarDecorationPreset,
+    String? nftContractAddress,
+    int? nftTokenId,
+    int? nftChainId,
+    String? nftImageUrl,
   }) {
     return UserEntity(
       userId: userId ?? this.userId,
@@ -148,7 +186,12 @@ class UserEntity extends Equatable {
       n42Username: n42Username ?? this.n42Username,
       walletAddress: walletAddress ?? this.walletAddress,
       ensName: ensName ?? this.ensName,
+      avatarDecorationPreset:
+          avatarDecorationPreset ?? this.avatarDecorationPreset,
+      nftContractAddress: nftContractAddress ?? this.nftContractAddress,
+      nftTokenId: nftTokenId ?? this.nftTokenId,
+      nftChainId: nftChainId ?? this.nftChainId,
+      nftImageUrl: nftImageUrl ?? this.nftImageUrl,
     );
   }
 }
-

@@ -11,6 +11,34 @@ class MockAiService extends Mock implements AiService {}
 
 class MockSecureStorage extends Mock implements PreferencesDataSource {}
 
+class InMemoryPreferencesDataSource extends PreferencesDataSource {
+  final Map<String, String> values = {};
+  final Duration writeDelay;
+
+  InMemoryPreferencesDataSource({
+    this.writeDelay = Duration.zero,
+  });
+
+  @override
+  Future<String?> read(String key) async => values[key];
+
+  @override
+  Future<void> write(String key, String value) async {
+    if (writeDelay > Duration.zero) {
+      await Future<void>.delayed(writeDelay);
+    }
+    values[key] = value;
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    if (writeDelay > Duration.zero) {
+      await Future<void>.delayed(writeDelay);
+    }
+    values.remove(key);
+  }
+}
+
 void main() {
   late AiRepositoryImpl repository;
   late MockAiService mockAiService;
@@ -222,6 +250,64 @@ void main() {
       final lastId =
           (savedMessages.last as Map<String, dynamic>)['id'] as String;
       expect(lastId, 'msg-100');
+    });
+
+    test('saveAssistant serializes concurrent writes so assistants are not lost',
+        () async {
+      final storage = InMemoryPreferencesDataSource(
+        writeDelay: const Duration(milliseconds: 10),
+      );
+      final concurrentRepository = AiRepositoryImpl(
+        aiService: mockAiService,
+        storage: storage,
+      );
+      final secondAssistant = AiAssistantEntity(
+        id: 'test-2',
+        name: 'Test Bot 2',
+        createdAt: DateTime(2025, 6, 2),
+      );
+
+      await Future.wait([
+        concurrentRepository.saveAssistant(testAssistant),
+        concurrentRepository.saveAssistant(secondAssistant),
+      ]);
+
+      final assistants = await concurrentRepository.getAssistants();
+      expect(
+        assistants.map((a) => a.id),
+        containsAll(<String>['default', 'test-1', 'test-2']),
+      );
+    });
+
+    test('saveChatMessage serializes concurrent writes so history is not lost',
+        () async {
+      final storage = InMemoryPreferencesDataSource(
+        writeDelay: const Duration(milliseconds: 10),
+      );
+      final concurrentRepository = AiRepositoryImpl(
+        aiService: mockAiService,
+        storage: storage,
+      );
+      final firstMessage = AiChatMessage(
+        id: 'msg-a',
+        role: 'user',
+        content: 'First',
+        timestamp: DateTime(2025, 6, 1, 10),
+      );
+      final secondMessage = AiChatMessage(
+        id: 'msg-b',
+        role: 'assistant',
+        content: 'Second',
+        timestamp: DateTime(2025, 6, 1, 10, 1),
+      );
+
+      await Future.wait([
+        concurrentRepository.saveChatMessage('assistant-1', firstMessage),
+        concurrentRepository.saveChatMessage('assistant-1', secondMessage),
+      ]);
+
+      final history = await concurrentRepository.getChatHistory('assistant-1');
+      expect(history.map((m) => m.id), ['msg-a', 'msg-b']);
     });
   });
 }

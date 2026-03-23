@@ -158,7 +158,9 @@ class OnChainNotificationService {
     final url = notif.ctaUrl;
     if (url != null && url.isNotEmpty) {
       final uri = Uri.tryParse(url);
-      if (uri != null) {
+      if (uri != null &&
+          (uri.scheme == 'https' || uri.scheme == 'http') &&
+          uri.host.isNotEmpty) {
         try {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         } catch (e) {

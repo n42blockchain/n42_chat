@@ -1,3 +1,4 @@
+import '../../data/models/social/social_similarity_model.dart';
 import '../entities/social/social_connection.dart';
 import '../entities/social/social_profile.dart';
 import '../entities/social/social_recommendation.dart';
@@ -26,10 +27,13 @@ abstract class ISocialGraphRepository {
     int limit = 20,
   });
 
-  /// Calculate the similarity score between [addressA] and [addressB].
+  /// Calculate the full similarity result between [addressA] and [addressB].
   ///
-  /// Returns a value from 0.0 (no overlap) to 1.0 (identical portfolios).
-  Future<double> calculateSimilarity(String addressA, String addressB);
+  /// Includes the total score and the underlying common tokens/NFTs/chains.
+  Future<SocialSimilarityModel> calculateSimilarity(
+    String addressA,
+    String addressB,
+  );
 
   /// Search for profiles by ENS name, Lens handle, or Farcaster username.
   Future<List<SocialProfile>> searchProfiles(String query);

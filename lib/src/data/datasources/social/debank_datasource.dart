@@ -12,27 +12,48 @@ class DeBankDatasource {
 
   final String _baseUrl;
   final String? _apiKey;
+  final String? _authToken;
+  final bool _useProxyEndpoint;
   final http.Client _httpClient;
 
   DeBankDatasource({
     String? baseUrl,
     String? apiKey,
+    String? authToken,
+    bool useProxyEndpoint = false,
     http.Client? httpClient,
-  })  : _baseUrl = baseUrl ?? _defaultBaseUrl,
-        _apiKey = apiKey,
-        _httpClient = httpClient ?? http.Client();
+  }) : _baseUrl = baseUrl ?? _defaultBaseUrl,
+       _apiKey = apiKey,
+       _authToken = authToken,
+       _useProxyEndpoint = useProxyEndpoint,
+       _httpClient = httpClient ?? http.Client();
 
   Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        if (_apiKey != null) 'AccessKey': _apiKey,
-      };
+    'Content-Type': 'application/json',
+    if (_useProxyEndpoint && _authToken != null && _authToken.isNotEmpty)
+      'Authorization': 'Bearer $_authToken',
+    if (!_useProxyEndpoint && _apiKey != null && _apiKey.isNotEmpty)
+      'AccessKey': _apiKey,
+  };
+
+  String get _normalizedBaseUrl => _baseUrl.endsWith('/')
+      ? _baseUrl.substring(0, _baseUrl.length - 1)
+      : _baseUrl;
+
+  String _path(String directPath, String proxyPath) =>
+      _useProxyEndpoint ? proxyPath : directPath;
+
+  Map<String, String> _addressParams(String address) =>
+      _useProxyEndpoint ? {'address': address} : {'id': address};
 
   /// Perform a GET request and decode the response as a JSON object.
   Future<Map<String, dynamic>> _get(
     String path, {
     Map<String, String>? params,
   }) async {
-    final uri = Uri.parse('$_baseUrl$path').replace(queryParameters: params);
+    final uri = Uri.parse(
+      '$_normalizedBaseUrl$path',
+    ).replace(queryParameters: params);
     final response = await _httpClient
         .get(uri, headers: _headers)
         .timeout(const Duration(seconds: 15));
@@ -48,7 +69,9 @@ class DeBankDatasource {
     String path, {
     Map<String, String>? params,
   }) async {
-    final uri = Uri.parse('$_baseUrl$path').replace(queryParameters: params);
+    final uri = Uri.parse(
+      '$_normalizedBaseUrl$path',
+    ).replace(queryParameters: params);
     final response = await _httpClient
         .get(uri, headers: _headers)
         .timeout(const Duration(seconds: 15));
@@ -61,7 +84,10 @@ class DeBankDatasource {
 
   /// Get user's total portfolio value across all chains.
   Future<DeBankPortfolioModel> getUserPortfolio(String address) async {
-    final data = await _get('/user/total_balance', params: {'id': address});
+    final data = await _get(
+      _path('/user/total_balance', '/total_balance'),
+      params: _addressParams(address),
+    );
     return DeBankPortfolioModel.fromJson(data);
   }
 
@@ -72,19 +98,23 @@ class DeBankDatasource {
     String address,
     String chainId,
   ) async {
-    final data = await _getList('/user/token_list', params: {
-      'id': address,
+    final params = {
+      ..._addressParams(address),
       'chain_id': chainId,
-      'is_all': 'false',
-    });
+      if (!_useProxyEndpoint) 'is_all': 'false',
+    };
+    final data = await _getList(
+      _path('/user/token_list', '/token_list'),
+      params: params,
+    );
     return data.cast<Map<String, dynamic>>();
   }
 
   /// Get all chains that [address] has interacted with.
   Future<List<String>> getUsedChains(String address) async {
     final data = await _getList(
-      '/user/used_chain_list',
-      params: {'id': address},
+      _path('/user/used_chain_list', '/used_chain_list'),
+      params: _addressParams(address),
     );
     return data
         .map((chain) {

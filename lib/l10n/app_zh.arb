@@ -1,10 +1,10 @@
 {
   "@@locale": "zh",
-  "commonRetry": "重试",
-  "commonUnknownUser": "未知用户",
-  "transferWalletNotConnected": "钱包未连接",
-  "chatCallServiceNotInitialized": "通话服务未初始化",
-  "authLoginFailed": "登录失败: {error}",
+  "commonRetry": "重試",
+  "commonUnknownUser": "未知用戶",
+  "transferWalletNotConnected": "錢包未連接",
+  "chatCallServiceNotInitialized": "通話服務未初始化",
+  "authLoginFailed": "登錄失敗: {error}",
   "@authLoginFailed": {
     "placeholders": {
       "error": {
@@ -12,47 +12,47 @@
       }
     }
   },
-  "chatCallBack": "回拨",
-  "chatMissedVideoCall": "未接视频通话",
-  "chatMissedVoiceCall": "未接语音通话",
-  "chatCallNotAnswered": "对方未接听",
-  "chatCallDurationLabel": "通话时长",
-  "chatVoiceCallCancelled": "语音通话已取消",
-  "chatVideoCallCancelled": "视频通话已取消",
-  "commonImage": "[图片]",
-  "chatVideo": "[视频]",
-  "chatVoice": "[语音]",
+  "chatCallBack": "回撥",
+  "chatMissedVideoCall": "未接視頻通話",
+  "chatMissedVoiceCall": "未接語音通話",
+  "chatCallNotAnswered": "對方未接聽",
+  "chatCallDurationLabel": "通話時長",
+  "chatVoiceCallCancelled": "語音通話已取消",
+  "chatVideoCallCancelled": "視頻通話已取消",
+  "commonImage": "[圖片]",
+  "chatVideo": "[視頻]",
+  "chatVoice": "[語音]",
   "commonFile": "[文件]",
   "chatLocation": "[位置]",
   "chatUnknownMessage": "[未知消息]",
-  "commonDelete": "删除",
-  "chatDeleteThisMessage": "删除这条消息？",
-  "chatMessageDeleted": "消息已删除",
-  "profileNotLoggedIn": "未登录",
+  "commonDelete": "刪除",
+  "chatDeleteThisMessage": "刪除這條消息？",
+  "chatMessageDeleted": "消息已刪除",
+  "profileNotLoggedIn": "未登錄",
   "chatMyLocation": "我的位置",
-  "commonGroupChat": "群聊",
+  "commonGroupChat": "羣聊",
   "commonSearch": "搜索",
   "commonCancel": "取消",
-  "commonLoadFailed": "加载失败",
+  "commonLoadFailed": "加載失敗",
   "commonMessages": "消息",
-  "commonContacts": "联系人",
+  "commonContacts": "聯繫人",
   "commonMe": "我",
-  "commonVoiceLoading": "语音加载中，请稍后再试",
-  "commonVoiceToTextFailed": "语音转文字失败",
-  "commonConvertToText": "转文字",
-  "chatCopy": "复制",
-  "commonForward": "转发",
+  "commonVoiceLoading": "語音加載中，請稍後再試",
+  "commonVoiceToTextFailed": "語音轉文字失敗",
+  "commonConvertToText": "轉文字",
+  "chatCopy": "複製",
+  "commonForward": "轉發",
   "commonUnfavorite": "取消收藏",
   "commonFavorite": "收藏",
-  "settingsResend": "重新发送",
+  "settingsResend": "重新發送",
   "chatRecall": "撤回",
   "commonQuote": "引用",
   "commonRemind": "提醒",
-  "chatCopied": "已复制",
-  "storySendMessageHint": "发送消息",
-  "commonMicrophonePermissionRequired": "请允许使用麦克风权限",
-  "chatMicrophonePermissionDeniedPermanent": "麦克风权限已被拒绝，请在系统设置中开启以使用语音消息功能。",
-  "commonStartRecordingFailed": "开始录音失败: {error}",
+  "chatCopied": "已複製",
+  "storySendMessageHint": "發送消息",
+  "commonMicrophonePermissionRequired": "請允許使用麥克風權限",
+  "chatMicrophonePermissionDeniedPermanent": "麥克風權限已被拒絕，請在系統設置中開啓以使用語音消息功能。",
+  "commonStartRecordingFailed": "開始錄音失敗: {error}",
   "@commonStartRecordingFailed": {
     "placeholders": {
       "error": {
@@ -60,8 +60,8 @@
       }
     }
   },
-  "commonRecordingTooShort": "录音时间太短",
-  "commonStopRecordingFailed": "停止录音失败: {error}",
+  "commonRecordingTooShort": "錄音時間太短",
+  "commonStopRecordingFailed": "停止錄音失敗: {error}",
   "@commonStopRecordingFailed": {
     "placeholders": {
       "error": {
@@ -69,13 +69,13 @@
       }
     }
   },
-  "chatReleaseToCancel": "松开取消",
-  "chatReleaseToSend": "松开发送，上滑取消",
-  "commonHoldToTalk": "按住 说话",
-  "commonSend": "发送",
+  "chatReleaseToCancel": "鬆開取消",
+  "chatReleaseToSend": "鬆開發送，上滑取消",
+  "commonHoldToTalk": "按住 說話",
+  "commonSend": "發送",
   "commonAddFriend": "添加好友",
-  "commonChatServiceNotConnected": "聊天服务未连接",
-  "contactUserNotFoundHint": "未找到用户 \"{query}\"\n\n提示：\n• 尝试输入完整用户ID，如 @username:server.com\n• 确认用户名拼写正确",
+  "commonChatServiceNotConnected": "聊天服務未連接",
+  "contactUserNotFoundHint": "未找到用戶 \"{query}\"\n\n提示：\n• 嘗試輸入完整用戶ID，如 @username:server.com\n• 確認用戶名拼寫正確",
   "@contactUserNotFoundHint": {
     "placeholders": {
       "query": {
@@ -83,7 +83,7 @@
       }
     }
   },
-  "contactCreateChatFailed": "创建会话失败: {error}",
+  "contactCreateChatFailed": "創建會話失敗: {error}",
   "@contactCreateChatFailed": {
     "placeholders": {
       "error": {
@@ -91,7 +91,7 @@
       }
     }
   },
-  "contactSearchFailed": "搜索失败: {error}",
+  "contactSearchFailed": "搜索失敗: {error}",
   "@contactSearchFailed": {
     "placeholders": {
       "error": {
@@ -99,11 +99,11 @@
       }
     }
   },
-  "contactEnterUserIdOrUsername": "输入用户 ID 或用户名搜索",
+  "contactEnterUserIdOrUsername": "輸入用戶 ID 或用戶名搜索",
   "contactSearching": "搜索中...",
-  "contactSearchUserToChat": "搜索用户开始聊天",
-  "contactMatrixIdExample": "可以输入完整的 Matrix ID\n例如: @user:matrix.n42.network",
-  "contactUserNotFound": "未找到用户 \"{username}\"",
+  "contactSearchUserToChat": "搜索用戶開始聊天",
+  "contactMatrixIdExample": "可以輸入完整的 Matrix ID\n例如: @user:matrix.n42.network",
+  "contactUserNotFound": "未找到用戶 \"{username}\"",
   "@contactUserNotFound": {
     "placeholders": {
       "username": {
@@ -112,24 +112,24 @@
     }
   },
   "commonChat": "聊天",
-  "commonSettings": "设置",
-  "profileEditProfile": "编辑资料",
-  "authLogin": "登录",
-  "commonCreateGroup": "创建群聊",
-  "chatError": "错误",
-  "commonTransfer": "转账",
+  "commonSettings": "設置",
+  "profileEditProfile": "編輯資料",
+  "authLogin": "登錄",
+  "commonCreateGroup": "創建羣聊",
+  "chatError": "錯誤",
+  "commonTransfer": "轉賬",
   "commonReceived": "已被接收",
-  "commonRefunded": "已退还",
-  "commonExpired": "已过期",
-  "chatRedPacketGreeting": "恭喜发财，大吉大利",
-  "commonN42RedPacket": "N42红包",
-  "commonClaimed": "已领取",
-  "commonAllClaimed": "已被领完",
-  "chatReadAloud": "朗读",
-  "chatReply": "回复",
-  "commonEdit": "编辑",
-  "chatSelectForwardTarget": "选择转发对象",
-  "commonSendCount": "发送({count})",
+  "commonRefunded": "已退還",
+  "commonExpired": "已過期",
+  "chatRedPacketGreeting": "恭喜發財，大吉大利",
+  "commonN42RedPacket": "N42紅包",
+  "commonClaimed": "已領取",
+  "commonAllClaimed": "已被領完",
+  "chatReadAloud": "朗讀",
+  "chatReply": "回覆",
+  "commonEdit": "編輯",
+  "chatSelectForwardTarget": "選擇轉發對象",
+  "commonSendCount": "發送({count})",
   "@commonSendCount": {
     "placeholders": {
       "count": {
@@ -137,7 +137,7 @@
       }
     }
   },
-  "contactN42Id": "N42号：{id}",
+  "contactN42Id": "N42號：{id}",
   "@contactN42Id": {
     "placeholders": {
       "id": {
@@ -145,39 +145,39 @@
       }
     }
   },
-  "profileN42IdTitle": "N42号",
+  "profileN42IdTitle": "N42號",
   "profileN42Bean": "N42豆",
-  "contactFriendInfo": "朋友资料",
-  "contactFriendInfoDesc": "添加朋友的备注名、电话、标签、备忘、照片等，并设置朋友权限。",
+  "contactFriendInfo": "朋友資料",
+  "contactFriendInfoDesc": "添加朋友的備註名、電話、標籤、備忘、照片等，並設置朋友權限。",
   "commonMoments": "朋友圈",
-  "commonSendMessage": "发消息",
-  "contactAudioVideoCall": "音视频通话",
-  "contactVideoChannel": "视频号",
-  "contactRemark": "备注",
-  "contactRemarkName": "备注名",
-  "contactPhone": "电话",
-  "contactTags": "标签",
-  "contactNotes": "备忘",
+  "commonSendMessage": "發消息",
+  "contactAudioVideoCall": "音視頻通話",
+  "contactVideoChannel": "視頻號",
+  "contactRemark": "備註",
+  "contactRemarkName": "備註名",
+  "contactPhone": "電話",
+  "contactTags": "標籤",
+  "contactNotes": "備忘",
   "contactPhotos": "照片",
-  "contactPermissions": "权限",
-  "contactChatMomentsEtc": "聊天、朋友圈、运动等",
+  "contactPermissions": "權限",
+  "contactChatMomentsEtc": "聊天、朋友圈、運動等",
   "contactMoreInfo": "更多信息",
-  "contactCommonGroups": "我和他 (她) 的共同群聊",
-  "contactSource": "来源",
+  "contactCommonGroups": "我和他 (她) 的共同羣聊",
+  "contactSource": "來源",
   "settingsNotificationSettings": "消息通知",
-  "settingsPrivacy": "隐私",
-  "settingsAppearance": "外观",
-  "settingsAbout": "关于",
-  "commonLogout": "退出登录",
-  "commonLogoutConfirm": "确定要退出登录吗？",
+  "settingsPrivacy": "隱私",
+  "settingsAppearance": "外觀",
+  "settingsAbout": "關於",
+  "commonLogout": "退出登錄",
+  "commonLogoutConfirm": "確定要退出登錄嗎？",
   "commonSave": "保存",
-  "profileNickname": "昵称",
-  "profileEnterNickname": "请输入昵称",
-  "profileSignature": "签名",
-  "profileAddSignature": "添加个性签名",
+  "profileNickname": "暱稱",
+  "profileEnterNickname": "請輸入暱稱",
+  "profileSignature": "簽名",
+  "profileAddSignature": "添加個性簽名",
   "commonTakePhoto": "拍照",
-  "profileChooseFromGallery": "从相册选择",
-  "profileSaveFailed": "保存失败: {error}",
+  "profileChooseFromGallery": "從相冊選擇",
+  "profileSaveFailed": "保存失敗: {error}",
   "@profileSaveFailed": {
     "placeholders": {
       "error": {
@@ -185,21 +185,21 @@
       }
     }
   },
-  "authSecureDecentralizedChat": "安全、去中心化的即时通讯",
+  "authSecureDecentralizedChat": "安全、去中心化的即時通訊",
   "commonEndToEndEncryption": "端到端加密",
-  "authMessagesOnlyYouCanSee": "消息仅你和对方可见",
+  "authMessagesOnlyYouCanSee": "消息僅你和對方可見",
   "authDecentralized": "去中心化",
-  "authBasedOnMatrix": "基于Matrix开放协议",
-  "authWalletIntegration": "钱包集成",
-  "authEasyCryptoTransfer": "轻松进行加密货币转账",
-  "authRegister": "注册",
-  "authAgreeTerms": "登录即表示同意",
-  "authTermsOfService": "《服务协议》",
+  "authBasedOnMatrix": "基於Matrix開放協議",
+  "authWalletIntegration": "錢包集成",
+  "authEasyCryptoTransfer": "輕鬆進行加密貨幣轉賬",
+  "authRegister": "註冊",
+  "authAgreeTerms": "登錄即表示同意",
+  "authTermsOfService": "《服務協議》",
   "authAnd": "和",
-  "authPrivacyPolicy": "《隐私政策》",
-  "authServerAddress": "服务器地址",
-  "authEnterServerAddress": "请输入服务器地址",
-  "authConnectedTo": "已连接到 {serverName}",
+  "authPrivacyPolicy": "《隱私政策》",
+  "authServerAddress": "服務器地址",
+  "authEnterServerAddress": "請輸入服務器地址",
+  "authConnectedTo": "已連接到 {serverName}",
   "@authConnectedTo": {
     "placeholders": {
       "serverName": {
@@ -207,37 +207,37 @@
       }
     }
   },
-  "authUsername": "用户名",
-  "authEnterUsername": "请输入用户名",
-  "authUsernameOrEmail": "用户名或邮箱",
-  "authEnterUsernameOrEmail": "请输入用户名或邮箱",
-  "authPassword": "密码",
-  "authEnterPassword": "请输入密码",
-  "authRegisterAccount": "注册账号",
-  "authForgotPassword": "忘记密码",
-  "authOtherLoginMethods": "其他登录方式",
-  "authCreateAccount": "创建账号",
-  "authJoinN42Chat": "加入 N42 Chat 开始聊天",
-  "authUsernameHint": "3-20字符，字母/数字/_",
-  "authUsernameMinLength": "用户名至少3个字符",
-  "authUsernameMaxLength": "用户名最多20个字符",
-  "authUsernameFormat": "用户名只能包含字母、数字和下划线",
+  "authUsername": "用戶名",
+  "authEnterUsername": "請輸入用戶名",
+  "authUsernameOrEmail": "用戶名或郵箱",
+  "authEnterUsernameOrEmail": "請輸入用戶名或郵箱",
+  "authPassword": "密碼",
+  "authEnterPassword": "請輸入密碼",
+  "authRegisterAccount": "註冊賬號",
+  "authForgotPassword": "忘記密碼",
+  "authOtherLoginMethods": "其他登錄方式",
+  "authCreateAccount": "創建賬號",
+  "authJoinN42Chat": "加入 N42 Chat 開始聊天",
+  "authUsernameHint": "3-20字符，字母/數字/_",
+  "authUsernameMinLength": "用戶名至少3個字符",
+  "authUsernameMaxLength": "用戶名最多20個字符",
+  "authUsernameFormat": "用戶名只能包含字母、數字和下劃線",
   "authPasswordHint": "至少8位",
-  "commonPasswordMinLength": "密码至少8位",
-  "authConfirmPassword": "确认密码",
-  "authFilled": "已填写",
-  "authEnterInviteCode": "请输入邀请码",
-  "authAlreadyHaveAccount": "已有账号？",
-  "authLoginNow": "立即登录",
-  "profileAvatar": "头像",
-  "profileStatus": "状态",
-  "commonLoading": "加载中...",
-  "conversationNoConversations": "暂无会话",
-  "conversationTapToChat": "点击右上角开始聊天",
-  "conversationStartGroup": "发起群聊",
-  "commonScan": "扫一扫",
+  "commonPasswordMinLength": "密碼至少8位",
+  "authConfirmPassword": "確認密碼",
+  "authFilled": "已填寫",
+  "authEnterInviteCode": "請輸入邀請碼",
+  "authAlreadyHaveAccount": "已有賬號？",
+  "authLoginNow": "立即登錄",
+  "profileAvatar": "頭像",
+  "profileStatus": "狀態",
+  "commonLoading": "加載中...",
+  "conversationNoConversations": "暫無會話",
+  "conversationTapToChat": "點擊右上角開始聊天",
+  "conversationStartGroup": "發起羣聊",
+  "commonScan": "掃一掃",
   "commonPayment": "收付款",
-  "commonFeatureComingSoon": "{feature} 功能即将推出",
+  "commonFeatureComingSoon": "{feature} 功能即將推出",
   "@commonFeatureComingSoon": {
     "placeholders": {
       "feature": {
@@ -245,13 +245,13 @@
       }
     }
   },
-  "conversationMarkAsRead": "标记已读",
-  "commonUnmute": "取消静音",
-  "commonMute": "消息免打扰",
-  "conversationUnpin": "取消置顶",
-  "conversationPin": "置顶",
-  "conversationDeleteConversation": "删除会话",
-  "conversationDeleteConversationConfirm": "确定要删除与 {name} 的会话吗？",
+  "conversationMarkAsRead": "標記已讀",
+  "commonUnmute": "取消靜音",
+  "commonMute": "消息免打擾",
+  "conversationUnpin": "取消置頂",
+  "conversationPin": "置頂",
+  "conversationDeleteConversation": "刪除會話",
+  "conversationDeleteConversationConfirm": "確定要刪除與 {name} 的會話嗎？",
   "@conversationDeleteConversationConfirm": {
     "placeholders": {
       "name": {
@@ -259,22 +259,22 @@
       }
     }
   },
-  "commonNoContacts": "暂无联系人",
-  "contactAddFriendsToChat": "添加好友开始聊天",
-  "contactNotFound": "未找到联系人",
-  "contactTryOtherKeywords": "尝试搜索其他关键词或全局搜索",
-  "contactSearchResults": "搜索结果",
+  "commonNoContacts": "暫無聯繫人",
+  "contactAddFriendsToChat": "添加好友開始聊天",
+  "contactNotFound": "未找到聯繫人",
+  "contactTryOtherKeywords": "嘗試搜索其他關鍵詞或全局搜索",
+  "contactSearchResults": "搜索結果",
   "contactNewFriends": "新的朋友",
-  "contactChatOnlyFriends": "仅聊天的朋友",
-  "contactOfficialAccounts": "公众号",
-  "contactServiceAccounts": "服务号",
-  "contactEnterpriseContacts": "企业联系人",
-  "contactRecommendToFriend": "推荐给朋友",
-  "commonSetRemark": "设置备注",
-  "contactSendingCard": "正在发送名片...",
+  "contactChatOnlyFriends": "僅聊天的朋友",
+  "contactOfficialAccounts": "公衆號",
+  "contactServiceAccounts": "服務號",
+  "contactEnterpriseContacts": "企業聯繫人",
+  "contactRecommendToFriend": "推薦給朋友",
+  "commonSetRemark": "設置備註",
+  "contactSendingCard": "正在發送名片...",
   "commonFileLabel": "文件",
   "commonLocationLabel": "位置",
-  "contactRecommendFailed": "推荐失败: {error}",
+  "contactRecommendFailed": "推薦失敗: {error}",
   "@contactRecommendFailed": {
     "placeholders": {
       "error": {
@@ -282,9 +282,9 @@
       }
     }
   },
-  "profileEnterRemark": "请输入备注名",
-  "contactOpeningChat": "正在打开聊天...",
-  "contactOpenChatFailed": "打开聊天失败: {error}",
+  "profileEnterRemark": "請輸入備註名",
+  "contactOpeningChat": "正在打開聊天...",
+  "contactOpenChatFailed": "打開聊天失敗: {error}",
   "@contactOpenChatFailed": {
     "placeholders": {
       "error": {
@@ -292,28 +292,28 @@
       }
     }
   },
-  "contactAddContact": "添加联系人",
-  "contactEnterUserId": "输入用户ID",
-  "contactNoFriendRequests": "暂无好友请求",
+  "contactAddContact": "添加聯繫人",
+  "contactEnterUserId": "輸入用戶ID",
+  "contactNoFriendRequests": "暫無好友請求",
   "commonAccept": "接受",
-  "commonReject": "拒绝",
-  "commonNoGroups": "暂无群聊",
-  "contactSelectFriendToRecommend": "选择要推荐给的朋友",
-  "commonSearchContacts": "搜索联系人",
-  "contactNoContactsFound": "没有找到联系人",
+  "commonReject": "拒絕",
+  "commonNoGroups": "暫無羣聊",
+  "contactSelectFriendToRecommend": "選擇要推薦給的朋友",
+  "commonSearchContacts": "搜索聯繫人",
+  "contactNoContactsFound": "沒有找到聯繫人",
   "favoriteYesterday": "昨天",
-  "chatJustNow": "刚刚",
-  "profileOnline": "在线",
-  "profileOffline": "离线",
-  "searchContactsGroupsMessages": "搜索联系人、群聊和消息",
-  "searchError": "搜索出错",
+  "chatJustNow": "剛剛",
+  "profileOnline": "在線",
+  "profileOffline": "離線",
+  "searchContactsGroupsMessages": "搜索聯繫人、羣聊和消息",
+  "searchError": "搜索出錯",
   "chatSearchHint": "搜索",
-  "searchHistory": "搜索历史",
+  "searchHistory": "搜索歷史",
   "commonClear": "清除",
   "commonAll": "全部",
-  "searchGroups": "群聊",
-  "searchNoResults": "无结果",
-  "commonGroupMembers": "群成员 ({count})",
+  "searchGroups": "羣聊",
+  "searchNoResults": "無結果",
+  "commonGroupMembers": "羣成員 ({count})",
   "@commonGroupMembers": {
     "placeholders": {
       "count": {
@@ -321,38 +321,38 @@
       }
     }
   },
-  "groupMembersTitle": "群成员",
+  "groupMembersTitle": "羣成員",
   "groupViewAll": "查看全部",
-  "groupOwner": "群主",
+  "groupOwner": "羣主",
   "groupAdmin": "管理",
-  "groupInvite": "邀请",
-  "commonGroupAnnouncement": "群公告",
-  "commonNotSet": "未设置",
-  "groupDescription": "群简介",
-  "groupPublicGroup": "公开群聊",
-  "commonClearChatHistory": "清空聊天记录",
-  "commonDissolveGroup": "解散群聊",
-  "commonLeaveGroup": "退出群聊",
-  "groupChangeGroupName": "修改群名称",
-  "commonEnterGroupName": "请输入群名称",
-  "commonConfirm": "确认",
-  "groupEnterGroupDescription": "请输入群简介",
-  "groupPublish": "发布",
-  "chatClearHistoryConfirm": "确定要清空聊天记录吗？此操作不可恢复。",
+  "groupInvite": "邀請",
+  "commonGroupAnnouncement": "羣公告",
+  "commonNotSet": "未設置",
+  "groupDescription": "羣簡介",
+  "groupPublicGroup": "公開羣聊",
+  "commonClearChatHistory": "清空聊天記錄",
+  "commonDissolveGroup": "解散羣聊",
+  "commonLeaveGroup": "退出羣聊",
+  "groupChangeGroupName": "修改羣名稱",
+  "commonEnterGroupName": "請輸入羣名稱",
+  "commonConfirm": "確認",
+  "groupEnterGroupDescription": "請輸入羣簡介",
+  "groupPublish": "發佈",
+  "chatClearHistoryConfirm": "確定要清空聊天記錄嗎？此操作不可恢復。",
   "chatClearAction": "清空",
-  "commonChatHistoryCleared": "聊天记录已清空",
+  "commonChatHistoryCleared": "聊天記錄已清空",
   "commonDissolve": "解散",
-  "groupQrCode": "群二维码",
-  "commonSearchChatHistory": "查找聊天记录",
-  "groupIdCopied": "群ID已复制",
-  "transferEnterOrPasteAddress": "输入或粘贴钱包地址",
-  "transferSelectToken": "选择代币",
-  "commonTransferAmount": "转账金额",
+  "groupQrCode": "羣二維碼",
+  "commonSearchChatHistory": "查找聊天記錄",
+  "groupIdCopied": "羣ID已複製",
+  "transferEnterOrPasteAddress": "輸入或粘貼錢包地址",
+  "transferSelectToken": "選擇代幣",
+  "commonTransferAmount": "轉賬金額",
   "transferAvailable": "可用",
-  "transferMemoOptional": "备注（可选）",
-  "transferConfirmTransfer": "确认转账",
-  "transferAddressVerified": "地址已验证",
-  "transferAvailableBalance": "可用余额: {balance} {symbol}",
+  "transferMemoOptional": "備註（可選）",
+  "transferConfirmTransfer": "確認轉賬",
+  "transferAddressVerified": "地址已驗證",
+  "transferAvailableBalance": "可用餘額: {balance} {symbol}",
   "@transferAvailableBalance": {
     "placeholders": {
       "balance": {
@@ -363,12 +363,12 @@
       }
     }
   },
-  "commonEnterAmount": "请输入金额",
-  "commonRedPacketCountMin": "红包个数至少为1",
-  "commonViewRedPacketDetails": "查看红包详情",
-  "commonEnterTransferAmount": "请输入转账金额",
-  "commonTransferTo": "转账给",
-  "commonFromSender": "来自 {name}",
+  "commonEnterAmount": "請輸入金額",
+  "commonRedPacketCountMin": "紅包個數至少爲1",
+  "commonViewRedPacketDetails": "查看紅包詳情",
+  "commonEnterTransferAmount": "請輸入轉賬金額",
+  "commonTransferTo": "轉賬給",
+  "commonFromSender": "來自 {name}",
   "@commonFromSender": {
     "placeholders": {
       "name": {
@@ -376,19 +376,19 @@
       }
     }
   },
-  "commonConfirmReceive": "确认收款",
-  "groupProfile": "群资料",
-  "groupRemoveMember": "移出群聊",
+  "commonConfirmReceive": "確認收款",
+  "groupProfile": "羣資料",
+  "groupRemoveMember": "移出羣聊",
   "commonRemove": "移出",
-  "profileClearStatus": "清除状态",
-  "profileClearStatusConfirm": "确定要清除当前状态吗？",
-  "profileStatusCleared": "状态已清除",
-  "profileUserNotExist": "用户不存在",
-  "profileUserIdCopied": "用户ID已复制",
-  "commonReport": "举报",
-  "profileQrCode": "二维码",
-  "profileAvatarUpdated": "头像更新成功",
-  "commonSelectImageFailed": "选择图片失败: {error}",
+  "profileClearStatus": "清除狀態",
+  "profileClearStatusConfirm": "確定要清除當前狀態嗎？",
+  "profileStatusCleared": "狀態已清除",
+  "profileUserNotExist": "用戶不存在",
+  "profileUserIdCopied": "用戶ID已複製",
+  "commonReport": "舉報",
+  "profileQrCode": "二維碼",
+  "profileAvatarUpdated": "頭像更新成功",
+  "commonSelectImageFailed": "選擇圖片失敗: {error}",
   "@commonSelectImageFailed": {
     "placeholders": {
       "error": {
@@ -399,7 +399,7 @@
   "profileChangeName": "修改名字",
   "profileMale": "男",
   "profileFemale": "女",
-  "chatFeatureInDev": "{feature}功能开发中...",
+  "chatFeatureInDev": "{feature}功能開發中...",
   "@chatFeatureInDev": {
     "placeholders": {
       "feature": {
@@ -407,7 +407,7 @@
       }
     }
   },
-  "profileSaveAddressFailed": "保存地址失败: {error}",
+  "profileSaveAddressFailed": "保存地址失敗: {error}",
   "@profileSaveAddressFailed": {
     "placeholders": {
       "error": {
@@ -419,9 +419,9 @@
   "profileAddAddress": "添加地址",
   "profileAddressAdded": "地址添加成功",
   "profileAddressUpdated": "地址更新成功",
-  "profileDeleteAddress": "删除地址",
-  "profileAddressDeleted": "地址已删除",
-  "profileSaveInvoiceFailed": "保存发票抬头失败: {error}",
+  "profileDeleteAddress": "刪除地址",
+  "profileAddressDeleted": "地址已刪除",
+  "profileSaveInvoiceFailed": "保存發票抬頭失敗: {error}",
   "@profileSaveInvoiceFailed": {
     "placeholders": {
       "error": {
@@ -429,16 +429,16 @@
       }
     }
   },
-  "profileMyInvoices": "我的发票抬头",
-  "profileAddInvoice": "添加发票抬头",
-  "profileInvoiceAdded": "发票抬头添加成功",
-  "profileInvoiceUpdated": "发票抬头更新成功",
-  "profileDeleteInvoice": "删除发票抬头",
-  "profileInvoiceDeleted": "发票抬头已删除",
-  "profilePersonal": "个人",
-  "groupSelectAtLeastOne": "请至少选择一位成员",
+  "profileMyInvoices": "我的發票抬頭",
+  "profileAddInvoice": "添加發票抬頭",
+  "profileInvoiceAdded": "發票抬頭添加成功",
+  "profileInvoiceUpdated": "發票抬頭更新成功",
+  "profileDeleteInvoice": "刪除發票抬頭",
+  "profileInvoiceDeleted": "發票抬頭已刪除",
+  "profilePersonal": "個人",
+  "groupSelectAtLeastOne": "請至少選擇一位成員",
   "chatFileNotExist": "文件不存在",
-  "chatSendFailed": "发送失败: {error}",
+  "chatSendFailed": "發送失敗: {error}",
   "@chatSendFailed": {
     "placeholders": {
       "error": {
@@ -446,8 +446,8 @@
       }
     }
   },
-  "chatCannotOpenBrowser": "无法打开浏览器",
-  "chatSelectFileFailed": "选择文件失败: {error}",
+  "chatCannotOpenBrowser": "無法打開瀏覽器",
+  "chatSelectFileFailed": "選擇文件失敗: {error}",
   "@chatSelectFileFailed": {
     "placeholders": {
       "error": {
@@ -455,7 +455,7 @@
       }
     }
   },
-  "settingsSetupFailed": "设置失败: {error}",
+  "settingsSetupFailed": "設置失敗: {error}",
   "@settingsSetupFailed": {
     "placeholders": {
       "error": {
@@ -463,9 +463,9 @@
       }
     }
   },
-  "transferEnterValidAmount": "请输入有效的转账金额",
-  "commonAddressCopied": "地址已复制",
-  "favoriteOpenItem": "打开: {content}",
+  "transferEnterValidAmount": "請輸入有效的轉賬金額",
+  "commonAddressCopied": "地址已複製",
+  "favoriteOpenItem": "打開: {content}",
   "@favoriteOpenItem": {
     "placeholders": {
       "content": {
@@ -473,88 +473,88 @@
       }
     }
   },
-  "favoriteDeleted": "已删除",
-  "profileWallet": "钱包",
-  "chatRecording": "录像",
-  "chatInvalidVideoUrl": "无效的视频链接",
-  "chatDownloadFile": "下载文件",
-  "chatClearChatHistoryTitle": "清空聊天记录",
-  "chatVideoCall": "视频通话",
-  "commonVoiceCall": "语音通话",
-  "callLeaveMeeting": "离开会议",
-  "chatDetails": "聊天详情",
-  "chatViewAllGroupMembers": "查看全部群成员",
-  "chatGroupName": "群聊名称",
-  "chatGroupNameUpdated": "群名称已更新",
-  "chatUpdateFailed": "更新失败",
-  "chatNoPermissionToModify": "您没有修改权限",
-  "chatGroupManagement": "群管理",
-  "chatMyNicknameInGroup": "我在本群的昵称",
-  "chatPinChat": "置顶聊天",
-  "chatStrongReminder": "强提醒",
-  "chatSetChatBackground": "设置当前聊天背景",
+  "favoriteDeleted": "已刪除",
+  "profileWallet": "錢包",
+  "chatRecording": "錄像",
+  "chatInvalidVideoUrl": "無效的視頻鏈接",
+  "chatDownloadFile": "下載文件",
+  "chatClearChatHistoryTitle": "清空聊天記錄",
+  "chatVideoCall": "視頻通話",
+  "commonVoiceCall": "語音通話",
+  "callLeaveMeeting": "離開會議",
+  "chatDetails": "聊天詳情",
+  "chatViewAllGroupMembers": "查看全部羣成員",
+  "chatGroupName": "羣聊名稱",
+  "chatGroupNameUpdated": "羣名稱已更新",
+  "chatUpdateFailed": "更新失敗",
+  "chatNoPermissionToModify": "您沒有修改權限",
+  "chatGroupManagement": "羣管理",
+  "chatMyNicknameInGroup": "我在本羣的暱稱",
+  "chatPinChat": "置頂聊天",
+  "chatStrongReminder": "強提醒",
+  "chatSetChatBackground": "設置當前聊天背景",
   "chatUnknownFile": "未知文件",
-  "chatDownload": "下载",
-  "chatInvalidLocation": "无效的位置",
-  "chatTapToCancel": "点击取消",
-  "chatCaptureFailed": "拍摄失败: {error}",
-  "chatProcessingVideo": "正在处理视频...",
-  "chatVideoFileNotExist": "视频文件不存在",
-  "chatVideoDataEmpty": "视频数据为空",
-  "chatVideoTooLarge": "视频大小不能超过 100MB",
-  "chatSendingVideo": "视频发送中...",
-  "chatSendVideoFailed": "发送视频失败: {error}",
-  "chatImageFileNotExist": "图片文件不存在",
-  "commonImageDataEmpty": "图片数据为空",
-  "chatSendingImage": "图片发送中...",
-  "chatSendImageFailed": "发送图片失败: {error}",
-  "chatSendLocation": "发送位置",
-  "chatSelectLocationAndSend": "选择地点并发送给对方",
-  "chatShareRealTimeLocation": "共享实时位置",
-  "chatShareLocationForOneHour": "与好友共享1小时实时位置",
-  "chatLocationSent": "位置已发送",
-  "chatSelectMessages": "选择消息",
-  "chatSelectedCount": "已选择 {count}",
-  "chatSelectAll": "全选",
-  "chatGroupChatCount": "群聊({count})",
+  "chatDownload": "下載",
+  "chatInvalidLocation": "無效的位置",
+  "chatTapToCancel": "點擊取消",
+  "chatCaptureFailed": "拍攝失敗: {error}",
+  "chatProcessingVideo": "正在處理視頻...",
+  "chatVideoFileNotExist": "視頻文件不存在",
+  "chatVideoDataEmpty": "視頻數據爲空",
+  "chatVideoTooLarge": "視頻大小不能超過 100MB",
+  "chatSendingVideo": "視頻發送中...",
+  "chatSendVideoFailed": "發送視頻失敗: {error}",
+  "chatImageFileNotExist": "圖片文件不存在",
+  "commonImageDataEmpty": "圖片數據爲空",
+  "chatSendingImage": "圖片發送中...",
+  "chatSendImageFailed": "發送圖片失敗: {error}",
+  "chatSendLocation": "發送位置",
+  "chatSelectLocationAndSend": "選擇地點併發送給對方",
+  "chatShareRealTimeLocation": "共享實時位置",
+  "chatShareLocationForOneHour": "與好友共享1小時實時位置",
+  "chatLocationSent": "位置已發送",
+  "chatSelectMessages": "選擇消息",
+  "chatSelectedCount": "已選擇 {count}",
+  "chatSelectAll": "全選",
+  "chatGroupChatCount": "羣聊({count})",
   "chatPrivateChat": "私聊",
-  "chatNoMessages": "暂无消息",
-  "chatSendFirstMessage": "发送第一条消息开始聊天",
-  "chatEncryptionNotice": "此聊天已启用端到端加密。只有您和对方可以阅读消息。",
-  "chatMultiForward": "转发",
+  "chatNoMessages": "暫無消息",
+  "chatSendFirstMessage": "發送第一條消息開始聊天",
+  "chatEncryptionNotice": "此聊天已啓用端到端加密。只有您和對方可以閱讀消息。",
+  "chatMultiForward": "轉發",
   "chatCollect": "收藏",
-  "chatNoMembers": "没有成员",
-  "chatMemberNotFound": "未找到成员",
-  "chatVoiceFileNotExist": "语音文件不存在",
-  "chatVoiceFileEmpty": "语音文件为空",
-  "chatSendingVoice": "语音发送中...",
-  "chatSendVoiceFailed": "发送语音失败: {error}",
-  "chatMessageForwarded": "消息已转发",
-  "chatForwardFailed": "转发失败: {error}",
+  "chatNoMembers": "沒有成員",
+  "chatMemberNotFound": "未找到成員",
+  "chatVoiceFileNotExist": "語音文件不存在",
+  "chatVoiceFileEmpty": "語音文件爲空",
+  "chatSendingVoice": "語音發送中...",
+  "chatSendVoiceFailed": "發送語音失敗: {error}",
+  "chatMessageForwarded": "消息已轉發",
+  "chatForwardFailed": "轉發失敗: {error}",
   "chatUnfavorited": "已取消收藏",
   "chatFavorited": "已收藏",
-  "chatReactionAdded": "已添加表情回应",
-  "chatReactionRemoved": "已移除表情回应",
-  "chatFailedMessageDeleted": "已删除失败消息",
-  "chatDeleteMessages": "删除消息",
-  "chatDeleteMessagesConfirm": "确定要删除 {count} 条消息吗？",
-  "chatNoteOtherMessages": "注意：{count} 条消息来自他人，仅对你删除。",
-  "chatMyMessagesWillBeRecalled": "{count} 条你发送的消息将对所有人撤回。",
-  "chatRecalledCount": "已撤回 {count} 条消息，{localCount} 条仅对你删除",
-  "chatRecalledMessages": "已撤回 {count} 条消息",
-  "chatDeletedLocally": "{count} 条消息仅对你删除",
-  "chatForwardedCount": "已转发 {count} 条消息",
-  "chatForwardComplete": "转发完成：成功 {success} 条，失败 {failed} 条",
-  "chatRemindOnlyInGroup": "提醒功能仅在群聊中可用",
-  "chatOnlyTextSearchable": "仅支持搜索文本消息",
+  "chatReactionAdded": "已添加表情回應",
+  "chatReactionRemoved": "已移除表情回應",
+  "chatFailedMessageDeleted": "已刪除失敗消息",
+  "chatDeleteMessages": "刪除消息",
+  "chatDeleteMessagesConfirm": "確定要刪除 {count} 條消息嗎？",
+  "chatNoteOtherMessages": "注意：{count} 條消息來自他人，僅對你刪除。",
+  "chatMyMessagesWillBeRecalled": "{count} 條你發送的消息將對所有人撤回。",
+  "chatRecalledCount": "已撤回 {count} 條消息，{localCount} 條僅對你刪除",
+  "chatRecalledMessages": "已撤回 {count} 條消息",
+  "chatDeletedLocally": "{count} 條消息僅對你刪除",
+  "chatForwardedCount": "已轉發 {count} 條消息",
+  "chatForwardComplete": "轉發完成：成功 {success} 條，失敗 {failed} 條",
+  "chatRemindOnlyInGroup": "提醒功能僅在羣聊中可用",
+  "chatOnlyTextSearchable": "僅支持搜索文本消息",
   "chatSearchFor": "搜索 \"{text}\"",
   "chatBaiduSearch": "百度搜索",
   "chatGoogleSearch": "Google 搜索",
-  "chatBingSearch": "必应搜索",
+  "chatBingSearch": "必應搜索",
   "chatCalling": "呼叫中...",
-  "chatRinging": "响铃中...",
-  "chatInCall": "通话中",
-  "commonFeatureInDevelopment": "{feature}功能开发中...",
+  "chatRinging": "響鈴中...",
+  "chatInCall": "通話中",
+  "commonFeatureInDevelopment": "{feature}功能開發中...",
   "@commonFeatureInDevelopment": {
     "placeholders": {
       "feature": {
@@ -562,7 +562,7 @@
       }
     }
   },
-  "chatCollectMessages": "已收藏 {count} 条消息",
+  "chatCollectMessages": "已收藏 {count} 條消息",
   "commonMemberCount": "{count} 人",
   "groupDone": "完成({count})",
   "@groupDone": {
@@ -572,11 +572,11 @@
       }
     }
   },
-  "profileServices": "服务",
+  "profileServices": "服務",
   "commonFavorites": "收藏",
-  "profileOrdersAndCards": "订单与卡包",
+  "profileOrdersAndCards": "訂單與卡包",
   "profileStickers": "表情",
-  "profileStatusSetTo": "状态已设置为：{status}",
+  "profileStatusSetTo": "狀態已設置爲：{status}",
   "@profileStatusSetTo": {
     "placeholders": {
       "status": {
@@ -584,17 +584,17 @@
       }
     }
   },
-  "profileAvatarUploadFailed": "头像上传失败",
-  "profilePersonalProfile": "个人信息",
+  "profileAvatarUploadFailed": "頭像上傳失敗",
+  "profilePersonalProfile": "個人信息",
   "profileName": "名字",
-  "profileGender": "性别",
-  "profileRegion": "地区",
-  "commonMyQrCode": "我的二维码",
+  "profileGender": "性別",
+  "profileRegion": "地區",
+  "commonMyQrCode": "我的二維碼",
   "profilePoke": "拍一拍",
-  "profileRingtone": "来电铃声",
-  "profileDefaultRingtone": "默认铃声",
+  "profileRingtone": "來電鈴聲",
+  "profileDefaultRingtone": "默認鈴聲",
   "profileMyAddresses": "我的地址",
-  "profileGenderSetTo": "性别已设置为：{gender}",
+  "profileGenderSetTo": "性別已設置爲：{gender}",
   "@profileGenderSetTo": {
     "placeholders": {
       "gender": {
@@ -602,9 +602,9 @@
       }
     }
   },
-  "profileSelectRegion": "选择地区",
-  "profileSelectCity": "选择城市",
-  "profileRegionSetTo": "地区已设置为：{region}",
+  "profileSelectRegion": "選擇地區",
+  "profileSelectCity": "選擇城市",
+  "profileRegionSetTo": "地區已設置爲：{region}",
   "@profileRegionSetTo": {
     "placeholders": {
       "region": {
@@ -612,12 +612,12 @@
       }
     }
   },
-  "profileSetPoke": "设置拍一拍",
+  "profileSetPoke": "設置拍一拍",
   "profileFriendPokedMe": "朋友拍了拍我",
   "profileExample": "示例",
   "profileOnTheShoulder": "的肩膀",
   "profilePokeCleared": "拍一拍已清除",
-  "profilePokeSetTo": "拍一拍已设置为：拍了拍我{suffix}",
+  "profilePokeSetTo": "拍一拍已設置爲：拍了拍我{suffix}",
   "@profilePokeSetTo": {
     "placeholders": {
       "suffix": {
@@ -625,12 +625,12 @@
       }
     }
   },
-  "profileEditSignature": "编辑个性签名",
-  "profileIntroduceYourself": "一句话介绍自己",
-  "profileSignatureCleared": "个性签名已清除",
-  "profileSignatureUpdated": "个性签名已更新",
-  "profileScanToAddFriend": "扫一扫上面的二维码图案，加我为好友",
-  "profileRingtoneSetTo": "来电铃声已设置为：{ringtone}",
+  "profileEditSignature": "編輯個性簽名",
+  "profileIntroduceYourself": "一句話介紹自己",
+  "profileSignatureCleared": "個性簽名已清除",
+  "profileSignatureUpdated": "個性簽名已更新",
+  "profileScanToAddFriend": "掃一掃上面的二維碼圖案，加我爲好友",
+  "profileRingtoneSetTo": "來電鈴聲已設置爲：{ringtone}",
   "@profileRingtoneSetTo": {
     "placeholders": {
       "ringtone": {
@@ -638,7 +638,7 @@
       }
     }
   },
-  "commonConfirmDissolveGroup": "确定要解散群聊「{name}」吗？此操作无法撤销。",
+  "commonConfirmDissolveGroup": "確定要解散羣聊「{name}」嗎？此操作無法撤銷。",
   "@commonConfirmDissolveGroup": {
     "placeholders": {
       "name": {
@@ -646,22 +646,21 @@
       }
     }
   },
-  "authEnterValidServerAddress": "请输入有效的服务器地址",
-  "authEmailOtp": "邮箱验证码",
-  "authEnterServerAddressFirst": "请先输入服务器地址",
-  "authPasskeyRequiresServer": "Passkey登录需要服务器支持",
-  "authLoginAgreement": "登录即表示同意",
-  "authPleaseAgreeToTerms": "请先阅读并同意服务协议和隐私政策",
-  "authRegisterFailed": "注册失败",
-  "commonReenterPassword": "请再次输入密码",
-  "commonPasswordsDoNotMatch": "两次输入的密码不一致",
-  "authInviteCodeBuiltIn": "邀请码（已内置）",
-  "authInviteCodeBuiltInNote": "邀请码已内置，通常无需修改",
-  "authIHaveReadAndAgree": "我已阅读并同意",
-  "mainStartGroupChat": "发起群聊",
+  "authEnterValidServerAddress": "請輸入有效的服務器地址",
+  "authEnterServerAddressFirst": "請先輸入服務器地址",
+  "authPasskeyRequiresServer": "Passkey登錄需要服務器支持",
+  "authLoginAgreement": "登錄即表示同意",
+  "authPleaseAgreeToTerms": "請先閱讀並同意服務協議和隱私政策",
+  "authRegisterFailed": "註冊失敗",
+  "commonReenterPassword": "請再次輸入密碼",
+  "commonPasswordsDoNotMatch": "兩次輸入的密碼不一致",
+  "authInviteCodeBuiltIn": "邀請碼（已內置）",
+  "authInviteCodeBuiltInNote": "邀請碼已內置，通常無需修改",
+  "authIHaveReadAndAgree": "我已閱讀並同意",
+  "mainStartGroupChat": "發起羣聊",
   "mainAddFriends": "添加朋友",
   "mainPaymentAndCollection": "收付款",
-  "contactCount": "{count}位联系人",
+  "contactCount": "{count}位聯繫人",
   "@contactCount": {
     "placeholders": {
       "count": {
@@ -670,7 +669,7 @@
     }
   },
   "contactAddToHomeScreen": "添加到桌面",
-  "contactRecommendedCardTo": "已将{contact}的名片推荐给{recipient}",
+  "contactRecommendedCardTo": "已將{contact}的名片推薦給{recipient}",
   "@contactRecommendedCardTo": {
     "placeholders": {
       "contact": {
@@ -681,8 +680,8 @@
       }
     }
   },
-  "contactEnterRemarkName": "请输入备注名",
-  "contactRemarkSetTo": "备注已设置为：{remark}",
+  "contactEnterRemarkName": "請輸入備註名",
+  "contactRemarkSetTo": "備註已設置爲：{remark}",
   "@contactRemarkSetTo": {
     "placeholders": {
       "remark": {
@@ -690,7 +689,7 @@
       }
     }
   },
-  "contactAcceptedFriendRequest": "已接受{name}的好友请求",
+  "contactAcceptedFriendRequest": "已接受{name}的好友請求",
   "@contactAcceptedFriendRequest": {
     "placeholders": {
       "name": {
@@ -698,7 +697,7 @@
       }
     }
   },
-  "contactRejectedFriendRequest": "已拒绝{name}的好友请求",
+  "contactRejectedFriendRequest": "已拒絕{name}的好友請求",
   "@contactRejectedFriendRequest": {
     "placeholders": {
       "name": {
@@ -706,8 +705,8 @@
       }
     }
   },
-  "commonGroupInvites": "群邀请",
-  "commonMyGroups": "我的群聊 ({count})",
+  "commonGroupInvites": "羣邀請",
+  "commonMyGroups": "我的羣聊 ({count})",
   "@commonMyGroups": {
     "placeholders": {
       "count": {
@@ -715,8 +714,8 @@
       }
     }
   },
-  "commonInvitedToJoinGroup": "邀请加入群聊",
-  "commonConfirmLeaveGroup": "确定要退出群聊「{name}」吗？",
+  "commonInvitedToJoinGroup": "邀請加入羣聊",
+  "commonConfirmLeaveGroup": "確定要退出羣聊「{name}」嗎？",
   "@commonConfirmLeaveGroup": {
     "placeholders": {
       "name": {
@@ -724,14 +723,14 @@
       }
     }
   },
-  "commonLeave": "离开",
-  "commonRecallThisMessage": "撤回该条消息？",
-  "commonSavedToGallery": "已保存到相册",
-  "commonFailedToSave": "保存失败",
+  "commonLeave": "離開",
+  "commonRecallThisMessage": "撤回該條消息？",
+  "commonSavedToGallery": "已保存到相冊",
+  "commonFailedToSave": "保存失敗",
   "chatSaving": "保存中...",
   "commonShare": "分享",
-  "chatSaveToGallery": "保存到相册",
-  "chatDownloadFailed": "下载失败: {code}",
+  "chatSaveToGallery": "保存到相冊",
+  "chatDownloadFailed": "下載失敗: {code}",
   "@chatDownloadFailed": {
     "placeholders": {
       "code": {
@@ -739,7 +738,7 @@
       }
     }
   },
-  "commonShareFailed": "分享失败: {error}",
+  "commonShareFailed": "分享失敗: {error}",
   "@commonShareFailed": {
     "placeholders": {
       "error": {
@@ -747,17 +746,17 @@
       }
     }
   },
-  "chatFailedToLoadImage": "图片加载失败",
-  "chatVideoRecordingFailed": "视频录制失败，请重试",
-  "profileRedPacket": "红包",
-  "commonMusic": "音乐",
+  "chatFailedToLoadImage": "圖片加載失敗",
+  "chatVideoRecordingFailed": "視頻錄製失敗，請重試",
+  "profileRedPacket": "紅包",
+  "commonMusic": "音樂",
   "commonCoupon": "卡券",
-  "commonGift": "礼物",
+  "commonGift": "禮物",
   "commonPoll": "投票",
   "favoriteText": "文本",
-  "favoriteLinkLabel": "链接",
-  "favoriteNote": "笔记",
-  "favoriteMyNotes": "我的笔记",
+  "favoriteLinkLabel": "鏈接",
+  "favoriteNote": "筆記",
+  "favoriteMyNotes": "我的筆記",
   "favoriteToday": "今天",
   "favoriteDaysAgoText": "{count}天前",
   "@favoriteDaysAgoText": {
@@ -778,35 +777,35 @@
       }
     }
   },
-  "favoriteNoFavorites": "暂无收藏",
-  "favoriteLongPressToFavorite": "长按消息进行收藏",
-  "favoriteNewNote": "新建笔记",
-  "favoriteLink": "收藏链接",
-  "favoriteEditTags": "编辑标签",
-  "favoriteDeleteFavorite": "删除收藏",
-  "favoriteDeleteFavoriteConfirm": "确定要删除这条收藏吗？",
-  "favoriteNoSearchResultsFound": "没有找到结果",
-  "commonSendRedPacket": "发红包",
-  "transferAmount": "金额",
-  "commonRedPacketCover": "红包封面",
-  "commonRedPacketType": "红包类型",
-  "commonNormalRedPacket": "普通红包",
-  "commonLuckyRedPacket": "拼手气",
-  "commonRedPacketCount": "红包个数",
-  "commonPieces": "个",
-  "commonPutMoneyInRedPacket": "塞钱进红包",
-  "commonRedPacketRefundNotice": "未领取的红包，将于24小时后发起退款",
+  "favoriteNoFavorites": "暫無收藏",
+  "favoriteLongPressToFavorite": "長按消息進行收藏",
+  "favoriteNewNote": "新建筆記",
+  "favoriteLink": "收藏鏈接",
+  "favoriteEditTags": "編輯標籤",
+  "favoriteDeleteFavorite": "刪除收藏",
+  "favoriteDeleteFavoriteConfirm": "確定要刪除這條收藏嗎？",
+  "favoriteNoSearchResultsFound": "沒有找到結果",
+  "commonSendRedPacket": "發紅包",
+  "transferAmount": "金額",
+  "commonRedPacketCover": "紅包封面",
+  "commonRedPacketType": "紅包類型",
+  "commonNormalRedPacket": "普通紅包",
+  "commonLuckyRedPacket": "拼手氣",
+  "commonRedPacketCount": "紅包個數",
+  "commonPieces": "個",
+  "commonPutMoneyInRedPacket": "塞錢進紅包",
+  "commonRedPacketRefundNotice": "未領取的紅包，將於24小時後發起退款",
   "commonOpenRedPacket": "開",
-  "commonRedPacketAllClaimed": "红包已被领完",
-  "commonRedPacketExpired": "红包已过期",
-  "commonAddTransferNote": "添加转账说明",
+  "commonRedPacketAllClaimed": "紅包已被領完",
+  "commonRedPacketExpired": "紅包已過期",
+  "commonAddTransferNote": "添加轉賬說明",
   "commonYuan": "元",
-  "commonReplyWithEmoji": "用此表情回复",
-  "contactEditRemark": "编辑备注",
-  "contactSetPermissions": "设置权限",
-  "profileAddToBlacklist": "加入黑名单",
-  "contactDeleteContact": "删除联系人",
-  "contactDeleteContactConfirm": "确定要删除 {name} 吗？",
+  "commonReplyWithEmoji": "用此表情回覆",
+  "contactEditRemark": "編輯備註",
+  "contactSetPermissions": "設置權限",
+  "profileAddToBlacklist": "加入黑名單",
+  "contactDeleteContact": "刪除聯繫人",
+  "contactDeleteContactConfirm": "確定要刪除 {name} 嗎？",
   "@contactDeleteContactConfirm": {
     "placeholders": {
       "name": {
@@ -814,18 +813,18 @@
       }
     }
   },
-  "transferTitle": "转账",
+  "transferTitle": "轉賬",
   "transferReceiverAddressLabel": "收款地址",
-  "transferSelectTokenLabel": "选择代币",
-  "transferAmountLabel": "转账金额",
-  "transferMemoLabel": "备注（可选）",
-  "transferAddMemoHint": "添加备注信息",
-  "transferSendPaymentRequest": "发送收款请求",
-  "transferQrCodeGenerateFailed": "二维码生成失败",
-  "transferScanQrToPayMe": "扫描二维码向我付款",
-  "transferMyWalletAddress": "我的钱包地址",
-  "transferCreatePaymentRequest": "创建收款请求",
-  "profileN42IdLabel": "N42号：{id}",
+  "transferSelectTokenLabel": "選擇代幣",
+  "transferAmountLabel": "轉賬金額",
+  "transferMemoLabel": "備註（可選）",
+  "transferAddMemoHint": "添加備註信息",
+  "transferSendPaymentRequest": "發送收款請求",
+  "transferQrCodeGenerateFailed": "二維碼生成失敗",
+  "transferScanQrToPayMe": "掃描二維碼向我付款",
+  "transferMyWalletAddress": "我的錢包地址",
+  "transferCreatePaymentRequest": "創建收款請求",
+  "profileN42IdLabel": "N42號：{id}",
   "@profileN42IdLabel": {
     "placeholders": {
       "id": {
@@ -833,8 +832,8 @@
       }
     }
   },
-  "commonRedPacketDefaultGreeting": "恭喜发财，大吉大利",
-  "commonSenderRedPacket": "{name}的红包",
+  "commonRedPacketDefaultGreeting": "恭喜發財，大吉大利",
+  "commonSenderRedPacket": "{name}的紅包",
   "@commonSenderRedPacket": {
     "placeholders": {
       "name": {
@@ -842,10 +841,10 @@
       }
     }
   },
-  "transferEnterValidAddress": "请输入有效的收款地址",
-  "transferPleaseSelectToken": "请选择代币",
-  "commonReceivedTransfer": "收到转账",
-  "commonSenderSentRedPacket": "{name}发出的红包",
+  "transferEnterValidAddress": "請輸入有效的收款地址",
+  "transferPleaseSelectToken": "請選擇代幣",
+  "commonReceivedTransfer": "收到轉賬",
+  "commonSenderSentRedPacket": "{name}發出的紅包",
   "@commonSenderSentRedPacket": {
     "placeholders": {
       "name": {
@@ -853,14 +852,14 @@
       }
     }
   },
-  "commonSavedToBalance": "已存入零钱，可直接转账",
-  "commonRedPacketExpiredOrEmpty": "红包已过期/已领完",
-  "transferScanFeatureComingSoon": "扫描功能开发中...",
-  "contactSetAsStarred": "设为星标朋友",
-  "contactAddToBlocklist": "加入黑名单",
-  "commonClaimedYour": "领取了你的",
-  "commonClaimedText": "领取了",
-  "commonUserTyping": "{name}正在输入...",
+  "commonSavedToBalance": "已存入零錢，可直接轉賬",
+  "commonRedPacketExpiredOrEmpty": "紅包已過期/已領完",
+  "transferScanFeatureComingSoon": "掃描功能開發中...",
+  "contactSetAsStarred": "設爲星標朋友",
+  "contactAddToBlocklist": "加入黑名單",
+  "commonClaimedYour": "領取了你的",
+  "commonClaimedText": "領取了",
+  "commonUserTyping": "{name}正在輸入...",
   "@commonUserTyping": {
     "placeholders": {
       "name": {
@@ -868,25 +867,25 @@
       }
     }
   },
-  "commonTyping": "对方正在输入...",
-  "commonWaitingToReceive": "待对方接收",
-  "commonTapToClaim": "点击领取",
+  "commonTyping": "對方正在輸入...",
+  "commonWaitingToReceive": "待對方接收",
+  "commonTapToClaim": "點擊領取",
   "commonHasBeenReceived": "已被接收",
-  "commonGetLucky": "领个好彩头",
-  "qrcodeCameraStartFailed": "相机启动失败",
-  "qrcodeUnknownError": "未知错误",
-  "qrcodePlaceQrCodeInFrame": "将二维码放入框内扫描",
-  "qrcodeCloseManualInput": "关闭手动输入",
-  "qrcodeManualInputUserId": "手动输入用户ID",
+  "commonGetLucky": "領個好彩頭",
+  "qrcodeCameraStartFailed": "相機啓動失敗",
+  "qrcodeUnknownError": "未知錯誤",
+  "qrcodePlaceQrCodeInFrame": "將二維碼放入框內掃描",
+  "qrcodeCloseManualInput": "關閉手動輸入",
+  "qrcodeManualInputUserId": "手動輸入用戶ID",
   "commonAdd": "加入",
-  "profileSetStatus": "设置状态",
-  "profileVisibleToFriends24h": "可被好友看到，24小时后自动清除",
-  "profileWriteStatus": "写状态",
-  "profileEnterYourStatus": "输入你的状态...",
-  "profileOk": "确定",
-  "qrcodeCameraPermissionRequired": "扫描二维码需要相机权限",
-  "qrcodeCameraPermissionDenied": "相机权限已被永久拒绝，请在系统设置中开启。",
-  "qrcodePermissionCheckError": "检查权限时出错: {error}",
+  "profileSetStatus": "設置狀態",
+  "profileVisibleToFriends24h": "可被好友看到，24小時後自動清除",
+  "profileWriteStatus": "寫狀態",
+  "profileEnterYourStatus": "輸入你的狀態...",
+  "profileOk": "確定",
+  "qrcodeCameraPermissionRequired": "掃描二維碼需要相機權限",
+  "qrcodeCameraPermissionDenied": "相機權限已被永久拒絕，請在系統設置中開啓。",
+  "qrcodePermissionCheckError": "檢查權限時出錯: {error}",
   "@qrcodePermissionCheckError": {
     "placeholders": {
       "error": {
@@ -894,8 +893,8 @@
       }
     }
   },
-  "qrcodeInvalidQrCode": "无效的二维码",
-  "qrcodeCannotAddFriend": "无法添加好友: {error}",
+  "qrcodeInvalidQrCode": "無效的二維碼",
+  "qrcodeCannotAddFriend": "無法添加好友: {error}",
   "@qrcodeCannotAddFriend": {
     "placeholders": {
       "error": {
@@ -903,13 +902,13 @@
       }
     }
   },
-  "qrcodeScanQrCode": "扫描二维码",
-  "qrcodeCheckingCameraPermission": "正在检查相机权限...",
-  "qrcodeNeedCameraPermission": "需要相机权限",
-  "qrcodeRetryPermission": "重试",
-  "qrcodeOpenSettings": "打开设置",
-  "groupInviteMembers": "邀请成员",
-  "groupInviteCount": "邀请({count})",
+  "qrcodeScanQrCode": "掃描二維碼",
+  "qrcodeCheckingCameraPermission": "正在檢查相機權限...",
+  "qrcodeNeedCameraPermission": "需要相機權限",
+  "qrcodeRetryPermission": "重試",
+  "qrcodeOpenSettings": "打開設置",
+  "groupInviteMembers": "邀請成員",
+  "groupInviteCount": "邀請({count})",
   "@groupInviteCount": {
     "placeholders": {
       "count": {
@@ -917,17 +916,17 @@
       }
     }
   },
-  "profileNoShippingAddress": "暂无收货地址",
-  "profileDefaultLabel": "默认",
-  "profileNoInvoice": "暂无发票抬头",
-  "profileCompany": "企业",
-  "profileTaxNumber": "税号",
-  "profileConfirmDeleteAddress": "确定要删除这个地址吗？",
-  "profileConfirmDeleteInvoice": "确定要删除这个发票抬头吗？",
-  "commonGroupOwner": "群主",
-  "commonGroupAdmin": "管理员",
-  "groupSearchMembers": "搜索成员",
-  "groupTotalMembers": "{count}位成员",
+  "profileNoShippingAddress": "暫無收貨地址",
+  "profileDefaultLabel": "默認",
+  "profileNoInvoice": "暫無發票抬頭",
+  "profileCompany": "企業",
+  "profileTaxNumber": "稅號",
+  "profileConfirmDeleteAddress": "確定要刪除這個地址嗎？",
+  "profileConfirmDeleteInvoice": "確定要刪除這個發票抬頭嗎？",
+  "commonGroupOwner": "羣主",
+  "commonGroupAdmin": "管理員",
+  "groupSearchMembers": "搜索成員",
+  "groupTotalMembers": "{count}位成員",
   "@groupTotalMembers": {
     "placeholders": {
       "count": {
@@ -935,8 +934,8 @@
       }
     }
   },
-  "chatRemoveFromGroup": "移出群聊",
-  "groupConfirmRemoveMember": "确定要将\"{name}\"移出群聊吗？",
+  "chatRemoveFromGroup": "移出羣聊",
+  "groupConfirmRemoveMember": "確定要將\"{name}\"移出羣聊嗎？",
   "@groupConfirmRemoveMember": {
     "placeholders": {
       "name": {
@@ -945,47 +944,47 @@
     }
   },
   "chatUnknownSong": "未知歌曲",
-  "chatUnknownArtist": "未知艺术家",
-  "chatUnknownContact": "未知联系人",
-  "chatPersonalCard": "个人名片",
-  "chatSingleChoice": "单选",
-  "chatMultiChoice": "多选",
-  "chatEnded": "已结束",
-  "chatEndPollButton": "结束投票",
-  "chatPollHint": "投票发起后将显示在聊天中，群成员可以参与投票",
+  "chatUnknownArtist": "未知藝術家",
+  "chatUnknownContact": "未知聯繫人",
+  "chatPersonalCard": "個人名片",
+  "chatSingleChoice": "單選",
+  "chatMultiChoice": "多選",
+  "chatEnded": "已結束",
+  "chatEndPollButton": "結束投票",
+  "chatPollHint": "投票發起後將顯示在聊天中，羣成員可以參與投票",
   "chatSearchSongOrArtist": "搜索歌曲或歌手",
-  "chatNoSongsFound": "没有找到歌曲",
-  "chatSongNameOptional": "歌曲名称（可选）",
-  "chatEnterSongName": "输入歌曲名称",
-  "chatArtistNameOptional": "歌手名称（可选）",
-  "chatEnterArtistName": "输入歌手名称",
-  "chatRealTimeLocationSharing": "实时位置共享功能开发中...",
-  "profileVoiceCallFeatureInDev": "语音通话功能开发中...",
-  "profileReportFeatureInDev": "举报功能开发中...",
-  "profileShareFeatureInDev": "分享功能开发中...",
-  "profileQrCodeFeatureInDev": "二维码功能开发中...",
-  "qrcodeScanQrToAddMe": "扫一扫上面的二维码，加我为好友",
-  "qrcodeSaveToAlbum": "保存到相册",
-  "qrcodeChangeStyle": "换个样式",
-  "qrcodeCopyId": "复制 ID",
-  "qrcodeIdCopied": "已复制用户 ID",
-  "qrcodeMoreStylesFeatureComingSoon": "更多样式即将推出",
-  "profileBio": "个性签名",
-  "profileHomeServer": "服务器",
+  "chatNoSongsFound": "沒有找到歌曲",
+  "chatSongNameOptional": "歌曲名稱（可選）",
+  "chatEnterSongName": "輸入歌曲名稱",
+  "chatArtistNameOptional": "歌手名稱（可選）",
+  "chatEnterArtistName": "輸入歌手名稱",
+  "chatRealTimeLocationSharing": "實時位置共享功能開發中...",
+  "profileVoiceCallFeatureInDev": "語音通話功能開發中...",
+  "profileReportFeatureInDev": "舉報功能開發中...",
+  "profileShareFeatureInDev": "分享功能開發中...",
+  "profileQrCodeFeatureInDev": "二維碼功能開發中...",
+  "qrcodeScanQrToAddMe": "掃一掃上面的二維碼，加我爲好友",
+  "qrcodeSaveToAlbum": "保存到相冊",
+  "qrcodeChangeStyle": "換個樣式",
+  "qrcodeCopyId": "複製 ID",
+  "qrcodeIdCopied": "已複製用戶 ID",
+  "qrcodeMoreStylesFeatureComingSoon": "更多樣式即將推出",
+  "profileBio": "個性簽名",
+  "profileHomeServer": "服務器",
   "profileShareContactCard": "分享名片",
-  "profileRemoveFromBlacklist": "移出黑名单",
-  "profileConfirmAddBlacklist": "确定将该用户加入黑名单吗？你将不再收到对方的消息",
-  "profileConfirmRemoveBlacklist": "确定将该用户移出黑名单吗？",
-  "profileRemarkSaved": "备注已保存",
-  "profileRemarkCleared": "已清除备注",
+  "profileRemoveFromBlacklist": "移出黑名單",
+  "profileConfirmAddBlacklist": "確定將該用戶加入黑名單嗎？你將不再收到對方的消息",
+  "profileConfirmRemoveBlacklist": "確定將該用戶移出黑名單嗎？",
+  "profileRemarkSaved": "備註已保存",
+  "profileRemarkCleared": "已清除備註",
   "transferReceive": "收款",
-  "transferPleaseConnectWallet": "请先连接钱包",
-  "transferSendRequest": "发送请求",
-  "transferPleaseEnterValidAmount": "请输入有效的金额",
-  "searchPlaceholder": "搜索联系人、群聊、消息",
-  "searchEnterKeywordToSearch": "输入关键词开始搜索",
+  "transferPleaseConnectWallet": "請先連接錢包",
+  "transferSendRequest": "發送請求",
+  "transferPleaseEnterValidAmount": "請輸入有效的金額",
+  "searchPlaceholder": "搜索聯繫人、羣聊、消息",
+  "searchEnterKeywordToSearch": "輸入關鍵詞開始搜索",
   "searchClearHistory": "清除",
-  "searchNoResultsForQuery": "没有找到\"{query}\"相关的结果",
+  "searchNoResultsForQuery": "沒有找到\"{query}\"相關的結果",
   "@searchNoResultsForQuery": {
     "placeholders": {
       "query": {
@@ -995,14 +994,14 @@
   },
   "searchAllResults": "全部",
   "searchInChat": "在聊天中搜索",
-  "searchContactLabel": "联系人",
-  "searchGroupLabel": "群聊",
-  "searchConversationLabel": "会话",
+  "searchContactLabel": "聯繫人",
+  "searchGroupLabel": "羣聊",
+  "searchConversationLabel": "會話",
   "searchMessageLabel": "消息",
   "settingsSecurityTitle": "安全",
-  "settingsKeyBackup": "密钥备份",
-  "settingsBackupEncryptionKeys": "备份加密密钥",
-  "settingsKeysBackedUp": "已备份 {count} 个密钥",
+  "settingsKeyBackup": "密鑰備份",
+  "settingsBackupEncryptionKeys": "備份加密密鑰",
+  "settingsKeysBackedUp": "已備份 {count} 個密鑰",
   "@settingsKeysBackedUp": {
     "placeholders": {
       "count": {
@@ -1010,33 +1009,33 @@
       }
     }
   },
-  "settingsBackupNotSet": "未设置备份",
-  "settingsRestoreKeys": "恢复密钥",
-  "settingsRestoreKeysFromBackup": "从备份恢复加密密钥",
-  "settingsExportKeys": "导出密钥",
-  "settingsExportKeysToFile": "导出密钥到文件",
-  "settingsLoggedInDevices": "已登录设备",
-  "settingsNoOtherDevices": "暂无其他设备",
-  "settingsVerified": "已验证",
-  "settingsUnverified": "未验证",
-  "settingsAdvanced": "高级",
-  "settingsCrossSigning": "跨设备签名",
-  "settingsEnabled": "已启用",
-  "settingsNotEnabled": "未启用",
+  "settingsBackupNotSet": "未設置備份",
+  "settingsRestoreKeys": "恢復密鑰",
+  "settingsRestoreKeysFromBackup": "從備份恢復加密密鑰",
+  "settingsExportKeys": "導出密鑰",
+  "settingsExportKeysToFile": "導出密鑰到文件",
+  "settingsLoggedInDevices": "已登錄設備",
+  "settingsNoOtherDevices": "暫無其他設備",
+  "settingsVerified": "已驗證",
+  "settingsUnverified": "未驗證",
+  "settingsAdvanced": "高級",
+  "settingsCrossSigning": "跨設備簽名",
+  "settingsEnabled": "已啓用",
+  "settingsNotEnabled": "未啓用",
   "settingsResetEncryption": "重置加密",
-  "settingsDeleteAllEncryptionKeys": "删除所有加密密钥",
+  "settingsDeleteAllEncryptionKeys": "刪除所有加密密鑰",
   "settingsEncryptionNotSupported": "不支持加密",
   "settingsNotInitialized": "未初始化",
-  "settingsBackupKeyTitle": "备份密钥",
-  "settingsBackupKeyMessage": "是否创建新的密钥备份？这将帮助您在新设备上恢复加密消息。",
-  "settingsBackup": "备份",
-  "settingsRestoreKeyTitle": "恢复密钥",
-  "settingsRestoreKeyMessage": "输入您的恢复密码或恢复密钥来恢复加密消息。",
-  "settingsRestore": "恢复",
-  "settingsExportKeyTitle": "导出密钥",
-  "settingsExportKeyMessage": "导出的密钥文件包含您的所有加密密钥，请妥善保管。",
-  "settingsExport": "导出",
-  "settingsDeviceIdLabel": "设备ID: {deviceId}",
+  "settingsBackupKeyTitle": "備份密鑰",
+  "settingsBackupKeyMessage": "是否創建新的密鑰備份？這將幫助您在新設備上恢復加密消息。",
+  "settingsBackup": "備份",
+  "settingsRestoreKeyTitle": "恢復密鑰",
+  "settingsRestoreKeyMessage": "輸入您的恢復密碼或恢復密鑰來恢復加密消息。",
+  "settingsRestore": "恢復",
+  "settingsExportKeyTitle": "導出密鑰",
+  "settingsExportKeyMessage": "導出的密鑰文件包含您的所有加密密鑰，請妥善保管。",
+  "settingsExport": "導出",
+  "settingsDeviceIdLabel": "設備ID: {deviceId}",
   "@settingsDeviceIdLabel": {
     "placeholders": {
       "deviceId": {
@@ -1044,9 +1043,9 @@
       }
     }
   },
-  "settingsDeviceStatusVerified": "状态: 已验证",
-  "settingsDeviceStatusUnverified": "状态: 未验证",
-  "settingsLastActiveLabel": "最后活跃: {lastSeen}",
+  "settingsDeviceStatusVerified": "狀態: 已驗證",
+  "settingsDeviceStatusUnverified": "狀態: 未驗證",
+  "settingsLastActiveLabel": "最後活躍: {lastSeen}",
   "@settingsLastActiveLabel": {
     "placeholders": {
       "lastSeen": {
@@ -1054,28 +1053,28 @@
       }
     }
   },
-  "settingsVerifyThisDevice": "验证此设备",
-  "settingsCrossSigningAlreadyEnabled": "跨设备签名已启用",
-  "settingsCrossSigningSetupSuccess": "跨设备签名设置成功",
+  "settingsVerifyThisDevice": "驗證此設備",
+  "settingsCrossSigningAlreadyEnabled": "跨設備簽名已啓用",
+  "settingsCrossSigningSetupSuccess": "跨設備簽名設置成功",
   "settingsResetEncryptionTitle": "重置加密",
-  "settingsResetEncryptionWarning": "警告：这将删除您所有的加密密钥。您将无法解密之前的加密消息。此操作不可撤销。",
+  "settingsResetEncryptionWarning": "警告：這將刪除您所有的加密密鑰。您將無法解密之前的加密消息。此操作不可撤銷。",
   "settingsReset": "重置",
-  "settingsBackupSuccess": "密钥备份成功",
-  "settingsBackupFailed": "备份失败",
-  "settingsRecoveryKey": "恢复密钥",
-  "settingsRecoveryKeySaveWarning": "请将此恢复密钥保存在安全的地方。您需要它在新设备上恢复加密消息。",
+  "settingsBackupSuccess": "密鑰備份成功",
+  "settingsBackupFailed": "備份失敗",
+  "settingsRecoveryKey": "恢復密鑰",
+  "settingsRecoveryKeySaveWarning": "請將此恢復密鑰保存在安全的地方。您需要它在新設備上恢復加密消息。",
   "settingsRecoveryKeySaved": "我已保存",
-  "settingsRestoreSuccess": "密钥恢复成功",
-  "settingsRestoreFailed": "恢复失败",
-  "settingsPassword": "密码",
-  "settingsEnterRecoveryKey": "输入恢复密钥",
-  "settingsEnterPassword": "输入密码",
-  "settingsExportSuccess": "密钥已成功导出到服务端备份",
-  "settingsExportNeedBackupFirst": "请先创建密钥备份",
-  "settingsExportFailed": "导出失败",
+  "settingsRestoreSuccess": "密鑰恢復成功",
+  "settingsRestoreFailed": "恢復失敗",
+  "settingsPassword": "密碼",
+  "settingsEnterRecoveryKey": "輸入恢復密鑰",
+  "settingsEnterPassword": "輸入密碼",
+  "settingsExportSuccess": "密鑰已成功導出到服務端備份",
+  "settingsExportNeedBackupFirst": "請先創建密鑰備份",
+  "settingsExportFailed": "導出失敗",
   "settingsResetSuccess": "加密重置成功",
-  "settingsResetFailed": "重置失败",
-  "callLeaveMeetingConfirm": "确定要离开会议吗？",
+  "settingsResetFailed": "重置失敗",
+  "callLeaveMeetingConfirm": "確定要離開會議嗎？",
   "chatPokedSomeone": "拍了拍「{name}」{suffix}",
   "@chatPokedSomeone": {
     "placeholders": {
@@ -1087,9 +1086,9 @@
       }
     }
   },
-  "chatNoContactsToAdd": "没有可添加的联系人",
-  "chatAddMembers": "添加成员",
-  "chatInvitedMembers": "已邀请 {count} 位成员",
+  "chatNoContactsToAdd": "沒有可添加的聯繫人",
+  "chatAddMembers": "添加成員",
+  "chatInvitedMembers": "已邀請 {count} 位成員",
   "@chatInvitedMembers": {
     "placeholders": {
       "count": {
@@ -1097,7 +1096,7 @@
       }
     }
   },
-  "chatInviteFailed": "邀请失败: {error}",
+  "chatInviteFailed": "邀請失敗: {error}",
   "@chatInviteFailed": {
     "placeholders": {
       "error": {
@@ -1105,8 +1104,8 @@
       }
     }
   },
-  "chatMemberRemoved": "已移除成员",
-  "chatRemoveFailed": "移除失败: {error}",
+  "chatMemberRemoved": "已移除成員",
+  "chatRemoveFailed": "移除失敗: {error}",
   "@chatRemoveFailed": {
     "placeholders": {
       "error": {
@@ -1114,16 +1113,16 @@
       }
     }
   },
-  "chatRealTimeLocationShareMessage": "开始共享后，对方将能看到你的实时位置，共享时长为1小时。",
-  "chatStartSharing": "开始共享",
-  "chatLocationServiceNotEnabled": "位置服务未开启",
-  "chatEnableLocationService": "请开启位置服务以使用位置功能",
-  "chatGoToSettings": "去设置",
-  "chatLocationPermissionRequired": "需要位置权限才能使用此功能",
-  "chatLocationPermissionDeniedPermanent": "位置权限已被永久拒绝，请在设置中开启",
-  "chatLocationPermissionDenied": "位置权限被拒绝",
-  "chatGettingLocation": "正在获取位置...",
-  "chatGetLocationFailed": "获取位置失败: {error}",
+  "chatRealTimeLocationShareMessage": "開始共享後，對方將能看到你的實時位置，共享時長爲1小時。",
+  "chatStartSharing": "開始共享",
+  "chatLocationServiceNotEnabled": "位置服務未開啓",
+  "chatEnableLocationService": "請開啓位置服務以使用位置功能",
+  "chatGoToSettings": "去設置",
+  "chatLocationPermissionRequired": "需要位置權限才能使用此功能",
+  "chatLocationPermissionDeniedPermanent": "位置權限已被永久拒絕，請在設置中開啓",
+  "chatLocationPermissionDenied": "位置權限被拒絕",
+  "chatGettingLocation": "正在獲取位置...",
+  "chatGetLocationFailed": "獲取位置失敗: {error}",
   "@chatGetLocationFailed": {
     "placeholders": {
       "error": {
@@ -1131,9 +1130,9 @@
       }
     }
   },
-  "chatMapPreview": "地图预览",
-  "chatSearchLocation": "搜索地点",
-  "chatRedPacketSent": "已发送 {amount} {token} 红包",
+  "chatMapPreview": "地圖預覽",
+  "chatSearchLocation": "搜索地點",
+  "chatRedPacketSent": "已發送 {amount} {token} 紅包",
   "@chatRedPacketSent": {
     "placeholders": {
       "amount": {
@@ -1144,8 +1143,8 @@
       }
     }
   },
-  "chatTransferDefault": "转账",
-  "chatTransferSent": "已发送 {amount} {token} 转账",
+  "chatTransferDefault": "轉賬",
+  "chatTransferSent": "已發送 {amount} {token} 轉賬",
   "@chatTransferSent": {
     "placeholders": {
       "amount": {
@@ -1156,7 +1155,7 @@
       }
     }
   },
-  "chatPickFileFailed": "选择文件失败: {error}",
+  "chatPickFileFailed": "選擇文件失敗: {error}",
   "@chatPickFileFailed": {
     "placeholders": {
       "error": {
@@ -1164,8 +1163,8 @@
       }
     }
   },
-  "chatFileSizeLimit": "文件大小不能超过 50MB",
-  "chatFileSending": "文件发送中: {filename}",
+  "chatFileSizeLimit": "文件大小不能超過 50MB",
+  "chatFileSending": "文件發送中: {filename}",
   "@chatFileSending": {
     "placeholders": {
       "filename": {
@@ -1173,7 +1172,7 @@
       }
     }
   },
-  "chatSendFileFailed": "发送文件失败: {error}",
+  "chatSendFileFailed": "發送文件失敗: {error}",
   "@chatSendFileFailed": {
     "placeholders": {
       "error": {
@@ -1181,7 +1180,7 @@
       }
     }
   },
-  "chatContactCardSent": "已发送 {name} 的名片",
+  "chatContactCardSent": "已發送 {name} 的名片",
   "@chatContactCardSent": {
     "placeholders": {
       "name": {
@@ -1191,7 +1190,7 @@
   },
   "chatFavoritesFeature": "收藏",
   "chatCouponsFeature": "卡券",
-  "chatGiftFeature": "礼物",
+  "chatGiftFeature": "禮物",
   "chatSharedMusic": "已分享 {name}",
   "@chatSharedMusic": {
     "placeholders": {
@@ -1200,41 +1199,41 @@
       }
     }
   },
-  "chatEndPollTitle": "结束投票",
-  "chatEndPollConfirmMessage": "确定要结束这个投票吗？结束后将无法继续投票。",
-  "chatPollEndedMessage": "投票已结束",
-  "chatConnectingCall": "正在连接...",
-  "chatMuteCall": "静音",
-  "chatSpeakerOff": "关闭免提",
+  "chatEndPollTitle": "結束投票",
+  "chatEndPollConfirmMessage": "確定要結束這個投票嗎？結束後將無法繼續投票。",
+  "chatPollEndedMessage": "投票已結束",
+  "chatConnectingCall": "正在連接...",
+  "chatMuteCall": "靜音",
+  "chatSpeakerOff": "關閉免提",
   "chatSpeakerOn": "免提",
-  "chatCameraOn": "开启摄像头",
-  "chatCameraOff": "关闭摄像头",
-  "chatHangUp": "挂断",
-  "chatSelectForwardTargetTitle": "选择转发对象",
-  "chatNoForwardableChat": "没有可转发的会话",
-  "chatNoMatchingChat": "没有找到相关会话",
+  "chatCameraOn": "開啓攝像頭",
+  "chatCameraOff": "關閉攝像頭",
+  "chatHangUp": "掛斷",
+  "chatSelectForwardTargetTitle": "選擇轉發對象",
+  "chatNoForwardableChat": "沒有可轉發的會話",
+  "chatNoMatchingChat": "沒有找到相關會話",
   "chatLocationTitle": "位置",
-  "chatSendButton": "发送",
-  "chatRetryButton": "重试",
-  "chatSearchContactHint": "搜索联系人",
-  "chatShareMusic": "分享音乐",
+  "chatSendButton": "發送",
+  "chatRetryButton": "重試",
+  "chatSearchContactHint": "搜索聯繫人",
+  "chatShareMusic": "分享音樂",
   "chatRecentPlayed": "最近播放",
-  "chatMyFavorites": "我喜欢",
-  "chatNetworkLink": "网络链接",
+  "chatMyFavorites": "我喜歡",
+  "chatNetworkLink": "網絡鏈接",
   "chatLocalFile": "本地文件",
-  "chatPasteMusicLink": "粘贴音乐链接",
-  "chatShareMusicButton": "分享音乐",
-  "chatSelectLocalAudio": "选择本地音频文件",
+  "chatPasteMusicLink": "粘貼音樂鏈接",
+  "chatShareMusicButton": "分享音樂",
+  "chatSelectLocalAudio": "選擇本地音頻文件",
   "chatSupportedAudioFormats": "支持 MP3、M4A、WAV、FLAC 等格式",
-  "chatSelectFileButton": "选择文件",
-  "chatPleaseEnterMusicLink": "请输入音乐链接",
-  "chatPleaseEnterValidLink": "请输入有效的网络链接",
+  "chatSelectFileButton": "選擇文件",
+  "chatPleaseEnterMusicLink": "請輸入音樂鏈接",
+  "chatPleaseEnterValidLink": "請輸入有效的網絡鏈接",
   "chatSharedSong": "分享歌曲",
-  "chatSelectMember": "选择成员",
-  "chatSearchMemberHint": "搜索成员",
-  "chatNoMatchingMembers": "未找到匹配的成员",
+  "chatSelectMember": "選擇成員",
+  "chatSearchMemberHint": "搜索成員",
+  "chatNoMatchingMembers": "未找到匹配的成員",
   "commonUnknownMember": "未知",
-  "chatSelectedMessagesCount": "已选择 {count} 条消息",
+  "chatSelectedMessagesCount": "已選擇 {count} 條消息",
   "@chatSelectedMessagesCount": {
     "placeholders": {
       "count": {
@@ -1242,17 +1241,17 @@
       }
     }
   },
-  "chatSearchContactsOrGroups": "搜索联系人或群聊",
-  "chatVideoTitle": "视频",
-  "chatLoadingText": "加载中...",
-  "chatVideoLoadFailed": "视频加载失败",
-  "chatPlayerInitFailed": "播放器初始化失败",
-  "chatCreatePollTitle": "创建投票",
-  "chatSubmitPoll": "发起",
-  "chatPollQuestionLabel": "投票问题",
-  "chatEnterPollQuestionHint": "请输入投票问题",
-  "chatPollOptionsLabel": "投票选项",
-  "chatOptionHintWithIndex": "选项 {index}",
+  "chatSearchContactsOrGroups": "搜索聯繫人或羣聊",
+  "chatVideoTitle": "視頻",
+  "chatLoadingText": "加載中...",
+  "chatVideoLoadFailed": "視頻加載失敗",
+  "chatPlayerInitFailed": "播放器初始化失敗",
+  "chatCreatePollTitle": "創建投票",
+  "chatSubmitPoll": "發起",
+  "chatPollQuestionLabel": "投票問題",
+  "chatEnterPollQuestionHint": "請輸入投票問題",
+  "chatPollOptionsLabel": "投票選項",
+  "chatOptionHintWithIndex": "選項 {index}",
   "@chatOptionHintWithIndex": {
     "placeholders": {
       "index": {
@@ -1260,15 +1259,15 @@
       }
     }
   },
-  "chatAddOptionButton": "添加选项",
-  "chatPollSettingsLabel": "投票设置",
-  "chatSelectionType": "选择类型",
-  "chatSingleChoiceLabel": "单选",
-  "chatMultiChoiceLabel": "多选",
+  "chatAddOptionButton": "添加選項",
+  "chatPollSettingsLabel": "投票設置",
+  "chatSelectionType": "選擇類型",
+  "chatSingleChoiceLabel": "單選",
+  "chatMultiChoiceLabel": "多選",
   "chatAnonymousPollSwitch": "匿名投票",
-  "chatPleaseEnterQuestion": "请输入投票问题",
-  "chatAtLeastTwoOptions": "至少需要2个选项",
-  "chatConfirmWithCount": "确定 ({count})",
+  "chatPleaseEnterQuestion": "請輸入投票問題",
+  "chatAtLeastTwoOptions": "至少需要2個選項",
+  "chatConfirmWithCount": "確定 ({count})",
   "@chatConfirmWithCount": {
     "placeholders": {
       "count": {
@@ -1297,9 +1296,9 @@
       }
     }
   },
-  "authEmailVerificationTitle": "邮箱验证",
-  "authEnterValidEmailAddress": "请输入有效的邮箱地址",
-  "authVerificationCodeSentTo": "验证码已发送到 {email}",
+  "authEmailVerificationTitle": "郵箱驗證",
+  "authEnterValidEmailAddress": "請輸入有效的郵箱地址",
+  "authVerificationCodeSentTo": "驗證碼已發送到 {email}",
   "@authVerificationCodeSentTo": {
     "placeholders": {
       "email": {
@@ -1307,7 +1306,7 @@
       }
     }
   },
-  "authSendCodeFailed": "发送验证码失败: {error}",
+  "authSendCodeFailed": "發送驗證碼失敗: {error}",
   "@authSendCodeFailed": {
     "placeholders": {
       "error": {
@@ -1315,9 +1314,9 @@
       }
     }
   },
-  "authVerificationSuccess": "验证成功",
-  "authVerificationFailed": "验证失败",
-  "authVerificationCodeError": "验证码错误: {error}",
+  "authVerificationSuccess": "驗證成功",
+  "authVerificationFailed": "驗證失敗",
+  "authVerificationCodeError": "驗證碼錯誤: {error}",
   "@authVerificationCodeError": {
     "placeholders": {
       "error": {
@@ -1325,9 +1324,9 @@
       }
     }
   },
-  "commonEnterVerificationCode": "输入验证码",
-  "authEnterYourEmail": "输入邮箱",
-  "authWeSentCodeTo": "我们已向 {email} 发送了\n6位验证码",
+  "commonEnterVerificationCode": "輸入驗證碼",
+  "authEnterYourEmail": "輸入郵箱",
+  "authWeSentCodeTo": "我們已向 {email} 發送了\n6位驗證碼",
   "@authWeSentCodeTo": {
     "placeholders": {
       "email": {
@@ -1335,10 +1334,10 @@
       }
     }
   },
-  "authEnterEmailForCode": "输入您的邮箱地址，我们将发送验证码",
-  "commonSendVerificationCode": "发送验证码",
-  "authResendVerificationCode": "重新发送验证码",
-  "authCanResendAfter": "{seconds}秒后可重新发送",
+  "authEnterEmailForCode": "輸入您的郵箱地址，我們將發送驗證碼",
+  "commonSendVerificationCode": "發送驗證碼",
+  "authResendVerificationCode": "重新發送驗證碼",
+  "authCanResendAfter": "{seconds}秒後可重新發送",
   "@authCanResendAfter": {
     "placeholders": {
       "seconds": {
@@ -1346,11 +1345,11 @@
       }
     }
   },
-  "commonChangeEmail": "更换邮箱",
-  "contactAddToContacts": "添加到通讯录",
+  "commonChangeEmail": "更換郵箱",
+  "contactAddToContacts": "添加到通訊錄",
   "contactAddingToContacts": "添加中...",
-  "contactAddedToContacts": "已添加到通讯录",
-  "contactAddFailedWithError": "添加失败: {error}",
+  "contactAddedToContacts": "已添加到通訊錄",
+  "contactAddFailedWithError": "添加失敗: {error}",
   "@contactAddFailedWithError": {
     "placeholders": {
       "error": {
@@ -1358,11 +1357,11 @@
       }
     }
   },
-  "contactAddPhone": "添加电话",
-  "contactAddTag": "添加标签",
+  "contactAddPhone": "添加電話",
+  "contactAddTag": "添加標籤",
   "contactAddText": "添加文字",
   "contactAddPhoto": "添加照片",
-  "contactGroupCountLabel": "{count}个",
+  "contactGroupCountLabel": "{count}個",
   "@contactGroupCountLabel": {
     "placeholders": {
       "count": {
@@ -1370,10 +1369,10 @@
       }
     }
   },
-  "contactAddedViaSearch": "通过搜索添加",
-  "contactAddTime": "添加时间",
+  "contactAddedViaSearch": "通過搜索添加",
+  "contactAddTime": "添加時間",
   "contactDoneButton": "完成",
-  "callWaitingForParticipants": "等待参与者加入...",
+  "callWaitingForParticipants": "等待參與者加入...",
   "callParticipantMe": "{name}（我）",
   "@callParticipantMe": {
     "placeholders": {
@@ -1399,16 +1398,16 @@
       }
     }
   },
-  "callMuteLabel": "静音",
-  "callUnmuteLabel": "解除静音",
-  "callTurnOffVideo": "关闭视频",
-  "callTurnOnVideo": "开启视频",
+  "callMuteLabel": "靜音",
+  "callUnmuteLabel": "解除靜音",
+  "callTurnOffVideo": "關閉視頻",
+  "callTurnOnVideo": "開啓視頻",
   "callShareScreen": "共享屏幕",
   "callStopSharing": "停止共享",
-  "callSwitchCameraLabel": "切换",
-  "callLeaveLabel": "离开",
-  "callParticipantsLabel": "参与者",
-  "callJoiningMeeting": "正在加入会议...",
+  "callSwitchCameraLabel": "切換",
+  "callLeaveLabel": "離開",
+  "callParticipantsLabel": "參與者",
+  "callJoiningMeeting": "正在加入會議...",
   "chatPollVotesFormat": "{count} 票 ({percentage}%)",
   "@chatPollVotesFormat": {
     "placeholders": {
@@ -1420,7 +1419,7 @@
       }
     }
   },
-  "chatPollParticipantsFormat": "{count} 人参与",
+  "chatPollParticipantsFormat": "{count} 人蔘與",
   "@chatPollParticipantsFormat": {
     "placeholders": {
       "count": {
@@ -1428,15 +1427,15 @@
       }
     }
   },
-  "commonTapToRetry": "点击重试",
-  "chatDefaultRedPacketGreeting": "恭喜发财，大吉大利",
-  "groupAllowOthersToSearchAndJoin": "允许他人搜索并加入",
-  "groupConfirmClearChatHistory": "确定要清空聊天记录吗？",
-  "groupCreateGroupToChat": "创建群聊以开始聊天",
-  "groupEditGroupAnnouncement": "编辑群公告",
-  "groupEditGroupDescription": "编辑群描述",
-  "groupEnterGroupAnnouncement": "请输入群公告",
-  "chatErrorWithMessage": "错误: {message}",
+  "commonTapToRetry": "點擊重試",
+  "chatDefaultRedPacketGreeting": "恭喜發財，大吉大利",
+  "groupAllowOthersToSearchAndJoin": "允許他人搜索並加入",
+  "groupConfirmClearChatHistory": "確定要清空聊天記錄嗎？",
+  "groupCreateGroupToChat": "創建羣聊以開始聊天",
+  "groupEditGroupAnnouncement": "編輯羣公告",
+  "groupEditGroupDescription": "編輯羣描述",
+  "groupEnterGroupAnnouncement": "請輸入羣公告",
+  "chatErrorWithMessage": "錯誤: {message}",
   "@chatErrorWithMessage": {
     "placeholders": {
       "message": {
@@ -1444,7 +1443,7 @@
       }
     }
   },
-  "groupMemberCountClickToCopy": "{count}人，点击复制群ID",
+  "groupMemberCountClickToCopy": "{count}人，點擊複製羣ID",
   "@groupMemberCountClickToCopy": {
     "placeholders": {
       "count": {
@@ -1452,19 +1451,19 @@
       }
     }
   },
-  "chatMusicLinkLabel": "音乐链接",
-  "chatNoMediaUrlAvailable": "没有可用的媒体链接",
-  "groupNoPermissionToEditGroupName": "你没有权限修改群名称",
-  "chatRedPacketTransferCannotForward": "红包和转账消息无法转发",
-  "authEmailAddress": "邮箱地址",
-  "commonEnterEmailAddress": "请输入邮箱地址",
-  "authEmailRecoveryHint": "用于找回密码",
-  "commonInvalidEmailFormat": "请输入有效的邮箱地址",
-  "authOptional": "选填",
-  "authResetPassword": "重置密码",
-  "authEnterRegisteredEmail": "请输入注册时绑定的邮箱地址",
-  "authSendResetCode": "发送重置验证码",
-  "authResetCodeSent": "重置验证码已发送至 {email}",
+  "chatMusicLinkLabel": "音樂鏈接",
+  "chatNoMediaUrlAvailable": "沒有可用的媒體鏈接",
+  "groupNoPermissionToEditGroupName": "你沒有權限修改羣名稱",
+  "chatRedPacketTransferCannotForward": "紅包和轉賬消息無法轉發",
+  "authEmailAddress": "郵箱地址",
+  "commonEnterEmailAddress": "請輸入郵箱地址",
+  "authEmailRecoveryHint": "用於找回密碼",
+  "commonInvalidEmailFormat": "請輸入有效的郵箱地址",
+  "authOptional": "選填",
+  "authResetPassword": "重置密碼",
+  "authEnterRegisteredEmail": "請輸入註冊時綁定的郵箱地址",
+  "authSendResetCode": "發送重置驗證碼",
+  "authResetCodeSent": "重置驗證碼已發送至 {email}",
   "@authResetCodeSent": {
     "placeholders": {
       "email": {
@@ -1472,45 +1471,45 @@
       }
     }
   },
-  "authEnterResetCode": "输入重置验证码",
-  "authSetNewPassword": "设置新密码",
-  "commonConfirmNewPassword": "确认新密码",
-  "commonNewPassword": "新密码",
-  "authPasswordResetSuccess": "密码重置成功，请使用新密码登录",
-  "authResetPasswordFailed": "重置密码失败",
-  "settingsChangePassword": "修改密码",
-  "settingsCurrentPassword": "当前密码",
-  "settingsEnterCurrentPassword": "请输入当前密码",
-  "settingsEnterNewPassword": "请输入新密码",
-  "settingsPasswordChanged": "密码修改成功，请使用新密码重新登录",
-  "settingsChangePasswordFailed": "修改密码失败",
-  "settingsNewPasswordMustBeDifferent": "新密码不能与当前密码相同",
-  "settingsChangePasswordInfo": "修改密码后，您将被登出，需要使用新密码重新登录。",
-  "settingsPasswordRequirements": "密码要求：",
-  "settingsSecurityNote": "为了安全，修改密码后需要在所有设备上重新登录。",
+  "authEnterResetCode": "輸入重置驗證碼",
+  "authSetNewPassword": "設置新密碼",
+  "commonConfirmNewPassword": "確認新密碼",
+  "commonNewPassword": "新密碼",
+  "authPasswordResetSuccess": "密碼重置成功，請使用新密碼登錄",
+  "authResetPasswordFailed": "重置密碼失敗",
+  "settingsChangePassword": "修改密碼",
+  "settingsCurrentPassword": "當前密碼",
+  "settingsEnterCurrentPassword": "請輸入當前密碼",
+  "settingsEnterNewPassword": "請輸入新密碼",
+  "settingsPasswordChanged": "密碼修改成功，請使用新密碼重新登錄",
+  "settingsChangePasswordFailed": "修改密碼失敗",
+  "settingsNewPasswordMustBeDifferent": "新密碼不能與當前密碼相同",
+  "settingsChangePasswordInfo": "修改密碼後，您將被登出，需要使用新密碼重新登錄。",
+  "settingsPasswordRequirements": "密碼要求：",
+  "settingsSecurityNote": "爲了安全，修改密碼後需要在所有設備上重新登錄。",
   "settingsSecurity": "安全",
-  "settingsCurrentBoundEmail": "当前绑定邮箱",
-  "settingsNewEmailAddress": "新邮箱地址",
-  "settingsEnterNewEmail": "请输入新邮箱地址",
-  "settingsVerificationCode": "验证码",
-  "settingsVerificationCodeSent": "验证码已发送",
-  "settingsCodeSentTo": "验证码已发送至",
-  "settingsDidNotReceiveCode": "没有收到验证码？",
-  "settingsEmailChangedSuccess": "邮箱修改成功",
-  "settingsChangeEmailFailed": "修改邮箱失败",
-  "settingsEmailSecurityNote": "邮箱用于密码找回，请确保安全。",
-  "commonGoogleLogin": "使用 Google 登录",
-  "commonAppleLogin": "使用 Apple 登录",
+  "settingsCurrentBoundEmail": "當前綁定郵箱",
+  "settingsNewEmailAddress": "新郵箱地址",
+  "settingsEnterNewEmail": "請輸入新郵箱地址",
+  "settingsVerificationCode": "驗證碼",
+  "settingsVerificationCodeSent": "驗證碼已發送",
+  "settingsCodeSentTo": "驗證碼已發送至",
+  "settingsDidNotReceiveCode": "沒有收到驗證碼？",
+  "settingsEmailChangedSuccess": "郵箱修改成功",
+  "settingsChangeEmailFailed": "修改郵箱失敗",
+  "settingsEmailSecurityNote": "郵箱用於密碼找回，請確保安全。",
+  "commonGoogleLogin": "使用 Google 登錄",
+  "commonAppleLogin": "使用 Apple 登錄",
   "commonWechat": "微信",
-  "settingsLanguage": "语言",
-  "settingsLanguageChanged": "语言已更改",
-  "settingsTranslation": "翻译",
-  "settingsTranslateTextTo": "将文字翻译为",
-  "settingsTranslateDescription": "选择你希望将消息翻译成的语言。",
-  "settingsAutoTranslate": "自动翻译聊天中收到的消息",
-  "settingsAutoTranslateDescription": "自动将聊天中收到的消息翻译为你选择的语言。",
-  "settingsBiometricLogin": "生物识别登录",
-  "authLoginWithBiometric": "使用{type}登录",
+  "settingsLanguage": "語言",
+  "settingsLanguageChanged": "語言已更改",
+  "settingsTranslation": "翻譯",
+  "settingsTranslateTextTo": "將文字翻譯爲",
+  "settingsTranslateDescription": "選擇你希望將消息翻譯成的語言。",
+  "settingsAutoTranslate": "自動翻譯聊天中收到的消息",
+  "settingsAutoTranslateDescription": "自動將聊天中收到的消息翻譯爲你選擇的語言。",
+  "settingsBiometricLogin": "生物識別登錄",
+  "authLoginWithBiometric": "使用{type}登錄",
   "@authLoginWithBiometric": {
     "placeholders": {
       "type": {
@@ -1518,14 +1517,14 @@
       }
     }
   },
-  "settingsBiometricLoginEnabled": "生物识别登录已启用",
-  "settingsBiometricLoginDisabled": "生物识别登录已禁用",
-  "settingsEnableBiometricLogin": "启用生物识别登录",
-  "settingsBiometricEnabled": "已启用 - 使用生物识别登录",
-  "settingsBiometricDisabled": "已禁用 - 点击启用",
-  "settingsBiometricNeedRelogin": "请退出后重新登录以启用生物识别",
+  "settingsBiometricLoginEnabled": "生物識別登錄已啓用",
+  "settingsBiometricLoginDisabled": "生物識別登錄已禁用",
+  "settingsEnableBiometricLogin": "啓用生物識別登錄",
+  "settingsBiometricEnabled": "已啓用 - 使用生物識別登錄",
+  "settingsBiometricDisabled": "已禁用 - 點擊啓用",
+  "settingsBiometricNeedRelogin": "請退出後重新登錄以啓用生物識別",
   "authOr": "或",
-  "qrcodeCameraPermissionRestricted": "此设备上的相机访问受限",
+  "qrcodeCameraPermissionRestricted": "此設備上的相機訪問受限",
   "authPasskeyLabel": "Passkey",
   "authGoogleLabel": "Google",
   "authAppleLabel": "Apple",
@@ -1535,19 +1534,19 @@
   "authServerAddressHint": "https://m.si46.world",
   "authEmailExampleHint": "example@email.com",
   "authVerificationCodePlaceholder": "------",
-  "profileEnterPokeSuffixHint": "输入戳一戳后缀，例如：的肩膀",
-  "groupAlbum": "群相册",
-  "groupFiles": "群文件",
-  "groupImages": "图片",
-  "groupVideos": "视频",
+  "profileEnterPokeSuffixHint": "輸入戳一戳後綴，例如：的肩膀",
+  "groupAlbum": "羣相冊",
+  "groupFiles": "羣文件",
+  "groupImages": "圖片",
+  "groupVideos": "視頻",
   "groupTotal": "全部",
   "groupSize": "大小",
-  "groupNoMedia": "暂无媒体",
-  "groupNoMediaDescription": "此群还没有图片或视频",
-  "groupDocuments": "文档",
-  "groupNoFiles": "暂无文件",
-  "groupNoFilesDescription": "此群还没有文件",
-  "groupDownloadStarted": "正在下载 {filename}...",
+  "groupNoMedia": "暫無媒體",
+  "groupNoMediaDescription": "此羣還沒有圖片或視頻",
+  "groupDocuments": "文檔",
+  "groupNoFiles": "暫無文件",
+  "groupNoFilesDescription": "此羣還沒有文件",
+  "groupDownloadStarted": "正在下載 {filename}...",
   "@groupDownloadStarted": {
     "placeholders": {
       "filename": {
@@ -1555,18 +1554,18 @@
       }
     }
   },
-  "contactNoCommonGroups": "暂无共同群组",
-  "contactNoCommonGroupsDescription": "你们没有共同加入的群组",
-  "chatVoiceMessage": "语音",
+  "contactNoCommonGroups": "暫無共同羣組",
+  "contactNoCommonGroupsDescription": "你們沒有共同加入的羣組",
+  "chatVoiceMessage": "語音",
   "chatMessage": "消息",
-  "conversationHideChat": "隐藏",
-  "settingsQuickReply": "快捷回复",
-  "commonTranslate": "翻译",
-  "contactCreateTag": "新建标签",
-  "contactEnterTagName": "输入标签名称",
-  "contactEditTag": "编辑标签",
-  "contactDeleteTag": "删除标签",
-  "contactDeleteTagConfirm": "确定要删除标签 \"{tagName}\" 吗？",
+  "conversationHideChat": "隱藏",
+  "settingsQuickReply": "快捷回覆",
+  "commonTranslate": "翻譯",
+  "contactCreateTag": "新建標籤",
+  "contactEnterTagName": "輸入標籤名稱",
+  "contactEditTag": "編輯標籤",
+  "contactDeleteTag": "刪除標籤",
+  "contactDeleteTagConfirm": "確定要刪除標籤 \"{tagName}\" 嗎？",
   "@contactDeleteTagConfirm": {
     "placeholders": {
       "tagName": {
@@ -1574,40 +1573,40 @@
       }
     }
   },
-  "contactNoTags": "暂无标签",
-  "contactFriendPermissions": "朋友权限",
-  "contactSetChatOnly": "设为仅聊天",
-  "contactChatOnlyDesc": "只能聊天，其他内容将被隐藏",
-  "contactHideMyMoments": "不让他（她）看我的朋友圈",
-  "contactHideMyMomentsDesc": "该好友无法查看你的朋友圈动态",
+  "contactNoTags": "暫無標籤",
+  "contactFriendPermissions": "朋友權限",
+  "contactSetChatOnly": "設爲僅聊天",
+  "contactChatOnlyDesc": "只能聊天，其他內容將被隱藏",
+  "contactHideMyMoments": "不讓他（她）看我的朋友圈",
+  "contactHideMyMomentsDesc": "該好友無法查看你的朋友圈動態",
   "contactHideTheirMoments": "不看他（她）的朋友圈",
-  "contactHideTheirMomentsDesc": "不会看到该好友的朋友圈动态",
-  "contactHideMyStatus": "不让他（她）看我的状态",
-  "contactHideMyStatusDesc": "该好友无法查看你的状态更新",
-  "contactNoChatOnlyFriends": "暂无仅聊天的朋友",
-  "contactNoOfficialAccounts": "暂无公众号",
-  "contactFollowOfficialAccountsDesc": "关注公众号，获取最新资讯",
-  "contactNoServiceAccounts": "暂无服务号",
-  "contactSubscribeServiceAccountsDesc": "订阅服务号，享受便捷服务",
-  "contactNoEnterpriseContacts": "暂无企业联系人",
-  "contactEnterpriseContactsDesc": "企业通讯录联系人将显示在这里",
+  "contactHideTheirMomentsDesc": "不會看到該好友的朋友圈動態",
+  "contactHideMyStatus": "不讓他（她）看我的狀態",
+  "contactHideMyStatusDesc": "該好友無法查看你的狀態更新",
+  "contactNoChatOnlyFriends": "暫無僅聊天的朋友",
+  "contactNoOfficialAccounts": "暫無公衆號",
+  "contactFollowOfficialAccountsDesc": "關注公衆號，獲取最新資訊",
+  "contactNoServiceAccounts": "暫無服務號",
+  "contactSubscribeServiceAccountsDesc": "訂閱服務號，享受便捷服務",
+  "contactNoEnterpriseContacts": "暫無企業聯繫人",
+  "contactEnterpriseContactsDesc": "企業通訊錄聯繫人將顯示在這裏",
   "profileCardPack": "卡包",
-  "profileOrders": "订单",
-  "profileNoOrders": "暂无订单",
-  "profileOrdersDesc": "你的订单将显示在这里",
-  "profileNoCards": "暂无卡券",
-  "profileCardsDesc": "你的卡券将显示在这里",
-  "favoriteEnterTagsHint": "输入标签，用逗号分隔",
-  "favoriteTagsUpdated": "标签已更新",
-  "favoriteForwardedContent": "内容已转发",
-  "favoriteEnterNoteContent": "输入笔记内容",
-  "favoriteNoteAdded": "笔记已添加",
-  "favoriteLinkTitle": "链接标题",
+  "profileOrders": "訂單",
+  "profileNoOrders": "暫無訂單",
+  "profileOrdersDesc": "你的訂單將顯示在這裏",
+  "profileNoCards": "暫無卡券",
+  "profileCardsDesc": "你的卡券將顯示在這裏",
+  "favoriteEnterTagsHint": "輸入標籤，用逗號分隔",
+  "favoriteTagsUpdated": "標籤已更新",
+  "favoriteForwardedContent": "內容已轉發",
+  "favoriteEnterNoteContent": "輸入筆記內容",
+  "favoriteNoteAdded": "筆記已添加",
+  "favoriteLinkTitle": "鏈接標題",
   "favoriteLinkUrl": "https://",
-  "favoriteLinkAdded": "链接已添加",
+  "favoriteLinkAdded": "鏈接已添加",
   "contactPhotoAdded": "照片已添加",
-  "contactEnterPhone": "输入手机号码",
-  "commonConversationWithId": "会话: {roomId}",
+  "contactEnterPhone": "輸入手機號碼",
+  "commonConversationWithId": "會話: {roomId}",
   "@commonConversationWithId": {
     "placeholders": {
       "roomId": {
@@ -1615,7 +1614,7 @@
       }
     }
   },
-  "commonContactWithId": "联系人: {userId}",
+  "commonContactWithId": "聯繫人: {userId}",
   "@commonContactWithId": {
     "placeholders": {
       "userId": {
@@ -1623,8 +1622,8 @@
       }
     }
   },
-  "commonDiscover": "发现",
-  "commonDeveloping": "{title}\n(开发中)",
+  "commonDiscover": "發現",
+  "commonDeveloping": "{title}\n(開發中)",
   "@commonDeveloping": {
     "placeholders": {
       "title": {
@@ -1632,40 +1631,40 @@
       }
     }
   },
-  "commonPageNotFound": "页面不存在",
-  "commonBackToHome": "返回首页",
+  "commonPageNotFound": "頁面不存在",
+  "commonBackToHome": "返回首頁",
   "settingsMessageNotifications": "消息通知",
   "settingsReceiveNewMessageNotifications": "接收新消息通知",
-  "settingsShowMessagePreview": "显示消息预览",
-  "settingsShowMessageContentInNotification": "在通知中显示消息内容",
-  "settingsNotificationSound": "通知声音",
-  "settingsPlaySoundOnMessage": "收到消息时播放声音",
-  "commonVibration": "振动",
-  "settingsVibrateOnMessage": "收到消息时震动",
-  "settingsDoNotDisturbMode": "勿扰模式",
-  "settingsDoNotDisturbDescription": "在指定时间内不接收通知",
-  "settingsStartTime": "开始时间",
-  "settingsEndTime": "结束时间",
-  "settingsDeleteQuickReply": "删除快捷回复",
-  "settingsEditQuickReply": "编辑快捷回复",
-  "settingsAddQuickReply": "添加快捷回复",
-  "settingsManageQuickReplies": "管理快捷回复",
-  "settingsNoQuickReplies": "暂无快捷回复",
-  "settingsDefaultQuickReplies": "将显示默认快捷回复",
-  "settingsWhoCanSee": "谁可以查看",
-  "settingsLastSeen": "最后上线时间",
-  "settingsHiddenChats": "隐藏的聊天",
+  "settingsShowMessagePreview": "顯示消息預覽",
+  "settingsShowMessageContentInNotification": "在通知中顯示消息內容",
+  "settingsNotificationSound": "通知聲音",
+  "settingsPlaySoundOnMessage": "收到消息時播放聲音",
+  "commonVibration": "振動",
+  "settingsVibrateOnMessage": "收到消息時震動",
+  "settingsDoNotDisturbMode": "勿擾模式",
+  "settingsDoNotDisturbDescription": "在指定時間內不接收通知",
+  "settingsStartTime": "開始時間",
+  "settingsEndTime": "結束時間",
+  "settingsDeleteQuickReply": "刪除快捷回覆",
+  "settingsEditQuickReply": "編輯快捷回覆",
+  "settingsAddQuickReply": "添加快捷回覆",
+  "settingsManageQuickReplies": "管理快捷回覆",
+  "settingsNoQuickReplies": "暫無快捷回覆",
+  "settingsDefaultQuickReplies": "將顯示默認快捷回覆",
+  "settingsWhoCanSee": "誰可以查看",
+  "settingsLastSeen": "最後上線時間",
+  "settingsHiddenChats": "隱藏的聊天",
   "settingsMessagesLabel": "消息",
-  "settingsAllowStrangerMessages": "允许陌生人消息",
-  "settingsReceiveMessagesFromNonContacts": "接收非联系人的消息",
-  "settingsReadReceipts": "已读回执",
-  "settingsLetOthersKnowYouRead": "让对方知道你已读",
-  "settingsTypingIndicator": "输入状态指示",
-  "settingsLetOthersKnowYouTyping": "让对方知道你正在输入",
+  "settingsAllowStrangerMessages": "允許陌生人消息",
+  "settingsReceiveMessagesFromNonContacts": "接收非聯繫人的消息",
+  "settingsReadReceipts": "已讀回執",
+  "settingsLetOthersKnowYouRead": "讓對方知道你已讀",
+  "settingsTypingIndicator": "輸入狀態指示",
+  "settingsLetOthersKnowYouTyping": "讓對方知道你正在輸入",
   "settingsEveryone": "所有人",
-  "settingsContactsOnly": "仅联系人",
-  "settingsNobody": "无人",
-  "settingsWhoCanSeeTitle": "谁可以看到 {title}",
+  "settingsContactsOnly": "僅聯繫人",
+  "settingsNobody": "無人",
+  "settingsWhoCanSeeTitle": "誰可以看到 {title}",
   "@settingsWhoCanSeeTitle": {
     "placeholders": {
       "title": {
@@ -1681,50 +1680,50 @@
       }
     }
   },
-  "settingsCheckForUpdates": "检查更新",
-  "settingsOpenSourceLicenses": "开源许可",
-  "settingsFeedbackAndSuggestions": "反馈与建议",
-  "settingsBuiltOnMatrix": "基于 Matrix 协议构建",
-  "settingsNoHiddenChats": "没有隐藏的聊天",
-  "settingsNoHiddenChatsDescription": "你隐藏的聊天会显示在这里",
-  "settingsUnhideChat": "取消隐藏",
+  "settingsCheckForUpdates": "檢查更新",
+  "settingsOpenSourceLicenses": "開源許可",
+  "settingsFeedbackAndSuggestions": "反饋與建議",
+  "settingsBuiltOnMatrix": "基於 Matrix 協議構建",
+  "settingsNoHiddenChats": "沒有隱藏的聊天",
+  "settingsNoHiddenChatsDescription": "你隱藏的聊天會顯示在這裏",
+  "settingsUnhideChat": "取消隱藏",
   "settingsDarkMode": "深色模式",
-  "settingsFontSize": "字体大小",
-  "settingsBubbleStyle": "气泡样式",
-  "settingsFollowSystem": "跟随系统",
-  "settingsAutoSwitchBySystem": "跟随系统自动切换",
-  "settingsLightMode": "浅色模式",
-  "settingsAlwaysUseLightTheme": "始终使用浅色主题",
-  "settingsDarkModeOption": "深色模式选项",
-  "settingsAlwaysUseDarkTheme": "始终使用深色主题",
+  "settingsFontSize": "字體大小",
+  "settingsBubbleStyle": "氣泡樣式",
+  "settingsFollowSystem": "跟隨系統",
+  "settingsAutoSwitchBySystem": "跟隨系統自動切換",
+  "settingsLightMode": "淺色模式",
+  "settingsAlwaysUseLightTheme": "始終使用淺色主題",
+  "settingsDarkModeOption": "深色模式選項",
+  "settingsAlwaysUseDarkTheme": "始終使用深色主題",
   "settingsFontSizeSmall": "小",
-  "settingsFontSizeStandard": "标准",
+  "settingsFontSizeStandard": "標準",
   "settingsFontSizeLarge": "大",
   "settingsFontSizeExtraLarge": "特大",
-  "settingsBubbleStyleWechat": "微信样式",
-  "settingsBubbleStyleWechatDesc": "经典微信气泡样式",
-  "settingsBubbleStyleModern": "现代样式",
-  "settingsBubbleStyleModernDesc": "简洁的现代气泡样式",
-  "settingsBubbleStyleClassic": "经典样式",
-  "settingsBubbleStyleClassicDesc": "传统的气泡样式",
-  "discoverVideoChannels": "视频号",
+  "settingsBubbleStyleWechat": "微信樣式",
+  "settingsBubbleStyleWechatDesc": "經典微信氣泡樣式",
+  "settingsBubbleStyleModern": "現代樣式",
+  "settingsBubbleStyleModernDesc": "簡潔的現代氣泡樣式",
+  "settingsBubbleStyleClassic": "經典樣式",
+  "settingsBubbleStyleClassicDesc": "傳統的氣泡樣式",
+  "discoverVideoChannels": "視頻號",
   "discoverLive": "直播",
-  "discoverListen": "听一听",
+  "discoverListen": "聽一聽",
   "discoverWatch": "看一看",
   "discoverSearchDiscover": "搜一搜",
   "discoverNearbyPeople": "附近的人",
-  "discoverGames": "游戏",
+  "discoverGames": "遊戲",
   "discoverMiniPrograms": "小程序",
-  "chatAlreadyInCall": "当前正在通话中",
-  "commonConnectionFailed": "连接失败",
-  "chatCallRejected": "对方已拒绝",
-  "chatNoAnswer": "对方无应答",
-  "commonClose": "关闭",
-  "chatSelectContact": "选择联系人",
+  "chatAlreadyInCall": "當前正在通話中",
+  "commonConnectionFailed": "連接失敗",
+  "chatCallRejected": "對方已拒絕",
+  "chatNoAnswer": "對方無應答",
+  "commonClose": "關閉",
+  "chatSelectContact": "選擇聯繫人",
   "chatVoteRemoved": "已取消投票",
   "chatVoteChanged": "投票已更改",
   "chatVoted": "已投票",
-  "chatReplyTo": "回复 {name}",
+  "chatReplyTo": "回覆 {name}",
   "@chatReplyTo": {
     "placeholders": {
       "name": {
@@ -1732,8 +1731,8 @@
       }
     }
   },
-  "chatCurrentLocation": "当前位置",
-  "chatNearbyPlace": "附近地点 {index}",
+  "chatCurrentLocation": "當前位置",
+  "chatNearbyPlace": "附近地點 {index}",
   "@chatNearbyPlace": {
     "placeholders": {
       "index": {
@@ -1741,7 +1740,7 @@
       }
     }
   },
-  "chatApproximateDistance": "约 {distance}",
+  "chatApproximateDistance": "約 {distance}",
   "@chatApproximateDistance": {
     "placeholders": {
       "distance": {
@@ -1750,21 +1749,25 @@
     }
   },
   "chatAddress": "地址",
-  "chatLatitude": "纬度",
-  "chatLongitude": "经度",
-  "groupDescriptionUpdated": "群简介已更新",
-  "groupAvatarUpdated": "群头像已更新",
-  "callDecline": "拒绝",
-  "callAnswer": "接听",
-  "callIncomingVideoCall": "视频来电",
-  "callIncomingVoiceCall": "语音来电",
-  "callVideoCallInProgress": "视频通话中",
-  "callVoiceCallInProgress": "语音通话中",
-  "callReconnectingCall": "正在重连...",
-  "callEnded": "通话已结束",
-  "callFailed": "通话失败",
+  "chatLatitude": "緯度",
+  "chatLongitude": "經度",
+  "groupDescriptionUpdated": "羣簡介已更新",
+  "groupAvatarUpdated": "羣頭像已更新",
+  "groupVisibilityUpdated": "羣可見性已更新",
+  "groupChannelCreated": "頻道已創建",
+  "groupChannelUpdated": "頻道已更新",
+  "groupChannelDeleted": "頻道已刪除",
+  "callDecline": "拒絕",
+  "callAnswer": "接聽",
+  "callIncomingVideoCall": "視頻來電",
+  "callIncomingVoiceCall": "語音來電",
+  "callVideoCallInProgress": "視頻通話中",
+  "callVoiceCallInProgress": "語音通話中",
+  "callReconnectingCall": "正在重連...",
+  "callEnded": "通話已結束",
+  "callFailed": "通話失敗",
   "callLivekitNotConfigured": "LiveKit 未配置",
-  "callJoinMeetingFailed": "加入会议失败: {error}",
+  "callJoinMeetingFailed": "加入會議失敗: {error}",
   "@callJoinMeetingFailed": {
     "placeholders": {
       "error": {
@@ -1772,7 +1775,7 @@
       }
     }
   },
-  "callScreenShareFailed": "屏幕共享失败: {error}",
+  "callScreenShareFailed": "屏幕共享失敗: {error}",
   "@callScreenShareFailed": {
     "placeholders": {
       "error": {
@@ -1781,88 +1784,88 @@
     }
   },
   "profileN42BeanTitle": "N42豆",
-  "profileNoN42Bean": "暂无N42豆",
-  "profileN42BeanDetails": "N42豆明细",
-  "profileN42BeanDescription": "N42豆是用于兑换N42内虚拟物品和服务的道具，目前可用于兑换：",
-  "profileN42BeanFeature1": "会员专属表情和主题",
-  "profileN42BeanFeature2": "聊天气泡个性化",
-  "profileN42BeanFeature3": "红包封面定制",
-  "profileN42BeanFeature4": "专属昵称标识",
-  "profileN42BeanFeature5": "群聊特权功能",
-  "profileN42BeanFeature6": "云存储空间扩展",
-  "profileN42BeanFeature7": "视频通话美颜滤镜",
-  "profileN42BeanFeature8": "朋友圈背景更换",
-  "profileN42BeanFeature9": "VIP客服优先服务",
+  "profileNoN42Bean": "暫無N42豆",
+  "profileN42BeanDetails": "N42豆明細",
+  "profileN42BeanDescription": "N42豆是用於兌換N42內虛擬物品和服務的道具，目前可用於兌換：",
+  "profileN42BeanFeature1": "會員專屬表情和主題",
+  "profileN42BeanFeature2": "聊天氣泡個性化",
+  "profileN42BeanFeature3": "紅包封面定製",
+  "profileN42BeanFeature4": "專屬暱稱標識",
+  "profileN42BeanFeature5": "羣聊特權功能",
+  "profileN42BeanFeature6": "雲存儲空間擴展",
+  "profileN42BeanFeature7": "視頻通話美顏濾鏡",
+  "profileN42BeanFeature8": "朋友圈背景更換",
+  "profileN42BeanFeature9": "VIP客服優先服務",
   "profileGotIt": "我知道了",
-  "profileNoN42BeanRecords": "暂无N42豆明细记录",
+  "profileNoN42BeanRecords": "暫無N42豆明細記錄",
   "profileMoodAndThoughts": "心情想法",
-  "profileStatusHappy": "开心",
-  "profileStatusCracked": "裂开",
-  "profileStatusLucky": "发呆",
-  "profileStatusSunny": "天气晴",
+  "profileStatusHappy": "開心",
+  "profileStatusCracked": "裂開",
+  "profileStatusLucky": "發呆",
+  "profileStatusSunny": "天氣晴",
   "profileStatusTired": "累了",
-  "profileStatusDaydream": "发呆中",
+  "profileStatusDaydream": "發呆中",
   "profileStatusRushing": "忙碌",
   "profileStatusOverthinking": "想太多",
-  "profileStatusEnergized": "元气满满",
-  "profileWorkAndStudy": "工作学习",
-  "profileStatusWorking": "搬砖中",
-  "profileStatusStudying": "学习中",
+  "profileStatusEnergized": "元氣滿滿",
+  "profileWorkAndStudy": "工作學習",
+  "profileStatusWorking": "搬磚中",
+  "profileStatusStudying": "學習中",
   "profileStatusBusy": "忙",
-  "profileStatusSlacking": "摸鱼中",
+  "profileStatusSlacking": "摸魚中",
   "profileStatusTraveling": "旅行中",
   "profileStatusGoingHome": "回家中",
-  "profileStatusDnd": "请勿打扰",
-  "profileActivities": "活动",
+  "profileStatusDnd": "請勿打擾",
+  "profileActivities": "活動",
   "profileStatusHanging": "出去浪",
   "profileStatusCheckIn": "打卡",
-  "profileStatusExercising": "运动中",
+  "profileStatusExercising": "運動中",
   "profileStatusCoffee": "喝咖啡",
   "profileStatusBubbleTea": "奶茶",
-  "profileStatusEating": "干饭中",
-  "profileStatusParenting": "带娃中",
+  "profileStatusEating": "乾飯中",
+  "profileStatusParenting": "帶娃中",
   "profileStatusSavingWorld": "拯救世界",
   "profileStatusSelfie": "自拍",
   "profileRest": "休息",
-  "profileStatusRetreat": "闭关",
+  "profileStatusRetreat": "閉關",
   "profileStatusHome": "宅家",
-  "profileStatusSleeping": "睡觉中",
-  "profileStatusCatLover": "吸猫中",
+  "profileStatusSleeping": "睡覺中",
+  "profileStatusCatLover": "吸貓中",
   "profileStatusDogWalking": "遛狗中",
-  "profileStatusGaming": "游戏中",
-  "profileStatusListening": "听歌中",
-  "profileEditAddress": "编辑地址",
-  "profileRecipient": "收货人",
-  "profileEnterRecipientName": "请输入收货人姓名",
-  "profilePhoneNumber": "手机号码",
-  "profileEnterPhoneNumber": "请输入手机号码",
-  "profileRegionHint": "省/市/区",
-  "profileDetailedAddress": "详细地址",
-  "profileDetailedAddressHint": "街道、门牌号等",
-  "profileSetAsDefaultAddress": "设为默认地址",
-  "profilePleaseCompleteInfo": "请填写完整信息",
-  "profileEditInvoice": "编辑发票抬头",
-  "profileInvoiceType": "抬头类型",
-  "profileCompanyName": "企业名称",
-  "profilePersonalName": "个人姓名",
-  "profileEnterCompanyName": "请输入企业名称",
-  "profileEnterName": "请输入姓名",
-  "profileTaxIdNumber": "纳税人识别号",
-  "profileEnterTaxIdNumber": "请输入纳税人识别号",
-  "profileBankNameOptional": "开户银行（选填）",
-  "profileEnterBankName": "请输入开户银行",
-  "profileBankAccountOptional": "银行账号（选填）",
-  "profileEnterBankAccount": "请输入银行账号",
-  "profileCompanyAddressOptional": "企业地址（选填）",
-  "profileEnterCompanyAddress": "请输入企业地址",
-  "profileCompanyPhoneOptional": "企业电话（选填）",
-  "profileEnterCompanyPhone": "请输入企业电话",
-  "profileSetAsDefaultInvoice": "设为默认抬头",
-  "profileRingtoneVibrate": "震动",
-  "profileRingtoneSilent": "静音",
-  "profileVibrateMode": "振动模式",
-  "profileSilentMode": "静音模式",
-  "profilePlayFailed": "播放失败: {ringtoneName}",
+  "profileStatusGaming": "遊戲中",
+  "profileStatusListening": "聽歌中",
+  "profileEditAddress": "編輯地址",
+  "profileRecipient": "收貨人",
+  "profileEnterRecipientName": "請輸入收貨人姓名",
+  "profilePhoneNumber": "手機號碼",
+  "profileEnterPhoneNumber": "請輸入手機號碼",
+  "profileRegionHint": "省/市/區",
+  "profileDetailedAddress": "詳細地址",
+  "profileDetailedAddressHint": "街道、門牌號等",
+  "profileSetAsDefaultAddress": "設爲默認地址",
+  "profilePleaseCompleteInfo": "請填寫完整信息",
+  "profileEditInvoice": "編輯發票抬頭",
+  "profileInvoiceType": "抬頭類型",
+  "profileCompanyName": "企業名稱",
+  "profilePersonalName": "個人姓名",
+  "profileEnterCompanyName": "請輸入企業名稱",
+  "profileEnterName": "請輸入姓名",
+  "profileTaxIdNumber": "納稅人識別號",
+  "profileEnterTaxIdNumber": "請輸入納稅人識別號",
+  "profileBankNameOptional": "開戶銀行（選填）",
+  "profileEnterBankName": "請輸入開戶銀行",
+  "profileBankAccountOptional": "銀行賬號（選填）",
+  "profileEnterBankAccount": "請輸入銀行賬號",
+  "profileCompanyAddressOptional": "企業地址（選填）",
+  "profileEnterCompanyAddress": "請輸入企業地址",
+  "profileCompanyPhoneOptional": "企業電話（選填）",
+  "profileEnterCompanyPhone": "請輸入企業電話",
+  "profileSetAsDefaultInvoice": "設爲默認抬頭",
+  "profileRingtoneVibrate": "震動",
+  "profileRingtoneSilent": "靜音",
+  "profileVibrateMode": "振動模式",
+  "profileSilentMode": "靜音模式",
+  "profilePlayFailed": "播放失敗: {ringtoneName}",
   "@profilePlayFailed": {
     "placeholders": {
       "ringtoneName": {
@@ -1879,9 +1882,9 @@
     }
   },
   "profileStop": "停止",
-  "profileSelectRingtone": "选择铃声",
-  "profileLoadingRingtones": "加载铃声中...",
-  "profileNoRingtonesFound": "未找到铃声",
+  "profileSelectRingtone": "選擇鈴聲",
+  "profileLoadingRingtones": "加載鈴聲中...",
+  "profileNoRingtonesFound": "未找到鈴聲",
   "mainMessagesWithCount": "消息({count})",
   "@mainMessagesWithCount": {
     "placeholders": {
@@ -1890,13 +1893,13 @@
       }
     }
   },
-  "storyViewers": "浏览者",
-  "storyNoViewers": "暂无浏览",
-  "storyReplyToStory": "回复状态...",
-  "commonCopiedToClipboard": "已复制到剪贴板",
+  "storyViewers": "瀏覽者",
+  "storyNoViewers": "暫無瀏覽",
+  "storyReplyToStory": "回覆狀態...",
+  "commonCopiedToClipboard": "已複製到剪貼板",
   "commonMore": "更多",
-  "commonTranslating": "翻译中...",
-  "commonTranslatedFrom": "翻译自{language}",
+  "commonTranslating": "翻譯中...",
+  "commonTranslatedFrom": "翻譯自{language}",
   "@commonTranslatedFrom": {
     "placeholders": {
       "language": {
@@ -1904,10 +1907,10 @@
       }
     }
   },
-  "commonTranslation": "翻译",
-  "commonTranslationFailed": "翻译失败",
-  "commonAllRead": "全部已读",
-  "commonReadCount": "{count}人已读",
+  "commonTranslation": "翻譯",
+  "commonTranslationFailed": "翻譯失敗",
+  "commonAllRead": "全部已讀",
+  "commonReadCount": "{count}人已讀",
   "@commonReadCount": {
     "placeholders": {
       "count": {
@@ -1915,24 +1918,24 @@
       }
     }
   },
-  "commonYouRecalledMessage": "你撤回了一条消息",
-  "commonMessageRecalled": "对方撤回了一条消息",
-  "commonReEdit": "重新编辑",
-  "commonWalletArea": "钱包功能区域",
-  "callIncomingCall": "来电",
-  "callMissedCall": "未接来电",
-  "groupRemoveAdmin": "取消管理员",
-  "chatSelectCurrency": "选择币种",
-  "chatSelectEmoji": "选择表情",
-  "chatSelectRedPacketCover": "选择封面",
-  "groupSetAsAdmin": "设为管理员",
-  "chatVideoPlaybackFailed": "视频播放失败",
-  "groupViewProfile": "查看资料",
-  "favoriteAddLinkComingSoon": "添加链接功能即将推出",
-  "favoriteNewNoteComingSoon": "新建笔记功能即将推出",
-  "qrcodeSaveFeatureComingSoon": "保存功能即将推出",
-  "qrcodeShareFeatureComingSoon": "分享功能即将推出",
-  "qrcodeProcessFailed": "处理二维码失败: {error}",
+  "commonYouRecalledMessage": "你撤回了一條消息",
+  "commonMessageRecalled": "對方撤回了一條消息",
+  "commonReEdit": "重新編輯",
+  "commonWalletArea": "錢包功能區域",
+  "callIncomingCall": "來電",
+  "callMissedCall": "未接來電",
+  "groupRemoveAdmin": "取消管理員",
+  "chatSelectCurrency": "選擇幣種",
+  "chatSelectEmoji": "選擇表情",
+  "chatSelectRedPacketCover": "選擇封面",
+  "groupSetAsAdmin": "設爲管理員",
+  "chatVideoPlaybackFailed": "視頻播放失敗",
+  "groupViewProfile": "查看資料",
+  "favoriteAddLinkComingSoon": "添加鏈接功能即將推出",
+  "favoriteNewNoteComingSoon": "新建筆記功能即將推出",
+  "qrcodeSaveFeatureComingSoon": "保存功能即將推出",
+  "qrcodeShareFeatureComingSoon": "分享功能即將推出",
+  "qrcodeProcessFailed": "處理二維碼失敗: {error}",
   "@qrcodeProcessFailed": {
     "placeholders": {
       "error": {
@@ -1940,8 +1943,8 @@
       }
     }
   },
-  "securityDeviceIdRequired": "需要设备 ID",
-  "securityVerificationStartFailed": "启动验证失败: {error}",
+  "securityDeviceIdRequired": "需要設備 ID",
+  "securityVerificationStartFailed": "啓動驗證失敗: {error}",
   "@securityVerificationStartFailed": {
     "placeholders": {
       "error": {
@@ -1949,8 +1952,8 @@
       }
     }
   },
-  "securityVerificationFailed": "验证失败",
-  "securityVerificationFailedWithReason": "验证失败: {reason}",
+  "securityVerificationFailed": "驗證失敗",
+  "securityVerificationFailedWithReason": "驗證失敗: {reason}",
   "@securityVerificationFailedWithReason": {
     "placeholders": {
       "reason": {
@@ -1958,22 +1961,22 @@
       }
     }
   },
-  "securityEmojiMismatchRejected": "验证被拒绝 - 表情不匹配",
-  "securityWaitingForDeviceAccept": "等待另一台设备接受...",
-  "securityVerifyDevice": "验证此设备",
-  "securityConfirmEmojiMatch": "确认以下表情符号在两台设备上以相同顺序显示",
+  "securityEmojiMismatchRejected": "驗證被拒絕 - 表情不匹配",
+  "securityWaitingForDeviceAccept": "等待另一臺設備接受...",
+  "securityVerifyDevice": "驗證此設備",
+  "securityConfirmEmojiMatch": "確認以下表情符號在兩臺設備上以相同順序顯示",
   "securityEmojiDontMatch": "不匹配",
   "securityEmojiMatch": "匹配",
-  "securityWaitingForDeviceConfirm": "等待另一台设备确认...",
-  "securityVerificationSuccess": "验证成功！",
-  "securityDeviceVerifiedTrusted": "此设备已验证并可信任。",
-  "securityCompareEmoji": "比较两台设备上的表情符号",
-  "securityCompareNumbers": "比较两台设备上的数字",
-  "commonTryAgain": "重试",
+  "securityWaitingForDeviceConfirm": "等待另一臺設備確認...",
+  "securityVerificationSuccess": "驗證成功！",
+  "securityDeviceVerifiedTrusted": "此設備已驗證並可信任。",
+  "securityCompareEmoji": "比較兩臺設備上的表情符號",
+  "securityCompareNumbers": "比較兩臺設備上的數字",
+  "commonTryAgain": "重試",
   "commonDone": "完成",
-  "chatExportTitle": "导出聊天记录",
-  "chatExportSuccess": "导出成功",
-  "chatExportFailed": "导出失败: {error}",
+  "chatExportTitle": "導出聊天記錄",
+  "chatExportSuccess": "導出成功",
+  "chatExportFailed": "導出失敗: {error}",
   "@chatExportFailed": {
     "placeholders": {
       "error": {
@@ -1981,19 +1984,19 @@
       }
     }
   },
-  "chatExportFormat": "导出格式",
-  "chatExportHtmlDesc": "可在任何浏览器中打开的精美排版",
-  "chatExportJsonDesc": "机器可读的结构化数据格式",
-  "chatExportDateRange": "日期范围",
+  "chatExportFormat": "導出格式",
+  "chatExportHtmlDesc": "可在任何瀏覽器中打開的精美排版",
+  "chatExportJsonDesc": "機器可讀的結構化數據格式",
+  "chatExportDateRange": "日期範圍",
   "chatExportAll": "全部消息",
   "chatExportLastWeek": "最近7天",
-  "chatExportLastMonth": "最近一个月",
-  "chatExportLast3Months": "最近三个月",
-  "chatExportMessageCount": "待导出消息",
-  "chatExportButton": "导出并分享",
-  "chatMediaGallery": "媒体文件",
-  "chatExportHistory": "导出聊天记录",
-  "pdfLoadFailed": "加载 PDF 失败",
+  "chatExportLastMonth": "最近一個月",
+  "chatExportLast3Months": "最近三個月",
+  "chatExportMessageCount": "待導出消息",
+  "chatExportButton": "導出並分享",
+  "chatMediaGallery": "媒體文件",
+  "chatExportHistory": "導出聊天記錄",
+  "pdfLoadFailed": "加載 PDF 失敗",
   "pdfPageIndicator": "{current} / {total}",
   "@pdfPageIndicator": {
     "placeholders": {
@@ -2006,11 +2009,11 @@
     }
   },
   "mediaAll": "全部",
-  "mediaImages": "图片",
-  "mediaVideos": "视频",
+  "mediaImages": "圖片",
+  "mediaVideos": "視頻",
   "mediaFiles": "文件",
-  "mediaAudio": "音频",
-  "mediaItemsCount": "{count} 项",
+  "mediaAudio": "音頻",
+  "mediaItemsCount": "{count} 項",
   "@mediaItemsCount": {
     "placeholders": {
       "count": {
@@ -2018,18 +2021,18 @@
       }
     }
   },
-  "mediaNoMediaFound": "暂无媒体文件",
-  "spacesTitle": "社区",
-  "spacesCreate": "创建社区",
+  "mediaNoMediaFound": "暫無媒體文件",
+  "spacesTitle": "社區",
+  "spacesCreate": "創建社區",
   "spacesJoined": "已加入",
-  "spacesDiscover": "发现",
-  "spacesNoJoined": "还没有加入任何社区",
-  "spacesExplore": "探索社区",
-  "spacesNoPublic": "没有找到公共社区",
+  "spacesDiscover": "發現",
+  "spacesNoJoined": "還沒有加入任何社區",
+  "spacesExplore": "探索社區",
+  "spacesNoPublic": "沒有找到公共社區",
   "spacesJoin": "加入",
-  "spacesSubSpaces": "子社区",
-  "spacesChannels": "频道",
-  "spacesMembersCount": "{count} 位成员",
+  "spacesSubSpaces": "子社區",
+  "spacesChannels": "頻道",
+  "spacesMembersCount": "{count} 位成員",
   "@spacesMembersCount": {
     "placeholders": {
       "count": {
@@ -2037,10 +2040,10 @@
       }
     }
   },
-  "spacesPublic": "公开",
+  "spacesPublic": "公開",
   "spacesPrivate": "私密",
-  "spacesSuggested": "推荐",
-  "spacesChannelsCount": "{count} 个频道",
+  "spacesSuggested": "推薦",
+  "spacesChannelsCount": "{count} 個頻道",
   "@spacesChannelsCount": {
     "placeholders": {
       "count": {
@@ -2048,8 +2051,8 @@
       }
     }
   },
-  "callInCallChat": "通话中聊天",
-  "callMessagesCount": "{count} 条消息",
+  "callInCallChat": "通話中聊天",
+  "callMessagesCount": "{count} 條消息",
   "@callMessagesCount": {
     "placeholders": {
       "count": {
@@ -2057,14 +2060,14 @@
       }
     }
   },
-  "callNoMessagesYet": "暂无消息\n发送一条消息开始聊天",
-  "callTypeMessage": "输入消息...",
+  "callNoMessagesYet": "暫無消息\n發送一條消息開始聊天",
+  "callTypeMessage": "輸入消息...",
   "callYouSender": "我",
   "callChatLabel": "聊天",
-  "chatEdited": "已编辑",
-  "chatEditHistory": "编辑历史",
+  "chatEdited": "已編輯",
+  "chatEditHistory": "編輯歷史",
   "chatOriginalMessage": "原始消息",
-  "chatEditedAt": "编辑于 {time}",
+  "chatEditedAt": "編輯於 {time}",
   "@chatEditedAt": {
     "placeholders": {
       "time": {
@@ -2072,16 +2075,16 @@
       }
     }
   },
-  "chatViewOnce": "阅后即焚",
-  "chatViewOncePhoto": "阅后即焚照片",
-  "chatViewOnceVideo": "阅后即焚视频",
+  "chatViewOnce": "閱後即焚",
+  "chatViewOncePhoto": "閱後即焚照片",
+  "chatViewOnceVideo": "閱後即焚視頻",
   "chatViewOnceViewed": "已查看",
-  "chatViewOnceExpired": "已过期",
-  "chatViewOnceTap": "点击查看",
-  "chatAutoFaceBlur": "自动模糊人脸",
-  "chatAutoFaceBlurDesc": "发送照片时自动模糊人脸",
-  "threadReplyInThread": "在线程中回复",
-  "threadReplies": "{count} 条回复",
+  "chatViewOnceExpired": "已過期",
+  "chatViewOnceTap": "點擊查看",
+  "chatAutoFaceBlur": "自動模糊人臉",
+  "chatAutoFaceBlurDesc": "發送照片時自動模糊人臉",
+  "threadReplyInThread": "在線程中回覆",
+  "threadReplies": "{count} 條回覆",
   "@threadReplies": {
     "placeholders": {
       "count": {
@@ -2089,7 +2092,7 @@
       }
     }
   },
-  "threadReply": "1 条回复",
+  "threadReply": "1 條回覆",
   "threadLatestReply": "最新: {preview}",
   "@threadLatestReply": {
     "placeholders": {
@@ -2098,9 +2101,9 @@
       }
     }
   },
-  "threadTitle": "消息线程",
-  "threadReplyPlaceholder": "在线程中回复...",
-  "threadParticipants": "{count} 位参与者",
+  "threadTitle": "消息線程",
+  "threadReplyPlaceholder": "在線程中回覆...",
+  "threadParticipants": "{count} 位參與者",
   "@threadParticipants": {
     "placeholders": {
       "count": {
@@ -2108,24 +2111,24 @@
       }
     }
   },
-  "voiceRoomTitle": "语音聊天室",
-  "voiceRoomCreate": "创建语音房间",
+  "voiceRoomTitle": "語音聊天室",
+  "voiceRoomCreate": "創建語音房間",
   "voiceRoomJoin": "加入",
-  "voiceRoomLeave": "离开",
-  "voiceRoomEnd": "结束房间",
-  "voiceRoomRaiseHand": "举手",
+  "voiceRoomLeave": "離開",
+  "voiceRoomEnd": "結束房間",
+  "voiceRoomRaiseHand": "舉手",
   "voiceRoomLowerHand": "放下手",
-  "voiceRoomMute": "静音",
-  "voiceRoomUnmute": "取消静音",
+  "voiceRoomMute": "靜音",
+  "voiceRoomUnmute": "取消靜音",
   "voiceRoomHost": "主持人",
-  "voiceRoomSpeakers": "发言者",
-  "voiceRoomListeners": "听众",
+  "voiceRoomSpeakers": "發言者",
+  "voiceRoomListeners": "聽衆",
   "voiceRoomLive": "直播中",
-  "voiceRoomEnded": "已结束",
-  "voiceRoomScheduled": "已预约",
-  "voiceRoomApprove": "批准发言",
-  "voiceRoomDemote": "移至听众",
-  "voiceRoomHandRaised": "{name} 举手了",
+  "voiceRoomEnded": "已結束",
+  "voiceRoomScheduled": "已預約",
+  "voiceRoomApprove": "批准發言",
+  "voiceRoomDemote": "移至聽衆",
+  "voiceRoomHandRaised": "{name} 舉手了",
   "@voiceRoomHandRaised": {
     "placeholders": {
       "name": {
@@ -2133,88 +2136,88 @@
       }
     }
   },
-  "voiceRoomName": "房间名称",
-  "voiceRoomTopic": "话题（可选）",
-  "voiceRoomNoActive": "暂无活跃的语音房间",
-  "voiceRoomConnecting": "连接中...",
-  "usernameTitle": "用户名",
-  "usernameSet": "设置用户名",
-  "usernameChange": "修改用户名",
-  "usernamePlaceholder": "输入用户名",
-  "usernameAvailable": "用户名可用",
-  "usernameUnavailable": "用户名已被占用",
-  "usernameInvalid": "3-30个字符，小写字母、数字、下划线，必须以字母开头",
-  "usernameReserved": "此用户名为保留名称",
-  "usernameSaved": "用户名已保存",
-  "usernameSearchHint": "通过 @用户名 搜索",
+  "voiceRoomName": "房間名稱",
+  "voiceRoomTopic": "話題（可選）",
+  "voiceRoomNoActive": "暫無活躍的語音房間",
+  "voiceRoomConnecting": "連接中...",
+  "usernameTitle": "用戶名",
+  "usernameSet": "設置用戶名",
+  "usernameChange": "修改用戶名",
+  "usernamePlaceholder": "輸入用戶名",
+  "usernameAvailable": "用戶名可用",
+  "usernameUnavailable": "用戶名已被佔用",
+  "usernameInvalid": "3-30個字符，小寫字母、數字、下劃線，必須以字母開頭",
+  "usernameReserved": "此用戶名爲保留名稱",
+  "usernameSaved": "用戶名已保存",
+  "usernameSearchHint": "通過 @用戶名 搜索",
   "ensName": "ENS 域名",
-  "ensLinked": "已关联 ENS",
+  "ensLinked": "已關聯 ENS",
   "ensResolving": "正在解析 ENS...",
   "ensNotFound": "未找到 ENS 域名",
-  "tokenGateTitle": "代币门控",
-  "tokenGateEnable": "启用代币门控",
-  "tokenGateDisable": "禁用代币门控",
-  "tokenGateAddRule": "添加规则",
-  "tokenGateRemoveRule": "删除规则",
-  "tokenGateContractAddress": "合约地址",
-  "tokenGateMinBalance": "最低余额",
+  "tokenGateTitle": "代幣門控",
+  "tokenGateEnable": "啓用代幣門控",
+  "tokenGateDisable": "禁用代幣門控",
+  "tokenGateAddRule": "添加規則",
+  "tokenGateRemoveRule": "刪除規則",
+  "tokenGateContractAddress": "合約地址",
+  "tokenGateMinBalance": "最低餘額",
   "tokenGateTokenId": "Token ID (ERC-1155)",
-  "tokenGateChainId": "链 ID",
-  "tokenGateVerifying": "正在验证代币持有...",
-  "tokenGateVerified": "验证通过",
-  "tokenGateDenied": "您未满足代币要求",
-  "tokenGateOperatorAnd": "需满足所有规则",
-  "tokenGateOperatorOr": "满足任一规则即可",
-  "tokenGateRuleErc20": "ERC-20 代币",
+  "tokenGateChainId": "鏈 ID",
+  "tokenGateVerifying": "正在驗證代幣持有...",
+  "tokenGateVerified": "驗證通過",
+  "tokenGateDenied": "您未滿足代幣要求",
+  "tokenGateOperatorAnd": "需滿足所有規則",
+  "tokenGateOperatorOr": "滿足任一規則即可",
+  "tokenGateRuleErc20": "ERC-20 代幣",
   "tokenGateRuleErc721": "NFT (ERC-721)",
-  "tokenGateRuleErc1155": "多代币 (ERC-1155)",
-  "tokenGateRuleNative": "原生代币",
-  "tokenGateSaved": "代币门控已保存",
-  "tokenGateEnableDescription": "要求成员持有指定代币才能加入",
-  "tokenGateOperator": "规则逻辑",
-  "tokenGateRules": "规则列表",
-  "tokenGateSymbol": "代币符号（可选）",
-  "tokenGateChain": "区块链",
-  "tokenGateTokenStandard": "代币标准",
-  "tokenGateDenialMessage": "拒绝消息",
-  "tokenGateDenialMessageHint": "验证失败时显示的消息",
-  "tokenGateVerifyTitle": "代币验证",
-  "tokenGateVerifyPassed": "验证通过",
-  "tokenGateVerifyFailed": "验证未通过",
-  "tokenGateRetryVerify": "重新验证",
+  "tokenGateRuleErc1155": "多代幣 (ERC-1155)",
+  "tokenGateRuleNative": "原生代幣",
+  "tokenGateSaved": "代幣門控已保存",
+  "tokenGateEnableDescription": "要求成員持有指定代幣才能加入",
+  "tokenGateOperator": "規則邏輯",
+  "tokenGateRules": "規則列表",
+  "tokenGateSymbol": "代幣符號（可選）",
+  "tokenGateChain": "區塊鏈",
+  "tokenGateTokenStandard": "代幣標準",
+  "tokenGateDenialMessage": "拒絕消息",
+  "tokenGateDenialMessageHint": "驗證失敗時顯示的消息",
+  "tokenGateVerifyTitle": "代幣驗證",
+  "tokenGateVerifyPassed": "驗證通過",
+  "tokenGateVerifyFailed": "驗證未通過",
+  "tokenGateRetryVerify": "重新驗證",
   "tokenGateRequired": "要求",
-  "tokenGateYourBalance": "你的余额",
-  "tokenGateRulesActive": "条规则生效",
-  "tokenGateDisabled": "未启用",
-  "ensNotBound": "未绑定",
-  "liveLocation": "实时位置",
+  "tokenGateYourBalance": "你的餘額",
+  "tokenGateRulesActive": "條規則生效",
+  "tokenGateDisabled": "未啓用",
+  "ensNotBound": "未綁定",
+  "liveLocation": "實時位置",
   "stopLiveLocation": "停止共享",
-  "startLiveLocation": "开始共享",
-  "selectDuration": "选择共享时长",
+  "startLiveLocation": "開始共享",
+  "selectDuration": "選擇共享時長",
   "groupChatFiles": "聊天文件",
-  "groupLinks": "链接",
-  "groupNoLinks": "暂无链接",
+  "groupLinks": "鏈接",
+  "groupNoLinks": "暫無鏈接",
   "chatBackground": "聊天背景",
-  "solidColors": "纯色",
-  "gradients": "渐变",
-  "defaultBackground": "默认",
-  "settingsFontSizeSlider": "字体大小",
-  "autoDownload": "自动下载",
-  "images": "图片",
-  "voice": "语音",
-  "video": "视频",
+  "solidColors": "純色",
+  "gradients": "漸變",
+  "defaultBackground": "默認",
+  "settingsFontSizeSlider": "字體大小",
+  "autoDownload": "自動下載",
+  "images": "圖片",
+  "voice": "語音",
+  "video": "視頻",
   "files": "文件",
-  "mobileData": "移动数据",
-  "roaming": "漫游",
-  "storageManagement": "存储管理",
-  "totalUsage": "总用量",
-  "cache": "缓存",
+  "mobileData": "移動數據",
+  "roaming": "漫遊",
+  "storageManagement": "存儲管理",
+  "totalUsage": "總用量",
+  "cache": "緩存",
   "other": "其他",
-  "clearCache": "清理缓存",
-  "cacheCleared": "缓存已清除",
-  "clearCacheFailed": "清理缓存失败",
-  "confirmClearCache": "确认清理所有缓存数据？",
-  "mapView": "地图视图",
+  "clearCache": "清理緩存",
+  "cacheCleared": "緩存已清除",
+  "clearCacheFailed": "清理緩存失敗",
+  "confirmClearCache": "確認清理所有緩存數據？",
+  "mapView": "地圖視圖",
   "liveLocationSharingCount": "{count} 人正在共享位置",
   "@liveLocationSharingCount": {
     "placeholders": {
@@ -2223,13 +2226,13 @@
       }
     }
   },
-  "minutes15": "15 分钟",
-  "minutes30": "30 分钟",
-  "hour1": "1 小时",
-  "hours8": "8 小时",
-  "personalCard": "个人名片",
-  "downloadFailed": "下载失败",
-  "locationExpired": "已过期",
+  "minutes15": "15 分鐘",
+  "minutes30": "30 分鐘",
+  "hour1": "1 小時",
+  "hours8": "8 小時",
+  "personalCard": "個人名片",
+  "downloadFailed": "下載失敗",
+  "locationExpired": "已過期",
   "secondsRemaining": "{count}秒",
   "@secondsRemaining": {
     "placeholders": {
@@ -2238,7 +2241,7 @@
       }
     }
   },
-  "minutesRemaining": "{count}分钟",
+  "minutesRemaining": "{count}分鐘",
   "@minutesRemaining": {
     "placeholders": {
       "count": {
@@ -2246,7 +2249,7 @@
       }
     }
   },
-  "hoursMinutesRemaining": "{hours}小时{minutes}分钟",
+  "hoursMinutesRemaining": "{hours}小時{minutes}分鐘",
   "@hoursMinutesRemaining": {
     "placeholders": {
       "hours": {
@@ -2258,27 +2261,27 @@
     }
   },
   "favoriteMessages": "收藏消息",
-  "linksCopied": "链接已复制",
-  "noLinksFound": "未找到链接",
-  "roomStorageRanking": "房间存储排行",
-  "downloadComplete": "下载完成",
-  "downloading": "下载中...",
+  "linksCopied": "鏈接已複製",
+  "noLinksFound": "未找到鏈接",
+  "roomStorageRanking": "房間存儲排行",
+  "downloadComplete": "下載完成",
+  "downloading": "下載中...",
   "draftSaved": "草稿已保存",
-  "voiceRecording": "语音录制",
-  "searchLocation": "搜索地点",
-  "tapToSearch": "点击搜索",
-  "settingsThisDevice": "本设备",
-  "settingsJustNow": "刚刚",
-  "settingsDeviceId": "设备 ID",
-  "settingsStatus": "状态",
-  "settingsLastActive": "最后活跃",
+  "voiceRecording": "語音錄製",
+  "searchLocation": "搜索地點",
+  "tapToSearch": "點擊搜索",
+  "settingsThisDevice": "本設備",
+  "settingsJustNow": "剛剛",
+  "settingsDeviceId": "設備 ID",
+  "settingsStatus": "狀態",
+  "settingsLastActive": "最後活躍",
   "settingsIpAddress": "IP 地址",
-  "settingsRenameDevice": "重命名设备",
-  "settingsDeviceNameHint": "输入设备名称",
-  "settingsDeviceRenamed": "设备已重命名",
-  "settingsRenameFailed": "重命名失败",
-  "settingsRemoteLogout": "远程登出",
-  "settingsRemoteLogoutConfirm": "确定要登出「{deviceName}」吗？此操作无法撤销。",
+  "settingsRenameDevice": "重命名設備",
+  "settingsDeviceNameHint": "輸入設備名稱",
+  "settingsDeviceRenamed": "設備已重命名",
+  "settingsRenameFailed": "重命名失敗",
+  "settingsRemoteLogout": "遠程登出",
+  "settingsRemoteLogoutConfirm": "確定要登出「{deviceName}」嗎？此操作無法撤銷。",
   "@settingsRemoteLogoutConfirm": {
     "placeholders": {
       "deviceName": {
@@ -2286,55 +2289,55 @@
       }
     }
   },
-  "settingsDeviceLoggedOut": "设备已登出",
-  "settingsLogoutFailed": "登出失败",
+  "settingsDeviceLoggedOut": "設備已登出",
+  "settingsLogoutFailed": "登出失敗",
   "settingsLogout": "登出",
-  "settingsVerifyIdentity": "验证身份",
-  "settingsEnterPasswordToConfirm": "请输入密码以确认此操作。",
-  "scheduledSendTitle": "定时发送",
-  "scheduledSendInOneHour": "1小时后",
+  "settingsVerifyIdentity": "驗證身份",
+  "settingsEnterPasswordToConfirm": "請輸入密碼以確認此操作。",
+  "scheduledSendTitle": "定時發送",
+  "scheduledSendInOneHour": "1小時後",
   "scheduledSendTonight": "今晚 (20:00)",
   "scheduledSendTomorrowMorning": "明早 (9:00)",
-  "scheduledSendCustom": "自定义时间",
-  "scheduledMessageLabel": "定时发送",
-  "scheduledMessageCancel": "取消定时发送",
-  "chatLockTitle": "聊天锁",
-  "chatLockEnable": "锁定此聊天",
-  "chatLockDisable": "解锁此聊天",
-  "chatLockDescription": "锁定的聊天需要通过生物识别或 PIN 码验证才能打开",
-  "chatLockVerifyTitle": "聊天已锁定",
-  "chatLockVerifySubtitle": "验证后访问此聊天",
-  "chatLockVerifyFailed": "验证失败",
-  "chatLockEnabled": "聊天已锁定",
-  "chatLockDisabled": "聊天已解锁",
-  "chatLockPinTitle": "输入 PIN 码",
-  "chatLockPinSetTitle": "设置 PIN 码",
-  "chatLockPinConfirmTitle": "确认 PIN 码",
-  "chatLockPinMismatch": "PIN 码不一致",
-  "chatLockUseBiometric": "使用生物识别",
-  "chatLockUsePin": "使用 PIN 码",
-  "mediaEditorUndo": "撤销",
+  "scheduledSendCustom": "自定義時間",
+  "scheduledMessageLabel": "定時發送",
+  "scheduledMessageCancel": "取消定時發送",
+  "chatLockTitle": "聊天鎖",
+  "chatLockEnable": "鎖定此聊天",
+  "chatLockDisable": "解鎖此聊天",
+  "chatLockDescription": "鎖定的聊天需要通過生物識別或 PIN 碼驗證才能打開",
+  "chatLockVerifyTitle": "聊天已鎖定",
+  "chatLockVerifySubtitle": "驗證後訪問此聊天",
+  "chatLockVerifyFailed": "驗證失敗",
+  "chatLockEnabled": "聊天已鎖定",
+  "chatLockDisabled": "聊天已解鎖",
+  "chatLockPinTitle": "輸入 PIN 碼",
+  "chatLockPinSetTitle": "設置 PIN 碼",
+  "chatLockPinConfirmTitle": "確認 PIN 碼",
+  "chatLockPinMismatch": "PIN 碼不一致",
+  "chatLockUseBiometric": "使用生物識別",
+  "chatLockUsePin": "使用 PIN 碼",
+  "mediaEditorUndo": "撤銷",
   "mediaEditorRedo": "重做",
   "mediaEditorCrop": "裁剪",
-  "mediaEditorFilter": "滤镜",
-  "mediaEditorDraw": "涂鸦",
+  "mediaEditorFilter": "濾鏡",
+  "mediaEditorDraw": "塗鴉",
   "mediaEditorText": "文字",
   "aiAssistant": "AI 助手",
-  "aiAssistantWelcome": "你好！我是 N42 AI 助手，有什么可以帮你的吗？",
-  "aiAssistantNotConfigured": "AI 服务未配置",
-  "aiAssistantSettings": "AI 设置",
-  "aiAssistantClearHistory": "清空对话历史",
-  "aiAssistantClearHistoryConfirm": "确定清空所有 AI 对话历史？",
+  "aiAssistantWelcome": "你好！我是 N42 AI 助手，有什麼可以幫你的嗎？",
+  "aiAssistantNotConfigured": "AI 服務未配置",
+  "aiAssistantSettings": "AI 設置",
+  "aiAssistantClearHistory": "清空對話歷史",
+  "aiAssistantClearHistoryConfirm": "確定清空所有 AI 對話歷史？",
   "aiAssistantStopGenerating": "停止生成",
   "aiAssistantModel": "模型",
-  "aiAssistantTemperature": "温度",
-  "aiAssistantMaxTokens": "最大令牌数",
+  "aiAssistantTemperature": "溫度",
+  "aiAssistantMaxTokens": "最大令牌數",
   "aiAssistantContextWindow": "上下文窗口",
-  "aiAssistantServiceStatus": "服务状态",
+  "aiAssistantServiceStatus": "服務狀態",
   "aiAssistantAvailable": "可用",
   "aiAssistantUnavailable": "不可用",
-  "aiSummarize": "AI 总结",
-  "aiSummarizeUnread": "AI 总结 {count} 条未读消息",
+  "aiSummarize": "AI 總結",
+  "aiSummarizeUnread": "AI 總結 {count} 條未讀消息",
   "@aiSummarizeUnread": {
     "placeholders": {
       "count": {
@@ -2342,45 +2345,45 @@
       }
     }
   },
-  "aiSummarizeLoading": "正在总结...",
-  "aiSummarizeError": "总结失败",
-  "aiRewrite": "AI 改写",
+  "aiSummarizeLoading": "正在總結...",
+  "aiSummarizeError": "總結失敗",
+  "aiRewrite": "AI 改寫",
   "aiRewriteFormal": "正式",
-  "aiRewriteCasual": "轻松",
+  "aiRewriteCasual": "輕鬆",
   "aiRewritePlayful": "俏皮",
-  "aiRewriteProfessional": "专业",
+  "aiRewriteProfessional": "專業",
   "aiRewriteAccept": "使用",
   "aiRewriteCancel": "取消",
-  "aiRewriteLoading": "正在改写...",
+  "aiRewriteLoading": "正在改寫...",
   "aiLinkSummary": "AI 摘要",
   "aiLinkSummaryAnalyzing": "正在分析...",
-  "chatFolderManagement": "管理文件夹",
-  "chatFolderSystem": "系统文件夹",
-  "chatFolderCustom": "自定义文件夹",
-  "chatFolderEmpty": "暂无自定义文件夹",
-  "chatFolderCreate": "创建文件夹",
-  "chatFolderEdit": "编辑文件夹",
-  "chatFolderNameHint": "文件夹名称",
+  "chatFolderManagement": "管理文件夾",
+  "chatFolderSystem": "系統文件夾",
+  "chatFolderCustom": "自定義文件夾",
+  "chatFolderEmpty": "暫無自定義文件夾",
+  "chatFolderCreate": "創建文件夾",
+  "chatFolderEdit": "編輯文件夾",
+  "chatFolderNameHint": "文件夾名稱",
   "chatFolderAll": "全部",
-  "chatFolderUnread": "未读",
+  "chatFolderUnread": "未讀",
   "chatFolderPersonal": "私聊",
-  "chatFolderGroups": "群组",
-  "chatFolderChannels": "频道",
-  "chatFolderMuted": "已静音",
-  "storyAddMusic": "添加音乐",
-  "storyChangeMusic": "更换音乐",
-  "storyBackgroundMusic": "背景音乐",
-  "storyMusicPreview": "预览 (最长15秒)",
-  "storyChooseFromDevice": "从设备选择",
-  "storyUseThisMusic": "使用此音乐",
-  "authPasskeyNotSupported": "此设备不支持 Passkey",
-  "authPasskeyRegister": "注册 Passkey",
-  "authPasskeyNoRegistered": "未注册 Passkey",
-  "authPasskeyRegisterHint": "注册 Passkey 以实现无密码登录",
-  "authPasskeyNameYours": "为 Passkey 命名",
-  "authPasskeyRegistered": "Passkey 注册成功",
-  "authPasskeyDeleted": "Passkey 已删除",
-  "authPasskeyDeleteConfirm": "删除 Passkey \"{name}\"？删除后将无法使用该 Passkey 登录。",
+  "chatFolderGroups": "羣組",
+  "chatFolderChannels": "頻道",
+  "chatFolderMuted": "已靜音",
+  "storyAddMusic": "添加音樂",
+  "storyChangeMusic": "更換音樂",
+  "storyBackgroundMusic": "背景音樂",
+  "storyMusicPreview": "預覽 (最長15秒)",
+  "storyChooseFromDevice": "從設備選擇",
+  "storyUseThisMusic": "使用此音樂",
+  "authPasskeyNotSupported": "此設備不支持 Passkey",
+  "authPasskeyRegister": "註冊 Passkey",
+  "authPasskeyNoRegistered": "未註冊 Passkey",
+  "authPasskeyRegisterHint": "爲當前賬號註冊 Passkey，獨立 Passkey 登錄入口後續開放。",
+  "authPasskeyNameYours": "爲 Passkey 命名",
+  "authPasskeyRegistered": "Passkey 已保存到當前賬號",
+  "authPasskeyDeleted": "Passkey 已從當前賬號移除",
+  "authPasskeyDeleteConfirm": "刪除 Passkey \"{name}\"？如需後續使用 Passkey 登錄，需要重新註冊。",
   "@authPasskeyDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -2388,10 +2391,10 @@
       }
     }
   },
-  "momentVisibilityPublic": "公开",
+  "momentVisibilityPublic": "公開",
   "momentVisibilityPrivate": "私密",
-  "momentVisibilityPartial": "部分可见",
-  "momentVisibilityExcluded": "不给谁看",
+  "momentVisibilityPartial": "部分可見",
+  "momentVisibilityExcluded": "不給誰看",
   "momentUserMoments": "{userName}的朋友圈",
   "@momentUserMoments": {
     "placeholders": {
@@ -2400,11 +2403,11 @@
       }
     }
   },
-  "momentForwardTo": "转发给",
-  "momentForwardSuccess": "转发成功",
-  "momentSelectFriends": "选择好友",
-  "momentSelectTags": "按标签选择",
-  "momentSelectedCount": "已选择 ({count})",
+  "momentForwardTo": "轉發給",
+  "momentForwardSuccess": "轉發成功",
+  "momentSelectFriends": "選擇好友",
+  "momentSelectTags": "按標籤選擇",
+  "momentSelectedCount": "已選擇 ({count})",
   "@momentSelectedCount": {
     "placeholders": {
       "count": {
@@ -2412,9 +2415,9 @@
       }
     }
   },
-  "momentNoMomentsYet": "暂无动态",
-  "momentForwardMoment": "转发动态",
-  "momentAddComment": "写评论...",
+  "momentNoMomentsYet": "暫無動態",
+  "momentForwardMoment": "轉發動態",
+  "momentAddComment": "寫評論...",
   "momentForwardContent": "[朋友圈] {content}",
   "@momentForwardContent": {
     "placeholders": {
@@ -2423,17 +2426,17 @@
       }
     }
   },
-  "momentDeleteMoment": "删除动态",
-  "momentDeleteConfirm": "确定要删除这条动态吗？",
-  "momentComment": "评论",
-  "momentWriteComment": "写评论...",
-  "momentLike": "赞",
+  "momentDeleteMoment": "刪除動態",
+  "momentDeleteConfirm": "確定要刪除這條動態嗎？",
+  "momentComment": "評論",
+  "momentWriteComment": "寫評論...",
+  "momentLike": "贊",
   "momentUnlike": "取消",
-  "momentForward": "转发",
-  "momentDelete": "删除",
-  "momentReply": "回复",
-  "momentMoment": "动态",
-  "momentLikesCount": "{count} 个赞",
+  "momentForward": "轉發",
+  "momentDelete": "刪除",
+  "momentReply": "回覆",
+  "momentMoment": "動態",
+  "momentLikesCount": "{count} 個贊",
   "@momentLikesCount": {
     "placeholders": {
       "count": {
@@ -2441,7 +2444,7 @@
       }
     }
   },
-  "momentCommentsCount": "{count} 条评论",
+  "momentCommentsCount": "{count} 條評論",
   "@momentCommentsCount": {
     "placeholders": {
       "count": {
@@ -2449,9 +2452,9 @@
       }
     }
   },
-  "momentNoComments": "暂无评论",
-  "momentFailedToLoad": "图片加载失败",
-  "momentReplyTo": "回复 {userName}...",
+  "momentNoComments": "暫無評論",
+  "momentFailedToLoad": "圖片加載失敗",
+  "momentReplyTo": "回覆 {userName}...",
   "@momentReplyTo": {
     "placeholders": {
       "userName": {
@@ -2459,9 +2462,9 @@
       }
     }
   },
-  "momentNoConversations": "暂无会话",
-  "momentJustNow": "刚刚",
-  "momentMinutesAgo": "{count}分钟前",
+  "momentNoConversations": "暫無會話",
+  "momentJustNow": "剛剛",
+  "momentMinutesAgo": "{count}分鐘前",
   "@momentMinutesAgo": {
     "placeholders": {
       "count": {
@@ -2469,7 +2472,7 @@
       }
     }
   },
-  "momentHoursAgo": "{count}小时前",
+  "momentHoursAgo": "{count}小時前",
   "@momentHoursAgo": {
     "placeholders": {
       "count": {
@@ -2485,58 +2488,58 @@
       }
     }
   },
-  "chatGroupAnnouncementHint": "输入群公告",
-  "chatGroupAnnouncementEmpty": "暂无群公告",
-  "chatEditNickname": "编辑群昵称",
-  "chatNicknameHint": "输入你在群里的昵称",
-  "contactAddPhoneHint": "输入电话号码",
-  "contactNotesHint": "添加联系人备忘",
-  "reportTitle": "投诉",
+  "chatGroupAnnouncementHint": "輸入羣公告",
+  "chatGroupAnnouncementEmpty": "暫無羣公告",
+  "chatEditNickname": "編輯羣暱稱",
+  "chatNicknameHint": "輸入你在羣裏的暱稱",
+  "contactAddPhoneHint": "輸入電話號碼",
+  "contactNotesHint": "添加聯繫人備忘",
+  "reportTitle": "投訴",
   "reportReasonSpam": "垃圾信息",
-  "reportReasonHarassment": "骚扰",
-  "reportReasonFraud": "欺诈",
+  "reportReasonHarassment": "騷擾",
+  "reportReasonFraud": "欺詐",
   "reportReasonOther": "其他",
-  "reportSubmitted": "投诉已提交",
-  "reportDescription": "补充说明（选填）",
-  "qrcodeSaved": "二维码已保存到相册",
-  "chatSendRedPacketInChat": "请在聊天中发送红包",
-  "commonSaveFailed": "保存失败",
-  "reportSelectReason": "请选择投诉原因",
-  "gameCenter": "游戏中心",
+  "reportSubmitted": "投訴已提交",
+  "reportDescription": "補充說明（選填）",
+  "qrcodeSaved": "二維碼已保存到相冊",
+  "chatSendRedPacketInChat": "請在聊天中發送紅包",
+  "commonSaveFailed": "保存失敗",
+  "reportSelectReason": "請選擇投訴原因",
+  "gameCenter": "遊戲中心",
   "gameHighScore": "最高分",
-  "gameScore": "分数",
-  "gameOver": "游戏结束",
-  "gamePlayAgain": "再来一局",
+  "gameScore": "分數",
+  "gameOver": "遊戲結束",
+  "gamePlayAgain": "再來一局",
   "gameLeaderboard": "排行榜",
-  "gamePause": "暂停",
-  "gameResume": "点击继续",
-  "gameConfirmExit": "确定退出游戏？",
-  "gameNoScores": "暂无记录",
+  "gamePause": "暫停",
+  "gameResume": "點擊繼續",
+  "gameConfirmExit": "確定退出遊戲？",
+  "gameNoScores": "暫無記錄",
   "game2048": "2048",
-  "game2048Desc": "合并数字到 2048",
-  "gameBlockDrop": "方块消除",
-  "gameBlockDropDesc": "消除方块行",
-  "gameMinesweeper": "扫雷",
+  "game2048Desc": "合併數字到 2048",
+  "gameBlockDrop": "方塊消除",
+  "gameBlockDropDesc": "消除方塊行",
+  "gameMinesweeper": "掃雷",
   "gameMinesweeperDesc": "找出所有安全格",
-  "gameMatch3": "消消乐",
-  "gameMatch3Desc": "连接3个以上宝石",
-  "gameMinesweeperEasy": "初级",
-  "gameMinesweeperMedium": "中级",
-  "gameMinesLeft": "剩余雷数",
-  "gameTimeLeft": "时间",
-  "gameLevel": "等级",
-  "gameNext": "下一个",
-  "gameBestTime": "最佳用时",
-  "gameNewRecord": "新纪录！",
-  "gameLines": "行数",
-  "storyMyStory": "我的动态",
+  "gameMatch3": "消消樂",
+  "gameMatch3Desc": "連接3個以上寶石",
+  "gameMinesweeperEasy": "初級",
+  "gameMinesweeperMedium": "中級",
+  "gameMinesLeft": "剩餘雷數",
+  "gameTimeLeft": "時間",
+  "gameLevel": "等級",
+  "gameNext": "下一個",
+  "gameBestTime": "最佳用時",
+  "gameNewRecord": "新紀錄！",
+  "gameLines": "行數",
+  "storyMyStory": "我的動態",
   "storageSmartCleanup": "智能清理",
-  "storageOldMediaFiles": "旧媒体文件",
+  "storageOldMediaFiles": "舊媒體文件",
   "storageLargeFiles": "大文件",
-  "storageAppCache": "应用缓存",
-  "storageSettings": "存储设置",
-  "storageAutoCleanup": "自动清理",
-  "storageAutoCleanupDesc": "自动清理 {days} 天以上未访问的文件",
+  "storageAppCache": "應用緩存",
+  "storageSettings": "存儲設置",
+  "storageAutoCleanup": "自動清理",
+  "storageAutoCleanupDesc": "自動清理 {days} 天以上未訪問的文件",
   "@storageAutoCleanupDesc": {
     "placeholders": {
       "days": {
@@ -2544,12 +2547,12 @@
       }
     }
   },
-  "storageCleanupPeriod": "清理周期",
-  "storagePreserveThumbnails": "保留缩略图",
-  "storagePreserveThumbnailsDesc": "清理时保留图片缩略图",
-  "storageWarningHigh": "存储空间较高，建议清理旧文件。",
-  "storageWarningCritical": "存储空间严重不足，请立即清理。",
-  "storageFreed": "已释放 {size}（{count} 个文件）",
+  "storageCleanupPeriod": "清理週期",
+  "storagePreserveThumbnails": "保留縮略圖",
+  "storagePreserveThumbnailsDesc": "清理時保留圖片縮略圖",
+  "storageWarningHigh": "存儲空間較高，建議清理舊文件。",
+  "storageWarningCritical": "存儲空間嚴重不足，請立即清理。",
+  "storageFreed": "已釋放 {size}（{count} 個文件）",
   "@storageFreed": {
     "placeholders": {
       "size": {
@@ -2568,7 +2571,7 @@
       }
     }
   },
-  "storageViewAllRooms": "查看全部 {count} 个房间",
+  "storageViewAllRooms": "查看全部 {count} 個房間",
   "@storageViewAllRooms": {
     "placeholders": {
       "count": {
@@ -2576,9 +2579,9 @@
       }
     }
   },
-  "storageNoFiles": "暂无文件",
+  "storageNoFiles": "暫無文件",
   "storageFilePinned": "已保留",
-  "storageDeleteSelected": "删除 {count} 个选中文件？文件可从服务器重新下载。",
+  "storageDeleteSelected": "刪除 {count} 個選中文件？文件可從服務器重新下載。",
   "@storageDeleteSelected": {
     "placeholders": {
       "count": {
@@ -2586,23 +2589,23 @@
       }
     }
   },
-  "backupRestore": "备份与恢复",
-  "backupCreate": "创建备份",
-  "backupCreateDesc": "备份设置和加密密钥。消息将在重新登录后从服务器恢复。",
-  "backupIncludeKeys": "包含加密密钥",
-  "backupIncludeKeysDesc": "读取加密消息所必需",
-  "backupPasswordProtect": "密码保护",
-  "backupEnterPassword": "输入备份密码",
-  "backupHistory": "备份历史",
-  "backupNoBackups": "暂无备份",
-  "backupRestore2": "恢复",
-  "backupDelete": "删除",
-  "backupDeleteConfirm": "确定删除此备份？此操作不可撤销。",
-  "backupRestoreFromFile": "从文件恢复",
-  "backupRestoreFromFileDesc": "导入来自其他设备或之前备份的 .n42backup 文件。",
-  "backupChooseFile": "选择备份文件",
-  "backupRestoring": "恢复中...",
-  "backupCreated": "备份已创建：{rooms} 个房间，{messages} 条消息",
+  "backupRestore": "備份與恢復",
+  "backupCreate": "創建備份",
+  "backupCreateDesc": "備份設置和加密密鑰。消息將在重新登錄後從服務器恢復。",
+  "backupIncludeKeys": "包含加密密鑰",
+  "backupIncludeKeysDesc": "讀取加密消息所必需",
+  "backupPasswordProtect": "密碼保護",
+  "backupEnterPassword": "輸入備份密碼",
+  "backupHistory": "備份歷史",
+  "backupNoBackups": "暫無備份",
+  "backupRestore2": "恢復",
+  "backupDelete": "刪除",
+  "backupDeleteConfirm": "確定刪除此備份？此操作不可撤銷。",
+  "backupRestoreFromFile": "從文件恢復",
+  "backupRestoreFromFileDesc": "導入來自其他設備或之前備份的 .n42backup 文件。",
+  "backupChooseFile": "選擇備份文件",
+  "backupRestoring": "恢復中...",
+  "backupCreated": "備份已創建：{rooms} 個房間，{messages} 條消息",
   "@backupCreated": {
     "placeholders": {
       "rooms": {
@@ -2613,7 +2616,7 @@
       }
     }
   },
-  "backupRestored": "已恢复 {settings} 项设置（来自 {rooms} 个房间）",
+  "backupRestored": "已恢復 {settings} 項設置（來自 {rooms} 個房間）",
   "@backupRestored": {
     "placeholders": {
       "settings": {
@@ -2624,7 +2627,7 @@
       }
     }
   },
-  "backupFailed": "备份失败：{error}",
+  "backupFailed": "備份失敗：{error}",
   "@backupFailed": {
     "placeholders": {
       "error": {
@@ -2632,9 +2635,9 @@
       }
     }
   },
-  "backupPasswordRequired": "此备份需要密码",
-  "blocGroupNotFound": "群组未找到",
-  "blocGroupMembersInvited": "已邀请{count}位成员",
+  "backupPasswordRequired": "此備份需要密碼",
+  "blocGroupNotFound": "羣組未找到",
+  "blocGroupMembersInvited": "已邀請{count}位成員",
   "@blocGroupMembersInvited": {
     "placeholders": {
       "count": {
@@ -2642,67 +2645,67 @@
       }
     }
   },
-  "blocGroupMemberRemoved": "成员已移除",
-  "blocGroupAdminRemoved": "已取消管理员",
-  "blocGroupLeft": "已退出群聊",
-  "blocGroupDisbanded": "群聊已解散",
-  "blocGroupJoined": "已加入群聊",
-  "blocGroupInviteDeclined": "已拒绝邀请",
-  "blocGroupTokenGateUpdated": "Token 门槛已更新",
-  "blocTransferProcessing": "转账处理中...",
-  "blocTransferCancelled": "转账已取消",
-  "blocTransferFailed": "转账失败",
-  "blocPaymentProcessing": "支付处理中...",
-  "blocPaymentFailed": "支付失败",
-  "groupMaxMembers": "群人数上限",
+  "blocGroupMemberRemoved": "成員已移除",
+  "blocGroupAdminRemoved": "已取消管理員",
+  "blocGroupLeft": "已退出羣聊",
+  "blocGroupDisbanded": "羣聊已解散",
+  "blocGroupJoined": "已加入羣聊",
+  "blocGroupInviteDeclined": "已拒絕邀請",
+  "blocGroupTokenGateUpdated": "Token 門檻已更新",
+  "blocTransferProcessing": "轉賬處理中...",
+  "blocTransferCancelled": "轉賬已取消",
+  "blocTransferFailed": "轉賬失敗",
+  "blocPaymentProcessing": "支付處理中...",
+  "blocPaymentFailed": "支付失敗",
+  "groupMaxMembers": "羣人數上限",
   "groupMaxMembersUnlimited": "不限",
-  "groupMaxMembersHint": "输入上限（留空表示不限）",
-  "groupMaxMembersUpdated": "群人数上限已更新",
-  "groupFull": "群已满员",
-  "groupChannels": "话题频道",
-  "groupChannelsEmpty": "暂无话题频道",
-  "groupChannelsCount": "个频道",
-  "groupChannelCreate": "新建频道",
-  "groupChannelName": "频道名称",
-  "groupChannelTopic": "频道话题（可选）",
-  "groupChannelDelete": "删除频道",
-  "groupChannelDeleteConfirm": "确认删除此频道？消息不可恢复。",
-  "groupBotSettings": "Bot 设置",
-  "groupBotEnabled": "启用 Bot",
-  "groupBotWelcomeMessage": "欢迎语模板",
-  "groupBotWelcomeHint": "用 'name' 作为新成员名字占位符",
-  "groupBotConfigUpdated": "Bot 设置已更新",
-  "groupContentFilter": "关键词过滤",
-  "groupContentFilterEnabled": "启用关键词过滤",
-  "groupContentFilterReplace": "替换为 ***",
-  "groupContentFilterHide": "隐藏消息",
-  "groupContentFilterAddWord": "添加关键词",
-  "groupContentFilterUpdated": "内容过滤设置已更新",
+  "groupMaxMembersHint": "輸入上限（留空表示不限）",
+  "groupMaxMembersUpdated": "羣人數上限已更新",
+  "groupFull": "羣已滿員",
+  "groupChannels": "話題頻道",
+  "groupChannelsEmpty": "暫無話題頻道",
+  "groupChannelsCount": "個頻道",
+  "groupChannelCreate": "新建頻道",
+  "groupChannelName": "頻道名稱",
+  "groupChannelTopic": "頻道話題（可選）",
+  "groupChannelDelete": "刪除頻道",
+  "groupChannelDeleteConfirm": "確認刪除此頻道？消息不可恢復。",
+  "groupBotSettings": "Bot 設置",
+  "groupBotEnabled": "啓用 Bot",
+  "groupBotWelcomeMessage": "歡迎語模板",
+  "groupBotWelcomeHint": "用 'name' 作爲新成員名字佔位符",
+  "groupBotConfigUpdated": "Bot 設置已更新",
+  "groupContentFilter": "關鍵詞過濾",
+  "groupContentFilterEnabled": "啓用關鍵詞過濾",
+  "groupContentFilterReplace": "替換爲 ***",
+  "groupContentFilterHide": "隱藏消息",
+  "groupContentFilterAddWord": "添加關鍵詞",
+  "groupContentFilterUpdated": "內容過濾設置已更新",
   "chatSlashCommands": "指令",
-  "chatCommandPoll": "/poll — 创建投票",
-  "chatCommandAnnounce": "/announce — 发布公告",
-  "chatCommandWelcome": "/welcome — 设置欢迎语",
-  "chatReportMessage": "举报",
-  "chatReportReason": "举报原因",
+  "chatCommandPoll": "/poll — 創建投票",
+  "chatCommandAnnounce": "/announce — 發佈公告",
+  "chatCommandWelcome": "/welcome — 設置歡迎語",
+  "chatReportMessage": "舉報",
+  "chatReportReason": "舉報原因",
   "chatReportSpam": "垃圾信息",
-  "chatReportHarassment": "骚扰",
-  "chatReportInappropriate": "违规内容",
+  "chatReportHarassment": "騷擾",
+  "chatReportInappropriate": "違規內容",
   "chatReportOther": "其他",
-  "chatReportSuccess": "举报已提交",
-  "spacesName": "社区名称",
+  "chatReportSuccess": "舉報已提交",
+  "spacesName": "社區名稱",
   "spacesNameHint": "例如：加密交易者",
-  "spacesNameRequired": "请输入社区名称",
-  "spacesDescription": "简介",
-  "spacesDescriptionHint": "介绍一下这个社区",
-  "spacesType": "社区类型",
-  "spacesPublicDesc": "任何人均可发现并加入",
-  "spacesPrivateDesc": "仅受邀成员可加入",
-  "spacesNotFound": "社区不存在",
-  "spacesSearch": "搜索社区...",
-  "spacesMembers": "成员",
-  "spacesNoChannels": "暂无频道",
-  "spacesLeave": "退出社区",
-  "spacesLeaveConfirm": "确定要退出「{name}」吗？",
+  "spacesNameRequired": "請輸入社區名稱",
+  "spacesDescription": "簡介",
+  "spacesDescriptionHint": "介紹一下這個社區",
+  "spacesType": "社區類型",
+  "spacesPublicDesc": "任何人均可發現並加入",
+  "spacesPrivateDesc": "僅受邀成員可加入",
+  "spacesNotFound": "社區不存在",
+  "spacesSearch": "搜索社區...",
+  "spacesMembers": "成員",
+  "spacesNoChannels": "暫無頻道",
+  "spacesLeave": "退出社區",
+  "spacesLeaveConfirm": "確定要退出「{name}」嗎？",
   "@spacesLeaveConfirm": {
     "placeholders": {
       "name": {
@@ -2710,8 +2713,8 @@
       }
     }
   },
-  "spacesDelete": "解散社区",
-  "spacesDeleteConfirm": "此操作将永久删除「{name}」及其所有频道，且不可撤销。",
+  "spacesDelete": "解散社區",
+  "spacesDeleteConfirm": "此操作將永久刪除「{name}」及其所有頻道，且不可撤銷。",
   "@spacesDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -2719,11 +2722,11 @@
       }
     }
   },
-  "spacesCreateChannel": "创建频道",
-  "spacesChannelName": "频道名称",
-  "spacesChannelTopic": "话题（可选）",
-  "spacesDeleteChannel": "删除频道",
-  "spacesDeleteChannelConfirm": "确定要删除频道「#{name}」吗？",
+  "spacesCreateChannel": "創建頻道",
+  "spacesChannelName": "頻道名稱",
+  "spacesChannelTopic": "話題（可選）",
+  "spacesDeleteChannel": "刪除頻道",
+  "spacesDeleteChannelConfirm": "確定要刪除頻道「#{name}」嗎？",
   "@spacesDeleteChannelConfirm": {
     "placeholders": {
       "name": {
@@ -2731,9 +2734,9 @@
       }
     }
   },
-  "spacesEditName": "修改名称",
-  "spacesEditDescription": "修改简介",
-  "spacesViewAllMembers": "查看全部 {count} 位成员",
+  "spacesEditName": "修改名稱",
+  "spacesEditDescription": "修改簡介",
+  "spacesViewAllMembers": "查看全部 {count} 位成員",
   "@spacesViewAllMembers": {
     "placeholders": {
       "count": {
@@ -2757,37 +2760,37 @@
       }
     }
   },
-  "spacesPromoteAdmin": "设为管理员",
-  "spacesDemoteAdmin": "撤销管理员",
-  "spacesInviteMember": "邀请成员",
-  "spacesInviteMemberUserId": "用户 ID（如 @user:server.com）",
+  "spacesPromoteAdmin": "設爲管理員",
+  "spacesDemoteAdmin": "撤銷管理員",
+  "spacesInviteMember": "邀請成員",
+  "spacesInviteMemberUserId": "用戶 ID（如 @user:server.com）",
   "spacesSave": "保存",
-  "settingsScreenshotProtection": "截图防护",
-  "settingsScreenshotProtectionDesc": "防止截图和屏幕录制",
-  "chatSelfDestructTimer": "阅后即焚",
-  "chatTimerPickerTitle": "设置阅后即焚时间",
-  "chatTimerOff": "关闭",
-  "onChainNotificationsTitle": "链上事件",
-  "onChainMarkAllRead": "全部已读",
-  "onChainNoNotifications": "暂无链上事件",
-  "onChainNoNotificationsDesc": "来自订阅频道的事件通知将在此显示",
-  "onChainViewDetails": "查看详情",
+  "settingsScreenshotProtection": "截圖防護",
+  "settingsScreenshotProtectionDesc": "防止截圖和屏幕錄製",
+  "chatSelfDestructTimer": "閱後即焚",
+  "chatTimerPickerTitle": "設置閱後即焚時間",
+  "chatTimerOff": "關閉",
+  "onChainNotificationsTitle": "鏈上事件",
+  "onChainMarkAllRead": "全部已讀",
+  "onChainNoNotifications": "暫無鏈上事件",
+  "onChainNoNotificationsDesc": "來自訂閱頻道的事件通知將在此顯示",
+  "onChainViewDetails": "查看詳情",
   "chatCommandHelp": "/help — 查看所有命令",
-  "chatCommandPrice": "/price — 查询代币价格",
-  "chatCommandBalance": "/balance — 查看钱包余额",
-  "chatCommandChains": "/chains — 查看 236+ 条支持链",
-  "chatMiniApps": "应用",
+  "chatCommandPrice": "/price — 查詢代幣價格",
+  "chatCommandBalance": "/balance — 查看錢包餘額",
+  "chatCommandChains": "/chains — 查看 236+ 條支持鏈",
+  "chatMiniApps": "應用",
   "miniAppMarketTitle": "小程序",
   "miniAppCategoryAll": "全部",
-  "miniAppSearch": "搜索应用...",
-  "miniAppFeatured": "精选",
-  "miniAppAllApps": "全部应用",
-  "miniAppNoResults": "未找到应用",
-  "slideToPayLabel": "→→→  滑动确认",
-  "slideToPayConfirming": "确认中...",
-  "redPacketBestLuck": "最佳手气",
-  "redPacketBestLuckCongrats": "最佳手气！你抢到了最多！",
-  "redPacketStats": "{claimed} / {total} 个已领取",
+  "miniAppSearch": "搜索應用...",
+  "miniAppFeatured": "精選",
+  "miniAppAllApps": "全部應用",
+  "miniAppNoResults": "未找到應用",
+  "slideToPayLabel": "→→→  滑動確認",
+  "slideToPayConfirming": "確認中...",
+  "redPacketBestLuck": "最佳手氣",
+  "redPacketBestLuckCongrats": "最佳手氣！你搶到了最多！",
+  "redPacketStats": "{claimed} / {total} 個已領取",
   "@redPacketStats": {
     "placeholders": {
       "claimed": {
@@ -2798,8 +2801,8 @@
       }
     }
   },
-  "redPacketStatsTotal": "共计",
-  "redPacketGrabbedViral": "🧧 抢到了红包 • {amount} {token}",
+  "redPacketStatsTotal": "共計",
+  "redPacketGrabbedViral": "🧧 搶到了紅包 • {amount} {token}",
   "@redPacketGrabbedViral": {
     "placeholders": {
       "amount": {
@@ -2813,14 +2816,14 @@
   "web3SearchHint": "@matrix:id  •  0x 錢包地址  •  name.eth",
   "web3SearchPlaceholder": "搜索 ID、錢包地址或 ENS...",
   "web3WalletAddress": "錢包地址",
-  "web3AddressCopied": "地址已复制",
-  "web3Copy": "复制",
-  "web3SendMessage": "发消息",
-  "web3SendToWallet": "发送到錢包",
-  "web3WalletOnlyHint": "该地址尚无 N42 账号。对方加入后消息将自动送达。",
-  "web3NftAvatar": "NFT 头像",
-  "web3ResolveFailed": "身份解析失败",
-  "web3EnsNotFound": "ENS 名称“{name}”未找到",
+  "web3AddressCopied": "地址已複製",
+  "web3Copy": "複製",
+  "web3SendMessage": "發消息",
+  "web3SendToWallet": "發送到錢包",
+  "web3WalletOnlyHint": "該地址尚無 N42 賬號。對方加入後消息將自動送達。",
+  "web3NftAvatar": "NFT 頭像",
+  "web3ResolveFailed": "身份解析失敗",
+  "web3EnsNotFound": "ENS 名稱“{name}”未找到",
   "@web3EnsNotFound": {
     "placeholders": {
       "name": {
@@ -2828,44 +2831,44 @@
       }
     }
   },
-  "web3NoN42AccountTitle": "无 N42 账号",
-  "web3NoN42AccountDesc": "该钱包地址尚无 N42 账号。您可以分享 N42 邀请链接邀请对方加入。",
-  "web3ShareInvite": "分享邀请",
-  "nftPickerTitle": "选择 NFT 头像",
-  "nftPickerTabPopular": "热门",
-  "nftPickerTabCustom": "自定义",
-  "nftPickerChain": "链",
-  "nftPickerContract": "合约地址",
+  "web3NoN42AccountTitle": "無 N42 賬號",
+  "web3NoN42AccountDesc": "該錢包地址尚無 N42 賬號。您可以分享 N42 邀請鏈接邀請對方加入。",
+  "web3ShareInvite": "分享邀請",
+  "nftPickerTitle": "選擇 NFT 頭像",
+  "nftPickerTabPopular": "熱門",
+  "nftPickerTabCustom": "自定義",
+  "nftPickerChain": "鏈",
+  "nftPickerContract": "合約地址",
   "nftPickerTokenId": "Token ID",
-  "nftPickerVerifyOwnership": "验证所有权并预览",
-  "nftPickerUseAsAvatar": "用作头像",
-  "nftPickerPreview": "预览",
-  "nftPickerNotOwned": "您不拥有这个 NFT",
-  "nftPickerInvalidTokenId": "无效的 Token ID",
-  "nftPickerEnterBoth": "请输入合约地址和 Token ID",
-  "nftPickerInfoTitle": "NFT 头像 — 链上身份验证",
-  "nftPickerInfoDesc": "绑定您持有的 NFT 作为头像。任何人均可在链上验证归属权。在 N42 全应用中以金色边框标识。",
-  "nftPickerPopularCollections": "热门 NFT 项目",
-  "nftPickerWalletHint": "连接 N42 錢包，自动发现您在 236+ 条链上持有的 NFT。",
-  "profileBindNftAvatar": "绑定 NFT 头像",
-  "profileChangeAvatar": "更换头像",
-  "groupTopics": "群话题",
-  "groupTopicsEmpty": "暂无话题",
-  "syncInProgress": "正在同步历史消息...",
-  "recoveryKeyReminderTitle": "保护您的消息",
-  "recoveryKeyReminderDesc": "创建恢复密钥以在多设备上安全同步加密消息",
-  "recoveryKeySetupNow": "立即设置",
-  "recoveryKeyRemindLater": "稍后提醒",
-  "channelReadOnly": "仅管理员可在此频道发言",
-  "channelSubscribers": "订阅者",
-  "channelVerified": "已认证频道",
-  "redPacketHistory": "红包记录",
-  "redPacketSent": "已发出",
+  "nftPickerVerifyOwnership": "驗證所有權並預覽",
+  "nftPickerUseAsAvatar": "用作頭像",
+  "nftPickerPreview": "預覽",
+  "nftPickerNotOwned": "您不擁有這個 NFT",
+  "nftPickerInvalidTokenId": "無效的 Token ID",
+  "nftPickerEnterBoth": "請輸入合約地址和 Token ID",
+  "nftPickerInfoTitle": "NFT 頭像 — 鏈上身份驗證",
+  "nftPickerInfoDesc": "綁定您持有的 NFT 作爲頭像。任何人均可在鏈上驗證歸屬權。在 N42 全應用中以金色邊框標識。",
+  "nftPickerPopularCollections": "熱門 NFT 項目",
+  "nftPickerWalletHint": "連接 N42 錢包，自動發現您在 236+ 條鏈上持有的 NFT。",
+  "profileBindNftAvatar": "綁定 NFT 頭像",
+  "profileChangeAvatar": "更換頭像",
+  "groupTopics": "羣話題",
+  "groupTopicsEmpty": "暫無話題",
+  "syncInProgress": "正在同步歷史消息...",
+  "recoveryKeyReminderTitle": "保護您的消息",
+  "recoveryKeyReminderDesc": "創建恢復密鑰以在多設備上安全同步加密消息",
+  "recoveryKeySetupNow": "立即設置",
+  "recoveryKeyRemindLater": "稍後提醒",
+  "channelReadOnly": "僅管理員可在此頻道發言",
+  "channelSubscribers": "訂閱者",
+  "channelVerified": "已認證頻道",
+  "redPacketHistory": "紅包記錄",
+  "redPacketSent": "已發出",
   "redPacketReceived": "已收到",
-  "redPacketExpired": "已过期",
-  "redPacketClaimed": "已领取",
-  "redPacketInsufficientBalance": "余额不足",
-  "selfDestructCountdown": "{time} 后销毁",
+  "redPacketExpired": "已過期",
+  "redPacketClaimed": "已領取",
+  "redPacketInsufficientBalance": "餘額不足",
+  "selfDestructCountdown": "{time} 後銷燬",
   "@selfDestructCountdown": {
     "placeholders": {
       "time": {
@@ -2873,8 +2876,8 @@
       }
     }
   },
-  "messageDestroyed": "消息已销毁",
-  "miniAppPermissionDenied": "权限不足：{permission}",
+  "messageDestroyed": "消息已銷燬",
+  "miniAppPermissionDenied": "權限不足：{permission}",
   "@miniAppPermissionDenied": {
     "placeholders": {
       "permission": {
@@ -2882,16 +2885,16 @@
       }
     }
   },
-  "aiSuggestionGasFee": "什么是 Gas 费？",
-  "aiSuggestionDefi": "DeFi 入门",
-  "aiSuggestionSecurity": "如何检查合约安全",
-  "aiSuggestionBridge": "跨链桥接",
-  "channelDiscoverTitle": "发现频道",
-  "channelDiscoverSearch": "搜索频道...",
+  "aiSuggestionGasFee": "什麼是 Gas 費？",
+  "aiSuggestionDefi": "DeFi 入門",
+  "aiSuggestionSecurity": "如何檢查合約安全",
+  "aiSuggestionBridge": "跨鏈橋接",
+  "channelDiscoverTitle": "發現頻道",
+  "channelDiscoverSearch": "搜索頻道...",
   "channelJoin": "加入",
   "channelJoined": "已加入",
-  "channelCategory": "分类",
-  "slowModeCooldown": "慢速模式：请等待 {seconds} 秒",
+  "channelCategory": "分類",
+  "slowModeCooldown": "慢速模式：請等待 {seconds} 秒",
   "@slowModeCooldown": {
     "placeholders": {
       "seconds": {
@@ -2899,31 +2902,28 @@
       }
     }
   },
-  "addressCopyAction": "复制地址",
-  "addressSendMessage": "发消息",
-  "addressViewProfile": "查看资料",
-  "sendToAddress": "通过钱包地址发消息",
-  "blocAuthSendVerificationCodeFailed": "发送验证码失败",
-  "blocAuthServerNoEmailPasswordReset": "该服务器不支持通过邮箱重置密码",
-  "blocAuthResetPasswordFailed": "重置密码失败",
-  "blocAuthChangePasswordFailed": "修改密码失败",
-  "blocAuthOldPasswordWrong": "原密码错误",
-  "blocAuthLoginCancelled": "登录已取消",
-  "blocAuthGoogleLoginFailed": "Google 登录失败",
-  "blocAuthAppleLoginFailed": "Apple 登录失败",
-  "blocAuthSsoLoginFailed": "SSO 登录失败",
-  "blocAuthFacebookLoginFailed": "Facebook 登录失败",
-  "blocAuthTwitterLoginFailed": "Twitter 登录失败",
-  "blocAuthWeChatLoginFailed": "微信登录失败",
-  "blocAuthWeChatNotConfigured": "微信登录未配置",
-  "blocAuthWeChatNotInstalled": "请先安装微信",
-  "blocAuthPasswordWrong": "密码错误",
-  "blocAuthEmailAlreadyBound": "该邮箱已被其他账号绑定",
-  "blocAuthChangeEmailFailed": "修改邮箱失败",
-  "blocAuthVerificationCodeInvalid": "验证码错误或已过期",
-  "blocAuthSessionExpired": "会话已失效，请重新登录",
-  "blocAuthSessionIncomplete": "会话数据不完整，请重新登录",
-  "blocAuthPasskeyNotImplemented": "Passkey 登录功能尚未实现",
-  "blocAuthPasskeyRegisterNotImplemented": "Passkey 注册功能尚未实现",
-  "blocAuthEmailOtpNotImplemented": "邮箱 OTP 登录功能尚未实现"
+  "addressCopyAction": "複製地址",
+  "addressSendMessage": "發消息",
+  "addressViewProfile": "查看資料",
+  "sendToAddress": "通過錢包地址發消息",
+  "blocAuthSendVerificationCodeFailed": "發送驗證碼失敗",
+  "blocAuthServerNoEmailPasswordReset": "該服務器不支持通過郵箱重置密碼",
+  "blocAuthResetPasswordFailed": "重置密碼失敗",
+  "blocAuthChangePasswordFailed": "修改密碼失敗",
+  "blocAuthOldPasswordWrong": "原密碼錯誤",
+  "blocAuthLoginCancelled": "登錄已取消",
+  "blocAuthGoogleLoginFailed": "Google 登錄失敗",
+  "blocAuthAppleLoginFailed": "Apple 登錄失敗",
+  "blocAuthSsoLoginFailed": "SSO 登錄失敗",
+  "blocAuthFacebookLoginFailed": "Facebook 登錄失敗",
+  "blocAuthTwitterLoginFailed": "Twitter 登錄失敗",
+  "blocAuthWeChatLoginFailed": "微信登錄失敗",
+  "blocAuthWeChatNotConfigured": "微信登錄未配置",
+  "blocAuthWeChatNotInstalled": "請先安裝微信",
+  "blocAuthPasswordWrong": "密碼錯誤",
+  "blocAuthEmailAlreadyBound": "該郵箱已被其他賬號綁定",
+  "blocAuthChangeEmailFailed": "修改郵箱失敗",
+  "blocAuthVerificationCodeInvalid": "驗證碼錯誤或已過期",
+  "blocAuthSessionExpired": "會話已失效，請重新登錄",
+  "blocAuthSessionIncomplete": "會話數據不完整，請重新登錄"
 }

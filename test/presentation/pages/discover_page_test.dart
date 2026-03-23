@@ -27,18 +27,16 @@ Widget buildTestWidget(Widget child, {MomentBloc? momentBloc}) {
   );
 
   if (momentBloc != null) {
-    return BlocProvider<MomentBloc>.value(
-      value: momentBloc,
-      child: widget,
-    );
+    return BlocProvider<MomentBloc>.value(value: momentBloc, child: widget);
   }
   return widget;
 }
 
 void main() {
   group('DiscoverPage', () {
-    testWidgets('renders 5 menu items (Moments, Scan, Search, Games, Communities)',
-        (tester) async {
+    testWidgets('renders stories hub plus core discover menu items', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
@@ -48,30 +46,36 @@ void main() {
       // 验证有 Scan 菜单项
       expect(find.text('Scan'), findsOneWidget);
 
+      expect(find.text('Voice Room'), findsOneWidget);
+      expect(find.text('Mini Apps'), findsOneWidget);
+      expect(find.text('Stories & Fun'), findsOneWidget);
+
       // 验证有 Search 菜单项（可能是 'Search' 或本地化的文本）
       final searchFinder = find.textContaining('Search');
       expect(searchFinder, findsWidgets);
 
       // 验证有 Communities 菜单项
       expect(find.text('Communities'), findsOneWidget);
+
+      // 验证有 Channels 菜单项
+      expect(find.textContaining('Channel'), findsOneWidget);
     });
 
-    testWidgets('does not show hidden features (Channels, Live, etc.)',
-        (tester) async {
+    testWidgets('does not show still-hidden features (Listen, Watch, Nearby)', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
       // 验证已隐藏的功能不显示
-      expect(find.text('Channels'), findsNothing);
-      expect(find.text('Live'), findsNothing);
       expect(find.text('Listen'), findsNothing);
       expect(find.text('Watch'), findsNothing);
       expect(find.text('Nearby'), findsNothing);
-      expect(find.text('Mini Programs'), findsNothing);
     });
 
-    testWidgets('shows AppBar with Discover title when showAppBar is true',
-        (tester) async {
+    testWidgets('shows AppBar with Discover title when showAppBar is true', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
@@ -138,14 +142,15 @@ void main() {
       expect(find.text('Moments'), findsOneWidget);
     });
 
-    testWidgets('has exactly 4 chevron_right icons for menu items',
-        (tester) async {
+    testWidgets('has exactly 9 chevron_right icons for visible menu items', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
-      // 发现页应该有 5 个右箭头（Moments、Scan、Search、Games、Communities）
+      // 发现页当前显示 9 个入口（Moments、Stories & Fun、Scan、Search、Voice Room、Mini Apps、Games、Communities、Channels）
       final chevronIcons = find.byIcon(Icons.chevron_right);
-      expect(chevronIcons, findsNWidgets(5));
+      expect(chevronIcons, findsNWidgets(9));
     });
   });
 }

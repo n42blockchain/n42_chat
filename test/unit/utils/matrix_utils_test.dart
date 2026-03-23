@@ -1,9 +1,9 @@
-// Tests for MatrixUtils pure static methods.
-// Only tests the self-contained methods that have no matrix.Client dependency.
-// Methods that require matrix.Client or matrix.User are excluded.
-
 import 'package:flutter_test/flutter_test.dart';
+import 'package:matrix/matrix.dart' as matrix;
+import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/utils/matrix_utils.dart';
+
+class _MockClient extends Mock implements matrix.Client {}
 
 void main() {
   // ─────────────────────────────────────────────────
@@ -32,7 +32,10 @@ void main() {
     });
 
     test('preserves underscores and digits in username', () {
-      expect(MatrixUtils.getUsernameFromUserId('@user_123:server.com'), 'user_123');
+      expect(
+        MatrixUtils.getUsernameFromUserId('@user_123:server.com'),
+        'user_123',
+      );
     });
   });
 
@@ -42,12 +45,17 @@ void main() {
 
   group('MatrixUtils.getServerFromUserId', () {
     test('extracts server from full Matrix ID', () {
-      expect(MatrixUtils.getServerFromUserId('@alice:server.com'), 'server.com');
+      expect(
+        MatrixUtils.getServerFromUserId('@alice:server.com'),
+        'server.com',
+      );
     });
 
     test('extracts multi-part server name', () {
-      expect(MatrixUtils.getServerFromUserId('@bob:matrix.example.org'),
-          'matrix.example.org');
+      expect(
+        MatrixUtils.getServerFromUserId('@bob:matrix.example.org'),
+        'matrix.example.org',
+      );
     });
 
     test('null returns null', () {
@@ -303,28 +311,99 @@ void main() {
 
   group('MatrixUtils.ensureFileExtension', () {
     test('filename with extension is unchanged', () {
-      expect(MatrixUtils.ensureFileExtension('photo.jpg', '/path/photo.jpg'),
-          'photo.jpg');
+      expect(
+        MatrixUtils.ensureFileExtension('photo.jpg', '/path/photo.jpg'),
+        'photo.jpg',
+      );
     });
 
     test('filename without extension gets extension from path', () {
       expect(
-          MatrixUtils.ensureFileExtension('photo', '/path/to/photo.jpg'),
-          'photo.jpg');
+        MatrixUtils.ensureFileExtension('photo', '/path/to/photo.jpg'),
+        'photo.jpg',
+      );
     });
 
     test('filename without extension and no path ext returns unchanged', () {
       // path ext would be 'path/to/photonoext' → last split = 'photonoext' (length > 5?)
       // Actually 'photonoext'.length = 10 > 5 → not added
       expect(
-          MatrixUtils.ensureFileExtension('file', '/path/to/filenamenoext'),
-          'file');
+        MatrixUtils.ensureFileExtension('file', '/path/to/filenamenoext'),
+        'file',
+      );
     });
 
     test('path with short extension (≤5 chars) is applied', () {
       expect(
-          MatrixUtils.ensureFileExtension('video', '/tmp/clip.webm'),
-          'video.webm');
+        MatrixUtils.ensureFileExtension('video', '/tmp/clip.webm'),
+        'video.webm',
+      );
+    });
+  });
+
+  group('MatrixUtils media helpers', () {
+    late _MockClient client;
+
+    setUp(() {
+      client = _MockClient();
+      when(
+        () => client.homeserver,
+      ).thenReturn(Uri.parse('https://matrix.example.com'));
+      when(() => client.accessToken).thenReturn('secret-token');
+    });
+
+    test('getMediaDownloadUrl builds authenticated media download URL', () {
+      expect(
+        MatrixUtils.getMediaDownloadUrl(
+          'mxc://cdn.example.com/media123',
+          client: client,
+        ),
+        'https://matrix.example.com/_matrix/client/v1/media/download/cdn.example.com/media123',
+      );
+    });
+
+    test('getAvatarUrl builds thumbnail crop URL', () {
+      expect(
+        MatrixUtils.getAvatarUrl(
+          'mxc://cdn.example.com/avatar123',
+          client: client,
+          size: 96,
+        ),
+        'https://matrix.example.com/_matrix/client/v1/media/thumbnail/cdn.example.com/avatar123?width=96&height=96&method=crop',
+      );
+    });
+
+    test(
+      'buildAuthenticatedMediaHeaders only sends token to same homeserver',
+      () {
+        expect(
+          MatrixUtils.buildAuthenticatedMediaHeaders(
+            'https://matrix.example.com/_matrix/client/v1/media/download/cdn.example.com/media123',
+            client: client,
+          ),
+          const {'Authorization': 'Bearer secret-token'},
+        );
+      },
+    );
+
+    test('buildAuthenticatedMediaHeaders rejects port mismatch', () {
+      expect(
+        MatrixUtils.buildAuthenticatedMediaHeaders(
+          'https://matrix.example.com:8448/_matrix/client/v1/media/download/cdn.example.com/media123',
+          client: client,
+        ),
+        isEmpty,
+      );
+    });
+
+    test('buildAuthenticatedMediaHeaders rejects different host', () {
+      expect(
+        MatrixUtils.buildAuthenticatedMediaHeaders(
+          'https://cdn.example.com/_matrix/client/v1/media/download/cdn.example.com/media123',
+          client: client,
+        ),
+        isEmpty,
+      );
     });
   });
 }

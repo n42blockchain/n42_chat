@@ -16,6 +16,9 @@ class ChannelEntity extends Equatable {
   /// 频道话题（可选）
   final String? topic;
 
+  /// 频道分类（可选）
+  final String? category;
+
   /// 排序序号（越小越靠前）
   final int order;
 
@@ -30,6 +33,7 @@ class ChannelEntity extends Equatable {
     required this.parentRoomId,
     required this.name,
     this.topic,
+    this.category,
     this.order = 0,
     this.unreadCount = 0,
     this.lastMessage,
@@ -40,6 +44,7 @@ class ChannelEntity extends Equatable {
     String? parentRoomId,
     String? name,
     String? topic,
+    Object? category = _unset,
     int? order,
     int? unreadCount,
     MessageEntity? lastMessage,
@@ -49,6 +54,9 @@ class ChannelEntity extends Equatable {
       parentRoomId: parentRoomId ?? this.parentRoomId,
       name: name ?? this.name,
       topic: topic ?? this.topic,
+      category: identical(category, _unset)
+          ? this.category
+          : category as String?,
       order: order ?? this.order,
       unreadCount: unreadCount ?? this.unreadCount,
       lastMessage: lastMessage ?? this.lastMessage,
@@ -68,12 +76,15 @@ class ChannelEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        roomId,
-        parentRoomId,
-        name,
-        topic,
-        order,
-        unreadCount,
-        lastMessage,
-      ];
+    roomId,
+    parentRoomId,
+    name,
+    topic,
+    category,
+    order,
+    unreadCount,
+    lastMessage,
+  ];
+
+  static const Object _unset = Object();
 }

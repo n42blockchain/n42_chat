@@ -36,6 +36,61 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     widget.onSave?.call(newSettings);
   }
 
+  String _privacyModeLabel(NotificationPrivacyMode mode) {
+    final l10n = S.of(context);
+    switch (mode) {
+      case NotificationPrivacyMode.full:
+        return l10n?.settingsShowMessagePreview ?? 'Show sender and message';
+      case NotificationPrivacyMode.senderOnly:
+        return 'Show sender only';
+      case NotificationPrivacyMode.hidden:
+        return 'Hide sender and message';
+    }
+  }
+
+  Future<void> _selectPrivacyMode() async {
+    final isDark = context.isDarkMode;
+    final selected = await showModalBottomSheet<NotificationPrivacyMode>(
+      context: context,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      builder: (ctx) {
+        final textColor = isDark ? Colors.white : AppColors.textPrimary;
+        final secondary = isDark
+            ? AppColors.textSecondaryDark
+            : AppColors.textSecondary;
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: NotificationPrivacyMode.values.map((mode) {
+              return ListTile(
+                title: Text(
+                  _privacyModeLabel(mode),
+                  style: TextStyle(color: textColor),
+                ),
+                subtitle: Text(switch (mode) {
+                  NotificationPrivacyMode.full =>
+                    'Display sender and message preview',
+                  NotificationPrivacyMode.senderOnly =>
+                    'Display sender, hide message body',
+                  NotificationPrivacyMode.hidden =>
+                    'Display a generic private notification',
+                }, style: TextStyle(color: secondary)),
+                trailing: mode == _settings.privacyMode
+                    ? const Icon(Icons.check, color: AppColors.primary)
+                    : null,
+                onTap: () => Navigator.pop(ctx, mode),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+
+    if (selected != null) {
+      _updateSettings(_settings.copyWith(privacyMode: selected));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
@@ -58,13 +113,16 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             child: Column(
               children: [
                 _buildSwitchTile(
-                  title: l10n?.settingsMessageNotifications ?? 'Message Notifications',
-                  subtitle: l10n?.settingsReceiveNewMessageNotifications ?? 'Receive new message notifications',
+                  title:
+                      l10n?.settingsMessageNotifications ??
+                      'Message Notifications',
+                  subtitle:
+                      l10n?.settingsReceiveNewMessageNotifications ??
+                      'Receive new message notifications',
                   icon: Icons.notifications_outlined,
                   value: _settings.enabled,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(enabled: value),
-                  ),
+                  onChanged: (value) =>
+                      _updateSettings(_settings.copyWith(enabled: value)),
                   isDark: isDark,
                 ),
               ],
@@ -80,35 +138,51 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               child: Column(
                 children: [
                   _buildSwitchTile(
-                    title: l10n?.settingsShowMessagePreview ?? 'Show Message Preview',
-                    subtitle: l10n?.settingsShowMessageContentInNotification ?? 'Show message content in notifications',
+                    title:
+                        l10n?.settingsShowMessagePreview ??
+                        'Show Message Preview',
+                    subtitle:
+                        l10n?.settingsShowMessageContentInNotification ??
+                        'Show message content in notifications',
                     icon: Icons.visibility_outlined,
                     value: _settings.showPreview,
-                    onChanged: (value) => _updateSettings(
-                      _settings.copyWith(showPreview: value),
-                    ),
+                    onChanged: (value) =>
+                        _updateSettings(_settings.copyWith(showPreview: value)),
+                    isDark: isDark,
+                  ),
+                  _buildDivider(isDark),
+                  _buildValueTile(
+                    title: 'Notification Privacy',
+                    subtitle:
+                        'Control how much content appears on the lock screen',
+                    icon: Icons.privacy_tip_outlined,
+                    value: _privacyModeLabel(_settings.privacyMode),
+                    onTap: _selectPrivacyMode,
                     isDark: isDark,
                   ),
                   _buildDivider(isDark),
                   _buildSwitchTile(
-                    title: l10n?.settingsNotificationSound ?? 'Notification Sound',
-                    subtitle: l10n?.settingsPlaySoundOnMessage ?? 'Play sound when receiving messages',
+                    title:
+                        l10n?.settingsNotificationSound ?? 'Notification Sound',
+                    subtitle:
+                        l10n?.settingsPlaySoundOnMessage ??
+                        'Play sound when receiving messages',
                     icon: Icons.volume_up_outlined,
                     value: _settings.playSound,
-                    onChanged: (value) => _updateSettings(
-                      _settings.copyWith(playSound: value),
-                    ),
+                    onChanged: (value) =>
+                        _updateSettings(_settings.copyWith(playSound: value)),
                     isDark: isDark,
                   ),
                   _buildDivider(isDark),
                   _buildSwitchTile(
                     title: l10n?.commonVibration ?? 'Vibration',
-                    subtitle: l10n?.settingsVibrateOnMessage ?? 'Vibrate when receiving messages',
+                    subtitle:
+                        l10n?.settingsVibrateOnMessage ??
+                        'Vibrate when receiving messages',
                     icon: Icons.vibration,
                     value: _settings.vibrate,
-                    onChanged: (value) => _updateSettings(
-                      _settings.copyWith(vibrate: value),
-                    ),
+                    onChanged: (value) =>
+                        _updateSettings(_settings.copyWith(vibrate: value)),
                     isDark: isDark,
                   ),
                 ],
@@ -124,7 +198,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 children: [
                   _buildSwitchTile(
                     title: l10n?.settingsDoNotDisturbMode ?? 'Do Not Disturb',
-                    subtitle: l10n?.settingsDoNotDisturbDescription ?? 'Do not receive notifications during specified time',
+                    subtitle:
+                        l10n?.settingsDoNotDisturbDescription ??
+                        'Do not receive notifications during specified time',
                     icon: Icons.do_not_disturb_on_outlined,
                     value: _settings.doNotDisturb,
                     onChanged: (value) => _updateSettings(
@@ -253,6 +329,80 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildValueTile({
+    required String title,
+    String? subtitle,
+    required String value,
+    required IconData icon,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(icon, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: Text(
+                value,
+                textAlign: TextAlign.right,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
               ),
             ),
             const SizedBox(width: 8),

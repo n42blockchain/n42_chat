@@ -32,10 +32,10 @@ class MatrixProtocol implements IMessagingProtocol {
     required MatrixRoomDataSource roomDataSource,
     required MatrixMessageDataSource messageDataSource,
     required MatrixContactDataSource contactDataSource,
-  })  : _clientManager = clientManager,
-        _roomDataSource = roomDataSource,
-        _messageDataSource = messageDataSource,
-        _contactDataSource = contactDataSource;
+  }) : _clientManager = clientManager,
+       _roomDataSource = roomDataSource,
+       _messageDataSource = messageDataSource,
+       _contactDataSource = contactDataSource;
 
   @override
   String get protocolId => 'matrix';
@@ -122,6 +122,7 @@ class MatrixProtocol implements IMessagingProtocol {
       if (params.isDirect && params.inviteUserIds.isNotEmpty) {
         return await _roomDataSource.createDirectChat(
           params.inviteUserIds.first,
+          encrypted: params.enableEncryption,
         );
       }
       return await _roomDataSource.createGroupChat(

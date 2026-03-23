@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
@@ -8,12 +8,14 @@ import '../../core/services/message_archive_service.dart';
 import '../../domain/entities/group_album_entity.dart';
 import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
+import '../../domain/entities/transfer_entity.dart';
 import '../../domain/repositories/message_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
 import '../mappers/archived_message_mapper.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
 import '../../core/utils/debug_log.dart';
+import '../../core/utils/matrix_utils.dart';
 
 /// 消息仓库实现
 class MessageRepositoryImpl implements IMessageRepository {
@@ -22,6 +24,8 @@ class MessageRepositoryImpl implements IMessageRepository {
   final PreferencesDataSource _secureStorage;
   MessageArchiveService? _archiveService;
   final ArchivedMessageMapper _archiveMapper = const ArchivedMessageMapper();
+
+  static final _trailingSlashRegExp = RegExp(r'/$');
 
   // 缓存时间线，避免重复创建（使用 LRU 策略，最多缓存 15 个）
   // 增加缓存大小可提升约 30% 房间切换速度
@@ -61,24 +65,38 @@ class MessageRepositoryImpl implements IMessageRepository {
     if (timeline == null) return [];
 
     // 如果当前事件数量不足，请求更多历史
-    var displayableEvents = timeline.events.where((e) => _isDisplayableEvent(e)).toList();
-    
+    var displayableEvents = timeline.events
+        .where((e) => _isDisplayableEvent(e))
+        .toList();
+
     if (displayableEvents.length < limit) {
-      debugLog('MessageRepositoryImpl: Only ${displayableEvents.length} displayable events, requesting more...');
+      debugLog(
+        'MessageRepositoryImpl: Only ${displayableEvents.length} displayable events, requesting more...',
+      );
       try {
         await timeline.requestHistory(historyCount: limit * 2);
-        displayableEvents = timeline.events.where((e) => _isDisplayableEvent(e)).toList();
-        debugLog('MessageRepositoryImpl: After requestHistory, ${displayableEvents.length} displayable events');
+        displayableEvents = timeline.events
+            .where((e) => _isDisplayableEvent(e))
+            .toList();
+        debugLog(
+          'MessageRepositoryImpl: After requestHistory, ${displayableEvents.length} displayable events',
+        );
       } catch (e) {
         debugLog('MessageRepositoryImpl: Failed to request more history: $e');
       }
     }
 
     final events = displayableEvents.take(limit).toList();
-    final messages = events.map((e) => _messageDataSource.mapEventToMessage(e, room)).toList();
+    final messages = events
+        .map((e) => _messageDataSource.mapEventToMessage(e, room))
+        .toList();
+    final resolvedMessages = _applyPaymentRequestFulfillments(
+      messages,
+      timeline.events,
+    );
 
     // 归档回退：初始加载时如果消息不足，补充归档数据
-    if (messages.length < limit && _archiveService != null) {
+    if (resolvedMessages.length < limit && _archiveService != null) {
       final oldestTs = events.isNotEmpty
           ? events.last.originServerTs.millisecondsSinceEpoch
           : null;
@@ -87,15 +105,17 @@ class MessageRepositoryImpl implements IMessageRepository {
           final archived = await _archiveService!.getArchivedMessages(
             roomId,
             beforeTimestamp: oldestTs,
-            limit: limit - messages.length,
+            limit: limit - resolvedMessages.length,
           );
           if (archived.isNotEmpty) {
-            debugLog('MessageRepositoryImpl: Supplemented ${archived.length} messages from archive');
+            debugLog(
+              'MessageRepositoryImpl: Supplemented ${archived.length} messages from archive',
+            );
             final archivedEntities = _archiveMapper.toEntities(
               archived,
               currentUserId: _client?.userID,
             );
-            return [...messages, ...archivedEntities];
+            return [...resolvedMessages, ...archivedEntities];
           }
         } catch (e) {
           debugLog('MessageRepositoryImpl: Archive supplement failed: $e');
@@ -103,7 +123,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
     }
 
-    return messages;
+    return resolvedMessages;
   }
 
   @override
@@ -134,18 +154,22 @@ class MessageRepositoryImpl implements IMessageRepository {
     final timeline = await _getOrCreateTimeline(roomId);
     if (timeline == null) return;
 
+    final initialMessage = _findMessageInTimeline(timeline, room, messageId);
+    if (initialMessage != null) {
+      yield initialMessage;
+    }
+
     // 通过 client 的同步事件监听更新
     final syncStream = _client?.onSync.stream;
     if (syncStream != null) {
       await for (final _ in syncStream) {
-        try {
-          final event = timeline.events.firstWhere(
-            (e) => e.eventId == messageId,
-          );
-          yield _messageDataSource.mapEventToMessage(event, room);
-        } catch (e) {
-          // 事件未找到，跳过
-          debugLog('Error: $e');
+        final updatedMessage = _findMessageInTimeline(
+          timeline,
+          room,
+          messageId,
+        );
+        if (updatedMessage != null) {
+          yield updatedMessage;
         }
       }
     }
@@ -163,12 +187,16 @@ class MessageRepositoryImpl implements IMessageRepository {
     if (timeline == null) return [];
 
     final beforeCount = timeline.events.length;
-    debugLog('MessageRepositoryImpl: loadMoreMessages - before: $beforeCount events');
+    debugLog(
+      'MessageRepositoryImpl: loadMoreMessages - before: $beforeCount events',
+    );
 
     await timeline.requestHistory(historyCount: limit);
 
     final afterCount = timeline.events.length;
-    debugLog('MessageRepositoryImpl: loadMoreMessages - after: $afterCount events (+${afterCount - beforeCount})');
+    debugLog(
+      'MessageRepositoryImpl: loadMoreMessages - after: $afterCount events (+${afterCount - beforeCount})',
+    );
 
     final messages = _getMessagesFromTimeline(timeline, room);
 
@@ -185,7 +213,9 @@ class MessageRepositoryImpl implements IMessageRepository {
             limit: limit,
           );
           if (archived.isNotEmpty) {
-            debugLog('MessageRepositoryImpl: Loaded ${archived.length} messages from archive');
+            debugLog(
+              'MessageRepositoryImpl: Loaded ${archived.length} messages from archive',
+            );
             final archivedEntities = _archiveMapper.toEntities(
               archived,
               currentUserId: _client?.userID,
@@ -288,10 +318,13 @@ class MessageRepositoryImpl implements IMessageRepository {
   @override
   Future<MessageEntity?> sendFileMessage(
     String roomId, {
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
   }) async {
     final eventId = await _messageDataSource.sendFileMessage(
       roomId,
@@ -299,6 +332,9 @@ class MessageRepositoryImpl implements IMessageRepository {
       filename: filename,
       mimeType: mimeType,
       selfDestructAfter: selfDestructAfter,
+      filePath: filePath,
+      fileStream: fileStream,
+      fileSize: fileSize,
     );
     if (eventId == null) return null;
 
@@ -383,10 +419,18 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   @override
-  Future<bool> redactMessage(String roomId, String messageId, {String? reason}) async {
-    return await _messageDataSource.redactMessage(roomId, messageId, reason: reason);
+  Future<bool> redactMessage(
+    String roomId,
+    String messageId, {
+    String? reason,
+  }) async {
+    return await _messageDataSource.redactMessage(
+      roomId,
+      messageId,
+      reason: reason,
+    );
   }
-  
+
   @override
   Future<bool> deleteFailedMessage(String roomId, String messageId) async {
     return await _messageDataSource.deleteFailedMessage(roomId, messageId);
@@ -396,12 +440,18 @@ class MessageRepositoryImpl implements IMessageRepository {
   Future<MessageEntity?> replyToMessage(
     String roomId,
     String replyToMessageId,
-    String text,
-  ) async {
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  }) async {
     final eventId = await _messageDataSource.replyToMessage(
       roomId,
       replyToMessageId,
       text,
+      selfDestructAfter: selfDestructAfter,
+      mentionedUserIds: mentionedUserIds,
+      mentionsRoom: mentionsRoom,
     );
     if (eventId == null) return null;
 
@@ -425,12 +475,20 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   @override
-  Future<bool> addReaction(String roomId, String messageId, String emoji) async {
+  Future<bool> addReaction(
+    String roomId,
+    String messageId,
+    String emoji,
+  ) async {
     return await _messageDataSource.addReaction(roomId, messageId, emoji);
   }
 
   @override
-  Future<bool> removeReaction(String roomId, String messageId, String emoji) async {
+  Future<bool> removeReaction(
+    String roomId,
+    String messageId,
+    String emoji,
+  ) async {
     try {
       final room = _client?.getRoomById(roomId);
       if (room == null) return false;
@@ -445,8 +503,14 @@ class MessageRepositoryImpl implements IMessageRepository {
       for (final event in timeline.events) {
         if (event.type == 'm.reaction' &&
             event.senderId == userId &&
-            event.content.tryGet<Map<String, dynamic>>('m.relates_to')?['event_id'] == messageId &&
-            event.content.tryGet<Map<String, dynamic>>('m.relates_to')?['key'] == emoji) {
+            event.content.tryGet<Map<String, dynamic>>(
+                  'm.relates_to',
+                )?['event_id'] ==
+                messageId &&
+            event.content.tryGet<Map<String, dynamic>>(
+                  'm.relates_to',
+                )?['key'] ==
+                emoji) {
           await room.redactEvent(event.eventId, reason: 'Remove reaction');
           return true;
         }
@@ -470,7 +534,11 @@ class MessageRepositoryImpl implements IMessageRepository {
 
   @override
   String? getMediaUrl(String? mxcUrl, {int? width, int? height}) {
-    final uri = _messageDataSource.getMediaUrl(mxcUrl, width: width, height: height);
+    final uri = _messageDataSource.getMediaUrl(
+      mxcUrl,
+      width: width,
+      height: height,
+    );
     return uri?.toString();
   }
 
@@ -494,26 +562,38 @@ class MessageRepositoryImpl implements IMessageRepository {
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
 
       if (serverName.isEmpty || mediaId.isEmpty) {
-        debugLog('downloadMedia: Invalid mxc URL components: server=$serverName, mediaId=$mediaId');
+        debugLog(
+          'downloadMedia: Invalid mxc URL components: server=$serverName, mediaId=$mediaId',
+        );
         return null;
       }
 
-      final homeserver = _client!.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
-      final accessToken = _client!.accessToken;
+      final homeserver =
+          _client!.homeserver?.toString().replaceAll(_trailingSlashRegExp, '') ?? '';
 
       // 方法1: 使用 Matrix 1.11+ 认证媒体端点 (直接 HTTP 请求)
-      final authenticatedUrl = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+      final authenticatedUrl = MatrixUtils.getMediaDownloadUrl(
+        mxcUrl,
+        client: _client,
+      );
+      final authHeaders = MatrixUtils.buildAuthenticatedMediaHeaders(
+        authenticatedUrl,
+        client: _client,
+      );
+      if (authenticatedUrl == null) {
+        debugLog('downloadMedia: Failed to build authenticated media URL');
+        return null;
+      }
       debugLog('downloadMedia: Trying authenticated URL: $authenticatedUrl');
 
       try {
-        final response = await http.get(
-          Uri.parse(authenticatedUrl),
-          headers: {
-            if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-          },
-        ).timeout(const Duration(seconds: 30));
+        final response = await http
+            .get(Uri.parse(authenticatedUrl), headers: authHeaders)
+            .timeout(const Duration(seconds: 30));
 
-        debugLog('downloadMedia: Auth endpoint response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+        debugLog(
+          'downloadMedia: Auth endpoint response: ${response.statusCode}, size: ${response.bodyBytes.length}',
+        );
 
         if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
           return response.bodyBytes;
@@ -523,18 +603,18 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
 
       // 方法2: 使用传统媒体端点 v3
-      final legacyUrl = '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
+      final legacyUrl =
+          '$homeserver/_matrix/media/v3/download/$serverName/$mediaId';
       debugLog('downloadMedia: Trying legacy v3 URL: $legacyUrl');
 
       try {
-        final response = await http.get(
-          Uri.parse(legacyUrl),
-          headers: {
-            if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-          },
-        ).timeout(const Duration(seconds: 30));
+        final response = await http
+            .get(Uri.parse(legacyUrl), headers: authHeaders)
+            .timeout(const Duration(seconds: 30));
 
-        debugLog('downloadMedia: Legacy v3 response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+        debugLog(
+          'downloadMedia: Legacy v3 response: ${response.statusCode}, size: ${response.bodyBytes.length}',
+        );
 
         if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
           return response.bodyBytes;
@@ -550,8 +630,12 @@ class MessageRepositoryImpl implements IMessageRepository {
         final downloadLink = uri.getDownloadLink(_client!);
         debugLog('downloadMedia: SDK download link: $downloadLink');
 
-        final response = await http.get(downloadLink).timeout(const Duration(seconds: 30));
-        debugLog('downloadMedia: SDK link response: ${response.statusCode}, size: ${response.bodyBytes.length}');
+        final response = await http
+            .get(downloadLink)
+            .timeout(const Duration(seconds: 30));
+        debugLog(
+          'downloadMedia: SDK link response: ${response.statusCode}, size: ${response.bodyBytes.length}',
+        );
 
         if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
           return response.bodyBytes;
@@ -563,8 +647,12 @@ class MessageRepositoryImpl implements IMessageRepository {
       // 方法4: 使用 Matrix SDK httpClient (带自动认证)
       debugLog('downloadMedia: Trying Matrix SDK httpClient');
       try {
-        final sdkResponse = await _client!.httpClient.get(Uri.parse(authenticatedUrl));
-        debugLog('downloadMedia: SDK httpClient response: ${sdkResponse.statusCode}, size: ${sdkResponse.bodyBytes.length}');
+        final sdkResponse = await _client!.httpClient.get(
+          Uri.parse(authenticatedUrl),
+        );
+        debugLog(
+          'downloadMedia: SDK httpClient response: ${sdkResponse.statusCode}, size: ${sdkResponse.bodyBytes.length}',
+        );
 
         if (sdkResponse.statusCode == 200 && sdkResponse.bodyBytes.isNotEmpty) {
           return sdkResponse.bodyBytes;
@@ -596,7 +684,9 @@ class MessageRepositoryImpl implements IMessageRepository {
     String? thumbnailUrl,
   }) async {
     try {
-      debugLog('forwardMediaMessage: roomId=$roomId, mxcUrl=$mxcUrl, msgType=$msgType');
+      debugLog(
+        'forwardMediaMessage: roomId=$roomId, mxcUrl=$mxcUrl, msgType=$msgType',
+      );
 
       final room = _client?.getRoomById(roomId);
       if (room == null) {
@@ -657,7 +747,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       return null;
     }
   }
-  
+
   @override
   Future<String?> getMemberPokeText({
     required String roomId,
@@ -673,42 +763,51 @@ class MessageRepositoryImpl implements IMessageRepository {
       return null;
     }
   }
-  
+
   @override
   Future<String?> getCurrentUserId() async {
     return _client?.userID;
   }
-  
+
   @override
   Future<MessageEntity?> sendPollMessage(
     String roomId, {
     required String question,
     required List<String> options,
     int maxSelections = 1,
+    bool isAnonymous = false,
   }) async {
     try {
-      debugLog('MessageRepositoryImpl: Sending poll - question: $question, options: $options');
+      debugLog(
+        'MessageRepositoryImpl: Sending poll - question: $question, options: $options, isAnonymous: $isAnonymous',
+      );
       final eventId = await _messageDataSource.sendPollMessage(
         roomId,
         question: question,
         options: options,
         maxSelections: maxSelections,
+        isAnonymous: isAnonymous,
       );
       if (eventId != null) {
-        debugLog('MessageRepositoryImpl: Poll sent successfully - eventId: $eventId');
-        
+        debugLog(
+          'MessageRepositoryImpl: Poll sent successfully - eventId: $eventId',
+        );
+
         // 获取发送者名称
         String senderName = '';
         try {
           final userId = _client?.userID;
           if (userId != null) {
             final profile = await _client?.getUserProfile(userId);
-            senderName = profile?.displayname ?? userId.split(':').first.replaceFirst('@', '');
+            senderName =
+                profile?.displayname ??
+                userId.split(':').first.replaceFirst('@', '');
           }
         } catch (e) {
-          senderName = _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
+          senderName =
+              _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
         }
-        
+
         // 返回一个临时消息实体
         return MessageEntity(
           id: eventId,
@@ -722,6 +821,8 @@ class MessageRepositoryImpl implements IMessageRepository {
           metadata: MessageMetadata(
             pollQuestion: question,
             pollOptions: options,
+            isAnonymousPoll: isAnonymous,
+            maxSelections: maxSelections,
           ),
         );
       }
@@ -731,7 +832,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       rethrow;
     }
   }
-  
+
   @override
   Future<MessageEntity?> sendForwardedPollSnapshot(
     String roomId, {
@@ -743,7 +844,9 @@ class MessageRepositoryImpl implements IMessageRepository {
     int maxSelections = 1,
   }) async {
     try {
-      debugLog('MessageRepositoryImpl: Sending forwarded poll snapshot - question: $question');
+      debugLog(
+        'MessageRepositoryImpl: Sending forwarded poll snapshot - question: $question',
+      );
       final eventId = await _messageDataSource.sendForwardedPollSnapshot(
         roomId,
         question: question,
@@ -754,7 +857,9 @@ class MessageRepositoryImpl implements IMessageRepository {
         maxSelections: maxSelections,
       );
       if (eventId != null) {
-        debugLog('MessageRepositoryImpl: Forwarded poll sent successfully - eventId: $eventId');
+        debugLog(
+          'MessageRepositoryImpl: Forwarded poll sent successfully - eventId: $eventId',
+        );
 
         // 获取发送者名称
         String senderName = '';
@@ -762,10 +867,13 @@ class MessageRepositoryImpl implements IMessageRepository {
           final userId = _client?.userID;
           if (userId != null) {
             final profile = await _client?.getUserProfile(userId);
-            senderName = profile?.displayname ?? userId.split(':').first.replaceFirst('@', '');
+            senderName =
+                profile?.displayname ??
+                userId.split(':').first.replaceFirst('@', '');
           }
         } catch (e) {
-          senderName = _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
+          senderName =
+              _client?.userID?.split(':').first.replaceFirst('@', '') ?? '';
         }
 
         // 返回一个临时消息实体
@@ -791,7 +899,9 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
       return null;
     } catch (e) {
-      debugLog('MessageRepositoryImpl: Failed to send forwarded poll snapshot: $e');
+      debugLog(
+        'MessageRepositoryImpl: Failed to send forwarded poll snapshot: $e',
+      );
       rethrow;
     }
   }
@@ -803,7 +913,9 @@ class MessageRepositoryImpl implements IMessageRepository {
     required List<String> selectedOptionIds,
   }) async {
     try {
-      debugLog('MessageRepositoryImpl: Voting on poll - pollEventId: $pollEventId, options: $selectedOptionIds');
+      debugLog(
+        'MessageRepositoryImpl: Voting on poll - pollEventId: $pollEventId, options: $selectedOptionIds',
+      );
       return await _messageDataSource.voteOnPoll(
         roomId,
         pollEventId: pollEventId,
@@ -851,7 +963,9 @@ class MessageRepositoryImpl implements IMessageRepository {
     try {
       return await _messageDataSource.getReactionAggregations(roomId, eventId);
     } catch (e) {
-      debugLog('MessageRepositoryImpl: Failed to get reaction aggregations: $e');
+      debugLog(
+        'MessageRepositoryImpl: Failed to get reaction aggregations: $e',
+      );
       return null;
     }
   }
@@ -864,15 +978,17 @@ class MessageRepositoryImpl implements IMessageRepository {
     Map<String, dynamic>? additionalData,
   }) async {
     try {
-      debugLog('MessageRepositoryImpl: Sending custom message - type: $msgType');
-      
+      debugLog(
+        'MessageRepositoryImpl: Sending custom message - type: $msgType',
+      );
+
       // 构建消息内容
       final messageContent = <String, dynamic>{
         'msgtype': msgType,
         'body': content,
         ...?additionalData,
       };
-      
+
       return await _messageDataSource.sendCustomMessage(
         roomId: roomId,
         msgType: msgType,
@@ -888,7 +1004,10 @@ class MessageRepositoryImpl implements IMessageRepository {
   // 辅助方法
   // ============================================
 
-  Future<matrix.Timeline?> _getOrCreateTimeline(String roomId, {bool requestHistory = true}) async {
+  Future<matrix.Timeline?> _getOrCreateTimeline(
+    String roomId, {
+    bool requestHistory = true,
+  }) async {
     // 更新访问顺序（LRU）
     _timelineAccessOrder.remove(roomId);
     _timelineAccessOrder.add(roomId);
@@ -901,10 +1020,13 @@ class MessageRepositoryImpl implements IMessageRepository {
     if (room == null) return null;
 
     // 检查缓存是否已满，移除最久未使用的 timeline
-    while (_timelines.length >= _maxTimelineCacheSize && _timelineAccessOrder.isNotEmpty) {
+    while (_timelines.length >= _maxTimelineCacheSize &&
+        _timelineAccessOrder.isNotEmpty) {
       final oldestRoomId = _timelineAccessOrder.removeAt(0);
       _timelines.remove(oldestRoomId);
-      debugLog('MessageRepositoryImpl: Evicted timeline cache for room $oldestRoomId (LRU)');
+      debugLog(
+        'MessageRepositoryImpl: Evicted timeline cache for room $oldestRoomId (LRU)',
+      );
     }
 
     final timeline = await room.getTimeline();
@@ -914,10 +1036,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     // 优化：降低阈值和请求数量，减少约 60% 网络请求
     // 大多数场景下 20 条消息已足够首屏显示
     if (requestHistory && timeline.events.length < 20) {
-      debugLog('MessageRepositoryImpl: Timeline has ${timeline.events.length} events, requesting more history...');
+      debugLog(
+        'MessageRepositoryImpl: Timeline has ${timeline.events.length} events, requesting more history...',
+      );
       try {
         await timeline.requestHistory(historyCount: 30);
-        debugLog('MessageRepositoryImpl: After requestHistory, timeline has ${timeline.events.length} events');
+        debugLog(
+          'MessageRepositoryImpl: After requestHistory, timeline has ${timeline.events.length} events',
+        );
       } catch (e) {
         debugLog('MessageRepositoryImpl: Failed to request history: $e');
       }
@@ -931,10 +1057,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     matrix.Room room,
   ) {
     final now = DateTime.now();
-    return timeline.events
+    final allEvents = timeline.events;
+    final messages = allEvents
         .where((e) => _isDisplayableEvent(e))
         .map((e) => _getCachedOrMapMessage(e, room, now))
         .toList();
+    return _applyPaymentRequestFulfillments(messages, allEvents);
   }
 
   /// 从缓存获取消息或重新映射
@@ -966,13 +1094,100 @@ class MessageRepositoryImpl implements IMessageRepository {
     return entity;
   }
 
+  MessageEntity? _findMessageInTimeline(
+    matrix.Timeline timeline,
+    matrix.Room room,
+    String messageId,
+  ) {
+    for (final event in timeline.events) {
+      if (event.eventId == messageId) {
+        return _applyPaymentRequestFulfillmentsToMessage(
+          _messageDataSource.mapEventToMessage(event, room),
+          timeline.events,
+        );
+      }
+    }
+    return null;
+  }
+
+  List<MessageEntity> _applyPaymentRequestFulfillments(
+    List<MessageEntity> messages,
+    List<matrix.Event> allEvents,
+  ) {
+    final fulfilledRequestIds = _collectFulfilledPaymentRequestIds(allEvents);
+    if (fulfilledRequestIds.isEmpty) {
+      return messages;
+    }
+
+    return messages
+        .map(
+          (message) => _applyPaymentRequestFulfillmentsToMessage(
+            message,
+            allEvents,
+            fulfilledRequestIds: fulfilledRequestIds,
+          ),
+        )
+        .toList();
+  }
+
+  MessageEntity _applyPaymentRequestFulfillmentsToMessage(
+    MessageEntity message,
+    List<matrix.Event> allEvents, {
+    Set<String>? fulfilledRequestIds,
+  }) {
+    if (message.type != MessageType.paymentRequest) {
+      return message;
+    }
+
+    final requestId = message.metadata?.paymentRequestId;
+    if (requestId == null || requestId.isEmpty) {
+      return message;
+    }
+
+    final fulfilled =
+        fulfilledRequestIds ?? _collectFulfilledPaymentRequestIds(allEvents);
+    if (!fulfilled.contains(requestId)) {
+      return message;
+    }
+
+    final metadata =
+        message.metadata?.copyWithTransfer(transferStatus: 'completed') ??
+        const MessageMetadata(transferStatus: 'completed');
+    return message.copyWith(metadata: metadata);
+  }
+
+  Set<String> _collectFulfilledPaymentRequestIds(List<matrix.Event> events) {
+    final fulfilled = <String>{};
+    for (final event in events) {
+      if (event.type != PaymentRequestFulfillmentContent.eventType) {
+        continue;
+      }
+
+      try {
+        final content = PaymentRequestFulfillmentContent.fromEventContent(
+          event.content,
+        );
+        if (content.requestId.isNotEmpty) {
+          fulfilled.add(content.requestId);
+        }
+      } catch (e) {
+        debugLog(
+          'MessageRepositoryImpl: Failed to parse payment fulfillment event: $e',
+        );
+      }
+    }
+    return fulfilled;
+  }
+
   /// 清理过期的消息缓存
   void _cleanExpiredMessageCache(DateTime now) {
     _messageEntityCache.removeWhere((_, value) {
       final (_, cachedAt) = value;
       return now.difference(cachedAt) >= _messageCacheExpiry;
     });
-    debugLog('MessageRepositoryImpl: Cleaned message cache, remaining: ${_messageEntityCache.length}');
+    debugLog(
+      'MessageRepositoryImpl: Cleaned message cache, remaining: ${_messageEntityCache.length}',
+    );
   }
 
   Future<MessageEntity?> _getMessageById(String roomId, String eventId) async {
@@ -1024,7 +1239,10 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   @override
-  Future<void> markMessagesAsLocallyDeleted(String roomId, List<String> messageIds) async {
+  Future<void> markMessagesAsLocallyDeleted(
+    String roomId,
+    List<String> messageIds,
+  ) async {
     await _secureStorage.markMessagesAsLocallyDeleted(roomId, messageIds);
   }
 
@@ -1067,11 +1285,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
 
     // 存储销毁时间到本地存储
-    await _secureStorage.setMessageDestroyedAt(
-      roomId,
-      messageId,
-      destroyedAt,
-    );
+    await _secureStorage.setMessageDestroyedAt(roomId, messageId, destroyedAt);
 
     // 返回更新后的消息
     return message.copyWith(destroyedAt: destroyedAt);
@@ -1081,7 +1295,9 @@ class MessageRepositoryImpl implements IMessageRepository {
   Future<void> destroyExpiredMessages(String roomId) async {
     try {
       // 获取所有消息的销毁时间
-      final destructionTimes = await _secureStorage.getMessageDestructionTimes(roomId);
+      final destructionTimes = await _secureStorage.getMessageDestructionTimes(
+        roomId,
+      );
       if (destructionTimes.isEmpty) return;
 
       final now = DateTime.now();
@@ -1095,19 +1311,26 @@ class MessageRepositoryImpl implements IMessageRepository {
 
       if (expiredMessageIds.isEmpty) return;
 
-      debugLog('MessageRepositoryImpl: Destroying ${expiredMessageIds.length} expired messages');
+      debugLog(
+        'MessageRepositoryImpl: Destroying ${expiredMessageIds.length} expired messages',
+      );
 
       // 撤回过期消息
       for (final messageId in expiredMessageIds) {
         try {
           await redactMessage(roomId, messageId, reason: 'Self-destructed');
         } catch (e) {
-          debugLog('MessageRepositoryImpl: Failed to redact message $messageId: $e');
+          debugLog(
+            'MessageRepositoryImpl: Failed to redact message $messageId: $e',
+          );
         }
       }
 
       // 清除销毁时间记录
-      await _secureStorage.clearMessageDestructionTimes(roomId, expiredMessageIds);
+      await _secureStorage.clearMessageDestructionTimes(
+        roomId,
+        expiredMessageIds,
+      );
     } catch (e) {
       debugLog('MessageRepositoryImpl: Error destroying expired messages: $e');
     }
@@ -1168,18 +1391,19 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return MessageEntity(
-      id: eventId,
-      roomId: roomId,
-      senderId: _clientManager.client?.userID ?? '',
-      senderName: _clientManager.client?.userID ?? '',
-      content: text,
-      type: MessageType.text,
-      timestamp: DateTime.now(),
-      status: MessageStatus.sending,
-      isFromMe: true,
-      threadRootId: threadRootEventId,
-    );
+    return await _getMessageById(roomId, eventId) ??
+        MessageEntity(
+          id: eventId,
+          roomId: roomId,
+          senderId: _clientManager.client?.userID ?? '',
+          senderName: _clientManager.client?.userID ?? '',
+          content: text,
+          type: MessageType.text,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sending,
+          isFromMe: true,
+          threadRootId: threadRootEventId,
+        );
   }
 
   @override
@@ -1199,18 +1423,19 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return MessageEntity(
-      id: eventId,
-      roomId: roomId,
-      senderId: _clientManager.client?.userID ?? '',
-      senderName: _clientManager.client?.userID ?? '',
-      content: filename,
-      type: MessageType.image,
-      timestamp: DateTime.now(),
-      status: MessageStatus.sending,
-      isFromMe: true,
-      threadRootId: threadRootEventId,
-    );
+    return await _getMessageById(roomId, eventId) ??
+        MessageEntity(
+          id: eventId,
+          roomId: roomId,
+          senderId: _clientManager.client?.userID ?? '',
+          senderName: _clientManager.client?.userID ?? '',
+          content: filename,
+          type: MessageType.image,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sending,
+          isFromMe: true,
+          threadRootId: threadRootEventId,
+        );
   }
 
   @override
@@ -1230,18 +1455,19 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return MessageEntity(
-      id: eventId,
-      roomId: roomId,
-      senderId: _clientManager.client?.userID ?? '',
-      senderName: _clientManager.client?.userID ?? '',
-      content: filename,
-      type: MessageType.file,
-      timestamp: DateTime.now(),
-      status: MessageStatus.sending,
-      isFromMe: true,
-      threadRootId: threadRootEventId,
-    );
+    return await _getMessageById(roomId, eventId) ??
+        MessageEntity(
+          id: eventId,
+          roomId: roomId,
+          senderId: _clientManager.client?.userID ?? '',
+          senderName: _clientManager.client?.userID ?? '',
+          content: filename,
+          type: MessageType.file,
+          timestamp: DateTime.now(),
+          status: MessageStatus.sending,
+          isFromMe: true,
+          threadRootId: threadRootEventId,
+        );
   }
 
   @override
@@ -1277,4 +1503,3 @@ class MessageRepositoryImpl implements IMessageRepository {
     await client.reportEvent(roomId, eventId, score: -100, reason: reason);
   }
 }
-

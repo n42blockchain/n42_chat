@@ -22,10 +22,7 @@ abstract class IMessageRepository {
   Stream<MessageEntity?> watchMessage(String roomId, String messageId);
 
   /// 加载更多历史消息
-  Future<List<MessageEntity>> loadMoreMessages(
-    String roomId, {
-    int limit = 50,
-  });
+  Future<List<MessageEntity>> loadMoreMessages(String roomId, {int limit = 50});
 
   /// 发送文本消息
   ///
@@ -72,10 +69,13 @@ abstract class IMessageRepository {
   /// 发送文件消息
   Future<MessageEntity?> sendFileMessage(
     String roomId, {
-    required Uint8List fileBytes,
+    Uint8List? fileBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
   });
 
   /// 发送位置消息
@@ -116,7 +116,7 @@ abstract class IMessageRepository {
 
   /// 撤回消息
   Future<bool> redactMessage(String roomId, String messageId, {String? reason});
-  
+
   /// 删除发送失败的消息（从本地和服务器）
   Future<bool> deleteFailedMessage(String roomId, String messageId);
 
@@ -124,8 +124,11 @@ abstract class IMessageRepository {
   Future<MessageEntity?> replyToMessage(
     String roomId,
     String replyToMessageId,
-    String text,
-  );
+    String text, {
+    int? selfDestructAfter,
+    List<String>? mentionedUserIds,
+    bool mentionsRoom = false,
+  });
 
   /// 编辑消息
   Future<MessageEntity?> editMessage(
@@ -145,13 +148,13 @@ abstract class IMessageRepository {
 
   /// 发送正在输入状态
   Future<void> sendTypingNotification(String roomId, bool isTyping);
-  
+
   /// 发送系统通知/拍一拍消息
   Future<MessageEntity?> sendNoticeMessage({
     required String roomId,
     required String notice,
   });
-  
+
   /// 获取房间成员的拍一拍后缀
   Future<String?> getMemberPokeText({
     required String roomId,
@@ -180,13 +183,14 @@ abstract class IMessageRepository {
 
   /// 获取当前用户ID
   Future<String?> getCurrentUserId();
-  
+
   /// 发送投票消息
   Future<MessageEntity?> sendPollMessage(
     String roomId, {
     required String question,
     required List<String> options,
     int maxSelections = 1,
+    bool isAnonymous = false,
   });
 
   /// 发送转发的投票快照（包含投票结果，不可再投票）
@@ -237,7 +241,10 @@ abstract class IMessageRepository {
   Future<Set<String>> getLocallyDeletedMessageIds(String roomId);
 
   /// 标记消息为本地删除（持久化存储）
-  Future<void> markMessagesAsLocallyDeleted(String roomId, List<String> messageIds);
+  Future<void> markMessagesAsLocallyDeleted(
+    String roomId,
+    List<String> messageIds,
+  );
 
   /// 清除房间的本地删除消息记录
   Future<void> clearLocallyDeletedMessages(String roomId);
@@ -351,4 +358,3 @@ abstract class IMessageRepository {
     String? fromEventId,
   });
 }
-

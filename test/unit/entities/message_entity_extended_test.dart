@@ -14,23 +14,22 @@ MessageEntity _msg({
   MessageMetadata? metadata,
   List<MessageReaction> reactions = const [],
   MessageStatus status = MessageStatus.sent,
-}) =>
-    MessageEntity(
-      id: 'msg1',
-      roomId: '!room:server',
-      senderId: '@alice:server',
-      senderName: 'Alice',
-      content: 'hello',
-      type: MessageType.text,
-      timestamp: DateTime(2025, 6, 1),
-      isFromMe: isFromMe,
-      replyToId: replyToId,
-      threadReplyCount: threadReplyCount,
-      threadRootId: threadRootId,
-      metadata: metadata,
-      reactions: reactions,
-      status: status,
-    );
+}) => MessageEntity(
+  id: 'msg1',
+  roomId: '!room:server',
+  senderId: '@alice:server',
+  senderName: 'Alice',
+  content: 'hello',
+  type: MessageType.text,
+  timestamp: DateTime(2025, 6, 1),
+  isFromMe: isFromMe,
+  replyToId: replyToId,
+  threadReplyCount: threadReplyCount,
+  threadRootId: threadRootId,
+  metadata: metadata,
+  reactions: reactions,
+  status: status,
+);
 
 void main() {
   // ─────────────────────────────────────────────────
@@ -137,6 +136,70 @@ void main() {
       const meta = MessageMetadata(duration: 125000);
       expect(meta.formattedDuration, "2'5\"");
     });
+  });
+
+  group('MessageMetadata preserves red packet metadata', () {
+    test('copyWithPoll keeps redPacketId and transfer fields', () {
+      const meta = MessageMetadata(
+        amount: '8.88',
+        token: 'CNY',
+        transferStatus: 'pending',
+        redPacketId: 'rp_123',
+      );
+
+      final updated = meta.copyWithPoll(
+        voteCounts: const {'a': 1},
+        totalVoters: 1,
+      );
+
+      expect(updated.amount, '8.88');
+      expect(updated.token, 'CNY');
+      expect(updated.transferStatus, 'pending');
+      expect(updated.redPacketId, 'rp_123');
+    });
+
+    test('copyWithTranscription keeps redPacketId and transfer fields', () {
+      const meta = MessageMetadata(
+        amount: '8.88',
+        token: 'CNY',
+        transferStatus: 'pending',
+        redPacketId: 'rp_123',
+      );
+
+      final updated = meta.copyWithTranscription(
+        transcription: 'hello',
+        transcriptionStatus: TranscriptionStatus.success,
+      );
+
+      expect(updated.amount, '8.88');
+      expect(updated.token, 'CNY');
+      expect(updated.transferStatus, 'pending');
+      expect(updated.redPacketId, 'rp_123');
+    });
+  });
+
+  group('MessageMetadata.copyWithTransfer', () {
+    test(
+      'updates transfer status without dropping existing payment fields',
+      () {
+        final meta = MessageMetadata(
+          amount: '12.5',
+          token: 'USDT',
+          paymentRequestId: 'req-42',
+          paymentReceiverAddress: '0xreceiver',
+          paymentRequestExpiresAt: DateTime(2030, 1, 1),
+        );
+
+        final updated = meta.copyWithTransfer(transferStatus: 'completed');
+
+        expect(updated.amount, '12.5');
+        expect(updated.token, 'USDT');
+        expect(updated.paymentRequestId, 'req-42');
+        expect(updated.paymentReceiverAddress, '0xreceiver');
+        expect(updated.paymentRequestExpiresAt, DateTime(2030, 1, 1));
+        expect(updated.transferStatus, 'completed');
+      },
+    );
   });
 
   // ─────────────────────────────────────────────────

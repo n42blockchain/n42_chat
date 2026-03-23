@@ -10,6 +10,16 @@ abstract class LiveLocationEvent extends Equatable {
 }
 
 /// 开始共享实时位置
+class ObserveLiveLocationRoom extends LiveLocationEvent {
+  final String roomId;
+
+  const ObserveLiveLocationRoom({required this.roomId});
+
+  @override
+  List<Object?> get props => [roomId];
+}
+
+/// 开始共享实时位置
 class StartLiveLocation extends LiveLocationEvent {
   final String roomId;
   final int durationMinutes;
@@ -57,6 +67,20 @@ class LiveLocationUpdated extends LiveLocationEvent {
 
   @override
   List<Object?> get props => [location];
+}
+
+/// 位置快照同步
+class LiveLocationSnapshotReceived extends LiveLocationEvent {
+  final String roomId;
+  final List<LiveLocationEntity> locations;
+
+  const LiveLocationSnapshotReceived({
+    required this.roomId,
+    required this.locations,
+  });
+
+  @override
+  List<Object?> get props => [roomId, locations];
 }
 
 /// 位置共享过期

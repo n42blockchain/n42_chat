@@ -48,8 +48,9 @@ void main() {
       'emits loading → loaded on success',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.getMoments(limit: any(named: 'limit')))
-            .thenAnswer((_) async => [_makeMoment()]);
+        when(
+          () => mockRepo.getMoments(limit: any(named: 'limit')),
+        ).thenAnswer((_) async => [_makeMoment()]);
         when(() => mockRepo.getUnreadMomentCount()).thenAnswer((_) async => 3);
       },
       act: (bloc) => bloc.add(const LoadMoments()),
@@ -66,8 +67,9 @@ void main() {
       'emits loading → error on failure',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.getMoments(limit: any(named: 'limit')))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockRepo.getMoments(limit: any(named: 'limit')),
+        ).thenThrow(Exception('Network error'));
       },
       act: (bloc) => bloc.add(const LoadMoments()),
       expect: () => [
@@ -83,12 +85,13 @@ void main() {
       build: buildBloc,
       seed: () => MomentState.loading(),
       setUp: () {
-        when(() => mockRepo.getMoments(limit: any(named: 'limit')))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockRepo.getMoments(limit: any(named: 'limit')),
+        ).thenAnswer((_) async => []);
         when(() => mockRepo.getUnreadMomentCount()).thenAnswer((_) async => 0);
       },
       act: (bloc) => bloc.add(const LoadMoments()),
-      expect: () => [],
+      expect: () => <MomentState>[],
     );
   });
 
@@ -107,14 +110,38 @@ void main() {
         ).thenAnswer((_) async => _makeMoment(id: 'new-1', isFromMe: true));
         when(() => mockRepo.getUnreadMomentCount()).thenAnswer((_) async => 0);
       },
-      act: (bloc) => bloc.add(
-        const PostTextMoment(content: 'Hello world!'),
-      ),
+      act: (bloc) => bloc.add(const PostTextMoment(content: 'Hello world!')),
       expect: () => [
         isA<MomentState>().having((s) => s.isPosting, 'isPosting', isTrue),
         isA<MomentState>()
             .having((s) => s.isPosting, 'isPosting', isFalse)
             .having((s) => s.moments.first.id, 'moments.first.id', 'new-1'),
+      ],
+    );
+
+    blocTest<MomentBloc, MomentState>(
+      'clears stale error before a successful post completes',
+      build: buildBloc,
+      seed: () => const MomentState(errorMessage: 'old error'),
+      setUp: () {
+        when(
+          () => mockRepo.postTextMoment(
+            content: any(named: 'content'),
+            location: any(named: 'location'),
+            visibility: any(named: 'visibility'),
+            visibilityUserIds: any(named: 'visibilityUserIds'),
+          ),
+        ).thenAnswer((_) async => _makeMoment(id: 'new-2', isFromMe: true));
+      },
+      act: (bloc) => bloc.add(const PostTextMoment(content: 'Retry post')),
+      expect: () => [
+        isA<MomentState>()
+            .having((s) => s.isPosting, 'isPosting', isTrue)
+            .having((s) => s.errorMessage, 'errorMessage', isNull),
+        isA<MomentState>()
+            .having((s) => s.isPosting, 'isPosting', isFalse)
+            .having((s) => s.errorMessage, 'errorMessage', isNull)
+            .having((s) => s.moments.first.id, 'moments.first.id', 'new-2'),
       ],
     );
 
@@ -132,9 +159,7 @@ void main() {
         ).thenThrow(Exception('Upload failed'));
         when(() => mockRepo.getUnreadMomentCount()).thenAnswer((_) async => 0);
       },
-      act: (bloc) => bloc.add(
-        const PostTextMoment(content: 'Hello!'),
-      ),
+      act: (bloc) => bloc.add(const PostTextMoment(content: 'Hello!')),
       expect: () => [
         isA<MomentState>().having((s) => s.isPosting, 'isPosting', isTrue),
         isA<MomentState>()
@@ -154,11 +179,27 @@ void main() {
       seed: () => MomentState(moments: [_makeMoment(id: 'm-1')]),
       act: (bloc) => bloc.add(const DeleteMoment('m-1')),
       expect: () => [
-        isA<MomentState>().having(
-          (s) => s.moments.any((m) => m.id == 'm-1'),
-          'moment removed',
-          isFalse,
-        ),
+        isA<MomentState>()
+            .having(
+              (s) => s.moments.any((m) => m.id == 'm-1'),
+              'moment removed',
+              isFalse,
+            )
+            .having(
+              (s) => s.deleteActionVersion,
+              'deleteActionVersion',
+              1,
+            )
+            .having(
+              (s) => s.deleteActionMomentId,
+              'deleteActionMomentId',
+              'm-1',
+            )
+            .having(
+              (s) => s.deleteActionStatus,
+              'deleteActionStatus',
+              MomentDeleteActionStatus.success,
+            ),
       ],
     );
 
@@ -166,13 +207,30 @@ void main() {
       'emits error on failure',
       build: buildBloc,
       setUp: () {
-        when(() => mockRepo.deleteMoment(any()))
-            .thenThrow(Exception('Cannot delete'));
+        when(
+          () => mockRepo.deleteMoment(any()),
+        ).thenThrow(Exception('Cannot delete'));
       },
       seed: () => MomentState(moments: [_makeMoment(id: 'm-1')]),
       act: (bloc) => bloc.add(const DeleteMoment('m-1')),
       expect: () => [
-        isA<MomentState>().having((s) => s.hasError, 'hasError', isTrue),
+        isA<MomentState>()
+            .having((s) => s.hasError, 'hasError', isTrue)
+            .having(
+              (s) => s.deleteActionVersion,
+              'deleteActionVersion',
+              1,
+            )
+            .having(
+              (s) => s.deleteActionMomentId,
+              'deleteActionMomentId',
+              'm-1',
+            )
+            .having(
+              (s) => s.deleteActionStatus,
+              'deleteActionStatus',
+              MomentDeleteActionStatus.failure,
+            ),
       ],
     );
   });

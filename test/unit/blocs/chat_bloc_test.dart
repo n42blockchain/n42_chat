@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
 import 'package:n42_chat/src/domain/repositories/message_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_event.dart';
@@ -62,40 +63,54 @@ void main() {
     mockSecureStorage = MockSecureStorage();
 
     // Default stubs for methods called during InitializeChat
-    when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
-        .thenAnswer((_) async => _testMessages);
-    when(() => mockRepository.watchMessages(any()))
-        .thenAnswer((_) => const Stream.empty());
-    when(() => mockRepository.watchPollResponses(any()))
-        .thenReturn(null);
-    when(() => mockRepository.markAsRead(any(), any()))
-        .thenAnswer((_) async {});
-    when(() => mockRepository.getLocallyDeletedMessageIds(any()))
-        .thenAnswer((_) async => <String>{});
-    when(() => mockRepository.getPollAggregations(any(), any()))
-        .thenAnswer((_) async => null);
-    when(() => mockRepository.getReactionAggregations(any(), any()))
-        .thenAnswer((_) async => null);
-    when(() => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')))
-        .thenAnswer((_) async => _testMessages);
+    when(
+      () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
+    ).thenAnswer((_) async => _testMessages);
+    when(
+      () => mockRepository.watchMessages(any()),
+    ).thenAnswer((_) => const Stream.empty());
+    when(() => mockRepository.watchPollResponses(any())).thenReturn(null);
+    when(
+      () => mockRepository.markAsRead(any(), any()),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockRepository.getLocallyDeletedMessageIds(any()),
+    ).thenAnswer((_) async => <String>{});
+    when(
+      () => mockRepository.getPollAggregations(any(), any()),
+    ).thenAnswer((_) async => null);
+    when(
+      () => mockRepository.getReactionAggregations(any(), any()),
+    ).thenAnswer((_) async => null);
+    when(
+      () => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')),
+    ).thenAnswer((_) async => _testMessages);
 
     // Default stubs for PreferencesDataSource
-    when(() => mockSecureStorage.getMessageDestructionTimes(any()))
-        .thenAnswer((_) async => <String, DateTime>{});
-    when(() => mockSecureStorage.getScheduledMessages(any()))
-        .thenAnswer((_) async => <Map<String, dynamic>>[]);
-    when(() => mockSecureStorage.shouldShowReadReceipts())
-        .thenAnswer((_) async => true);
-    when(() => mockSecureStorage.shouldShowTypingIndicator())
-        .thenAnswer((_) async => true);
-    when(() => mockSecureStorage.getDueScheduledMessages())
-        .thenAnswer((_) async => <Map<String, dynamic>>[]);
+    when(
+      () => mockSecureStorage.getMessageDestructionTimes(any()),
+    ).thenAnswer((_) async => <String, DateTime>{});
+    when(
+      () => mockSecureStorage.getScheduledMessages(any()),
+    ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
+    when(
+      () => mockSecureStorage.shouldShowReadReceipts(),
+    ).thenAnswer((_) async => true);
+    when(
+      () => mockSecureStorage.shouldShowTypingIndicator(),
+    ).thenAnswer((_) async => true);
+    when(
+      () => mockSecureStorage.getDueScheduledMessages(),
+    ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
+    when(
+      () => mockSecureStorage.getDefaultSelfDestructSeconds(),
+    ).thenAnswer((_) async => null);
   });
 
   ChatBloc buildBloc() => ChatBloc(
-        messageRepository: mockRepository,
-        secureStorage: mockSecureStorage,
-      );
+    messageRepository: mockRepository,
+    secureStorage: mockSecureStorage,
+  );
 
   /// Helper: builds a bloc and initializes the chat room so
   /// `_currentRoomId` is set. Returns the bloc after waiting for init.
@@ -140,8 +155,9 @@ void main() {
     });
 
     test('handles empty room gracefully', () async {
-      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
-          .thenAnswer((_) async => []);
+      when(
+        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
+      ).thenAnswer((_) async => []);
 
       final bloc = buildBloc();
       bloc.add(const InitializeChat(_roomId));
@@ -155,8 +171,9 @@ void main() {
     });
 
     test('sets error when repository throws on load', () async {
-      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
-          .thenThrow(Exception('Network error'));
+      when(
+        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
+      ).thenThrow(Exception('Network error'));
 
       final bloc = buildBloc();
       bloc.add(const InitializeChat(_roomId));
@@ -195,8 +212,9 @@ void main() {
       final bloc = await buildInitializedBloc();
 
       // Now make it fail
-      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
-          .thenThrow(Exception('Failed'));
+      when(
+        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
+      ).thenThrow(Exception('Failed'));
 
       bloc.add(const LoadMessages(_roomId));
       await Future<void>.delayed(const Duration(milliseconds: 200));
@@ -221,8 +239,9 @@ void main() {
           status: MessageStatus.sent,
         ),
       );
-      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
-          .thenAnswer((_) async => manyMessages);
+      when(
+        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
+      ).thenAnswer((_) async => manyMessages);
 
       final bloc = buildBloc();
       bloc.add(const InitializeChat(_roomId));
@@ -240,13 +259,15 @@ void main() {
 
   group('SendTextMessage', () {
     test('sends text and calls repository', () async {
-      when(() => mockRepository.sendTextMessage(
-            any(),
-            any(),
-            selfDestructAfter: any(named: 'selfDestructAfter'),
-            mentionedUserIds: any(named: 'mentionedUserIds'),
-            mentionsRoom: any(named: 'mentionsRoom'),
-          )).thenAnswer((_) async => _testMessages.first);
+      when(
+        () => mockRepository.sendTextMessage(
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenAnswer((_) async => _testMessages.first);
 
       final bloc = await buildInitializedBloc();
       clearInteractions(mockRepository);
@@ -255,20 +276,66 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 200));
 
       expect(bloc.state.isSending, false);
-      verify(() => mockRepository.sendTextMessage(
-            _roomId,
-            'Hello world',
-            selfDestructAfter: null,
-            mentionedUserIds: null,
-            mentionsRoom: false,
-          )).called(1);
+      verify(
+        () => mockRepository.sendTextMessage(
+          _roomId,
+          'Hello world',
+          selfDestructAfter: null,
+          mentionedUserIds: null,
+          mentionsRoom: false,
+        ),
+      ).called(1);
 
       await bloc.close();
     });
 
+    test(
+      'uses default self-destruct timer when message does not override it',
+      () async {
+        when(
+          () => mockSecureStorage.getDefaultSelfDestructSeconds(),
+        ).thenAnswer((_) async => 45);
+        when(
+          () => mockRepository.sendTextMessage(
+            any(),
+            any(),
+            selfDestructAfter: any(named: 'selfDestructAfter'),
+            mentionedUserIds: any(named: 'mentionedUserIds'),
+            mentionsRoom: any(named: 'mentionsRoom'),
+          ),
+        ).thenAnswer((_) async => _testMessages.first);
+
+        final bloc = await buildInitializedBloc();
+        clearInteractions(mockRepository);
+
+        bloc.add(const SendTextMessage('Hello world'));
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+
+        verify(
+          () => mockRepository.sendTextMessage(
+            _roomId,
+            'Hello world',
+            selfDestructAfter: 45,
+            mentionedUserIds: null,
+            mentionsRoom: false,
+          ),
+        ).called(1);
+
+        await bloc.close();
+      },
+    );
+
     test('uses replyToMessage when reply target is set', () async {
-      when(() => mockRepository.replyToMessage(any(), any(), any()))
-          .thenAnswer((_) async => _testMessages.first);
+      when(
+        () => mockRepository.replyToMessage(
+          any(),
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenAnswer((_) async => _testMessages.first);
 
       final bloc = await buildInitializedBloc();
 
@@ -283,23 +350,74 @@ void main() {
 
       expect(bloc.state.isSending, false);
       expect(bloc.state.replyTarget, isNull);
-      verify(() => mockRepository.replyToMessage(
-            _roomId,
-            '\$event1',
-            'Reply text',
-          )).called(1);
+      verify(
+        () => mockRepository.replyToMessage(
+          _roomId,
+          '\$event1',
+          'Reply text',
+          selfDestructAfter: null,
+          mentionedUserIds: null,
+          mentionsRoom: false,
+        ),
+      ).called(1);
 
       await bloc.close();
     });
 
-    test('emits error when send fails', () async {
-      when(() => mockRepository.sendTextMessage(
+    test(
+      'passes mention and self-destruct metadata through reply sends',
+      () async {
+        when(
+          () => mockRepository.replyToMessage(
+            any(),
             any(),
             any(),
             selfDestructAfter: any(named: 'selfDestructAfter'),
             mentionedUserIds: any(named: 'mentionedUserIds'),
             mentionsRoom: any(named: 'mentionsRoom'),
-          )).thenThrow(Exception('Network error'));
+          ),
+        ).thenAnswer((_) async => _testMessages.first);
+
+        final bloc = await buildInitializedBloc();
+
+        bloc.add(SetReplyTarget(_testMessages.first));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        bloc.add(
+          const SendTextMessage(
+            'Reply with metadata',
+            selfDestructAfter: 30,
+            mentionedUserIds: ['@user3:server.com'],
+            mentionsRoom: true,
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+
+        verify(
+          () => mockRepository.replyToMessage(
+            _roomId,
+            '\$event1',
+            'Reply with metadata',
+            selfDestructAfter: 30,
+            mentionedUserIds: ['@user3:server.com'],
+            mentionsRoom: true,
+          ),
+        ).called(1);
+
+        await bloc.close();
+      },
+    );
+
+    test('emits error when send fails', () async {
+      when(
+        () => mockRepository.sendTextMessage(
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenThrow(Exception('Network error'));
 
       final bloc = await buildInitializedBloc();
       bloc.add(const SendTextMessage('Hello'));
@@ -318,13 +436,15 @@ void main() {
       bloc.add(const SendTextMessage('   '));
       await Future<void>.delayed(const Duration(milliseconds: 200));
 
-      verifyNever(() => mockRepository.sendTextMessage(
-            any(),
-            any(),
-            selfDestructAfter: any(named: 'selfDestructAfter'),
-            mentionedUserIds: any(named: 'mentionedUserIds'),
-            mentionsRoom: any(named: 'mentionsRoom'),
-          ));
+      verifyNever(
+        () => mockRepository.sendTextMessage(
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      );
 
       await bloc.close();
     });
@@ -336,19 +456,23 @@ void main() {
 
   group('SendImageMessage', () {
     test('sends image and calls repository', () async {
-      when(() => mockRepository.sendImageMessage(
-            any(),
-            imageBytes: any(named: 'imageBytes'),
-            filename: any(named: 'filename'),
-            mimeType: any(named: 'mimeType'),
-            selfDestructAfter: any(named: 'selfDestructAfter'),
-          )).thenAnswer((_) async => _testMessages.first);
+      when(
+        () => mockRepository.sendImageMessage(
+          any(),
+          imageBytes: any(named: 'imageBytes'),
+          filename: any(named: 'filename'),
+          mimeType: any(named: 'mimeType'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+        ),
+      ).thenAnswer((_) async => _testMessages.first);
 
       final bloc = await buildInitializedBloc();
-      bloc.add(SendImageMessage(
-        imageBytes: Uint8List.fromList([1, 2, 3]),
-        filename: 'test.png',
-      ));
+      bloc.add(
+        SendImageMessage(
+          imageBytes: Uint8List.fromList([1, 2, 3]),
+          filename: 'test.png',
+        ),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 200));
 
       expect(bloc.state.isSending, false);
@@ -357,20 +481,104 @@ void main() {
       await bloc.close();
     });
 
-    test('emits error when send image fails', () async {
-      when(() => mockRepository.sendImageMessage(
+    test(
+      'clears reply target and updates lastMessageSentAt on success',
+      () async {
+        when(
+          () => mockRepository.sendImageMessage(
             any(),
             imageBytes: any(named: 'imageBytes'),
             filename: any(named: 'filename'),
             mimeType: any(named: 'mimeType'),
             selfDestructAfter: any(named: 'selfDestructAfter'),
-          )).thenThrow(Exception('Upload failed'));
+          ),
+        ).thenAnswer((_) async => _testMessages.first);
+
+        final bloc = await buildInitializedBloc();
+        bloc.add(SetReplyTarget(_testMessages.first));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        bloc.add(
+          SendImageMessage(
+            imageBytes: Uint8List.fromList([1, 2, 3]),
+            filename: 'reply-image.png',
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+
+        expect(bloc.state.replyTarget, isNull);
+        expect(bloc.state.lastMessageSentAt, isNotNull);
+
+        await bloc.close();
+      },
+    );
+
+    test('blocks image send during slow mode cooldown', () async {
+      when(
+        () => mockRepository.sendTextMessage(
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenAnswer((_) async => _testMessages.first);
 
       final bloc = await buildInitializedBloc();
-      bloc.add(SendImageMessage(
-        imageBytes: Uint8List.fromList([1, 2, 3]),
-        filename: 'test.png',
-      ));
+      bloc.add(
+        const RoomInfoLoaded(
+          isChannel: false,
+          canSendMessages: true,
+          slowModeInterval: 60,
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      bloc.add(const SendTextMessage('Trigger slow mode'));
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+
+      clearInteractions(mockRepository);
+
+      bloc.add(
+        SendImageMessage(
+          imageBytes: Uint8List.fromList([1, 2, 3]),
+          filename: 'blocked.png',
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+
+      expect(bloc.state.error, contains('Slow mode: wait'));
+      verifyNever(
+        () => mockRepository.sendImageMessage(
+          any(),
+          imageBytes: any(named: 'imageBytes'),
+          filename: any(named: 'filename'),
+          mimeType: any(named: 'mimeType'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+        ),
+      );
+
+      await bloc.close();
+    });
+
+    test('emits error when send image fails', () async {
+      when(
+        () => mockRepository.sendImageMessage(
+          any(),
+          imageBytes: any(named: 'imageBytes'),
+          filename: any(named: 'filename'),
+          mimeType: any(named: 'mimeType'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+        ),
+      ).thenThrow(Exception('Upload failed'));
+
+      final bloc = await buildInitializedBloc();
+      bloc.add(
+        SendImageMessage(
+          imageBytes: Uint8List.fromList([1, 2, 3]),
+          filename: 'test.png',
+        ),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 200));
 
       expect(bloc.state.isSending, false);
@@ -387,13 +595,18 @@ void main() {
   group('LoadMoreMessages', () {
     test('loads more messages when hasMore is true', () async {
       final moreMessages = [..._testMessages, ..._testMessages];
-      when(() => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')))
-          .thenAnswer((_) async => moreMessages);
+      when(
+        () =>
+            mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')),
+      ).thenAnswer((_) async => moreMessages);
 
       final bloc = await buildInitializedBloc();
 
       // Ensure hasMore is true (it should be from init with 2 messages and limit 30)
-      expect(bloc.state.hasMore, isFalse); // actually 2 < 100, so hasMore=false from LoadMessages
+      expect(
+        bloc.state.hasMore,
+        isFalse,
+      ); // actually 2 < 100, so hasMore=false from LoadMessages
 
       // Set hasMore to true manually via MessagesUpdated won't work.
       // Instead test with many initial messages to have hasMore=true
@@ -409,46 +622,57 @@ void main() {
       bloc.add(const LoadMoreMessages());
       await Future<void>.delayed(const Duration(milliseconds: 200));
 
-      verifyNever(() => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')));
-
-      await bloc.close();
-    });
-
-    test('loads more when hasMore is true with many initial messages', () async {
-      // Provide enough messages to trigger hasMore=true
-      final initialMessages = List.generate(
-        100,
-        (i) => MessageEntity(
-          id: '\$msg$i',
-          roomId: _roomId,
-          senderId: '@user:server.com',
-          senderName: 'User',
-          content: 'Msg $i',
-          timestamp: DateTime(2026, 1, 1, 12, i),
-          type: MessageType.text,
-          status: MessageStatus.sent,
-        ),
+      verifyNever(
+        () =>
+            mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')),
       );
-      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
-          .thenAnswer((_) async => initialMessages);
-      final expandedMessages = [...initialMessages, ..._testMessages];
-      when(() => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')))
-          .thenAnswer((_) async => expandedMessages);
-
-      final bloc = buildBloc();
-      bloc.add(const InitializeChat(_roomId));
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-
-      expect(bloc.state.hasMore, true);
-
-      bloc.add(const LoadMoreMessages());
-      await Future<void>.delayed(const Duration(milliseconds: 200));
-
-      expect(bloc.state.isLoadingMore, false);
-      expect(bloc.state.messages.length, expandedMessages.length);
 
       await bloc.close();
     });
+
+    test(
+      'loads more when hasMore is true with many initial messages',
+      () async {
+        // Provide enough messages to trigger hasMore=true
+        final initialMessages = List.generate(
+          100,
+          (i) => MessageEntity(
+            id: '\$msg$i',
+            roomId: _roomId,
+            senderId: '@user:server.com',
+            senderName: 'User',
+            content: 'Msg $i',
+            timestamp: DateTime(2026, 1, 1, 12, i),
+            type: MessageType.text,
+            status: MessageStatus.sent,
+          ),
+        );
+        when(
+          () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
+        ).thenAnswer((_) async => initialMessages);
+        final expandedMessages = [...initialMessages, ..._testMessages];
+        when(
+          () => mockRepository.loadMoreMessages(
+            any(),
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) async => expandedMessages);
+
+        final bloc = buildBloc();
+        bloc.add(const InitializeChat(_roomId));
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+
+        expect(bloc.state.hasMore, true);
+
+        bloc.add(const LoadMoreMessages());
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+
+        expect(bloc.state.isLoadingMore, false);
+        expect(bloc.state.messages.length, expandedMessages.length);
+
+        await bloc.close();
+      },
+    );
 
     test('emits error when load more fails', () async {
       final initialMessages = List.generate(
@@ -464,10 +688,13 @@ void main() {
           status: MessageStatus.sent,
         ),
       );
-      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
-          .thenAnswer((_) async => initialMessages);
-      when(() => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')))
-          .thenThrow(Exception('Failed'));
+      when(
+        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
+      ).thenAnswer((_) async => initialMessages);
+      when(
+        () =>
+            mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')),
+      ).thenThrow(Exception('Failed'));
 
       final bloc = buildBloc();
       bloc.add(const InitializeChat(_roomId));
@@ -489,8 +716,13 @@ void main() {
 
   group('RedactMessage', () {
     test('optimistically marks message as redacted on success', () async {
-      when(() => mockRepository.redactMessage(any(), any(), reason: any(named: 'reason')))
-          .thenAnswer((_) async => true);
+      when(
+        () => mockRepository.redactMessage(
+          any(),
+          any(),
+          reason: any(named: 'reason'),
+        ),
+      ).thenAnswer((_) async => true);
 
       final bloc = await buildInitializedBloc();
       final initialCount = bloc.state.messages.length;
@@ -501,7 +733,9 @@ void main() {
       // 乐观更新：消息保留在列表中，type 改为 redacted（不删除）
       expect(bloc.state.messages.length, initialCount);
       expect(
-        bloc.state.messages.any((m) => m.id == '\$event1' && m.type == MessageType.redacted),
+        bloc.state.messages.any(
+          (m) => m.id == '\$event1' && m.type == MessageType.redacted,
+        ),
         isTrue,
       );
 
@@ -509,8 +743,13 @@ void main() {
     });
 
     test('emits error when redact fails', () async {
-      when(() => mockRepository.redactMessage(any(), any(), reason: any(named: 'reason')))
-          .thenThrow(Exception('Not allowed'));
+      when(
+        () => mockRepository.redactMessage(
+          any(),
+          any(),
+          reason: any(named: 'reason'),
+        ),
+      ).thenThrow(Exception('Not allowed'));
 
       final bloc = await buildInitializedBloc();
       bloc.add(const RedactMessage('\$event1'));
@@ -540,8 +779,9 @@ void main() {
     });
 
     test('skips read receipt when privacy setting is off', () async {
-      when(() => mockSecureStorage.shouldShowReadReceipts())
-          .thenAnswer((_) async => false);
+      when(
+        () => mockSecureStorage.shouldShowReadReceipts(),
+      ).thenAnswer((_) async => false);
 
       final bloc = await buildInitializedBloc();
       clearInteractions(mockRepository);
@@ -570,18 +810,15 @@ void main() {
       ),
       act: (bloc) => bloc.add(MessagesUpdated(_testMessages)),
       expect: () => [
-        isA<ChatState>()
-            .having((s) => s.messages.length, 'messages.length', 2),
+        isA<ChatState>().having((s) => s.messages.length, 'messages.length', 2),
       ],
     );
 
     blocTest<ChatBloc, ChatState>(
       'filters out thread messages',
       build: () => buildBloc(),
-      seed: () => ChatState.initial().copyWith(
-        roomId: _roomId,
-        isLoading: false,
-      ),
+      seed: () =>
+          ChatState.initial().copyWith(roomId: _roomId, isLoading: false),
       act: (bloc) {
         final threadMessage = MessageEntity(
           id: '\$thread1',
@@ -597,8 +834,7 @@ void main() {
         bloc.add(MessagesUpdated([..._testMessages, threadMessage]));
       },
       expect: () => [
-        isA<ChatState>()
-            .having((s) => s.messages.length, 'messages.length', 2),
+        isA<ChatState>().having((s) => s.messages.length, 'messages.length', 2),
       ],
     );
   });
@@ -635,11 +871,7 @@ void main() {
       ),
       act: (bloc) => bloc.add(const SetReplyTarget(null)),
       expect: () => [
-        isA<ChatState>().having(
-          (s) => s.replyTarget,
-          'replyTarget',
-          isNull,
-        ),
+        isA<ChatState>().having((s) => s.replyTarget, 'replyTarget', isNull),
       ],
     );
   });
@@ -656,7 +888,11 @@ void main() {
       act: (bloc) => bloc.add(SetEditTarget(_testMessages.first)),
       expect: () => [
         isA<ChatState>()
-            .having((s) => s.editingMessage, 'editingMessage', _testMessages.first)
+            .having(
+              (s) => s.editingMessage,
+              'editingMessage',
+              _testMessages.first,
+            )
             .having((s) => s.replyTarget, 'replyTarget', isNull),
       ],
     );
@@ -687,7 +923,12 @@ void main() {
     test('DeleteMessagesLocally contains message ids', () {
       const event = DeleteMessagesLocally(['msg1', 'msg2']);
       expect(event.messageIds, equals(['msg1', 'msg2']));
-      expect(event.props, equals([['msg1', 'msg2']]));
+      expect(
+        event.props,
+        equals([
+          ['msg1', 'msg2'],
+        ]),
+      );
     });
 
     test('RedactMessage contains message id and reason', () {
@@ -739,12 +980,16 @@ void main() {
     });
 
     test('hasReplyTarget returns true when set', () {
-      final state = ChatState.initial().copyWith(replyTarget: _testMessages.first);
+      final state = ChatState.initial().copyWith(
+        replyTarget: _testMessages.first,
+      );
       expect(state.hasReplyTarget, true);
     });
 
     test('isEditing returns true when editingMessage set', () {
-      final state = ChatState.initial().copyWith(editingMessage: _testMessages.first);
+      final state = ChatState.initial().copyWith(
+        editingMessage: _testMessages.first,
+      );
       expect(state.isEditing, true);
     });
 
@@ -755,7 +1000,9 @@ void main() {
     });
 
     test('copyWith clearReplyTarget clears replyTarget', () {
-      final state = ChatState.initial().copyWith(replyTarget: _testMessages.first);
+      final state = ChatState.initial().copyWith(
+        replyTarget: _testMessages.first,
+      );
       final cleared = state.copyWith(clearReplyTarget: true);
       expect(cleared.replyTarget, isNull);
     });

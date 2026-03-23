@@ -1,3 +1,24 @@
+final RegExp _matrixIdRegExp =
+    RegExp(r'^@[a-zA-Z0-9._=\-/]+:[a-zA-Z0-9.\-]+$');
+final RegExp _roomIdRegExp =
+    RegExp(r'^![a-zA-Z0-9]+:[a-zA-Z0-9.\-]+$');
+final RegExp _roomAliasRegExp =
+    RegExp(r'^#[a-zA-Z0-9._=\-]+:[a-zA-Z0-9.\-]+$');
+final RegExp _whitespaceRegExp = RegExp(r'\s+');
+final RegExp _urlExtractRegExp = RegExp(
+  r'https?://[^\s<>\[\]{}|\\^`"]+',
+  caseSensitive: false,
+);
+final RegExp _emojiRegExp = RegExp(
+  r'[\u{1F600}-\u{1F64F}]|'
+  r'[\u{1F300}-\u{1F5FF}]|'
+  r'[\u{1F680}-\u{1F6FF}]|'
+  r'[\u{1F1E0}-\u{1F1FF}]|'
+  r'[\u{2600}-\u{26FF}]|'
+  r'[\u{2700}-\u{27BF}]',
+  unicode: true,
+);
+
 /// 字符串工具类
 abstract class StringUtils {
   StringUtils._();
@@ -76,17 +97,17 @@ abstract class StringUtils {
 
   /// 检查是否是有效的Matrix用户ID
   static bool isValidMatrixId(String id) {
-    return RegExp(r'^@[a-zA-Z0-9._=\-/]+:[a-zA-Z0-9.\-]+$').hasMatch(id);
+    return _matrixIdRegExp.hasMatch(id);
   }
 
   /// 检查是否是有效的Matrix房间ID
   static bool isValidRoomId(String id) {
-    return RegExp(r'^![a-zA-Z0-9]+:[a-zA-Z0-9.\-]+$').hasMatch(id);
+    return _roomIdRegExp.hasMatch(id);
   }
 
   /// 检查是否是有效的Matrix房间别名
   static bool isValidRoomAlias(String alias) {
-    return RegExp(r'^#[a-zA-Z0-9._=\-]+:[a-zA-Z0-9.\-]+$').hasMatch(alias);
+    return _roomAliasRegExp.hasMatch(alias);
   }
 
   /// 消息预览处理
@@ -94,7 +115,7 @@ abstract class StringUtils {
   /// 替换换行为空格，限制长度
   static String formatMessagePreview(String content, {int maxLength = 50}) {
     final preview = content
-        .replaceAll(RegExp(r'\s+'), ' ')
+        .replaceAll(_whitespaceRegExp, ' ')
         .trim();
     return truncate(preview, maxLength);
   }
@@ -114,28 +135,12 @@ abstract class StringUtils {
 
   /// 解析链接
   static List<String> extractUrls(String text) {
-    final urlPattern = RegExp(
-      r'https?://[^\s<>\[\]{}|\\^`"]+',
-      caseSensitive: false,
-    );
-    return urlPattern.allMatches(text).map((m) => m.group(0)!).toList();
+    return _urlExtractRegExp.allMatches(text).map((m) => m.group(0)!).toList();
   }
 
   /// 检查文本是否只包含表情
   static bool isOnlyEmoji(String text) {
-    // 移除所有emoji后检查是否为空
-    final withoutEmoji = text.replaceAll(
-      RegExp(
-        r'[\u{1F600}-\u{1F64F}]|'
-        r'[\u{1F300}-\u{1F5FF}]|'
-        r'[\u{1F680}-\u{1F6FF}]|'
-        r'[\u{1F1E0}-\u{1F1FF}]|'
-        r'[\u{2600}-\u{26FF}]|'
-        r'[\u{2700}-\u{27BF}]',
-        unicode: true,
-      ),
-      '',
-    );
+    final withoutEmoji = text.replaceAll(_emojiRegExp, '');
     return withoutEmoji.trim().isEmpty && text.trim().isNotEmpty;
   }
 

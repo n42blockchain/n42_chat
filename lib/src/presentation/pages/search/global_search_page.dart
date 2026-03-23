@@ -10,6 +10,8 @@ import '../../blocs/search/search_event.dart';
 import '../../blocs/search/search_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'search_result_tile.dart';
+import 'search_message_filter_sheet.dart';
+import '../../../n42_chat.dart';
 
 /// 全局搜索页面
 class GlobalSearchPage extends StatefulWidget {
@@ -22,6 +24,7 @@ class GlobalSearchPage extends StatefulWidget {
 class _GlobalSearchPageState extends State<GlobalSearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  MessageSearchFilter? _messageFilter;
 
   @override
   void initState() {
@@ -38,13 +41,30 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   }
 
   void _onSearch(String query) {
-    context.read<SearchBloc>().add(PerformSearch(query));
+    context.read<SearchBloc>().add(
+      PerformSearch(query, filter: _messageFilter),
+    );
   }
 
   void _clearSearch() {
     _searchController.clear();
     context.read<SearchBloc>().add(const ClearSearch());
     _focusNode.requestFocus();
+  }
+
+  Future<void> _showFilters() async {
+    final nextFilter = await showMessageSearchFilterSheet(
+      context,
+      currentFilter: _messageFilter ?? const MessageSearchFilter(),
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(() => _messageFilter = nextFilter);
+    final query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      _onSearch(query);
+    }
   }
 
   @override
@@ -55,9 +75,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
-        child: SafeArea(
-          child: _buildSearchBar(isDark),
-        ),
+        child: SafeArea(child: _buildSearchBar(isDark)),
       ),
       body: BlocBuilder<SearchBloc, SearchState>(
         builder: (context, state) {
@@ -117,7 +135,9 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 controller: _searchController,
                 focusNode: _focusNode,
                 decoration: InputDecoration(
-                  hintText: S.of(context)?.searchPlaceholder ?? 'Search contacts, groups, messages',
+                  hintText:
+                      S.of(context)?.searchPlaceholder ??
+                      'Search contacts, groups, messages',
                   hintStyle: TextStyle(
                     fontSize: 14,
                     color: isDark
@@ -150,6 +170,33 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
           ),
 
           const SizedBox(width: 8),
+          IconButton(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  Icons.tune,
+                  color: _messageFilter == null
+                      ? (isDark ? Colors.white : AppColors.textPrimary)
+                      : AppColors.primary,
+                ),
+                if (_messageFilter != null)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onPressed: _showFilters,
+          ),
         ],
       ),
     );
@@ -160,8 +207,12 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       return Center(
         child: N42EmptyState(
           icon: Icons.search,
-          title: S.of(context)?.searchContactsGroupsMessages ?? 'Search contacts, groups and messages',
-          description: S.of(context)?.searchEnterKeywordToSearch ?? 'Enter keyword to start searching',
+          title:
+              S.of(context)?.searchContactsGroupsMessages ??
+              'Search contacts, groups and messages',
+          description:
+              S.of(context)?.searchEnterKeywordToSearch ??
+              'Enter keyword to start searching',
         ),
       );
     }
@@ -177,7 +228,9 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
             ),
             TextButton(
@@ -202,10 +255,13 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 label: Text(query),
                 deleteIcon: const Icon(Icons.close, size: 16),
                 onDeleted: () {
-                  context.read<SearchBloc>().add(DeleteSearchHistoryItem(query));
+                  context.read<SearchBloc>().add(
+                    DeleteSearchHistoryItem(query),
+                  );
                 },
-                backgroundColor:
-                    isDark ? AppColors.surfaceDark : AppColors.surface,
+                backgroundColor: isDark
+                    ? AppColors.surfaceDark
+                    : AppColors.surface,
               ),
             );
           }).toList(),
@@ -218,7 +274,9 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     if (state.results.isEmpty) {
       return Center(
         child: N42EmptyState.noSearchResult(
-          description: S.of(context)?.searchNoResultsForQuery(state.results.query) ?? 'No results found for "${state.results.query}"',
+          description:
+              S.of(context)?.searchNoResultsForQuery(state.results.query) ??
+              'No results found for "${state.results.query}"',
         ),
       );
     }
@@ -227,11 +285,25 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       children: [
         // 类型选择器
         _buildTypeSelector(state, isDark),
+        if (state.results.messageFilter != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Message filters active: ${state.results.messageFilter!.activeCount}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ),
 
         // 结果列表
-        Expanded(
-          child: _buildResultList(state, isDark),
-        ),
+        Expanded(child: _buildResultList(state, isDark)),
       ],
     );
   }
@@ -322,8 +394,8 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                     color: isSelected
                         ? Colors.white.withValues(alpha: 0.8)
                         : (isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary),
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondary),
                   ),
                 ),
               ],
@@ -350,10 +422,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       itemCount: results.length,
       itemBuilder: (context, index) {
         final item = results[index];
-        return SearchResultTile(
-          item: item,
-          onTap: () => _onResultTap(item),
-        );
+        return SearchResultTile(item: item, onTap: () => _onResultTap(item));
       },
     );
   }
@@ -361,17 +430,18 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   void _onResultTap(SearchResultItem item) {
     switch (item.type) {
       case SearchResultType.contact:
-        Navigator.of(context).pushNamed('/profile/${item.id}');
+        N42Chat.openUserProfile(item.id, context: context);
         break;
       case SearchResultType.group:
       case SearchResultType.conversation:
-        Navigator.of(context).pushNamed('/chat/${item.roomId ?? item.id}');
+        N42Chat.openConversation(item.roomId ?? item.id, context: context);
         break;
       case SearchResultType.message:
         if (item.roomId != null) {
-          Navigator.of(context).pushNamed(
-            '/chat/${item.roomId}',
-            arguments: {'highlightEventId': item.id},
+          N42Chat.openConversation(
+            item.roomId!,
+            context: context,
+            targetMessageId: item.id,
           );
         }
         break;
@@ -380,4 +450,3 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     }
   }
 }
-

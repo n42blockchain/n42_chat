@@ -5,16 +5,114 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import 'slash_command_picker.dart';
+import 'scheduled_send_picker.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 语音录音结果回调
 typedef VoiceRecordCallback = void Function(String path, Duration duration);
 
 /// 录音状态回调
-typedef RecordingStateCallback = void Function(bool isRecording, bool isCancelled, Duration duration);
+typedef RecordingStateCallback =
+    void Function(bool isRecording, bool isCancelled, Duration duration);
+
+class _MarkdownFormatAction {
+  final String prefix;
+  final String suffix;
+  final IconData? icon;
+  final String? label;
+  final String tooltip;
+  final bool bold;
+  final bool italic;
+  final bool strikethrough;
+
+  const _MarkdownFormatAction({
+    required this.prefix,
+    this.suffix = '',
+    required this.tooltip,
+    this.icon,
+    this.label,
+    this.bold = false,
+    this.italic = false,
+    this.strikethrough = false,
+  });
+}
+
+const List<_MarkdownFormatAction> _formatActions = [
+  _MarkdownFormatAction(
+    prefix: '**',
+    suffix: '**',
+    tooltip: 'Bold',
+    label: 'B',
+    bold: true,
+  ),
+  _MarkdownFormatAction(
+    prefix: '*',
+    suffix: '*',
+    tooltip: 'Italic',
+    label: 'I',
+    italic: true,
+  ),
+  _MarkdownFormatAction(
+    prefix: '~~',
+    suffix: '~~',
+    tooltip: 'Strikethrough',
+    label: 'S',
+    strikethrough: true,
+  ),
+  _MarkdownFormatAction(
+    prefix: '`',
+    suffix: '`',
+    tooltip: 'Inline code',
+    label: '<>',
+  ),
+  _MarkdownFormatAction(
+    prefix: '```dart\n',
+    suffix: '\n```',
+    tooltip: 'Code block',
+    label: '{}',
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n> ',
+    tooltip: 'Quote',
+    icon: Icons.format_quote,
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n- [ ] ',
+    tooltip: 'Checklist item',
+    icon: Icons.check_box_outlined,
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n- ',
+    tooltip: 'Bullet list',
+    icon: Icons.format_list_bulleted,
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n1. ',
+    tooltip: 'Numbered list',
+    icon: Icons.format_list_numbered,
+  ),
+  _MarkdownFormatAction(
+    prefix: '[',
+    suffix: '](https://)',
+    tooltip: 'Link',
+    icon: Icons.link,
+  ),
+  _MarkdownFormatAction(
+    prefix: '\n| Column | Value |\n| --- | --- |\n| Item | Detail |\n',
+    tooltip: 'Table',
+    label: '| |',
+  ),
+  _MarkdownFormatAction(
+    prefix:
+        '\n### Meeting Notes\n- Date: \n- Attendees: \n- Agenda:\n  - \n- Notes:\n- Action Items:\n  - [ ] \n',
+    tooltip: 'Meeting template',
+    icon: Icons.calendar_today_outlined,
+  ),
+];
 
 /// 聊天输入栏
 ///
@@ -86,6 +184,9 @@ class ChatInputBar extends StatefulWidget {
   /// 斜杠命令 /poll 回调（由 UI 层打开投票对话框）
   final VoidCallback? onCommandPoll;
 
+  /// 语音服务（测试或宿主注入）
+  final VoiceService? voiceService;
+
   const ChatInputBar({
     super.key,
     this.onSendText,
@@ -108,6 +209,7 @@ class ChatInputBar extends StatefulWidget {
     this.controller,
     this.focusNode,
     this.onCommandPoll,
+    this.voiceService,
   });
 
   @override
@@ -128,19 +230,29 @@ class ChatInputBarState extends State<ChatInputBar> {
   bool _cancelRecording = false;
   Duration _recordingDuration = Duration.zero;
   StreamSubscription<RecordingState>? _recordingSubscription;
-  
-  final VoiceService _voiceService = VoiceService();
+
+  late final VoiceService _voiceService;
+  late final bool _ownsVoiceService;
 
   @override
   void initState() {
     super.initState();
+    _voiceService =
+        widget.voiceService ??
+        (getIt.isRegistered<VoiceService>()
+            ? getIt<VoiceService>()
+            : VoiceService());
+    _ownsVoiceService =
+        widget.voiceService == null && !getIt.isRegistered<VoiceService>();
+    unawaited(_voiceService.initialize());
+
     _controller = widget.controller ?? TextEditingController();
     _focusNode = widget.focusNode ?? FocusNode();
     _hasText = _controller.text.isNotEmpty;
 
     _controller.addListener(_onTextChanged);
     _focusNode.addListener(_onFocusChanged);
-    
+
     // 监听录音状态
     _recordingSubscription = _voiceService.recordingStateStream.listen((state) {
       if (mounted) {
@@ -148,7 +260,11 @@ class ChatInputBarState extends State<ChatInputBar> {
           _recordingDuration = state.duration;
         });
         // 通知父组件录音状态变化
-        widget.onRecordingStateChanged?.call(_isRecording, _cancelRecording, state.duration);
+        widget.onRecordingStateChanged?.call(
+          _isRecording,
+          _cancelRecording,
+          state.duration,
+        );
       }
     });
   }
@@ -156,6 +272,9 @@ class ChatInputBarState extends State<ChatInputBar> {
   @override
   void dispose() {
     _recordingSubscription?.cancel();
+    if (_ownsVoiceService) {
+      unawaited(_voiceService.dispose());
+    }
     if (widget.controller == null) {
       _controller.dispose();
     }
@@ -273,9 +392,14 @@ class ChatInputBarState extends State<ChatInputBar> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n?.commonMicrophonePermissionRequired ?? 'Microphone Permission Required'),
-        content: Text(l10n?.chatMicrophonePermissionDeniedPermanent ??
-            'Microphone permission has been denied. Please enable it in system settings to use voice messages.'),
+        title: Text(
+          l10n?.commonMicrophonePermissionRequired ??
+              'Microphone Permission Required',
+        ),
+        content: Text(
+          l10n?.chatMicrophonePermissionDeniedPermanent ??
+              'Microphone permission has been denied. Please enable it in system settings to use voice messages.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -294,9 +418,9 @@ class ChatInputBarState extends State<ChatInputBar> {
   }
 
   void _sendMessage() {
-    final text = _controller.text.trim();
-    if (text.isNotEmpty) {
-      widget.onSendText?.call(text);
+    final rawText = _controller.text;
+    if (rawText.trim().isNotEmpty) {
+      widget.onSendText?.call(rawText);
       _controller.clear();
     }
   }
@@ -319,7 +443,10 @@ class ChatInputBarState extends State<ChatInputBar> {
           messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.commonMicrophonePermissionRequired ?? 'Please allow microphone permission'),
+              content: Text(
+                S.of(context)?.commonMicrophonePermissionRequired ??
+                    'Please allow microphone permission',
+              ),
               backgroundColor: AppColors.error,
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
@@ -336,7 +463,9 @@ class ChatInputBarState extends State<ChatInputBar> {
         messenger.clearSnackBars();
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.commonStartRecordingFailed ?? 'Start recording failed'}: $e'),
+            content: Text(
+              '${S.of(context)?.commonStartRecordingFailed ?? 'Start recording failed'}: $e',
+            ),
             backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
@@ -353,21 +482,21 @@ class ChatInputBarState extends State<ChatInputBar> {
       _forceResetRecordingState();
       return;
     }
-    
+
     final wasCancelled = _cancelRecording;
-    
+
     try {
       if (wasCancelled) {
         await _voiceService.cancelRecording();
         _forceResetRecordingState();
         return;
       }
-      
+
       final result = await _voiceService.stopRecording();
-      
+
       // 先重置状态
       _forceResetRecordingState();
-      
+
       if (result != null && result.duration.inSeconds >= 1) {
         widget.onSendVoice?.call(result.path, result.duration);
       } else if (result != null) {
@@ -377,7 +506,9 @@ class ChatInputBarState extends State<ChatInputBar> {
           messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              content: Text(S.of(context)?.commonRecordingTooShort ?? 'Recording too short'),
+              content: Text(
+                S.of(context)?.commonRecordingTooShort ?? 'Recording too short',
+              ),
               duration: const Duration(seconds: 1),
               behavior: SnackBarBehavior.floating,
               dismissDirection: DismissDirection.horizontal,
@@ -393,7 +524,9 @@ class ChatInputBarState extends State<ChatInputBar> {
         messenger.clearSnackBars();
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${S.of(context)?.commonStopRecordingFailed ?? 'Stop recording failed'}: $e'),
+            content: Text(
+              '${S.of(context)?.commonStopRecordingFailed ?? 'Stop recording failed'}: $e',
+            ),
             backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
@@ -403,7 +536,7 @@ class ChatInputBarState extends State<ChatInputBar> {
       }
     }
   }
-  
+
   /// 强制重置录音状态
   void _forceResetRecordingState() {
     setState(() {
@@ -506,8 +639,9 @@ class ChatInputBarState extends State<ChatInputBar> {
                   // 格式化工具栏切换按钮
                   _buildIconButton(
                     icon: Icons.text_format,
-                    onPressed: () =>
-                        setState(() => _showFormattingBar = !_showFormattingBar),
+                    onPressed: () => setState(
+                      () => _showFormattingBar = !_showFormattingBar,
+                    ),
                     isDark: isDark,
                   ),
 
@@ -515,12 +649,12 @@ class ChatInputBarState extends State<ChatInputBar> {
                   _hasText
                       ? _buildSendButton()
                       : (widget.showMoreButton
-                          ? _buildIconButton(
-                              icon: Icons.add_circle_outline,
-                              onPressed: widget.onMorePressed,
-                              isDark: isDark,
-                            )
-                          : const SizedBox.shrink()),
+                            ? _buildIconButton(
+                                icon: Icons.add_circle_outline,
+                                onPressed: widget.onMorePressed,
+                                isDark: isDark,
+                              )
+                            : const SizedBox.shrink()),
                 ],
               ),
             ),
@@ -533,7 +667,7 @@ class ChatInputBarState extends State<ChatInputBar> {
   Widget _buildFormattingBar(bool isDark) {
     return Container(
       height: 40,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surface,
         border: Border(
@@ -543,42 +677,44 @@ class ChatInputBarState extends State<ChatInputBar> {
           ),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildFormatButton(label: 'B', prefix: '**', suffix: '**', bold: true),
-          _buildFormatButton(label: 'I', prefix: '*', suffix: '*', italic: true),
-          _buildFormatButton(label: 'S', prefix: '~~', suffix: '~~', strikethrough: true),
-          _buildFormatButton(label: '<>', prefix: '`', suffix: '`'),
-          _buildFormatButton(label: '```', prefix: '```\n', suffix: '\n```'),
-          _buildFormatButton(label: '>', prefix: '\n> ', suffix: ''),
-        ],
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _formatActions.length,
+        itemBuilder: (context, index) {
+          return _buildFormatButton(_formatActions[index]);
+        },
       ),
     );
   }
 
-  Widget _buildFormatButton({
-    required String label,
-    required String prefix,
-    required String suffix,
-    bool bold = false,
-    bool italic = false,
-    bool strikethrough = false,
-  }) {
-    return GestureDetector(
-      onTap: () => _applyMarkdownFormat(prefix, suffix),
-      child: Container(
-        width: 40,
-        height: 32,
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-            fontStyle: italic ? FontStyle.italic : FontStyle.normal,
-            decoration: strikethrough ? TextDecoration.lineThrough : null,
-            fontSize: 14,
-          ),
+  Widget _buildFormatButton(_MarkdownFormatAction action) {
+    return Tooltip(
+      message: action.tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => _applyMarkdownFormat(action.prefix, action.suffix),
+        child: Container(
+          width: 40,
+          height: 32,
+          margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          alignment: Alignment.center,
+          child: action.icon != null
+              ? Icon(action.icon, size: 18)
+              : Text(
+                  action.label ?? '',
+                  style: TextStyle(
+                    fontWeight: action.bold
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    fontStyle: action.italic
+                        ? FontStyle.italic
+                        : FontStyle.normal,
+                    decoration: action.strikethrough
+                        ? TextDecoration.lineThrough
+                        : null,
+                    fontSize: 14,
+                  ),
+                ),
         ),
       ),
     );
@@ -592,7 +728,11 @@ class ChatInputBarState extends State<ChatInputBar> {
     if (sel.isValid && !sel.isCollapsed) {
       // 有选中文本 → 包裹
       final selected = text.substring(sel.start, sel.end);
-      final newText = text.replaceRange(sel.start, sel.end, '$prefix$selected$suffix');
+      final newText = text.replaceRange(
+        sel.start,
+        sel.end,
+        '$prefix$selected$suffix',
+      );
       ctrl.value = TextEditingValue(
         text: newText,
         selection: TextSelection.collapsed(
@@ -620,10 +760,7 @@ class ChatInputBarState extends State<ChatInputBar> {
       color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       onPressed: widget.enabled ? onPressed : null,
       padding: const EdgeInsets.all(6),
-      constraints: const BoxConstraints(
-        minWidth: 40,
-        minHeight: 40,
-      ),
+      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
     );
   }
 
@@ -653,7 +790,10 @@ class ChatInputBarState extends State<ChatInputBar> {
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
         decoration: InputDecoration(
-          hintText: widget.hintText ?? S.of(context)?.commonSendMessage ?? 'Send message',
+          hintText:
+              widget.hintText ??
+              S.of(context)?.commonSendMessage ??
+              'Send message',
           hintStyle: const TextStyle(
             fontSize: 16,
             color: AppColors.textTertiary,
@@ -690,7 +830,11 @@ class ChatInputBarState extends State<ChatInputBar> {
             setState(() {
               _cancelRecording = shouldCancel;
             });
-            widget.onRecordingStateChanged?.call(_isRecording, shouldCancel, _recordingDuration);
+            widget.onRecordingStateChanged?.call(
+              _isRecording,
+              shouldCancel,
+              _recordingDuration,
+            );
           }
         }
       },
@@ -699,12 +843,14 @@ class ChatInputBarState extends State<ChatInputBar> {
         height: 40,
         decoration: BoxDecoration(
           color: _isRecording
-              ? (_cancelRecording ? AppColors.error.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1))
+              ? (_cancelRecording
+                    ? AppColors.error.withValues(alpha: 0.1)
+                    : AppColors.primary.withValues(alpha: 0.1))
               : (isDark ? AppColors.surfaceDark : AppColors.surface),
           borderRadius: BorderRadius.circular(4),
           border: _isRecording
               ? Border.all(
-                  color: _cancelRecording ? AppColors.error : AppColors.primary, 
+                  color: _cancelRecording ? AppColors.error : AppColors.primary,
                   width: 1,
                 )
               : null,
@@ -712,14 +858,20 @@ class ChatInputBarState extends State<ChatInputBar> {
         child: Center(
           child: Text(
             _isRecording
-                ? (_cancelRecording ? (S.of(context)?.chatReleaseToCancel ?? 'Release to cancel') : (S.of(context)?.chatReleaseToSend ?? 'Release to send, swipe up to cancel'))
+                ? (_cancelRecording
+                      ? (S.of(context)?.chatReleaseToCancel ??
+                            'Release to cancel')
+                      : (S.of(context)?.chatReleaseToSend ??
+                            'Release to send, swipe up to cancel'))
                 : (S.of(context)?.commonHoldToTalk ?? 'Hold to talk'),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: _isRecording
                   ? (_cancelRecording ? AppColors.error : AppColors.primary)
-                  : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                  : (isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary),
             ),
           ),
         ),
@@ -732,7 +884,20 @@ class ChatInputBarState extends State<ChatInputBar> {
       margin: const EdgeInsets.only(left: 4),
       child: GestureDetector(
         onLongPress: widget.enabled && widget.onScheduledSend != null
-            ? () => _showScheduledSendPicker()
+            ? () async {
+                if (_controller.text.trim().isEmpty) {
+                  return;
+                }
+                final scheduledAt = await showScheduledSendPicker(context);
+                if (!mounted || scheduledAt == null) {
+                  return;
+                }
+                widget.onScheduledSend?.call(scheduledAt);
+                if (!mounted) {
+                  return;
+                }
+                _controller.clear();
+              }
             : null,
         child: ElevatedButton(
           onPressed: widget.enabled ? _sendMessage : null,
@@ -748,131 +913,10 @@ class ChatInputBarState extends State<ChatInputBar> {
           ),
           child: Text(
             S.of(context)?.commonSend ?? 'Send',
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
           ),
         ),
       ),
-    );
-  }
-
-  void _showScheduledSendPicker() {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-
-    final l10n = S.of(context);
-    final now = DateTime.now();
-
-    showModalBottomSheet<DateTime>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                l10n?.scheduledSendTitle ?? 'Schedule message',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              _buildScheduleOption(
-                ctx,
-                icon: Icons.schedule,
-                label: l10n?.scheduledSendInOneHour ?? 'In 1 hour',
-                dateTime: now.add(const Duration(hours: 1)),
-              ),
-              _buildScheduleOption(
-                ctx,
-                icon: Icons.nightlight_round,
-                label: l10n?.scheduledSendTonight ?? 'Tonight (8:00 PM)',
-                dateTime: DateTime(now.year, now.month, now.day, 20, 0),
-              ),
-              _buildScheduleOption(
-                ctx,
-                icon: Icons.wb_sunny,
-                label: l10n?.scheduledSendTomorrowMorning ?? 'Tomorrow morning (9:00 AM)',
-                dateTime: DateTime(now.year, now.month, now.day + 1, 9, 0),
-              ),
-              const Divider(),
-              _buildScheduleOption(
-                ctx,
-                icon: Icons.calendar_today,
-                label: l10n?.scheduledSendCustom ?? 'Pick a date & time',
-                dateTime: null,
-                isCustom: true,
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
-    ).then((scheduledAt) {
-      if (scheduledAt != null) {
-        widget.onScheduledSend?.call(scheduledAt);
-        _controller.clear();
-      }
-    });
-  }
-
-  Widget _buildScheduleOption(
-    BuildContext ctx, {
-    required IconData icon,
-    required String label,
-    DateTime? dateTime,
-    bool isCustom = false,
-  }) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: AppColors.primary),
-      title: Text(label),
-      onTap: () async {
-        if (isCustom) {
-          final pickedDate = await showDatePicker(
-            context: ctx,
-            initialDate: DateTime.now().add(const Duration(hours: 1)),
-            firstDate: DateTime.now(),
-            lastDate: DateTime.now().add(const Duration(days: 365)),
-          );
-          if (pickedDate != null && ctx.mounted) {
-            final pickedTime = await showTimePicker(
-              context: ctx,
-              initialTime: TimeOfDay.now(),
-            );
-            if (pickedTime != null && ctx.mounted) {
-              final scheduled = DateTime(
-                pickedDate.year,
-                pickedDate.month,
-                pickedDate.day,
-                pickedTime.hour,
-                pickedTime.minute,
-              );
-              if (scheduled.isAfter(DateTime.now())) {
-                Navigator.pop(ctx, scheduled);
-              }
-            }
-          }
-        } else {
-          Navigator.pop(ctx, dateTime);
-        }
-      },
     );
   }
 }

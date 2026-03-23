@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/router/routes.dart';
 import '../../../domain/entities/voice_room_entity.dart';
 import '../../../domain/repositories/voice_room_repository.dart';
 import '../../../services/voip/voice_room_service.dart';
@@ -84,19 +86,80 @@ class _VoiceRoomListView extends StatelessWidget {
   }
 
   void _showCreateDialog(BuildContext context) {
-    final s = S.of(context);
-    final nameController = TextEditingController();
-    final topicController = TextEditingController();
-
+    final bloc = context.read<VoiceRoomBloc>();
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (_) => BlocProvider<VoiceRoomBloc>.value(
+        value: bloc,
+        child: _CreateVoiceRoomDialog(parentContext: context),
+      ),
+    );
+  }
+}
+
+class _CreateVoiceRoomDialog extends StatefulWidget {
+  final BuildContext parentContext;
+
+  const _CreateVoiceRoomDialog({required this.parentContext});
+
+  @override
+  State<_CreateVoiceRoomDialog> createState() => _CreateVoiceRoomDialogState();
+}
+
+class _CreateVoiceRoomDialogState extends State<_CreateVoiceRoomDialog> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _topicController;
+  bool _submitStarted = false;
+  String? _inlineError;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _topicController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _topicController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+
+    return BlocListener<VoiceRoomBloc, VoiceRoomState>(
+      listenWhen: (previous, current) {
+        if (!_submitStarted) return false;
+        return previous.isLoading != current.isLoading ||
+            previous.isConnected != current.isConnected ||
+            previous.error != current.error;
+      },
+      listener: (context, state) {
+        if (!_submitStarted) return;
+
+        if (state.isConnected && state.room != null) {
+          Navigator.of(context).pop();
+          widget.parentContext.push(Routes.voiceRoomPath(state.room!.roomId));
+          return;
+        }
+
+        if (!state.isLoading && state.error != null) {
+          setState(() {
+            _submitStarted = false;
+            _inlineError = state.error;
+          });
+        }
+      },
+      child: AlertDialog(
         title: Text(s?.voiceRoomCreate ?? 'Create Voice Room'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: nameController,
+              controller: _nameController,
               decoration: InputDecoration(
                 labelText: s?.voiceRoomName ?? 'Room name',
                 border: const OutlineInputBorder(),
@@ -104,33 +167,69 @@ class _VoiceRoomListView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             TextField(
-              controller: topicController,
+              controller: _topicController,
               decoration: InputDecoration(
                 labelText: s?.voiceRoomTopic ?? 'Topic (optional)',
                 border: const OutlineInputBorder(),
               ),
             ),
+            if (_inlineError != null) ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _inlineError!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+            onPressed: _submitStarted
+                ? null
+                : () => Navigator.of(context).pop(),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           ),
-          FilledButton(
-            onPressed: () {
-              final name = nameController.text.trim();
-              if (name.isNotEmpty) {
-                context.read<VoiceRoomBloc>().add(CreateVoiceRoom(
-                      name: name,
-                      topic: topicController.text.trim().isEmpty
-                          ? null
-                          : topicController.text.trim(),
-                    ));
-                Navigator.of(dialogContext).pop();
-              }
+          BlocBuilder<VoiceRoomBloc, VoiceRoomState>(
+            buildWhen: (previous, current) =>
+                previous.isLoading != current.isLoading ||
+                previous.error != current.error,
+            builder: (context, state) {
+              final isSubmitting = _submitStarted && state.isLoading;
+              return FilledButton(
+                onPressed: isSubmitting
+                    ? null
+                    : () {
+                        final name = _nameController.text.trim();
+                        if (name.isEmpty) return;
+
+                        setState(() {
+                          _submitStarted = true;
+                          _inlineError = null;
+                        });
+                        context.read<VoiceRoomBloc>().add(
+                              CreateVoiceRoom(
+                                name: name,
+                                topic: _topicController.text.trim().isEmpty
+                                    ? null
+                                    : _topicController.text.trim(),
+                              ),
+                            );
+                      },
+                child: isSubmitting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(s?.voiceRoomCreate ?? 'Create'),
+              );
             },
-            child: Text(s?.voiceRoomCreate ?? 'Create'),
           ),
         ],
       ),
@@ -153,7 +252,7 @@ class _VoiceRoomCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          context.read<VoiceRoomBloc>().add(JoinVoiceRoom(room.roomId));
+          context.push(Routes.voiceRoomPath(room.roomId));
         },
         child: Padding(
           padding: const EdgeInsets.all(16),

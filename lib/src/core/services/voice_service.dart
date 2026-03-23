@@ -30,6 +30,7 @@ class VoiceService {
   // 播放状态
   bool _isPlaying = false;
   String? _currentPlayingUrl;
+  String? _currentDownloadedPlaybackPath;
   
   // 状态流
   final _recordingStateController = StreamController<RecordingState>.broadcast();
@@ -68,6 +69,7 @@ class VoiceService {
       _isPlaying = state == PlayerState.playing;
       if (state == PlayerState.completed || state == PlayerState.stopped) {
         _currentPlayingUrl = null;
+        unawaited(_cleanupDownloadedPlaybackFile());
       }
       _playbackStateController.add(PlaybackState(
         isPlaying: _isPlaying,
@@ -228,6 +230,8 @@ class VoiceService {
         await stop();
       }
 
+      await _cleanupDownloadedPlaybackFile();
+
       _currentPlayingUrl = url;
       
       if (url.startsWith('http')) {
@@ -236,6 +240,7 @@ class VoiceService {
           // 下载到本地再播放
           final localPath = await _downloadWithAuth(url);
           if (localPath != null) {
+            _currentDownloadedPlaybackPath = localPath;
             await _player.play(DeviceFileSource(localPath));
           } else {
             debugLog('Failed to download audio file');
@@ -314,6 +319,7 @@ class VoiceService {
   Future<void> stop() async {
     await _player.stop();
     _currentPlayingUrl = null;
+    await _cleanupDownloadedPlaybackFile();
   }
 
   /// 设置播放位置
@@ -359,11 +365,27 @@ class VoiceService {
     _recordingTimer?.cancel();
     await _playerStateSubscription?.cancel();
     _playerStateSubscription = null;
+    await _cleanupDownloadedPlaybackFile();
     await _recorder.dispose();
     await _player.dispose();
     await _recordingStateController.close();
     await _playbackStateController.close();
     await _amplitudeController.close();
+  }
+
+  Future<void> _cleanupDownloadedPlaybackFile() async {
+    final path = _currentDownloadedPlaybackPath;
+    _currentDownloadedPlaybackPath = null;
+    if (path == null || path.isEmpty) return;
+
+    try {
+      final file = File(path);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (e) {
+      debugLog('VoiceService: Failed to delete temp playback file: $e');
+    }
   }
 }
 
@@ -407,4 +429,3 @@ class PlaybackState {
     required this.state,
   });
 }
-

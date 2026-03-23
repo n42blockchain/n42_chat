@@ -218,6 +218,19 @@ void main() {
         verify(() => mockService.toggleMute()).called(1);
       },
     );
+
+    blocTest<VoiceRoomBloc, VoiceRoomState>(
+      'emits error when toggleMute fails',
+      build: () {
+        when(() => mockService.toggleMute())
+            .thenThrow(StateError('mute failed'));
+        return buildBloc();
+      },
+      act: (bloc) => bloc.add(const ToggleMute()),
+      expect: () => [
+        isA<VoiceRoomState>().having((s) => s.error, 'error', contains('Failed to toggle mute')),
+      ],
+    );
   });
 
   // ─────────────────────────────────────────────────
@@ -246,6 +259,22 @@ void main() {
     );
 
     blocTest<VoiceRoomBloc, VoiceRoomState>(
+      'emits error when endVoiceRoom returns false',
+      build: () {
+        when(() => mockRepo.endVoiceRoom(any()))
+            .thenAnswer((_) async => false);
+        return buildBloc();
+      },
+      seed: () => VoiceRoomState(room: _makeRoom()),
+      act: (bloc) => bloc.add(const EndVoiceRoom()),
+      expect: () => [
+        isA<VoiceRoomState>()
+            .having((s) => s.room, 'room', isNotNull)
+            .having((s) => s.error, 'error', 'Failed to end voice room'),
+      ],
+    );
+
+    blocTest<VoiceRoomBloc, VoiceRoomState>(
       'does not emit when room is null',
       build: buildBloc,
       // Default state has no room
@@ -260,16 +289,24 @@ void main() {
 
   group('VoiceRoomUpdated', () {
     blocTest<VoiceRoomBloc, VoiceRoomState>(
-      'emits updated room',
+      'emits updated room and synced local mute/role state',
       build: buildBloc,
-      act: (bloc) => bloc.add(VoiceRoomUpdated(_makeRoom(roomId: '!new:server'))),
+      setUp: () {
+        when(() => mockService.myRole).thenReturn(VoiceRoomRole.host);
+        when(() => mockService.isMuted).thenReturn(false);
+        when(() => mockService.syncFromRoom(any())).thenReturn(null);
+      },
+      act: (bloc) =>
+          bloc.add(VoiceRoomUpdated(_makeRoom(roomId: '!new:server'))),
       expect: () => [
-        isA<VoiceRoomState>().having(
-          (s) => s.room?.roomId,
-          'room.roomId',
-          '!new:server',
-        ),
+        isA<VoiceRoomState>()
+            .having((s) => s.room?.roomId, 'room.roomId', '!new:server')
+            .having((s) => s.myRole, 'myRole', VoiceRoomRole.host)
+            .having((s) => s.isMuted, 'isMuted', isFalse),
       ],
+      verify: (_) {
+        verify(() => mockService.syncFromRoom(any())).called(1);
+      },
     );
   });
 

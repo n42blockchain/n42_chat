@@ -58,6 +58,22 @@ class AuthRegisterRequested extends AuthEvent {
   List<Object?> get props => [homeserver, username, email, registrationToken];
 }
 
+/// 匿名注册请求
+class AuthAnonymousRegisterRequested extends AuthEvent {
+  final String homeserver;
+  final String password;
+  final String? registrationToken;
+
+  const AuthAnonymousRegisterRequested({
+    required this.homeserver,
+    required this.password,
+    this.registrationToken,
+  });
+
+  @override
+  List<Object?> get props => [homeserver, registrationToken];
+}
+
 /// 检查Homeserver
 class AuthHomeserverCheckRequested extends AuthEvent {
   final String homeserver;
@@ -91,6 +107,30 @@ class AuthTokenLoginRequested extends AuthEvent {
   List<Object?> get props => [homeserver, accessToken, userId, deviceId];
 }
 
+/// 切换到本机已保存账号
+class AuthSwitchStoredAccountRequested extends AuthEvent {
+  final String userId;
+
+  const AuthSwitchStoredAccountRequested({required this.userId});
+
+  @override
+  List<Object?> get props => [userId];
+}
+
+/// Matrix login token 登录请求（SSO/OIDC 回调）
+class AuthLoginTokenLoginRequested extends AuthEvent {
+  final String homeserver;
+  final String loginToken;
+
+  const AuthLoginTokenLoginRequested({
+    required this.homeserver,
+    required this.loginToken,
+  });
+
+  @override
+  List<Object?> get props => [homeserver, loginToken];
+}
+
 /// 清除错误
 class AuthErrorCleared extends AuthEvent {
   const AuthErrorCleared();
@@ -101,10 +141,7 @@ class UpdateAvatar extends AuthEvent {
   final Uint8List avatarBytes;
   final String filename;
 
-  const UpdateAvatar({
-    required this.avatarBytes,
-    required this.filename,
-  });
+  const UpdateAvatar({required this.avatarBytes, required this.filename});
 
   @override
   List<Object?> get props => [avatarBytes, filename];
@@ -128,6 +165,12 @@ class UpdateUserProfile extends AuthEvent {
   final String? region;
   final String? pokeText;
   final String? ringtone;
+  final String? avatarDecorationPreset;
+  final String? nftContractAddress;
+  final int? nftTokenId;
+  final int? nftChainId;
+  final String? nftImageUrl;
+  final bool clearNftAvatar;
 
   const UpdateUserProfile({
     this.displayName,
@@ -136,10 +179,29 @@ class UpdateUserProfile extends AuthEvent {
     this.region,
     this.pokeText,
     this.ringtone,
+    this.avatarDecorationPreset,
+    this.nftContractAddress,
+    this.nftTokenId,
+    this.nftChainId,
+    this.nftImageUrl,
+    this.clearNftAvatar = false,
   });
 
   @override
-  List<Object?> get props => [displayName, signature, gender, region, pokeText, ringtone];
+  List<Object?> get props => [
+    displayName,
+    signature,
+    gender,
+    region,
+    pokeText,
+    ringtone,
+    avatarDecorationPreset,
+    nftContractAddress,
+    nftTokenId,
+    nftChainId,
+    nftImageUrl,
+    clearNftAvatar,
+  ];
 }
 
 /// 加载用户资料数据
@@ -151,57 +213,12 @@ class LoadUserProfileData extends AuthEvent {
 // 多种登录方式事件
 // ============================================
 
-/// Passkey 登录请求
-class AuthPasskeyLoginRequested extends AuthEvent {
-  final String homeserver;
-  
-  const AuthPasskeyLoginRequested({required this.homeserver});
-  
-  @override
-  List<Object?> get props => [homeserver];
-}
-
-/// 注册 Passkey
-class AuthRegisterPasskeyRequested extends AuthEvent {
-  const AuthRegisterPasskeyRequested();
-}
-
-/// 请求邮箱验证码
-class AuthRequestEmailOtpRequested extends AuthEvent {
-  final String homeserver;
-  final String email;
-  
-  const AuthRequestEmailOtpRequested({
-    required this.homeserver,
-    required this.email,
-  });
-  
-  @override
-  List<Object?> get props => [homeserver, email];
-}
-
-/// 邮箱验证码登录请求
-class AuthEmailOtpLoginRequested extends AuthEvent {
-  final String homeserver;
-  final String email;
-  final String otp;
-  
-  const AuthEmailOtpLoginRequested({
-    required this.homeserver,
-    required this.email,
-    required this.otp,
-  });
-  
-  @override
-  List<Object?> get props => [homeserver, email, otp];
-}
-
 /// Google 登录请求
 class AuthGoogleLoginRequested extends AuthEvent {
   final String homeserver;
-  
+
   const AuthGoogleLoginRequested({required this.homeserver});
-  
+
   @override
   List<Object?> get props => [homeserver];
 }
@@ -209,9 +226,9 @@ class AuthGoogleLoginRequested extends AuthEvent {
 /// Apple 登录请求
 class AuthAppleLoginRequested extends AuthEvent {
   final String homeserver;
-  
+
   const AuthAppleLoginRequested({required this.homeserver});
-  
+
   @override
   List<Object?> get props => [homeserver];
 }
@@ -221,10 +238,7 @@ class AuthSsoLoginRequested extends AuthEvent {
   final String homeserver;
   final String? providerId;
 
-  const AuthSsoLoginRequested({
-    required this.homeserver,
-    this.providerId,
-  });
+  const AuthSsoLoginRequested({required this.homeserver, this.providerId});
 
   @override
   List<Object?> get props => [homeserver, providerId];
@@ -373,4 +387,3 @@ class AuthEnableBiometricLogin extends AuthEvent {
 class AuthDisableBiometricLogin extends AuthEvent {
   const AuthDisableBiometricLogin();
 }
-

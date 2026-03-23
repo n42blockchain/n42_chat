@@ -1,15 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart' show AuthenticationPassword, AuthenticationUserIdentifier, MatrixException;
+import 'package:matrix/matrix.dart'
+    show AuthenticationPassword, AuthenticationUserIdentifier, MatrixException;
 
 import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/matrix_uia_utils.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
+import '../../../n42_chat.dart';
 import '../../../services/auth/auth_methods_service.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/settings/recovery_key_display_dialog.dart';
@@ -61,7 +64,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   Future<void> _loadBiometricStatus() async {
     final isAvailable = await _biometricService.isAvailable();
     if (isAvailable) {
-      final typeDescription = await _biometricService.getBiometricTypeDescription();
+      final typeDescription = await _biometricService
+          .getBiometricTypeDescription();
       final isEnabled = await _secureStorage.isBiometricEnabled();
       setState(() {
         _isBiometricAvailable = true;
@@ -112,25 +116,26 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       final currentDeviceId = widget.e2eeManager.currentDeviceId;
       final userId = widget.e2eeManager.client.userID;
 
-      final devices = matrixDevices.map((d) {
-        final isVerified = userId != null
-            ? widget.e2eeManager.isDeviceVerified(userId, d.deviceId)
-            : false;
-        return DeviceInfo(
-          deviceId: d.deviceId,
-          deviceName: d.displayName ?? d.deviceId,
-          isVerified: isVerified,
-          lastSeenTs: d.lastSeenTs,
-          lastSeenIp: d.lastSeenIp,
-          isCurrentDevice: d.deviceId == currentDeviceId,
-        );
-      }).toList()
-        // 当前设备排在最前面
-        ..sort((a, b) {
-          if (a.isCurrentDevice) return -1;
-          if (b.isCurrentDevice) return 1;
-          return (b.lastSeenTs ?? 0).compareTo(a.lastSeenTs ?? 0);
-        });
+      final devices =
+          matrixDevices.map((d) {
+              final isVerified = userId != null
+                  ? widget.e2eeManager.isDeviceVerified(userId, d.deviceId)
+                  : false;
+              return DeviceInfo(
+                deviceId: d.deviceId,
+                deviceName: d.displayName ?? d.deviceId,
+                isVerified: isVerified,
+                lastSeenTs: d.lastSeenTs,
+                lastSeenIp: d.lastSeenIp,
+                isCurrentDevice: d.deviceId == currentDeviceId,
+              );
+            }).toList()
+            // 当前设备排在最前面
+            ..sort((a, b) {
+              if (a.isCurrentDevice) return -1;
+              if (b.isCurrentDevice) return 1;
+              return (b.lastSeenTs ?? 0).compareTo(a.lastSeenTs ?? 0);
+            });
 
       setState(() {
         _backupInfo = backupInfo;
@@ -224,10 +229,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                biometricIcon,
-                color: Colors.green,
-              ),
+              child: Icon(biometricIcon, color: Colors.green),
             ),
             title: Text(
               _biometricTypeDescription ?? 'Biometric',
@@ -237,8 +239,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             ),
             subtitle: Text(
               _isBiometricEnabled
-                  ? (S.of(context)?.settingsBiometricEnabled ?? 'Enabled - Use biometric to login')
-                  : (S.of(context)?.settingsBiometricDisabled ?? 'Disabled - Tap to enable'),
+                  ? (S.of(context)?.settingsBiometricEnabled ??
+                        'Enabled - Use biometric to login')
+                  : (S.of(context)?.settingsBiometricDisabled ??
+                        'Disabled - Tap to enable'),
               style: TextStyle(
                 color: isDark
                     ? AppColors.textSecondaryDark
@@ -259,6 +263,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Widget _buildPasskeySection(bool isDark) {
+    final l10n = S.of(context);
+
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: Column(
@@ -267,7 +273,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              'Passkey',
+              l10n?.authPasskeyLabel ?? 'Passkey',
               style: TextStyle(
                 fontSize: 13,
                 color: isDark
@@ -289,13 +295,14 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 child: const Icon(Icons.key, color: AppColors.primary),
               ),
               title: Text(
-                'No passkeys registered',
+                l10n?.authPasskeyNoRegistered ?? 'No passkeys registered',
                 style: TextStyle(
                   color: isDark ? Colors.white : AppColors.textPrimary,
                 ),
               ),
               subtitle: Text(
-                'Register a passkey for passwordless login',
+                l10n?.authPasskeyRegisterHint ??
+                    'Register a passkey for this account. Standalone passkey sign-in will be enabled later.',
                 style: TextStyle(
                   color: isDark
                       ? AppColors.textSecondaryDark
@@ -304,45 +311,51 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               ),
             )
           else
-            ..._registeredPasskeys.map((passkey) => ListTile(
-              leading: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+            ..._registeredPasskeys.map(
+              (passkey) => ListTile(
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.key, color: Colors.green),
                 ),
-                child: const Icon(Icons.key, color: Colors.green),
-              ),
-              title: Text(
-                passkey.displayName ?? 'Passkey',
-                style: TextStyle(
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                title: Text(
+                  passkey.displayName ?? 'Passkey',
+                  style: TextStyle(
+                    color: isDark ? Colors.white : AppColors.textPrimary,
+                  ),
+                ),
+                subtitle: Text(
+                  passkey.credentialId.length > 20
+                      ? '${passkey.credentialId.substring(0, 20)}...'
+                      : passkey.credentialId,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
+                  ),
+                ),
+                trailing: IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: AppColors.error,
+                    size: 20,
+                  ),
+                  onPressed: () => _deletePasskey(passkey),
                 ),
               ),
-              subtitle: Text(
-                passkey.credentialId.length > 20
-                    ? '${passkey.credentialId.substring(0, 20)}...'
-                    : passkey.credentialId,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
-                ),
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
-                onPressed: () => _deletePasskey(passkey),
-              ),
-            )),
+            ),
           // Register button
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: OutlinedButton.icon(
               onPressed: _registerPasskey,
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('Register Passkey'),
+              label: Text(l10n?.authPasskeyRegister ?? 'Register Passkey'),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 44),
                 shape: RoundedRectangleBorder(
@@ -357,6 +370,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Future<void> _registerPasskey() async {
+    final l10n = S.of(context);
     final client = widget.e2eeManager.client;
     final userId = client.userID;
     final accessToken = client.accessToken;
@@ -364,26 +378,30 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
     if (userId == null || accessToken == null || homeserver == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Not logged in')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Not logged in')));
       }
       return;
     }
 
     try {
       // 1. Request challenge
-      final challengeData = await _authMethodsService.requestPasskeyRegistrationChallenge(
-        homeserver: homeserver,
-        userId: userId,
-        accessToken: accessToken,
-      );
+      final challengeData = await _authMethodsService
+          .requestPasskeyRegistrationChallenge(
+            homeserver: homeserver,
+            userId: userId,
+            accessToken: accessToken,
+          );
 
       if (challengeData == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Server does not support Passkey (MSC3824)'),
+            SnackBar(
+              content: Text(
+                l10n?.authPasskeyRequiresServer ??
+                    'Passkey registration requires server support',
+              ),
               backgroundColor: Colors.orange,
             ),
           );
@@ -409,7 +427,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
       if (credential != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passkey registered successfully')),
+          SnackBar(
+            content: Text(
+              l10n?.authPasskeyRegistered ?? 'Passkey saved to this account',
+            ),
+          ),
         );
         unawaited(_loadPasskeyStatus()); // Refresh list
       }
@@ -423,11 +445,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Future<String?> _showPasskeyNameDialog() async {
+    final l10n = S.of(context);
     final controller = TextEditingController(text: 'My Passkey');
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Name your Passkey'),
+        title: Text(l10n?.authPasskeyNameYours ?? 'Name your Passkey'),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -450,7 +473,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               controller.dispose();
               Navigator.pop(ctx, name.isNotEmpty ? name : 'My Passkey');
             },
-            child: const Text('Register'),
+            child: Text(l10n?.authPasskeyRegister ?? 'Register'),
           ),
         ],
       ),
@@ -459,11 +482,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Future<void> _deletePasskey(PasskeyCredential passkey) async {
+    final l10n = S.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Passkey'),
-        content: Text('Delete passkey "${passkey.displayName ?? 'Passkey'}"? You will no longer be able to use it to log in.'),
+        title: Text(l10n?.commonDelete ?? 'Delete'),
+        content: Text(
+          l10n?.authPasskeyDeleteConfirm(passkey.displayName ?? 'Passkey') ??
+              'Delete passkey "${passkey.displayName ?? 'Passkey'}"? You will need to register it again before using passkey sign-in later.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -495,7 +522,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     if (mounted) {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passkey deleted')),
+          SnackBar(
+            content: Text(
+              l10n?.authPasskeyDeleted ?? 'Passkey removed from this account',
+            ),
+          ),
         );
         unawaited(_loadPasskeyStatus());
       } else {
@@ -516,7 +547,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             SnackBar(
               content: Text(
                 S.of(context)?.settingsBiometricNeedRelogin ??
-                'Please log out and log in again to enable biometric login',
+                    'Please log out and log in again to enable biometric login',
               ),
               duration: const Duration(seconds: 4),
             ),
@@ -528,7 +559,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       if (!mounted) return;
       // 执行生物识别验证
       final result = await _biometricService.authenticate(
-        reason: S.of(context)?.settingsEnableBiometricLogin ?? 'Verify to enable biometric login',
+        reason:
+            S.of(context)?.settingsEnableBiometricLogin ??
+            'Verify to enable biometric login',
       );
 
       if (result.success) {
@@ -543,7 +576,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.settingsBiometricLoginEnabled ?? 'Biometric login enabled'),
+                content: Text(
+                  S.of(context)?.settingsBiometricLoginEnabled ??
+                      'Biometric login enabled',
+                ),
               ),
             );
           }
@@ -564,7 +600,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(S.of(context)?.settingsBiometricLoginDisabled ?? 'Biometric login disabled'),
+            content: Text(
+              S.of(context)?.settingsBiometricLoginDisabled ??
+                  'Biometric login disabled',
+            ),
           ),
         );
       }
@@ -592,11 +631,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(24),
             ),
-            child: Icon(
-              Icons.lock,
-              color: statusColor,
-              size: 24,
-            ),
+            child: Icon(Icons.lock, color: statusColor, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -604,7 +639,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  S.of(context)?.commonEndToEndEncryption ?? 'End-to-End Encryption',
+                  S.of(context)?.commonEndToEndEncryption ??
+                      'End-to-End Encryption',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -614,10 +650,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 const SizedBox(height: 4),
                 Text(
                   statusText,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: statusColor,
-                  ),
+                  style: TextStyle(fontSize: 13, color: statusColor),
                 ),
               ],
             ),
@@ -655,9 +688,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ),
           _buildListItem(
             icon: Icons.cloud_upload,
-            title: S.of(context)?.settingsBackupEncryptionKeys ?? 'Backup Encryption Keys',
+            title:
+                S.of(context)?.settingsBackupEncryptionKeys ??
+                'Backup Encryption Keys',
             subtitle: _backupInfo != null
-                ? S.of(context)?.settingsKeysBackedUp(_backupInfo!.count) ?? '${_backupInfo!.count} keys backed up'
+                ? S.of(context)?.settingsKeysBackedUp(_backupInfo!.count) ??
+                      '${_backupInfo!.count} keys backed up'
                 : S.of(context)?.settingsBackupNotSet ?? 'Backup not set',
             onTap: _showBackupDialog,
             isDark: isDark,
@@ -666,7 +702,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           _buildListItem(
             icon: Icons.cloud_download,
             title: S.of(context)?.settingsRestoreKeys ?? 'Restore Keys',
-            subtitle: S.of(context)?.settingsRestoreKeysFromBackup ?? 'Restore encryption keys from backup',
+            subtitle:
+                S.of(context)?.settingsRestoreKeysFromBackup ??
+                'Restore encryption keys from backup',
             onTap: _showRestoreDialog,
             isDark: isDark,
           ),
@@ -674,7 +712,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           _buildListItem(
             icon: Icons.key,
             title: S.of(context)?.settingsExportKeys ?? 'Export Keys',
-            subtitle: S.of(context)?.settingsExportKeysToFile ?? 'Export keys to file',
+            subtitle:
+                S.of(context)?.settingsExportKeysToFile ??
+                'Export keys to file',
             onTap: _showExportDialog,
             isDark: isDark,
           ),
@@ -761,8 +801,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           color: device.isCurrentDevice
               ? AppColors.primary.withValues(alpha: 0.1)
               : device.isVerified
-                  ? Colors.green.withValues(alpha: 0.1)
-                  : Colors.orange.withValues(alpha: 0.1),
+              ? Colors.green.withValues(alpha: 0.1)
+              : Colors.orange.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
@@ -770,15 +810,17 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           color: device.isCurrentDevice
               ? AppColors.primary
               : device.isVerified
-                  ? Colors.green
-                  : Colors.orange,
+              ? Colors.green
+              : Colors.orange,
         ),
       ),
       title: Text(
         device.deviceName,
         style: TextStyle(
           color: isDark ? Colors.white : AppColors.textPrimary,
-          fontWeight: device.isCurrentDevice ? FontWeight.w600 : FontWeight.normal,
+          fontWeight: device.isCurrentDevice
+              ? FontWeight.w600
+              : FontWeight.normal,
         ),
       ),
       subtitle: Text(
@@ -788,8 +830,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           color: device.isCurrentDevice
               ? AppColors.primary
               : device.isVerified
-                  ? Colors.green
-                  : Colors.orange,
+              ? Colors.green
+              : Colors.orange,
         ),
       ),
       trailing: Icon(
@@ -841,14 +883,222 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           _buildListItem(
             icon: Icons.delete_forever,
             title: S.of(context)?.settingsResetEncryption ?? 'Reset Encryption',
-            subtitle: S.of(context)?.settingsDeleteAllEncryptionKeys ?? 'Delete all encryption keys',
+            subtitle:
+                S.of(context)?.settingsDeleteAllEncryptionKeys ??
+                'Delete all encryption keys',
             onTap: _showResetConfirmation,
+            isDark: isDark,
+            isDestructive: true,
+          ),
+          _buildDivider(isDark),
+          _buildListItem(
+            icon: Icons.person_remove_outlined,
+            title: 'Delete Account',
+            subtitle: 'Deactivate this account and erase local encrypted data',
+            onTap: _showDeleteAccountConfirmation,
             isDark: isDark,
             isDestructive: true,
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _showDeleteAccountConfirmation() async {
+    final passwordController = TextEditingController();
+    var eraseLocalData = true;
+    var eraseRemoteData = false;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Delete Account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'This permanently deactivates your Matrix account. If your homeserver requires password verification, you can provide it now or enter it after confirmation.',
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  hintText: 'Password (optional)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              CheckboxListTile(
+                value: eraseLocalData,
+                onChanged: (value) {
+                  setDialogState(() {
+                    eraseLocalData = value ?? true;
+                  });
+                },
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Also erase local chat data on this device'),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+              CheckboxListTile(
+                value: eraseRemoteData,
+                onChanged: (value) {
+                  setDialogState(() {
+                    eraseRemoteData = value ?? false;
+                  });
+                },
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Request homeserver data erasure'),
+                subtitle: const Text(
+                  'If supported, the server will purge account data after deactivation.',
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: Text(S.of(context)?.commonDelete ?? 'Delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed != true) {
+      passwordController.dispose();
+      return;
+    }
+
+    final password = passwordController.text.trim();
+    passwordController.dispose();
+
+    await _deactivateAccount(
+      password: password.isEmpty ? null : password,
+      eraseLocalData: eraseLocalData,
+      eraseRemoteData: eraseRemoteData,
+    );
+  }
+
+  Future<void> _deactivateAccount({
+    String? password,
+    required bool eraseLocalData,
+    required bool eraseRemoteData,
+  }) async {
+    setState(() => _isLoading = true);
+    try {
+      final authDataSource = MatrixAuthDataSource();
+      try {
+        await authDataSource.deactivateAccount(
+          password: password,
+          erase: eraseRemoteData,
+        );
+      } on MatrixException catch (e) {
+        if (password == null &&
+            e.response?.statusCode == 401 &&
+            matrixUiaSupportsPassword(e.response?.body)) {
+          if (mounted) {
+            setState(() => _isLoading = false);
+            await _showDeactivatePasswordDialog(
+              eraseLocalData: eraseLocalData,
+              eraseRemoteData: eraseRemoteData,
+            );
+          }
+          return;
+        }
+        rethrow;
+      }
+
+      try {
+        await N42Chat.logout();
+      } catch (_) {
+        // 账号已失效时继续清理本地状态即可。
+      }
+
+      if (eraseLocalData) {
+        await N42Chat.purgeLocalData();
+      }
+
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Delete account failed: $e')));
+      }
+      return;
+    }
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _showDeactivatePasswordDialog({
+    required bool eraseLocalData,
+    required bool eraseRemoteData,
+  }) async {
+    final passwordController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.settingsVerifyIdentity ?? 'Verify identity'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              S.of(context)?.settingsEnterPasswordToConfirm ??
+                  'Enter your password to confirm this action.',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: S.of(context)?.settingsPassword ?? 'Password',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+          ),
+        ],
+      ),
+    );
+
+    final password = passwordController.text.trim();
+    passwordController.dispose();
+
+    if (confirmed == true && password.isNotEmpty) {
+      await _deactivateAccount(
+        password: password,
+        eraseLocalData: eraseLocalData,
+        eraseRemoteData: eraseRemoteData,
+      );
+    }
   }
 
   Widget _buildListItem({
@@ -864,7 +1114,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         : (isDark ? Colors.white : AppColors.textPrimary);
 
     return ListTile(
-      leading: Icon(icon, color: isDestructive ? AppColors.error : AppColors.primary),
+      leading: Icon(
+        icon,
+        color: isDestructive ? AppColors.error : AppColors.primary,
+      ),
       title: Text(title, style: TextStyle(color: color)),
       subtitle: subtitle != null
           ? Text(
@@ -897,7 +1150,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   String _getStatusText(E2EEStatus status) {
     switch (status) {
       case E2EEStatus.notSupported:
-        return S.of(context)?.settingsEncryptionNotSupported ?? 'Encryption not supported';
+        return S.of(context)?.settingsEncryptionNotSupported ??
+            'Encryption not supported';
       case E2EEStatus.notInitialized:
         return S.of(context)?.settingsNotInitialized ?? 'Not initialized';
       case E2EEStatus.ready:
@@ -921,7 +1175,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.settingsBackupKeyTitle ?? 'Backup Keys'),
-        content: Text(S.of(context)?.settingsBackupKeyMessage ?? 'Create a new key backup? This will help you restore encrypted messages on a new device.'),
+        content: Text(
+          S.of(context)?.settingsBackupKeyMessage ??
+              'Create a new key backup? This will help you restore encrypted messages on a new device.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -960,14 +1217,23 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         _showRecoveryKeyDialog(recoveryKey);
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.settingsBackupSuccess ?? 'Keys backed up successfully')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.settingsBackupSuccess ??
+                  'Keys backed up successfully',
+            ),
+          ),
         );
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${S.of(context)?.settingsBackupFailed ?? 'Backup failed'}: $e')),
+          SnackBar(
+            content: Text(
+              '${S.of(context)?.settingsBackupFailed ?? 'Backup failed'}: $e',
+            ),
+          ),
         );
       }
     }
@@ -1010,7 +1276,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(S.of(context)?.settingsRecoveryKeySaved ?? 'I have saved it'),
+            child: Text(
+              S.of(context)?.settingsRecoveryKeySaved ?? 'I have saved it',
+            ),
           ),
         ],
       ),
@@ -1039,15 +1307,19 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               Row(
                 children: [
                   ChoiceChip(
-                    label: Text(S.of(context)?.settingsRecoveryKey ?? 'Recovery Key'),
+                    label: Text(
+                      S.of(context)?.settingsRecoveryKey ?? 'Recovery Key',
+                    ),
                     selected: isRecoveryKey,
-                    onSelected: (v) => setDialogState(() => isRecoveryKey = true),
+                    onSelected: (v) =>
+                        setDialogState(() => isRecoveryKey = true),
                   ),
                   const SizedBox(width: 8),
                   ChoiceChip(
                     label: Text(S.of(context)?.settingsPassword ?? 'Password'),
                     selected: !isRecoveryKey,
-                    onSelected: (v) => setDialogState(() => isRecoveryKey = false),
+                    onSelected: (v) =>
+                        setDialogState(() => isRecoveryKey = false),
                   ),
                 ],
               ),
@@ -1057,10 +1329,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 obscureText: !isRecoveryKey,
                 decoration: InputDecoration(
                   hintText: isRecoveryKey
-                      ? (S.of(context)?.settingsEnterRecoveryKey ?? 'Enter recovery key')
-                      : (S.of(context)?.settingsEnterPassword ?? 'Enter password'),
+                      ? (S.of(context)?.settingsEnterRecoveryKey ??
+                            'Enter recovery key')
+                      : (S.of(context)?.settingsEnterPassword ??
+                            'Enter password'),
                   border: const OutlineInputBorder(),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                 ),
                 maxLines: isRecoveryKey ? 3 : 1,
               ),
@@ -1090,7 +1367,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     );
   }
 
-  Future<void> _performRestore(String input, {required bool isRecoveryKey}) async {
+  Future<void> _performRestore(
+    String input, {
+    required bool isRecoveryKey,
+  }) async {
     setState(() => _isLoading = true);
     try {
       if (isRecoveryKey) {
@@ -1115,14 +1395,23 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.settingsRestoreSuccess ?? 'Keys restored successfully')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.settingsRestoreSuccess ??
+                  'Keys restored successfully',
+            ),
+          ),
         );
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${S.of(context)?.settingsRestoreFailed ?? 'Restore failed'}: $e')),
+          SnackBar(
+            content: Text(
+              '${S.of(context)?.settingsRestoreFailed ?? 'Restore failed'}: $e',
+            ),
+          ),
         );
       }
     }
@@ -1133,7 +1422,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.settingsExportKeyTitle ?? 'Export Keys'),
-        content: Text(S.of(context)?.settingsExportKeyMessage ?? 'The exported key file contains all your encryption keys. Please keep it safe.'),
+        content: Text(
+          S.of(context)?.settingsExportKeyMessage ??
+              'The exported key file contains all your encryption keys. Please keep it safe.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -1167,12 +1459,22 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           _showRecoveryKeyDialog(recoveryKey);
         } else if (widget.e2eeManager.hasSsssDefaultKey) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.settingsExportSuccess ?? 'Keys exported to server backup successfully')),
+            SnackBar(
+              content: Text(
+                S.of(context)?.settingsExportSuccess ??
+                    'Keys exported to server backup successfully',
+              ),
+            ),
           );
         } else {
           // 没有恢复密钥，提示先创建
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context)?.settingsExportNeedBackupFirst ?? 'Please create a key backup first')),
+            SnackBar(
+              content: Text(
+                S.of(context)?.settingsExportNeedBackupFirst ??
+                    'Please create a key backup first',
+              ),
+            ),
           );
         }
       }
@@ -1180,7 +1482,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${S.of(context)?.settingsExportFailed ?? 'Export failed'}: $e')),
+          SnackBar(
+            content: Text(
+              '${S.of(context)?.settingsExportFailed ?? 'Export failed'}: $e',
+            ),
+          ),
         );
       }
     }
@@ -1194,9 +1500,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       var recoveryKey = await widget.e2eeManager.getRecoveryKey();
 
       // 如果没有恢复密钥，创建一个
-      if (recoveryKey == null) {
-        recoveryKey = await widget.e2eeManager.createRecoveryKey();
-      }
+      recoveryKey ??= await widget.e2eeManager.createRecoveryKey();
 
       setState(() => _isLoading = false);
 
@@ -1204,17 +1508,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         await RecoveryKeyDisplayDialog.show(context, recoveryKey);
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to create recovery key'),
-          ),
+          const SnackBar(content: Text('Failed to create recovery key')),
         );
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -1259,15 +1561,19 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       color: device.isCurrentDevice
                           ? AppColors.primary.withValues(alpha: 0.1)
                           : device.isVerified
-                              ? Colors.green.withValues(alpha: 0.1)
-                              : Colors.orange.withValues(alpha: 0.1),
+                          ? Colors.green.withValues(alpha: 0.1)
+                          : Colors.orange.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      device.isCurrentDevice ? Icons.smartphone : Icons.phone_android,
+                      device.isCurrentDevice
+                          ? Icons.smartphone
+                          : Icons.phone_android,
                       color: device.isCurrentDevice
                           ? AppColors.primary
-                          : device.isVerified ? Colors.green : Colors.orange,
+                          : device.isVerified
+                          ? Colors.green
+                          : Colors.orange,
                       size: 28,
                     ),
                   ),
@@ -1281,7 +1587,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : AppColors.textPrimary,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -1289,7 +1597,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                         if (device.isCurrentDevice)
                           Text(
                             S.of(context)?.settingsThisDevice ?? 'This device',
-                            style: const TextStyle(fontSize: 13, color: AppColors.primary),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.primary,
+                            ),
                           ),
                       ],
                     ),
@@ -1331,7 +1642,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                     _showRenameDeviceDialog(device);
                   },
                   icon: const Icon(Icons.edit, size: 18),
-                  label: Text(S.of(context)?.settingsRenameDevice ?? 'Rename device'),
+                  label: Text(
+                    S.of(context)?.settingsRenameDevice ?? 'Rename device',
+                  ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -1347,7 +1660,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       _startSasVerification(device);
                     },
                     icon: const Icon(Icons.verified_user, size: 18),
-                    label: Text(S.of(context)?.settingsVerifyThisDevice ?? 'Verify this device'),
+                    label: Text(
+                      S.of(context)?.settingsVerifyThisDevice ??
+                          'Verify this device',
+                    ),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       backgroundColor: AppColors.primary,
@@ -1366,7 +1682,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       _showRemoteLogoutConfirmation(device);
                     },
                     icon: const Icon(Icons.logout, size: 18),
-                    label: Text(S.of(context)?.settingsRemoteLogout ?? 'Remote logout'),
+                    label: Text(
+                      S.of(context)?.settingsRemoteLogout ?? 'Remote logout',
+                    ),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       foregroundColor: AppColors.error,
@@ -1394,7 +1712,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               label,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
             ),
           ),
@@ -1422,7 +1742,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: S.of(context)?.settingsDeviceNameHint ?? 'Enter device name',
+            hintText:
+                S.of(context)?.settingsDeviceNameHint ?? 'Enter device name',
             border: const OutlineInputBorder(),
           ),
         ),
@@ -1457,13 +1778,21 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       await _loadData();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.settingsDeviceRenamed ?? 'Device renamed')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.settingsDeviceRenamed ?? 'Device renamed',
+            ),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${S.of(context)?.settingsRenameFailed ?? 'Rename failed'}: $e')),
+          SnackBar(
+            content: Text(
+              '${S.of(context)?.settingsRenameFailed ?? 'Rename failed'}: $e',
+            ),
+          ),
         );
       }
     }
@@ -1504,7 +1833,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       try {
         await authDataSource.deleteDevice(device.deviceId);
       } on MatrixException catch (e) {
-        if (e.response?.statusCode == 401) {
+        if (e.response?.statusCode == 401 &&
+            matrixUiaSupportsPassword(e.response?.body)) {
           // UIA required - show password dialog
           if (mounted) {
             setState(() => _isLoading = false);
@@ -1517,14 +1847,22 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       await _loadData();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.settingsDeviceLoggedOut ?? 'Device logged out')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.settingsDeviceLoggedOut ?? 'Device logged out',
+            ),
+          ),
         );
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e')),
+          SnackBar(
+            content: Text(
+              '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
+            ),
+          ),
         );
       }
     }
@@ -1539,7 +1877,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(S.of(context)?.settingsEnterPasswordToConfirm ?? 'Enter your password to confirm this action.'),
+            Text(
+              S.of(context)?.settingsEnterPasswordToConfirm ??
+                  'Enter your password to confirm this action.',
+            ),
             const SizedBox(height: 12),
             TextField(
               controller: passwordController,
@@ -1586,14 +1927,22 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           await _loadData();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(S.of(context)?.settingsDeviceLoggedOut ?? 'Device logged out')),
+              SnackBar(
+                content: Text(
+                  S.of(context)?.settingsDeviceLoggedOut ?? 'Device logged out',
+                ),
+              ),
             );
           }
         } catch (e) {
           setState(() => _isLoading = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e')),
+              SnackBar(
+                content: Text(
+                  '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
+                ),
+              ),
             );
           }
         }
@@ -1606,7 +1955,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   void _setupCrossSigning() async {
     if (widget.e2eeManager.isCrossSigningEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.settingsCrossSigningAlreadyEnabled ?? 'Cross-signing is already enabled')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.settingsCrossSigningAlreadyEnabled ??
+                'Cross-signing is already enabled',
+          ),
+        ),
       );
       return;
     }
@@ -1615,13 +1969,23 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       await widget.e2eeManager.initializeCrossSigning();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.settingsCrossSigningSetupSuccess ?? 'Cross-signing setup successful')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.settingsCrossSigningSetupSuccess ??
+                'Cross-signing setup successful',
+          ),
+        ),
       );
       setState(() {});
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.settingsSetupFailed(e.toString()) ?? 'Setup failed: $e')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.settingsSetupFailed(e.toString()) ??
+                'Setup failed: $e',
+          ),
+        ),
       );
     }
   }
@@ -1630,9 +1994,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.settingsResetEncryptionTitle ?? 'Reset Encryption'),
+        title: Text(
+          S.of(context)?.settingsResetEncryptionTitle ?? 'Reset Encryption',
+        ),
         content: Text(
-          S.of(context)?.settingsResetEncryptionWarning ?? 'Warning: This will delete all your encryption keys. You will not be able to decrypt previous encrypted messages. This action cannot be undone.',
+          S.of(context)?.settingsResetEncryptionWarning ??
+              'Warning: This will delete all your encryption keys. You will not be able to decrypt previous encrypted messages. This action cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -1645,21 +2012,31 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               setState(() => _isLoading = true);
               try {
                 await widget.keyBackupService.deleteKeyBackup();
-                final backupInfo = await widget.keyBackupService.getBackupInfo();
+                final backupInfo = await widget.keyBackupService
+                    .getBackupInfo();
                 setState(() {
                   _backupInfo = backupInfo;
                   _isLoading = false;
                 });
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(S.of(context)?.settingsResetSuccess ?? 'Encryption reset successful')),
+                    SnackBar(
+                      content: Text(
+                        S.of(context)?.settingsResetSuccess ??
+                            'Encryption reset successful',
+                      ),
+                    ),
                   );
                 }
               } catch (e) {
                 setState(() => _isLoading = false);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${S.of(context)?.settingsResetFailed ?? 'Reset failed'}: $e')),
+                    SnackBar(
+                      content: Text(
+                        '${S.of(context)?.settingsResetFailed ?? 'Reset failed'}: $e',
+                      ),
+                    ),
                   );
                 }
               }
@@ -1677,9 +2054,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     // 获取当前用户 ID
     final userId = widget.e2eeManager.client.userID;
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('User not logged in')));
       return;
     }
 
@@ -1698,10 +2075,14 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         // 验证成功，刷新设备列表
         _loadData();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.securityDeviceVerifiedTrusted ?? 'Device verified successfully')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.securityDeviceVerifiedTrusted ??
+                  'Device verified successfully',
+            ),
+          ),
         );
       }
     });
   }
 }
-

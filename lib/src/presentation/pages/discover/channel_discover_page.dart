@@ -21,7 +21,6 @@ class _RecommendedChannel {
   final String alias;
   final int subscriberCount;
   final ChannelCategory category;
-  final IconData icon;
 
   const _RecommendedChannel({
     required this.name,
@@ -29,7 +28,6 @@ class _RecommendedChannel {
     required this.alias,
     required this.subscriberCount,
     required this.category,
-    this.icon = Icons.campaign,
   });
 }
 
@@ -238,7 +236,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: channels.length,
-      separatorBuilder: (_, __) => Divider(
+      separatorBuilder: (_, _) => Divider(
         height: 1,
         indent: 72,
         color: isDark ? AppColors.dividerDark : AppColors.divider,

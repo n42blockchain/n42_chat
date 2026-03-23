@@ -46,7 +46,9 @@ class StorageManagementBloc
       final storageInfo = await _storageManager.getStorageUsage();
       final status = await _monitorService.checkStorageStatus();
       final config = await _monitorService.getStorageConfig();
-      final recommendations = await _cleanupService.getRecommendations();
+      final recommendations = await _cleanupService.getRecommendations(
+        preserveThumbnails: config.preserveThumbnails,
+      );
 
       // 加载房间排行
       final roomRanking = await _storageManager.getRoomStorageRanking();
@@ -109,7 +111,9 @@ class StorageManagementBloc
     Emitter<StorageManagementState> emit,
   ) async {
     try {
-      final recommendations = await _cleanupService.getRecommendations();
+      final recommendations = await _cleanupService.getRecommendations(
+        preserveThumbnails: state.storageConfig?.preserveThumbnails ?? true,
+      );
       emit(state.copyWith(recommendations: recommendations));
     } catch (e) {
       emit(state.copyWith(error: 'Failed to load recommendations: $e'));
@@ -122,8 +126,10 @@ class StorageManagementBloc
   ) async {
     emit(state.copyWith(isCleaning: true));
     try {
-      final result =
-          await _cleanupService.executeRecommendation(event.recommendation);
+      final result = await _cleanupService.executeRecommendation(
+        event.recommendation,
+        preserveThumbnails: state.storageConfig?.preserveThumbnails ?? true,
+      );
       emit(state.copyWith(
         isCleaning: false,
         lastCleanupResult: result,
@@ -147,6 +153,7 @@ class StorageManagementBloc
       final result = await _cleanupService.cleanupByRoom(
         roomId: event.roomId,
         fileCategories: event.fileCategories,
+        preserveThumbnails: state.storageConfig?.preserveThumbnails ?? true,
       );
       emit(state.copyWith(
         isCleaning: false,
@@ -231,10 +238,21 @@ class StorageManagementBloc
     emit(state.copyWith(isCleaning: true));
     try {
       final result = await _lifecycleService.cleanupFiles(event.filePaths);
+      if (result.filesDeleted > 0 || result.bytesFreed > 0) {
+        _storageManager.invalidateCache();
+      }
       emit(state.copyWith(
         isCleaning: false,
         lastCleanupResult: result,
       ));
+      if (event.roomId != null) {
+        add(
+          LoadRoomMediaDetail(
+            roomId: event.roomId!,
+            filterCategory: event.filterCategory,
+          ),
+        );
+      }
       // 删除后刷新存储信息，与 _onCleanupByRoom / _onClearCache 保持一致
       add(const LoadStorageInfo());
     } catch (e) {

@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/privacy_redaction_utils.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -12,10 +13,8 @@ import 'translation_settings_page.dart';
 import 'backup_restore_page.dart';
 import 'storage_management_page.dart';
 import 'auto_download_settings_page.dart';
-import '../../../data/datasources/matrix/matrix_client_manager.dart';
-import '../bridge/bridge_list_page.dart';
-import '../../../integration/bridge/bridge_manager.dart';
-import '../../../core/utils/debug_log.dart';
+import 'privacy_security_page.dart';
+import 'system_accounts_page.dart';
 
 /// 设置页面
 class SettingsPage extends StatelessWidget {
@@ -27,10 +26,12 @@ class SettingsPage extends StatelessWidget {
   final VoidCallback? onChat;
   final VoidCallback? onLanguage;
   final VoidCallback? onSecurity;
+  final VoidCallback? onAccounts;
   final VoidCallback? onChangePassword;
   final VoidCallback? onChangeEmail;
   final VoidCallback? onAbout;
   final VoidCallback? onLogout;
+
   /// 生物识别登录相关
   final bool isBiometricAvailable;
   final bool isBiometricEnabled;
@@ -47,6 +48,7 @@ class SettingsPage extends StatelessWidget {
     this.onChat,
     this.onLanguage,
     this.onSecurity,
+    this.onAccounts,
     this.onChangePassword,
     this.onChangeEmail,
     this.onAbout,
@@ -75,21 +77,25 @@ class SettingsPage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // 设置组1：通知与隐私
+          // 设置组1：通知与隐私安全
           _SettingsGroup(
             children: [
               _SettingsItem(
                 icon: Icons.notifications_outlined,
                 iconColor: Colors.red,
-                title: S.of(context)?.settingsNotificationSettings ?? 'Notifications',
+                title:
+                    S.of(context)?.settingsNotificationSettings ??
+                    'Notifications',
                 onTap: onNotification,
                 isDark: isDark,
               ),
               _SettingsItem(
-                icon: Icons.lock_outline,
+                icon: Icons.shield_moon_outlined,
                 iconColor: Colors.blue,
-                title: S.of(context)?.settingsPrivacy ?? 'Privacy',
-                onTap: onPrivacy,
+                title: 'Privacy & Security',
+                subtitle:
+                    'E2EE, disappearing messages, screenshot protection, and proxies',
+                onTap: () => _navigateToPrivacySecurity(context),
                 isDark: isDark,
               ),
             ],
@@ -187,15 +193,16 @@ class SettingsPage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // 设置组2.8：Connected Accounts (Bridge)
+          // 设置组2.8：System & Accounts
           _SettingsGroup(
             children: [
               _SettingsItem(
-                icon: Icons.link,
-                iconColor: Colors.deepPurple,
-                title: 'Connected Accounts',
-                subtitle: 'Discord, WhatsApp, Telegram...',
-                onTap: () => _navigateToBridges(context),
+                icon: Icons.settings_suggest_outlined,
+                iconColor: Colors.indigo,
+                title: 'System & Accounts',
+                subtitle:
+                    'Accounts, devices, usernames, notifications, and bridges',
+                onTap: () => _navigateToSystemAccounts(context),
                 isDark: isDark,
               ),
             ],
@@ -206,20 +213,15 @@ class SettingsPage extends StatelessWidget {
           // 设置组3：账号安全
           _SettingsGroup(
             children: [
-              _SettingsItem(
-                icon: Icons.security_outlined,
-                iconColor: Colors.teal,
-                title: S.of(context)?.settingsSecurity ?? 'Security',
-                onTap: onSecurity,
-                isDark: isDark,
-              ),
               if (isBiometricAvailable)
                 _SettingsItem(
                   icon: biometricTypeDescription?.contains('Face') == true
                       ? Icons.face
                       : Icons.fingerprint,
                   iconColor: Colors.green,
-                  title: S.of(context)?.settingsBiometricLogin ?? 'Biometric Login',
+                  title:
+                      S.of(context)?.settingsBiometricLogin ??
+                      'Biometric Login',
                   subtitle: biometricTypeDescription,
                   trailing: Switch(
                     value: isBiometricEnabled,
@@ -234,7 +236,8 @@ class SettingsPage extends StatelessWidget {
               _SettingsItem(
                 icon: Icons.lock_outline,
                 iconColor: Colors.indigo,
-                title: S.of(context)?.settingsChangePassword ?? 'Change Password',
+                title:
+                    S.of(context)?.settingsChangePassword ?? 'Change Password',
                 onTap: onChangePassword,
                 isDark: isDark,
               ),
@@ -282,6 +285,10 @@ class SettingsPage extends StatelessWidget {
   }
 
   Widget _buildProfileCard(BuildContext context, bool isDark) {
+    final secondaryColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -301,46 +308,81 @@ class SettingsPage extends StatelessWidget {
                   imageUrl: profile!.avatarUrl,
                   name: profile!.effectiveDisplayName,
                   size: 64,
+                  decorationPreset: profile!.avatarDecorationPreset,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        profile!.effectiveDisplayName,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        profile!.userId,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                      if (profile!.statusMessage != null &&
-                          profile!.statusMessage!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          profile!.statusMessage!,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                  child: FutureBuilder<PrivacySettings>(
+                    future: getIt<PreferencesDataSource>()
+                        .getPrivacySettingsModel(),
+                    builder: (context, snapshot) {
+                      final hidePhoneNumber =
+                          snapshot.data?.hidePhoneNumber ?? false;
+                      final phoneNumber = hidePhoneNumber
+                          ? maskPhoneNumber(profile!.phoneNumber)
+                          : profile!.phoneNumber?.trim();
+                      final email = profile!.email?.trim();
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            profile!.effectiveDisplayName,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ],
+                          const SizedBox(height: 4),
+                          Text(
+                            profile!.userId,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: secondaryColor,
+                            ),
+                          ),
+                          if (phoneNumber != null &&
+                              phoneNumber.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              phoneNumber,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: secondaryColor,
+                              ),
+                            ),
+                          ],
+                          if (email != null && email.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              email,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: secondaryColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                          if (profile!.statusMessage != null &&
+                              profile!.statusMessage!.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              profile!.statusMessage!,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: secondaryColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ],
+                      );
+                    },
                   ),
                 ),
                 Icon(
@@ -357,37 +399,55 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  void _navigateToBridges(BuildContext context) {
-    try {
-      final clientManager = getIt<MatrixClientManager>();
-      final client = clientManager.client;
-      if (client != null) {
-        final manager = BridgeManager(client: client);
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => BridgeListPage(bridgeManager: manager),
-          ),
-        );
-      }
-    } catch (e) {
-      debugLog('SettingsPage: Failed to open bridges: $e');
-    }
+  void _navigateToSystemAccounts(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SystemAccountsPage(
+          onOpenAccounts: onAccounts == null
+              ? null
+              : () async {
+                  onAccounts!.call();
+                },
+          onOpenSecuritySettings: onSecurity == null
+              ? null
+              : () async {
+                  onSecurity!.call();
+                },
+        ),
+      ),
+    );
+  }
+
+  void _navigateToPrivacySecurity(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PrivacySecurityPage(
+          onOpenPrivacySettings: onPrivacy == null
+              ? null
+              : () async {
+                  onPrivacy!.call();
+                },
+          onOpenSecuritySettings: onSecurity == null
+              ? null
+              : () async {
+                  onSecurity!.call();
+                },
+        ),
+      ),
+    );
   }
 
   void _navigateToTranslation(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const TranslationSettingsPage(),
-      ),
+      MaterialPageRoute<void>(builder: (_) => const TranslationSettingsPage()),
     );
   }
 
   void _navigateToQuickReplies(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => QuickRepliesPage(
-          storageDataSource: getIt<PreferencesDataSource>(),
-        ),
+        builder: (_) =>
+            QuickRepliesPage(storageDataSource: getIt<PreferencesDataSource>()),
       ),
     );
   }
@@ -397,7 +457,10 @@ class SettingsPage extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(S.of(context)?.commonLogout ?? 'Log Out'),
-        content: Text(S.of(context)?.commonLogoutConfirm ?? 'Are you sure you want to log out?'),
+        content: Text(
+          S.of(context)?.commonLogoutConfirm ??
+              'Are you sure you want to log out?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -432,21 +495,18 @@ class _SettingsGroup extends StatelessWidget {
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       child: Column(
-        children: List.generate(
-          children.length * 2 - 1,
-          (index) {
-            if (index.isOdd) {
-              return Padding(
-                padding: const EdgeInsets.only(left: 56),
-                child: Divider(
-                  height: 1,
-                  color: isDark ? AppColors.dividerDark : AppColors.divider,
-                ),
-              );
-            }
-            return children[index ~/ 2];
-          },
-        ),
+        children: List.generate(children.length * 2 - 1, (index) {
+          if (index.isOdd) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 56),
+              child: Divider(
+                height: 1,
+                color: isDark ? AppColors.dividerDark : AppColors.divider,
+              ),
+            );
+          }
+          return children[index ~/ 2];
+        }),
       ),
     );
   }
@@ -530,4 +590,3 @@ class _SettingsItem extends StatelessWidget {
     );
   }
 }
-

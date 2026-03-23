@@ -1,5 +1,6 @@
-import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
@@ -99,8 +100,9 @@ class MatrixMediaUploader {
     }
     request.bodyBytes = content;
 
+    final httpClient = http.Client();
     try {
-      final streamedResponse = await http.Client().send(request);
+      final streamedResponse = await httpClient.send(request);
       final response = await http.Response.fromStream(streamedResponse);
 
       debugLog('MatrixMessageDataSource: Upload response status: ${response.statusCode}');
@@ -162,6 +164,158 @@ class MatrixMediaUploader {
         debugLog('MatrixMessageDataSource: SDK upload failed: $sdkError');
         rethrow;
       }
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Future<Uri?> uploadFileAuthenticated(
+    String filePath, {
+    required int contentLength,
+    String? filename,
+    String? contentType,
+  }) async {
+    return _uploadStreamWithReplay(
+      streamFactory: () => File(filePath).openRead(),
+      contentLength: contentLength,
+      filename: filename,
+      contentType: contentType,
+      allowLegacyRetry: true,
+    );
+  }
+
+  Future<Uri?> uploadStreamAuthenticated(
+    Stream<List<int>> contentStream, {
+    required int contentLength,
+    String? filename,
+    String? contentType,
+  }) async {
+    return _uploadStreamWithReplay(
+      streamFactory: () => http.ByteStream(contentStream),
+      contentLength: contentLength,
+      filename: filename,
+      contentType: contentType,
+      allowLegacyRetry: false,
+    );
+  }
+
+  Future<Uri?> _uploadStreamWithReplay({
+    required Stream<List<int>> Function() streamFactory,
+    required int contentLength,
+    String? filename,
+    String? contentType,
+    required bool allowLegacyRetry,
+  }) async {
+    final client = _client;
+    if (client == null) {
+      throw Exception('Matrix client not initialized');
+    }
+    if (client.accessToken == null) {
+      throw Exception('No access token available');
+    }
+    if (client.homeserver == null) {
+      throw Exception('No homeserver configured');
+    }
+
+    final supportsAuth = await supportsAuthenticatedMedia();
+    final authPath = supportsAuth
+        ? '_matrix/client/v1/media/upload'
+        : '_matrix/media/v3/upload';
+
+    final authUri = Uri.parse('${client.homeserver}/$authPath').replace(
+      queryParameters: filename != null ? {'filename': filename} : null,
+    );
+
+    final response = await _sendStreamingRequest(
+      uri: authUri,
+      contentStream: streamFactory(),
+      contentLength: contentLength,
+      accessToken: client.accessToken!,
+      contentType: contentType,
+    );
+
+    final parsed = _parseUploadResponse(response);
+    if (parsed != null) {
+      return parsed;
+    }
+
+    if (supportsAuth &&
+        allowLegacyRetry &&
+        (response.statusCode == 403 || response.statusCode == 404)) {
+      final legacyUri = Uri.parse('${client.homeserver}/_matrix/media/v3/upload')
+          .replace(
+        queryParameters: filename != null ? {'filename': filename} : null,
+      );
+      final legacyResponse = await _sendStreamingRequest(
+        uri: legacyUri,
+        contentStream: streamFactory(),
+        contentLength: contentLength,
+        accessToken: client.accessToken!,
+        contentType: contentType,
+      );
+      final legacyParsed = _parseUploadResponse(legacyResponse);
+      if (legacyParsed != null) {
+        return legacyParsed;
+      }
+      _throwUploadResponseError(legacyResponse);
+    }
+
+    _throwUploadResponseError(response);
+  }
+
+  Future<http.Response> _sendStreamingRequest({
+    required Uri uri,
+    required Stream<List<int>> contentStream,
+    required int contentLength,
+    required String accessToken,
+    String? contentType,
+  }) async {
+    final request = http.StreamedRequest('POST', uri);
+    final httpClient = http.Client();
+    request.headers['Authorization'] = 'Bearer $accessToken';
+    if (contentType != null) {
+      request.headers['Content-Type'] = contentType;
+    }
+    request.contentLength = contentLength;
+
+    try {
+      final sendFuture = httpClient.send(request);
+      await request.sink.addStream(contentStream);
+      await request.sink.close();
+      final streamedResponse = await sendFuture;
+      return http.Response.fromStream(streamedResponse);
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  Uri? _parseUploadResponse(http.Response response) {
+    debugLog(
+      'MatrixMessageDataSource: Streaming upload response: ${response.statusCode}',
+    );
+    if (response.statusCode != 200) {
+      debugLog('MatrixMessageDataSource: Streaming upload failed: ${response.body}');
+      return null;
+    }
+    final json = jsonDecode(response.body);
+    final contentUri = json['content_uri'] as String?;
+    if (contentUri == null || contentUri.isEmpty) {
+      return null;
+    }
+    return Uri.parse(contentUri);
+  }
+
+  Never _throwUploadResponseError(http.Response response) {
+    try {
+      final errorJson = jsonDecode(response.body);
+      final errcode = errorJson['errcode'] as String?;
+      final error = errorJson['error'] as String?;
+      throw Exception('Upload failed: $errcode - $error');
+    } catch (e) {
+      if (e is Exception && e.toString().contains('Upload failed:')) {
+        rethrow;
+      }
+      throw Exception('Upload failed with status ${response.statusCode}');
     }
   }
 
@@ -180,6 +334,7 @@ class MatrixMediaUploader {
 
     debugLog('MatrixMessageDataSource: Uploading (legacy) to: $uri');
 
+    final httpClient = http.Client();
     try {
       final request = http.Request('POST', uri);
       request.headers['Authorization'] = 'Bearer ${client.accessToken}';
@@ -188,7 +343,7 @@ class MatrixMediaUploader {
       }
       request.bodyBytes = content;
 
-      final streamedResponse = await http.Client().send(request);
+      final streamedResponse = await httpClient.send(request);
       final response = await http.Response.fromStream(streamedResponse);
 
       debugLog('MatrixMessageDataSource: Legacy upload response: ${response.statusCode}');
@@ -221,6 +376,8 @@ class MatrixMediaUploader {
         debugLog('MatrixMessageDataSource: All upload methods failed: $sdkError');
         rethrow;
       }
+    } finally {
+      httpClient.close();
     }
   }
 }

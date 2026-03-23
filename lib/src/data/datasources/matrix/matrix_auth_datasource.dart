@@ -18,8 +18,8 @@ class MatrixAuthDataSource {
   MatrixAuthDataSource({
     MatrixClientManager? clientManager,
     SecureStorageDataSource? secureStorage,
-  })  : _clientManager = clientManager ?? MatrixClientManager.instance,
-        _secureStorage = secureStorage;
+  }) : _clientManager = clientManager ?? MatrixClientManager.instance,
+       _secureStorage = secureStorage;
 
   /// 获取客户端管理器
   MatrixClientManager get clientManager => _clientManager;
@@ -83,6 +83,26 @@ class MatrixAuthDataSource {
     _autoSetupCrossSigning();
   }
 
+  /// 使用 Matrix SSO/OIDC 返回的 login token 登录
+  Future<LoginResponse> loginWithLoginToken({
+    required String homeserver,
+    required String loginToken,
+    String? deviceName,
+  }) async {
+    if (!_clientManager.isInitialized) {
+      await _clientManager.initialize();
+    }
+
+    final response = await _clientManager.loginWithLoginToken(
+      homeserver: homeserver,
+      loginToken: loginToken,
+      deviceName: deviceName,
+    );
+
+    _autoSetupCrossSigning();
+    return response;
+  }
+
   Future<void>? _autoSetupFuture;
 
   /// 登录后异步初始化 cross-signing（不阻塞登录流程）
@@ -105,7 +125,8 @@ class MatrixAuthDataSource {
   ///
   /// 返回服务器版本信息和支持的登录方式
   /// Matrix 6.0: checkHomeserver 返回 4 值 record tuple
-  Future<(DiscoveryInformation?, GetVersionsResponse, List<LoginFlow>)> checkHomeserver(String homeserver) async {
+  Future<(DiscoveryInformation?, GetVersionsResponse, List<LoginFlow>)>
+  checkHomeserver(String homeserver) async {
     if (!_clientManager.isInitialized) {
       await _clientManager.initialize();
     }
@@ -116,7 +137,9 @@ class MatrixAuthDataSource {
     }
 
     final homeserverUri = Uri.parse(homeserver);
-    final (discovery, versions, loginFlows, _) = await client.checkHomeserver(homeserverUri);
+    final (discovery, versions, loginFlows, _) = await client.checkHomeserver(
+      homeserverUri,
+    );
     return (discovery, versions, loginFlows);
   }
 
@@ -176,9 +199,7 @@ class MatrixAuthDataSource {
     // 构建认证数据
     AuthenticationData? auth;
     if (registrationToken != null && registrationToken.isNotEmpty) {
-      auth = RegistrationTokenAuthenticationData(
-        token: registrationToken,
-      );
+      auth = RegistrationTokenAuthenticationData(token: registrationToken);
     }
 
     // 注册
@@ -203,7 +224,9 @@ class MatrixAuthDataSource {
             if (decoded is! Map<String, dynamic>) rethrow;
             body = decoded;
           } on FormatException catch (fe) {
-            debugLog('MatrixAuthDataSource: Register UIA - server returned non-JSON body: $fe');
+            debugLog(
+              'MatrixAuthDataSource: Register UIA - server returned non-JSON body: $fe',
+            );
             rethrow; // 继续抛出原始 MatrixException
           }
 
@@ -240,7 +263,9 @@ class MatrixAuthDataSource {
           }
         } catch (innerError) {
           // 解析或处理失败，继续抛出原始异常
-          debugLog('MatrixAuthDataSource: Register UIA parse error: $innerError');
+          debugLog(
+            'MatrixAuthDataSource: Register UIA parse error: $innerError',
+          );
         }
       }
       rethrow;
@@ -296,6 +321,33 @@ class MatrixAuthDataSource {
     }
   }
 
+  /// 注销账号并删除服务端数据
+  Future<void> deactivateAccount({
+    String? password,
+    AuthenticationData? auth,
+    bool erase = true,
+  }) async {
+    final client = _clientManager.client;
+    if (client == null || !_clientManager.isLoggedIn) {
+      throw StateError('Matrix client not logged in');
+    }
+
+    final userId = client.userID;
+    if (userId == null || userId.isEmpty) {
+      throw StateError('User ID not available');
+    }
+
+    var requestAuth = auth;
+    if (requestAuth == null && password != null && password.isNotEmpty) {
+      requestAuth = AuthenticationPassword(
+        password: password,
+        identifier: AuthenticationUserIdentifier(user: userId),
+      );
+    }
+
+    await client.deactivateAccount(auth: requestAuth, erase: erase);
+  }
+
   // ============================================
   // 会话管理
   // ============================================
@@ -319,11 +371,9 @@ class MatrixAuthDataSource {
   /// 注意：Matrix协议本身不支持刷新token，
   /// 但某些服务器可能提供这个功能
   Future<void> refreshToken() async {
-    // Matrix协议不直接支持刷新token
-    // 如果token过期，需要重新登录
-    throw UnimplementedError(
-      'Matrix protocol does not support token refresh. '
-      'Please login again if token expired.',
+    debugLog(
+      'MatrixAuthDataSource: refreshToken is not supported by Matrix; '
+      'keeping the current session unchanged.',
     );
   }
 
@@ -448,10 +498,7 @@ class MatrixAuthDataSource {
       // 创建邮箱验证认证数据（使用与请求时相同的 clientSecret）
       final auth = AuthenticationThreePidCreds(
         type: 'm.login.email.identity',
-        threepidCreds: ThreepidCreds(
-          sid: savedSid,
-          clientSecret: clientSecret,
-        ),
+        threepidCreds: ThreepidCreds(sid: savedSid, clientSecret: clientSecret),
       );
 
       await client.changePassword(newPassword, auth: auth);
@@ -522,17 +569,17 @@ class SessionCredentials {
   });
 
   Map<String, dynamic> toJson() => {
-        'homeserver': homeserver,
-        // accessToken excluded — sensitive credential, must not be serialized
-        'userId': userId,
-        'deviceId': deviceId,
-        'deviceName': deviceName,
-      };
+    'homeserver': homeserver,
+    // accessToken excluded — sensitive credential, must not be serialized
+    'userId': userId,
+    'deviceId': deviceId,
+    'deviceName': deviceName,
+  };
 
   factory SessionCredentials.fromJson(Map<String, dynamic> json) {
     return SessionCredentials(
       homeserver: json['homeserver'] as String,
-      accessToken: json['accessToken'] as String,
+      accessToken: json['accessToken'] as String? ?? '',
       userId: json['userId'] as String,
       deviceId: json['deviceId'] as String,
       deviceName: json['deviceName'] as String? ?? '',
@@ -540,7 +587,8 @@ class SessionCredentials {
   }
 
   @override
-  String toString() => 'SessionCredentials(userId: $userId, deviceId: $deviceId)';
+  String toString() =>
+      'SessionCredentials(userId: $userId, deviceId: $deviceId)';
 }
 
 /// 用于 registration_token 认证的数据类
@@ -549,12 +597,8 @@ class SessionCredentials {
 class RegistrationTokenAuthenticationData extends AuthenticationData {
   final String token;
 
-  RegistrationTokenAuthenticationData({
-    required this.token,
-    super.session,
-  }) : super(
-          type: 'm.login.registration_token',
-        );
+  RegistrationTokenAuthenticationData({required this.token, super.session})
+    : super(type: 'm.login.registration_token');
 
   @override
   Map<String, dynamic> toJson() {
@@ -573,20 +617,14 @@ class PasswordAuthenticationData extends AuthenticationData {
     required this.userId,
     required this.password,
     super.session,
-  }) : super(
-          type: 'm.login.password',
-        );
+  }) : super(type: 'm.login.password');
 
   @override
   Map<String, dynamic> toJson() {
     final json = super.toJson();
     json['user'] = userId;
     json['password'] = password;
-    json['identifier'] = {
-      'type': 'm.id.user',
-      'user': userId,
-    };
+    json['identifier'] = {'type': 'm.id.user', 'user': userId};
     return json;
   }
 }
-

@@ -1,9 +1,15 @@
+import 'package:equatable/equatable.dart';
+
 /// Model for storing multi-dimensional similarity calculation results
 /// between two on-chain addresses.
 ///
 /// Each dimension (token, NFT, chain, DAO, transaction) contributes a
 /// partial score; [weightedScore] combines them with domain-specific weights.
-class SocialSimilarityModel {
+class SocialSimilarityModel extends Equatable {
+  static const double tokenWeight = 0.43;
+  static const double nftWeight = 0.36;
+  static const double chainWeight = 0.21;
+
   /// First address in the comparison.
   final String addressA;
 
@@ -59,25 +65,37 @@ class SocialSimilarityModel {
   /// proportionally among the three active dimensions:
   ///   Token: 0.43, NFT: 0.36, Chain: 0.21  (normalized from 0.30, 0.25, 0.15)
   double get weightedScore {
-    return tokenOverlap * 0.43 +
-        nftOverlap * 0.36 +
-        chainUsage * 0.21;
+    return calculateWeightedScore(
+      tokenOverlap: tokenOverlap,
+      nftOverlap: nftOverlap,
+      chainUsage: chainUsage,
+    );
+  }
+
+  static double calculateWeightedScore({
+    required double tokenOverlap,
+    required double nftOverlap,
+    required double chainUsage,
+  }) {
+    return tokenOverlap * tokenWeight +
+        nftOverlap * nftWeight +
+        chainUsage * chainWeight;
   }
 
   /// Serialize to JSON for caching or debugging.
   Map<String, dynamic> toJson() => {
-        'addressA': addressA,
-        'addressB': addressB,
-        'tokenOverlap': tokenOverlap,
-        'nftOverlap': nftOverlap,
-        'transactionInteraction': transactionInteraction,
-        'chainUsage': chainUsage,
-        'daoMembership': daoMembership,
-        'totalScore': totalScore,
-        'commonTokens': commonTokens,
-        'commonNftCollections': commonNftCollections,
-        'commonChains': commonChains,
-      };
+    'addressA': addressA,
+    'addressB': addressB,
+    'tokenOverlap': tokenOverlap,
+    'nftOverlap': nftOverlap,
+    'transactionInteraction': transactionInteraction,
+    'chainUsage': chainUsage,
+    'daoMembership': daoMembership,
+    'totalScore': totalScore,
+    'commonTokens': commonTokens,
+    'commonNftCollections': commonNftCollections,
+    'commonChains': commonChains,
+  };
 
   /// Deserialize from JSON.
   factory SocialSimilarityModel.fromJson(Map<String, dynamic> json) {
@@ -91,15 +109,28 @@ class SocialSimilarityModel {
       chainUsage: (json['chainUsage'] as num?)?.toDouble() ?? 0,
       daoMembership: (json['daoMembership'] as num?)?.toDouble() ?? 0,
       totalScore: (json['totalScore'] as num?)?.toDouble() ?? 0,
-      commonTokens: (json['commonTokens'] as List<dynamic>?)
-              ?.cast<String>() ??
-          const [],
+      commonTokens:
+          (json['commonTokens'] as List<dynamic>?)?.cast<String>() ?? const [],
       commonNftCollections:
           (json['commonNftCollections'] as List<dynamic>?)?.cast<String>() ??
-              const [],
-      commonChains: (json['commonChains'] as List<dynamic>?)
-              ?.cast<String>() ??
           const [],
+      commonChains:
+          (json['commonChains'] as List<dynamic>?)?.cast<String>() ?? const [],
     );
   }
+
+  @override
+  List<Object?> get props => [
+    addressA,
+    addressB,
+    tokenOverlap,
+    nftOverlap,
+    transactionInteraction,
+    chainUsage,
+    daoMembership,
+    totalScore,
+    commonTokens,
+    commonNftCollections,
+    commonChains,
+  ];
 }

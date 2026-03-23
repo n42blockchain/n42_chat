@@ -7,20 +7,13 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../domain/entities/message_entity.dart';
 
+final RegExp _unsafeExportNameRegExp = RegExp(r'[^\w\s-]');
+
 /// 导出格式
-enum ExportFormat {
-  html,
-  json,
-}
+enum ExportFormat { html, json, txt }
 
 /// 日期范围选项
-enum ExportDateRange {
-  all,
-  lastWeek,
-  lastMonth,
-  last3Months,
-  custom,
-}
+enum ExportDateRange { all, lastWeek, lastMonth, last3Months, custom }
 
 /// 聊天记录导出服务
 class ChatExportService {
@@ -43,26 +36,27 @@ class ChatExportService {
     DateTime? customStart,
     DateTime? customEnd,
   }) async {
-    // 过滤日期范围
-    final filteredMessages = _filterByDateRange(
-      messages,
-      dateRange,
-      customStart,
-      customEnd,
+    final filteredMessages = sortMessagesForExport(
+      filterMessagesForExport(messages, dateRange, customStart, customEnd),
     );
-
-    // 生成内容
-    final content = switch (format) {
-      ExportFormat.html => _generateHtml(filteredMessages, roomName),
-      ExportFormat.json => _generateJson(filteredMessages, roomName),
-    };
+    final content = generateChatExportContent(
+      format: format,
+      messages: filteredMessages,
+      roomName: roomName,
+    );
 
     // 写入临时文件
     final dir = await getTemporaryDirectory();
     final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-    final extension = format == ExportFormat.html ? 'html' : 'json';
-    final sanitizedName = roomName.replaceAll(RegExp(r'[^\w\s-]'), '_');
-    final file = File('${dir.path}/chat_${sanitizedName}_$timestamp.$extension');
+    final extension = switch (format) {
+      ExportFormat.html => 'html',
+      ExportFormat.json => 'json',
+      ExportFormat.txt => 'txt',
+    };
+    final sanitizedName = roomName.replaceAll(_unsafeExportNameRegExp, '_');
+    final file = File(
+      '${dir.path}/chat_${sanitizedName}_$timestamp.$extension',
+    );
     await file.writeAsString(content);
 
     return file;
@@ -94,156 +88,6 @@ class ChatExportService {
     );
   }
 
-  List<MessageEntity> _filterByDateRange(
-    List<MessageEntity> messages,
-    ExportDateRange range,
-    DateTime? customStart,
-    DateTime? customEnd,
-  ) {
-    final now = DateTime.now();
-    DateTime? start;
-
-    switch (range) {
-      case ExportDateRange.all:
-        return messages;
-      case ExportDateRange.lastWeek:
-        start = now.subtract(const Duration(days: 7));
-      case ExportDateRange.lastMonth:
-        start = DateTime(now.year, now.month - 1, now.day);
-      case ExportDateRange.last3Months:
-        start = DateTime(now.year, now.month - 3, now.day);
-      case ExportDateRange.custom:
-        start = customStart;
-    }
-
-    return messages.where((m) {
-      if (start != null && m.timestamp.isBefore(start)) return false;
-      if (customEnd != null && m.timestamp.isAfter(customEnd)) return false;
-      return true;
-    }).toList();
-  }
-
-  String _generateJson(List<MessageEntity> messages, String roomName) {
-    final data = {
-      'roomName': roomName,
-      'exportedAt': DateTime.now().toIso8601String(),
-      'messageCount': messages.length,
-      'messages': messages.map((m) => {
-        'id': m.id,
-        'sender': m.senderName,
-        'senderId': m.senderId,
-        'content': m.content,
-        'type': m.type.name,
-        'timestamp': m.timestamp.toIso8601String(),
-        'isEdited': m.isEdited,
-        if (m.replyToId != null) 'replyTo': {
-          'id': m.replyToId,
-          'content': m.replyToContent,
-          'sender': m.replyToSender,
-        },
-        if (m.metadata != null) 'metadata': {
-          if (m.metadata!.fileName != null) 'fileName': m.metadata!.fileName,
-          if (m.metadata!.mimeType != null) 'mimeType': m.metadata!.mimeType,
-          if (m.metadata!.size != null) 'size': m.metadata!.size,
-          if (m.metadata!.duration != null) 'duration': m.metadata!.duration,
-        },
-      }).toList(),
-    };
-
-    return const JsonEncoder.withIndent('  ').convert(data);
-  }
-
-  String _generateHtml(List<MessageEntity> messages, String roomName) {
-    final dateFormatter = DateFormat('yyyy-MM-dd HH:mm:ss');
-    final buf = StringBuffer();
-
-    buf.writeln('<!DOCTYPE html>');
-    buf.writeln('<html lang="en">');
-    buf.writeln('<head>');
-    buf.writeln('<meta charset="UTF-8">');
-    buf.writeln('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
-    buf.writeln('<title>Chat Export - ${_escapeHtml(roomName)}</title>');
-    buf.writeln('<style>');
-    buf.writeln(_htmlStyle);
-    buf.writeln('</style>');
-    buf.writeln('</head>');
-    buf.writeln('<body>');
-    buf.writeln('<div class="container">');
-    buf.writeln('<h1>${_escapeHtml(roomName)}</h1>');
-    buf.writeln('<p class="meta">Exported: ${dateFormatter.format(DateTime.now())} | ${messages.length} messages</p>');
-    buf.writeln('<div class="messages">');
-
-    String? lastDate;
-    for (final msg in messages) {
-      final dateStr = DateFormat('yyyy-MM-dd').format(msg.timestamp);
-      if (dateStr != lastDate) {
-        buf.writeln('<div class="date-separator">$dateStr</div>');
-        lastDate = dateStr;
-      }
-
-      final timeStr = DateFormat('HH:mm').format(msg.timestamp);
-      final bubbleClass = msg.isFromMe ? 'self' : 'other';
-
-      buf.writeln('<div class="message $bubbleClass">');
-      buf.writeln('<div class="sender">${_escapeHtml(msg.senderName)}</div>');
-      buf.writeln('<div class="bubble">');
-
-      if (msg.hasReply && msg.replyToContent != null) {
-        buf.writeln('<div class="reply">');
-        buf.writeln('<span class="reply-sender">${_escapeHtml(msg.replyToSender ?? '')}</span>');
-        buf.writeln('<span class="reply-content">${_escapeHtml(msg.replyToContent!)}</span>');
-        buf.writeln('</div>');
-      }
-
-      buf.writeln('<div class="content">${_formatContent(msg)}</div>');
-      buf.writeln('<div class="time">$timeStr${msg.isEdited ? " (edited)" : ""}</div>');
-      buf.writeln('</div>');
-      buf.writeln('</div>');
-    }
-
-    buf.writeln('</div>');
-    buf.writeln('</div>');
-    buf.writeln('</body>');
-    buf.writeln('</html>');
-
-    return buf.toString();
-  }
-
-  String _formatContent(MessageEntity msg) {
-    switch (msg.type) {
-      case MessageType.text:
-        return _escapeHtml(msg.content);
-      case MessageType.image:
-        return '[Image${msg.metadata?.fileName != null ? ": ${_escapeHtml(msg.metadata!.fileName!)}" : ""}]';
-      case MessageType.video:
-        return '[Video${msg.metadata?.formattedDuration.isNotEmpty == true ? " (${msg.metadata!.formattedDuration})" : ""}]';
-      case MessageType.voice:
-      case MessageType.audio:
-        return '[Voice${msg.metadata?.formattedDuration.isNotEmpty == true ? " (${msg.metadata!.formattedDuration})" : ""}]';
-      case MessageType.file:
-        return '[File: ${_escapeHtml(msg.metadata?.fileName ?? "unknown")} (${msg.metadata?.formattedSize ?? ""})]';
-      case MessageType.location:
-        return '[Location: ${_escapeHtml(msg.metadata?.locationName ?? "Unknown")}]';
-      case MessageType.sticker:
-        return '[Sticker]';
-      case MessageType.poll:
-        return '[Poll: ${_escapeHtml(msg.metadata?.pollQuestion ?? "")}]';
-      case MessageType.transfer:
-        return '[Transfer: ${msg.metadata?.amount ?? ""} ${msg.metadata?.token ?? ""}]';
-      default:
-        return _escapeHtml(msg.content);
-    }
-  }
-
-  String _escapeHtml(String text) {
-    return text
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-  }
-
   static const _htmlStyle = '''
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: #ededed; }
 .container { max-width: 800px; margin: 0 auto; padding: 20px; }
@@ -265,4 +109,231 @@ h1 { text-align: center; color: #333; }
 .reply-sender { font-weight: 600; display: block; color: #576b95; }
 .reply-content { color: #666; }
 ''';
+}
+
+List<MessageEntity> filterMessagesForExport(
+  List<MessageEntity> messages,
+  ExportDateRange range,
+  DateTime? customStart,
+  DateTime? customEnd,
+) {
+  final now = DateTime.now();
+  DateTime? start;
+
+  switch (range) {
+    case ExportDateRange.all:
+      return List<MessageEntity>.from(messages);
+    case ExportDateRange.lastWeek:
+      start = now.subtract(const Duration(days: 7));
+    case ExportDateRange.lastMonth:
+      start = DateTime(now.year, now.month - 1, now.day);
+    case ExportDateRange.last3Months:
+      start = DateTime(now.year, now.month - 3, now.day);
+    case ExportDateRange.custom:
+      start = customStart;
+  }
+
+  return messages
+      .where((message) {
+        if (start != null && message.timestamp.isBefore(start)) {
+          return false;
+        }
+        if (customEnd != null && message.timestamp.isAfter(customEnd)) {
+          return false;
+        }
+        return true;
+      })
+      .toList(growable: false);
+}
+
+List<MessageEntity> sortMessagesForExport(List<MessageEntity> messages) {
+  final sortedMessages = List<MessageEntity>.from(messages);
+  sortedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  return sortedMessages;
+}
+
+String generateChatExportContent({
+  required ExportFormat format,
+  required List<MessageEntity> messages,
+  required String roomName,
+}) {
+  return switch (format) {
+    ExportFormat.html => generateHtmlChatExport(messages, roomName),
+    ExportFormat.json => generateJsonChatExport(messages, roomName),
+    ExportFormat.txt => generateTextChatExport(messages, roomName),
+  };
+}
+
+String generateJsonChatExport(List<MessageEntity> messages, String roomName) {
+  final data = {
+    'roomName': roomName,
+    'exportedAt': DateTime.now().toIso8601String(),
+    'messageCount': messages.length,
+    'messages': messages
+        .map(
+          (message) => {
+            'id': message.id,
+            'sender': message.senderName,
+            'senderId': message.senderId,
+            'content': message.content,
+            'type': message.type.name,
+            'timestamp': message.timestamp.toIso8601String(),
+            'isEdited': message.isEdited,
+            if (message.replyToId != null)
+              'replyTo': {
+                'id': message.replyToId,
+                'content': message.replyToContent,
+                'sender': message.replyToSender,
+              },
+            if (message.metadata != null)
+              'metadata': {
+                if (message.metadata!.fileName != null)
+                  'fileName': message.metadata!.fileName,
+                if (message.metadata!.mimeType != null)
+                  'mimeType': message.metadata!.mimeType,
+                if (message.metadata!.size != null)
+                  'size': message.metadata!.size,
+                if (message.metadata!.duration != null)
+                  'duration': message.metadata!.duration,
+              },
+          },
+        )
+        .toList(),
+  };
+
+  return const JsonEncoder.withIndent('  ').convert(data);
+}
+
+String generateHtmlChatExport(List<MessageEntity> messages, String roomName) {
+  final dateFormatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+  final buf = StringBuffer();
+
+  buf.writeln('<!DOCTYPE html>');
+  buf.writeln('<html lang="en">');
+  buf.writeln('<head>');
+  buf.writeln('<meta charset="UTF-8">');
+  buf.writeln(
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+  );
+  buf.writeln('<title>Chat Export - ${escapeChatExportHtml(roomName)}</title>');
+  buf.writeln('<style>');
+  buf.writeln(ChatExportService._htmlStyle);
+  buf.writeln('</style>');
+  buf.writeln('</head>');
+  buf.writeln('<body>');
+  buf.writeln('<div class="container">');
+  buf.writeln('<h1>${escapeChatExportHtml(roomName)}</h1>');
+  buf.writeln(
+    '<p class="meta">Exported: ${dateFormatter.format(DateTime.now())} | ${messages.length} messages</p>',
+  );
+  buf.writeln('<div class="messages">');
+
+  String? lastDate;
+  for (final message in messages) {
+    final dateStr = DateFormat('yyyy-MM-dd').format(message.timestamp);
+    if (dateStr != lastDate) {
+      buf.writeln('<div class="date-separator">$dateStr</div>');
+      lastDate = dateStr;
+    }
+
+    final timeStr = DateFormat('HH:mm').format(message.timestamp);
+    final bubbleClass = message.isFromMe ? 'self' : 'other';
+
+    buf.writeln('<div class="message $bubbleClass">');
+    buf.writeln(
+      '<div class="sender">${escapeChatExportHtml(message.senderName)}</div>',
+    );
+    buf.writeln('<div class="bubble">');
+
+    if (message.hasReply && message.replyToContent != null) {
+      buf.writeln('<div class="reply">');
+      buf.writeln(
+        '<span class="reply-sender">${escapeChatExportHtml(message.replyToSender ?? '')}</span>',
+      );
+      buf.writeln(
+        '<span class="reply-content">${escapeChatExportHtml(message.replyToContent!)}</span>',
+      );
+      buf.writeln('</div>');
+    }
+
+    buf.writeln('<div class="content">${_formatExportContent(message)}</div>');
+    buf.writeln(
+      '<div class="time">$timeStr${message.isEdited ? " (edited)" : ""}</div>',
+    );
+    buf.writeln('</div>');
+    buf.writeln('</div>');
+  }
+
+  buf.writeln('</div>');
+  buf.writeln('</div>');
+  buf.writeln('</body>');
+  buf.writeln('</html>');
+
+  return buf.toString();
+}
+
+String generateTextChatExport(List<MessageEntity> messages, String roomName) {
+  final buf = StringBuffer();
+  final exportedAt = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+  buf.writeln(roomName);
+  buf.writeln('Exported: $exportedAt');
+  buf.writeln('Messages: ${messages.length}');
+  buf.writeln('');
+
+  for (final message in messages) {
+    final timestamp = DateFormat('yyyy-MM-dd HH:mm').format(message.timestamp);
+    buf.writeln(
+      '[$timestamp] ${message.senderName}: ${_formatPlainExportContent(message)}',
+    );
+    if (message.hasReply && message.replyToContent != null) {
+      buf.writeln(
+        '  Reply to ${message.replyToSender ?? "Unknown"}: ${message.replyToContent}',
+      );
+    }
+    if (message.isEdited) {
+      buf.writeln('  (edited)');
+    }
+  }
+
+  return buf.toString().trimRight();
+}
+
+String escapeChatExportHtml(String text) {
+  return text
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+}
+
+String _formatExportContent(MessageEntity message) {
+  return escapeChatExportHtml(_formatPlainExportContent(message));
+}
+
+String _formatPlainExportContent(MessageEntity message) {
+  switch (message.type) {
+    case MessageType.text:
+      return message.content;
+    case MessageType.image:
+      return '[Image${message.metadata?.fileName != null ? ": ${message.metadata!.fileName!}" : ""}]';
+    case MessageType.video:
+      return '[Video${message.metadata?.formattedDuration.isNotEmpty == true ? " (${message.metadata!.formattedDuration})" : ""}]';
+    case MessageType.voice:
+    case MessageType.audio:
+      return '[Voice${message.metadata?.formattedDuration.isNotEmpty == true ? " (${message.metadata!.formattedDuration})" : ""}]';
+    case MessageType.file:
+      return '[File: ${message.metadata?.fileName ?? "unknown"} (${message.metadata?.formattedSize ?? ""})]';
+    case MessageType.location:
+      return '[Location: ${message.metadata?.locationName ?? "Unknown"}]';
+    case MessageType.sticker:
+      return '[Sticker]';
+    case MessageType.poll:
+      return '[Poll: ${message.metadata?.pollQuestion ?? ""}]';
+    case MessageType.transfer:
+      return '[Transfer: ${message.metadata?.amount ?? ""} ${message.metadata?.token ?? ""}]';
+    default:
+      return message.content;
+  }
 }

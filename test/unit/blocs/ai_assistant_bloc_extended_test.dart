@@ -7,6 +7,7 @@
 //   SendAiMessage: blocked guards
 
 import 'package:bloc_test/bloc_test.dart';
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/ai_service.dart';
@@ -43,6 +44,15 @@ void main() {
     model: 'gpt-4o',
     contextWindow: 10,
     createdAt: DateTime(2025, 2, 1),
+  );
+
+  final anotherAssistant = AiAssistantEntity(
+    id: 'assistant-2',
+    name: 'Another AI',
+    systemPrompt: 'Another.',
+    model: 'gpt-4o',
+    contextWindow: 12,
+    createdAt: DateTime(2025, 3, 1),
   );
 
   setUp(() {
@@ -302,6 +312,151 @@ void main() {
       ),
       act: (bloc) => bloc.add(const SendAiMessage('hello')),
       expect: () => <AiAssistantState>[],
+    );
+
+    blocTest<AiAssistantBloc, AiAssistantState>(
+      'continues generation when persisting user message fails',
+      build: () {
+        when(() => mockRepo.saveChatMessage(any(), any()))
+            .thenThrow(Exception('disk full'));
+        when(
+          () => mockService.streamCompletion(
+            any(),
+            systemPrompt: any(named: 'systemPrompt'),
+            model: any(named: 'model'),
+            temperature: any(named: 'temperature'),
+            maxTokens: any(named: 'maxTokens'),
+          ),
+        ).thenAnswer((_) => Stream<String>.fromIterable(const ['Hi']));
+        return buildBloc();
+      },
+      seed: () => AiAssistantState(
+        assistant: defaultAssistant,
+        isAvailable: true,
+      ),
+      act: (bloc) => bloc.add(const SendAiMessage('hello')),
+      expect: () => [
+        isA<AiAssistantState>()
+            .having((s) => s.isGenerating, 'isGenerating', isTrue)
+            .having((s) => s.messages, 'messages', hasLength(1))
+            .having((s) => s.error, 'error', isNull),
+        isA<AiAssistantState>()
+            .having((s) => s.streamingText, 'streamingText', 'Hi'),
+        isA<AiAssistantState>()
+            .having((s) => s.isGenerating, 'isGenerating', isFalse)
+            .having((s) => s.messages, 'messages', hasLength(2))
+            .having((s) => s.messages.last.content, 'assistant reply', 'Hi')
+            .having((s) => s.error, 'error', isNull),
+      ],
+    );
+  });
+
+  blocTest<AiAssistantBloc, AiAssistantState>(
+    'ClearAiChatHistory keeps messages and emits error when repository fails',
+    build: () {
+      when(() => mockRepo.clearChatHistory(any()))
+          .thenThrow(Exception('db failure'));
+      return buildBloc();
+    },
+    seed: () => AiAssistantState(
+      assistant: defaultAssistant,
+      messages: [
+        AiChatMessage(
+          id: 'm1',
+          role: 'user',
+          content: 'hello',
+          timestamp: DateTime(2025, 1, 1),
+        ),
+      ],
+      isLoading: false,
+    ),
+    act: (bloc) => bloc.add(const ClearAiChatHistory()),
+    expect: () => [
+      isA<AiAssistantState>()
+          .having((s) => s.messages, 'messages', hasLength(1))
+          .having((s) => s.isGenerating, 'isGenerating', isFalse)
+          .having((s) => s.streamingText, 'streamingText', isEmpty)
+          .having((s) => s.error, 'error', 'Failed to clear chat history'),
+    ],
+  );
+
+  blocTest<AiAssistantBloc, AiAssistantState>(
+    'SwitchAiAssistant falls back to empty state when history load fails',
+    build: () {
+      when(() => mockRepo.getChatHistory(anotherAssistant.id))
+          .thenThrow(Exception('history load failed'));
+      return buildBloc();
+    },
+    seed: () => AiAssistantState(
+      assistant: defaultAssistant,
+      messages: [
+        AiChatMessage(
+          id: 'm1',
+          role: 'user',
+          content: 'hello',
+          timestamp: DateTime(2025, 1, 1),
+        ),
+      ],
+      isLoading: false,
+    ),
+    act: (bloc) => bloc.add(SwitchAiAssistant(anotherAssistant)),
+    expect: () => [
+      isA<AiAssistantState>()
+          .having((s) => s.assistant, 'assistant', anotherAssistant)
+          .having((s) => s.messages, 'messages', isEmpty)
+          .having((s) => s.error, 'error', 'Failed to load assistant history'),
+    ],
+  );
+
+  test('stale stream events are ignored after switching assistant', () async {
+    final controller = StreamController<String>();
+
+    when(() => mockRepo.saveChatMessage(any(), any()))
+        .thenAnswer((_) async {});
+    when(
+      () => mockService.streamCompletion(
+        any(),
+        systemPrompt: any(named: 'systemPrompt'),
+        model: any(named: 'model'),
+        temperature: any(named: 'temperature'),
+        maxTokens: any(named: 'maxTokens'),
+      ),
+    ).thenAnswer((_) => controller.stream);
+    when(() => mockRepo.getDefaultAssistant())
+        .thenAnswer((_) async => defaultAssistant);
+    when(() => mockRepo.getChatHistory(defaultAssistant.id))
+        .thenAnswer((_) async => []);
+    when(() => mockRepo.getChatHistory(anotherAssistant.id))
+        .thenAnswer((_) async => []);
+
+    final bloc = buildBloc();
+    addTearDown(() async {
+      await controller.close();
+      await bloc.close();
+    });
+
+    bloc.add(const InitializeAiAssistant());
+    await Future<void>.delayed(Duration.zero);
+    bloc.add(const SendAiMessage('hello'));
+    await Future<void>.delayed(Duration.zero);
+    bloc.add(SwitchAiAssistant(anotherAssistant));
+    await Future<void>.delayed(Duration.zero);
+    bloc.add(const AiStreamChunkReceived('stale', requestId: 1));
+    bloc.add(const AiStreamCompleted(requestId: 1));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(bloc.state.assistant?.id, anotherAssistant.id);
+    expect(bloc.state.streamingText, isEmpty);
+    expect(bloc.state.messages, isEmpty);
+    verifyNever(
+      () => mockRepo.saveChatMessage(
+        anotherAssistant.id,
+        any(that: isA<AiChatMessage>().having(
+          (m) => m.content,
+          'content',
+          'stale',
+        )),
+      ),
     );
   });
 }

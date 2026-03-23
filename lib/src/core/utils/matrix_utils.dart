@@ -13,7 +13,7 @@ class MatrixUtils {
   /// 参考 FluffyChat 的实现方式，直接构建 URL
   /// 格式: https://homeserver/_matrix/media/v3/download/server/mediaId
   /// 或缩略图: https://homeserver/_matrix/media/v3/thumbnail/server/mediaId?width=x&height=y&method=crop
-  /// 
+  ///
   /// 对于需要认证的服务器，添加 access_token 参数
   static String? mxcToHttp(
     String? mxcUrl, {
@@ -43,35 +43,75 @@ class MatrixUtils {
       final uri = Uri.parse(mxcUrl);
       final serverName = uri.host;
       final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
-      
+
       if (serverName.isEmpty || mediaId.isEmpty) {
         debugLog('MatrixUtils: Invalid mxc URL format: $mxcUrl');
         return null;
       }
 
-      final homeserver = client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
+      final homeserver =
+          client.homeserver?.toString().replaceAll(RegExp(r'/$'), '') ?? '';
       if (homeserver.isEmpty) {
         debugLog('MatrixUtils: No homeserver configured');
         return null;
       }
-      
+
       // 构建 HTTP URL - 使用认证媒体 API (Matrix 1.11+)
       String url;
       if (width != null && height != null) {
         // 缩略图 URL
-        final methodStr = method == matrix.ThumbnailMethod.crop ? 'crop' : 'scale';
+        final methodStr = method == matrix.ThumbnailMethod.crop
+            ? 'crop'
+            : 'scale';
         final animatedStr = animated ? '&animated=true' : '';
-        url = '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$methodStr$animatedStr';
+        url =
+            '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$methodStr$animatedStr';
       } else {
         // 完整下载 URL
-        url = '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+        url =
+            '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
       }
-      
+
       return url;
     } catch (e) {
       debugLog('MatrixUtils: Error converting mxc URL: $e');
       return null;
     }
+  }
+
+  /// 仅对当前 homeserver 的认证媒体 URL 附带 Authorization 头。
+  static Map<String, String> buildAuthenticatedMediaHeaders(
+    String? url, {
+    required matrix.Client? client,
+  }) {
+    if (url == null || url.isEmpty || client == null) {
+      return const {};
+    }
+
+    final targetUri = Uri.tryParse(url);
+    final accessToken = client.accessToken;
+    final homeserver = client.homeserver;
+    if (targetUri == null ||
+        accessToken == null ||
+        accessToken.isEmpty ||
+        homeserver == null) {
+      return const {};
+    }
+
+    final targetPort = targetUri.hasPort
+        ? targetUri.port
+        : (targetUri.scheme == 'https' ? 443 : 80);
+    final homeserverPort = homeserver.hasPort
+        ? homeserver.port
+        : (homeserver.scheme == 'https' ? 443 : 80);
+
+    if (targetUri.scheme != homeserver.scheme ||
+        targetUri.host != homeserver.host ||
+        targetPort != homeserverPort) {
+      return const {};
+    }
+
+    return {'Authorization': 'Bearer $accessToken'};
   }
 
   /// 获取头像 HTTP URL

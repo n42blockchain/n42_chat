@@ -4,6 +4,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../../../domain/entities/message_entity.dart';
 import '../matrix_client_manager.dart';
 import 'matrix_event_mapper.dart';
+import 'matrix_text_message_content.dart';
 import '../../../../core/utils/debug_log.dart';
 
 /// Matrix 消息线程处理器 (MSC3440)
@@ -28,20 +29,11 @@ class MatrixThreadHandler {
     final room = _client?.getRoomById(roomId);
     if (room == null) return null;
 
-    final content = <String, dynamic>{
-      'msgtype': 'm.text',
-      'body': text,
-      'm.relates_to': {
-        'rel_type': 'm.thread',
-        'event_id': threadRootEventId,
-        'is_falling_back': true,
-        'm.in_reply_to': {
-          'event_id': threadRootEventId,
-        },
-      },
-    };
-
-    return await room.sendEvent(content);
+    return room.sendEvent(
+      buildTextMessageContent(text),
+      threadRootEventId: threadRootEventId,
+      threadLastEventId: threadRootEventId,
+    );
   }
 
   /// 发送线程内图片消息
@@ -68,21 +60,14 @@ class MatrixThreadHandler {
       'msgtype': 'm.image',
       'body': filename,
       'url': uri.toString(),
-      'info': {
-        'mimetype': actualMimeType,
-        'size': imageBytes.length,
-      },
-      'm.relates_to': {
-        'rel_type': 'm.thread',
-        'event_id': threadRootEventId,
-        'is_falling_back': true,
-        'm.in_reply_to': {
-          'event_id': threadRootEventId,
-        },
-      },
+      'info': {'mimetype': actualMimeType, 'size': imageBytes.length},
     };
 
-    return await room.sendEvent(content);
+    return room.sendEvent(
+      content,
+      threadRootEventId: threadRootEventId,
+      threadLastEventId: threadRootEventId,
+    );
   }
 
   /// 发送线程内文件消息
@@ -109,21 +94,14 @@ class MatrixThreadHandler {
       'msgtype': 'm.file',
       'body': filename,
       'url': uri.toString(),
-      'info': {
-        'mimetype': actualMimeType,
-        'size': fileBytes.length,
-      },
-      'm.relates_to': {
-        'rel_type': 'm.thread',
-        'event_id': threadRootEventId,
-        'is_falling_back': true,
-        'm.in_reply_to': {
-          'event_id': threadRootEventId,
-        },
-      },
+      'info': {'mimetype': actualMimeType, 'size': fileBytes.length},
     };
 
-    return await room.sendEvent(content);
+    return room.sendEvent(
+      content,
+      threadRootEventId: threadRootEventId,
+      threadLastEventId: threadRootEventId,
+    );
   }
 
   /// 获取线程内的消息列表
@@ -143,10 +121,7 @@ class MatrixThreadHandler {
       final response = await _client!.request(
         matrix.RequestType.GET,
         '/client/v1/rooms/${Uri.encodeComponent(roomId)}/relations/${Uri.encodeComponent(threadRootEventId)}/m.thread',
-        query: {
-          'limit': limit.toString(),
-          'from': ?fromToken,
-        },
+        query: {'limit': limit.toString(), 'from': ?fromToken},
       );
 
       final chunk = response['chunk'] as List<dynamic>? ?? [];
@@ -179,17 +154,26 @@ class MatrixThreadHandler {
   /// 在服务器不支持 /relations API 时使用此方法。
   /// Matrix SDK 6.0 不再提供同步 timeline 访问，
   /// 此方法通过 getTimeline() 异步获取。
-  List<MessageEntity> _getThreadMessagesFromTimeline(
+  Future<List<MessageEntity>> _getThreadMessagesFromTimeline(
     matrix.Room room,
     String threadRootEventId,
-  ) {
+  ) async {
     final messages = <MessageEntity>[];
     try {
-      // SDK 6.0 does not expose a synchronous timeline accessor.
-      // The /relations API in getThreadMessages() is the primary path.
-      // This fallback returns empty and logs a warning.
-      debugLog('MatrixMessageDataSource: Timeline fallback not available in SDK 6.0, '
-          'returning empty thread results for $threadRootEventId');
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        if (event.eventId == threadRootEventId) {
+          messages.add(_eventMapper.mapEventToMessage(event, room));
+          continue;
+        }
+
+        final relatesTo =
+            event.content['m.relates_to'] as Map<String, dynamic>?;
+        if (relatesTo?['rel_type'] == 'm.thread' &&
+            relatesTo?['event_id'] == threadRootEventId) {
+          messages.add(_eventMapper.mapEventToMessage(event, room));
+        }
+      }
     } catch (e) {
       debugLog('MatrixMessageDataSource: Fallback thread fetch failed: $e');
     }
@@ -201,17 +185,23 @@ class MatrixThreadHandler {
   Stream<List<MessageEntity>> watchThreadMessages(
     String roomId,
     String threadRootEventId,
-  ) {
+  ) async* {
     final room = _client?.getRoomById(roomId);
-    if (room == null) return const Stream.empty();
+    if (room == null) {
+      return;
+    }
 
-    // 利用房间 timeline 的 onChange 流，过滤出线程相关消息
-    return room.client.onSync.stream
-        .where((sync) => sync.rooms?.join?.containsKey(roomId) == true ||
-            sync.rooms?.leave?.containsKey(roomId) == true)
-        .asyncMap((_) async {
-      return _getThreadMessagesFromTimeline(room, threadRootEventId);
-    });
+    yield await getThreadMessages(roomId, threadRootEventId);
+
+    await for (final sync in room.client.onSync.stream) {
+      final roomUpdated =
+          sync.rooms?.join?.containsKey(roomId) == true ||
+          sync.rooms?.leave?.containsKey(roomId) == true;
+      if (!roomUpdated) {
+        continue;
+      }
+      yield await getThreadMessages(roomId, threadRootEventId);
+    }
   }
 
   /// 获取房间内所有线程根消息

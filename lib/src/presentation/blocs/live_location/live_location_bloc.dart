@@ -13,16 +13,43 @@ class LiveLocationBloc extends Bloc<LiveLocationEvent, LiveLocationState> {
   final MatrixMessageDataSource _messageDataSource;
   Timer? _locationUpdateTimer;
   Timer? _expiryCheckTimer;
+  StreamSubscription<List<LiveLocationEntity>>? _liveLocationsSubscription;
 
   LiveLocationBloc({
     required MatrixMessageDataSource messageDataSource,
   })  : _messageDataSource = messageDataSource,
         super(const LiveLocationState()) {
+    on<ObserveLiveLocationRoom>(_onObserveLiveLocationRoom);
     on<StartLiveLocation>(_onStartLiveLocation);
     on<StopLiveLocation>(_onStopLiveLocation);
     on<UpdateMyLocation>(_onUpdateMyLocation);
     on<LiveLocationUpdated>(_onLiveLocationUpdated);
+    on<LiveLocationSnapshotReceived>(_onLiveLocationSnapshotReceived);
     on<LiveLocationExpired>(_onLiveLocationExpired);
+  }
+
+  Future<void> _onObserveLiveLocationRoom(
+    ObserveLiveLocationRoom event,
+    Emitter<LiveLocationState> emit,
+  ) async {
+    await _liveLocationsSubscription?.cancel();
+    emit(state.copyWith(currentRoomId: event.roomId, error: null));
+
+    _liveLocationsSubscription = _messageDataSource
+        .watchLiveLocations(event.roomId)
+        .listen(
+      (locations) {
+        if (!isClosed) {
+          add(LiveLocationSnapshotReceived(
+            roomId: event.roomId,
+            locations: locations,
+          ));
+        }
+      },
+      onError: (Object error) {
+        debugLog('LiveLocationBloc: Failed to watch live locations: $error');
+      },
+    );
   }
 
   Future<void> _onStartLiveLocation(
@@ -128,6 +155,26 @@ class LiveLocationBloc extends Bloc<LiveLocationEvent, LiveLocationState> {
     emit(state.copyWith(activeSharings: updatedSharings));
   }
 
+  void _onLiveLocationSnapshotReceived(
+    LiveLocationSnapshotReceived event,
+    Emitter<LiveLocationState> emit,
+  ) {
+    final activeSharings = <String, LiveLocationEntity>{
+      for (final location in event.locations) location.userId: location,
+    };
+    final currentUserId = _messageDataSource.currentUserId;
+    final isSharingFromSnapshot = currentUserId != null &&
+        activeSharings.containsKey(currentUserId);
+
+    emit(state.copyWith(
+      currentRoomId: event.roomId,
+      activeSharings: activeSharings,
+      isSharing: isSharingFromSnapshot ||
+          (state.isSharing && state.currentRoomId == event.roomId),
+      error: null,
+    ));
+  }
+
   void _onLiveLocationExpired(
     LiveLocationExpired event,
     Emitter<LiveLocationState> emit,
@@ -185,6 +232,7 @@ class LiveLocationBloc extends Bloc<LiveLocationEvent, LiveLocationState> {
   Future<void> close() {
     _locationUpdateTimer?.cancel();
     _expiryCheckTimer?.cancel();
+    _liveLocationsSubscription?.cancel();
     return super.close();
   }
 }

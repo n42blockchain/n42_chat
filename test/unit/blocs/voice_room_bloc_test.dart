@@ -27,6 +27,10 @@ void main() {
   late MockVoiceRoomRepository mockRepo;
   late MockVoiceRoomService mockService;
 
+  setUpAll(() {
+    registerFallbackValue(_makeRoom());
+  });
+
   setUp(() {
     mockRepo = MockVoiceRoomRepository();
     mockService = MockVoiceRoomService();
@@ -34,9 +38,9 @@ void main() {
     // BLoC constructor subscribes to both streams immediately.
     // These MUST be stubbed before buildBloc() is called.
     when(() => mockService.stateStream)
-        .thenAnswer((_) => Stream.empty());
+        .thenAnswer((_) => const Stream.empty());
     when(() => mockRepo.watchActiveVoiceRooms())
-        .thenAnswer((_) => Stream.empty());
+        .thenAnswer((_) => const Stream.empty());
   });
 
   VoiceRoomBloc buildBloc() => VoiceRoomBloc(
@@ -109,7 +113,7 @@ void main() {
         when(() => mockService.myRole).thenReturn(VoiceRoomRole.host);
         when(() => mockService.isMuted).thenReturn(false);
         when(() => mockRepo.watchVoiceRoom(any()))
-            .thenAnswer((_) => Stream.empty());
+            .thenAnswer((_) => const Stream.empty());
       },
       act: (bloc) =>
           bloc.add(const CreateVoiceRoom(name: 'My Room', topic: 'Dart talk')),
@@ -208,7 +212,7 @@ void main() {
         when(() => mockService.raiseHand()).thenAnswer((_) async => false);
       },
       act: (bloc) => bloc.add(const RaiseHand()),
-      expect: () => [],
+      expect: () => <VoiceRoomState>[],
     );
   });
 
@@ -250,6 +254,11 @@ void main() {
     blocTest<VoiceRoomBloc, VoiceRoomState>(
       'updates room entity',
       build: buildBloc,
+      setUp: () {
+        when(() => mockService.myRole).thenReturn(VoiceRoomRole.listener);
+        when(() => mockService.isMuted).thenReturn(true);
+        when(() => mockService.syncFromRoom(any())).thenReturn(null);
+      },
       act: (bloc) => bloc.add(VoiceRoomUpdated(_makeRoom())),
       expect: () => [
         isA<VoiceRoomState>().having((s) => s.room, 'room', isNotNull),

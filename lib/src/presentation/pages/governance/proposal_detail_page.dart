@@ -34,13 +34,16 @@ class ProposalDetailPage extends StatefulWidget {
 
 class _ProposalDetailPageState extends State<ProposalDetailPage> {
   int? _selectedChoice;
+  bool _isLoadingDetail = false;
+  bool _voteInFlight = false;
 
   @override
   void initState() {
     super.initState();
-    context
-        .read<GovernanceBloc>()
-        .add(GovernanceLoadProposalDetail(widget.proposalId));
+    _isLoadingDetail = true;
+    context.read<GovernanceBloc>().add(
+          GovernanceLoadProposalDetail(widget.proposalId),
+        );
   }
 
   @override
@@ -55,32 +58,63 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
         elevation: 0.5,
       ),
       body: BlocConsumer<GovernanceBloc, GovernanceState>(
+        listenWhen: (previous, current) =>
+            previous.status != current.status ||
+            previous.selectedProposal != current.selectedProposal,
         listener: (context, state) {
-          if (state.status == GovernanceStatus.voted) {
+          final matchesCurrentProposal =
+              state.selectedProposal?.id == widget.proposalId;
+
+          if (_isLoadingDetail &&
+              state.status == GovernanceStatus.loaded &&
+              matchesCurrentProposal) {
+            if (mounted) {
+              setState(() => _isLoadingDetail = false);
+            }
+          }
+
+          if (_voteInFlight &&
+              state.status == GovernanceStatus.voted &&
+              matchesCurrentProposal) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Vote submitted successfully!'),
                 backgroundColor: AppColors.success,
               ),
             );
-            setState(() => _selectedChoice = null);
-          } else if (state.status == GovernanceStatus.error &&
+            setState(() {
+              _voteInFlight = false;
+              _selectedChoice = null;
+            });
+          } else if ((state.status == GovernanceStatus.error &&
+                  (_voteInFlight || _isLoadingDetail)) &&
               state.errorMessage != null) {
+            final wasVoting = _voteInFlight;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
                 backgroundColor: AppColors.error,
               ),
             );
+            if (mounted) {
+              setState(() {
+                _voteInFlight = false;
+                if (!wasVoting) {
+                  _isLoadingDetail = false;
+                }
+              });
+            }
           }
         },
         builder: (context, state) {
-          if (state.status == GovernanceStatus.loading &&
-              state.selectedProposal == null) {
+          final proposal = state.selectedProposal?.id == widget.proposalId
+              ? state.selectedProposal
+              : null;
+
+          if (_isLoadingDetail && proposal == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final proposal = state.selectedProposal;
           if (proposal == null) {
             return Center(
               child: Text(
@@ -353,7 +387,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
     GovernanceState state,
     bool isDark,
   ) {
-    final isVoting = state.status == GovernanceStatus.voting;
+    final isVoting = _voteInFlight && state.status == GovernanceStatus.voting;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -475,6 +509,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
       ),
     ).then((confirmed) {
       if (confirmed == true && mounted) {
+        setState(() => _voteInFlight = true);
         context.read<GovernanceBloc>().add(
               GovernanceCastVote(
                 spaceId: widget.spaceId,

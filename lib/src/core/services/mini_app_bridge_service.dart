@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -23,6 +24,71 @@ class _BridgeMessage {
       params: map['params'] as Map<String, dynamic>?,
     );
   }
+}
+
+enum MiniAppChatActionType { sendMessage, close, ignore }
+
+@immutable
+class MiniAppChatAction {
+  final MiniAppChatActionType type;
+  final String? text;
+
+  const MiniAppChatAction._(this.type, {this.text});
+
+  const MiniAppChatAction.ignore() : this._(MiniAppChatActionType.ignore);
+
+  const MiniAppChatAction.close() : this._(MiniAppChatActionType.close);
+
+  const MiniAppChatAction.sendMessage(String text)
+    : this._(MiniAppChatActionType.sendMessage, text: text);
+}
+
+MiniAppChatAction parseMiniAppChatAction(
+  String rawMessage, {
+  required bool canSendMessage,
+}) {
+  final message = _BridgeMessage.fromJson(rawMessage);
+
+  switch (message.method) {
+    case 'sendMessage':
+      if (!canSendMessage) {
+        return const MiniAppChatAction.ignore();
+      }
+      final text = message.params?['text'] as String?;
+      final trimmed = text?.trim();
+      if (trimmed == null || trimmed.isEmpty) {
+        return const MiniAppChatAction.ignore();
+      }
+      return MiniAppChatAction.sendMessage(trimmed);
+    case 'close':
+      return const MiniAppChatAction.close();
+    default:
+      return const MiniAppChatAction.ignore();
+  }
+}
+
+Uri? normalizeTrustedMiniAppUri(String? rawUrl) {
+  final normalized = rawUrl?.trim();
+  if (normalized == null || normalized.isEmpty) return null;
+
+  final uri = Uri.tryParse(normalized);
+  if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
+    return null;
+  }
+
+  return uri;
+}
+
+bool isTrustedMiniAppNavigationUrl({
+  required String? appUrl,
+  required String? candidateUrl,
+}) {
+  final trustedUri = normalizeTrustedMiniAppUri(appUrl);
+  final candidateUri = normalizeTrustedMiniAppUri(candidateUrl);
+  if (trustedUri == null || candidateUri == null) return false;
+
+  return trustedUri.host == candidateUri.host &&
+      trustedUri.port == candidateUri.port;
 }
 
 /// Mini App JS Bridge 服务
@@ -57,13 +123,21 @@ class MiniAppBridgeService {
     MiniAppEntity? app,
     this.onSendMessage,
     this.onClose,
-  })  : _walletBridge = walletBridge,
-        _roomId = roomId,
-        _app = app;
+  }) : _walletBridge = walletBridge,
+       _roomId = roomId,
+       _app = app;
 
   /// 检查 Mini App 是否拥有指定权限
   bool _hasPermission(MiniAppPermission permission) {
-    if (_app == null) return true; // 未指定 app 时默认允许
+    if ((permission == MiniAppPermission.chatRead ||
+            permission == MiniAppPermission.chatSend) &&
+        _roomId.trim().isEmpty) {
+      return false;
+    }
+    if (_app == null) {
+      // 没有清单时只保留低风险只读能力，避免把交易或发消息默认放开。
+      return permission == MiniAppPermission.walletAddress;
+    }
     return _app.permissions.contains(permission);
   }
 
@@ -77,14 +151,19 @@ class MiniAppBridgeService {
       )
       ..addJavaScriptChannel(
         'N42ChatChannel',
-        onMessageReceived: (msg) => _handleChatMessage(msg),
+        onMessageReceived: (msg) =>
+            unawaited(_handleChatMessage(controller, msg)),
       );
   }
 
   /// 初始化注入脚本 —— 在页面加载完成后执行
-  String get initScript => '''
+  String get initScript =>
+      '''
 (function() {
   if (window.n42) return; // 防止重复注入
+
+  var _canChatRead = ${_hasPermission(MiniAppPermission.chatRead)};
+  var _canChatSend = ${_hasPermission(MiniAppPermission.chatSend)};
 
   // ─── Promise 响应追踪 ───
   var _pendingCallbacks = {};
@@ -125,12 +204,18 @@ class MiniAppBridgeService {
     },
 
     chat: {
-      getRoomId: function() { return '${_roomId.replaceAll("'", "\\'")}'; },
+      getRoomId: function() {
+        if (!_canChatRead) return null;
+        return '${_escapeJsString(_roomId)}';
+      },
       sendMessage: function(text) {
+        if (!_canChatSend || typeof text !== 'string' || !text.trim()) return false;
         N42ChatChannel.postMessage(JSON.stringify({method: 'sendMessage', params: {text: text}}));
+        return true;
       },
       close: function() {
         N42ChatChannel.postMessage(JSON.stringify({method: 'close'}));
+        return true;
       },
     },
 
@@ -154,45 +239,88 @@ class MiniAppBridgeService {
     JavaScriptMessage msg,
     BuildContext context,
   ) async {
+    _BridgeMessage? message;
     try {
-      final message = _BridgeMessage.fromJson(msg.message);
+      message = _BridgeMessage.fromJson(msg.message);
+      if (!await _isTrustedSource(controller)) {
+        await _resolveCallback(
+          controller,
+          message.id,
+          false,
+          jsonEncode('Permission denied: untrusted origin'),
+        );
+        return;
+      }
 
       switch (message.method) {
         case 'getAddress':
           if (!_hasPermission(MiniAppPermission.walletAddress)) {
-            await _resolveCallback(controller, message.id, false,
-                '"Permission denied: walletAddress"');
-            break;
+            await _resolveCallback(
+              controller,
+              message.id,
+              false,
+              jsonEncode('Permission denied: walletAddress'),
+            );
+            return;
           }
           final address = _walletBridge.walletAddress ?? '';
-          await _resolveCallback(controller, message.id, true, '"$address"');
+          await _resolveCallback(
+            controller,
+            message.id,
+            true,
+            jsonEncode(address),
+          );
+          return;
 
         case 'getBalance':
           if (!_hasPermission(MiniAppPermission.walletBalance)) {
-            await _resolveCallback(controller, message.id, false,
-                '"Permission denied: walletBalance"');
-            break;
+            await _resolveCallback(
+              controller,
+              message.id,
+              false,
+              jsonEncode('Permission denied: walletBalance'),
+            );
+            return;
           }
           try {
             final chainId = message.params?['chainId'] as String? ?? 'ETH';
             final balance = await _walletBridge.getBalance(chainId);
             await _resolveCallback(
-              controller, message.id, true, '"$balance"',
+              controller,
+              message.id,
+              true,
+              jsonEncode(balance),
             );
           } catch (e) {
             debugLog('MiniAppBridge: getBalance error: $e');
             await _resolveCallback(
-              controller, message.id, false, '"Failed to get balance: $e"',
+              controller,
+              message.id,
+              false,
+              jsonEncode('Failed to get balance: $e'),
             );
           }
+          return;
 
         case 'requestTransaction':
           if (!_hasPermission(MiniAppPermission.walletTransaction)) {
-            await _resolveCallback(controller, message.id, false,
-                '"Permission denied: walletTransaction"');
-            break;
+            await _resolveCallback(
+              controller,
+              message.id,
+              false,
+              jsonEncode('Permission denied: walletTransaction'),
+            );
+            return;
           }
-          if (!context.mounted) break;
+          if (!context.mounted) {
+            await _resolveCallback(
+              controller,
+              message.id,
+              false,
+              jsonEncode('Mini App is no longer active'),
+            );
+            return;
+          }
           final confirmed = await _showTransactionConfirmDialog(
             context,
             message.params,
@@ -215,14 +343,17 @@ class MiniAppBridgeService {
                   controller,
                   message.id,
                   true,
-                  '{"status":"confirmed","txHash":"$txHash"}',
+                  jsonEncode(<String, String>{
+                    'status': 'confirmed',
+                    'txHash': txHash,
+                  }),
                 );
               } else {
                 await _resolveCallback(
                   controller,
                   message.id,
                   false,
-                  '"${result.errorMessage ?? 'Transaction failed'}"',
+                  jsonEncode(result.errorMessage ?? 'Transaction failed'),
                 );
               }
             } catch (e) {
@@ -231,7 +362,7 @@ class MiniAppBridgeService {
                 controller,
                 message.id,
                 false,
-                '"Transaction failed: $e"',
+                jsonEncode('Transaction failed: $e'),
               );
             }
           } else {
@@ -239,24 +370,52 @@ class MiniAppBridgeService {
               controller,
               message.id,
               false,
-              '"User rejected transaction"',
+              jsonEncode('User rejected transaction'),
             );
           }
+          return;
+        default:
+          await _resolveCallback(
+            controller,
+            message.id,
+            false,
+            jsonEncode('Unsupported wallet method: ${message.method}'),
+          );
+          return;
       }
     } catch (e) {
       debugLog('MiniAppBridge: wallet message error: $e');
+      await _resolveCallback(
+        controller,
+        message?.id,
+        false,
+        jsonEncode('Mini App bridge error: $e'),
+      );
     }
   }
 
-  void _handleChatMessage(JavaScriptMessage msg) {
+  Future<void> _handleChatMessage(
+    WebViewController controller,
+    JavaScriptMessage msg,
+  ) async {
     try {
-      final message = _BridgeMessage.fromJson(msg.message);
-      switch (message.method) {
-        case 'sendMessage':
-          final text = message.params?['text'] as String?;
-          if (text != null && text.isNotEmpty) onSendMessage?.call(text);
-        case 'close':
+      if (!await _isTrustedSource(controller)) {
+        debugLog('MiniAppBridge: rejected chat message from untrusted origin');
+        return;
+      }
+      final action = parseMiniAppChatAction(
+        msg.message,
+        canSendMessage: _hasPermission(MiniAppPermission.chatSend),
+      );
+      switch (action.type) {
+        case MiniAppChatActionType.sendMessage:
+          onSendMessage?.call(action.text!);
+          return;
+        case MiniAppChatActionType.close:
           onClose?.call();
+          return;
+        case MiniAppChatActionType.ignore:
+          return;
       }
     } catch (e) {
       debugLog('MiniAppBridge: chat message error: $e');
@@ -270,10 +429,44 @@ class MiniAppBridgeService {
     String dataJson,
   ) async {
     if (id == null) return;
-    final escapedId = id.replaceAll("'", "\\'");
-    await controller.runJavaScript(
-      "window._n42NativeCallback('$escapedId', $success, $dataJson);",
-    );
+    // Validate callback id: only allow safe alphanumeric + underscore ids
+    // to prevent JS injection via crafted callback identifiers.
+    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(id)) {
+      debugLog('MiniAppBridge: rejected callback id with unsafe characters');
+      return;
+    }
+    try {
+      await controller.runJavaScript(
+        "window._n42NativeCallback('$id', $success, $dataJson);",
+      );
+    } catch (e) {
+      debugLog('MiniAppBridge: callback resolution error: $e');
+    }
+  }
+
+  /// Escape a string for safe embedding inside a JS single-quoted literal.
+  /// Prevents XSS via roomId or other injected values.
+  static String _escapeJsString(String s) {
+    return s
+        .replaceAll(r'\', r'\\')
+        .replaceAll("'", r"\'")
+        .replaceAll('"', r'\"')
+        .replaceAll('\n', r'\n')
+        .replaceAll('\r', r'\r')
+        .replaceAll('</', r'<\/');
+  }
+
+  Future<bool> _isTrustedSource(WebViewController controller) async {
+    try {
+      final currentUrl = await controller.currentUrl();
+      return isTrustedMiniAppNavigationUrl(
+        appUrl: _app?.url,
+        candidateUrl: currentUrl,
+      );
+    } catch (e) {
+      debugLog('MiniAppBridge: failed to inspect current URL: $e');
+      return false;
+    }
   }
 
   Future<bool> _showTransactionConfirmDialog(
@@ -308,13 +501,8 @@ class MiniAppBridgeService {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  params.entries
-                      .map((e) => '${e.key}: ${e.value}')
-                      .join('\n'),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'monospace',
-                  ),
+                  params.entries.map((e) => '${e.key}: ${e.value}').join('\n'),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
                 ),
               ),
             ],
@@ -326,9 +514,7 @@ class MiniAppBridgeService {
             child: const Text('Reject'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Confirm'),
           ),

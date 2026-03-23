@@ -10,6 +10,9 @@ enum PresenceStatus {
   unavailable,
 }
 
+final _whitespaceRegExp = RegExp(r'\s+');
+final _upperLetterRegExp = RegExp(r'[A-Z]');
+
 /// 联系人实体
 ///
 /// 表示通讯录中的一个联系人
@@ -110,7 +113,7 @@ class ContactEntity extends Equatable {
     final name = effectiveDisplayName;
     if (name.isEmpty) return '?';
 
-    final words = name.trim().split(RegExp(r'\s+'));
+    final words = name.trim().split(_whitespaceRegExp);
     if (words.length == 1) {
       return name.substring(0, name.length.clamp(0, 2)).toUpperCase();
     }
@@ -130,7 +133,7 @@ class ContactEntity extends Equatable {
     if (name.isEmpty) return '#';
 
     final first = name[0].toUpperCase();
-    if (RegExp(r'[A-Z]').hasMatch(first)) {
+    if (_upperLetterRegExp.hasMatch(first)) {
       return first;
     }
 

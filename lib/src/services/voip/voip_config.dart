@@ -152,7 +152,9 @@ class VoIPConfig {
   // ============================================
 
   /// 是否启用通话录音功能
-  bool enableCallRecording = true;
+  ///
+  /// 当前 LiveKit 录制仍依赖后端 Egress 接线，默认保持关闭，避免把未交付能力暴露成已启用状态。
+  bool enableCallRecording = false;
 
   /// 录音自动开始（进入通话时自动开始录音）
   bool autoStartRecording = false;
@@ -517,7 +519,7 @@ class CallRecordingConfig {
   final String? savePath;
 
   const CallRecordingConfig({
-    this.enabled = true,
+    this.enabled = false,
     this.autoStart = false,
     this.sampleRate = 44100,
     this.bitRate = 128000,
@@ -569,4 +571,3 @@ class CallRecordingConfig {
     return 'CallRecordingConfig(enabled: $enabled, autoStart: $autoStart, sampleRate: $sampleRate, bitRate: $bitRate)';
   }
 }
-

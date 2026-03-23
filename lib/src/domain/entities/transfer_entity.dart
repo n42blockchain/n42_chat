@@ -4,12 +4,16 @@ import 'package:equatable/equatable.dart';
 enum TransferStatus {
   /// 等待中
   pending,
+
   /// 处理中
   processing,
+
   /// 已完成
   completed,
+
   /// 失败
   failed,
+
   /// 已取消
   cancelled,
 }
@@ -18,6 +22,7 @@ enum TransferStatus {
 enum TransferDirection {
   /// 发送
   sent,
+
   /// 接收
   received,
 }
@@ -29,6 +34,9 @@ class TransferEntity extends Equatable {
 
   /// 关联的消息事件ID
   final String? eventId;
+
+  /// 关联的房间ID
+  final String? roomId;
 
   /// 发送方地址
   final String senderAddress;
@@ -84,6 +92,7 @@ class TransferEntity extends Equatable {
   const TransferEntity({
     required this.id,
     this.eventId,
+    this.roomId,
     required this.senderAddress,
     required this.receiverAddress,
     this.senderUserId,
@@ -149,30 +158,32 @@ class TransferEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        eventId,
-        senderAddress,
-        receiverAddress,
-        senderUserId,
-        receiverUserId,
-        amount,
-        token,
-        tokenName,
-        tokenIcon,
-        transactionHash,
-        status,
-        memo,
-        createdAt,
-        completedAt,
-        failureReason,
-        confirmations,
-        fee,
-        feeToken,
-      ];
+    id,
+    eventId,
+    roomId,
+    senderAddress,
+    receiverAddress,
+    senderUserId,
+    receiverUserId,
+    amount,
+    token,
+    tokenName,
+    tokenIcon,
+    transactionHash,
+    status,
+    memo,
+    createdAt,
+    completedAt,
+    failureReason,
+    confirmations,
+    fee,
+    feeToken,
+  ];
 
   TransferEntity copyWith({
     String? id,
     String? eventId,
+    String? roomId,
     String? senderAddress,
     String? receiverAddress,
     String? senderUserId,
@@ -194,6 +205,7 @@ class TransferEntity extends Equatable {
     return TransferEntity(
       id: id ?? this.id,
       eventId: eventId ?? this.eventId,
+      roomId: roomId ?? this.roomId,
       senderAddress: senderAddress ?? this.senderAddress,
       receiverAddress: receiverAddress ?? this.receiverAddress,
       senderUserId: senderUserId ?? this.senderUserId,
@@ -219,6 +231,7 @@ class TransferEntity extends Equatable {
     return TransferEntity(
       id: json['id'] as String,
       eventId: json['event_id'] as String?,
+      roomId: json['room_id'] as String?,
       senderAddress: json['sender_address'] as String,
       receiverAddress: json['receiver_address'] as String,
       senderUserId: json['sender_user_id'] as String?,
@@ -249,6 +262,7 @@ class TransferEntity extends Equatable {
     return {
       'id': id,
       'event_id': eventId,
+      'room_id': roomId,
       'sender_address': senderAddress,
       'receiver_address': receiverAddress,
       'sender_user_id': senderUserId,
@@ -311,7 +325,9 @@ class TransferMessageContent {
   });
 
   /// 从消息内容创建
-  factory TransferMessageContent.fromMessageContent(Map<String, dynamic> content) {
+  factory TransferMessageContent.fromMessageContent(
+    Map<String, dynamic> content,
+  ) {
     return TransferMessageContent(
       transferId: content['transfer_id'] as String? ?? '',
       senderAddress: content['sender_address'] as String? ?? '',
@@ -383,7 +399,9 @@ class PaymentRequestContent {
   }
 
   /// 从消息内容创建
-  factory PaymentRequestContent.fromMessageContent(Map<String, dynamic> content) {
+  factory PaymentRequestContent.fromMessageContent(
+    Map<String, dynamic> content,
+  ) {
     return PaymentRequestContent(
       requestId: content['request_id'] as String? ?? '',
       receiverAddress: content['receiver_address'] as String? ?? '',
@@ -411,3 +429,81 @@ class PaymentRequestContent {
   }
 }
 
+/// 收款请求完成确认事件内容
+class PaymentRequestFulfillmentContent {
+  /// 自定义事件类型，不直接展示为聊天消息
+  static const String eventType = 'n42.payment_request.fulfillment';
+
+  /// 收款请求 ID
+  final String requestId;
+
+  /// 对应的转账 ID
+  final String transferId;
+
+  /// 对应的转账消息事件 ID
+  final String? transferEventId;
+
+  /// 支付方地址
+  final String payerAddress;
+
+  /// 收款方地址
+  final String receiverAddress;
+
+  /// 金额
+  final String amount;
+
+  /// 代币符号
+  final String token;
+
+  /// 交易哈希
+  final String? transactionHash;
+
+  /// 完成时间
+  final DateTime fulfilledAt;
+
+  const PaymentRequestFulfillmentContent({
+    required this.requestId,
+    required this.transferId,
+    this.transferEventId,
+    required this.payerAddress,
+    required this.receiverAddress,
+    required this.amount,
+    required this.token,
+    this.transactionHash,
+    required this.fulfilledAt,
+  });
+
+  factory PaymentRequestFulfillmentContent.fromEventContent(
+    Map<String, dynamic> content,
+  ) {
+    return PaymentRequestFulfillmentContent(
+      requestId: content['request_id'] as String? ?? '',
+      transferId: content['transfer_id'] as String? ?? '',
+      transferEventId: content['transfer_event_id'] as String?,
+      payerAddress: content['payer_address'] as String? ?? '',
+      receiverAddress: content['receiver_address'] as String? ?? '',
+      amount: content['amount'] as String? ?? '0',
+      token: content['token'] as String? ?? '',
+      transactionHash: content['tx_hash'] as String?,
+      fulfilledAt: content['fulfilled_at'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              (content['fulfilled_at'] as num).toInt(),
+            )
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toEventContent() {
+    return {
+      'request_id': requestId,
+      'transfer_id': transferId,
+      'transfer_event_id': transferEventId,
+      'payer_address': payerAddress,
+      'receiver_address': receiverAddress,
+      'amount': amount,
+      'token': token,
+      'tx_hash': transactionHash,
+      'fulfilled_at': fulfilledAt.millisecondsSinceEpoch,
+    };
+  }
+}

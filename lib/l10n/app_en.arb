@@ -483,7 +483,6 @@
     }
   },
   "authEnterValidServerAddress": "Please enter a valid server address",
-  "authEmailOtp": "Email OTP",
   "authEnterServerAddressFirst": "Please enter server address first",
   "authPasskeyRequiresServer": "Passkey login requires server support",
   "authLoginAgreement": "By logging in, you agree to ",
@@ -1604,6 +1603,10 @@
   "chatLongitude": "Longitude",
   "groupDescriptionUpdated": "Group description updated",
   "groupAvatarUpdated": "Group avatar updated",
+  "groupVisibilityUpdated": "Group visibility updated",
+  "groupChannelCreated": "Channel created",
+  "groupChannelUpdated": "Channel updated",
+  "groupChannelDeleted": "Channel deleted",
   "callDecline": "Decline",
   "callAnswer": "Answer",
   "callIncomingVideoCall": "Incoming video call",
@@ -2194,11 +2197,11 @@
   "authPasskeyNotSupported": "Passkey is not supported on this device",
   "authPasskeyRegister": "Register Passkey",
   "authPasskeyNoRegistered": "No passkeys registered",
-  "authPasskeyRegisterHint": "Register a passkey for passwordless login",
+  "authPasskeyRegisterHint": "Register a passkey for this account. Standalone passkey sign-in will be enabled later.",
   "authPasskeyNameYours": "Name your Passkey",
-  "authPasskeyRegistered": "Passkey registered successfully",
-  "authPasskeyDeleted": "Passkey deleted",
-  "authPasskeyDeleteConfirm": "Delete passkey \"{name}\"? You will no longer be able to use it to log in.",
+  "authPasskeyRegistered": "Passkey saved to this account",
+  "authPasskeyDeleted": "Passkey removed from this account",
+  "authPasskeyDeleteConfirm": "Delete passkey \"{name}\"? You will need to register it again before using passkey sign-in later.",
   "@authPasskeyDeleteConfirm": {
     "placeholders": {
       "name": {
@@ -2740,8 +2743,5 @@
   "blocAuthChangeEmailFailed": "Failed to change email",
   "blocAuthVerificationCodeInvalid": "Verification code is incorrect or expired",
   "blocAuthSessionExpired": "Session expired, please login again",
-  "blocAuthSessionIncomplete": "Session data incomplete, please login again",
-  "blocAuthPasskeyNotImplemented": "Passkey login is not yet available",
-  "blocAuthPasskeyRegisterNotImplemented": "Passkey registration is not yet available",
-  "blocAuthEmailOtpNotImplemented": "Email OTP login is not yet available"
+  "blocAuthSessionIncomplete": "Session data incomplete, please login again"
 }

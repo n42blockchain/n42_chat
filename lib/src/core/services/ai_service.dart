@@ -79,6 +79,13 @@ abstract class AiService {
   /// 链接内容摘要
   Future<String> summarizeUrl(String url, String pageContent);
 
+  /// 智能回复建议
+  Future<List<String>> suggestReplies(
+    List<AiMessage> messages, {
+    int count,
+    String? language,
+  });
+
   /// 检查服务是否可用
   bool get isAvailable;
 

@@ -29,7 +29,10 @@ class PointsConfig extends Equatable {
         roomId,
         isEnabled,
         pointsName,
+        pointsSymbol,
         rules,
+        allowTransfers,
+        showLeaderboard,
         dailyEarnLimit,
       ];
 }

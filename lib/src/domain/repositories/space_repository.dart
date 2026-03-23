@@ -28,6 +28,9 @@ abstract class ISpaceRepository {
   /// 刷新 Space 层级结构（重新拉取所有子房间）
   Future<SpaceEntity?> refreshSpaceHierarchy(String spaceId);
 
+  /// 获取社区分享链接
+  Future<String> getSpaceInviteLink(String spaceId);
+
   // ============================================
   // Space 生命周期
   // ============================================
@@ -96,5 +99,8 @@ abstract class ISpaceRepository {
 
   /// 设置成员权限等级（50 = 管理员，0 = 普通成员）
   Future<void> setMemberPowerLevel(
-      String spaceId, String userId, int powerLevel);
+    String spaceId,
+    String userId,
+    int powerLevel,
+  );
 }

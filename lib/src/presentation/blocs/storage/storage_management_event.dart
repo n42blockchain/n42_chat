@@ -97,11 +97,17 @@ class LoadRoomMediaDetail extends StorageManagementEvent {
 /// 删除选中的文件
 class DeleteSelectedFiles extends StorageManagementEvent {
   final List<String> filePaths;
+  final String? roomId;
+  final String? filterCategory;
 
-  const DeleteSelectedFiles(this.filePaths);
+  const DeleteSelectedFiles(
+    this.filePaths, {
+    this.roomId,
+    this.filterCategory,
+  });
 
   @override
-  List<Object?> get props => [filePaths];
+  List<Object?> get props => [filePaths, roomId, filterCategory];
 }
 
 /// 切换文件保留状态

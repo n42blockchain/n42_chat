@@ -159,8 +159,8 @@ class StoryEntity extends Equatable {
               ?.map((e) => StoryMedia.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      expiresAt: DateTime.parse(json['expiresAt'] as String),
+      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      expiresAt: DateTime.tryParse(json['expiresAt'] as String? ?? '') ?? DateTime.now().add(const Duration(hours: 24)),
       viewedBy: (json['viewedBy'] as List<dynamic>?)
               ?.map((e) => StoryViewer.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -337,7 +337,7 @@ class StoryViewer extends Equatable {
       userId: json['userId'] as String,
       userName: json['userName'] as String,
       avatarUrl: json['avatarUrl'] as String?,
-      viewedAt: DateTime.parse(json['viewedAt'] as String),
+      viewedAt: DateTime.tryParse(json['viewedAt'] as String? ?? '') ?? DateTime.now(),
     );
   }
 

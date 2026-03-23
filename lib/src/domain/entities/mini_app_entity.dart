@@ -22,6 +22,7 @@ enum MiniAppPermission {
 enum MiniAppCategory {
   defi('DeFi'),
   nft('NFT'),
+  commerce('Commerce'),
   games('Games'),
   tools('Tools'),
   social('Social'),
@@ -135,6 +136,39 @@ class BuiltInMiniApps {
       isBuiltIn: true,
       developer: 'N42 Foundation',
       userCount: 18000,
+    ),
+    MiniAppEntity(
+      id: 'n42_shop',
+      name: 'N42 Shop',
+      description:
+          'Browse token-gated drops, digital goods, and merchant checkouts',
+      url: 'https://shop.n42.world',
+      iconUrl: 'assets/icons/miniapp_shop.png',
+      category: MiniAppCategory.commerce,
+      permissions: [
+        MiniAppPermission.walletAddress,
+        MiniAppPermission.walletTransaction,
+      ],
+      isBuiltIn: true,
+      isFeatured: true,
+      developer: 'N42 Commerce',
+      userCount: 22000,
+    ),
+    MiniAppEntity(
+      id: 'creator_pass',
+      name: 'Creator Pass',
+      description: 'Manage paid channel memberships and gated community access',
+      url: 'https://creator.n42.world',
+      iconUrl: 'assets/icons/miniapp_creator.png',
+      category: MiniAppCategory.commerce,
+      permissions: [
+        MiniAppPermission.walletAddress,
+        MiniAppPermission.walletBalance,
+        MiniAppPermission.walletTransaction,
+      ],
+      isBuiltIn: true,
+      developer: 'N42 Commerce',
+      userCount: 9000,
     ),
     MiniAppEntity(
       id: 'n42_portfolio',

@@ -25,12 +25,13 @@ class ThreadDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ThreadBloc(
-        messageRepository: getIt<IMessageRepository>(),
-      )..add(InitializeThread(
-          roomId: roomId,
-          threadRootEventId: threadRootEventId,
-        )),
+      create: (_) => ThreadBloc(messageRepository: getIt<IMessageRepository>())
+        ..add(
+          InitializeThread(
+            roomId: roomId,
+            threadRootEventId: threadRootEventId,
+          ),
+        ),
       child: const _ThreadDetailView(),
     );
   }
@@ -129,24 +130,31 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                     // 分隔线 + 回复计数
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: Row(
                           children: [
                             Text(
                               state.replies.length == 1
                                   ? (s?.threadReply ?? '1 reply')
                                   : (s?.threadReplies(state.replies.length) ??
-                                      '${state.replies.length} replies'),
+                                        '${state.replies.length} replies'),
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Divider(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.12,
+                                ),
                               ),
                             ),
                           ],
@@ -156,19 +164,14 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
 
                     // 回复列表
                     SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final reply = state.replies[index];
-                          return _buildReplyItem(context, reply);
-                        },
-                        childCount: state.replies.length,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final reply = state.replies[index];
+                        return _buildReplyItem(context, reply);
+                      }, childCount: state.replies.length),
                     ),
 
                     // 底部留白
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: 16),
-                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
                   ],
                 ),
               ),
@@ -206,8 +209,10 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                     ? NetworkImage(message.senderAvatarUrl!)
                     : null,
                 child: message.senderAvatarUrl == null
-                    ? Text(message.senderInitials,
-                        style: const TextStyle(fontSize: 14))
+                    ? Text(
+                        message.senderInitials,
+                        style: const TextStyle(fontSize: 14),
+                      )
                     : null,
               ),
               const SizedBox(width: 10),
@@ -234,10 +239,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
           ),
           const SizedBox(height: 12),
           // 消息内容
-          Text(
-            message.content,
-            style: const TextStyle(fontSize: 15),
-          ),
+          Text(message.content, style: const TextStyle(fontSize: 15)),
         ],
       ),
     );
@@ -256,8 +258,10 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                 ? NetworkImage(reply.senderAvatarUrl!)
                 : null,
             child: reply.senderAvatarUrl == null
-                ? Text(reply.senderInitials,
-                    style: const TextStyle(fontSize: 12))
+                ? Text(
+                    reply.senderInitials,
+                    style: const TextStyle(fontSize: 12),
+                  )
                 : null,
           ),
           const SizedBox(width: 10),
@@ -279,16 +283,15 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                       _formatTime(reply.timestamp),
                       style: TextStyle(
                         fontSize: 11,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  reply.content,
-                  style: const TextStyle(fontSize: 14),
-                ),
+                Text(reply.content, style: const TextStyle(fontSize: 14)),
               ],
             ),
           ),
@@ -357,10 +360,10 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
   }
 
   void _sendMessage() {
-    final text = _textController.text.trim();
-    if (text.isEmpty) return;
+    final rawText = _textController.text;
+    if (rawText.trim().isEmpty) return;
 
-    context.read<ThreadBloc>().add(SendThreadTextMessage(text));
+    context.read<ThreadBloc>().add(SendThreadTextMessage(rawText));
     _textController.clear();
 
     // 滚动到底部

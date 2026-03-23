@@ -30,6 +30,14 @@ String resolveBlocMessage(BuildContext context, String key) {
       return l10n.groupDescriptionUpdated;
     case BlocMessageKeys.groupAvatarUpdated:
       return l10n.groupAvatarUpdated;
+    case BlocMessageKeys.groupVisibilityUpdated:
+      return l10n.groupVisibilityUpdated;
+    case BlocMessageKeys.groupChannelCreated:
+      return l10n.groupChannelCreated;
+    case BlocMessageKeys.groupChannelUpdated:
+      return l10n.groupChannelUpdated;
+    case BlocMessageKeys.groupChannelDeleted:
+      return l10n.groupChannelDeleted;
     case BlocMessageKeys.groupMemberRemoved:
       return l10n.blocGroupMemberRemoved;
     case BlocMessageKeys.groupSetAsAdmin:
@@ -116,14 +124,6 @@ String resolveBlocMessage(BuildContext context, String key) {
       return l10n.blocAuthSessionExpired;
     case BlocMessageKeys.authSessionIncomplete:
       return l10n.blocAuthSessionIncomplete;
-
-    // Auth — unimplemented
-    case BlocMessageKeys.authPasskeyNotImplemented:
-      return l10n.blocAuthPasskeyNotImplemented;
-    case BlocMessageKeys.authPasskeyRegisterNotImplemented:
-      return l10n.blocAuthPasskeyRegisterNotImplemented;
-    case BlocMessageKeys.authEmailOtpNotImplemented:
-      return l10n.blocAuthEmailOtpNotImplemented;
 
     default:
       return key;

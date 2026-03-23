@@ -18,10 +18,12 @@ void main() {
     ['AuthRestoreSessionRequested', () => const AuthRestoreSessionRequested()],
     ['AuthErrorCleared', () => const AuthErrorCleared()],
     ['LoadUserProfileData', () => const LoadUserProfileData()],
-    ['AuthRegisterPasskeyRequested', () => const AuthRegisterPasskeyRequested()],
     ['AuthGetBoundEmailRequested', () => const AuthGetBoundEmailRequested()],
     ['AuthBiometricLoginRequested', () => const AuthBiometricLoginRequested()],
-    ['AuthCheckBiometricAvailability', () => const AuthCheckBiometricAvailability()],
+    [
+      'AuthCheckBiometricAvailability',
+      () => const AuthCheckBiometricAvailability(),
+    ],
     ['AuthEnableBiometricLogin', () => const AuthEnableBiometricLogin()],
     ['AuthDisableBiometricLogin', () => const AuthDisableBiometricLogin()],
   ]) {
@@ -29,7 +31,10 @@ void main() {
     final factory = pair[1] as AuthEvent Function();
     group(name, () {
       test('is an AuthEvent', () => expect(factory(), isA<AuthEvent>()));
-      test('two instances are equal', () => expect(factory(), equals(factory())));
+      test(
+        'two instances are equal',
+        () => expect(factory(), equals(factory())),
+      );
     });
   }
 
@@ -52,31 +57,49 @@ void main() {
     test('rememberMe defaults to true', () {
       expect(
         const AuthLoginRequested(
-          homeserver: 'h', username: 'u', password: 'p').rememberMe,
+          homeserver: 'h',
+          username: 'u',
+          password: 'p',
+        ).rememberMe,
         isTrue,
       );
     });
 
     test('stores rememberMe=false', () {
       const e = AuthLoginRequested(
-        homeserver: 'h', username: 'u', password: 'p', rememberMe: false);
+        homeserver: 'h',
+        username: 'u',
+        password: 'p',
+        rememberMe: false,
+      );
       expect(e.rememberMe, isFalse);
     });
 
     test('same fields → equal', () {
       expect(
-        const AuthLoginRequested(
-          homeserver: 'h', username: 'u', password: 'p'),
-        equals(const AuthLoginRequested(
-          homeserver: 'h', username: 'u', password: 'p')),
+        const AuthLoginRequested(homeserver: 'h', username: 'u', password: 'p'),
+        equals(
+          const AuthLoginRequested(
+            homeserver: 'h',
+            username: 'u',
+            password: 'p',
+          ),
+        ),
       );
     });
 
     test('different username → not equal', () {
       expect(
         const AuthLoginRequested(homeserver: 'h', username: 'a', password: 'p'),
-        isNot(equals(const AuthLoginRequested(
-          homeserver: 'h', username: 'b', password: 'p'))),
+        isNot(
+          equals(
+            const AuthLoginRequested(
+              homeserver: 'h',
+              username: 'b',
+              password: 'p',
+            ),
+          ),
+        ),
       );
     });
 
@@ -95,41 +118,75 @@ void main() {
   group('AuthRegisterRequested', () {
     test('stores required fields', () {
       const e = AuthRegisterRequested(
-        homeserver: 'h', username: 'u', password: 'p');
+        homeserver: 'h',
+        username: 'u',
+        password: 'p',
+      );
       expect(e.homeserver, 'h');
       expect(e.username, 'u');
       expect(e.password, 'p');
     });
 
     test('email defaults to null', () {
-      expect(const AuthRegisterRequested(
-        homeserver: 'h', username: 'u', password: 'p').email, isNull);
+      expect(
+        const AuthRegisterRequested(
+          homeserver: 'h',
+          username: 'u',
+          password: 'p',
+        ).email,
+        isNull,
+      );
     });
 
     test('registrationToken defaults to null', () {
-      expect(const AuthRegisterRequested(
-        homeserver: 'h', username: 'u', password: 'p').registrationToken, isNull);
+      expect(
+        const AuthRegisterRequested(
+          homeserver: 'h',
+          username: 'u',
+          password: 'p',
+        ).registrationToken,
+        isNull,
+      );
     });
 
     test('stores optional fields', () {
       const e = AuthRegisterRequested(
-        homeserver: 'h', username: 'u', password: 'p',
-        email: 'a@b.com', registrationToken: 'tok123');
+        homeserver: 'h',
+        username: 'u',
+        password: 'p',
+        email: 'a@b.com',
+        registrationToken: 'tok123',
+      );
       expect(e.email, 'a@b.com');
       expect(e.registrationToken, 'tok123');
     });
 
     test('same fields → equal', () {
       expect(
-        const AuthRegisterRequested(homeserver: 'h', username: 'u', password: 'p'),
-        equals(const AuthRegisterRequested(
-          homeserver: 'h', username: 'u', password: 'p')),
+        const AuthRegisterRequested(
+          homeserver: 'h',
+          username: 'u',
+          password: 'p',
+        ),
+        equals(
+          const AuthRegisterRequested(
+            homeserver: 'h',
+            username: 'u',
+            password: 'p',
+          ),
+        ),
       );
     });
 
     test('is an AuthEvent', () {
-      expect(const AuthRegisterRequested(
-        homeserver: 'h', username: 'u', password: 'p'), isA<AuthEvent>());
+      expect(
+        const AuthRegisterRequested(
+          homeserver: 'h',
+          username: 'u',
+          password: 'p',
+        ),
+        isA<AuthEvent>(),
+      );
     });
   });
 
@@ -139,18 +196,24 @@ void main() {
 
   group('AuthHomeserverCheckRequested', () {
     test('stores homeserver', () {
-      expect(const AuthHomeserverCheckRequested('https://matrix.org').homeserver,
-          'https://matrix.org');
+      expect(
+        const AuthHomeserverCheckRequested('https://matrix.org').homeserver,
+        'https://matrix.org',
+      );
     });
 
     test('same homeserver → equal', () {
-      expect(const AuthHomeserverCheckRequested('h'),
-          equals(const AuthHomeserverCheckRequested('h')));
+      expect(
+        const AuthHomeserverCheckRequested('h'),
+        equals(const AuthHomeserverCheckRequested('h')),
+      );
     });
 
     test('different homeserver → not equal', () {
-      expect(const AuthHomeserverCheckRequested('a'),
-          isNot(equals(const AuthHomeserverCheckRequested('b'))));
+      expect(
+        const AuthHomeserverCheckRequested('a'),
+        isNot(equals(const AuthHomeserverCheckRequested('b'))),
+      );
     });
 
     test('is an AuthEvent', () {
@@ -179,24 +242,51 @@ void main() {
     test('same fields → equal', () {
       expect(
         const AuthTokenLoginRequested(
-          homeserver: 'h', accessToken: 't', userId: 'u', deviceId: 'd'),
-        equals(const AuthTokenLoginRequested(
-          homeserver: 'h', accessToken: 't', userId: 'u', deviceId: 'd')),
+          homeserver: 'h',
+          accessToken: 't',
+          userId: 'u',
+          deviceId: 'd',
+        ),
+        equals(
+          const AuthTokenLoginRequested(
+            homeserver: 'h',
+            accessToken: 't',
+            userId: 'u',
+            deviceId: 'd',
+          ),
+        ),
       );
     });
 
     test('different accessToken → not equal', () {
       expect(
         const AuthTokenLoginRequested(
-          homeserver: 'h', accessToken: 'a', userId: 'u', deviceId: 'd'),
-        isNot(equals(const AuthTokenLoginRequested(
-          homeserver: 'h', accessToken: 'b', userId: 'u', deviceId: 'd'))),
+          homeserver: 'h',
+          accessToken: 'a',
+          userId: 'u',
+          deviceId: 'd',
+        ),
+        isNot(
+          equals(
+            const AuthTokenLoginRequested(
+              homeserver: 'h',
+              accessToken: 'b',
+              userId: 'u',
+              deviceId: 'd',
+            ),
+          ),
+        ),
       );
     });
 
     test('is an AuthEvent', () {
-      expect(const AuthTokenLoginRequested(
-        homeserver: 'h', accessToken: 't', userId: 'u', deviceId: 'd'),
+      expect(
+        const AuthTokenLoginRequested(
+          homeserver: 'h',
+          accessToken: 't',
+          userId: 'u',
+          deviceId: 'd',
+        ),
         isA<AuthEvent>(),
       );
     });
@@ -232,11 +322,17 @@ void main() {
     });
 
     test('same name → equal', () {
-      expect(const UpdateDisplayName('n'), equals(const UpdateDisplayName('n')));
+      expect(
+        const UpdateDisplayName('n'),
+        equals(const UpdateDisplayName('n')),
+      );
     });
 
     test('different name → not equal', () {
-      expect(const UpdateDisplayName('a'), isNot(equals(const UpdateDisplayName('b'))));
+      expect(
+        const UpdateDisplayName('a'),
+        isNot(equals(const UpdateDisplayName('b'))),
+      );
     });
 
     test('is an AuthEvent', () {
@@ -257,6 +353,12 @@ void main() {
       expect(e.region, isNull);
       expect(e.pokeText, isNull);
       expect(e.ringtone, isNull);
+      expect(e.avatarDecorationPreset, isNull);
+      expect(e.nftContractAddress, isNull);
+      expect(e.nftTokenId, isNull);
+      expect(e.nftChainId, isNull);
+      expect(e.nftImageUrl, isNull);
+      expect(e.clearNftAvatar, isFalse);
     });
 
     test('stores provided fields', () {
@@ -267,6 +369,12 @@ void main() {
         region: 'US',
         pokeText: 'Poke me!',
         ringtone: 'default',
+        avatarDecorationPreset: 'aurora',
+        nftContractAddress: '0xabc',
+        nftTokenId: 9,
+        nftChainId: 1,
+        nftImageUrl: 'https://example.com/nft.png',
+        clearNftAvatar: true,
       );
       expect(e.displayName, 'Alice');
       expect(e.signature, 'Dev @ N42');
@@ -274,6 +382,12 @@ void main() {
       expect(e.region, 'US');
       expect(e.pokeText, 'Poke me!');
       expect(e.ringtone, 'default');
+      expect(e.avatarDecorationPreset, 'aurora');
+      expect(e.nftContractAddress, '0xabc');
+      expect(e.nftTokenId, 9);
+      expect(e.nftChainId, 1);
+      expect(e.nftImageUrl, 'https://example.com/nft.png');
+      expect(e.clearNftAvatar, isTrue);
     });
 
     test('same fields → equal', () {
@@ -299,75 +413,6 @@ void main() {
   // Social login events (single homeserver field)
   // ─────────────────────────────────────────────────
 
-  group('AuthPasskeyLoginRequested', () {
-    test('stores homeserver', () {
-      expect(const AuthPasskeyLoginRequested(homeserver: 'h').homeserver, 'h');
-    });
-
-    test('same homeserver → equal', () {
-      expect(const AuthPasskeyLoginRequested(homeserver: 'h'),
-          equals(const AuthPasskeyLoginRequested(homeserver: 'h')));
-    });
-
-    test('is an AuthEvent', () {
-      expect(const AuthPasskeyLoginRequested(homeserver: 'h'), isA<AuthEvent>());
-    });
-  });
-
-  group('AuthRequestEmailOtpRequested', () {
-    test('stores homeserver and email', () {
-      const e = AuthRequestEmailOtpRequested(
-        homeserver: 'https://matrix.org', email: 'alice@example.com');
-      expect(e.homeserver, 'https://matrix.org');
-      expect(e.email, 'alice@example.com');
-    });
-
-    test('same fields → equal', () {
-      expect(
-        const AuthRequestEmailOtpRequested(homeserver: 'h', email: 'e@e.com'),
-        equals(const AuthRequestEmailOtpRequested(homeserver: 'h', email: 'e@e.com')),
-      );
-    });
-
-    test('is an AuthEvent', () {
-      expect(const AuthRequestEmailOtpRequested(homeserver: 'h', email: 'e@e.com'),
-          isA<AuthEvent>());
-    });
-  });
-
-  group('AuthEmailOtpLoginRequested', () {
-    test('stores homeserver, email, otp', () {
-      const e = AuthEmailOtpLoginRequested(
-        homeserver: 'h', email: 'e@e.com', otp: '123456');
-      expect(e.homeserver, 'h');
-      expect(e.email, 'e@e.com');
-      expect(e.otp, '123456');
-    });
-
-    test('same fields → equal', () {
-      expect(
-        const AuthEmailOtpLoginRequested(
-          homeserver: 'h', email: 'e@e.com', otp: '111'),
-        equals(const AuthEmailOtpLoginRequested(
-          homeserver: 'h', email: 'e@e.com', otp: '111')),
-      );
-    });
-
-    test('different otp → not equal', () {
-      expect(
-        const AuthEmailOtpLoginRequested(
-          homeserver: 'h', email: 'e@e.com', otp: '111'),
-        isNot(equals(const AuthEmailOtpLoginRequested(
-          homeserver: 'h', email: 'e@e.com', otp: '222'))),
-      );
-    });
-
-    test('is an AuthEvent', () {
-      expect(const AuthEmailOtpLoginRequested(
-        homeserver: 'h', email: 'e@e.com', otp: '111'), isA<AuthEvent>());
-    });
-  });
-
   group('AuthSsoLoginRequested', () {
     test('stores homeserver', () {
       expect(const AuthSsoLoginRequested(homeserver: 'h').homeserver, 'h');
@@ -378,8 +423,13 @@ void main() {
     });
 
     test('stores providerId', () {
-      expect(const AuthSsoLoginRequested(
-        homeserver: 'h', providerId: 'google').providerId, 'google');
+      expect(
+        const AuthSsoLoginRequested(
+          homeserver: 'h',
+          providerId: 'google',
+        ).providerId,
+        'google',
+      );
     });
 
     test('same fields → equal', () {
@@ -401,7 +451,9 @@ void main() {
   group('AuthRequestPasswordResetRequested', () {
     test('stores homeserver and email', () {
       const e = AuthRequestPasswordResetRequested(
-        homeserver: 'h', email: 'a@b.com');
+        homeserver: 'h',
+        email: 'a@b.com',
+      );
       expect(e.homeserver, 'h');
       expect(e.email, 'a@b.com');
     });
@@ -409,20 +461,28 @@ void main() {
     test('same fields → equal', () {
       expect(
         const AuthRequestPasswordResetRequested(homeserver: 'h', email: 'e'),
-        equals(const AuthRequestPasswordResetRequested(homeserver: 'h', email: 'e')),
+        equals(
+          const AuthRequestPasswordResetRequested(homeserver: 'h', email: 'e'),
+        ),
       );
     });
 
     test('is an AuthEvent', () {
-      expect(const AuthRequestPasswordResetRequested(homeserver: 'h', email: 'e'),
-          isA<AuthEvent>());
+      expect(
+        const AuthRequestPasswordResetRequested(homeserver: 'h', email: 'e'),
+        isA<AuthEvent>(),
+      );
     });
   });
 
   group('AuthConfirmPasswordResetRequested', () {
     test('stores all fields', () {
       const e = AuthConfirmPasswordResetRequested(
-        homeserver: 'h', email: 'e@e.com', code: '123', newPassword: 'pw');
+        homeserver: 'h',
+        email: 'e@e.com',
+        code: '123',
+        newPassword: 'pw',
+      );
       expect(e.homeserver, 'h');
       expect(e.email, 'e@e.com');
       expect(e.code, '123');
@@ -432,15 +492,30 @@ void main() {
     test('same fields → equal', () {
       expect(
         const AuthConfirmPasswordResetRequested(
-          homeserver: 'h', email: 'e', code: 'c', newPassword: 'p'),
-        equals(const AuthConfirmPasswordResetRequested(
-          homeserver: 'h', email: 'e', code: 'c', newPassword: 'p')),
+          homeserver: 'h',
+          email: 'e',
+          code: 'c',
+          newPassword: 'p',
+        ),
+        equals(
+          const AuthConfirmPasswordResetRequested(
+            homeserver: 'h',
+            email: 'e',
+            code: 'c',
+            newPassword: 'p',
+          ),
+        ),
       );
     });
 
     test('is an AuthEvent', () {
-      expect(const AuthConfirmPasswordResetRequested(
-        homeserver: 'h', email: 'e', code: 'c', newPassword: 'p'),
+      expect(
+        const AuthConfirmPasswordResetRequested(
+          homeserver: 'h',
+          email: 'e',
+          code: 'c',
+          newPassword: 'p',
+        ),
         isA<AuthEvent>(),
       );
     });
@@ -449,7 +524,9 @@ void main() {
   group('AuthChangePasswordRequested', () {
     test('stores old and new password', () {
       final e = AuthChangePasswordRequested(
-        oldPassword: 'old123', newPassword: 'new456');
+        oldPassword: 'old123',
+        newPassword: 'new456',
+      );
       expect(e.oldPassword, 'old123');
       expect(e.newPassword, 'new456');
     });
@@ -458,22 +535,30 @@ void main() {
     test('same fields → NOT equal (each instance is unique)', () {
       expect(
         AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'n'),
-        isNot(equals(AuthChangePasswordRequested(
-          oldPassword: 'o', newPassword: 'n'))),
+        isNot(
+          equals(
+            AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'n'),
+          ),
+        ),
       );
     });
 
     test('different newPassword → not equal', () {
       expect(
         AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'a'),
-        isNot(equals(AuthChangePasswordRequested(
-          oldPassword: 'o', newPassword: 'b'))),
+        isNot(
+          equals(
+            AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'b'),
+          ),
+        ),
       );
     });
 
     test('is an AuthEvent', () {
-      expect(AuthChangePasswordRequested(
-        oldPassword: 'o', newPassword: 'n'), isA<AuthEvent>());
+      expect(
+        AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'n'),
+        isA<AuthEvent>(),
+      );
     });
   });
 
@@ -484,7 +569,9 @@ void main() {
   group('AuthRequestChangeEmailRequested', () {
     test('stores password and newEmail', () {
       const e = AuthRequestChangeEmailRequested(
-        password: 'pw', newEmail: 'new@e.com');
+        password: 'pw',
+        newEmail: 'new@e.com',
+      );
       expect(e.password, 'pw');
       expect(e.newEmail, 'new@e.com');
     });
@@ -492,21 +579,26 @@ void main() {
     test('same fields → equal', () {
       expect(
         const AuthRequestChangeEmailRequested(password: 'pw', newEmail: 'e'),
-        equals(const AuthRequestChangeEmailRequested(
-          password: 'pw', newEmail: 'e')),
+        equals(
+          const AuthRequestChangeEmailRequested(password: 'pw', newEmail: 'e'),
+        ),
       );
     });
 
     test('is an AuthEvent', () {
-      expect(const AuthRequestChangeEmailRequested(
-        password: 'pw', newEmail: 'e'), isA<AuthEvent>());
+      expect(
+        const AuthRequestChangeEmailRequested(password: 'pw', newEmail: 'e'),
+        isA<AuthEvent>(),
+      );
     });
   });
 
   group('AuthConfirmChangeEmailRequested', () {
     test('stores newEmail and code', () {
       const e = AuthConfirmChangeEmailRequested(
-        newEmail: 'new@e.com', code: '654321');
+        newEmail: 'new@e.com',
+        code: '654321',
+      );
       expect(e.newEmail, 'new@e.com');
       expect(e.code, '654321');
     });
@@ -519,8 +611,10 @@ void main() {
     });
 
     test('is an AuthEvent', () {
-      expect(const AuthConfirmChangeEmailRequested(newEmail: 'e', code: 'c'),
-          isA<AuthEvent>());
+      expect(
+        const AuthConfirmChangeEmailRequested(newEmail: 'e', code: 'c'),
+        isA<AuthEvent>(),
+      );
     });
   });
 }

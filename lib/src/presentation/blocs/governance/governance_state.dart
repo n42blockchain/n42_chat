@@ -16,6 +16,8 @@ enum GovernanceStatus {
   created,
 }
 
+const _governanceUnset = Object();
+
 /// State for the governance BLoC
 class GovernanceState extends Equatable {
   final GovernanceStatus status;
@@ -26,6 +28,7 @@ class GovernanceState extends Equatable {
   final double? userVotingPower;
   final String? errorMessage;
   final bool hasMoreProposals;
+  final bool isLoadingMoreProposals;
   final ProposalState? filterState;
 
   const GovernanceState({
@@ -37,6 +40,7 @@ class GovernanceState extends Equatable {
     this.userVotingPower,
     this.errorMessage,
     this.hasMoreProposals = true,
+    this.isLoadingMoreProposals = false,
     this.filterState,
   });
 
@@ -53,7 +57,8 @@ class GovernanceState extends Equatable {
     double? userVotingPower,
     String? errorMessage,
     bool? hasMoreProposals,
-    ProposalState? filterState,
+    bool? isLoadingMoreProposals,
+    Object? filterState = _governanceUnset,
   }) {
     return GovernanceState(
       status: status ?? this.status,
@@ -64,20 +69,25 @@ class GovernanceState extends Equatable {
       userVotingPower: userVotingPower ?? this.userVotingPower,
       errorMessage: errorMessage,
       hasMoreProposals: hasMoreProposals ?? this.hasMoreProposals,
-      filterState: filterState ?? this.filterState,
+      isLoadingMoreProposals:
+          isLoadingMoreProposals ?? this.isLoadingMoreProposals,
+      filterState: filterState == _governanceUnset
+          ? this.filterState
+          : filterState as ProposalState?,
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
-        space,
-        proposals,
-        selectedProposal,
-        votes,
-        userVotingPower,
-        errorMessage,
-        hasMoreProposals,
-        filterState,
-      ];
+    status,
+    space,
+    proposals,
+    selectedProposal,
+    votes,
+    userVotingPower,
+    errorMessage,
+    hasMoreProposals,
+    isLoadingMoreProposals,
+    filterState,
+  ];
 }

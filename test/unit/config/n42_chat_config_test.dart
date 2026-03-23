@@ -4,6 +4,8 @@
 // No platform/network dependencies — pure Dart.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:n42_chat/src/integration/api_hub_bridge.dart';
+import 'package:n42_chat/src/integration/wallet_bridge.dart';
 import 'package:n42_chat/src/n42_chat_config.dart';
 
 void main() {
@@ -92,8 +94,28 @@ void main() {
       expect(config.giphyApiKey, isNull);
     });
 
+    test('giphyUseProxyEndpoint defaults to false', () {
+      expect(config.giphyUseProxyEndpoint, isFalse);
+    });
+
+    test('proxyAuthToken defaults to null', () {
+      expect(config.proxyAuthToken, isNull);
+    });
+
     test('googleTranslateApiKey defaults to null', () {
       expect(config.googleTranslateApiKey, isNull);
+    });
+
+    test('googleSpeechApiKey defaults to null', () {
+      expect(config.googleSpeechApiKey, isNull);
+    });
+
+    test('azureSpeechApiKey defaults to null', () {
+      expect(config.azureSpeechApiKey, isNull);
+    });
+
+    test('azureSpeechRegion defaults to eastus', () {
+      expect(config.azureSpeechRegion, 'eastus');
     });
 
     test('aiApiKey defaults to null', () {
@@ -106,6 +128,22 @@ void main() {
 
     test('aiModel defaults to non-empty string', () {
       expect(config.aiModel, isNotEmpty);
+    });
+
+    test('aiUseProxyEndpoint defaults to false', () {
+      expect(config.aiUseProxyEndpoint, isFalse);
+    });
+
+    test('speechUseProxyEndpoint defaults to false', () {
+      expect(config.speechUseProxyEndpoint, isFalse);
+    });
+
+    test('marketUseProxyEndpoint defaults to false', () {
+      expect(config.marketUseProxyEndpoint, isFalse);
+    });
+
+    test('marketBaseUrl defaults to CoinGecko', () {
+      expect(config.marketBaseUrl, startsWith('https://api.coingecko.com'));
     });
 
     test('customTheme defaults to null', () {
@@ -123,6 +161,25 @@ void main() {
     test('onAvatarTap defaults to null', () {
       expect(config.onAvatarTap, isNull);
     });
+
+    test('debankUseProxyEndpoint defaults to false', () {
+      expect(config.debankUseProxyEndpoint, isFalse);
+    });
+
+    test('debankBaseUrl defaults to DeBank', () {
+      expect(config.debankBaseUrl, startsWith('https://open-api.debank.com'));
+    });
+
+    test('alchemyUseProxyEndpoint defaults to false', () {
+      expect(config.alchemyUseProxyEndpoint, isFalse);
+    });
+
+    test('alchemyBaseUrl defaults to Alchemy mainnet', () {
+      expect(
+        config.alchemyBaseUrl,
+        startsWith('https://eth-mainnet.g.alchemy.com'),
+      );
+    });
   });
 
   // ─────────────────────────────────────────────────
@@ -138,13 +195,18 @@ void main() {
 
     test('replaces defaultHomeserver', () {
       expect(
-        base.copyWith(defaultHomeserver: 'https://custom.server').defaultHomeserver,
+        base
+            .copyWith(defaultHomeserver: 'https://custom.server')
+            .defaultHomeserver,
         'https://custom.server',
       );
     });
 
     test('replaces maxImageSize', () {
-      expect(base.copyWith(maxImageSize: 5 * 1024 * 1024).maxImageSize, 5 * 1024 * 1024);
+      expect(
+        base.copyWith(maxImageSize: 5 * 1024 * 1024).maxImageSize,
+        5 * 1024 * 1024,
+      );
     });
 
     test('replaces enableDebugLogs', () {
@@ -155,8 +217,73 @@ void main() {
       expect(base.copyWith(aiModel: 'claude-3').aiModel, 'claude-3');
     });
 
+    test('replaces aiUseProxyEndpoint', () {
+      expect(
+        base.copyWith(aiUseProxyEndpoint: true).aiUseProxyEndpoint,
+        isTrue,
+      );
+    });
+
     test('replaces giphyApiKey', () {
       expect(base.copyWith(giphyApiKey: 'my-key').giphyApiKey, 'my-key');
+    });
+
+    test('replaces giphyUseProxyEndpoint', () {
+      expect(
+        base.copyWith(giphyUseProxyEndpoint: true).giphyUseProxyEndpoint,
+        isTrue,
+      );
+    });
+
+    test('replaces proxyAuthToken', () {
+      expect(
+        base.copyWith(proxyAuthToken: 'proxy-token').proxyAuthToken,
+        'proxy-token',
+      );
+    });
+
+    test('replaces googleSpeechApiKey', () {
+      expect(
+        base.copyWith(googleSpeechApiKey: 'google-speech').googleSpeechApiKey,
+        'google-speech',
+      );
+    });
+
+    test('replaces azureSpeechApiKey', () {
+      expect(
+        base.copyWith(azureSpeechApiKey: 'azure-speech').azureSpeechApiKey,
+        'azure-speech',
+      );
+    });
+
+    test('replaces azureSpeechRegion', () {
+      expect(
+        base.copyWith(azureSpeechRegion: 'westus').azureSpeechRegion,
+        'westus',
+      );
+    });
+
+    test('replaces speechUseProxyEndpoint', () {
+      expect(
+        base.copyWith(speechUseProxyEndpoint: true).speechUseProxyEndpoint,
+        isTrue,
+      );
+    });
+
+    test('replaces marketUseProxyEndpoint', () {
+      expect(
+        base.copyWith(marketUseProxyEndpoint: true).marketUseProxyEndpoint,
+        isTrue,
+      );
+    });
+
+    test('replaces marketBaseUrl', () {
+      expect(
+        base
+            .copyWith(marketBaseUrl: 'https://proxy.example/v1/market')
+            .marketBaseUrl,
+        'https://proxy.example/v1/market',
+      );
     });
 
     test('replaces syncTimeout', () {
@@ -171,7 +298,10 @@ void main() {
     });
 
     test('replaces messageDeleteTimeout', () {
-      expect(base.copyWith(messageDeleteTimeout: 300).messageDeleteTimeout, 300);
+      expect(
+        base.copyWith(messageDeleteTimeout: 300).messageDeleteTimeout,
+        300,
+      );
     });
 
     test('original unchanged after copyWith', () {
@@ -179,12 +309,75 @@ void main() {
       expect(base.enableEncryption, isTrue);
     });
 
-    test('limitation: aiApiKey cannot be cleared to null via copyWith', () {
-      // copyWith uses `??` — passing null silently preserves the existing value.
-      // To clear a nullable field, reconstruct the config directly.
-      final withKey = base.copyWith(aiApiKey: 'key-123');
-      final attempt = withKey.copyWith(aiApiKey: null);
-      expect(attempt.aiApiKey, 'key-123'); // null was silently ignored
+    test('allows clearing nullable fields back to null', () {
+      final walletBridge = _TestWalletBridge();
+      final apiHubBridge = _TestApiHubBridge();
+
+      void onMessageTap(String roomId, String eventId) {}
+
+      Future<void> onLinkTap(String url) async {}
+
+      final configured = N42ChatConfig(
+        walletBridge: walletBridge,
+        apiHubBridge: apiHubBridge,
+        proxyAuthToken: 'proxy-token',
+        onMessageTap: onMessageTap,
+        onLinkTap: onLinkTap,
+        pushProtocol: const PushProtocolConfig(enabled: false),
+        pointsApiBaseUrl: 'https://points.example',
+      );
+
+      final cleared = configured.copyWith(
+        walletBridge: null,
+        apiHubBridge: null,
+        proxyAuthToken: null,
+        onMessageTap: null,
+        onLinkTap: null,
+        pushProtocol: null,
+        pointsApiBaseUrl: null,
+      );
+
+      expect(cleared.walletBridge, isNull);
+      expect(cleared.apiHubBridge, isNull);
+      expect(cleared.proxyAuthToken, isNull);
+      expect(cleared.onMessageTap, isNull);
+      expect(cleared.onLinkTap, isNull);
+      expect(cleared.pushProtocol, isNull);
+      expect(cleared.pointsApiBaseUrl, isNull);
+    });
+
+    test('replaces debankUseProxyEndpoint', () {
+      expect(
+        base.copyWith(debankUseProxyEndpoint: true).debankUseProxyEndpoint,
+        isTrue,
+      );
+    });
+
+    test('replaces debankBaseUrl', () {
+      expect(
+        base
+            .copyWith(debankBaseUrl: 'https://proxy.example/v1/debank')
+            .debankBaseUrl,
+        'https://proxy.example/v1/debank',
+      );
+    });
+
+    test('replaces alchemyUseProxyEndpoint', () {
+      expect(
+        base.copyWith(alchemyUseProxyEndpoint: true).alchemyUseProxyEndpoint,
+        isTrue,
+      );
+    });
+
+    test('replaces alchemyBaseUrl', () {
+      expect(
+        base
+            .copyWith(
+              alchemyBaseUrl: 'https://proxy.example/v1/alchemy/eth-mainnet',
+            )
+            .alchemyBaseUrl,
+        'https://proxy.example/v1/alchemy/eth-mainnet',
+      );
     });
   });
 
@@ -326,4 +519,110 @@ void main() {
       expect(config.syncFilter.lazyLoadMembers, isFalse);
     });
   });
+}
+
+class _TestApiHubBridge implements IApiHubBridge {
+  @override
+  Future<List<BridgeNewsItem>> getLatestNews({int limit = 10}) async => [];
+
+  @override
+  Future<Map<String, double>> getPrices(List<String> symbols) async => {};
+
+  @override
+  Future<bool> isUrlMalicious(String url, {bool useRemote = true}) async =>
+      false;
+}
+
+class _TestWalletBridge implements IWalletBridge {
+  @override
+  bool get isWalletConnected => false;
+
+  @override
+  String? get walletAddress => null;
+
+  @override
+  Future<Map<String, String?>> batchLookupEnsNames(
+    List<String> addresses,
+  ) async => {};
+
+  @override
+  Future<String> getBalance(String token) async => '0';
+
+  @override
+  Future<String?> getEnsAvatar(String ensName) async => null;
+
+  @override
+  Future<BigInt> getErc20Balance({
+    required String contractAddress,
+    required int chainId,
+    String? ownerAddress,
+  }) async => BigInt.zero;
+
+  @override
+  Future<int> getErc721Balance({
+    required String contractAddress,
+    required int chainId,
+    String? ownerAddress,
+  }) async => 0;
+
+  @override
+  Future<String?> getErc721TokenUri({
+    required String contractAddress,
+    required int tokenId,
+    required int chainId,
+  }) async => null;
+
+  @override
+  Future<BigInt> getErc1155Balance({
+    required String contractAddress,
+    required BigInt tokenId,
+    required int chainId,
+    String? ownerAddress,
+  }) async => BigInt.zero;
+
+  @override
+  Future<PaymentRequest> generatePaymentRequest({
+    required String amount,
+    required String token,
+    String? memo,
+  }) async => PaymentRequest(
+    requestId: 'req',
+    amount: amount,
+    token: token,
+    receiverAddress: '0x0',
+    qrCodeData: 'qr',
+    createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+  );
+
+  @override
+  Future<WalletUserInfo?> getUserInfoByAddress(String address) async => null;
+
+  @override
+  Future<String?> lookupEnsName(String address) async => null;
+
+  @override
+  Future<String?> resolveEnsName(String ensName) async => null;
+
+  @override
+  Future<TransferResult> requestTransfer({
+    required String toAddress,
+    required String amount,
+    required String token,
+    String? memo,
+  }) async => const TransferResult(success: false);
+
+  @override
+  Future<void> showReceiveQRCode() async {}
+
+  @override
+  Future<String?> signMessage(String message) async => null;
+
+  @override
+  Future<String?> signTypedData(String typedDataJson) async => null;
+
+  @override
+  bool isValidAddress(String address) => true;
+
+  @override
+  Future<List<TokenInfo>> getSupportedTokens() async => const [];
 }

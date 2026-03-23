@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../core/utils/matrix_utils.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -384,7 +385,8 @@ class MatrixStoryDataSource {
         'user_avatar_url': user.avatarUrl?.toString(),
         'content': content['content'] as String?,
         'media': mediaList,
-        'created_at': content['created_at'] as String? ??
+        'created_at':
+            content['created_at'] as String? ??
             event.originServerTs.toIso8601String(),
         'expires_at': content['expires_at'] as String?,
         'background_color': content['background_color'] as int?,
@@ -402,13 +404,7 @@ class MatrixStoryDataSource {
 
   /// 将 MXC URL 转换为 HTTP URL
   String? _getHttpUrlFromMxc(String mxcUrl) {
-    if (!mxcUrl.startsWith('mxc://')) return null;
-    if (_client?.homeserver == null) return null;
-
-    final uri = Uri.parse(mxcUrl);
-    return _client!.homeserver!
-        .resolve('/_matrix/media/v3/download/${uri.host}${uri.path}')
-        .toString();
+    return MatrixUtils.getMediaDownloadUrl(mxcUrl, client: _client);
   }
 
   /// 释放资源

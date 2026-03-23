@@ -57,7 +57,7 @@ abstract class IContactRepository {
   Future<String?> getUserStatusMessage(String userId);
 
   /// 设置当前用户的状态消息
-  Future<void> setMyStatus(String? statusMessage);
+  Future<void> setMyStatus(String? statusMessage, {Duration? expiresIn});
 
   /// 获取当前用户的状态消息
   Future<String?> getMyStatus();
@@ -104,4 +104,3 @@ class FriendRequest {
     this.message,
   });
 }
-

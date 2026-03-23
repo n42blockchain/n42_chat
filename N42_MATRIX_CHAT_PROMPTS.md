@@ -1,6 +1,7 @@
 # N42 Matrix Chat 客户端开发提示词系统
 
 > 本文档为在 Cursor IDE 中使用 Claude Opus 4.5 分阶段构建类微信UI的Matrix客户端的完整提示词指南
+> 注：本文主要用于历史构建提示与分阶段规划，不代表当前代码库的真实功能状态。实际对外能力以 `README.md`、源码和集成文档为准。
 
 ---
 
@@ -1080,7 +1081,7 @@ UI要求（模仿微信）：
   - 账号与安全
 
 2. lib/src/presentation/pages/profile/
-   - edit_profile_page.dart (编辑资料)
+   - profile_edit_page.dart (编辑资料)
    - settings_page.dart (设置)
    - account_security_page.dart (账号与安全)
 
@@ -1285,16 +1286,31 @@ class N42Chat {
   static List<RouteBase> routes();
   
   /// 登录
-  static Future<void> login(String homeserver, String username, String password);
+  static Future<void> login({
+    required String homeserver,
+    required String username,
+    required String password,
+  });
   
   /// 使用已有token登录
-  static Future<void> loginWithToken(String homeserver, String accessToken, String userId);
+  static Future<void> loginWithToken({
+    required String homeserver,
+    required String accessToken,
+    required String userId,
+    required String deviceId,
+  });
   
   /// 登出
   static Future<void> logout();
+
+  /// 强制清理本地 chat 数据
+  static Future<void> purgeLocalData();
   
   /// 是否已登录
   static bool get isLoggedIn;
+
+  /// 认证状态变化
+  static Stream<AuthStatus> get authStatusStream;
   
   /// 未读消息数Stream
   static Stream<int> get unreadCountStream;
@@ -1775,4 +1791,3 @@ n42_chat项目中的[模块名称]需要重构。
 ---
 
 > 本文档持续更新，请根据实际开发进度调整提示词内容。
-

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -87,12 +88,22 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   ArchiveDatabase._internal(super.e);
 
   static ArchiveDatabase? _instance;
+  static Completer<ArchiveDatabase>? _initCompleter;
 
   /// 获取单例实例
   static Future<ArchiveDatabase> getInstance() async {
     if (_instance != null) return _instance!;
-    _instance = ArchiveDatabase._internal(await _openConnection());
-    return _instance!;
+    if (_initCompleter != null) return _initCompleter!.future;
+    _initCompleter = Completer<ArchiveDatabase>();
+    try {
+      _instance = ArchiveDatabase._internal(await _openConnection());
+      _initCompleter!.complete(_instance!);
+      return _instance!;
+    } catch (e, s) {
+      _initCompleter!.completeError(e, s);
+      _initCompleter = null;
+      rethrow;
+    }
   }
 
   @visibleForTesting
@@ -154,11 +165,16 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   /// 批量插入归档消息（忽略已存在的）
   Future<int> insertMessages(List<ArchivedMessagesCompanion> entries) async {
     int inserted = 0;
-    await batch((b) {
+    await transaction(() async {
       for (final entry in entries) {
-        b.insert(archivedMessages, entry, mode: InsertMode.insertOrIgnore);
+        final rowId = await into(archivedMessages).insert(
+          entry,
+          mode: InsertMode.insertOrIgnore,
+        );
+        if (rowId > 0) {
+          inserted++;
+        }
       }
-      inserted = entries.length;
     });
     return inserted;
   }

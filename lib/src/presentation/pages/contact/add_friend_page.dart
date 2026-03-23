@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'phone_contacts_page.dart';
@@ -12,16 +13,20 @@ import 'phone_contacts_page.dart';
 // ─── Input type detection ─────────────────────────────────────────────────────
 
 enum _InputType {
-  matrixId,      // @user:server.com
+  matrixId, // @user:server.com
   walletAddress, // 0x...
-  ensName,       // xxx.eth / xxx.lens / xxx.cb.id
-  username,      // anything else
+  ensName, // xxx.eth / xxx.lens / xxx.cb.id
+  username, // anything else
 }
+
+final _walletAddressRegExp = RegExp(r'^0x[0-9a-fA-F]{40}$');
 
 _InputType _detectInputType(String input) {
   final q = input.trim();
   if (q.startsWith('@') && q.contains(':')) return _InputType.matrixId;
-  if (RegExp(r'^0x[0-9a-fA-F]{40}$').hasMatch(q)) return _InputType.walletAddress;
+  if (_walletAddressRegExp.hasMatch(q)) {
+    return _InputType.walletAddress;
+  }
   // ENS: requires at least 1 label char before the TLD dot (e.g. "a.eth")
   if ((q.endsWith('.eth') && q.length > 4) ||
       (q.endsWith('.lens') && q.length > 5) ||
@@ -161,7 +166,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = S.of(context)?.web3ResolveFailed ??
+          _errorMessage =
+              S.of(context)?.web3ResolveFailed ??
               'Failed to resolve wallet identity';
         });
       }
@@ -180,7 +186,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
           setState(() {
             _isLoading = false;
             _isSearching = true;
-            _errorMessage = S.of(context)?.web3EnsNotFound(ensName) ??
+            _errorMessage =
+                S.of(context)?.web3EnsNotFound(ensName) ??
                 'ENS name "$ensName" not found';
           });
         }
@@ -230,7 +237,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
       if (client == null) {
         setState(() {
-          _errorMessage = S.of(context)?.commonChatServiceNotConnected ??
+          _errorMessage =
+              S.of(context)?.commonChatServiceNotConnected ??
               'Chat service not connected';
           _isLoading = false;
         });
@@ -243,8 +251,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
       if (query.startsWith('@') && query.contains(':')) {
         try {
           final profile = await client.getProfileFromUserId(query);
-          final localpart =
-              query.split(':').first.replaceFirst('@', '');
+          final localpart = query.split(':').first.replaceFirst('@', '');
           results.add({
             'userId': query,
             'displayName': profile.displayName ?? localpart,
@@ -261,10 +268,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
         if (fullUserId.contains(':')) {
           try {
-            final profile =
-                await client.getProfileFromUserId(fullUserId);
-            final localpart =
-                fullUserId.split(':').first.replaceFirst('@', '');
+            final profile = await client.getProfileFromUserId(fullUserId);
+            final localpart = fullUserId.split(':').first.replaceFirst('@', '');
             results.add({
               'userId': fullUserId,
               'displayName': profile.displayName ?? localpart,
@@ -275,12 +280,13 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
         // Directory search
         try {
-          final response =
-              await client.searchUserDirectory(query, limit: 20);
+          final response = await client.searchUserDirectory(query, limit: 20);
           for (final user in response.results) {
             if (!results.any((r) => r['userId'] == user.userId)) {
-              final localpart =
-                  user.userId.split(':').first.replaceFirst('@', '');
+              final localpart = user.userId
+                  .split(':')
+                  .first
+                  .replaceFirst('@', '');
               results.add({
                 'userId': user.userId,
                 'displayName': user.displayName ?? localpart,
@@ -298,14 +304,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
         if (results.isEmpty) {
           _errorMessage =
               S.of(context)?.contactUserNotFoundHint(query) ??
-                  'User "$query" not found';
+              'User "$query" not found';
         }
       });
     } catch (e) {
       setState(() {
         _errorMessage =
             S.of(context)?.contactSearchFailed(e.toString()) ??
-                'Search failed: $e';
+            'Search failed: $e';
         _isLoading = false;
       });
     }
@@ -317,21 +323,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
     setState(() => _isLoading = true);
 
     try {
-      final clientManager = getIt<MatrixClientManager>();
-      final client = clientManager.client;
-
-      if (client == null) {
-        _showError(S.of(context)?.commonChatServiceNotConnected ??
-            'Chat service not connected');
-        return;
-      }
-
-      final roomId = await client.startDirectChat(userId);
+      final roomId = await getIt<IContactRepository>().startDirectChat(userId);
       if (mounted) Navigator.of(context).pop(roomId);
     } catch (e) {
       if (!mounted) return;
-      _showError(S.of(context)?.contactCreateChatFailed(e.toString()) ??
-          'Failed to create chat: $e');
+      _showError(
+        S.of(context)?.contactCreateChatFailed(e.toString()) ??
+            'Failed to create chat: $e',
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -340,9 +339,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
   void _showError(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            backgroundColor: AppColors.error),
+        SnackBar(content: Text(message), backgroundColor: AppColors.error),
       );
     }
   }
@@ -361,8 +358,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: N42AppBar(
         title: S.of(context)?.commonAddFriend ?? 'Add Friend',
         leading: IconButton(
@@ -405,7 +401,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
                           controller: _searchController,
                           focusNode: _focusNode,
                           decoration: InputDecoration(
-                            hintText: S.of(context)?.web3SearchPlaceholder ??
+                            hintText:
+                                S.of(context)?.web3SearchPlaceholder ??
                                 'Search by ID, wallet, or ENS...',
                             hintStyle: TextStyle(
                               fontSize: 14,
@@ -422,12 +419,15 @@ class _AddFriendPageState extends State<AddFriendPage> {
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                           style: TextStyle(
                             fontSize: 14,
-                            color:
-                                isDark ? Colors.white : AppColors.textPrimary,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
                           ),
                           onSubmitted: (_) => _searchUser(),
                         ),
@@ -449,7 +449,9 @@ class _AddFriendPageState extends State<AddFriendPage> {
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white),
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
                           : Text(S.of(context)?.commonSearch ?? 'Search'),
                     ),
@@ -459,10 +461,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                 // Input type hint chip
                 if (_searchController.text.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  _InputTypeChip(
-                    query: _searchController.text,
-                    isDark: isDark,
-                  ),
+                  _InputTypeChip(query: _searchController.text, isDark: isDark),
                 ],
               ],
             ),
@@ -480,8 +479,11 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.contacts,
-                    color: AppColors.primary, size: 22),
+                child: const Icon(
+                  Icons.contacts,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
               ),
               title: Text(
                 'From Contacts',
@@ -499,10 +501,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
                       : AppColors.textSecondary,
                 ),
               ),
-              trailing: Icon(Icons.chevron_right,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary),
+              trailing: Icon(
+                Icons.chevron_right,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
+              ),
               onTap: _openPhoneContacts,
             ),
           ),
@@ -513,9 +517,10 @@ class _AddFriendPageState extends State<AddFriendPage> {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               color: AppColors.error.withValues(alpha: 0.1),
-              child: Text(_errorMessage!,
-                  style: const TextStyle(
-                      color: AppColors.error, fontSize: 13)),
+              child: Text(
+                _errorMessage!,
+                style: const TextStyle(color: AppColors.error, fontSize: 13),
+              ),
             ),
 
           // ── Results
@@ -528,7 +533,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
   Widget _buildContent(bool isDark) {
     if (_isLoading) {
       return N42Loading(
-          message: S.of(context)?.contactSearching ?? 'Searching...');
+        message: S.of(context)?.contactSearching ?? 'Searching...',
+      );
     }
 
     if (!_isSearching) {
@@ -564,7 +570,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
       return N42EmptyState.noSearchResult(
         description:
             S.of(context)?.contactUserNotFound(_searchController.text) ??
-                'User "${_searchController.text}" not found',
+            'User "${_searchController.text}" not found',
       );
     }
 
@@ -601,9 +607,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         userId,
         style: TextStyle(
           fontSize: 13,
-          color: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondary,
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
       trailing: OutlinedButton(
@@ -714,8 +718,9 @@ class _SearchEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
-    final color =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final color = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Padding(
       padding: const EdgeInsets.all(32),
@@ -728,7 +733,10 @@ class _SearchEmptyState extends StatelessWidget {
             l10n?.contactSearchUserToChat ?? 'Search user to start chatting',
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 15, color: color, fontWeight: FontWeight.w500),
+              fontSize: 15,
+              color: color,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 24),
           // Search method cards
@@ -799,9 +807,7 @@ class _MethodCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isDark ? Colors.white10 : AppColors.divider,
-        ),
+        border: Border.all(color: isDark ? Colors.white10 : AppColors.divider),
       ),
       child: Row(
         children: [
@@ -823,8 +829,7 @@ class _MethodCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color:
-                      isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
                 ),
               ),
               Text(

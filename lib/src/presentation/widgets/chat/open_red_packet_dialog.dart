@@ -11,7 +11,7 @@ class SendRedPacketDialog extends StatelessWidget {
   final String receiverName;
   final bool isGroup;
   final int memberCount;
-  final void Function(String amount, String token, String greeting, int count,
+  final Future<bool> Function(String amount, String token, String greeting, int count,
       bool isLucky) onSend;
 
   const SendRedPacketDialog({

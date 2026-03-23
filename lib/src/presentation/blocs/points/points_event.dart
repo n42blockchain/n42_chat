@@ -87,3 +87,8 @@ class PointsRedeemItem extends PointsEvent {
   @override
   List<Object?> get props => [userId, roomId, itemId];
 }
+
+/// Clear the last redemption feedback after the UI has handled it.
+class PointsClearRedemptionFeedback extends PointsEvent {
+  const PointsClearRedemptionFeedback();
+}

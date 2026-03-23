@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,7 +11,7 @@ import '../../widgets/common/slide_to_pay_button.dart';
 class SendTransferPage extends StatefulWidget {
   final String receiverName;
   final String? receiverAvatar;
-  final void Function(String amount, String token, String? memo) onSend;
+  final Future<bool> Function(String amount, String token, String? memo) onSend;
 
   const SendTransferPage({
     super.key,
@@ -27,6 +29,10 @@ class _SendTransferPageState extends State<SendTransferPage> {
   final _memoController = TextEditingController();
   
   String _selectedToken = 'CNY';
+  var _isSending = false;
+  var _submitAttempt = 0;
+  RegExp? _cachedAmountRegex;
+  String? _cachedAmountPattern;
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
   
   /// 获取当前币种的小数位数限制
@@ -45,7 +51,17 @@ class _SendTransferPageState extends State<SendTransferPage> {
   
   /// 获取金额输入的正则表达式
   String get _amountPattern => r'^\d*\.?\d{0,' + _decimalPlaces.toString() + r'}';
-  
+
+  RegExp get _amountRegex {
+    final pattern = _amountPattern;
+    if (_cachedAmountPattern == pattern && _cachedAmountRegex != null) {
+      return _cachedAmountRegex!;
+    }
+    _cachedAmountPattern = pattern;
+    _cachedAmountRegex = RegExp(pattern);
+    return _cachedAmountRegex!;
+  }
+
   /// 切换币种时验证并截断金额小数位
   void _validateAmountDecimals() {
     final text = _amountController.text;
@@ -71,7 +87,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
     super.dispose();
   }
   
-  void _send() {
+  Future<void> _send() async {
+    if (_isSending) return;
+
     final amount = _amountController.text.trim();
     if (amount.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -79,13 +97,26 @@ class _SendTransferPageState extends State<SendTransferPage> {
       );
       return;
     }
-    
-    widget.onSend(
+
+    setState(() => _isSending = true);
+
+    final success = await widget.onSend(
       amount,
       _selectedToken,
       _memoController.text.trim().isNotEmpty ? _memoController.text.trim() : null,
     );
-    Navigator.of(context).pop();
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    setState(() {
+      _isSending = false;
+      _submitAttempt += 1;
+    });
   }
   
   @override
@@ -190,7 +221,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                           controller: _amountController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(_amountPattern)),
+                            FilteringTextInputFormatter.allow(_amountRegex),
                           ],
                           style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: textColor),
                           decoration: InputDecoration(
@@ -232,11 +263,14 @@ class _SendTransferPageState extends State<SendTransferPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SlideToPayButton(
+                key: ValueKey('send_transfer_submit_$_submitAttempt'),
                 label: S.of(context)?.slideToPayLabel ?? '→→→  Slide to confirm',
                 confirmingLabel:
                     S.of(context)?.slideToPayConfirming ?? 'Confirming...',
                 trackColor: const Color(0xFFF9A825),
-                onConfirmed: _send,
+                onConfirmed: () {
+                  unawaited(_send());
+                },
               ),
             ),
           ],
@@ -287,10 +321,10 @@ class _SendTransferPageState extends State<SendTransferPage> {
 }
 
 /// 发转账弹窗（兼容性包装，自动跳转到全屏页面）
-class SendTransferDialog extends StatelessWidget {
+class SendTransferDialog extends StatefulWidget {
   final String receiverName;
   final String? receiverAvatar;
-  final void Function(String amount, String token, String? memo) onSend;
+  final Future<bool> Function(String amount, String token, String? memo) onSend;
 
   const SendTransferDialog({
     super.key,
@@ -298,22 +332,35 @@ class SendTransferDialog extends StatelessWidget {
     this.receiverAvatar,
     required this.onSend,
   });
-  
+
   @override
-  Widget build(BuildContext context) {
-    // 自动跳转到全屏页面
+  State<SendTransferDialog> createState() => _SendTransferDialogState();
+}
+
+class _SendTransferDialogState extends State<SendTransferDialog> {
+  bool _navigated = false;
+
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_navigated || !mounted) return;
+      _navigated = true;
       Navigator.of(context).pop();
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => SendTransferPage(
-            receiverName: receiverName,
-            receiverAvatar: receiverAvatar,
-            onSend: onSend,
+            receiverName: widget.receiverName,
+            receiverAvatar: widget.receiverAvatar,
+            onSend: widget.onSend,
           ),
         ),
       );
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return const SizedBox.shrink();
   }
 }

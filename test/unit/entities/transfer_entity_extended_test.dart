@@ -1,7 +1,8 @@
 // Extended tests for TransferEntity — covers classes NOT exercised by
 // transfer_entity_test.dart:
 //   TransferMessageContent (fromMessageContent, toMessageContent, msgType),
-//   PaymentRequestContent  (fromMessageContent, toMessageContent, isExpired, msgType)
+//   PaymentRequestContent  (fromMessageContent, toMessageContent, isExpired, msgType),
+//   PaymentRequestFulfillmentContent (fromEventContent, toEventContent, eventType)
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/domain/entities/transfer_entity.dart';
@@ -142,8 +143,9 @@ void main() {
     });
 
     test('fromMessageContent parses all fields', () {
-      final futureMs =
-          DateTime.now().add(const Duration(days: 7)).millisecondsSinceEpoch;
+      final futureMs = DateTime.now()
+          .add(const Duration(days: 7))
+          .millisecondsSinceEpoch;
       final content = {
         'request_id': 'req-42',
         'receiver_address': '0xPayee',
@@ -206,6 +208,67 @@ void main() {
       final map = req.toMessageContent();
       expect(map['memo'], isNull);
       expect(map['expires_at'], isNull);
+    });
+  });
+
+  group('PaymentRequestFulfillmentContent', () {
+    test('eventType constant is n42.payment_request.fulfillment', () {
+      expect(
+        PaymentRequestFulfillmentContent.eventType,
+        'n42.payment_request.fulfillment',
+      );
+    });
+
+    test('fromEventContent parses all fields', () {
+      final content = {
+        'request_id': 'req-42',
+        'transfer_id': 'tx-42',
+        'transfer_event_id': '\$transfer42',
+        'payer_address': '0xpayer',
+        'receiver_address': '0xreceiver',
+        'amount': '12.5',
+        'token': 'USDT',
+        'tx_hash': '0xtxhash',
+        'fulfilled_at': DateTime(2030, 1, 1).millisecondsSinceEpoch,
+      };
+
+      final parsed = PaymentRequestFulfillmentContent.fromEventContent(content);
+
+      expect(parsed.requestId, 'req-42');
+      expect(parsed.transferId, 'tx-42');
+      expect(parsed.transferEventId, '\$transfer42');
+      expect(parsed.payerAddress, '0xpayer');
+      expect(parsed.receiverAddress, '0xreceiver');
+      expect(parsed.amount, '12.5');
+      expect(parsed.token, 'USDT');
+      expect(parsed.transactionHash, '0xtxhash');
+      expect(parsed.fulfilledAt, DateTime(2030, 1, 1));
+    });
+
+    test('toEventContent round-trips all fields', () {
+      final content = PaymentRequestFulfillmentContent(
+        requestId: 'req-7',
+        transferId: 'tx-7',
+        transferEventId: '\$transfer7',
+        payerAddress: '0xpayer',
+        receiverAddress: '0xreceiver',
+        amount: '7',
+        token: 'ETH',
+        transactionHash: '0xtx',
+        fulfilledAt: DateTime(2030, 2, 2),
+      );
+
+      final map = content.toEventContent();
+
+      expect(map['request_id'], 'req-7');
+      expect(map['transfer_id'], 'tx-7');
+      expect(map['transfer_event_id'], '\$transfer7');
+      expect(map['payer_address'], '0xpayer');
+      expect(map['receiver_address'], '0xreceiver');
+      expect(map['amount'], '7');
+      expect(map['token'], 'ETH');
+      expect(map['tx_hash'], '0xtx');
+      expect(map['fulfilled_at'], DateTime(2030, 2, 2).millisecondsSinceEpoch);
     });
   });
 }

@@ -63,6 +63,40 @@ void main() {
             .having((s) => s.error, 'error', isNull),
       ],
     );
+
+    blocTest<BackupBloc, BackupState>(
+      'appends warnings to success message without treating restore as failure',
+      build: () {
+        when(
+          () => mockService.restoreFromBackup(
+            backupFilePath: any(named: 'backupFilePath'),
+            password: any(named: 'password'),
+            roomIds: any(named: 'roomIds'),
+            restoreSettings: any(named: 'restoreSettings'),
+            restoreKeys: any(named: 'restoreKeys'),
+            onProgress: any(named: 'onProgress'),
+          ),
+        ).thenAnswer((_) async => const RestoreResult(
+              settingsRestored: 2,
+              warnings: [
+                'Encryption keys are backed up separately via Recovery Key in Security settings and are not included in .n42backup files.',
+              ],
+            ));
+        return buildBloc();
+      },
+      seed: () => const BackupState(),
+      act: (bloc) => bloc.add(const RestoreFromBackup(
+        backupFilePath: '/tmp/backup_with_warning.n42backup',
+      )),
+      expect: () => [
+        isA<BackupState>()
+            .having((s) => s.isRestoring, 'isRestoring', isTrue),
+        isA<BackupState>()
+            .having((s) => s.isRestoring, 'isRestoring', isFalse)
+            .having((s) => s.error, 'error', isNull)
+            .having((s) => s.successMessage, 'successMessage', contains('Recovery Key')),
+      ],
+    );
   });
 
   // ─────────────────────────────────────────────────

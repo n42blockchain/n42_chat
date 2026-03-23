@@ -25,17 +25,20 @@ class SocialGraphBloc extends Bloc<SocialGraphEvent, SocialGraphState> {
     SocialGraphLoadProfile event,
     Emitter<SocialGraphState> emit,
   ) async {
-    emit(state.copyWith(status: SocialGraphStatus.loading));
+    emit(state.copyWith(
+      profileStatus: SocialGraphStatus.loading,
+      clearProfileError: true,
+    ));
     try {
       final profile = await _repository.getProfile(event.address);
       emit(state.copyWith(
-        status: SocialGraphStatus.loaded,
+        profileStatus: SocialGraphStatus.loaded,
         profile: profile,
       ));
     } catch (e) {
       emit(state.copyWith(
-        status: SocialGraphStatus.error,
-        errorMessage: e.toString(),
+        profileStatus: SocialGraphStatus.error,
+        profileErrorMessage: e.toString(),
       ));
     }
   }
@@ -44,20 +47,23 @@ class SocialGraphBloc extends Bloc<SocialGraphEvent, SocialGraphState> {
     SocialGraphLoadRecommendations event,
     Emitter<SocialGraphState> emit,
   ) async {
-    emit(state.copyWith(status: SocialGraphStatus.loading));
+    emit(state.copyWith(
+      recommendationsStatus: SocialGraphStatus.loading,
+      clearRecommendationsError: true,
+    ));
     try {
       final recommendations = await _repository.getRecommendations(
         event.address,
         limit: event.limit,
       );
       emit(state.copyWith(
-        status: SocialGraphStatus.loaded,
+        recommendationsStatus: SocialGraphStatus.loaded,
         recommendations: recommendations,
       ));
     } catch (e) {
       emit(state.copyWith(
-        status: SocialGraphStatus.error,
-        errorMessage: e.toString(),
+        recommendationsStatus: SocialGraphStatus.error,
+        recommendationsErrorMessage: e.toString(),
       ));
     }
   }
@@ -66,20 +72,23 @@ class SocialGraphBloc extends Bloc<SocialGraphEvent, SocialGraphState> {
     SocialGraphCalculateSimilarity event,
     Emitter<SocialGraphState> emit,
   ) async {
-    emit(state.copyWith(status: SocialGraphStatus.loading));
+    emit(state.copyWith(
+      similarityStatus: SocialGraphStatus.loading,
+      clearSimilarityError: true,
+    ));
     try {
-      final score = await _repository.calculateSimilarity(
+      final similarity = await _repository.calculateSimilarity(
         event.addressA,
         event.addressB,
       );
       emit(state.copyWith(
-        status: SocialGraphStatus.loaded,
-        similarityScore: score,
+        similarityStatus: SocialGraphStatus.loaded,
+        similarity: similarity,
       ));
     } catch (e) {
       emit(state.copyWith(
-        status: SocialGraphStatus.error,
-        errorMessage: e.toString(),
+        similarityStatus: SocialGraphStatus.error,
+        similarityErrorMessage: e.toString(),
       ));
     }
   }
@@ -88,17 +97,20 @@ class SocialGraphBloc extends Bloc<SocialGraphEvent, SocialGraphState> {
     SocialGraphSearchProfiles event,
     Emitter<SocialGraphState> emit,
   ) async {
-    emit(state.copyWith(status: SocialGraphStatus.loading));
+    emit(state.copyWith(
+      searchStatus: SocialGraphStatus.loading,
+      clearSearchError: true,
+    ));
     try {
       final results = await _repository.searchProfiles(event.query);
       emit(state.copyWith(
-        status: SocialGraphStatus.loaded,
+        searchStatus: SocialGraphStatus.loaded,
         searchResults: results,
       ));
     } catch (e) {
       emit(state.copyWith(
-        status: SocialGraphStatus.error,
-        errorMessage: e.toString(),
+        searchStatus: SocialGraphStatus.error,
+        searchErrorMessage: e.toString(),
       ));
     }
   }

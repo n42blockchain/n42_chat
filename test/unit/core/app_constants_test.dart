@@ -28,12 +28,19 @@ void main() {
   // ─────────────────────────────────────────────────
 
   group('AppConstants — Matrix', () {
-    test('defaultHomeserver is https://matrix.org', () {
-      expect(AppConstants.defaultHomeserver, 'https://matrix.org');
+    test('defaultHomeserver matches chat config default', () {
+      expect(AppConstants.defaultHomeserver, 'https://m.si46.world');
     });
 
     test('popularHomeservers has 4 entries', () {
       expect(AppConstants.popularHomeservers, hasLength(4));
+    });
+
+    test('popularHomeservers contains default homeserver first', () {
+      expect(
+        AppConstants.popularHomeservers.first,
+        AppConstants.defaultHomeserver,
+      );
     });
 
     test('popularHomeservers contains matrix.org', () {
@@ -48,8 +55,8 @@ void main() {
       expect(AppConstants.popularHomeservers, contains('https://tchncs.de'));
     });
 
-    test('popularHomeservers contains nitro.chat', () {
-      expect(AppConstants.popularHomeservers, contains('https://nitro.chat'));
+    test('popularHomeservers contains m.si46.world', () {
+      expect(AppConstants.popularHomeservers, contains('https://m.si46.world'));
     });
 
     test('syncTimeout is 30', () {
@@ -181,15 +188,24 @@ void main() {
 
   group('AppConstants.matrixIdPattern', () {
     test('accepts valid Matrix user ID', () {
-      expect(AppConstants.matrixIdPattern.hasMatch('@alice:matrix.org'), isTrue);
+      expect(
+        AppConstants.matrixIdPattern.hasMatch('@alice:matrix.org'),
+        isTrue,
+      );
     });
 
     test('accepts user with dots and underscores', () {
-      expect(AppConstants.matrixIdPattern.hasMatch('@alice.bob_123:server.io'), isTrue);
+      expect(
+        AppConstants.matrixIdPattern.hasMatch('@alice.bob_123:server.io'),
+        isTrue,
+      );
     });
 
     test('rejects ID without leading @', () {
-      expect(AppConstants.matrixIdPattern.hasMatch('alice:matrix.org'), isFalse);
+      expect(
+        AppConstants.matrixIdPattern.hasMatch('alice:matrix.org'),
+        isFalse,
+      );
     });
 
     test('rejects ID without server part', () {
@@ -213,11 +229,17 @@ void main() {
 
   group('AppConstants.roomAliasPattern', () {
     test('accepts valid room alias', () {
-      expect(AppConstants.roomAliasPattern.hasMatch('#general:matrix.org'), isTrue);
+      expect(
+        AppConstants.roomAliasPattern.hasMatch('#general:matrix.org'),
+        isTrue,
+      );
     });
 
     test('rejects without leading #', () {
-      expect(AppConstants.roomAliasPattern.hasMatch('general:matrix.org'), isFalse);
+      expect(
+        AppConstants.roomAliasPattern.hasMatch('general:matrix.org'),
+        isFalse,
+      );
     });
   });
 
@@ -227,7 +249,10 @@ void main() {
     });
 
     test('matches https URL', () {
-      expect(AppConstants.urlPattern.hasMatch('https://example.com/path?q=1'), isTrue);
+      expect(
+        AppConstants.urlPattern.hasMatch('https://example.com/path?q=1'),
+        isTrue,
+      );
     });
 
     test('is case-insensitive', () {

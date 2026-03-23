@@ -148,6 +148,10 @@ class WebRTCService {
   // 清理锁：防止并发清理导致竞态
   bool _isCleaningUp = false;
 
+  // Matrix 事件订阅
+  StreamSubscription<List<matrix.BasicEventWithSender>>? _callEventsSubscription;
+  StreamSubscription<matrix.Event>? _timelineEventsSubscription;
+
   WebRTCService(this._client) : _config = VoIPConfig();
   
   // ============================================
@@ -179,6 +183,10 @@ class WebRTCService {
   /// 释放资源
   Future<void> dispose() async {
     await hangup();
+    await _callEventsSubscription?.cancel();
+    _callEventsSubscription = null;
+    await _timelineEventsSubscription?.cancel();
+    _timelineEventsSubscription = null;
     await localRenderer.dispose();
     await remoteRenderer.dispose();
     _durationTimer?.cancel();
@@ -192,8 +200,7 @@ class WebRTCService {
   void _setupMatrixEventListeners() {
     debugLog('WebRTCService: Setting up Matrix event listeners');
 
-    // 监听所有通话事件
-    _client.onCallEvents.stream.listen((events) {
+    _callEventsSubscription = _client.onCallEvents.stream.listen((events) {
       debugLog('WebRTCService: Received ${events.length} call events');
       for (final event in events) {
         final type = event.type;
@@ -221,9 +228,7 @@ class WebRTCService {
       }
     });
 
-    // 同时监听房间时间线事件（用于接收房间内的通话事件）
-    // Matrix 6.0: onEvent 已弃用，改用 onTimelineEvent（已解密的 Event 对象）
-    _client.onTimelineEvent.stream.listen((event) {
+    _timelineEventsSubscription = _client.onTimelineEvent.stream.listen((event) {
       final eventType = event.type;
 
       // 只处理通话相关事件
@@ -1084,7 +1089,8 @@ class WebRTCService {
       );
 
       try {
-        if (_peerConnection?.getRemoteDescription() != null) {
+        final remoteDesc = await _peerConnection?.getRemoteDescription();
+        if (remoteDesc != null) {
           await _peerConnection?.addCandidate(candidate);
           debugLog('WebRTCService: Added ICE candidate');
         } else {

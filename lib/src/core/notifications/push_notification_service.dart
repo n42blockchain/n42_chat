@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
+
+import '../../domain/entities/user_profile_entity.dart'
+    show NotificationPrivacyMode;
 import '../utils/debug_log.dart';
 
 /// 推送通知服务
@@ -43,13 +46,13 @@ abstract class IPushNotificationService {
 /// 推送通知服务实现
 class PushNotificationService implements IPushNotificationService {
   final matrix.Client _client;
-  
+
   /// 推送网关URL（用于注册推送）
   final String? pushGatewayUrl;
-  
+
   /// 应用标识符
   final String appId;
-  
+
   /// 推送器类型
   final String pushkeyType;
 
@@ -121,7 +124,9 @@ class PushNotificationService implements IPushNotificationService {
     // 检查房间是否静音
     if (room.pushRuleState == matrix.PushRuleState.dontNotify) return;
 
-    final senderName = room.unsafeGetUserFromMemoryOrFallback(event.senderId).calcDisplayname();
+    final senderName = room
+        .unsafeGetUserFromMemoryOrFallback(event.senderId)
+        .calcDisplayname();
     final roomName = room.getLocalizedDisplayname();
     final body = _getNotificationBody(event);
 
@@ -173,7 +178,7 @@ class PushNotificationService implements IPushNotificationService {
           appId: appId,
           appDisplayName: 'N42 Chat',
           deviceDisplayName: _client.deviceName ?? 'Unknown Device',
-          lang: 'zh-CN',
+          lang: 'zh-TW',
           data: matrix.PusherData(
             url: Uri.parse(pushGatewayUrl!),
             format: 'event_id_only',
@@ -198,7 +203,7 @@ class PushNotificationService implements IPushNotificationService {
           appId: appId,
           appDisplayName: 'N42 Chat',
           deviceDisplayName: _client.deviceName ?? 'Unknown Device',
-          lang: 'zh-CN',
+          lang: 'zh-TW',
           data: matrix.PusherData(),
         ),
       );
@@ -229,7 +234,7 @@ class PushNotificationService implements IPushNotificationService {
   }) async {
     // 注：实际实现需要使用 flutter_local_notifications 包
     // 这里只提供接口定义
-    
+
     debugLog('Showing notification: $title - $body');
   }
 
@@ -269,10 +274,13 @@ class PushNotificationService implements IPushNotificationService {
 enum NotificationPermissionStatus {
   /// 已授权
   granted,
+
   /// 已拒绝
   denied,
+
   /// 未确定
   notDetermined,
+
   /// 受限
   restricted,
 }
@@ -310,6 +318,9 @@ class NotificationConfig {
   /// 免打扰结束时间
   final TimeOfDay? dndEndTime;
 
+  /// 通知隐私模式
+  final NotificationPrivacyMode privacyMode;
+
   const NotificationConfig({
     this.enabled = true,
     this.showPreview = true,
@@ -318,6 +329,7 @@ class NotificationConfig {
     this.doNotDisturb = false,
     this.dndStartTime,
     this.dndEndTime,
+    this.privacyMode = NotificationPrivacyMode.full,
   });
 
   /// 检查当前是否在免打扰时间内
@@ -348,6 +360,7 @@ class NotificationConfig {
     bool? doNotDisturb,
     TimeOfDay? dndStartTime,
     TimeOfDay? dndEndTime,
+    NotificationPrivacyMode? privacyMode,
   }) {
     return NotificationConfig(
       enabled: enabled ?? this.enabled,
@@ -357,8 +370,39 @@ class NotificationConfig {
       doNotDisturb: doNotDisturb ?? this.doNotDisturb,
       dndStartTime: dndStartTime ?? this.dndStartTime,
       dndEndTime: dndEndTime ?? this.dndEndTime,
+      privacyMode: privacyMode ?? this.privacyMode,
     );
   }
+
+  NotificationPresentation presentMessage({
+    required String title,
+    required String body,
+    String genericTitle = 'N42 Chat',
+    String genericBody = 'You have a new message',
+  }) {
+    final normalizedTitle = title.trim().isEmpty ? genericTitle : title;
+    final normalizedBody = body.trim().isEmpty ? genericBody : body;
+
+    switch (privacyMode) {
+      case NotificationPrivacyMode.full:
+        return NotificationPresentation(
+          title: normalizedTitle,
+          body: showPreview ? normalizedBody : genericBody,
+        );
+      case NotificationPrivacyMode.senderOnly:
+        return NotificationPresentation(
+          title: normalizedTitle,
+          body: genericBody,
+        );
+      case NotificationPrivacyMode.hidden:
+        return NotificationPresentation(title: genericTitle, body: genericBody);
+    }
+  }
+
+  bool get allowsNativeForegroundPreview =>
+      enabled &&
+      privacyMode == NotificationPrivacyMode.full &&
+      showPreview;
 
   Map<String, dynamic> toJson() {
     return {
@@ -373,6 +417,7 @@ class NotificationConfig {
       'dndEndTime': dndEndTime != null
           ? '${dndEndTime!.hour}:${dndEndTime!.minute}'
           : null,
+      'privacyMode': privacyMode.name,
     };
   }
 
@@ -385,6 +430,7 @@ class NotificationConfig {
       doNotDisturb: json['doNotDisturb'] as bool? ?? false,
       dndStartTime: _parseTimeOfDay(json['dndStartTime'] as String?),
       dndEndTime: _parseTimeOfDay(json['dndEndTime'] as String?),
+      privacyMode: _parsePrivacyMode(json['privacyMode'] as String?),
     );
   }
 
@@ -397,4 +443,18 @@ class NotificationConfig {
       minute: int.tryParse(parts[1]) ?? 0,
     );
   }
+
+  static NotificationPrivacyMode _parsePrivacyMode(String? value) {
+    return NotificationPrivacyMode.values.firstWhere(
+      (mode) => mode.name == value,
+      orElse: () => NotificationPrivacyMode.full,
+    );
+  }
+}
+
+class NotificationPresentation {
+  final String title;
+  final String body;
+
+  const NotificationPresentation({required this.title, required this.body});
 }

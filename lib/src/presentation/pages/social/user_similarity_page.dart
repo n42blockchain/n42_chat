@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../data/models/social/social_similarity_model.dart';
 import '../../blocs/social/social_graph_bloc.dart';
 import '../../blocs/social/social_graph_event.dart';
 import '../../blocs/social/social_graph_state.dart';
@@ -84,17 +85,25 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
       ),
       body: BlocBuilder<SocialGraphBloc, SocialGraphState>(
         builder: (context, state) {
-          if (state.isLoading) {
+          final similarity = _currentSimilarity(state);
+
+          if (state.isSimilarityLoading ||
+              (similarity == null &&
+                  state.similarityStatus != SocialGraphStatus.error)) {
             return const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
 
-          if (state.status == SocialGraphStatus.error) {
-            return _buildError(state.errorMessage ?? 'Unknown error', isDark);
+          if (state.hasSimilarityError) {
+            return _buildError(
+              state.similarityErrorMessage ?? 'Unknown error',
+              isDark,
+            );
           }
 
-          final score = state.similarityScore ?? 0;
+          final resolvedSimilarity = similarity!;
+          final score = resolvedSimilarity.totalScore;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -111,12 +120,12 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 const SizedBox(height: 28),
 
                 // Dimension breakdown
-                _buildBreakdownSection(score, isDark),
+                _buildBreakdownSection(resolvedSimilarity, isDark),
 
                 const SizedBox(height: 24),
 
                 // Common items
-                _buildCommonItemsSection(isDark),
+                _buildCommonItemsSection(resolvedSimilarity, isDark),
 
                 const SizedBox(height: 32),
               ],
@@ -262,15 +271,10 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     );
   }
 
-  Widget _buildBreakdownSection(double totalScore, bool isDark) {
-    // Simulate dimension breakdown based on total score
-    // In production, the BLoC would provide the full SocialSimilarityModel
-    final tokenScore = totalScore * 1.1; // Slightly varied
-    final nftScore = totalScore * 0.9;
-    final chainScore = totalScore * 1.05;
-    final txScore = totalScore * 0.7;
-    final daoScore = totalScore * 0.5;
-
+  Widget _buildBreakdownSection(
+    SocialSimilarityModel similarity,
+    bool isDark,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -291,15 +295,44 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             ),
           ),
           const SizedBox(height: 14),
-          _buildDimensionBar('Token Holdings', tokenScore.clamp(0, 1), '30%', isDark),
+          _buildDimensionBar(
+            'Token Holdings',
+            similarity.tokenOverlap,
+            '43%',
+            isDark,
+          ),
           const SizedBox(height: 10),
-          _buildDimensionBar('NFT Collections', nftScore.clamp(0, 1), '25%', isDark),
+          _buildDimensionBar(
+            'NFT Collections',
+            similarity.nftOverlap,
+            '36%',
+            isDark,
+          ),
           const SizedBox(height: 10),
-          _buildDimensionBar('Chain Usage', chainScore.clamp(0, 1), '15%', isDark),
-          const SizedBox(height: 10),
-          _buildDimensionBar('Transactions', txScore.clamp(0, 1), '20%', isDark),
-          const SizedBox(height: 10),
-          _buildDimensionBar('DAO Membership', daoScore.clamp(0, 1), '10%', isDark),
+          _buildDimensionBar(
+            'Chain Usage',
+            similarity.chainUsage,
+            '21%',
+            isDark,
+          ),
+          if (similarity.transactionInteraction > 0) ...[
+            const SizedBox(height: 10),
+            _buildDimensionBar(
+              'Transactions',
+              similarity.transactionInteraction,
+              'Not weighted',
+              isDark,
+            ),
+          ],
+          if (similarity.daoMembership > 0) ...[
+            const SizedBox(height: 10),
+            _buildDimensionBar(
+              'DAO Membership',
+              similarity.daoMembership,
+              'Not weighted',
+              isDark,
+            ),
+          ],
         ],
       ),
     );
@@ -361,9 +394,10 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     );
   }
 
-  Widget _buildCommonItemsSection(bool isDark) {
-    // Placeholder common items. In production, derive from
-    // SocialSimilarityModel stored in state.
+  Widget _buildCommonItemsSection(
+    SocialSimilarityModel similarity,
+    bool isDark,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -384,11 +418,35 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             ),
           ),
           const SizedBox(height: 12),
-          _buildCommonItemRow(Icons.token_outlined, 'Tokens', 'Analyzed from top chain', isDark),
+          _buildCommonItemRow(
+            Icons.token_outlined,
+            'Shared Tokens',
+            _formatCommonItems(
+              similarity.commonTokens,
+              emptyLabel: 'No shared tokens found',
+            ),
+            isDark,
+          ),
           const Divider(height: 20),
-          _buildCommonItemRow(Icons.collections_outlined, 'NFT Collections', 'Compared ownership', isDark),
+          _buildCommonItemRow(
+            Icons.collections_outlined,
+            'Shared NFT Collections',
+            _formatCommonItems(
+              similarity.commonNftCollections,
+              emptyLabel: 'No shared NFT collections found',
+            ),
+            isDark,
+          ),
           const Divider(height: 20),
-          _buildCommonItemRow(Icons.link, 'Chains', 'Cross-chain activity', isDark),
+          _buildCommonItemRow(
+            Icons.link,
+            'Shared Chains',
+            _formatCommonItems(
+              similarity.commonChains,
+              emptyLabel: 'No shared chains found',
+            ),
+            isDark,
+          ),
         ],
       ),
     );
@@ -501,6 +559,48 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
   String _shortenAddress(String addr) {
     if (addr.length <= 10) return addr;
     return '${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}';
+  }
+
+  SocialSimilarityModel? _currentSimilarity(SocialGraphState state) {
+    final similarity = state.similarity;
+    if (similarity == null) return null;
+
+    final addressA = widget.addressA.toLowerCase();
+    final addressB = widget.addressB.toLowerCase();
+    final resultA = similarity.addressA.toLowerCase();
+    final resultB = similarity.addressB.toLowerCase();
+
+    if ((resultA == addressA && resultB == addressB) ||
+        (resultA == addressB && resultB == addressA)) {
+      return similarity;
+    }
+
+    return null;
+  }
+
+  String _formatCommonItems(
+    List<String> items, {
+    required String emptyLabel,
+  }) {
+    if (items.isEmpty) {
+      return emptyLabel;
+    }
+
+    final normalizedItems = items
+        .where((item) => item.trim().isNotEmpty)
+        .map((item) => item.trim())
+        .toList(growable: false);
+    if (normalizedItems.isEmpty) {
+      return emptyLabel;
+    }
+
+    const maxPreviewItems = 3;
+    final previewItems = normalizedItems.take(maxPreviewItems).join(', ');
+    final remaining = normalizedItems.length - maxPreviewItems;
+    if (remaining > 0) {
+      return '$previewItems +$remaining more';
+    }
+    return previewItems;
   }
 }
 

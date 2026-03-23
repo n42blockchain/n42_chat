@@ -9,6 +9,11 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../utils/debug_log.dart';
 
+final RegExp _phoneNormalizeRegExp = RegExp(r'[\s\-\(\)]');
+final RegExp _phoneDigitsRegExp = RegExp(r'^[+]?[0-9]+$');
+final RegExp _emailValidateRegExp =
+    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
 /// 手机通讯录联系人
 class PhoneContact {
   final String id;
@@ -43,7 +48,7 @@ class PhoneContact {
 
   /// 标准化电话号码（移除空格、破折号等）
   static String _normalizePhone(String phone) {
-    return phone.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+    return phone.replaceAll(_phoneNormalizeRegExp, '');
   }
 }
 
@@ -131,19 +136,15 @@ class ContactSyncService {
   /// 验证邮箱格式
   bool _isValidEmail(String email) {
     if (email.isEmpty || email.length > 254) return false;
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-    return emailRegex.hasMatch(email);
+    return _emailValidateRegExp.hasMatch(email);
   }
 
   /// 验证电话号码格式
   bool _isValidPhone(String phone) {
     if (phone.isEmpty) return false;
     final normalized = PhoneContact._normalizePhone(phone);
-    // 至少5位数字
     if (normalized.length < 5 || normalized.length > 20) return false;
-    return RegExp(r'^[+]?[0-9]+$').hasMatch(normalized);
+    return _phoneDigitsRegExp.hasMatch(normalized);
   }
 
   /// 搜索匹配的 Matrix 用户

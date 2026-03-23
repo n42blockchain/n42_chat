@@ -5,9 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/search_result_entity.dart';
 
 const _kSearchHistoryKey = 'n42_chat_search_history';
-const _kSearchHistoryLimit = 50;
+const _kSearchHistoryLimit = 20;
 
 /// Matrix搜索数据源
 ///
@@ -25,14 +27,14 @@ class MatrixSearchDataSource {
   // ============================================
 
   /// 搜索用户
-  Future<List<matrix.Profile>> searchUsers(String query, {int limit = 20}) async {
+  Future<List<matrix.Profile>> searchUsers(
+    String query, {
+    int limit = 20,
+  }) async {
     if (_client == null || query.trim().isEmpty) return [];
 
     try {
-      final result = await _client!.searchUserDirectory(
-        query,
-        limit: limit,
-      );
+      final result = await _client!.searchUserDirectory(query, limit: limit);
       return result.results;
     } catch (e) {
       return [];
@@ -104,7 +106,7 @@ class MatrixSearchDataSource {
     }).toList();
   }
 
-  /// 搜索本地会话（包括私聊和群聊）
+  /// 搜索本地会话（私聊）
   List<matrix.Room> searchLocalConversations(String query) {
     if (_client == null || query.trim().isEmpty) return [];
 
@@ -112,6 +114,7 @@ class MatrixSearchDataSource {
 
     return _client!.rooms.where((room) {
       if (room.membership != matrix.Membership.join) return false;
+      if (!room.isDirectChat) return false;
 
       final name = room.getLocalizedDisplayname().toLowerCase();
       final topic = room.topic.toLowerCase();
@@ -134,6 +137,7 @@ class MatrixSearchDataSource {
   Future<List<matrix.Event>> searchMessagesInRoom(
     String roomId,
     String query, {
+    MessageSearchFilter? filter,
     int limit = 50,
   }) async {
     final room = _client?.getRoomById(roomId);
@@ -149,8 +153,7 @@ class MatrixSearchDataSource {
       for (final event in timeline.events) {
         if (!_isMessageEvent(event)) continue;
 
-        final body = event.body.toLowerCase();
-        if (body.contains(lowerQuery)) {
+        if (_matchesMessageSearch(event, lowerQuery, filter)) {
           results.add(event);
           if (results.length >= limit) break;
         }
@@ -164,8 +167,7 @@ class MatrixSearchDataSource {
           if (!_isMessageEvent(event)) continue;
           if (results.any((e) => e.eventId == event.eventId)) continue;
 
-          final body = event.body.toLowerCase();
-          if (body.contains(lowerQuery)) {
+          if (_matchesMessageSearch(event, lowerQuery, filter)) {
             results.add(event);
             if (results.length >= limit) break;
           }
@@ -182,6 +184,7 @@ class MatrixSearchDataSource {
   /// 全局搜索消息（所有房间）
   Future<List<MessageSearchResult>> searchMessagesGlobally(
     String query, {
+    MessageSearchFilter? filter,
     int limit = 50,
     int limitPerRoom = 10,
   }) async {
@@ -200,12 +203,8 @@ class MatrixSearchDataSource {
         for (final event in timeline.events) {
           if (!_isMessageEvent(event)) continue;
 
-          final body = event.body.toLowerCase();
-          if (body.contains(lowerQuery)) {
-            results.add(MessageSearchResult(
-              event: event,
-              room: room,
-            ));
+          if (_matchesMessageSearch(event, lowerQuery, filter)) {
+            results.add(MessageSearchResult(event: event, room: room));
             roomResultCount++;
 
             if (roomResultCount >= limitPerRoom) break;
@@ -235,6 +234,87 @@ class MatrixSearchDataSource {
         event.status != matrix.EventStatus.error;
   }
 
+  bool _matchesMessageSearch(
+    matrix.Event event,
+    String lowerQuery,
+    MessageSearchFilter? filter,
+  ) {
+    final body = event.body.toLowerCase();
+    if (!body.contains(lowerQuery)) {
+      return false;
+    }
+
+    if (filter == null || filter.isEmpty) {
+      return true;
+    }
+
+    final senderId = event.senderId;
+    if (filter.onlyFromMe && senderId != _client?.userID) {
+      return false;
+    }
+    if (filter.senderId != null &&
+        filter.senderId!.isNotEmpty &&
+        senderId != filter.senderId) {
+      return false;
+    }
+
+    final timestamp = event.originServerTs;
+    if (filter.sentAfter != null && timestamp.isBefore(filter.sentAfter!)) {
+      return false;
+    }
+    if (filter.sentBefore != null && timestamp.isAfter(filter.sentBefore!)) {
+      return false;
+    }
+
+    final messageType = _mapMatrixMessageType(event);
+    if (filter.messageType != null && messageType != filter.messageType) {
+      return false;
+    }
+    if (filter.hasMediaOnly && !_isMediaType(messageType)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  MessageType _mapMatrixMessageType(matrix.Event event) {
+    switch (event.messageType) {
+      case matrix.MessageTypes.Image:
+        return MessageType.image;
+      case matrix.MessageTypes.Video:
+        return MessageType.video;
+      case matrix.MessageTypes.Audio:
+        return MessageType.audio;
+      case matrix.MessageTypes.File:
+        return MessageType.file;
+      case matrix.MessageTypes.Location:
+        return MessageType.location;
+      case matrix.MessageTypes.Notice:
+        return MessageType.notice;
+      default:
+        final contentMsgType = event.content['msgtype'] as String?;
+        switch (contentMsgType) {
+          case 'org.matrix.msc1767.text':
+          case 'm.text':
+            return MessageType.text;
+          case 'n42.contact_card':
+            return MessageType.contactCard;
+          case 'org.matrix.msc3381.poll.start':
+            return MessageType.poll;
+          default:
+            return MessageType.text;
+        }
+    }
+  }
+
+  bool _isMediaType(MessageType type) {
+    return type == MessageType.image ||
+        type == MessageType.video ||
+        type == MessageType.audio ||
+        type == MessageType.voice ||
+        type == MessageType.file;
+  }
+
   // ============================================
   // 搜索历史
   // ============================================
@@ -259,7 +339,9 @@ class MatrixSearchDataSource {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_kSearchHistoryKey);
-      final list = raw != null ? (jsonDecode(raw) as List).cast<String>() : <String>[];
+      final list = raw != null
+          ? (jsonDecode(raw) as List).cast<String>()
+          : <String>[];
       list.remove(query);
       list.insert(0, query);
       if (list.length > _kSearchHistoryLimit) {
@@ -280,6 +362,22 @@ class MatrixSearchDataSource {
       debugLog('MatrixSearchDataSource.clearSearchHistory error: $e');
     }
   }
+
+  /// 删除单条搜索记录
+  Future<void> deleteSearchQuery(String query) async {
+    if (query.trim().isEmpty) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_kSearchHistoryKey);
+      if (raw == null) return;
+
+      final list = (jsonDecode(raw) as List).cast<String>();
+      list.remove(query);
+      await prefs.setString(_kSearchHistoryKey, jsonEncode(list));
+    } catch (e) {
+      debugLog('MatrixSearchDataSource.deleteSearchQuery error: $e');
+    }
+  }
 }
 
 /// 消息搜索结果
@@ -287,9 +385,5 @@ class MessageSearchResult {
   final matrix.Event event;
   final matrix.Room room;
 
-  MessageSearchResult({
-    required this.event,
-    required this.room,
-  });
+  MessageSearchResult({required this.event, required this.room});
 }
-

@@ -12,6 +12,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/story_entity.dart';
+import '../../helpers/story_interaction_helper.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
@@ -38,8 +39,6 @@ import '../search/global_search_page.dart';
 import '../story/create_story_page.dart';
 import '../story/story_viewer_page.dart';
 import 'conversation_tile.dart';
-import '../../../core/utils/debug_log.dart';
-import '../../../n42_chat.dart';
 
 /// 会话列表页面（仿微信）
 class ConversationListPage extends StatefulWidget {
@@ -100,7 +99,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
       ..add(const SubscribeStories());
 
     // 监听备注更新
-    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((event) {
+    _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen((
+      event,
+    ) {
       // 当备注更新时刷新列表
       if (mounted) {
         setState(() {});
@@ -137,15 +138,17 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   void _onConversationTap(ConversationEntity conversation) {
     // 标记已读
-    context
-        .read<ConversationBloc>()
-        .add(MarkConversationAsRead(conversation.id));
+    context.read<ConversationBloc>().add(
+      MarkConversationAsRead(conversation.id),
+    );
 
     widget.onConversationTap?.call(conversation);
   }
 
   void _onConversationLongPress(
-      BuildContext context, ConversationEntity conversation) {
+    BuildContext context,
+    ConversationEntity conversation,
+  ) {
     _showConversationMenu(context, conversation);
   }
 
@@ -155,14 +158,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     // 检查 ContactBloc 是否可用
-    bool hasContactBloc = false;
-    try {
-      context.read<ContactBloc>();
-      hasContactBloc = true;
-    } catch (e) {
-      // ContactBloc 不可用
-      debugLog('Error: $e');
-    }
+    final hasContactBloc = context.read<ContactBloc?>() != null;
 
     final scaffold = Scaffold(
       backgroundColor: bgColor,
@@ -176,11 +172,11 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 )
               : _buildBody(isDark),
           // P0.5: 恢复密钥提醒 Banner（底部固定）
-          Positioned(
+          const Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: const RecoveryKeyReminderBanner(),
+            child: RecoveryKeyReminderBanner(),
           ),
           // P0.5: 首次同步进度覆盖层
           const SyncProgressOverlay(),
@@ -189,9 +185,10 @@ class _ConversationListPageState extends State<ConversationListPage> {
     );
 
     // 用 BlocProvider 包装提供链上通知 Bloc（用于铃铛 Badge）
-    Widget result = BlocProvider<OnChainNotificationBloc>(
-      create: (_) => getIt<OnChainNotificationBloc>()
-        ..add(const LoadOnChainNotifications()),
+    final result = BlocProvider<OnChainNotificationBloc>(
+      create: (_) =>
+          getIt<OnChainNotificationBloc>()
+            ..add(const LoadOnChainNotifications()),
       child: scaffold,
     );
 
@@ -200,7 +197,8 @@ class _ConversationListPageState extends State<ConversationListPage> {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
           // 当联系人备注更新时，刷新界面显示备注名
-          if (state.status == ContactStatus.remarkUpdated || state.status == ContactStatus.loaded) {
+          if (state.status == ContactStatus.remarkUpdated ||
+              state.status == ContactStatus.loaded) {
             if (mounted) setState(() {});
           }
         },
@@ -224,14 +222,25 @@ class _ConversationListPageState extends State<ConversationListPage> {
         // 会话列表
         Expanded(
           child: BlocConsumer<ConversationBloc, ConversationState>(
+            listenWhen: (previous, current) =>
+                previous.newConversationId != current.newConversationId ||
+                previous.error != current.error,
             listener: (context, state) {
               // 处理新建会话导航
               if (state.newConversationId != null) {
-                final conversation = state.conversations.firstWhere(
-                  (c) => c.id == state.newConversationId,
-                  orElse: () => state.conversations.first,
+                ConversationEntity? conversation;
+                for (final item in state.conversations) {
+                  if (item.id == state.newConversationId) {
+                    conversation = item;
+                    break;
+                  }
+                }
+                context.read<ConversationBloc>().add(
+                  const ClearNewConversationNavigation(),
                 );
-                widget.onConversationTap?.call(conversation);
+                if (conversation != null) {
+                  widget.onConversationTap?.call(conversation);
+                }
               }
 
               // 显示错误
@@ -247,13 +256,17 @@ class _ConversationListPageState extends State<ConversationListPage> {
             builder: (context, state) {
               if (state.isLoading) {
                 return N42Loading(
-                    message: S.of(context)?.commonLoading ?? 'Loading...');
+                  message: S.of(context)?.commonLoading ?? 'Loading...',
+                );
               }
 
               if (state.isEmpty) {
                 return N42EmptyState.noData(
-                  title: S.of(context)?.conversationNoConversations ?? 'No conversations',
-                  description: S.of(context)?.conversationTapToChat ??
+                  title:
+                      S.of(context)?.conversationNoConversations ??
+                      'No conversations',
+                  description:
+                      S.of(context)?.conversationTapToChat ??
                       'Tap the top right to start chatting',
                 );
               }
@@ -321,9 +334,10 @@ class _ConversationListPageState extends State<ConversationListPage> {
             allUserStories: [myStory],
             initialUserIndex: 0,
             currentUserId: currentUserId,
-            onStoryViewed: () {
+            onStoryViewed: (_) {
               // 自己的 Story 不需要记录查看
             },
+            onDeleteStory: _handleStoryDelete,
           ),
         ),
       );
@@ -347,18 +361,12 @@ class _ConversationListPageState extends State<ConversationListPage> {
           allUserStories: state.userStories,
           initialUserIndex: userIndex,
           currentUserId: currentUserId,
-          onStoryViewed: () {
-            // 记录查看 Story
-            final currentStory = userStory.stories.isNotEmpty
-                ? userStory.stories.first
-                : null;
-            if (currentStory != null) {
-              _storyBloc?.add(ViewStory(currentStory.id));
-            }
+          onStoryViewed: (story) {
+            _storyBloc?.add(ViewStory(story.id));
           },
+          onDeleteStory: _handleStoryDelete,
           onReply: (userId, storyId, message) {
-            // 回复 Story：创建私聊并发送消息
-            _handleStoryReply(userId, storyId, message);
+            return _handleStoryReply(userId, storyId, message);
           },
         ),
       ),
@@ -366,66 +374,40 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   /// 处理 Story 回复
-  void _handleStoryReply(String userId, String storyId, String message) async {
-    debugLog('Reply to story $storyId from user $userId: $message');
-    try {
-      final roomId = await N42Chat.createDirectMessage(userId);
-      if (!mounted) return;
-      await N42Chat.openConversation(roomId, context: context);
-    } catch (e) {
-      debugLog('ConversationListPage: Failed to create DM for story reply: $e');
+  Future<bool> _handleStoryReply(
+    String userId,
+    String storyId,
+    String message,
+  ) async {
+    return StoryInteractionHelper.replyToStory(
+      context,
+      userId: userId,
+      storyId: storyId,
+      message: message,
+    );
+  }
+
+  Future<bool> _handleStoryDelete(StoryEntity story) async {
+    final storyBloc = _storyBloc;
+    if (storyBloc == null) {
+      return false;
     }
+    return StoryInteractionHelper.deleteStory(
+      storyBloc: storyBloc,
+      story: story,
+    );
   }
 
   /// 添加新 Story
   void _onAddStory() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => CreateStoryPage(
-          onPost: (content, imageBytes, imageName, backgroundColor, textColor,
-              {String? musicFilePath, String? musicTitle}) {
-            // 构建媒体输入
-            final media = <StoryMediaInput>[];
-            if (imageBytes != null && imageName != null) {
-              media.add(StoryMediaInput(
-                type: StoryMediaType.image,
-                bytes: imageBytes,
-                filename: imageName,
-                mimeType: _getMimeType(imageName),
-              ));
-            }
-
-            // 发布 Story
-            _storyBloc?.add(PostStory(
-              content: content,
-              media: media,
-              backgroundColor: backgroundColor,
-              textColor: textColor,
-            ));
-          },
+        builder: (_) => BlocProvider<StoryBloc>.value(
+          value: _storyBloc!,
+          child: const CreateStoryPage(),
         ),
       ),
     );
-  }
-
-  /// 根据文件名获取 MIME 类型
-  String? _getMimeType(String filename) {
-    final ext = filename.split('.').last.toLowerCase();
-    switch (ext) {
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      case 'png':
-        return 'image/png';
-      case 'gif':
-        return 'image/gif';
-      case 'webp':
-        return 'image/webp';
-      case 'heic':
-        return 'image/heic';
-      default:
-        return 'image/jpeg';
-    }
   }
 
   PreferredSizeWidget _buildAppBar(bool isDark) {
@@ -464,15 +446,18 @@ class _ConversationListPageState extends State<ConversationListPage> {
                       Icons.notifications_outlined,
                       color: isDark ? Colors.white : AppColors.textPrimary,
                     ),
-                    tooltip: S.of(context)?.onChainNotificationsTitle ?? 'Notifications',
+                    tooltip:
+                        S.of(context)?.onChainNotificationsTitle ??
+                        'Notifications',
                     onPressed: () {
                       final bloc = context.read<OnChainNotificationBloc>();
                       Navigator.of(context).push(
                         MaterialPageRoute<void>(
-                          builder: (_) => BlocProvider<OnChainNotificationBloc>.value(
-                            value: bloc,
-                            child: const OnChainNotificationsPage(),
-                          ),
+                          builder: (_) =>
+                              BlocProvider<OnChainNotificationBloc>.value(
+                                value: bloc,
+                                child: const OnChainNotificationsPage(),
+                              ),
                         ),
                       );
                     },
@@ -483,14 +468,20 @@ class _ConversationListPageState extends State<ConversationListPage> {
                       right: 8,
                       child: Container(
                         padding: const EdgeInsets.all(2),
-                        constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
                         decoration: const BoxDecoration(
                           color: Colors.red,
                           shape: BoxShape.circle,
                         ),
                         child: Text(
                           unread > 99 ? '99+' : '$unread',
-                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -572,12 +563,15 @@ class _ConversationListPageState extends State<ConversationListPage> {
             child: Container(
               color: isDark ? AppColors.surfaceDark : AppColors.surface,
               child: Column(
-                children: state.pinnedConversations.asMap().entries.map((entry) {
+                children: state.pinnedConversations.asMap().entries.map((
+                  entry,
+                ) {
                   return ListItemAnimation(
                     index: entry.key,
                     child: ConversationTile(
                       conversation: entry.value,
-                      isSelected: widget.selectedConversationId == entry.value.id,
+                      isSelected:
+                          widget.selectedConversationId == entry.value.id,
                       isLocked: _lockedChatIds.contains(entry.value.id),
                       onTap: () => _onConversationTap(entry.value),
                       onLongPress: () =>
@@ -625,7 +619,10 @@ class _ConversationListPageState extends State<ConversationListPage> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.commonFeatureComingSoon(feature) ?? '$feature coming soon'),
+        content: Text(
+          S.of(context)?.commonFeatureComingSoon(feature) ??
+              '$feature coming soon',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -665,7 +662,8 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 ctx,
                 icon: Icons.group_add,
                 iconColor: const Color(0xFF57BE6A),
-                title: S.of(context)?.conversationStartGroup ?? 'Start Group Chat',
+                title:
+                    S.of(context)?.conversationStartGroup ?? 'Start Group Chat',
                 onTap: () => _navigateToCreateGroup(ctx),
               ),
 
@@ -729,7 +727,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
     required VoidCallback onTap,
   }) {
     final isDark = context.isDarkMode;
-    
+
     return ListTile(
       leading: Container(
         width: 40,
@@ -754,41 +752,45 @@ class _ConversationListPageState extends State<ConversationListPage> {
   void _navigateToCreateGroup(BuildContext sheetContext) {
     Navigator.pop(sheetContext);
 
-    Navigator.of(context).push<String?>(
-      MaterialPageRoute<String?>(
-        builder: (_) => MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (_) => getIt<GroupBloc>()),
-            BlocProvider(create: (_) => getIt<ContactBloc>()),
-          ],
-          child: const CreateGroupPage(),
-        ),
-      ),
-    ).then((roomId) {
-      if (roomId != null && mounted) {
-        // 刷新会话列表
-        context.read<ConversationBloc>().add(const RefreshConversations());
-      }
-    });
+    Navigator.of(context)
+        .push<String?>(
+          MaterialPageRoute<String?>(
+            builder: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider(create: (_) => getIt<GroupBloc>()),
+                BlocProvider(create: (_) => getIt<ContactBloc>()),
+              ],
+              child: const CreateGroupPage(),
+            ),
+          ),
+        )
+        .then((roomId) {
+          if (roomId != null && mounted) {
+            // 刷新会话列表
+            context.read<ConversationBloc>().add(const RefreshConversations());
+          }
+        });
   }
 
   void _navigateToAddFriend(BuildContext sheetContext) {
     Navigator.pop(sheetContext);
 
-    Navigator.of(context).push<String?>(
-      MaterialPageRoute<String?>(
-        builder: (_) => const AddFriendPage(),
-      ),
-    ).then((roomId) {
-      if (roomId != null && mounted) {
-        // 刷新会话列表
-        context.read<ConversationBloc>().add(const RefreshConversations());
-      }
-    });
+    Navigator.of(context)
+        .push<String?>(
+          MaterialPageRoute<String?>(builder: (_) => const AddFriendPage()),
+        )
+        .then((roomId) {
+          if (roomId != null && mounted) {
+            // 刷新会话列表
+            context.read<ConversationBloc>().add(const RefreshConversations());
+          }
+        });
   }
 
   void _showConversationMenu(
-      BuildContext context, ConversationEntity conversation) {
+    BuildContext context,
+    ConversationEntity conversation,
+  ) {
     final isDark = context.isDarkMode;
 
     showModalBottomSheet<void>(
@@ -822,12 +824,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 _buildMenuTile(
                   ctx,
                   icon: Icons.done_all,
-                  title: S.of(context)?.conversationMarkAsRead ?? 'Mark as read',
+                  title:
+                      S.of(context)?.conversationMarkAsRead ?? 'Mark as read',
                   onTap: () {
                     Navigator.pop(ctx);
-                    context
-                        .read<ConversationBloc>()
-                        .add(MarkConversationAsRead(conversation.id));
+                    context.read<ConversationBloc>().add(
+                      MarkConversationAsRead(conversation.id),
+                    );
                   },
                 ),
 
@@ -842,26 +845,32 @@ class _ConversationListPageState extends State<ConversationListPage> {
                     : (S.of(context)?.commonMute ?? 'Mute'),
                 onTap: () {
                   Navigator.pop(ctx);
-                  context.read<ConversationBloc>().add(SetConversationMuted(
-                        conversationId: conversation.id,
-                        muted: !conversation.isMuted,
-                      ));
+                  context.read<ConversationBloc>().add(
+                    SetConversationMuted(
+                      conversationId: conversation.id,
+                      muted: !conversation.isMuted,
+                    ),
+                  );
                 },
               ),
 
               // 置顶
               _buildMenuTile(
                 ctx,
-                icon: conversation.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                icon: conversation.isPinned
+                    ? Icons.push_pin_outlined
+                    : Icons.push_pin,
                 title: conversation.isPinned
                     ? (S.of(context)?.conversationUnpin ?? 'Unpin')
                     : (S.of(context)?.conversationPin ?? 'Pin'),
                 onTap: () {
                   Navigator.pop(ctx);
-                  context.read<ConversationBloc>().add(SetConversationPinned(
-                        conversationId: conversation.id,
-                        pinned: !conversation.isPinned,
-                      ));
+                  context.read<ConversationBloc>().add(
+                    SetConversationPinned(
+                      conversationId: conversation.id,
+                      pinned: !conversation.isPinned,
+                    ),
+                  );
                 },
               ),
 
@@ -872,10 +881,12 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 title: S.of(context)?.conversationHideChat ?? 'Hide',
                 onTap: () {
                   Navigator.pop(ctx);
-                  context.read<ConversationBloc>().add(SetConversationHidden(
-                        conversationId: conversation.id,
-                        hidden: true,
-                      ));
+                  context.read<ConversationBloc>().add(
+                    SetConversationHidden(
+                      conversationId: conversation.id,
+                      hidden: true,
+                    ),
+                  );
                 },
               ),
 
@@ -883,7 +894,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
               _buildMenuTile(
                 ctx,
                 icon: Icons.delete_outline,
-                title: S.of(context)?.conversationDeleteConversation ?? 'Delete Conversation',
+                title:
+                    S.of(context)?.conversationDeleteConversation ??
+                    'Delete Conversation',
                 isDestructive: true,
                 onTap: () {
                   Navigator.pop(ctx);
@@ -907,13 +920,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
     required VoidCallback onTap,
   }) {
     final isDark = context.isDarkMode;
-    final textColor = isDestructive 
-        ? AppColors.error 
+    final textColor = isDestructive
+        ? AppColors.error
         : (isDark ? Colors.white : Colors.black);
-    final iconColor = isDestructive 
-        ? AppColors.error 
+    final iconColor = isDestructive
+        ? AppColors.error
         : (isDark ? Colors.white54 : Colors.black54);
-    
+
     return ListTile(
       leading: Icon(icon, color: iconColor),
       title: Text(title, style: TextStyle(color: textColor)),
@@ -925,9 +938,16 @@ class _ConversationListPageState extends State<ConversationListPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.conversationDeleteConversation ?? 'Delete Conversation'),
-        content: Text(S.of(context)?.conversationDeleteConversationConfirm(conversation.name) ??
-            'Are you sure you want to delete the conversation with "${conversation.name}"?'),
+        title: Text(
+          S.of(context)?.conversationDeleteConversation ??
+              'Delete Conversation',
+        ),
+        content: Text(
+          S
+                  .of(context)
+                  ?.conversationDeleteConversationConfirm(conversation.name) ??
+              'Are you sure you want to delete the conversation with "${conversation.name}"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -936,9 +956,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context
-                  .read<ConversationBloc>()
-                  .add(DeleteConversation(conversation.id));
+              context.read<ConversationBloc>().add(
+                DeleteConversation(conversation.id),
+              );
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: Text(S.of(context)?.commonDelete ?? 'Delete'),
