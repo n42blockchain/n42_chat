@@ -15,11 +15,7 @@ class ChatLockPage extends StatefulWidget {
   final String roomId;
   final String chatName;
 
-  const ChatLockPage({
-    super.key,
-    required this.roomId,
-    required this.chatName,
-  });
+  const ChatLockPage({super.key, required this.roomId, required this.chatName});
 
   @override
   State<ChatLockPage> createState() => _ChatLockPageState();
@@ -67,6 +63,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
     } else if (mounted) {
       // Biometric failed, show PIN input as fallback
       final hasPin = await _lockService.hasPinSet(widget.roomId);
+      if (!mounted) return;
       if (hasPin) {
         setState(() {
           _showPinInput = true;
@@ -85,7 +82,8 @@ class _ChatLockPageState extends State<ChatLockPage> {
       Navigator.pop(context, true);
     } else if (mounted) {
       setState(() {
-        _errorMessage = S.of(context)?.chatLockVerifyFailed ?? 'Verification failed';
+        _errorMessage =
+            S.of(context)?.chatLockVerifyFailed ?? 'Verification failed';
         _pinController.clear();
       });
     }
@@ -102,7 +100,10 @@ class _ChatLockPageState extends State<ChatLockPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close, color: isDark ? Colors.white : AppColors.textPrimary),
+          icon: Icon(
+            Icons.close,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context, false),
         ),
       ),
@@ -140,7 +141,9 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   widget.chatName,
                   style: TextStyle(
                     fontSize: 16,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -148,7 +151,9 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   l10n?.chatLockVerifySubtitle ?? 'Verify to access this chat',
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
                   ),
                 ),
                 if (_errorMessage != null) ...[
@@ -215,7 +220,10 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
