@@ -38,19 +38,21 @@ class ChatFolderManagementPage extends StatelessWidget {
             children: [
               // 系统文件夹
               _buildSectionHeader(
-                context, isDark,
+                context,
+                isDark,
                 l10n?.chatFolderSystem ?? 'System Folders',
               ),
-              ...state.systemFolders.map((folder) => _buildFolderTile(
-                context, isDark, folder,
-                isSystem: true,
-              )),
+              ...state.systemFolders.map(
+                (folder) =>
+                    _buildFolderTile(context, isDark, folder, isSystem: true),
+              ),
 
               const SizedBox(height: 16),
 
               // 自定义文件夹
               _buildSectionHeader(
-                context, isDark,
+                context,
+                isDark,
                 l10n?.chatFolderCustom ?? 'Custom Folders',
               ),
               if (state.customFolders.isEmpty)
@@ -76,10 +78,14 @@ class ChatFolderManagementPage extends StatelessWidget {
                   ),
                 )
               else
-                ...state.customFolders.map((folder) => _buildFolderTile(
-                  context, isDark, folder,
-                  isSystem: false,
-                )),
+                ...state.customFolders.map(
+                  (folder) => _buildFolderTile(
+                    context,
+                    isDark,
+                    folder,
+                    isSystem: false,
+                  ),
+                ),
             ],
           );
         },
@@ -196,25 +202,30 @@ class ChatFolderManagementPage extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 children: ['📁', '⭐', '💼', '🏠', '🎮', '📚', '🎵', '💬']
-                    .map((icon) => GestureDetector(
-                          onTap: () => setState(() => selectedIcon = icon),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: icon == selectedIcon
-                                  ? AppColors.primary.withValues(alpha: 0.1)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(8),
-                              border: icon == selectedIcon
-                                  ? Border.all(color: AppColors.primary)
-                                  : null,
-                            ),
-                            child: Center(
-                              child: Text(icon, style: const TextStyle(fontSize: 20)),
+                    .map(
+                      (icon) => GestureDetector(
+                        onTap: () => setState(() => selectedIcon = icon),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: icon == selectedIcon
+                                ? AppColors.primary.withValues(alpha: 0.1)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            border: icon == selectedIcon
+                                ? Border.all(color: AppColors.primary)
+                                : null,
+                          ),
+                          child: Center(
+                            child: Text(
+                              icon,
+                              style: const TextStyle(fontSize: 20),
                             ),
                           ),
-                        ))
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             ],
@@ -228,10 +239,9 @@ class ChatFolderManagementPage extends StatelessWidget {
               onPressed: () {
                 final name = nameController.text.trim();
                 if (name.isNotEmpty) {
-                  context.read<ChatFolderBloc>().add(CreateChatFolder(
-                    name: name,
-                    icon: selectedIcon,
-                  ));
+                  context.read<ChatFolderBloc>().add(
+                    CreateChatFolder(name: name, icon: selectedIcon),
+                  );
                   Navigator.pop(dialogContext);
                 }
               },
@@ -240,7 +250,7 @@ class ChatFolderManagementPage extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ).whenComplete(nameController.dispose);
   }
 
   void _showEditDialog(BuildContext context, ChatFolderEntity folder) {
@@ -268,9 +278,9 @@ class ChatFolderManagementPage extends StatelessWidget {
             onPressed: () {
               final name = nameController.text.trim();
               if (name.isNotEmpty) {
-                context.read<ChatFolderBloc>().add(UpdateChatFolder(
-                  folder.copyWith(name: name),
-                ));
+                context.read<ChatFolderBloc>().add(
+                  UpdateChatFolder(folder.copyWith(name: name)),
+                );
                 Navigator.pop(dialogContext);
               }
             },
@@ -278,7 +288,7 @@ class ChatFolderManagementPage extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).whenComplete(nameController.dispose);
   }
 
   void _confirmDelete(BuildContext context, ChatFolderEntity folder) {

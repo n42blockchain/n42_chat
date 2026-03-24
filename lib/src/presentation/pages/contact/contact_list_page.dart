@@ -826,7 +826,7 @@ ID：${contact.userId}''';
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   Future<void> _startChatWithContact(ContactEntity contact) async {

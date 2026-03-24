@@ -1041,15 +1041,11 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
+            onPressed: () => Navigator.pop(ctx),
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
-              controller.dispose();
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -1062,7 +1058,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _showPhotosDialog() {
@@ -1190,16 +1186,12 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              phoneController.dispose();
-              Navigator.pop(ctx);
-            },
+            onPressed: () => Navigator.pop(ctx),
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               final phone = phoneController.text.trim();
-              phoneController.dispose();
               Navigator.pop(ctx);
               if (phone.isNotEmpty) {
                 _phoneController.text = phone;
@@ -1215,7 +1207,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(phoneController.dispose);
   }
 
   void _save() async {

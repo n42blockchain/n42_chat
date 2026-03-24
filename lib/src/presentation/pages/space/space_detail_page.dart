@@ -758,7 +758,10 @@ class _SpaceDetailScaffold extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).whenComplete(() {
+      nameCtrl.dispose();
+      topicCtrl.dispose();
+    });
   }
 
   void _confirmDeleteChannel(BuildContext context, SpaceChild child) {
@@ -875,7 +878,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).whenComplete(ctrl.dispose);
   }
 
   void _confirmDelete(BuildContext context) {
@@ -1273,6 +1276,6 @@ class _MembersBottomSheet extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).whenComplete(ctrl.dispose);
   }
 }

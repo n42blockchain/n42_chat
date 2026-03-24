@@ -124,7 +124,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
               SnackBar(
                 content: Text(
                   updatedRemark == null || updatedRemark.isEmpty
-                      ? (S.of(context)?.profileRemarkCleared ?? 'Remark cleared')
+                      ? (S.of(context)?.profileRemarkCleared ??
+                            'Remark cleared')
                       : (S.of(context)?.profileRemarkSaved ?? 'Remark saved'),
                 ),
               ),
@@ -541,10 +542,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _setRemark() {
+    final controller = TextEditingController(text: _contact?.remark);
     showDialog<void>(
       context: context,
       builder: (dialogContext) {
-        final controller = TextEditingController(text: _contact?.remark);
         return AlertDialog(
           title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
           content: TextField(
@@ -580,7 +581,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ],
         );
       },
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _toggleBlock() {
