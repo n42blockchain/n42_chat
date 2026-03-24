@@ -10796,7 +10796,7 @@ S lookupS(Locale locale) {
     case 'vi':
       return SVi();
     case 'zh':
-      return SZh();
+      return SZhTw();
   }
 
   throw FlutterError(
