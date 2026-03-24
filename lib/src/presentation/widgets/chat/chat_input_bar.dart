@@ -428,6 +428,7 @@ class ChatInputBarState extends State<ChatInputBar> {
   Future<void> _startRecording() async {
     try {
       final started = await _voiceService.startRecording();
+      if (!mounted) return;
       if (started) {
         setState(() {
           _isRecording = true;

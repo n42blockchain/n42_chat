@@ -65,6 +65,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
       if (result != null && result.files.isNotEmpty) {
         final file = result.files.first;
         if (file.path != null) {
+          if (!mounted) return;
           setState(() {
             _selectedFilePath = file.path;
             _selectedFileName = file.name;
@@ -103,6 +104,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
         if (mounted) setState(() => _isPlaying = false);
       });
       await _audioPlayer.resume();
+      if (!mounted) return;
       setState(() => _isPlaying = true);
     } catch (e) {
       debugLog('StoryMusicPicker: Preview failed: $e');
@@ -115,16 +117,19 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
     } else {
       await _audioPlayer.resume();
     }
+    if (!mounted) return;
     setState(() => _isPlaying = !_isPlaying);
   }
 
   void _confirmSelection() {
     if (_selectedFilePath != null) {
-      widget.onMusicSelected?.call(StoryMusicSelection(
-        filePath: _selectedFilePath!,
-        fileName: _selectedFileName ?? 'Unknown',
-        duration: _duration,
-      ));
+      widget.onMusicSelected?.call(
+        StoryMusicSelection(
+          filePath: _selectedFilePath!,
+          fileName: _selectedFileName ?? 'Unknown',
+          duration: _duration,
+        ),
+      );
     }
   }
 
@@ -160,7 +165,10 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
               Expanded(
                 child: Text(
                   l10n?.storyBackgroundMusic ?? 'Background Music',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               TextButton(
@@ -221,10 +229,15 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                         // 进度条
                         LinearProgressIndicator(
                           value: _duration.inMilliseconds > 0
-                              ? _position.inMilliseconds / _duration.inMilliseconds
+                              ? _position.inMilliseconds /
+                                    _duration.inMilliseconds
                               : 0,
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                          valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          valueColor: const AlwaysStoppedAnimation(
+                            AppColors.primary,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -254,9 +267,11 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
             child: OutlinedButton.icon(
               onPressed: _pickMusic,
               icon: const Icon(Icons.library_music_outlined),
-              label: Text(_selectedFilePath != null
-                  ? (l10n?.storyChangeMusic ?? 'Change Music')
-                  : (l10n?.storyChooseFromDevice ?? 'Choose from Device')),
+              label: Text(
+                _selectedFilePath != null
+                    ? (l10n?.storyChangeMusic ?? 'Change Music')
+                    : (l10n?.storyChooseFromDevice ?? 'Choose from Device'),
+              ),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -314,8 +329,8 @@ class StoryMusicSelection {
   });
 
   const StoryMusicSelection.empty()
-      : filePath = null,
-        fileName = '',
-        duration = Duration.zero,
-        isEmpty = true;
+    : filePath = null,
+      fileName = '',
+      duration = Duration.zero,
+      isEmpty = true;
 }

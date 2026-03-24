@@ -352,6 +352,7 @@ class _TransferPageState extends State<TransferPage> {
               icon: const Icon(Icons.content_paste, size: 20),
               onPressed: () async {
                 final data = await Clipboard.getData(Clipboard.kTextPlain);
+                if (!mounted) return;
                 if (data?.text != null) {
                   _addressController.text = data!.text!;
                   _validateAddress(data.text!.trim());

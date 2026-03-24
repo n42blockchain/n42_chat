@@ -30,7 +30,8 @@ class NftAvatarPickerPage extends StatefulWidget {
     required String contractAddress,
     required int tokenId,
     required int chainId,
-  }) onConfirm;
+  })
+  onConfirm;
 
   const NftAvatarPickerPage({super.key, required this.onConfirm});
 
@@ -71,15 +72,19 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
     final tokenIdStr = _tokenIdController.text.trim();
 
     if (contract.isEmpty || tokenIdStr.isEmpty) {
-      setState(() => _errorText =
-          S.of(context)?.nftPickerEnterBoth ?? 'Enter contract and token ID');
+      setState(
+        () => _errorText =
+            S.of(context)?.nftPickerEnterBoth ?? 'Enter contract and token ID',
+      );
       return;
     }
 
     final tokenId = int.tryParse(tokenIdStr);
     if (tokenId == null) {
-      setState(() => _errorText =
-          S.of(context)?.nftPickerInvalidTokenId ?? 'Invalid token ID');
+      setState(
+        () => _errorText =
+            S.of(context)?.nftPickerInvalidTokenId ?? 'Invalid token ID',
+      );
       return;
     }
 
@@ -97,12 +102,13 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
         contractAddress: contract,
         chainId: _selectedChainId,
       );
+      if (!mounted) return;
 
       if (balance <= 0) {
         setState(() {
           _isResolving = false;
-          _errorText = S.of(context)?.nftPickerNotOwned ??
-              'You do not own this NFT';
+          _errorText =
+              S.of(context)?.nftPickerNotOwned ?? 'You do not own this NFT';
         });
         return;
       }
@@ -121,10 +127,12 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             : NftMetadataService();
         imageUrl = await metadataService.resolveImageUrl(tokenUri);
       }
+      if (!mounted) return;
 
       setState(() {
         _isResolving = false;
-        _resolvedImageUrl = imageUrl ?? 'nft://$contract/$tokenId@$_selectedChainId';
+        _resolvedImageUrl =
+            imageUrl ?? 'nft://$contract/$tokenId@$_selectedChainId';
       });
     } catch (e) {
       setState(() {
@@ -152,8 +160,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
@@ -169,8 +176,9 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
-          unselectedLabelColor:
-              isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          unselectedLabelColor: isDark
+              ? AppColors.textSecondaryDark
+              : AppColors.textSecondary,
           tabs: [
             Tab(text: l10n?.nftPickerTabPopular ?? 'Popular'),
             Tab(text: l10n?.nftPickerTabCustom ?? 'Custom'),
@@ -214,15 +222,14 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             childAspectRatio: 0.85,
           ),
           itemCount: _popularCollections.length,
-          itemBuilder: (context, i) =>
-              _CollectionCard(
-                collection: _popularCollections[i],
-                isDark: isDark,
-                onTap: () {
-                  _contractController.text = _popularCollections[i].contract;
-                  _tabController.animateTo(1); // Switch to custom tab
-                },
-              ),
+          itemBuilder: (context, i) => _CollectionCard(
+            collection: _popularCollections[i],
+            isDark: isDark,
+            onTap: () {
+              _contractController.text = _popularCollections[i].contract;
+              _tabController.animateTo(1); // Switch to custom tab
+            },
+          ),
         ),
         const SizedBox(height: 24),
         _WalletConnectHint(isDark: isDark, l10n: l10n),
@@ -235,8 +242,9 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
   Widget _buildCustomTab(bool isDark, S? l10n) {
     final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
     final textColor = isDark ? Colors.white : AppColors.textPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final secondaryColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -247,9 +255,10 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           Text(
             l10n?.nftPickerChain ?? 'Chain',
             style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: secondaryColor),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: secondaryColor,
+            ),
           ),
           const SizedBox(height: 8),
           _ChainSelector(
@@ -264,9 +273,10 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           Text(
             l10n?.nftPickerContract ?? 'Contract Address',
             style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: secondaryColor),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: secondaryColor,
+            ),
           ),
           const SizedBox(height: 8),
           Container(
@@ -290,6 +300,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                   color: AppColors.primary,
                   onPressed: () async {
                     final data = await Clipboard.getData('text/plain');
+                    if (!mounted) return;
                     if (data?.text != null) {
                       _contractController.text = data!.text!;
                     }
@@ -305,9 +316,10 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           Text(
             l10n?.nftPickerTokenId ?? 'Token ID',
             style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: secondaryColor),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: secondaryColor,
+            ),
           ),
           const SizedBox(height: 8),
           Container(
@@ -344,8 +356,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               ),
               child: Text(
                 _errorText!,
-                style: const TextStyle(
-                    color: AppColors.error, fontSize: 13),
+                style: const TextStyle(color: AppColors.error, fontSize: 13),
               ),
             ),
 
@@ -379,7 +390,8 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
@@ -388,13 +400,17 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : Text(
                       l10n?.nftPickerVerifyOwnership ??
                           'Verify Ownership & Preview',
                       style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
             ),
           ),
@@ -428,7 +444,9 @@ class _NftPreview extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: 12),
@@ -454,16 +472,22 @@ class _NftPreview extends StatelessWidget {
                 child: imageUrl.startsWith('nft://')
                     ? Container(
                         color: Colors.grey[300],
-                        child: const Icon(Icons.image_outlined,
-                            size: 40, color: Colors.grey),
+                        child: const Icon(
+                          Icons.image_outlined,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
                       )
                     : Image.network(
                         imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (_, _, _) => Container(
                           color: Colors.grey[300],
-                          child: const Icon(Icons.broken_image,
-                              size: 40, color: Colors.grey),
+                          child: const Icon(
+                            Icons.broken_image,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
               ),
@@ -506,7 +530,8 @@ class _NftPreview extends StatelessWidget {
             foregroundColor: AppColors.primary,
             side: const BorderSide(color: AppColors.primary),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)),
+              borderRadius: BorderRadius.circular(10),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
         ),
@@ -530,9 +555,7 @@ class _InfoBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -613,19 +636,16 @@ class _ChainSelector extends StatelessWidget {
                 color: selected
                     ? AppColors.primary
                     : (isDark
-                        ? Colors.white10
-                        : AppColors.primary.withValues(alpha: 0.08)),
+                          ? Colors.white10
+                          : AppColors.primary.withValues(alpha: 0.08)),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: selected
-                      ? AppColors.primary
-                      : Colors.transparent,
+                  color: selected ? AppColors.primary : Colors.transparent,
                 ),
               ),
               child: Row(
                 children: [
-                  Text(chain.icon,
-                      style: const TextStyle(fontSize: 14)),
+                  Text(chain.icon, style: const TextStyle(fontSize: 14)),
                   const SizedBox(width: 6),
                   Text(
                     chain.name,
@@ -635,8 +655,8 @@ class _ChainSelector extends StatelessWidget {
                       color: selected
                           ? Colors.white
                           : (isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textPrimary),
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textPrimary),
                     ),
                   ),
                 ],
@@ -677,8 +697,7 @@ class _CollectionCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(collection.emoji,
-                style: const TextStyle(fontSize: 32)),
+            Text(collection.emoji, style: const TextStyle(fontSize: 32)),
             const SizedBox(height: 6),
             Text(
               collection.name,
@@ -726,11 +745,13 @@ class _WalletConnectHint extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline,
-              size: 16,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary),
+          Icon(
+            Icons.info_outline,
+            size: 16,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -758,8 +779,11 @@ class _NftCollection {
   final String emoji;
   final String contract;
 
-  const _NftCollection(
-      {required this.name, required this.emoji, required this.contract});
+  const _NftCollection({
+    required this.name,
+    required this.emoji,
+    required this.contract,
+  });
 }
 
 const _popularCollections = [

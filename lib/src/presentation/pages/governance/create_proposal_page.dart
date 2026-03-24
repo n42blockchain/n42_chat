@@ -19,10 +19,7 @@ import '../../blocs/governance/governance_state.dart';
 class CreateProposalPage extends StatefulWidget {
   final String spaceId;
 
-  const CreateProposalPage({
-    super.key,
-    required this.spaceId,
-  });
+  const CreateProposalPage({super.key, required this.spaceId});
 
   @override
   State<CreateProposalPage> createState() => _CreateProposalPageState();
@@ -78,12 +75,20 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
 
   Future<void> _pickStartTime() async {
     final date = await _pickDate(initialDate: _startTime);
-    if (date == null) return;
-    final time = await _pickTime(initialTime: TimeOfDay.fromDateTime(_startTime));
-    if (time == null) return;
+    if (!mounted || date == null) return;
+    final time = await _pickTime(
+      initialTime: TimeOfDay.fromDateTime(_startTime),
+    );
+    if (!mounted || time == null) return;
 
     setState(() {
-      _startTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+      _startTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
       // Ensure end time is after start time
       if (_endTime.isBefore(_startTime)) {
         _endTime = _startTime.add(const Duration(days: 3));
@@ -92,15 +97,18 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
   }
 
   Future<void> _pickEndTime() async {
-    final date = await _pickDate(
-      initialDate: _endTime,
-      firstDate: _startTime,
-    );
-    if (date == null) return;
+    final date = await _pickDate(initialDate: _endTime, firstDate: _startTime);
+    if (!mounted || date == null) return;
     final time = await _pickTime(initialTime: TimeOfDay.fromDateTime(_endTime));
-    if (time == null) return;
+    if (!mounted || time == null) return;
 
-    final picked = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    final picked = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
     if (picked.isBefore(_startTime)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -126,10 +134,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
   }
 
   Future<TimeOfDay?> _pickTime({required TimeOfDay initialTime}) {
-    return showTimePicker(
-      context: context,
-      initialTime: initialTime,
-    );
+    return showTimePicker(context: context, initialTime: initialTime);
   }
 
   Future<void> _submitProposal() async {
@@ -173,15 +178,15 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     if (confirmed == true && mounted) {
       setState(() => _submitInFlight = true);
       context.read<GovernanceBloc>().add(
-            GovernanceCreateProposal(
-              spaceId: widget.spaceId,
-              title: _titleController.text.trim(),
-              body: _bodyController.text.trim(),
-              choices: choices,
-              startTime: _startTime,
-              endTime: _endTime,
-            ),
-          );
+        GovernanceCreateProposal(
+          spaceId: widget.spaceId,
+          title: _titleController.text.trim(),
+          body: _bodyController.text.trim(),
+          choices: choices,
+          startTime: _startTime,
+          endTime: _endTime,
+        ),
+      );
     }
   }
 
@@ -297,8 +302,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: AppColors.primary),
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
             maxLength: 256,
             validator: (value) {
@@ -352,8 +359,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: AppColors.primary),
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
             maxLines: 8,
             minLines: 4,
@@ -437,13 +446,15 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: AppColors.inputBorder),
+                          borderSide: const BorderSide(
+                            color: AppColors.inputBorder,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: AppColors.primary),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                          ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -452,7 +463,13 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                         isDense: true,
                       ),
                       maxLength: 32,
-                      buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
+                      buildCounter:
+                          (
+                            _, {
+                            required currentLength,
+                            required isFocused,
+                            maxLength,
+                          }) => null,
                     ),
                   ),
                   // Remove button
@@ -557,12 +574,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          disabledBackgroundColor:
-              isDark ? const Color(0xFF3D3D3D) : const Color(0xFFE0E0E0),
+          disabledBackgroundColor: isDark
+              ? const Color(0xFF3D3D3D)
+              : const Color(0xFFE0E0E0),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: isCreating
             ? const SizedBox(

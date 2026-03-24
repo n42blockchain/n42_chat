@@ -45,18 +45,23 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
     try {
       final groupRepository = getIt<IGroupRepository>();
       final members = await groupRepository.getGroupMembers(widget.roomId);
-      
+      if (!mounted) return;
       setState(() {
-        _members = members.map((m) => {
-          'id': m.userId,
-          'name': m.displayName.isNotEmpty ? m.displayName : m.userId,
-          'avatarUrl': m.avatarUrl ?? '',
-        }).toList();
+        _members = members
+            .map(
+              (m) => {
+                'id': m.userId,
+                'name': m.displayName.isNotEmpty ? m.displayName : m.userId,
+                'avatarUrl': m.avatarUrl ?? '',
+              },
+            )
+            .toList();
         _filteredMembers = _members;
         _isLoading = false;
       });
     } catch (e) {
       debugLog('Error loading members: $e');
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
@@ -80,7 +85,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
     final bgColor = widget.isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = widget.isDark ? Colors.white : Colors.black;
     final subtextColor = widget.isDark ? Colors.white54 : Colors.black54;
-    
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.6,
       decoration: BoxDecoration(
@@ -131,18 +136,22 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
               onChanged: _filterMembers,
               style: TextStyle(color: textColor),
               decoration: InputDecoration(
-                hintText: S.of(context)?.chatSearchMemberHint ?? 'Search members',
+                hintText:
+                    S.of(context)?.chatSearchMemberHint ?? 'Search members',
                 hintStyle: TextStyle(color: subtextColor),
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
-                fillColor: widget.isDark 
-                    ? Colors.white.withValues(alpha: 0.1) 
+                fillColor: widget.isDark
+                    ? Colors.white.withValues(alpha: 0.1)
                     : Colors.grey[200],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
@@ -151,43 +160,48 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _filteredMembers.isEmpty
-                    ? Center(
-                        child: Text(
-                          _searchQuery.isEmpty
-                              ? (S.of(context)?.chatNoMembers ?? 'No members')
-                              : (S.of(context)?.chatNoMatchingMembers ?? 'No matching members'),
-                          style: TextStyle(color: subtextColor),
+                ? Center(
+                    child: Text(
+                      _searchQuery.isEmpty
+                          ? (S.of(context)?.chatNoMembers ?? 'No members')
+                          : (S.of(context)?.chatNoMatchingMembers ??
+                                'No matching members'),
+                      style: TextStyle(color: subtextColor),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: _filteredMembers.length,
+                    itemBuilder: (context, index) {
+                      final member = _filteredMembers[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: _getColorFromName(
+                            member['name'] ?? '',
+                          ),
+                          child: Text(
+                            (member['name'] ?? '?')[0].toUpperCase(),
+                            style: const TextStyle(color: Colors.white),
+                          ),
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: _filteredMembers.length,
-                        itemBuilder: (context, index) {
-                          final member = _filteredMembers[index];
-                          return ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: _getColorFromName(member['name'] ?? ''),
-                              child: Text(
-                                (member['name'] ?? '?')[0].toUpperCase(),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            title: Text(
-                              member['name'] ?? (S.of(context)?.commonUnknownMember ?? 'Unknown'),
-                              style: TextStyle(color: textColor),
-                            ),
-                            subtitle: Text(
-                              member['id'] ?? '',
-                              style: TextStyle(fontSize: 12, color: subtextColor),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            onTap: () => widget.onMemberSelected(
-                              member['name'] ?? (S.of(context)?.commonUnknownMember ?? 'Unknown'),
-                              member['id'] ?? '',
-                            ),
-                          );
-                        },
-                      ),
+                        title: Text(
+                          member['name'] ??
+                              (S.of(context)?.commonUnknownMember ?? 'Unknown'),
+                          style: TextStyle(color: textColor),
+                        ),
+                        subtitle: Text(
+                          member['id'] ?? '',
+                          style: TextStyle(fontSize: 12, color: subtextColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        onTap: () => widget.onMemberSelected(
+                          member['name'] ??
+                              (S.of(context)?.commonUnknownMember ?? 'Unknown'),
+                          member['id'] ?? '',
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

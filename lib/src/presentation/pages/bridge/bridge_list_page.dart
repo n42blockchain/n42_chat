@@ -14,10 +14,7 @@ import 'bridge_detail_page.dart';
 class BridgeListPage extends StatefulWidget {
   final BridgeManager bridgeManager;
 
-  const BridgeListPage({
-    super.key,
-    required this.bridgeManager,
-  });
+  const BridgeListPage({super.key, required this.bridgeManager});
 
   @override
   State<BridgeListPage> createState() => _BridgeListPageState();
@@ -41,14 +38,37 @@ class _BridgeListPageState extends State<BridgeListPage> {
   }
 
   Future<void> _initialize() async {
-    if (!widget.bridgeManager.isInitialized) {
-      await widget.bridgeManager.initialize();
+    try {
+      if (!widget.bridgeManager.isInitialized) {
+        await widget.bridgeManager.initialize();
+      }
+    } catch (e) {
+      debugPrint('BridgeListPage: initialize failed: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _states = widget.bridgeManager.states;
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  Future<void> _refreshBridges() async {
     if (mounted) {
-      setState(() {
-        _states = widget.bridgeManager.states;
-        _isLoading = false;
-      });
+      setState(() => _isLoading = true);
+    }
+    try {
+      await widget.bridgeManager.rediscoverBridges();
+    } catch (e) {
+      debugPrint('BridgeListPage: rediscover failed: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _states = widget.bridgeManager.states;
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -63,7 +83,9 @@ class _BridgeListPageState extends State<BridgeListPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF111111) : const Color(0xFFEDEDED),
+      backgroundColor: isDark
+          ? const Color(0xFF111111)
+          : const Color(0xFFEDEDED),
       appBar: AppBar(
         title: const Text('Connected Accounts'),
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
@@ -73,12 +95,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
           if (!_isLoading)
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: () {
-                setState(() => _isLoading = true);
-                widget.bridgeManager.rediscoverBridges().then((_) {
-                  if (mounted) setState(() => _isLoading = false);
-                });
-              },
+              onPressed: _refreshBridges,
             ),
         ],
       ),
@@ -138,7 +155,11 @@ class _BridgeListPageState extends State<BridgeListPage> {
     );
   }
 
-  Widget _buildBridgeTile(BuildContext context, BridgeState state, bool isDark) {
+  Widget _buildBridgeTile(
+    BuildContext context,
+    BridgeState state,
+    bool isDark,
+  ) {
     final info = BridgePlatformRegistry.getInfo(state.platform);
     final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black87;
@@ -172,10 +193,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
         ),
         subtitle: Text(
           _getStatusText(state),
-          style: TextStyle(
-            fontSize: 13,
-            color: _getStatusColor(state),
-          ),
+          style: TextStyle(fontSize: 13, color: _getStatusColor(state)),
         ),
         trailing: _buildTrailingWidget(state),
         onTap: state.isAvailable
