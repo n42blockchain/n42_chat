@@ -37,9 +37,7 @@ class _VoiceRoomListView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(s?.voiceRoomTitle ?? 'Voice Rooms'),
-      ),
+      appBar: AppBar(title: Text(s?.voiceRoomTitle ?? 'Voice Rooms')),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateDialog(context),
         child: const Icon(Icons.add),
@@ -141,8 +139,10 @@ class _CreateVoiceRoomDialogState extends State<_CreateVoiceRoomDialog> {
         if (!_submitStarted) return;
 
         if (state.isConnected && state.room != null) {
+          final parentContext = widget.parentContext;
+          if (!parentContext.mounted) return;
           Navigator.of(context).pop();
-          widget.parentContext.push(Routes.voiceRoomPath(state.room!.roomId));
+          parentContext.push(Routes.voiceRoomPath(state.room!.roomId));
           return;
         }
 
@@ -213,13 +213,13 @@ class _CreateVoiceRoomDialogState extends State<_CreateVoiceRoomDialog> {
                           _inlineError = null;
                         });
                         context.read<VoiceRoomBloc>().add(
-                              CreateVoiceRoom(
-                                name: name,
-                                topic: _topicController.text.trim().isEmpty
-                                    ? null
-                                    : _topicController.text.trim(),
-                              ),
-                            );
+                          CreateVoiceRoom(
+                            name: name,
+                            topic: _topicController.text.trim().isEmpty
+                                ? null
+                                : _topicController.text.trim(),
+                          ),
+                        );
                       },
                 child: isSubmitting
                     ? const SizedBox(
@@ -263,7 +263,10 @@ class _VoiceRoomCard extends StatelessWidget {
                 children: [
                   // 直播标识
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.green,
                       borderRadius: BorderRadius.circular(4),

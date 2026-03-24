@@ -10,22 +10,24 @@ import '../../../core/theme/app_colors.dart';
 class RecoveryKeyImportDialog extends StatefulWidget {
   final KeyBackupService keyBackupService;
 
-  const RecoveryKeyImportDialog({
-    super.key,
-    required this.keyBackupService,
-  });
+  const RecoveryKeyImportDialog({super.key, required this.keyBackupService});
 
   /// 展示恢复密钥导入对话框
-  static Future<bool?> show(BuildContext context, KeyBackupService keyBackupService) {
+  static Future<bool?> show(
+    BuildContext context,
+    KeyBackupService keyBackupService,
+  ) {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => RecoveryKeyImportDialog(keyBackupService: keyBackupService),
+      builder: (_) =>
+          RecoveryKeyImportDialog(keyBackupService: keyBackupService),
     );
   }
 
   @override
-  State<RecoveryKeyImportDialog> createState() => _RecoveryKeyImportDialogState();
+  State<RecoveryKeyImportDialog> createState() =>
+      _RecoveryKeyImportDialogState();
 }
 
 class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
@@ -49,10 +51,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
           Icon(Icons.key, color: AppColors.primary),
           SizedBox(width: 8),
           Expanded(
-            child: Text(
-              'Import Recovery Key',
-              style: TextStyle(fontSize: 18),
-            ),
+            child: Text('Import Recovery Key', style: TextStyle(fontSize: 18)),
           ),
         ],
       ),
@@ -110,10 +109,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
               const SizedBox(height: 8),
               Text(
                 _error!,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.error,
-                ),
+                style: const TextStyle(fontSize: 12, color: AppColors.error),
               ),
             ],
           ],
@@ -143,6 +139,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
 
   Future<void> _pasteFromClipboard() async {
     final data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (!mounted) return;
     if (data?.text != null && data!.text!.isNotEmpty) {
       _controller.text = data.text!.trim();
       _controller.selection = TextSelection.fromPosition(
@@ -170,7 +167,8 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
     });
 
     try {
-      final restoredCount = await widget.keyBackupService.restoreFromRecoveryKey(key);
+      final restoredCount = await widget.keyBackupService
+          .restoreFromRecoveryKey(key);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -185,7 +183,8 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _error = 'Import failed: ${e.toString().replaceFirst('Exception: ', '')}';
+          _error =
+              'Import failed: ${e.toString().replaceFirst('Exception: ', '')}';
         });
       }
     }

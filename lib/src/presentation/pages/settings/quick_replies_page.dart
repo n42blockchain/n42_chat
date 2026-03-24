@@ -11,10 +11,7 @@ import '../../widgets/common/common_widgets.dart';
 class QuickRepliesPage extends StatefulWidget {
   final PreferencesDataSource storageDataSource;
 
-  const QuickRepliesPage({
-    super.key,
-    required this.storageDataSource,
-  });
+  const QuickRepliesPage({super.key, required this.storageDataSource});
 
   @override
   State<QuickRepliesPage> createState() => _QuickRepliesPageState();
@@ -96,9 +93,11 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(isEditing
-            ? (l10n?.settingsEditQuickReply ?? 'Edit Quick Reply')
-            : (l10n?.settingsAddQuickReply ?? 'Add Quick Reply')),
+        title: Text(
+          isEditing
+              ? (l10n?.settingsEditQuickReply ?? 'Edit Quick Reply')
+              : (l10n?.settingsAddQuickReply ?? 'Add Quick Reply'),
+        ),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -145,7 +144,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _resetToDefaults() {
@@ -156,7 +155,8 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       builder: (ctx) => AlertDialog(
         title: const Text('Reset to Defaults'),
         content: const Text(
-            'This will remove all custom quick replies and restore defaults. Continue?'),
+          'This will remove all custom quick replies and restore defaults. Continue?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -213,15 +213,17 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       body: _isLoading
           ? N42Loading(message: l10n?.commonLoading ?? 'Loading...')
           : _replies.isEmpty
-              ? _buildEmptyState(isDark, l10n)
-              : _buildReplyList(isDark),
+          ? _buildEmptyState(isDark, l10n)
+          : _buildReplyList(isDark),
     );
   }
 
   Widget _buildEmptyState(bool isDark, S? l10n) {
     return N42EmptyState.noData(
       title: l10n?.settingsNoQuickReplies ?? 'No quick replies',
-      description: l10n?.settingsDefaultQuickReplies ?? 'Default quick replies will be shown',
+      description:
+          l10n?.settingsDefaultQuickReplies ??
+          'Default quick replies will be shown',
       buttonText: l10n?.settingsAddQuickReply ?? 'Add Quick Reply',
       onButtonPressed: _addReply,
     );
