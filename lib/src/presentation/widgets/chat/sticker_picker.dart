@@ -73,12 +73,14 @@ class _StickerPickerState extends State<StickerPicker> {
       final packs = await _repository.getInstalledPacks();
       final recent = await _repository.getRecentStickers(limit: 20);
 
+      if (!mounted) return;
       setState(() {
         _packs = packs;
         _recentStickers = recent;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
