@@ -444,14 +444,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       initialTime: initialTime,
     );
 
-    if (time != null) {
-      final formatted =
-          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-      _updateSettings(
-        isStart
-            ? _settings.copyWith(doNotDisturbStart: formatted)
-            : _settings.copyWith(doNotDisturbEnd: formatted),
-      );
-    }
+    if (!mounted || time == null) return;
+
+    final formatted =
+        '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    _updateSettings(
+      isStart
+          ? _settings.copyWith(doNotDisturbStart: formatted)
+          : _settings.copyWith(doNotDisturbEnd: formatted),
+    );
   }
 }

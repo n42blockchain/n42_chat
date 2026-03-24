@@ -728,11 +728,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       ? (activeColor ?? Colors.white)
                       : Colors.white.withValues(alpha: 0.2)),
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 24,
-            ),
+            child: Icon(icon, color: Colors.white, size: 24),
           ),
           const SizedBox(height: 6),
           Text(
@@ -920,6 +916,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   void _toggleMute() async {
     await widget.liveKitService.toggleMicrophone();
+    if (!mounted) return;
     setState(() {
       _syncControlsFromService();
     });
@@ -927,6 +924,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   void _toggleVideo() async {
     await widget.liveKitService.toggleCamera();
+    if (!mounted) return;
     setState(() {
       _syncControlsFromService();
     });
@@ -934,6 +932,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   void _toggleScreenShare() async {
     await widget.liveKitService.toggleScreenShare();
+    if (!mounted) return;
     setState(() {
       _syncControlsFromService();
     });

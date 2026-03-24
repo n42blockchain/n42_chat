@@ -821,6 +821,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   Future<void> _toggleSpeaker() async {
     await widget.webRTCService.toggleSpeaker();
+    if (!mounted) return;
     setState(() {
       _syncControlsFromService();
     });

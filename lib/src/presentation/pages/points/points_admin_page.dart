@@ -20,10 +20,7 @@ import '../../blocs/points/points_state.dart';
 class PointsAdminPage extends StatefulWidget {
   final String roomId;
 
-  const PointsAdminPage({
-    super.key,
-    required this.roomId,
-  });
+  const PointsAdminPage({super.key, required this.roomId});
 
   @override
   State<PointsAdminPage> createState() => _PointsAdminPageState();
@@ -105,8 +102,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
         title: const Text('Points Settings'),
         backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
@@ -128,9 +124,13 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
       body: BlocConsumer<PointsBloc, PointsState>(
         listener: (context, state) {
           final shouldApplyInitialConfig =
-              !_hasAppliedInitialConfig && state.config != null && state.status == PointsStatus.loaded;
+              !_hasAppliedInitialConfig &&
+              state.config != null &&
+              state.status == PointsStatus.loaded;
           final shouldApplySavedConfig =
-              _isSaving && state.config != null && state.status == PointsStatus.loaded;
+              _isSaving &&
+              state.config != null &&
+              state.status == PointsStatus.loaded;
 
           if (shouldApplyInitialConfig || shouldApplySavedConfig) {
             _applyConfig(state.config!);
@@ -143,8 +143,9 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
             }
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content:
-                    Text(state.errorMessage ?? 'Failed to save configuration'),
+                content: Text(
+                  state.errorMessage ?? 'Failed to save configuration',
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -164,7 +165,8 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                 children: [
                   _buildSwitchTile(
                     title: 'Enable Points System',
-                    subtitle: 'Turn on points earning and rewards for this room',
+                    subtitle:
+                        'Turn on points earning and rewards for this room',
                     value: _isEnabled,
                     isDark: isDark,
                     onChanged: (v) {
@@ -228,8 +230,10 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                 title: 'Reward Rules',
                 isDark: isDark,
                 trailing: IconButton(
-                  icon: const Icon(Icons.add_circle_outline,
-                      color: AppColors.primary),
+                  icon: const Icon(
+                    Icons.add_circle_outline,
+                    color: AppColors.primary,
+                  ),
                   onPressed: () => _showAddRuleDialog(isDark),
                 ),
                 children: [
@@ -250,28 +254,28 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     )
                   else
                     ..._rules.asMap().entries.map(
-                          (entry) => _RuleTile(
-                            rule: entry.value,
-                            isDark: isDark,
-                            onToggle: (enabled) {
-                              setState(() {
-                                _rules[entry.key] = RewardRule(
-                                  id: entry.value.id,
-                                  action: entry.value.action,
-                                  points: entry.value.points,
-                                  dailyLimit: entry.value.dailyLimit,
-                                  cooldown: entry.value.cooldown,
-                                  isEnabled: enabled,
-                                );
-                              });
-                              _markDirty();
-                            },
-                            onDelete: () {
-                              setState(() => _rules.removeAt(entry.key));
-                              _markDirty();
-                            },
-                          ),
-                        ),
+                      (entry) => _RuleTile(
+                        rule: entry.value,
+                        isDark: isDark,
+                        onToggle: (enabled) {
+                          setState(() {
+                            _rules[entry.key] = RewardRule(
+                              id: entry.value.id,
+                              action: entry.value.action,
+                              points: entry.value.points,
+                              dailyLimit: entry.value.dailyLimit,
+                              cooldown: entry.value.cooldown,
+                              isEnabled: enabled,
+                            );
+                          });
+                          _markDirty();
+                        },
+                        onDelete: () {
+                          setState(() => _rules.removeAt(entry.key));
+                          _markDirty();
+                        },
+                      ),
+                    ),
                 ],
               ),
             ],
@@ -392,8 +396,9 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color:
-                isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -405,8 +410,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           onChanged: (_) => _markDirty(),
           style: TextStyle(
             fontSize: 14,
-            color:
-                isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hint,
@@ -423,8 +427,10 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
             ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
             counterText: '',
           ),
         ),
@@ -448,8 +454,9 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              backgroundColor:
-                  isDark ? AppColors.surfaceDark : AppColors.surface,
+              backgroundColor: isDark
+                  ? AppColors.surfaceDark
+                  : AppColors.surface,
               title: const Text('Add Reward Rule'),
               content: SingleChildScrollView(
                 child: Column(
@@ -538,12 +545,9 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
-                    final points =
-                        int.tryParse(pointsController.text) ?? 1;
-                    final dailyLimit =
-                        int.tryParse(dailyLimitController.text);
-                    final cooldownSec =
-                        int.tryParse(cooldownController.text);
+                    final points = int.tryParse(pointsController.text) ?? 1;
+                    final dailyLimit = int.tryParse(dailyLimitController.text);
+                    final cooldownSec = int.tryParse(cooldownController.text);
 
                     final rule = RewardRule(
                       id: 'rule_${DateTime.now().millisecondsSinceEpoch}',
@@ -566,7 +570,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           },
         );
       },
-    );
+    ).whenComplete(() {
+      pointsController.dispose();
+      dailyLimitController.dispose();
+      cooldownController.dispose();
+    });
   }
 }
 
@@ -609,8 +617,8 @@ class _RuleTile extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: rule.isEnabled
                         ? (isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary)
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimary)
                         : AppColors.textDisabled,
                   ),
                 ),
@@ -650,7 +658,9 @@ class _RuleTile extends StatelessWidget {
   String _buildSubtitle() {
     final parts = <String>['${rule.points} pts'];
     if (rule.dailyLimit != null) parts.add('max ${rule.dailyLimit}/day');
-    if (rule.cooldown != null) parts.add('${rule.cooldown!.inSeconds}s cooldown');
+    if (rule.cooldown != null) {
+      parts.add('${rule.cooldown!.inSeconds}s cooldown');
+    }
     return parts.join(' | ');
   }
 }

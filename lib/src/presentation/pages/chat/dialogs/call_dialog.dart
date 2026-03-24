@@ -61,7 +61,9 @@ class _CallDialogState extends State<CallDialog> {
   }
 
   Future<void> _initCall() async {
-    debugLog('CallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
+    debugLog(
+      'CallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call',
+    );
     debugLog('CallDialog: Contact: ${widget.contactName}');
     debugLog('CallDialog: Room ID: ${widget.roomId ?? "N/A"}');
 
@@ -136,6 +138,7 @@ class _CallDialogState extends State<CallDialog> {
       return;
     }
     await service.toggleSpeaker();
+    if (!mounted) return;
     setState(() => _isSpeakerOn = service.isSpeakerOn);
     debugLog('CallDialog: Speaker ${_isSpeakerOn ? "on" : "off"}');
   }
@@ -292,7 +295,9 @@ class _CallDialogState extends State<CallDialog> {
   Widget _buildAvatarPlaceholder() {
     return Center(
       child: Text(
-        widget.contactName.isNotEmpty ? widget.contactName[0].toUpperCase() : '?',
+        widget.contactName.isNotEmpty
+            ? widget.contactName[0].toUpperCase()
+            : '?',
         style: const TextStyle(
           color: Colors.white,
           fontSize: 48,
@@ -317,7 +322,9 @@ class _CallDialogState extends State<CallDialog> {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.2),
+              color: isActive
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
