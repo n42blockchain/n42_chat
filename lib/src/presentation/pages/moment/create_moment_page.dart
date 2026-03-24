@@ -458,6 +458,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       final resolved = (permission == LocationPermission.denied)
           ? await Geolocator.requestPermission()
           : permission;
+      if (!mounted) return;
       if (resolved == LocationPermission.deniedForever ||
           resolved == LocationPermission.denied) {
         debugLog('_selectLocation: location permission denied');
@@ -469,6 +470,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           accuracy: LocationAccuracy.medium,
         ),
       );
+      if (!mounted) return;
       setState(() {
         _location = MomentLocation(
           latitude: pos.latitude,
@@ -477,6 +479,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       });
     } catch (e) {
       debugLog('_selectLocation error: $e');
+      if (!mounted) return;
       setState(() => _location = null);
     }
   }

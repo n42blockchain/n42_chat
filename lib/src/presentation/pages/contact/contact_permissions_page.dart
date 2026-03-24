@@ -38,6 +38,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
 
   Future<void> _loadPermissions() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     final key = 'permissions_${widget.userId}';
     final json = prefs.getString(key);
     if (json != null) {
