@@ -794,6 +794,7 @@ class _ChatTabContent extends StatelessWidget {
             ),
           )
           .then((_) {
+            if (!context.mounted) return;
             conversationBloc.add(const RefreshConversations());
           }),
     );

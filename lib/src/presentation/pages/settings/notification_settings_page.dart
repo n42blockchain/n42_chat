@@ -32,6 +32,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   void _updateSettings(NotificationSettings newSettings) {
+    if (!mounted) return;
     setState(() => _settings = newSettings);
     widget.onSave?.call(newSettings);
   }

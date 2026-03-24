@@ -57,6 +57,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
   }
 
   void _updateSettings(PrivacySettings newSettings) {
+    if (!mounted) return;
     setState(() => _settings = newSettings);
     unawaited(_persistSettings(newSettings));
     widget.onSave?.call(newSettings);
