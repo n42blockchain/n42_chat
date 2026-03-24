@@ -17,7 +17,7 @@ class ContactSettingsPage extends StatefulWidget {
   final String displayName;
   final bool isStarred;
   final void Function(bool)? onStarChanged;
-  
+
   const ContactSettingsPage({
     super.key,
     required this.userId,
@@ -34,13 +34,16 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   late bool _isStarred;
   bool _isBlocked = false;
   bool _isDeleting = false;
-  
+
   @override
   void initState() {
     super.initState();
     _isStarred = widget.isStarred;
     try {
-      final contact = context.read<ContactBloc>().state.contacts
+      final contact = context
+          .read<ContactBloc>()
+          .state
+          .contacts
           .where((c) => c.userId == widget.userId)
           .firstOrNull;
       _isBlocked = contact?.isBlocked ?? false;
@@ -57,7 +60,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     final textColor = isDark ? Colors.white : Colors.black;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
-    
+
     return BlocListener<ContactBloc, ContactState>(
       listenWhen: (previous, current) =>
           _isDeleting &&
@@ -116,14 +119,15 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 8),
-            
+
                   // 编辑备注
                   _buildMenuSection(
                     cardColor: cardColor,
                     dividerColor: dividerColor,
                     children: [
                       _buildMenuItem(
-                        title: S.of(context)?.contactEditRemark ?? 'Edit Remark',
+                        title:
+                            S.of(context)?.contactEditRemark ?? 'Edit Remark',
                         textColor: textColor,
                         secondaryTextColor: secondaryTextColor,
                         onTap: () => _openEditRemark(),
@@ -139,7 +143,9 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     dividerColor: dividerColor,
                     children: [
                       _buildMenuItem(
-                        title: S.of(context)?.contactSetPermissions ?? 'Set Permissions',
+                        title:
+                            S.of(context)?.contactSetPermissions ??
+                            'Set Permissions',
                         textColor: textColor,
                         secondaryTextColor: secondaryTextColor,
                         onTap: () => _openPermissions(),
@@ -155,7 +161,9 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     dividerColor: dividerColor,
                     children: [
                       _buildMenuItem(
-                        title: S.of(context)?.contactRecommendToFriend ?? 'Share contact',
+                        title:
+                            S.of(context)?.contactRecommendToFriend ??
+                            'Share contact',
                         textColor: textColor,
                         secondaryTextColor: secondaryTextColor,
                         onTap: () => _shareContact(),
@@ -171,7 +179,9 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     dividerColor: dividerColor,
                     children: [
                       _buildSwitchItem(
-                        title: S.of(context)?.contactSetAsStarred ?? 'Set as Starred',
+                        title:
+                            S.of(context)?.contactSetAsStarred ??
+                            'Set as Starred',
                         value: _isStarred,
                         textColor: textColor,
                         onChanged: (value) {
@@ -183,7 +193,9 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                       ),
                       _buildDivider(dividerColor),
                       _buildSwitchItem(
-                        title: S.of(context)?.contactAddToBlocklist ?? 'Add to Blocklist',
+                        title:
+                            S.of(context)?.contactAddToBlocklist ??
+                            'Add to Blocklist',
                         value: _isBlocked,
                         textColor: textColor,
                         onChanged: (value) {
@@ -192,12 +204,18 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                           });
                           try {
                             if (value) {
-                              context.read<ContactBloc>().add(IgnoreUser(widget.userId));
+                              context.read<ContactBloc>().add(
+                                IgnoreUser(widget.userId),
+                              );
                             } else {
-                              context.read<ContactBloc>().add(UnignoreUser(widget.userId));
+                              context.read<ContactBloc>().add(
+                                UnignoreUser(widget.userId),
+                              );
                             }
                           } catch (_) {
-                            debugLog('ContactBloc not available for blocklist toggle');
+                            debugLog(
+                              'ContactBloc not available for blocklist toggle',
+                            );
                           }
                         },
                       ),
@@ -233,7 +251,8 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           alignment: Alignment.center,
                           child: Text(
-                            S.of(context)?.contactDeleteContact ?? 'Delete Contact',
+                            S.of(context)?.contactDeleteContact ??
+                                'Delete Contact',
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.red,
@@ -243,25 +262,23 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 32),
                 ],
               ),
             ),
-            
+
             if (_isDeleting)
               const ColoredBox(
                 color: Color(0x80000000),
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
+                child: Center(child: CircularProgressIndicator()),
               ),
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildMenuSection({
     required Color cardColor,
     required Color dividerColor,
@@ -275,12 +292,10 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           bottom: BorderSide(color: dividerColor, width: 0.5),
         ),
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
-  
+
   Widget _buildMenuItem({
     required String title,
     required Color textColor,
@@ -293,25 +308,15 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                color: textColor,
-              ),
-            ),
+            Text(title, style: TextStyle(fontSize: 16, color: textColor)),
             const Spacer(),
-            Icon(
-              Icons.chevron_right,
-              color: secondaryTextColor,
-              size: 20,
-            ),
+            Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildSwitchItem({
     required String title,
     required bool value,
@@ -322,13 +327,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              color: textColor,
-            ),
-          ),
+          Text(title, style: TextStyle(fontSize: 16, color: textColor)),
           const Spacer(),
           Switch(
             value: value,
@@ -339,14 +338,14 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
       ),
     );
   }
-  
+
   Widget _buildDivider(Color color) {
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: Divider(height: 0.5, thickness: 0.5, color: color),
     );
   }
-  
+
   void _openPermissions() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -361,7 +360,14 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   void _shareContact() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.contactRecommendToFriend ?? 'Share contact') ?? 'Share contact coming soon'),
+        content: Text(
+          S
+                  .of(context)
+                  ?.commonFeatureComingSoon(
+                    S.of(context)?.contactRecommendToFriend ?? 'Share contact',
+                  ) ??
+              'Share contact coming soon',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -392,21 +398,32 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                   S.of(context)?.reportReasonHarassment ?? 'Harassment',
                   S.of(context)?.reportReasonFraud ?? 'Fraud',
                   S.of(context)?.reportReasonOther ?? 'Other',
-                ].map((reason) => RadioListTile<String>(
-                  title: Text(reason, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
-                  value: reason,
-                  activeColor: AppColors.primary,
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                )),
+                ].map(
+                  (reason) => RadioListTile<String>(
+                    title: Text(
+                      reason,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    value: reason,
+                    activeColor: AppColors.primary,
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: descController,
                   maxLines: 2,
                   style: TextStyle(color: isDark ? Colors.white : Colors.black),
                   decoration: InputDecoration(
-                    hintText: S.of(context)?.reportDescription ?? 'Additional description (optional)',
-                    hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+                    hintText:
+                        S.of(context)?.reportDescription ??
+                        'Additional description (optional)',
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white54 : Colors.black54,
+                    ),
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -415,10 +432,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                descController.dispose();
-                Navigator.pop(ctx);
-              },
+              onPressed: () => Navigator.pop(ctx),
               child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
@@ -426,17 +440,21 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                 if (selectedReason == null) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
                     SnackBar(
-                      content: Text(S.of(context)?.reportSelectReason ?? 'Please select a reason'),
+                      content: Text(
+                        S.of(context)?.reportSelectReason ??
+                            'Please select a reason',
+                      ),
                       duration: const Duration(seconds: 1),
                     ),
                   );
                   return;
                 }
-                descController.dispose();
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(S.of(context)?.reportSubmitted ?? 'Report submitted'),
+                    content: Text(
+                      S.of(context)?.reportSubmitted ?? 'Report submitted',
+                    ),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -446,7 +464,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           ],
         ),
       ),
-    );
+    ).whenComplete(descController.dispose);
   }
 
   void _openEditRemark() {
@@ -458,7 +476,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
       // ContactBloc 可能不可用
       debugLog('Error: $e');
     }
-    
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (ctx) {
@@ -466,25 +484,25 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
             userId: widget.userId,
             displayName: widget.displayName,
           );
-          
+
           if (contactBloc != null) {
-            return BlocProvider.value(
-              value: contactBloc,
-              child: page,
-            );
+            return BlocProvider.value(value: contactBloc, child: page);
           }
           return page;
         },
       ),
     );
   }
-  
+
   void _showDeleteConfirm() {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.contactDeleteContact ?? 'Delete Contact'),
-        content: Text(S.of(context)?.contactDeleteContactConfirm(widget.displayName) ?? 'Are you sure you want to delete ${widget.displayName}?'),
+        content: Text(
+          S.of(context)?.contactDeleteContactConfirm(widget.displayName) ??
+              'Are you sure you want to delete ${widget.displayName}?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),

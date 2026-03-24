@@ -734,37 +734,37 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
   Future<String?> _showProxyUrlEditor(String initialValue) async {
     final controller = TextEditingController(text: initialValue);
-    return showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Proxy Endpoint'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'http://127.0.0.1:7890',
-            border: OutlineInputBorder(),
+    try {
+      return await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Proxy Endpoint'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'http://127.0.0.1:7890',
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.url,
           ),
-          keyboardType: TextInputType.url,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final text = controller.text.trim();
+                Navigator.pop(ctx, text);
+              },
+              child: Text(S.of(context)?.commonSave ?? 'Save'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              final text = controller.text.trim();
-              controller.dispose();
-              Navigator.pop(ctx, text);
-            },
-            child: Text(S.of(context)?.commonSave ?? 'Save'),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _saveProxyUrl(String value, {required bool enableProxyAfterSave}) {

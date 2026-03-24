@@ -224,128 +224,103 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final confirmController = TextEditingController();
     final l10n = S.of(context);
 
-    return showDialog<String>(
-      context: context,
-      builder: (ctx) {
-        String? error;
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) => AlertDialog(
-            title: Text(l10n?.chatLockPinSetTitle ?? 'Set PIN'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: pinController,
-                  keyboardType: TextInputType.number,
-                  obscureText: true,
-                  maxLength: 6,
-                  decoration: InputDecoration(
-                    hintText: l10n?.chatLockPinTitle ?? 'Enter PIN',
-                    counterText: '',
-                    border: const OutlineInputBorder(),
+    try {
+      return await showDialog<String>(
+        context: context,
+        builder: (ctx) {
+          String? error;
+          return StatefulBuilder(
+            builder: (ctx, setDialogState) => AlertDialog(
+              title: Text(l10n?.chatLockPinSetTitle ?? 'Set PIN'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: pinController,
+                    keyboardType: TextInputType.number,
+                    obscureText: true,
+                    maxLength: 6,
+                    decoration: InputDecoration(
+                      hintText: l10n?.chatLockPinTitle ?? 'Enter PIN',
+                      counterText: '',
+                      border: const OutlineInputBorder(),
+                    ),
                   ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: confirmController,
+                    keyboardType: TextInputType.number,
+                    obscureText: true,
+                    maxLength: 6,
+                    decoration: InputDecoration(
+                      hintText: l10n?.chatLockPinConfirmTitle ?? 'Confirm PIN',
+                      counterText: '',
+                      border: const OutlineInputBorder(),
+                      errorText: error,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, null),
+                  child: Text(l10n?.commonCancel ?? 'Cancel'),
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: confirmController,
-                  keyboardType: TextInputType.number,
-                  obscureText: true,
-                  maxLength: 6,
-                  decoration: InputDecoration(
-                    hintText: l10n?.chatLockPinConfirmTitle ?? 'Confirm PIN',
-                    counterText: '',
-                    border: const OutlineInputBorder(),
-                    errorText: error,
-                  ),
+                TextButton(
+                  onPressed: () {
+                    final pin = pinController.text;
+                    final confirm = confirmController.text;
+                    if (pin.length < 4) return;
+                    if (pin != confirm) {
+                      setDialogState(() {
+                        error =
+                            l10n?.chatLockPinMismatch ?? 'PIN does not match';
+                      });
+                      return;
+                    }
+                    Navigator.pop(ctx, pin);
+                  },
+                  child: Text(l10n?.commonConfirm ?? 'Confirm'),
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  pinController.dispose();
-                  confirmController.dispose();
-                  Navigator.pop(ctx, null);
-                },
-                child: Text(l10n?.commonCancel ?? 'Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  final pin = pinController.text;
-                  final confirm = confirmController.text;
-                  if (pin.length < 4) return;
-                  if (pin != confirm) {
-                    setDialogState(() {
-                      error = l10n?.chatLockPinMismatch ?? 'PIN does not match';
-                    });
-                    return;
-                  }
-                  pinController.dispose();
-                  confirmController.dispose();
-                  Navigator.pop(ctx, pin);
-                },
-                child: Text(l10n?.commonConfirm ?? 'Confirm'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    } finally {
+      pinController.dispose();
+      confirmController.dispose();
+    }
   }
 
   Future<bool> _showVerifyPinDialog() async {
     final pinController = TextEditingController();
     final l10n = S.of(context);
 
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (ctx) {
-        String? error;
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) => AlertDialog(
-            title: Text(l10n?.chatLockPinTitle ?? 'Enter PIN'),
-            content: TextField(
-              controller: pinController,
-              keyboardType: TextInputType.number,
-              obscureText: true,
-              maxLength: 6,
-              decoration: InputDecoration(
-                counterText: '',
-                border: const OutlineInputBorder(),
-                errorText: error,
-              ),
-              onSubmitted: (_) async {
-                final verified = await _chatLockService.verifyPin(
-                  widget.conversation.id,
-                  pinController.text,
-                );
-                if (verified) {
-                  pinController.dispose();
-                  if (ctx.mounted) Navigator.pop(ctx, true);
-                } else {
-                  setDialogState(() {
-                    error = l10n?.chatLockVerifyFailed ?? 'Verification failed';
-                    pinController.clear();
-                  });
-                }
-              },
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  pinController.dispose();
-                  Navigator.pop(ctx, false);
-                },
-                child: Text(l10n?.commonCancel ?? 'Cancel'),
-              ),
-              TextButton(
-                onPressed: () async {
+    try {
+      final result = await showDialog<bool>(
+        context: context,
+        builder: (ctx) {
+          String? error;
+          return StatefulBuilder(
+            builder: (ctx, setDialogState) => AlertDialog(
+              title: Text(l10n?.chatLockPinTitle ?? 'Enter PIN'),
+              content: TextField(
+                controller: pinController,
+                keyboardType: TextInputType.number,
+                obscureText: true,
+                maxLength: 6,
+                decoration: InputDecoration(
+                  counterText: '',
+                  border: const OutlineInputBorder(),
+                  errorText: error,
+                ),
+                onSubmitted: (_) async {
                   final verified = await _chatLockService.verifyPin(
                     widget.conversation.id,
                     pinController.text,
                   );
                   if (verified) {
-                    pinController.dispose();
                     if (ctx.mounted) Navigator.pop(ctx, true);
                   } else {
                     setDialogState(() {
@@ -355,15 +330,39 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     });
                   }
                 },
-                child: Text(l10n?.commonConfirm ?? 'Confirm'),
               ),
-            ],
-          ),
-        );
-      },
-    );
-
-    return result ?? false;
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(l10n?.commonCancel ?? 'Cancel'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final verified = await _chatLockService.verifyPin(
+                      widget.conversation.id,
+                      pinController.text,
+                    );
+                    if (verified) {
+                      if (ctx.mounted) Navigator.pop(ctx, true);
+                    } else {
+                      setDialogState(() {
+                        error =
+                            l10n?.chatLockVerifyFailed ?? 'Verification failed';
+                        pinController.clear();
+                      });
+                    }
+                  },
+                  child: Text(l10n?.commonConfirm ?? 'Confirm'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+      return result ?? false;
+    } finally {
+      pinController.dispose();
+    }
   }
 
   @override
@@ -547,41 +546,47 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final controller = TextEditingController(text: _groupName);
     final isDark = context.isDarkMode;
 
-    final newName = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-        title: Text(
-          S.of(context)?.chatGroupName ?? 'Group Name',
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
-        ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 50,
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
-          decoration: InputDecoration(
-            hintText: S.of(context)?.commonEnterGroupName ?? 'Enter group name',
-            hintStyle: TextStyle(
-              color: isDark ? Colors.white54 : Colors.black54,
+    String? newName;
+    try {
+      newName = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          title: Text(
+            S.of(context)?.chatGroupName ?? 'Group Name',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLength: 50,
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            decoration: InputDecoration(
+              hintText:
+                  S.of(context)?.commonEnterGroupName ?? 'Enter group name',
+              hintStyle: TextStyle(
+                color: isDark ? Colors.white54 : Colors.black54,
+              ),
+              counterStyle: TextStyle(
+                color: isDark ? Colors.white54 : Colors.black54,
+              ),
             ),
-            counterStyle: TextStyle(
-              color: isDark ? Colors.white54 : Colors.black54,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
-          ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, controller.text.trim()),
+              child: Text(S.of(context)?.commonSave ?? 'Save'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: Text(S.of(context)?.commonSave ?? 'Save'),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
 
     if (newName != null && newName.isNotEmpty && newName != _groupName) {
       await _updateGroupName(newName);
@@ -1292,85 +1297,86 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final controller = TextEditingController();
     final canEdit = widget.canChangeSettings;
 
-    await showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-        title: Text(
-          S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
-        ),
-        content: canEdit
-            ? TextField(
-                controller: controller,
-                maxLines: 5,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  hintText:
-                      S.of(context)?.chatGroupAnnouncementHint ??
-                      'Enter group announcement',
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.white54 : Colors.black54,
-                  ),
-                  border: const OutlineInputBorder(),
-                ),
-              )
-            : Text(
-                S.of(context)?.chatGroupAnnouncementEmpty ?? 'No announcement',
-                style: TextStyle(
-                  color: isDark ? Colors.white70 : Colors.black87,
-                ),
-              ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              canEdit
-                  ? (S.of(context)?.commonCancel ?? 'Cancel')
-                  : (S.of(context)?.commonConfirm ?? 'OK'),
-            ),
+    try {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          title: Text(
+            S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
           ),
-          if (canEdit)
+          content: canEdit
+              ? TextField(
+                  controller: controller,
+                  maxLines: 5,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: InputDecoration(
+                    hintText:
+                        S.of(context)?.chatGroupAnnouncementHint ??
+                        'Enter group announcement',
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white54 : Colors.black54,
+                    ),
+                    border: const OutlineInputBorder(),
+                  ),
+                )
+              : Text(
+                  S.of(context)?.chatGroupAnnouncementEmpty ??
+                      'No announcement',
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black87,
+                  ),
+                ),
+          actions: [
             TextButton(
-              onPressed: () async {
-                final announcement = controller.text.trim();
-                controller.dispose();
-                Navigator.pop(ctx);
-                try {
-                  final groupRepository = getIt<IGroupRepository>();
-                  await groupRepository.setGroupAnnouncement(
-                    widget.conversation.id,
-                    announcement,
-                  );
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(S.of(context)?.commonSave ?? 'Saved'),
-                        duration: const Duration(seconds: 1),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          S.of(context)?.chatUpdateFailed ?? 'Update failed',
-                        ),
-                        backgroundColor: AppColors.error,
-                      ),
-                    );
-                  }
-                }
-              },
-              child: Text(S.of(context)?.commonSave ?? 'Save'),
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                canEdit
+                    ? (S.of(context)?.commonCancel ?? 'Cancel')
+                    : (S.of(context)?.commonConfirm ?? 'OK'),
+              ),
             ),
-        ],
-      ),
-    );
+            if (canEdit)
+              TextButton(
+                onPressed: () async {
+                  final announcement = controller.text.trim();
+                  Navigator.pop(ctx);
+                  try {
+                    final groupRepository = getIt<IGroupRepository>();
+                    await groupRepository.setGroupAnnouncement(
+                      widget.conversation.id,
+                      announcement,
+                    );
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(S.of(context)?.commonSave ?? 'Saved'),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            S.of(context)?.chatUpdateFailed ?? 'Update failed',
+                          ),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: Text(S.of(context)?.commonSave ?? 'Save'),
+              ),
+          ],
+        ),
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   /// 打开群管理设置
@@ -1387,50 +1393,51 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final isDark = context.isDarkMode;
     final controller = TextEditingController();
 
-    final newNickname = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-        title: Text(
-          S.of(context)?.chatEditNickname ?? 'Edit Nickname',
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
-        ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 30,
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
-          decoration: InputDecoration(
-            hintText:
-                S.of(context)?.chatNicknameHint ??
-                'Enter your nickname in this group',
-            hintStyle: TextStyle(
-              color: isDark ? Colors.white54 : Colors.black54,
+    String? newNickname;
+    try {
+      newNickname = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          title: Text(
+            S.of(context)?.chatEditNickname ?? 'Edit Nickname',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLength: 30,
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            decoration: InputDecoration(
+              hintText:
+                  S.of(context)?.chatNicknameHint ??
+                  'Enter your nickname in this group',
+              hintStyle: TextStyle(
+                color: isDark ? Colors.white54 : Colors.black54,
+              ),
+              counterStyle: TextStyle(
+                color: isDark ? Colors.white54 : Colors.black54,
+              ),
             ),
-            counterStyle: TextStyle(
-              color: isDark ? Colors.white54 : Colors.black54,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
-          ),
+            TextButton(
+              onPressed: () {
+                final text = controller.text.trim();
+                Navigator.pop(ctx, text);
+              },
+              child: Text(S.of(context)?.commonSave ?? 'Save'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              final text = controller.text.trim();
-              controller.dispose();
-              Navigator.pop(ctx, text);
-            },
-            child: Text(S.of(context)?.commonSave ?? 'Save'),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
 
     if (newNickname != null && newNickname.isNotEmpty && mounted) {
       // 群昵称功能需要 Matrix state event 支持，暂存本地
@@ -1508,10 +1515,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                descController.dispose();
-                Navigator.pop(ctx);
-              },
+              onPressed: () => Navigator.pop(ctx),
               child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
@@ -1528,7 +1532,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   );
                   return;
                 }
-                descController.dispose();
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -1544,7 +1547,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           ],
         ),
       ),
-    );
+    ).whenComplete(descController.dispose);
   }
 
   void _openContactDetail() {

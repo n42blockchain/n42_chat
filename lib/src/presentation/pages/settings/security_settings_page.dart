@@ -450,38 +450,37 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   Future<String?> _showPasskeyNameDialog() async {
     final l10n = S.of(context);
     final controller = TextEditingController(text: 'My Passkey');
-    final result = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n?.authPasskeyNameYours ?? 'Name your Passkey'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'e.g., iPhone, MacBook',
-            border: OutlineInputBorder(),
+    try {
+      return await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n?.authPasskeyNameYours ?? 'Name your Passkey'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'e.g., iPhone, MacBook',
+              border: OutlineInputBorder(),
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final name = controller.text.trim();
+                Navigator.pop(ctx, name.isNotEmpty ? name : 'My Passkey');
+              },
+              child: Text(l10n?.authPasskeyRegister ?? 'Register'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              controller.dispose();
-              Navigator.pop(ctx, name.isNotEmpty ? name : 'My Passkey');
-            },
-            child: Text(l10n?.authPasskeyRegister ?? 'Register'),
-          ),
-        ],
-      ),
-    );
-    return result;
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _deletePasskey(PasskeyCredential passkey) async {
@@ -1344,17 +1343,13 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                controller.dispose();
-                Navigator.pop(ctx);
-              },
+              onPressed: () => Navigator.pop(ctx),
               child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () async {
                 final input = controller.text.trim();
                 if (input.isEmpty) return;
-                controller.dispose();
                 Navigator.pop(ctx);
                 await _performRestore(input, isRecoveryKey: isRecoveryKey);
               },
@@ -1363,7 +1358,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ],
         ),
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   Future<void> _performRestore(
@@ -1744,16 +1739,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
+            onPressed: () => Navigator.pop(ctx),
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
               final newName = controller.text.trim();
-              controller.dispose();
               Navigator.pop(ctx);
               if (newName.isNotEmpty && newName != device.deviceName) {
                 await _renameDevice(device.deviceId, newName);
@@ -1763,7 +1754,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   Future<void> _renameDevice(String deviceId, String newName) async {
