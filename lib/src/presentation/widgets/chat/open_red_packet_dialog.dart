@@ -7,12 +7,18 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../pages/red_packet/send_red_packet_page.dart';
 
-class SendRedPacketDialog extends StatelessWidget {
+class SendRedPacketDialog extends StatefulWidget {
   final String receiverName;
   final bool isGroup;
   final int memberCount;
-  final Future<bool> Function(String amount, String token, String greeting, int count,
-      bool isLucky) onSend;
+  final Future<bool> Function(
+    String amount,
+    String token,
+    String greeting,
+    int count,
+    bool isLucky,
+  )
+  onSend;
 
   const SendRedPacketDialog({
     super.key,
@@ -23,21 +29,35 @@ class SendRedPacketDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    // 使用全屏页面代替弹窗
+  State<SendRedPacketDialog> createState() => _SendRedPacketDialogState();
+}
+
+class _SendRedPacketDialogState extends State<SendRedPacketDialog> {
+  bool _navigated = false;
+
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.of(context).pop();
-      Navigator.of(context).push(
+      if (_navigated || !mounted) return;
+      _navigated = true;
+      final navigator = Navigator.of(context);
+      navigator.pop();
+      navigator.push(
         MaterialPageRoute<void>(
           builder: (_) => SendRedPacketPage(
-            receiverName: receiverName,
-            isGroup: isGroup,
-            memberCount: memberCount,
-            onSend: onSend,
+            receiverName: widget.receiverName,
+            isGroup: widget.isGroup,
+            memberCount: widget.memberCount,
+            onSend: widget.onSend,
           ),
         ),
       );
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return const SizedBox.shrink();
   }
 }
@@ -104,13 +124,19 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
     );
     _scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-          tween: Tween(begin: 1.0, end: 1.2)
-              .chain(CurveTween(curve: Curves.easeOut)),
-          weight: 40),
+        tween: Tween(
+          begin: 1.0,
+          end: 1.2,
+        ).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 40,
+      ),
       TweenSequenceItem(
-          tween: Tween(begin: 1.2, end: 0.0)
-              .chain(CurveTween(curve: Curves.easeIn)),
-          weight: 60),
+        tween: Tween(
+          begin: 1.2,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeIn)),
+        weight: 60,
+      ),
     ]).animate(_openController);
 
     // Shimmer for "best luck" gold text
@@ -118,8 +144,10 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     )..repeat();
-    _shimmerAnimation = Tween<double>(begin: -1.5, end: 1.5)
-        .animate(_shimmerController);
+    _shimmerAnimation = Tween<double>(
+      begin: -1.5,
+      end: 1.5,
+    ).animate(_shimmerController);
 
     if (widget.status == OpenRedPacketStatus.opened) {
       _showResult = true;
@@ -189,9 +217,10 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                 ? Text(
                     widget.senderName.isNotEmpty ? widget.senderName[0] : '?',
                     style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   )
                 : null,
           ),
@@ -201,7 +230,10 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             S.of(context)?.commonSenderRedPacket(widget.senderName) ??
                 "${widget.senderName}'s Red Packet",
             style: const TextStyle(
-                color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 8),
 
@@ -229,18 +261,20 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 12,
-                              offset: Offset(0, 4)),
+                            color: Colors.black26,
+                            blurRadius: 12,
+                            offset: Offset(0, 4),
+                          ),
                         ],
                       ),
                       child: Center(
                         child: Text(
                           S.of(context)?.commonOpenRedPacket ?? 'Open',
                           style: const TextStyle(
-                              color: Color(0xFFB8860B),
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold),
+                            color: Color(0xFFB8860B),
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -276,17 +310,19 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
         message = S.of(context)?.commonClaimed ?? 'Claimed';
       case OpenRedPacketStatus.empty:
         message =
-            S.of(context)?.commonRedPacketAllClaimed ?? 'Red packet all claimed';
+            S.of(context)?.commonRedPacketAllClaimed ??
+            'Red packet all claimed';
       case OpenRedPacketStatus.expired:
-        message =
-            S.of(context)?.commonRedPacketExpired ?? 'Red packet expired';
+        message = S.of(context)?.commonRedPacketExpired ?? 'Red packet expired';
       default:
         message = '';
     }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Text(message,
-          style: const TextStyle(color: Colors.white70, fontSize: 16)),
+      child: Text(
+        message,
+        style: const TextStyle(color: Colors.white70, fontSize: 16),
+      ),
     );
   }
 
@@ -319,16 +355,18 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                   alignment: Alignment.topRight,
                   child: GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.close,
-                        color: Colors.white70, size: 24),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white70,
+                      size: 24,
+                    ),
                   ),
                 ),
 
                 Text(
                   S.of(context)?.commonSenderRedPacket(widget.senderName) ??
                       "${widget.senderName}'s Red Packet",
-                  style:
-                      const TextStyle(color: Colors.white, fontSize: 14),
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -356,7 +394,9 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                           child: Text(
                             ' ${widget.token}',
                             style: const TextStyle(
-                                color: Colors.white, fontSize: 18),
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
                       ],
@@ -384,8 +424,9 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                     S.of(context)?.commonViewRedPacketDetails ??
                         'View Red Packet Details',
                     style: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500),
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -435,7 +476,8 @@ class _BestLuckBanner extends StatelessWidget {
           color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: const Color(0xFFFFD700).withValues(alpha: 0.5)),
+            color: const Color(0xFFFFD700).withValues(alpha: 0.5),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -460,11 +502,6 @@ class _BestLuckBanner extends StatelessWidget {
 
 // ─── Status enum ─────────────────────────────────────────────────────────────
 
-enum OpenRedPacketStatus {
-  canOpen,
-  opened,
-  empty,
-  expired,
-}
+enum OpenRedPacketStatus { canOpen, opened, empty, expired }
 
 /// 发转账页面（全屏，解决溢出问题）

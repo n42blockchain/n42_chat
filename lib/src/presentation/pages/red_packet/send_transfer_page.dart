@@ -19,7 +19,7 @@ class SendTransferPage extends StatefulWidget {
     this.receiverAvatar,
     required this.onSend,
   });
-  
+
   @override
   State<SendTransferPage> createState() => _SendTransferPageState();
 }
@@ -27,30 +27,31 @@ class SendTransferPage extends StatefulWidget {
 class _SendTransferPageState extends State<SendTransferPage> {
   final _amountController = TextEditingController();
   final _memoController = TextEditingController();
-  
+
   String _selectedToken = 'CNY';
   var _isSending = false;
   var _submitAttempt = 0;
   RegExp? _cachedAmountRegex;
   String? _cachedAmountPattern;
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
-  
+
   /// 获取当前币种的小数位数限制
   int get _decimalPlaces {
     switch (_selectedToken) {
       case 'BTC':
-        return 8;  // BTC 最多 8 位小数
+        return 8; // BTC 最多 8 位小数
       case 'ETH':
         return 18; // ETH 最多 18 位小数
       case 'CNY':
       case 'USDT':
       default:
-        return 2;  // CNY/USDT 最多 2 位小数
+        return 2; // CNY/USDT 最多 2 位小数
     }
   }
-  
+
   /// 获取金额输入的正则表达式
-  String get _amountPattern => r'^\d*\.?\d{0,' + _decimalPlaces.toString() + r'}';
+  String get _amountPattern =>
+      r'^\d*\.?\d{0,' + _decimalPlaces.toString() + r'}';
 
   RegExp get _amountRegex {
     final pattern = _amountPattern;
@@ -66,10 +67,10 @@ class _SendTransferPageState extends State<SendTransferPage> {
   void _validateAmountDecimals() {
     final text = _amountController.text;
     if (text.isEmpty) return;
-    
+
     final dotIndex = text.indexOf('.');
     if (dotIndex == -1) return; // 没有小数点，不需要处理
-    
+
     final decimals = text.length - dotIndex - 1;
     if (decimals > _decimalPlaces) {
       // 截断多余的小数位
@@ -79,21 +80,26 @@ class _SendTransferPageState extends State<SendTransferPage> {
       );
     }
   }
-  
+
   @override
   void dispose() {
     _amountController.dispose();
     _memoController.dispose();
     super.dispose();
   }
-  
+
   Future<void> _send() async {
     if (_isSending) return;
 
     final amount = _amountController.text.trim();
     if (amount.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.commonEnterTransferAmount ?? 'Please enter transfer amount')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.commonEnterTransferAmount ??
+                'Please enter transfer amount',
+          ),
+        ),
       );
       return;
     }
@@ -103,7 +109,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
     final success = await widget.onSend(
       amount,
       _selectedToken,
-      _memoController.text.trim().isNotEmpty ? _memoController.text.trim() : null,
+      _memoController.text.trim().isNotEmpty
+          ? _memoController.text.trim()
+          : null,
     );
 
     if (!mounted) return;
@@ -118,14 +126,18 @@ class _SendTransferPageState extends State<SendTransferPage> {
       _submitAttempt += 1;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5);
     final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : Colors.grey;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : Colors.grey;
     final chipBgColor = isDark ? Colors.white10 : Colors.grey[100];
     final dividerColor = isDark ? AppColors.dividerDark : AppColors.divider;
 
@@ -141,7 +153,11 @@ class _SendTransferPageState extends State<SendTransferPage> {
         ),
         title: Text(
           S.of(context)?.commonTransfer ?? 'Transfer',
-          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         centerTitle: true,
       ),
@@ -156,14 +172,24 @@ class _SendTransferPageState extends State<SendTransferPage> {
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: isDark ? Colors.grey[700] : Colors.grey[200],
+                    backgroundColor: isDark
+                        ? Colors.grey[700]
+                        : Colors.grey[200],
                     backgroundImage: widget.receiverAvatar != null
                         ? NetworkImage(widget.receiverAvatar!)
                         : null,
                     child: widget.receiverAvatar == null
                         ? Text(
-                            widget.receiverName.isNotEmpty ? widget.receiverName[0] : '?',
-                            style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[600], fontSize: 18, fontWeight: FontWeight.bold),
+                            widget.receiverName.isNotEmpty
+                                ? widget.receiverName[0]
+                                : '?',
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.grey[300]
+                                  : Colors.grey[600],
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           )
                         : null,
                   ),
@@ -172,9 +198,22 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(S.of(context)?.commonTransferTo ?? 'Transfer to', style: TextStyle(fontSize: 13, color: secondaryTextColor)),
+                        Text(
+                          S.of(context)?.commonTransferTo ?? 'Transfer to',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: secondaryTextColor,
+                          ),
+                        ),
                         const SizedBox(height: 2),
-                        Text(widget.receiverName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: textColor)),
+                        Text(
+                          widget.receiverName,
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                            color: textColor,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -191,7 +230,10 @@ class _SendTransferPageState extends State<SendTransferPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(S.of(context)?.commonTransferAmount ?? 'Transfer Amount', style: TextStyle(fontSize: 14, color: secondaryTextColor)),
+                  Text(
+                    S.of(context)?.commonTransferAmount ?? 'Transfer Amount',
+                    style: TextStyle(fontSize: 14, color: secondaryTextColor),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -200,7 +242,10 @@ class _SendTransferPageState extends State<SendTransferPage> {
                       GestureDetector(
                         onTap: _showTokenPicker,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: chipBgColor,
                             borderRadius: BorderRadius.circular(8),
@@ -208,8 +253,19 @@ class _SendTransferPageState extends State<SendTransferPage> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(_selectedToken, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor)),
-                              Icon(Icons.arrow_drop_down, size: 20, color: textColor),
+                              Text(
+                                _selectedToken,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: textColor,
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_drop_down,
+                                size: 20,
+                                color: textColor,
+                              ),
                             ],
                           ),
                         ),
@@ -219,13 +275,20 @@ class _SendTransferPageState extends State<SendTransferPage> {
                       Expanded(
                         child: TextField(
                           controller: _amountController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
                           inputFormatters: [
                             FilteringTextInputFormatter.allow(_amountRegex),
                           ],
-                          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: textColor),
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
                           decoration: InputDecoration(
-                            hintText: S.of(context)?.transferAmountHintZero ?? '0.00',
+                            hintText:
+                                S.of(context)?.transferAmountHintZero ?? '0.00',
                             hintStyle: TextStyle(color: secondaryTextColor),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
@@ -245,8 +308,12 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     maxLength: 50,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
-                      hintText: S.of(context)?.commonAddTransferNote ?? 'Add transfer note',
-                      hintStyle: TextStyle(color: secondaryTextColor.withAlpha(153)),
+                      hintText:
+                          S.of(context)?.commonAddTransferNote ??
+                          'Add transfer note',
+                      hintStyle: TextStyle(
+                        color: secondaryTextColor.withAlpha(153),
+                      ),
                       border: InputBorder.none,
                       counterText: '',
                       contentPadding: EdgeInsets.zero,
@@ -264,7 +331,8 @@ class _SendTransferPageState extends State<SendTransferPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SlideToPayButton(
                 key: ValueKey('send_transfer_submit_$_submitAttempt'),
-                label: S.of(context)?.slideToPayLabel ?? '→→→  Slide to confirm',
+                label:
+                    S.of(context)?.slideToPayLabel ?? '→→→  Slide to confirm',
                 confirmingLabel:
                     S.of(context)?.slideToPayConfirming ?? 'Confirming...',
                 trackColor: const Color(0xFFF9A825),
@@ -282,7 +350,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
   void _showTokenPicker() {
     final isDark = context.isDarkMode;
     final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
 
     showModalBottomSheet<void>(
       context: context,
@@ -296,22 +366,31 @@ class _SendTransferPageState extends State<SendTransferPage> {
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text(S.of(ctx)?.chatSelectCurrency ?? 'Select currency', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor)),
+              child: Text(
+                S.of(ctx)?.chatSelectCurrency ?? 'Select currency',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: textColor,
+                ),
+              ),
             ),
-            ..._tokens.map((token) => ListTile(
-              title: Text(token, style: TextStyle(color: textColor)),
-              trailing: _selectedToken == token
-                  ? const Icon(Icons.check, color: Color(0xFFF9A825))
-                  : null,
-              onTap: () {
-                setState(() {
-                  _selectedToken = token;
-                  // 切换币种时验证金额小数位
-                  _validateAmountDecimals();
-                });
-                Navigator.pop(ctx);
-              },
-            )),
+            ..._tokens.map(
+              (token) => ListTile(
+                title: Text(token, style: TextStyle(color: textColor)),
+                trailing: _selectedToken == token
+                    ? const Icon(Icons.check, color: Color(0xFFF9A825))
+                    : null,
+                onTap: () {
+                  setState(() {
+                    _selectedToken = token;
+                    // 切换币种时验证金额小数位
+                    _validateAmountDecimals();
+                  });
+                  Navigator.pop(ctx);
+                },
+              ),
+            ),
             const SizedBox(height: 16),
           ],
         ),
@@ -346,8 +425,9 @@ class _SendTransferDialogState extends State<SendTransferDialog> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_navigated || !mounted) return;
       _navigated = true;
-      Navigator.of(context).pop();
-      Navigator.of(context).push(
+      final navigator = Navigator.of(context);
+      navigator.pop();
+      navigator.push(
         MaterialPageRoute<void>(
           builder: (_) => SendTransferPage(
             receiverName: widget.receiverName,

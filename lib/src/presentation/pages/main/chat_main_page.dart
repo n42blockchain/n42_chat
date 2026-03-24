@@ -47,10 +47,7 @@ class ChatMainPage extends StatefulWidget {
   /// 返回主应用的回调
   final VoidCallback? onBackToMain;
 
-  const ChatMainPage({
-    super.key,
-    this.onBackToMain,
-  });
+  const ChatMainPage({super.key, this.onBackToMain});
 
   @override
   State<ChatMainPage> createState() => _ChatMainPageState();
@@ -108,27 +105,36 @@ class _ChatMainPageState extends State<ChatMainPage> {
   }
 
   void _openScanQR() {
-    Navigator.of(context).push<Map<String, dynamic>?>(
-      MaterialPageRoute<Map<String, dynamic>?>(builder: (_) => const ScanQRPage()),
-    ).then((result) {
-      if (result != null) {
-        final roomId = result['roomId'];
-        if (roomId != null) {
-          _conversationBloc.add(const RefreshConversations());
-        }
-      }
-    });
+    Navigator.of(context)
+        .push<Map<String, dynamic>?>(
+          MaterialPageRoute<Map<String, dynamic>?>(
+            builder: (_) => const ScanQRPage(),
+          ),
+        )
+        .then((result) {
+          if (!mounted) return;
+          if (result != null) {
+            final roomId = result['roomId'];
+            if (roomId != null) {
+              _conversationBloc.add(const RefreshConversations());
+            }
+          }
+        });
   }
 
   /// 显示微信风格的 "+" 弹出菜单
   void _showAddMenu(BuildContext context) {
     final isDark = context.isDarkMode;
     final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
 
     final position = RelativeRect.fromRect(
       Rect.fromPoints(
-        button.localToGlobal(Offset(button.size.width - 160, 50), ancestor: overlay),
+        button.localToGlobal(
+          Offset(button.size.width - 160, 50),
+          ancestor: overlay,
+        ),
         button.localToGlobal(Offset(button.size.width, 50), ancestor: overlay),
       ),
       Offset.zero & overlay.size,
@@ -139,9 +145,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
       position: position,
       color: isDark ? const Color(0xFF4C4C4C) : Colors.white,
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       items: [
         _buildPopupMenuItem(
           value: 'group',
@@ -169,6 +173,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
         ),
       ],
     ).then((value) {
+      if (!mounted) return;
       if (value == null) return;
       switch (value) {
         case 'group':
@@ -205,10 +210,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
           Flexible(
             child: Text(
               text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: textColor, fontSize: 16),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -218,27 +220,34 @@ class _ChatMainPageState extends State<ChatMainPage> {
   }
 
   void _navigateToCreateGroup() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (_) => getIt<ContactBloc>()..add(const LoadContacts())),
-            BlocProvider(create: (_) => getIt<GroupBloc>()),
-          ],
-          child: const CreateGroupPage(),
-        ),
-      ),
-    ).then((_) {
-      _conversationBloc.add(const RefreshConversations());
-    });
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute<void>(
+            builder: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (_) =>
+                      getIt<ContactBloc>()..add(const LoadContacts()),
+                ),
+                BlocProvider(create: (_) => getIt<GroupBloc>()),
+              ],
+              child: const CreateGroupPage(),
+            ),
+          ),
+        )
+        .then((_) {
+          if (!mounted) return;
+          _conversationBloc.add(const RefreshConversations());
+        });
   }
 
   void _navigateToAddFriend() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const AddFriendPage()),
-    ).then((_) {
-      _conversationBloc.add(const RefreshConversations());
-    });
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => const AddFriendPage()))
+        .then((_) {
+          if (!mounted) return;
+          _conversationBloc.add(const RefreshConversations());
+        });
   }
 
   void _navigateToPayment() {
@@ -309,7 +318,8 @@ class _ChatMainPageState extends State<ChatMainPage> {
           switch (_currentIndex) {
             case 0:
               currentTitle = totalUnread > 0
-                  ? (l10n?.mainMessagesWithCount(totalUnread) ?? 'Messages($totalUnread)')
+                  ? (l10n?.mainMessagesWithCount(totalUnread) ??
+                        'Messages($totalUnread)')
                   : (l10n?.commonMessages ?? 'Messages');
               break;
             case 1:
@@ -338,17 +348,15 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
           // === 手机模式：保持原有布局 ===
           return Scaffold(
-            backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+            backgroundColor: isDark
+                ? AppColors.backgroundDark
+                : AppColors.background,
             appBar: AppBar(
               backgroundColor: bgColor,
               elevation: 0,
               scrolledUnderElevation: 0,
               leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  color: textColor,
-                  size: 20,
-                ),
+                icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
                 onPressed: _handleBack,
               ),
               title: Text(
@@ -364,14 +372,22 @@ class _ChatMainPageState extends State<ChatMainPage> {
                 if (_currentIndex == 0) ...[
                   Builder(
                     builder: (ctx) => IconButton(
-                      icon: Icon(Icons.add_circle_outline, color: textColor, size: 22),
+                      icon: Icon(
+                        Icons.add_circle_outline,
+                        color: textColor,
+                        size: 22,
+                      ),
                       onPressed: () => _showAddMenu(ctx),
                     ),
                   ),
                 ],
                 if (_currentIndex == 1)
                   IconButton(
-                    icon: Icon(Icons.person_add_outlined, color: textColor, size: 22),
+                    icon: Icon(
+                      Icons.person_add_outlined,
+                      color: textColor,
+                      size: 22,
+                    ),
                     onPressed: _navigateToAddFriend,
                   ),
                 const SizedBox(width: 8),
@@ -421,7 +437,11 @@ class _ChatMainPageState extends State<ChatMainPage> {
                   scrolledUnderElevation: 0,
                   automaticallyImplyLeading: false,
                   leading: IconButton(
-                    icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: textColor,
+                      size: 20,
+                    ),
                     onPressed: _handleBack,
                   ),
                   title: Text(
@@ -437,13 +457,21 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     if (_currentIndex == 0)
                       Builder(
                         builder: (ctx) => IconButton(
-                          icon: Icon(Icons.add_circle_outline, color: textColor, size: 20),
+                          icon: Icon(
+                            Icons.add_circle_outline,
+                            color: textColor,
+                            size: 20,
+                          ),
                           onPressed: () => _showAddMenu(ctx),
                         ),
                       ),
                     if (_currentIndex == 1)
                       IconButton(
-                        icon: Icon(Icons.person_add_outlined, color: textColor, size: 20),
+                        icon: Icon(
+                          Icons.person_add_outlined,
+                          color: textColor,
+                          size: 20,
+                        ),
                         onPressed: _navigateToAddFriend,
                       ),
                     const SizedBox(width: 4),
@@ -478,9 +506,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
             color: isDark ? AppColors.dividerDark : AppColors.divider,
           ),
           // --- 右侧面板：聊天内容或空状态 ---
-          Expanded(
-            child: _buildRightPanel(isDark),
-          ),
+          Expanded(child: _buildRightPanel(isDark)),
         ],
       ),
     );
@@ -496,14 +522,18 @@ class _ChatMainPageState extends State<ChatMainPage> {
             Icon(
               Icons.chat_bubble_outline,
               size: 64,
-              color: isDark ? AppColors.textSecondaryDark : const Color(0xFFBDBDBD),
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : const Color(0xFFBDBDBD),
             ),
             const SizedBox(height: 16),
             Text(
               S.of(context)?.commonMessages ?? 'Select a conversation',
               style: TextStyle(
                 fontSize: 16,
-                color: isDark ? AppColors.textSecondaryDark : const Color(0xFF9E9E9E),
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : const Color(0xFF9E9E9E),
               ),
             ),
           ],
@@ -528,7 +558,9 @@ class _ChatMainPageState extends State<ChatMainPage> {
   Widget _buildBottomNavigationBar(bool isDark, int totalUnread) {
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     const selectedColor = Color(0xFF07C160);
-    final unselectedColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final unselectedColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Container(
       decoration: BoxDecoration(
@@ -690,10 +722,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-      constraints: BoxConstraints(
-        minWidth: minWidth,
-        minHeight: 16,
-      ),
+      constraints: BoxConstraints(minWidth: minWidth, minHeight: 16),
       decoration: BoxDecoration(
         color: AppColors.badge,
         borderRadius: BorderRadius.circular(8),
@@ -726,7 +755,10 @@ class _ChatTabContent extends StatelessWidget {
     required this.contactBloc,
   });
 
-  void _navigateToChat(BuildContext context, ConversationEntity conversation) async {
+  void _navigateToChat(
+    BuildContext context,
+    ConversationEntity conversation,
+  ) async {
     // Check if chat is locked
     final lockService = ChatLockService();
     final isLocked = await lockService.isChatLocked(conversation.id);
@@ -745,22 +777,27 @@ class _ChatTabContent extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    unawaited(Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (_) => getIt<ChatBloc>()),
-            BlocProvider.value(value: contactBloc),
-          ],
-          child: ChatPage(
-            conversation: conversation,
-            onBack: () => Navigator.of(context).pop(),
-          ),
-        ),
-      ),
-    ).then((_) {
-      conversationBloc.add(const RefreshConversations());
-    }));
+    unawaited(
+      Navigator.of(context)
+          .push(
+            MaterialPageRoute<void>(
+              builder: (_) => MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (_) => getIt<ChatBloc>()),
+                  BlocProvider.value(value: contactBloc),
+                ],
+                child: ChatPage(
+                  conversation: conversation,
+                  onBack: () => Navigator.of(context).pop(),
+                ),
+              ),
+            ),
+          )
+          .then((_) {
+            if (!context.mounted) return;
+            conversationBloc.add(const RefreshConversations());
+          }),
+    );
   }
 
   @override
@@ -768,7 +805,8 @@ class _ChatTabContent extends StatelessWidget {
     return BlocProvider.value(
       value: conversationBloc,
       child: ConversationListPage(
-        onConversationTap: (conversation) => _navigateToChat(context, conversation),
+        onConversationTap: (conversation) =>
+            _navigateToChat(context, conversation),
         onSearchTap: () {
           debugLog('Open search');
         },

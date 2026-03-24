@@ -681,7 +681,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _editTopic(GroupEntity group) {
@@ -719,7 +719,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _editAnnouncement(GroupEntity group) {
@@ -758,7 +758,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _showMaxMembersDialog(GroupEntity group) {
@@ -803,7 +803,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _navigateToMemberList(GroupEntity group) {

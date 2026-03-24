@@ -56,6 +56,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
       final client = clientManager.client;
 
       if (client != null && client.isLogged()) {
+        if (!mounted) return;
         setState(() {
           _userId = client.userID;
           _displayName =

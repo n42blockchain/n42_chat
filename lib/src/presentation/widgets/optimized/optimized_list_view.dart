@@ -28,7 +28,8 @@ class OptimizedMessageListView extends StatefulWidget {
   });
 
   @override
-  State<OptimizedMessageListView> createState() => _OptimizedMessageListViewState();
+  State<OptimizedMessageListView> createState() =>
+      _OptimizedMessageListViewState();
 }
 
 class _OptimizedMessageListViewState extends State<OptimizedMessageListView> {
@@ -136,16 +137,11 @@ class _OptimizedMessageListViewState extends State<OptimizedMessageListView> {
 class _OptimizedListItem extends StatelessWidget {
   final Widget Function() builder;
 
-  const _OptimizedListItem({
-    super.key,
-    required this.builder,
-  });
+  const _OptimizedListItem({super.key, required this.builder});
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: builder(),
-    );
+    return RepaintBoundary(child: builder());
   }
 }
 
@@ -189,6 +185,7 @@ class _VirtualizedListViewState<T> extends State<VirtualizedListView<T>> {
     }
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -214,10 +211,7 @@ class _MeasuredItem extends StatefulWidget {
   final Widget child;
   final void Function(double height) onMeasured;
 
-  const _MeasuredItem({
-    required this.child,
-    required this.onMeasured,
-  });
+  const _MeasuredItem({required this.child, required this.onMeasured});
 
   @override
   State<_MeasuredItem> createState() => _MeasuredItemState();
@@ -231,6 +225,7 @@ class _MeasuredItemState extends State<_MeasuredItem> {
   }
 
   void _measureHeight(_) {
+    if (!mounted) return;
     final renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       widget.onMeasured(renderBox.size.height);
@@ -252,11 +247,7 @@ extension SmoothScrollExtension on ScrollController {
   }) async {
     if (!hasClients) return;
 
-    await animateTo(
-      0,
-      duration: duration,
-      curve: curve,
-    );
+    await animateTo(0, duration: duration, curve: curve);
   }
 
   /// 平滑滚动到顶部
@@ -266,11 +257,7 @@ extension SmoothScrollExtension on ScrollController {
   }) async {
     if (!hasClients) return;
 
-    await animateTo(
-      position.maxScrollExtent,
-      duration: duration,
-      curve: curve,
-    );
+    await animateTo(position.maxScrollExtent, duration: duration, curve: curve);
   }
 
   /// 检查是否在底部附近
@@ -285,4 +272,3 @@ extension SmoothScrollExtension on ScrollController {
     return position.pixels >= position.maxScrollExtent - threshold;
   }
 }
-
