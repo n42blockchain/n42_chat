@@ -483,10 +483,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       ),
     );
 
-    if (selected != null && selected != _notificationMode) {
-      setState(() => _notificationMode = selected);
-      await _updateNotificationMode(selected);
+    if (!mounted || selected == null || selected == _notificationMode) {
+      return;
     }
+
+    setState(() => _notificationMode = selected);
+    await _updateNotificationMode(selected);
   }
 
   /// 更新置顶状态

@@ -94,6 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadUserInfo() async {
+    if (!mounted) return;
     try {
       final clientManager = getIt<MatrixClientManager>();
       final client = clientManager.client;
@@ -673,6 +674,7 @@ class _ProfilePageState extends State<ProfilePage> {
         )
         .then((_) {
           // 返回后刷新用户信息
+          if (!mounted) return;
           _loadUserInfo();
         });
   }
@@ -690,6 +692,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         )
         .then((_) {
+          if (!mounted) return;
           _loadUserInfo();
         });
   }

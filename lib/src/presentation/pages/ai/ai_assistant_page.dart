@@ -24,9 +24,9 @@ class AiAssistantPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AiAssistantBloc(
-        aiRepository: getIt<IAiRepository>(),
-      )..add(InitializeAiAssistant(assistantId: assistantId)),
+      create: (_) =>
+          AiAssistantBloc(aiRepository: getIt<IAiRepository>())
+            ..add(InitializeAiAssistant(assistantId: assistantId)),
       child: const _AiAssistantView(),
     );
   }
@@ -68,6 +68,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -110,9 +111,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
           _lastShownError = null;
         } else if (state.error != _lastShownError) {
           _lastShownError = state.error;
-          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-            SnackBar(content: Text(state.error!)),
-          );
+          ScaffoldMessenger.maybeOf(
+            context,
+          )?.showSnackBar(SnackBar(content: Text(state.error!)));
         }
         if (state.isGenerating || state.messages.isNotEmpty) {
           _scrollToBottom();
@@ -122,7 +123,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
         final assistantName = state.assistant?.name ?? 'N42 AI';
 
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: isDark
+              ? AppColors.backgroundDark
+              : AppColors.background,
           appBar: N42AppBar(
             title: assistantName,
             actions: [
@@ -205,7 +208,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             ),
             const SizedBox(height: 8),
             Text(
-              l10n?.aiAssistantWelcome ?? 'Ask me anything! I can help with questions, writing, analysis, and more.',
+              l10n?.aiAssistantWelcome ??
+                  'Ask me anything! I can help with questions, writing, analysis, and more.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -215,18 +219,19 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             if (!state.isAvailable) ...[
               const SizedBox(height: 16),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  l10n?.aiAssistantNotConfigured ?? 'AI service not configured. Please set API key in settings.',
+                  l10n?.aiAssistantNotConfigured ??
+                      'AI service not configured. Please set API key in settings.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.orange,
-                  ),
+                  style: const TextStyle(fontSize: 13, color: Colors.orange),
                 ),
               ),
             ],
@@ -250,7 +255,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   ),
                   _buildSuggestionChip(
                     context,
-                    l10n?.aiSuggestionSecurity ?? 'How to check contract security',
+                    l10n?.aiSuggestionSecurity ??
+                        'How to check contract security',
                     Icons.security_outlined,
                   ),
                   _buildSuggestionChip(
@@ -285,12 +291,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
       backgroundColor: isDark
           ? AppColors.primary.withValues(alpha: 0.15)
           : AppColors.primary.withValues(alpha: 0.08),
-      side: BorderSide(
-        color: AppColors.primary.withValues(alpha: 0.2),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       onPressed: () {
         context.read<AiAssistantBloc>().add(SendAiMessage(label));
       },
@@ -303,7 +305,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
@@ -355,14 +359,18 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                           ),
                           code: TextStyle(
                             fontSize: 13,
-                            color: isDark ? Colors.greenAccent.shade200 : Colors.green.shade800,
+                            color: isDark
+                                ? Colors.greenAccent.shade200
+                                : Colors.green.shade800,
                             backgroundColor: isDark
                                 ? Colors.black26
                                 : Colors.grey.shade100,
                             fontFamily: 'monospace',
                           ),
                           codeblockDecoration: BoxDecoration(
-                            color: isDark ? Colors.black26 : Colors.grey.shade100,
+                            color: isDark
+                                ? Colors.black26
+                                : Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           listBullet: TextStyle(
@@ -383,7 +391,11 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              child: const Icon(Icons.person, size: 18, color: AppColors.primary),
+              child: const Icon(
+                Icons.person,
+                size: 18,
+                color: AppColors.primary,
+              ),
             ),
           ],
         ],
@@ -409,9 +421,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-                borderRadius: BorderRadius.circular(16).copyWith(
-                  topLeft: const Radius.circular(4),
-                ),
+                borderRadius: BorderRadius.circular(
+                  16,
+                ).copyWith(topLeft: const Radius.circular(4)),
               ),
               child: text.isEmpty
                   ? _buildTypingIndicator()
@@ -460,9 +472,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
         border: Border(
-          top: BorderSide(
-            color: isDark ? Colors.white12 : Colors.black12,
-          ),
+          top: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
         ),
       ),
       child: Row(
@@ -472,7 +482,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             child: Container(
               constraints: const BoxConstraints(maxHeight: 120),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF5F5F5),
+                color: isDark
+                    ? const Color(0xFF2C2C2E)
+                    : const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: TextField(
@@ -503,7 +515,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
           const SizedBox(width: 8),
           if (state.isGenerating)
             IconButton(
-              onPressed: () => context.read<AiAssistantBloc>().add(const StopAiGeneration()),
+              onPressed: () =>
+                  context.read<AiAssistantBloc>().add(const StopAiGeneration()),
               icon: Container(
                 width: 32,
                 height: 32,
@@ -524,7 +537,11 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   color: canSend ? AppColors.primary : Colors.grey,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(Icons.arrow_upward, color: Colors.white, size: 18),
+                child: const Icon(
+                  Icons.arrow_upward,
+                  color: Colors.white,
+                  size: 18,
+                ),
               ),
             ),
         ],
@@ -560,7 +577,10 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n?.aiAssistantClearHistory ?? 'Clear History'),
-        content: Text(l10n?.aiAssistantClearHistoryConfirm ?? 'Are you sure you want to clear all chat history?'),
+        content: Text(
+          l10n?.aiAssistantClearHistoryConfirm ??
+              'Are you sure you want to clear all chat history?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -592,7 +612,8 @@ class _TypingDot extends StatefulWidget {
   State<_TypingDot> createState() => _TypingDotState();
 }
 
-class _TypingDotState extends State<_TypingDot> with SingleTickerProviderStateMixin {
+class _TypingDotState extends State<_TypingDot>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -603,9 +624,10 @@ class _TypingDotState extends State<_TypingDot> with SingleTickerProviderStateMi
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     Future.delayed(Duration(milliseconds: widget.delay), () {
       if (mounted) _controller.repeat(reverse: true);

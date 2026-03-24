@@ -279,11 +279,13 @@ extension _ChatPageInputMethods on _ChatPageState {
       ),
     );
 
-    if (result != null) {
-      setState(() {
-        _selfDestructAfter = result == -1 ? null : result;
-      });
+    if (!mounted || result == null) {
+      return;
     }
+
+    setState(() {
+      _selfDestructAfter = result == -1 ? null : result;
+    });
   }
 
   /// View Once 提示条

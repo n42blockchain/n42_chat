@@ -58,6 +58,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   }
 
   Future<void> _checkCameraPermission() async {
+    if (!mounted) return;
     setState(() {
       _isCheckingPermission = true;
       _permissionError = null;
@@ -65,6 +66,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
     try {
       var status = await Permission.camera.status;
+      if (!mounted) return;
       debugLog('Camera permission initial status: $status');
 
       // Handle granted or limited (iOS 14+ limited access is still usable for camera)
@@ -80,6 +82,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       // If denied, try to request permission
       if (status.isDenied) {
         status = await Permission.camera.request();
+        if (!mounted) return;
         debugLog('Camera permission after request: $status');
 
         if (status.isGranted || status.isLimited) {
@@ -125,6 +128,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             'Camera permission is required to scan QR code';
       });
     } catch (e) {
+      if (!mounted) return;
       debugLog('Camera permission check error: $e');
       setState(() {
         _hasPermission = false;
