@@ -44,6 +44,7 @@ class _SpaceDetailPageState extends State<SpaceDetailPage> {
     super.initState();
     // 进入页面时加载详情（含子频道层级）
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       context.read<SpaceBloc>().add(LoadSpaceDetail(widget.spaceId));
       context.read<SpaceBloc>().add(LoadSpaceMembers(widget.spaceId));
     });

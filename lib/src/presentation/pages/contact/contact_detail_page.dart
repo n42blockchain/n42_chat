@@ -23,16 +23,16 @@ import '../../../core/utils/debug_log.dart';
 class ContactDetailPage extends StatefulWidget {
   /// 联系人用户ID
   final String userId;
-  
+
   /// 联系人显示名称
   final String displayName;
-  
+
   /// 联系人头像URL
   final String? avatarUrl;
-  
+
   /// 发消息回调
   final VoidCallback? onSendMessage;
-  
+
   /// 音视频通话回调
   final VoidCallback? onVideoCall;
 
@@ -60,6 +60,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _loadContact();
     });
     _remarkSubscription = RemarkService.instance.onRemarkUpdated.listen(
@@ -68,14 +69,15 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   }
 
   void _loadContact() {
+    if (!mounted) return;
     final contactBloc = _maybeContactBloc();
     if (contactBloc == null) return;
 
     final contactState = contactBloc.state;
     if (contactState.isLoaded) {
-      final contact = contactState.contacts.where(
-        (ContactEntity c) => c.userId == widget.userId
-      ).firstOrNull;
+      final contact = contactState.contacts
+          .where((ContactEntity c) => c.userId == widget.userId)
+          .firstOrNull;
       if (mounted) {
         final nextContact = _mergeRemarkIntoContact(contact);
         final nextIsFriend = nextContact != null;
@@ -140,7 +142,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     _remarkSubscription?.cancel();
     super.dispose();
   }
-  
+
   String get _effectiveDisplayName {
     // 优先从 RemarkService 获取
     final remark = RemarkService.instance.getRemark(widget.userId);
@@ -153,7 +155,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     }
     return widget.displayName;
   }
-  
+
   String get _n42Id {
     // 从 userId 提取 N42 ID
     if (widget.userId.startsWith('@')) {
@@ -174,170 +176,170 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     final textColor = isDark ? Colors.white : Colors.black;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
-    
+
     // 检查 ContactBloc 是否可用
     final hasContactBloc = _maybeContactBloc() != null;
-    
+
     final Widget scaffold = Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
         backgroundColor: bgColor,
-        appBar: AppBar(
-          backgroundColor: bgColor,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.more_horiz, color: textColor),
-              onPressed: () => _openSettings(),
-            ),
-          ],
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              
-              // 用户信息卡片
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 头像
-                    N42Avatar(
-                      imageUrl: widget.avatarUrl,
-                      name: _effectiveDisplayName,
-                      size: 64,
-                      borderRadius: 8,
-                    ),
-                    const SizedBox(width: 16),
-                    
-                    // 名称和ID
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _effectiveDisplayName,
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              color: textColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            S.of(context)?.contactN42Id(_n42Id) ?? 'N42 ID: $_n42Id',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // 星标
-                    if (_isStarred)
-                      const Icon(
-                        Icons.star,
-                        color: Color(0xFFFFD700),
-                        size: 24,
-                      ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // 朋友资料
-              _buildMenuSection(
-                cardColor: cardColor,
-                dividerColor: dividerColor,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.more_horiz, color: textColor),
+            onPressed: () => _openSettings(),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+
+            // 用户信息卡片
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildMenuItem(
-                    title: S.of(context)?.contactFriendInfo ?? 'Friend Info',
-                    subtitle: S.of(context)?.contactFriendInfoDesc ?? 'Add friend\'s remark, phone, tags, notes, photos and set permissions.',
-                    textColor: textColor,
-                    secondaryTextColor: secondaryTextColor,
-                    onTap: () => _openFriendInfo(),
+                  // 头像
+                  N42Avatar(
+                    imageUrl: widget.avatarUrl,
+                    name: _effectiveDisplayName,
+                    size: 64,
+                    borderRadius: 8,
                   ),
-                ],
-              ),
-              
-              const SizedBox(height: 8),
-              
-              // 朋友圈
-              _buildMenuSection(
-                cardColor: cardColor,
-                dividerColor: dividerColor,
-                children: [
-                  _buildMenuItem(
-                    title: S.of(context)?.commonMoments ?? 'Moments',
-                    textColor: textColor,
-                    secondaryTextColor: secondaryTextColor,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => MomentListPage(
-                            userId: widget.userId,
-                            userName: _effectiveDisplayName,
-                            userAvatarUrl: widget.avatarUrl,
+                  const SizedBox(width: 16),
+
+                  // 名称和ID
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _effectiveDisplayName,
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
                           ),
                         ),
-                      );
-                    },
+                        const SizedBox(height: 4),
+                        Text(
+                          S.of(context)?.contactN42Id(_n42Id) ??
+                              'N42 ID: $_n42Id',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
+                  // 星标
+                  if (_isStarred)
+                    const Icon(Icons.star, color: Color(0xFFFFD700), size: 24),
                 ],
               ),
-              
-              const SizedBox(height: 8),
-              
-              // 视频号
-              _buildMenuSection(
-                cardColor: cardColor,
-                dividerColor: dividerColor,
-                children: [
-                  _buildVideoSection(textColor, secondaryTextColor),
-                ],
-              ),
-              
-              const SizedBox(height: 32),
+            ),
 
-              // 根据是否是好友显示不同按钮
-              if (_isFriend) ...[
-                // 好友：显示发消息和音视频通话按钮
-                _buildActionButton(
-                  icon: Icons.chat_bubble_outline,
-                  label: S.of(context)?.commonSendMessage ?? 'Message',
-                  onTap: widget.onSendMessage ?? () => Navigator.of(context).pop(),
+            const SizedBox(height: 32),
+
+            // 朋友资料
+            _buildMenuSection(
+              cardColor: cardColor,
+              dividerColor: dividerColor,
+              children: [
+                _buildMenuItem(
+                  title: S.of(context)?.contactFriendInfo ?? 'Friend Info',
+                  subtitle:
+                      S.of(context)?.contactFriendInfoDesc ??
+                      'Add friend\'s remark, phone, tags, notes, photos and set permissions.',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: () => _openFriendInfo(),
                 ),
-
-                const SizedBox(height: 12),
-
-                _buildActionButton(
-                  icon: Icons.phone_outlined,
-                  label: S.of(context)?.contactAudioVideoCall ?? 'Audio/Video Call',
-                  onTap: widget.onVideoCall ?? () {},
-                ),
-              ] else ...[
-                // 非好友：显示添加好友按钮
-                _buildAddFriendButton(),
               ],
+            ),
 
-              const SizedBox(height: 32),
+            const SizedBox(height: 8),
+
+            // 朋友圈
+            _buildMenuSection(
+              cardColor: cardColor,
+              dividerColor: dividerColor,
+              children: [
+                _buildMenuItem(
+                  title: S.of(context)?.commonMoments ?? 'Moments',
+                  textColor: textColor,
+                  secondaryTextColor: secondaryTextColor,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => MomentListPage(
+                          userId: widget.userId,
+                          userName: _effectiveDisplayName,
+                          userAvatarUrl: widget.avatarUrl,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // 视频号
+            _buildMenuSection(
+              cardColor: cardColor,
+              dividerColor: dividerColor,
+              children: [_buildVideoSection(textColor, secondaryTextColor)],
+            ),
+
+            const SizedBox(height: 32),
+
+            // 根据是否是好友显示不同按钮
+            if (_isFriend) ...[
+              // 好友：显示发消息和音视频通话按钮
+              _buildActionButton(
+                icon: Icons.chat_bubble_outline,
+                label: S.of(context)?.commonSendMessage ?? 'Message',
+                onTap:
+                    widget.onSendMessage ?? () => Navigator.of(context).pop(),
+              ),
+
+              const SizedBox(height: 12),
+
+              _buildActionButton(
+                icon: Icons.phone_outlined,
+                label:
+                    S.of(context)?.contactAudioVideoCall ?? 'Audio/Video Call',
+                onTap: widget.onVideoCall ?? () {},
+              ),
+            ] else ...[
+              // 非好友：显示添加好友按钮
+              _buildAddFriendButton(),
             ],
-          ),
+
+            const SizedBox(height: 32),
+          ],
         ),
+      ),
     );
-    
+
     // 如果有 ContactBloc，用 BlocListener 包装
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state.status == ContactStatus.remarkUpdated && state.updatedRemarkUserId == widget.userId) {
+          if (state.status == ContactStatus.remarkUpdated &&
+              state.updatedRemarkUserId == widget.userId) {
             _handleRemarkUpdate(
               RemarkUpdateEvent(
                 userId: widget.userId,
@@ -351,10 +353,10 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         child: scaffold,
       );
     }
-    
+
     return scaffold;
   }
-  
+
   Widget _buildMenuSection({
     required Color cardColor,
     required Color dividerColor,
@@ -369,12 +371,10 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
           bottom: BorderSide(color: dividerColor, width: 0.5),
         ),
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
-  
+
   Widget _buildMenuItem({
     required String title,
     String? subtitle,
@@ -392,37 +392,24 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: textColor,
-                    ),
-                  ),
+                  Text(title, style: TextStyle(fontSize: 16, color: textColor)),
                   if (subtitle != null) ...[
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: secondaryTextColor,
-                      ),
+                      style: TextStyle(fontSize: 13, color: secondaryTextColor),
                     ),
                   ],
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: secondaryTextColor,
-              size: 20,
-            ),
+            Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildVideoSection(Color textColor, Color secondaryTextColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -433,19 +420,13 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             children: [
               Text(
                 S.of(context)?.contactVideoChannel ?? 'Video Channel',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
-                ),
+                style: TextStyle(fontSize: 16, color: textColor),
               ),
               const SizedBox(width: 24),
               Expanded(
                 child: Text(
                   _effectiveDisplayName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: textColor,
-                  ),
+                  style: TextStyle(fontSize: 16, color: textColor),
                 ),
               ),
             ],
@@ -485,11 +466,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Icon(
-                  Icons.chevron_right,
-                  color: secondaryTextColor,
-                  size: 20,
-                ),
+                Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
               ],
             ),
           ),
@@ -497,7 +474,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       ),
     );
   }
-  
+
   Widget _buildActionButton({
     required IconData icon,
     required String label,
@@ -525,13 +502,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             children: [
               Icon(icon, color: iconColor, size: 20),
               const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
-                ),
-              ),
+              Text(label, style: TextStyle(fontSize: 16, color: textColor)),
             ],
           ),
         ),
@@ -549,9 +520,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -572,10 +541,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               _isAddingFriend
                   ? (S.of(context)?.contactAddingToContacts ?? 'Adding...')
                   : (S.of(context)?.contactAddToContacts ?? 'Add to Contacts'),
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -602,13 +568,22 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.contactAddedToContacts ?? 'Added to contacts')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.contactAddedToContacts ?? 'Added to contacts',
+            ),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context)?.contactAddFailedWithError(e.toString()) ?? 'Add failed: $e')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.contactAddFailedWithError(e.toString()) ??
+                  'Add failed: $e',
+            ),
+          ),
         );
       }
     } finally {
@@ -624,59 +599,63 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     // 获取当前的 ContactBloc
     final contactBloc = _maybeContactBloc();
 
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (ctx) {
-          final page = ContactSettingsPage(
-            userId: widget.userId,
-            displayName: _effectiveDisplayName,
-            isStarred: _isStarred,
-            onStarChanged: (starred) {
-              setState(() {
-                _isStarred = starred;
-              });
-            },
-          );
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute<void>(
+            builder: (ctx) {
+              final page = ContactSettingsPage(
+                userId: widget.userId,
+                displayName: _effectiveDisplayName,
+                isStarred: _isStarred,
+                onStarChanged: (starred) {
+                  setState(() {
+                    _isStarred = starred;
+                  });
+                },
+              );
 
-          if (contactBloc != null) {
-            return BlocProvider.value(
-              value: contactBloc,
-              child: page,
-            );
-          }
-          return page;
-        },
-      ),
-    ).then((_) {
-      // 返回时刷新联系人信息
-      _loadContact();
-    });
+              if (contactBloc != null) {
+                return BlocProvider.value(value: contactBloc, child: page);
+              }
+              return page;
+            },
+          ),
+        )
+        .then((_) {
+          // 返回时刷新联系人信息
+          if (!mounted) return;
+          _loadContact();
+        });
   }
-  
+
   void _openFriendInfo() {
     // 获取当前的 ContactBloc
     final contactBloc = _maybeContactBloc();
-    
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (ctx) {
-          final page = FriendInfoPage(
-            userId: widget.userId,
-            displayName: widget.displayName,
-            avatarUrl: widget.avatarUrl,
-            remark: RemarkService.instance.getRemark(widget.userId) ?? _contact?.remark,
-          );
-          
-          if (contactBloc != null) {
-            return BlocProvider.value(
-              value: contactBloc,
-              child: page,
-            );
-          }
-          return page;
-        },
-      ),
-    ).then((_) => _loadContact());
+
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute<void>(
+            builder: (ctx) {
+              final page = FriendInfoPage(
+                userId: widget.userId,
+                displayName: widget.displayName,
+                avatarUrl: widget.avatarUrl,
+                remark:
+                    RemarkService.instance.getRemark(widget.userId) ??
+                    _contact?.remark,
+              );
+
+              if (contactBloc != null) {
+                return BlocProvider.value(value: contactBloc, child: page);
+              }
+              return page;
+            },
+          ),
+        )
+        .then((_) {
+          if (!mounted) return;
+          _loadContact();
+        });
   }
 }
 
@@ -686,7 +665,7 @@ class FriendInfoPage extends StatefulWidget {
   final String displayName;
   final String? avatarUrl;
   final String? remark;
-  
+
   const FriendInfoPage({
     super.key,
     required this.userId,
@@ -702,7 +681,7 @@ class FriendInfoPage extends StatefulWidget {
 class _FriendInfoPageState extends State<FriendInfoPage> {
   String? _currentRemark;
   StreamSubscription<RemarkUpdateEvent>? _remarkSubscription;
-  
+
   @override
   void initState() {
     super.initState();
@@ -718,7 +697,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     _remarkSubscription?.cancel();
     super.dispose();
   }
-  
+
   void _loadRemark() {
     // 优先从 RemarkService 获取（全局本地缓存）
     final remark = RemarkService.instance.getRemark(widget.userId);
@@ -728,16 +707,16 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
       });
       return;
     }
-    
+
     // 备用：从 ContactBloc 获取
     final contactBloc = _maybeContactBloc();
     if (contactBloc == null) return;
 
     final contactState = contactBloc.state;
     if (contactState.isLoaded) {
-      final contact = contactState.contacts.where(
-        (ContactEntity c) => c.userId == widget.userId
-      ).firstOrNull;
+      final contact = contactState.contacts
+          .where((ContactEntity c) => c.userId == widget.userId)
+          .firstOrNull;
       if (contact != null && mounted) {
         setState(() {
           _currentRemark = contact.remark;
@@ -766,10 +745,10 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
     final labelColor = isDark ? Colors.white38 : Colors.black38;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
-    
+
     // 检查 ContactBloc 是否可用
     final hasContactBloc = _maybeContactBloc() != null;
-    
+
     final Widget scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
@@ -794,7 +773,10 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 备注分组
-            _buildSectionLabel(S.of(context)?.contactRemark ?? 'Remark', labelColor),
+            _buildSectionLabel(
+              S.of(context)?.contactRemark ?? 'Remark',
+              labelColor,
+            ),
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
@@ -838,14 +820,19 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             ),
 
             // 权限分组
-            _buildSectionLabel(S.of(context)?.contactPermissions ?? 'Permissions', labelColor),
+            _buildSectionLabel(
+              S.of(context)?.contactPermissions ?? 'Permissions',
+              labelColor,
+            ),
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
                   title: S.of(context)?.contactPermissions ?? 'Permissions',
-                  value: S.of(context)?.contactChatMomentsEtc ?? 'Chat, Moments, Sports, etc.',
+                  value:
+                      S.of(context)?.contactChatMomentsEtc ??
+                      'Chat, Moments, Sports, etc.',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _openPermissions(),
@@ -854,13 +841,17 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             ),
 
             // 更多信息分组
-            _buildSectionLabel(S.of(context)?.contactMoreInfo ?? 'More Info', labelColor),
+            _buildSectionLabel(
+              S.of(context)?.contactMoreInfo ?? 'More Info',
+              labelColor,
+            ),
             _buildMenuSection(
               cardColor: cardColor,
               dividerColor: dividerColor,
               children: [
                 _buildMenuItem(
-                  title: S.of(context)?.contactCommonGroups ?? 'Groups in common',
+                  title:
+                      S.of(context)?.contactCommonGroups ?? 'Groups in common',
                   value: S.of(context)?.contactGroupCountLabel(0) ?? '0 groups',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
@@ -869,7 +860,9 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 _buildDivider(dividerColor),
                 _buildMenuItem(
                   title: S.of(context)?.contactSource ?? 'Source',
-                  value: S.of(context)?.contactAddedViaSearch ?? 'Added via search',
+                  value:
+                      S.of(context)?.contactAddedViaSearch ??
+                      'Added via search',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () {},
@@ -886,18 +879,19 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 32),
           ],
         ),
       ),
     );
-    
+
     // 如果有 ContactBloc，用 BlocListener 包装
     if (hasContactBloc) {
       return BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
-          if (state.status == ContactStatus.remarkUpdated && state.updatedRemarkUserId == widget.userId) {
+          if (state.status == ContactStatus.remarkUpdated &&
+              state.updatedRemarkUserId == widget.userId) {
             _handleRemarkUpdate(
               RemarkUpdateEvent(
                 userId: widget.userId,
@@ -911,23 +905,17 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         child: scaffold,
       );
     }
-    
+
     return scaffold;
   }
-  
+
   Widget _buildSectionLabel(String label, Color color) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 13,
-          color: color,
-        ),
-      ),
+      child: Text(label, style: TextStyle(fontSize: 13, color: color)),
     );
   }
-  
+
   Widget _buildMenuSection({
     required Color cardColor,
     required Color dividerColor,
@@ -941,12 +929,10 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           bottom: BorderSide(color: dividerColor, width: 0.5),
         ),
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
-  
+
   Widget _buildMenuItem({
     required String title,
     String? value,
@@ -962,13 +948,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         child: Row(
           children: [
             // 左侧标题
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                color: textColor,
-              ),
-            ),
+            Text(title, style: TextStyle(fontSize: 16, color: textColor)),
             // 中间弹性空间
             Expanded(
               child: value != null
@@ -989,25 +969,21 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             // 右侧箭头
             if (showArrow) ...[
               const SizedBox(width: 4),
-              Icon(
-                Icons.chevron_right,
-                color: secondaryTextColor,
-                size: 20,
-              ),
+              Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
             ],
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildDivider(Color color) {
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: Divider(height: 0.5, thickness: 0.5, color: color),
     );
   }
-  
+
   void _openTagsManagement() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -1054,8 +1030,12 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           maxLines: 4,
           style: TextStyle(color: isDark ? Colors.white : Colors.black),
           decoration: InputDecoration(
-            hintText: S.of(context)?.contactNotesHint ?? 'Add notes about this contact',
-            hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+            hintText:
+                S.of(context)?.contactNotesHint ??
+                'Add notes about this contact',
+            hintStyle: TextStyle(
+              color: isDark ? Colors.white54 : Colors.black54,
+            ),
             border: const OutlineInputBorder(),
           ),
         ),
@@ -1088,50 +1068,57 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   void _showPhotosDialog() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.contactPhotos ?? 'Photos') ?? 'Photos coming soon'),
+        content: Text(
+          S
+                  .of(context)
+                  ?.commonFeatureComingSoon(
+                    S.of(context)?.contactPhotos ?? 'Photos',
+                  ) ??
+              'Photos coming soon',
+        ),
         duration: const Duration(seconds: 1),
       ),
     );
   }
 
   void _openEditRemark() {
-    Navigator.of(context).push<String?>(
-      MaterialPageRoute<String?>(
-        builder: (ctx) {
-          // 传递 ContactBloc
-          ContactBloc? contactBloc;
-          try {
-            contactBloc = context.read<ContactBloc>();
-          } catch (e) {
-            // ContactBloc 可能不可用
-            debugLog('Error: $e');
+    Navigator.of(context)
+        .push<String?>(
+          MaterialPageRoute<String?>(
+            builder: (ctx) {
+              // 传递 ContactBloc
+              ContactBloc? contactBloc;
+              try {
+                contactBloc = context.read<ContactBloc>();
+              } catch (e) {
+                // ContactBloc 可能不可用
+                debugLog('Error: $e');
+              }
+
+              final page = EditRemarkPage(
+                userId: widget.userId,
+                currentRemark: _currentRemark,
+                displayName: widget.displayName,
+              );
+
+              if (contactBloc != null) {
+                return BlocProvider.value(value: contactBloc, child: page);
+              }
+              return page;
+            },
+          ),
+        )
+        .then((newRemark) {
+          if (!mounted) return;
+          // 如果有返回值，直接更新显示
+          if (newRemark != null || newRemark == '') {
+            setState(() {
+              _currentRemark = newRemark?.isEmpty == true ? null : newRemark;
+            });
           }
-          
-          final page = EditRemarkPage(
-            userId: widget.userId,
-            currentRemark: _currentRemark,
-            displayName: widget.displayName,
-          );
-          
-          if (contactBloc != null) {
-            return BlocProvider.value(
-              value: contactBloc,
-              child: page,
-            );
-          }
-          return page;
-        },
-      ),
-    ).then((newRemark) {
-      // 如果有返回值，直接更新显示
-      if (newRemark != null || newRemark == '') {
-        setState(() {
-          _currentRemark = newRemark?.isEmpty == true ? null : newRemark;
+          // 同时尝试从 ContactBloc 刷新
+          _loadRemark();
         });
-      }
-      // 同时尝试从 ContactBloc 刷新
-      _loadRemark();
-    });
   }
 }
 
@@ -1140,7 +1127,7 @@ class EditRemarkPage extends StatefulWidget {
   final String userId;
   final String? currentRemark;
   final String displayName;
-  
+
   const EditRemarkPage({
     super.key,
     required this.userId,
@@ -1158,7 +1145,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   late TextEditingController _memoController;
   bool _isSaving = false;
   String? _pendingRemarkToSave;
-  
+
   @override
   void initState() {
     super.initState();
@@ -1168,7 +1155,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     _phoneController = TextEditingController();
     _memoController = TextEditingController();
   }
-  
+
   @override
   void dispose() {
     _remarkController.dispose();
@@ -1176,7 +1163,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     _memoController.dispose();
     super.dispose();
   }
-  
+
   void _showAddPhoneDialog() {
     final phoneController = TextEditingController();
     final isDark = context.isDarkMode;
@@ -1193,8 +1180,11 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
           keyboardType: TextInputType.phone,
           style: TextStyle(color: isDark ? Colors.white : Colors.black),
           decoration: InputDecoration(
-            hintText: S.of(context)?.contactAddPhoneHint ?? 'Enter phone number',
-            hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+            hintText:
+                S.of(context)?.contactAddPhoneHint ?? 'Enter phone number',
+            hintStyle: TextStyle(
+              color: isDark ? Colors.white54 : Colors.black54,
+            ),
             border: const OutlineInputBorder(),
           ),
         ),
@@ -1233,8 +1223,10 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
 
     final remark = _remarkController.text.trim();
     final remarkToSave = remark.isEmpty ? null : remark;
-    
-    debugLog('EditRemarkPage: Saving remark for userId=${widget.userId}, remark=$remark');
+
+    debugLog(
+      'EditRemarkPage: Saving remark for userId=${widget.userId}, remark=$remark',
+    );
 
     if (!mounted) return;
     try {
@@ -1242,7 +1234,9 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         _isSaving = true;
         _pendingRemarkToSave = remarkToSave;
       });
-      context.read<ContactBloc>().add(SetContactRemark(widget.userId, remarkToSave));
+      context.read<ContactBloc>().add(
+        SetContactRemark(widget.userId, remarkToSave),
+      );
       debugLog('EditRemarkPage: ContactBloc notified');
     } catch (e) {
       debugLog('EditRemarkPage: ContactBloc not available: $e');
@@ -1262,11 +1256,13 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
-    final cardColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7);
+    final cardColor = isDark
+        ? const Color(0xFF2C2C2E)
+        : const Color(0xFFF2F2F7);
     final textColor = isDark ? Colors.white : Colors.black;
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     final labelColor = isDark ? Colors.white54 : Colors.black54;
-    
+
     final scaffold = Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
@@ -1280,10 +1276,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
               padding: const EdgeInsets.only(left: 16),
               child: Text(
                 S.of(context)?.commonCancel ?? 'Cancel',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
-                ),
+                style: TextStyle(fontSize: 16, color: textColor),
               ),
             ),
           ),
@@ -1303,7 +1296,10 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
             child: GestureDetector(
               onTap: _isSaving ? null : _save,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(4),
@@ -1335,14 +1331,11 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            
+
             // 备注名
             Text(
               S.of(context)?.contactRemarkName ?? 'Remark Name',
-              style: TextStyle(
-                fontSize: 13,
-                color: labelColor,
-              ),
+              style: TextStyle(fontSize: 13, color: labelColor),
             ),
             const SizedBox(height: 8),
             Container(
@@ -1352,10 +1345,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
               ),
               child: TextField(
                 controller: _remarkController,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
-                ),
+                style: TextStyle(fontSize: 16, color: textColor),
                 decoration: InputDecoration(
                   hintText: widget.displayName,
                   hintStyle: TextStyle(color: hintColor),
@@ -1367,16 +1357,13 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // 电话
             Text(
               S.of(context)?.contactPhone ?? 'Phone',
-              style: TextStyle(
-                fontSize: 13,
-                color: labelColor,
-              ),
+              style: TextStyle(fontSize: 13, color: labelColor),
             ),
             const SizedBox(height: 8),
             Container(
@@ -1402,26 +1389,20 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                       const SizedBox(width: 8),
                       Text(
                         S.of(context)?.contactAddPhone ?? 'Add phone',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: hintColor,
-                        ),
+                        style: TextStyle(fontSize: 16, color: hintColor),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // 标签
             Text(
               S.of(context)?.contactTags ?? 'Tags',
-              style: TextStyle(
-                fontSize: 13,
-                color: labelColor,
-              ),
+              style: TextStyle(fontSize: 13, color: labelColor),
             ),
             const SizedBox(height: 8),
             Container(
@@ -1433,7 +1414,8 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
-                      builder: (_) => const TagsManagementPage(selectMode: true),
+                      builder: (_) =>
+                          const TagsManagementPage(selectMode: true),
                     ),
                   );
                 },
@@ -1447,32 +1429,22 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                     children: [
                       Text(
                         S.of(context)?.contactAddTag ?? 'Add tags',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: hintColor,
-                        ),
+                        style: TextStyle(fontSize: 16, color: hintColor),
                       ),
                       const Spacer(),
-                      Icon(
-                        Icons.chevron_right,
-                        color: hintColor,
-                        size: 20,
-                      ),
+                      Icon(Icons.chevron_right, color: hintColor, size: 20),
                     ],
                   ),
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // 备忘
             Text(
               S.of(context)?.contactNotes ?? 'Notes',
-              style: TextStyle(
-                fontSize: 13,
-                color: labelColor,
-              ),
+              style: TextStyle(fontSize: 13, color: labelColor),
             ),
             const SizedBox(height: 8),
             Container(
@@ -1482,10 +1454,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
               ),
               child: TextField(
                 controller: _memoController,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
-                ),
+                style: TextStyle(fontSize: 16, color: textColor),
                 decoration: InputDecoration(
                   hintText: S.of(context)?.contactAddText ?? 'Add text',
                   hintStyle: TextStyle(color: hintColor),
@@ -1497,16 +1466,13 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // 照片
             Text(
               S.of(context)?.contactPhotos ?? 'Photos',
-              style: TextStyle(
-                fontSize: 13,
-                color: labelColor,
-              ),
+              style: TextStyle(fontSize: 13, color: labelColor),
             ),
             const SizedBox(height: 8),
             Container(
@@ -1520,7 +1486,14 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.contactPhotos ?? 'Photos') ?? 'Photos coming soon'),
+                      content: Text(
+                        S
+                                .of(context)
+                                ?.commonFeatureComingSoon(
+                                  S.of(context)?.contactPhotos ?? 'Photos',
+                                ) ??
+                            'Photos coming soon',
+                      ),
                       duration: const Duration(seconds: 1),
                     ),
                   );
@@ -1529,18 +1502,11 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.add_circle_outline,
-                      color: hintColor,
-                      size: 24,
-                    ),
+                    Icon(Icons.add_circle_outline, color: hintColor, size: 24),
                     const SizedBox(height: 4),
                     Text(
                       S.of(context)?.contactAddPhoto ?? 'Add photo',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: hintColor,
-                      ),
+                      style: TextStyle(fontSize: 12, color: hintColor),
                     ),
                   ],
                 ),
