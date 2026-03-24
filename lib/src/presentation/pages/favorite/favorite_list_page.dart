@@ -19,9 +19,9 @@ class FavoriteListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => FavoriteBloc(
-        repository: GetIt.instance<IMessageActionRepository>(),
-      )..add(const LoadFavorites()),
+      create: (_) =>
+          FavoriteBloc(repository: GetIt.instance<IMessageActionRepository>())
+            ..add(const LoadFavorites()),
       child: const _FavoriteListView(),
     );
   }
@@ -153,10 +153,11 @@ class _FavoriteListView extends StatelessWidget {
                       color: isSelected
                           ? AppColors.primary
                           : (isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary),
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondary),
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -175,8 +176,9 @@ class _FavoriteListView extends StatelessWidget {
   ) {
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? Colors.white : AppColors.textPrimary;
-    final subtitleColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final subtitleColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -199,10 +201,7 @@ class _FavoriteListView extends StatelessWidget {
                   favorite.content,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: textColor,
-                    height: 1.4,
-                  ),
+                  style: TextStyle(color: textColor, height: 1.4),
                 ),
 
                 const SizedBox(height: 8),
@@ -218,18 +217,12 @@ class _FavoriteListView extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       favorite.senderName,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: subtitleColor,
-                      ),
+                      style: TextStyle(fontSize: 12, color: subtitleColor),
                     ),
                     const Spacer(),
                     Text(
                       _formatTime(context, favorite.timestamp),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: subtitleColor,
-                      ),
+                      style: TextStyle(fontSize: 12, color: subtitleColor),
                     ),
                   ],
                 ),
@@ -285,10 +278,7 @@ class _FavoriteListView extends StatelessWidget {
           Text(
             S.of(context)?.favoriteLongPressToFavorite ??
                 'Long press message to favorite',
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textTertiary,
-            ),
+            style: const TextStyle(fontSize: 14, color: AppColors.textTertiary),
           ),
         ],
       ),
@@ -297,10 +287,10 @@ class _FavoriteListView extends StatelessWidget {
 
   void _showSearch(BuildContext context) {
     // 通过 BLoC 搜索
+    final controller = TextEditingController();
     showDialog<void>(
       context: context,
       builder: (dialogContext) {
-        final controller = TextEditingController();
         return AlertDialog(
           title: Text(S.of(context)?.commonSearch ?? 'Search'),
           content: TextField(
@@ -319,16 +309,16 @@ class _FavoriteListView extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-                context
-                    .read<FavoriteBloc>()
-                    .add(SearchFavorites(controller.text));
+                context.read<FavoriteBloc>().add(
+                  SearchFavorites(controller.text),
+                );
               },
               child: Text(S.of(context)?.commonConfirm ?? 'OK'),
             ),
           ],
         );
       },
-    );
+    ).whenComplete(controller.dispose);
   }
 
   void _showFavoriteOptions(BuildContext context, MessageEntity favorite) {
@@ -353,9 +343,7 @@ class _FavoriteListView extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.pop(sheetContext);
-                context
-                    .read<FavoriteBloc>()
-                    .add(DeleteFavorite(favorite.id));
+                context.read<FavoriteBloc>().add(DeleteFavorite(favorite.id));
               },
             ),
           ],
