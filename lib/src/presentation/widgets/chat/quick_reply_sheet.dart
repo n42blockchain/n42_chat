@@ -48,6 +48,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
   Future<void> _loadReplies() async {
     try {
       final data = await widget.storageDataSource.getQuickReplies();
+      if (!mounted) return;
       setState(() {
         _replies = data.map((e) => QuickReplyEntity.fromJson(e)).toList();
         // 按使用频率和顺序排序
@@ -64,6 +65,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _replies = QuickReplyEntity.createDefaultReplies();
         _isLoading = false;
@@ -178,8 +180,8 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
                     ),
                   )
                 : _replies.isEmpty
-                    ? _buildSmartReplyAwareEmptyState(isDark, l10n)
-                    : _buildReplyList(isDark, l10n),
+                ? _buildSmartReplyAwareEmptyState(isDark, l10n)
+                : _buildReplyList(isDark, l10n),
           ),
 
           // 底部安全区域
@@ -299,7 +301,9 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05),
+                  color: isDark
+                      ? Colors.white12
+                      : Colors.black.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -323,11 +327,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            const Icon(
-              Icons.auto_awesome,
-              size: 18,
-              color: AppColors.primary,
-            ),
+            const Icon(Icons.auto_awesome, size: 18, color: AppColors.primary),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
