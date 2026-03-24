@@ -13,12 +13,16 @@ import '../../../core/utils/debug_log.dart';
 enum SasVerificationStep {
   /// 等待对方接受
   waitingForAccept,
+
   /// 显示 emoji/数字，等待用户确认
   showingSas,
+
   /// 等待对方确认
   waitingForPartner,
+
   /// 验证成功
   verified,
+
   /// 验证失败/取消
   failed,
 }
@@ -88,7 +92,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       if (deviceId == null) {
         setState(() {
           _step = SasVerificationStep.failed;
-          _errorMessage = S.of(context)?.securityDeviceIdRequired ?? 'Device ID is required';
+          _errorMessage =
+              S.of(context)?.securityDeviceIdRequired ??
+              'Device ID is required';
         });
         return;
       }
@@ -101,7 +107,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       if (_verification == null) {
         setState(() {
           _step = SasVerificationStep.failed;
-          _errorMessage = S.of(context)?.securityVerificationFailed ?? 'Failed to start verification';
+          _errorMessage =
+              S.of(context)?.securityVerificationFailed ??
+              'Failed to start verification';
         });
         return;
       }
@@ -122,6 +130,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       _listenToVerification();
       await widget.e2eeManager.acceptSasVerification(_verification!);
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _step = SasVerificationStep.failed;
         _errorMessage = e.toString();
@@ -174,7 +183,10 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       case kv.KeyVerificationState.error:
         setState(() {
           _step = SasVerificationStep.failed;
-          _errorMessage = _verification!.canceledCode ?? (S.of(context)?.securityVerificationFailed ?? 'Verification failed');
+          _errorMessage =
+              _verification!.canceledCode ??
+              (S.of(context)?.securityVerificationFailed ??
+                  'Verification failed');
         });
         break;
 
@@ -192,6 +204,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
     try {
       await widget.e2eeManager.confirmSas(_verification!);
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _step = SasVerificationStep.failed;
         _errorMessage = e.toString();
@@ -212,7 +225,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
 
     setState(() {
       _step = SasVerificationStep.failed;
-      _errorMessage = S.of(context)?.securityEmojiMismatchRejected ?? 'Verification rejected - emoji did not match';
+      _errorMessage =
+          S.of(context)?.securityEmojiMismatchRejected ??
+          'Verification rejected - emoji did not match';
     });
   }
 
@@ -273,7 +288,8 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         ),
         const SizedBox(height: 24),
         Text(
-          S.of(context)?.securityWaitingForDeviceAccept ?? 'Waiting for the other device to accept...',
+          S.of(context)?.securityWaitingForDeviceAccept ??
+              'Waiting for the other device to accept...',
           style: TextStyle(
             fontSize: 16,
             color: isDark ? Colors.white : AppColors.textPrimary,
@@ -285,7 +301,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           widget.deviceName ?? widget.deviceId ?? '',
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: 32),
@@ -303,11 +321,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         const Spacer(),
 
         // 标题
-        const Icon(
-          Icons.security,
-          size: 48,
-          color: AppColors.primary,
-        ),
+        const Icon(Icons.security, size: 48, color: AppColors.primary),
         const SizedBox(height: 16),
         Text(
           S.of(context)?.securityVerifyDevice ?? 'Verify this device',
@@ -319,10 +333,13 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         ),
         const SizedBox(height: 8),
         Text(
-          S.of(context)?.securityConfirmEmojiMatch ?? 'Confirm the emoji below are displayed on both devices, in the same order',
+          S.of(context)?.securityConfirmEmojiMatch ??
+              'Confirm the emoji below are displayed on both devices, in the same order',
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -392,7 +409,8 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         ),
         const SizedBox(height: 24),
         Text(
-          S.of(context)?.securityWaitingForDeviceConfirm ?? 'Waiting for the other device to confirm...',
+          S.of(context)?.securityWaitingForDeviceConfirm ??
+              'Waiting for the other device to confirm...',
           style: TextStyle(
             fontSize: 16,
             color: isDark ? Colors.white : AppColors.textPrimary,
@@ -414,15 +432,12 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             color: Colors.green.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.verified,
-            color: Colors.green,
-            size: 48,
-          ),
+          child: const Icon(Icons.verified, color: Colors.green, size: 48),
         ),
         const SizedBox(height: 24),
         Text(
-          S.of(context)?.securityVerificationSuccess ?? 'Verification successful!',
+          S.of(context)?.securityVerificationSuccess ??
+              'Verification successful!',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -431,10 +446,13 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         ),
         const SizedBox(height: 8),
         Text(
-          S.of(context)?.securityDeviceVerifiedTrusted ?? 'This device is now verified and trusted.',
+          S.of(context)?.securityDeviceVerifiedTrusted ??
+              'This device is now verified and trusted.',
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -489,7 +507,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
               _errorMessage!,
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),

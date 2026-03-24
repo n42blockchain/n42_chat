@@ -47,6 +47,7 @@ class _StickerStorePageState extends State<StickerStorePage>
       final installed = await _repository.getInstalledPacks();
       final store = await _repository.getStorePacks();
 
+      if (!mounted) return;
       setState(() {
         _categories = categories;
         _installedPacks = installed;
@@ -54,20 +55,22 @@ class _StickerStorePageState extends State<StickerStorePage>
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
 
   Future<void> _installPack(StickerPack pack) async {
     final success = await _repository.installPack(pack.id);
+    if (!mounted) return;
     if (success) {
       setState(() {
         _installedPacks.add(pack.copyWith(isInstalled: true));
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Installed "${pack.name}"')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Installed "${pack.name}"')));
       }
     }
   }
@@ -94,14 +97,15 @@ class _StickerStorePageState extends State<StickerStorePage>
     if (confirm != true) return;
 
     final success = await _repository.uninstallPack(pack.id);
+    if (!mounted) return;
     if (success) {
       setState(() {
         _installedPacks.removeWhere((p) => p.id == pack.id);
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Removed "${pack.name}"')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Removed "${pack.name}"')));
       }
     }
   }
@@ -118,8 +122,9 @@ class _StickerStorePageState extends State<StickerStorePage>
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
-          unselectedLabelColor:
-              isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          unselectedLabelColor: isDark
+              ? AppColors.textSecondaryDark
+              : AppColors.textSecondary,
           indicatorColor: AppColors.primary,
           tabs: const [
             Tab(text: 'Store'),
@@ -131,10 +136,7 @@ class _StickerStorePageState extends State<StickerStorePage>
           ? const Center(child: CircularProgressIndicator())
           : TabBarView(
               controller: _tabController,
-              children: [
-                _buildStoreTab(isDark),
-                _buildMyStickersTab(isDark),
-              ],
+              children: [_buildStoreTab(isDark), _buildMyStickersTab(isDark)],
             ),
     );
   }
@@ -146,9 +148,7 @@ class _StickerStorePageState extends State<StickerStorePage>
         _buildCategoryTabs(isDark),
 
         // 贴纸包列表
-        Expanded(
-          child: _buildStoreList(isDark),
-        ),
+        Expanded(child: _buildStoreList(isDark)),
       ],
     );
   }
@@ -203,9 +203,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                 ? AppColors.primary.withValues(alpha: 0.1)
                 : (isDark ? Colors.grey[800] : Colors.grey[200]),
             borderRadius: BorderRadius.circular(16),
-            border: isSelected
-                ? Border.all(color: AppColors.primary)
-                : null,
+            border: isSelected ? Border.all(color: AppColors.primary) : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -323,7 +321,9 @@ class _StickerStorePageState extends State<StickerStorePage>
                             pack.name,
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : AppColors.textPrimary,
+                              color: isDark
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
                             ),
                           ),
                           if (pack.isOfficial) ...[
