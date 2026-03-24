@@ -30,12 +30,14 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
   Future<void> _loadReplies() async {
     try {
       final data = await widget.storageDataSource.getQuickReplies();
+      if (!mounted) return;
       setState(() {
         _replies = data.map((e) => QuickReplyEntity.fromJson(e)).toList();
         _replies.sort((a, b) => a.order.compareTo(b.order));
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _replies = QuickReplyEntity.createDefaultReplies();
         _isLoading = false;
