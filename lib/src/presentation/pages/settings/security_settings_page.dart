@@ -67,6 +67,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       final typeDescription = await _biometricService
           .getBiometricTypeDescription();
       final isEnabled = await _secureStorage.isBiometricEnabled();
+      if (!mounted) return;
       setState(() {
         _isBiometricAvailable = true;
         _biometricTypeDescription = typeDescription;
@@ -137,6 +138,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               return (b.lastSeenTs ?? 0).compareTo(a.lastSeenTs ?? 0);
             });
 
+      if (!mounted) return;
       setState(() {
         _backupInfo = backupInfo;
         _devices = devices;
@@ -144,6 +146,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       });
     } catch (e) {
       debugLog('SecuritySettingsPage: Failed to load data: $e');
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
@@ -447,38 +450,37 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   Future<String?> _showPasskeyNameDialog() async {
     final l10n = S.of(context);
     final controller = TextEditingController(text: 'My Passkey');
-    final result = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n?.authPasskeyNameYours ?? 'Name your Passkey'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'e.g., iPhone, MacBook',
-            border: OutlineInputBorder(),
+    try {
+      return await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n?.authPasskeyNameYours ?? 'Name your Passkey'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'e.g., iPhone, MacBook',
+              border: OutlineInputBorder(),
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final name = controller.text.trim();
+                Navigator.pop(ctx, name.isNotEmpty ? name : 'My Passkey');
+              },
+              child: Text(l10n?.authPasskeyRegister ?? 'Register'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              controller.dispose();
-              Navigator.pop(ctx, name.isNotEmpty ? name : 'My Passkey');
-            },
-            child: Text(l10n?.authPasskeyRegister ?? 'Register'),
-          ),
-        ],
-      ),
-    );
-    return result;
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _deletePasskey(PasskeyCredential passkey) async {
@@ -572,17 +574,16 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             homeserver: credentials['homeserver']!,
             username: credentials['username']!,
           );
+          if (!mounted) return;
           setState(() => _isBiometricEnabled = true);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  S.of(context)?.settingsBiometricLoginEnabled ??
-                      'Biometric login enabled',
-                ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                S.of(context)?.settingsBiometricLoginEnabled ??
+                    'Biometric login enabled',
               ),
-            );
-          }
+            ),
+          );
         }
       } else {
         if (mounted) {
@@ -596,17 +597,16 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     } else {
       // 禁用生物识别
       await _secureStorage.disableBiometricLogin();
+      if (!mounted) return;
       setState(() => _isBiometricEnabled = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              S.of(context)?.settingsBiometricLoginDisabled ??
-                  'Biometric login disabled',
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            S.of(context)?.settingsBiometricLoginDisabled ??
+                'Biometric login disabled',
           ),
-        );
-      }
+        ),
+      );
     }
   }
 
@@ -1035,17 +1035,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       }
       Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Delete account failed: $e')));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Delete account failed: $e')));
       return;
     }
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
+    if (!mounted) return;
+    setState(() => _isLoading = false);
   }
 
   Future<void> _showDeactivatePasswordDialog({
@@ -1207,6 +1205,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
       // 3. 刷新备份信息
       final backupInfo = await widget.keyBackupService.getBackupInfo();
+      if (!mounted) return;
       setState(() {
         _backupInfo = backupInfo;
         _isLoading = false;
@@ -1226,16 +1225,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${S.of(context)?.settingsBackupFailed ?? 'Backup failed'}: $e',
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${S.of(context)?.settingsBackupFailed ?? 'Backup failed'}: $e',
           ),
-        );
-      }
+        ),
+      );
     }
   }
 
@@ -1345,17 +1343,13 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                controller.dispose();
-                Navigator.pop(ctx);
-              },
+              onPressed: () => Navigator.pop(ctx),
               child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () async {
                 final input = controller.text.trim();
                 if (input.isEmpty) return;
-                controller.dispose();
                 Navigator.pop(ctx);
                 await _performRestore(input, isRecoveryKey: isRecoveryKey);
               },
@@ -1364,7 +1358,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ],
         ),
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   Future<void> _performRestore(
@@ -1388,32 +1382,30 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
       // 刷新备份信息
       final backupInfo = await widget.keyBackupService.getBackupInfo();
+      if (!mounted) return;
       setState(() {
         _backupInfo = backupInfo;
         _isLoading = false;
       });
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              S.of(context)?.settingsRestoreSuccess ??
-                  'Keys restored successfully',
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            S.of(context)?.settingsRestoreSuccess ??
+                'Keys restored successfully',
           ),
-        );
-      }
+        ),
+      );
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${S.of(context)?.settingsRestoreFailed ?? 'Restore failed'}: $e',
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${S.of(context)?.settingsRestoreFailed ?? 'Restore failed'}: $e',
           ),
-        );
-      }
+        ),
+      );
     }
   }
 
@@ -1452,43 +1444,41 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       // 获取当前恢复密钥（如果有）
       final recoveryKey = await widget.e2eeManager.getRecoveryKey();
 
+      if (!mounted) return;
       setState(() => _isLoading = false);
 
-      if (mounted) {
-        if (recoveryKey != null) {
-          _showRecoveryKeyDialog(recoveryKey);
-        } else if (widget.e2eeManager.hasSsssDefaultKey) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                S.of(context)?.settingsExportSuccess ??
-                    'Keys exported to server backup successfully',
-              ),
-            ),
-          );
-        } else {
-          // 没有恢复密钥，提示先创建
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                S.of(context)?.settingsExportNeedBackupFirst ??
-                    'Please create a key backup first',
-              ),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (mounted) {
+      if (recoveryKey != null) {
+        _showRecoveryKeyDialog(recoveryKey);
+      } else if (widget.e2eeManager.hasSsssDefaultKey) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${S.of(context)?.settingsExportFailed ?? 'Export failed'}: $e',
+              S.of(context)?.settingsExportSuccess ??
+                  'Keys exported to server backup successfully',
+            ),
+          ),
+        );
+      } else {
+        // 没有恢复密钥，提示先创建
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.settingsExportNeedBackupFirst ??
+                  'Please create a key backup first',
             ),
           ),
         );
       }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${S.of(context)?.settingsExportFailed ?? 'Export failed'}: $e',
+          ),
+        ),
+      );
     }
   }
 
@@ -1502,22 +1492,22 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       // 如果没有恢复密钥，创建一个
       recoveryKey ??= await widget.e2eeManager.createRecoveryKey();
 
+      if (!mounted) return;
       setState(() => _isLoading = false);
 
-      if (mounted && recoveryKey != null) {
+      if (recoveryKey != null) {
         await RecoveryKeyDisplayDialog.show(context, recoveryKey);
-      } else if (mounted) {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to create recovery key')),
         );
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -1749,16 +1739,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
+            onPressed: () => Navigator.pop(ctx),
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
               final newName = controller.text.trim();
-              controller.dispose();
               Navigator.pop(ctx);
               if (newName.isNotEmpty && newName != device.deviceName) {
                 await _renameDevice(device.deviceId, newName);
@@ -1768,7 +1754,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   Future<void> _renameDevice(String deviceId, String newName) async {
@@ -1855,16 +1841,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
           ),
-        );
-      }
+        ),
+      );
     }
   }
 
@@ -1895,7 +1880,6 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         actions: [
           TextButton(
             onPressed: () {
-              passwordController.dispose();
               Navigator.pop(ctx, false);
             },
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
@@ -1915,6 +1899,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       final password = passwordController.text;
       passwordController.dispose();
       if (password.isNotEmpty) {
+        if (!mounted) return;
         setState(() => _isLoading = true);
         try {
           final userId = widget.e2eeManager.client.userID ?? '';
@@ -1935,16 +1920,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             );
           }
         } catch (e) {
+          if (!mounted) return;
           setState(() => _isLoading = false);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
-                ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
               ),
-            );
-          }
+            ),
+          );
         }
       }
     } else {
@@ -2009,36 +1993,35 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
+              if (!mounted) return;
               setState(() => _isLoading = true);
               try {
                 await widget.keyBackupService.deleteKeyBackup();
                 final backupInfo = await widget.keyBackupService
                     .getBackupInfo();
+                if (!mounted) return;
                 setState(() {
                   _backupInfo = backupInfo;
                   _isLoading = false;
                 });
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        S.of(context)?.settingsResetSuccess ??
-                            'Encryption reset successful',
-                      ),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.settingsResetSuccess ??
+                          'Encryption reset successful',
                     ),
-                  );
-                }
+                  ),
+                );
               } catch (e) {
+                if (!mounted) return;
                 setState(() => _isLoading = false);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        '${S.of(context)?.settingsResetFailed ?? 'Reset failed'}: $e',
-                      ),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${S.of(context)?.settingsResetFailed ?? 'Reset failed'}: $e',
                     ),
-                  );
-                }
+                  ),
+                );
               }
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),

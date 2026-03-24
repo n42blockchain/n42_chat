@@ -554,38 +554,44 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   Future<void> _editDisplayName(String? currentName) async {
     final controller = TextEditingController(text: currentName);
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(S.of(context)?.profileChangeName ?? 'Change Name'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 20,
-          decoration: InputDecoration(
-            hintText: S.of(context)?.profileEnterNickname ?? 'Enter nickname',
-            counterText: '',
+    String? result;
+    try {
+      result = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(S.of(context)?.profileChangeName ?? 'Change Name'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLength: 20,
+            decoration: InputDecoration(
+              hintText: S.of(context)?.profileEnterNickname ?? 'Enter nickname',
+              counterText: '',
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
 
     if (result != null && result.isNotEmpty && result != currentName) {
+      final nextDisplayName = result;
       if (!mounted) return;
       _dispatchProfileOperation(
         operation: _PendingProfileOperation.displayName,
         errorFallback: 'Update nickname failed',
-        dispatch: (bloc) => bloc.add(UpdateDisplayName(result)),
+        dispatch: (bloc) => bloc.add(UpdateDisplayName(nextDisplayName)),
       );
     }
   }
@@ -823,59 +829,64 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   Future<void> _editPokeText(String? currentPokeText) async {
     final controller = TextEditingController(text: currentPokeText);
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(S.of(context)?.profileSetPoke ?? 'Set Poke'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              S.of(context)?.profileFriendPokedMe ?? 'Friend poked me',
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: controller,
-              autofocus: true,
-              maxLength: 50,
-              decoration: InputDecoration(
-                hintText:
-                    S.of(context)?.profileEnterPokeSuffixHint ??
-                    'Enter poke suffix, e.g.: on the shoulder',
-                border: const OutlineInputBorder(),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
+    String? result;
+    try {
+      result = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(S.of(context)?.profileSetPoke ?? 'Set Poke'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                S.of(context)?.profileFriendPokedMe ?? 'Friend poked me',
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${S.of(context)?.profileExample ?? 'Example'}: ${S.of(context)?.profileFriendPokedMe ?? 'Friend poked me'}${controller.text.isNotEmpty ? controller.text : (S.of(context)?.profileOnTheShoulder ?? " on the shoulder")}',
-              style: const TextStyle(
-                color: AppColors.textTertiary,
-                fontSize: 12,
+              const SizedBox(height: 8),
+              TextField(
+                controller: controller,
+                autofocus: true,
+                maxLength: 50,
+                decoration: InputDecoration(
+                  hintText:
+                      S.of(context)?.profileEnterPokeSuffixHint ??
+                      'Enter poke suffix, e.g.: on the shoulder',
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
               ),
+              const SizedBox(height: 8),
+              Text(
+                '${S.of(context)?.profileExample ?? 'Example'}: ${S.of(context)?.profileFriendPokedMe ?? 'Friend poked me'}${controller.text.isNotEmpty ? controller.text : (S.of(context)?.profileOnTheShoulder ?? " on the shoulder")}',
+                style: const TextStyle(
+                  color: AppColors.textTertiary,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
 
     if (result != null && mounted) {
       _dispatchProfileOperation(
@@ -892,33 +903,38 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   Future<void> _editSignature(String? currentSignature) async {
     final controller = TextEditingController(text: currentSignature);
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(S.of(context)?.profileEditSignature ?? 'Edit Signature'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 50,
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText:
-                S.of(context)?.profileIntroduceYourself ??
-                'A sentence to introduce yourself',
+    String? result;
+    try {
+      result = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(S.of(context)?.profileEditSignature ?? 'Edit Signature'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLength: 50,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText:
+                  S.of(context)?.profileIntroduceYourself ??
+                  'A sentence to introduce yourself',
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
 
     if (result != null && result != currentSignature && mounted) {
       _dispatchProfileOperation(

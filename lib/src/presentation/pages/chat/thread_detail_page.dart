@@ -368,6 +368,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
 
     // 滚动到底部
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
