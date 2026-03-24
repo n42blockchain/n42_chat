@@ -103,6 +103,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         widget.userId,
         deviceId,
       );
+      if (!mounted) return;
 
       if (_verification == null) {
         setState(() {
@@ -116,6 +117,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
 
       _listenToVerification();
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _step = SasVerificationStep.failed;
         _errorMessage = e.toString();
@@ -222,6 +224,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       // ignore
       debugLog('Error: $e');
     }
+    if (!mounted) return;
 
     setState(() {
       _step = SasVerificationStep.failed;

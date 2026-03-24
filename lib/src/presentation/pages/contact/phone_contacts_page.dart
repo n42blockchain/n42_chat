@@ -35,6 +35,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
   }
 
   Future<void> _loadContacts() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -46,6 +47,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
           // 可以用于显示进度
         },
       );
+      if (!mounted) return;
 
       if (!result.success) {
         setState(() {
@@ -63,6 +65,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -73,10 +76,8 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
   Future<void> _startDirectChat(String userId) async {
     try {
       final roomId = await getIt<IContactRepository>().startDirectChat(userId);
-
-      if (mounted) {
-        Navigator.of(context).pop(roomId);
-      }
+      if (!mounted) return;
+      Navigator.of(context).pop(roomId);
     } catch (e) {
       _showError('Failed to create chat: $e');
     }
