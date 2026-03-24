@@ -1889,7 +1889,6 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         actions: [
           TextButton(
             onPressed: () {
-              passwordController.dispose();
               Navigator.pop(ctx, false);
             },
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
