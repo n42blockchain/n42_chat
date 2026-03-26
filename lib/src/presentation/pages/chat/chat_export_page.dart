@@ -145,6 +145,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
   }
 
   Future<void> _export() async {
+    var completedWithExit = false;
     setState(() => _isExporting = true);
 
     try {
@@ -165,6 +166,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
             ),
           ),
         );
+        completedWithExit = true;
         Navigator.pop(context);
       }
     } catch (e) {
@@ -179,7 +181,9 @@ class _ChatExportPageState extends State<ChatExportPage> {
         );
       }
     } finally {
-      if (mounted) setState(() => _isExporting = false);
+      if (mounted && !completedWithExit) {
+        setState(() => _isExporting = false);
+      }
     }
   }
 

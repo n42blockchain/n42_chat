@@ -320,11 +320,15 @@ class _AddFriendPageState extends State<AddFriendPage> {
   // ─── DM creation ──────────────────────────────────────────────────────
 
   Future<void> _startDirectChat(String userId) async {
+    var completedWithExit = false;
     setState(() => _isLoading = true);
 
     try {
       final roomId = await getIt<IContactRepository>().startDirectChat(userId);
-      if (mounted) Navigator.of(context).pop(roomId);
+      if (mounted) {
+        completedWithExit = true;
+        Navigator.of(context).pop(roomId);
+      }
     } catch (e) {
       if (!mounted) return;
       _showError(
@@ -332,7 +336,9 @@ class _AddFriendPageState extends State<AddFriendPage> {
             'Failed to create chat: $e',
       );
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted && !completedWithExit) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
