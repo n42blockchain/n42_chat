@@ -111,6 +111,9 @@ class _ContactListPageState extends State<ContactListPage> {
           Expanded(
             child: BlocConsumer<ContactBloc, ContactState>(
               listener: (context, state) {
+                if (ModalRoute.of(context)?.isCurrent != true) {
+                  return;
+                }
                 if (state.status == ContactStatus.chatStarted) {
                   final roomId = state.startedChatRoomId;
                   if (roomId == null || roomId.isEmpty) {
