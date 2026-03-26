@@ -52,6 +52,11 @@ class _GroupListPageState extends State<GroupListPage> {
       ),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
+          final route = ModalRoute.of(context);
+          if (route?.isCurrent != true) {
+            return;
+          }
+
           if (state.status == GroupStatus.error && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
