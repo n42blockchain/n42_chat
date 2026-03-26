@@ -1855,83 +1855,87 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
   Future<void> _showUiaPasswordDialog(DeviceInfo device) async {
     final passwordController = TextEditingController();
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.settingsVerifyIdentity ?? 'Verify identity'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              S.of(context)?.settingsEnterPasswordToConfirm ??
-                  'Enter your password to confirm this action.',
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: S.of(context)?.settingsPassword ?? 'Password',
-                border: const OutlineInputBorder(),
+    try {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(
+            S.of(context)?.settingsVerifyIdentity ?? 'Verify identity',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                S.of(context)?.settingsEnterPasswordToConfirm ??
+                    'Enter your password to confirm this action.',
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: S.of(context)?.settingsPassword ?? 'Password',
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx, false);
-            },
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx, true);
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
-          ),
-        ],
-      ),
-    );
+      );
 
-    if (confirmed == true) {
-      final password = passwordController.text;
-      passwordController.dispose();
-      if (password.isNotEmpty) {
-        if (!mounted) return;
-        setState(() => _isLoading = true);
-        try {
-          final userId = widget.e2eeManager.client.userID ?? '';
-          final auth = AuthenticationPassword(
-            password: password,
-            identifier: AuthenticationUserIdentifier(user: userId),
-          );
-          final authDataSource = MatrixAuthDataSource();
-          await authDataSource.deleteDevice(device.deviceId, auth: auth);
-          await _loadData();
-          if (mounted) {
+      if (confirmed == true) {
+        final password = passwordController.text;
+        if (password.isNotEmpty) {
+          if (!mounted) return;
+          setState(() => _isLoading = true);
+          try {
+            final userId = widget.e2eeManager.client.userID ?? '';
+            final auth = AuthenticationPassword(
+              password: password,
+              identifier: AuthenticationUserIdentifier(user: userId),
+            );
+            final authDataSource = MatrixAuthDataSource();
+            await authDataSource.deleteDevice(device.deviceId, auth: auth);
+            await _loadData();
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    S.of(context)?.settingsDeviceLoggedOut ??
+                        'Device logged out',
+                  ),
+                ),
+              );
+            }
+          } catch (e) {
+            if (!mounted) return;
+            setState(() => _isLoading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  S.of(context)?.settingsDeviceLoggedOut ?? 'Device logged out',
+                  '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
                 ),
               ),
             );
           }
-        } catch (e) {
-          if (!mounted) return;
-          setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
-              ),
-            ),
-          );
         }
       }
-    } else {
+    } finally {
       passwordController.dispose();
     }
   }
