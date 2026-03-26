@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 
 /// 自动下载设置页
@@ -18,6 +19,7 @@ class AutoDownloadSettingsPage extends StatefulWidget {
 class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
   final PreferencesDataSource _storage =
       GetIt.instance<PreferencesDataSource>();
+  bool _isSaving = false;
 
   // WiFi 设置
   bool _wifiImages = true;
@@ -53,22 +55,76 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
     }
   }
 
-  Future<void> _saveSettings() async {
+  Map<String, bool> _currentSettings() => {
+    'wifi_images': _wifiImages,
+    'wifi_voice': _wifiVoice,
+    'wifi_video': _wifiVideo,
+    'wifi_files': _wifiFiles,
+    'mobile_images': _mobileImages,
+    'mobile_voice': _mobileVoice,
+    'mobile_video': _mobileVideo,
+    'mobile_files': _mobileFiles,
+  };
+
+  void _restoreSettings(Map<String, bool> settings) {
+    _wifiImages = settings['wifi_images'] ?? true;
+    _wifiVoice = settings['wifi_voice'] ?? true;
+    _wifiVideo = settings['wifi_video'] ?? true;
+    _wifiFiles = settings['wifi_files'] ?? true;
+    _mobileImages = settings['mobile_images'] ?? true;
+    _mobileVoice = settings['mobile_voice'] ?? true;
+    _mobileVideo = settings['mobile_video'] ?? false;
+    _mobileFiles = settings['mobile_files'] ?? false;
+  }
+
+  Future<void> _saveSettings(Map<String, bool> settings) async {
     await _storage.saveAutoDownloadSettings({
-      'wifi_images': _wifiImages,
-      'wifi_voice': _wifiVoice,
-      'wifi_video': _wifiVideo,
-      'wifi_files': _wifiFiles,
-      'mobile_images': _mobileImages,
-      'mobile_voice': _mobileVoice,
-      'mobile_video': _mobileVideo,
-      'mobile_files': _mobileFiles,
+      'wifi_images': settings['wifi_images'] ?? true,
+      'wifi_voice': settings['wifi_voice'] ?? true,
+      'wifi_video': settings['wifi_video'] ?? true,
+      'wifi_files': settings['wifi_files'] ?? true,
+      'mobile_images': settings['mobile_images'] ?? true,
+      'mobile_voice': settings['mobile_voice'] ?? true,
+      'mobile_video': settings['mobile_video'] ?? false,
+      'mobile_files': settings['mobile_files'] ?? false,
     });
   }
 
-  void _updateSetting(VoidCallback update) {
-    setState(update);
-    _saveSettings();
+  Future<void> _updateSetting(VoidCallback update) async {
+    if (_isSaving) {
+      return;
+    }
+
+    final previousSettings = _currentSettings();
+    final messenger = ScaffoldMessenger.of(context);
+    final saveFailedMessage = S.of(context)?.commonSaveFailed ?? 'Save failed';
+
+    setState(() {
+      _isSaving = true;
+      update();
+    });
+
+    try {
+      await _saveSettings(_currentSettings());
+    } catch (e) {
+      debugLog('AutoDownloadSettingsPage: Failed to save settings: $e');
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _restoreSettings(previousSettings);
+      });
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   @override
@@ -96,66 +152,104 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: ListView(
+      body: Stack(
         children: [
-          // WiFi
-          _buildSection(
-            context,
-            title: 'Wi-Fi',
-            icon: Icons.wifi,
-            isDark: isDark,
-            children: [
-              _buildSwitch(S.of(context)?.images ?? 'Images', _wifiImages, (v) {
-                _updateSetting(() => _wifiImages = v);
-              }),
-              _buildSwitch(S.of(context)?.voice ?? 'Voice', _wifiVoice, (v) {
-                _updateSetting(() => _wifiVoice = v);
-              }),
-              _buildSwitch(S.of(context)?.video ?? 'Video', _wifiVideo, (v) {
-                _updateSetting(() => _wifiVideo = v);
-              }),
-              _buildSwitch(S.of(context)?.files ?? 'Files', _wifiFiles, (v) {
-                _updateSetting(() => _wifiFiles = v);
-              }),
-            ],
+          AbsorbPointer(
+            absorbing: _isSaving,
+            child: ListView(
+              children: [
+                // WiFi
+                _buildSection(
+                  context,
+                  title: 'Wi-Fi',
+                  icon: Icons.wifi,
+                  isDark: isDark,
+                  children: [
+                    _buildSwitch(
+                      S.of(context)?.images ?? 'Images',
+                      _wifiImages,
+                      (v) {
+                        _updateSetting(() => _wifiImages = v);
+                      },
+                    ),
+                    _buildSwitch(S.of(context)?.voice ?? 'Voice', _wifiVoice, (
+                      v,
+                    ) {
+                      _updateSetting(() => _wifiVoice = v);
+                    }),
+                    _buildSwitch(S.of(context)?.video ?? 'Video', _wifiVideo, (
+                      v,
+                    ) {
+                      _updateSetting(() => _wifiVideo = v);
+                    }),
+                    _buildSwitch(S.of(context)?.files ?? 'Files', _wifiFiles, (
+                      v,
+                    ) {
+                      _updateSetting(() => _wifiFiles = v);
+                    }),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                // 移动数据
+                _buildSection(
+                  context,
+                  title: S.of(context)?.mobileData ?? 'Mobile Data',
+                  icon: Icons.signal_cellular_alt,
+                  isDark: isDark,
+                  children: [
+                    _buildSwitch(
+                      S.of(context)?.images ?? 'Images',
+                      _mobileImages,
+                      (v) {
+                        _updateSetting(() => _mobileImages = v);
+                      },
+                    ),
+                    _buildSwitch(
+                      S.of(context)?.voice ?? 'Voice',
+                      _mobileVoice,
+                      (v) {
+                        _updateSetting(() => _mobileVoice = v);
+                      },
+                    ),
+                    _buildSwitch(
+                      S.of(context)?.video ?? 'Video',
+                      _mobileVideo,
+                      (v) {
+                        _updateSetting(() => _mobileVideo = v);
+                      },
+                    ),
+                    _buildSwitch(
+                      S.of(context)?.files ?? 'Files',
+                      _mobileFiles,
+                      (v) {
+                        _updateSetting(() => _mobileFiles = v);
+                      },
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                _buildInfoCard(
+                  context,
+                  isDark: isDark,
+                  icon: Icons.info_outline,
+                  title: 'Roaming uses Mobile Data rules',
+                  message:
+                      'Dedicated roaming detection is not available yet, so roaming currently follows the Mobile Data auto-download settings.',
+                ),
+              ],
+            ),
           ),
-
-          const SizedBox(height: 10),
-
-          // 移动数据
-          _buildSection(
-            context,
-            title: S.of(context)?.mobileData ?? 'Mobile Data',
-            icon: Icons.signal_cellular_alt,
-            isDark: isDark,
-            children: [
-              _buildSwitch(S.of(context)?.images ?? 'Images', _mobileImages, (
-                v,
-              ) {
-                _updateSetting(() => _mobileImages = v);
-              }),
-              _buildSwitch(S.of(context)?.voice ?? 'Voice', _mobileVoice, (v) {
-                _updateSetting(() => _mobileVoice = v);
-              }),
-              _buildSwitch(S.of(context)?.video ?? 'Video', _mobileVideo, (v) {
-                _updateSetting(() => _mobileVideo = v);
-              }),
-              _buildSwitch(S.of(context)?.files ?? 'Files', _mobileFiles, (v) {
-                _updateSetting(() => _mobileFiles = v);
-              }),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          _buildInfoCard(
-            context,
-            isDark: isDark,
-            icon: Icons.info_outline,
-            title: 'Roaming uses Mobile Data rules',
-            message:
-                'Dedicated roaming detection is not available yet, so roaming currently follows the Mobile Data auto-download settings.',
-          ),
+          if (_isSaving)
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: LinearProgressIndicator(minHeight: 2),
+            ),
         ],
       ),
     );
