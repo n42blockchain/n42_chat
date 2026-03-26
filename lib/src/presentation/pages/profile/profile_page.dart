@@ -543,6 +543,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   /// 显示状态选择器
   void _showStatusPicker(BuildContext context, bool isDark) async {
+    final l10n = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute<String>(
         builder: (_) => StatusPage(currentStatus: _statusText),
@@ -550,6 +552,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     if (result != null && mounted) {
+      final previousStatus = _statusText;
+      final saveFailedMessage = l10n?.commonSaveFailed ?? 'Save failed';
       setState(() {
         _statusText = result;
       });
@@ -563,14 +567,25 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       } catch (e) {
         debugLog('Failed to sync status: $e');
+        if (mounted) {
+          setState(() {
+            _statusText = previousStatus;
+          });
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(saveFailedMessage),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
       }
 
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            S.of(context)?.profileStatusSetTo(result) ??
-                'Status set to: $result',
+            l10n?.profileStatusSetTo(result) ?? 'Status set to: $result',
           ),
           duration: const Duration(seconds: 1),
         ),
@@ -579,6 +594,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _clearStatus() async {
+    final previousStatus = _statusText;
+    final saveFailedMessage = S.of(context)?.commonSaveFailed ?? 'Save failed';
+    final messenger = ScaffoldMessenger.of(context);
     setState(() {
       _statusText = null;
     });
@@ -588,6 +606,18 @@ class _ProfilePageState extends State<ProfilePage> {
       await contactRepository.setMyStatus(null);
     } catch (e) {
       debugLog('Failed to clear status: $e');
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _statusText = previousStatus;
+      });
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
