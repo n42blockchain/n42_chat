@@ -110,10 +110,14 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   Future<void> _loadLockedChats() async {
-    final lockService = ChatLockService();
-    final ids = await lockService.getLockedChatIds();
-    if (mounted) {
-      setState(() => _lockedChatIds = ids.toSet());
+    try {
+      final lockService = ChatLockService();
+      final ids = await lockService.getLockedChatIds();
+      if (mounted) {
+        setState(() => _lockedChatIds = ids.toSet());
+      }
+    } catch (e) {
+      debugPrint('ConversationListPage._loadLockedChats error: $e');
     }
   }
 

@@ -39,15 +39,21 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
 
   Future<void> _loadDrafts() async {
     setState(() => _isLoading = true);
-    final drafts = (await _preferences.getScheduledMessages(
-      widget.roomId,
-    )).toList()..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+    try {
+      final drafts = (await _preferences.getScheduledMessages(
+        widget.roomId,
+      )).toList()..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
 
-    if (!mounted) return;
-    setState(() {
-      _drafts = drafts;
-      _isLoading = false;
-    });
+      if (!mounted) return;
+      setState(() {
+        _drafts = drafts;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('ScheduledMessagesPage._loadDrafts error: $e');
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _cancelDraft(ScheduledMessageDraft draft) async {

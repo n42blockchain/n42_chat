@@ -31,6 +31,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
   List<TagData> _tags = [];
   Set<String> _selectedTags = {};
   bool _isLoading = true;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -61,6 +62,51 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
     await prefs.setString('tags_data', json);
   }
 
+  List<TagData> _cloneTags(List<TagData> tags) {
+    return tags
+        .map((tag) => tag.copyWith(contactIds: List<String>.from(tag.contactIds)))
+        .toList();
+  }
+
+  Future<void> _applyTagMutation(VoidCallback update) async {
+    if (_isSaving) {
+      return;
+    }
+
+    final previousTags = _cloneTags(_tags);
+    final previousSelectedTags = Set<String>.from(_selectedTags);
+    final messenger = ScaffoldMessenger.of(context);
+    final saveFailedMessage = S.of(context)?.commonSaveFailed ?? 'Save failed';
+
+    setState(() {
+      _isSaving = true;
+      update();
+    });
+
+    try {
+      await _saveTags();
+    } catch (e) {
+      debugLog('TagsManagementPage: Failed to save tags: $e');
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _tags = previousTags;
+        _selectedTags = previousSelectedTags;
+      });
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
   void _createTag() {
     final controller = TextEditingController();
     showDialog<void>(
@@ -81,17 +127,16 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               final name = controller.text.trim();
               if (name.isNotEmpty) {
                 Navigator.pop(ctx);
-                setState(() {
+                await _applyTagMutation(() {
                   _tags.add(TagData(
                     name: name,
                     contactIds: [],
                   ));
                 });
-                _saveTags();
               }
             },
             child: Text(S.of(context)?.commonConfirm ?? 'OK'),
@@ -120,14 +165,13 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               final name = controller.text.trim();
               if (name.isNotEmpty) {
                 Navigator.pop(ctx);
-                setState(() {
+                await _applyTagMutation(() {
                   _tags[index] = _tags[index].copyWith(name: name);
                 });
-                _saveTags();
               }
             },
             child: Text(S.of(context)?.commonSave ?? 'Save'),
@@ -151,13 +195,12 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              setState(() {
+              await _applyTagMutation(() {
                 _selectedTags.remove(tag.name);
                 _tags.removeAt(index);
               });
-              _saveTags();
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
