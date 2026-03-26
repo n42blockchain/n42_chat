@@ -26,6 +26,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   bool _obscureCurrentPassword = true;
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -37,10 +38,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   void _changePassword() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthBloc>().add(AuthChangePasswordRequested(
-            oldPassword: _currentPasswordController.text,
-            newPassword: _newPasswordController.text,
-          ));
+      setState(() {
+        _isSubmitting = true;
+      });
+      context.read<AuthBloc>().add(
+        AuthChangePasswordRequested(
+          oldPassword: _currentPasswordController.text,
+          newPassword: _newPasswordController.text,
+        ),
+      );
     }
   }
 
@@ -57,29 +63,45 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         onBackPressed: () => Navigator.pop(context),
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
+        listenWhen: (previous, current) =>
+            _isSubmitting &&
+            (previous.changePasswordStatus != current.changePasswordStatus ||
+                previous.errorMessage != current.errorMessage),
         listener: (context, state) {
           if (state.changePasswordStatus == ChangePasswordStatus.success) {
+            setState(() {
+              _isSubmitting = false;
+            });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.settingsPasswordChanged ??
-                    'Password changed successfully. Please login with your new password.'),
+                content: Text(
+                  S.of(context)?.settingsPasswordChanged ??
+                      'Password changed successfully. Please login with your new password.',
+                ),
                 backgroundColor: AppColors.success,
               ),
             );
             // 修改成功后会自动登出，返回登录页
             Navigator.of(context).popUntil((route) => route.isFirst);
-          } else if (state.changePasswordStatus == ChangePasswordStatus.failed) {
+          } else if (state.changePasswordStatus ==
+              ChangePasswordStatus.failed) {
+            setState(() {
+              _isSubmitting = false;
+            });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ??
-                    (S.of(context)?.settingsChangePasswordFailed ?? 'Change password failed')),
+                content: Text(
+                  state.errorMessage ??
+                      (S.of(context)?.settingsChangePasswordFailed ??
+                          'Change password failed'),
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
           }
         },
         builder: (context, state) {
-          final isLoading = state.changePasswordStatus == ChangePasswordStatus.changing;
+          final isLoading = _isSubmitting;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -122,7 +144,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       onPressed: isLoading ? null : _changePassword,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+                        disabledBackgroundColor: AppColors.primary.withValues(
+                          alpha: 0.5,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -134,7 +158,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : Text(
@@ -163,7 +189,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   Widget _buildInfoCard(bool isDark) {
     final cardBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -173,20 +201,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.info_outline,
-            color: AppColors.primary,
-            size: 24,
-          ),
+          const Icon(Icons.info_outline, color: AppColors.primary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               S.of(context)?.settingsChangePasswordInfo ??
                   'After changing password, you will be logged out and need to login with the new password.',
-              style: TextStyle(
-                fontSize: 14,
-                color: textColor,
-              ),
+              style: TextStyle(fontSize: 14, color: textColor),
             ),
           ),
         ],
@@ -195,10 +216,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Widget _buildCurrentPasswordField(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +243,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           controller: _currentPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.settingsEnterCurrentPassword ?? 'Enter current password',
+            hintText:
+                S.of(context)?.settingsEnterCurrentPassword ??
+                'Enter current password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -228,13 +257,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureCurrentPassword ? Icons.visibility_off : Icons.visibility,
+                _obscureCurrentPassword
+                    ? Icons.visibility_off
+                    : Icons.visibility,
                 color: hintColor,
               ),
               onPressed: () {
@@ -248,7 +276,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.settingsEnterCurrentPassword ?? 'Please enter current password';
+              return S.of(context)?.settingsEnterCurrentPassword ??
+                  'Please enter current password';
             }
             return null;
           },
@@ -258,10 +287,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Widget _buildNewPasswordField(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,7 +314,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           controller: _newPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.settingsEnterNewPassword ?? 'Enter new password',
+            hintText:
+                S.of(context)?.settingsEnterNewPassword ?? 'Enter new password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -291,10 +327,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureNewPassword ? Icons.visibility_off : Icons.visibility,
@@ -311,10 +344,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.settingsEnterNewPassword ?? 'Please enter new password';
+              return S.of(context)?.settingsEnterNewPassword ??
+                  'Please enter new password';
             }
             if (value.length < 8) {
-              return S.of(context)?.commonPasswordMinLength ?? 'Password must be at least 8 characters';
+              return S.of(context)?.commonPasswordMinLength ??
+                  'Password must be at least 8 characters';
             }
             if (value == _currentPasswordController.text) {
               return S.of(context)?.settingsNewPasswordMustBeDifferent ??
@@ -328,10 +363,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Widget _buildConfirmPasswordField(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,7 +390,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.commonReenterPassword ?? 'Re-enter password',
+            hintText:
+                S.of(context)?.commonReenterPassword ?? 'Re-enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -361,13 +403,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                _obscureConfirmPassword
+                    ? Icons.visibility_off
+                    : Icons.visibility,
                 color: hintColor,
               ),
               onPressed: () {
@@ -382,10 +423,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           onFieldSubmitted: (_) => _changePassword(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.commonReenterPassword ?? 'Please re-enter password';
+              return S.of(context)?.commonReenterPassword ??
+                  'Please re-enter password';
             }
             if (value != _newPasswordController.text) {
-              return S.of(context)?.commonPasswordsDoNotMatch ?? 'Passwords do not match';
+              return S.of(context)?.commonPasswordsDoNotMatch ??
+                  'Passwords do not match';
             }
             return null;
           },
@@ -395,32 +438,31 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Widget _buildPasswordRequirements(bool isDark) {
-    final textColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final textColor = isDark
+        ? AppColors.textTertiaryDark
+        : AppColors.textTertiary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.settingsPasswordRequirements ?? 'Password requirements:',
-          style: TextStyle(
-            fontSize: 12,
-            color: textColor,
-          ),
+          S.of(context)?.settingsPasswordRequirements ??
+              'Password requirements:',
+          style: TextStyle(fontSize: 12, color: textColor),
         ),
         const SizedBox(height: 4),
         Text(
           '• ${S.of(context)?.commonPasswordMinLength ?? 'At least 8 characters'}',
-          style: TextStyle(
-            fontSize: 12,
-            color: textColor,
-          ),
+          style: TextStyle(fontSize: 12, color: textColor),
         ),
       ],
     );
   }
 
   Widget _buildSecurityNote(bool isDark) {
-    final textColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final textColor = isDark
+        ? AppColors.textTertiaryDark
+        : AppColors.textTertiary;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -430,20 +472,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.security,
-            color: Colors.orange,
-            size: 20,
-          ),
+          const Icon(Icons.security, color: Colors.orange, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               S.of(context)?.settingsSecurityNote ??
                   'For security, you will need to re-login on all devices after changing password.',
-              style: TextStyle(
-                fontSize: 12,
-                color: textColor,
-              ),
+              style: TextStyle(fontSize: 12, color: textColor),
             ),
           ),
         ],
