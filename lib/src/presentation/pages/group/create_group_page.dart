@@ -32,6 +32,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   final Set<String> _selectedUserIds = {};
   Uint8List? _avatarBytes;
   bool _isSearching = false;
+  bool _isCreating = false;
 
   @override
   void initState() {
@@ -70,26 +71,42 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   }
 
   void _createGroup() {
+    if (_isCreating) {
+      return;
+    }
+
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.commonEnterGroupName ?? 'Enter group name')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.commonEnterGroupName ?? 'Enter group name',
+          ),
+        ),
       );
       return;
     }
 
     if (_selectedUserIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.groupSelectAtLeastOne ?? 'Please select at least one member')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.groupSelectAtLeastOne ??
+                'Please select at least one member',
+          ),
+        ),
       );
       return;
     }
 
-    context.read<GroupBloc>().add(CreateGroup(
-          name: name,
-          inviteUserIds: _selectedUserIds.toList(),
-          avatar: _avatarBytes,
-        ));
+    setState(() => _isCreating = true);
+    context.read<GroupBloc>().add(
+      CreateGroup(
+        name: name,
+        inviteUserIds: _selectedUserIds.toList(),
+        avatar: _avatarBytes,
+      ),
+    );
   }
 
   @override
@@ -98,16 +115,27 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
     return BlocListener<GroupBloc, GroupState>(
       listener: (context, state) {
+        if (!_isCreating) {
+          return;
+        }
+
         if (state.status == GroupStatus.created) {
+          setState(() => _isCreating = false);
           Navigator.of(context).pop(state.createdRoomId!);
-        } else if (state.status == GroupStatus.error && state.errorMessage != null) {
+        } else if (state.status == GroupStatus.error &&
+            state.errorMessage != null) {
+          setState(() => _isCreating = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
+            SnackBar(
+              content: Text(resolveBlocMessage(context, state.errorMessage!)),
+            ),
           );
         }
       },
       child: Scaffold(
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.background,
         appBar: N42AppBar(
           title: S.of(context)?.commonCreateGroup ?? 'Create Group',
           leading: IconButton(
@@ -116,15 +144,24 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
           ),
           actions: [
             TextButton(
-              onPressed: _selectedUserIds.isNotEmpty ? _createGroup : null,
-              child: Text(
-                S.of(context)?.groupDone(_selectedUserIds.length) ?? 'Done(${_selectedUserIds.length})',
-                style: TextStyle(
-                  color: _selectedUserIds.isNotEmpty
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
-                ),
-              ),
+              onPressed: (_selectedUserIds.isNotEmpty && !_isCreating)
+                  ? _createGroup
+                  : null,
+              child: _isCreating
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(
+                      S.of(context)?.groupDone(_selectedUserIds.length) ??
+                          'Done(${_selectedUserIds.length})',
+                      style: TextStyle(
+                        color: _selectedUserIds.isNotEmpty
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
             ),
           ],
         ),
@@ -143,7 +180,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.backgroundDark : AppColors.background,
+                        color: isDark
+                            ? AppColors.backgroundDark
+                            : AppColors.background,
                         borderRadius: BorderRadius.circular(8),
                         image: _avatarBytes != null
                             ? DecorationImage(
@@ -153,7 +192,10 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                             : null,
                       ),
                       child: _avatarBytes == null
-                          ? const Icon(Icons.camera_alt, color: AppColors.textSecondary)
+                          ? const Icon(
+                              Icons.camera_alt,
+                              color: AppColors.textSecondary,
+                            )
                           : null,
                     ),
                   ),
@@ -163,7 +205,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                     child: TextField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        hintText: S.of(context)?.commonEnterGroupName ?? 'Enter group name',
+                        hintText:
+                            S.of(context)?.commonEnterGroupName ??
+                            'Enter group name',
                         border: InputBorder.none,
                         hintStyle: TextStyle(
                           color: isDark
@@ -215,7 +259,8 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               padding: const EdgeInsets.all(12),
               child: N42SearchBar(
                 controller: _searchController,
-                hintText: S.of(context)?.commonSearchContacts ?? 'Search contacts',
+                hintText:
+                    S.of(context)?.commonSearchContacts ?? 'Search contacts',
                 onChanged: (query) {
                   setState(() {
                     _isSearching = query.isNotEmpty;
@@ -252,7 +297,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                     itemCount: contacts.length,
                     itemBuilder: (context, index) {
                       final contact = contacts[index];
-                      final isSelected = _selectedUserIds.contains(contact.userId);
+                      final isSelected = _selectedUserIds.contains(
+                        contact.userId,
+                      );
 
                       return SimpleContactTile(
                         contact: contact,
@@ -320,4 +367,3 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     );
   }
 }
-
