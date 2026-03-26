@@ -89,7 +89,8 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
           _isChecking = false;
           _isAvailable = available;
           if (!available) {
-            _errorMessage = S.of(context)?.usernameUnavailable ?? 'Username already taken';
+            _errorMessage =
+                S.of(context)?.usernameUnavailable ?? 'Username already taken';
           }
         });
       }
@@ -102,9 +103,11 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
 
     setState(() => _isSaving = true);
 
-    final success = await _usernameService.claimUsername(username);
+    try {
+      final success = await _usernameService.claimUsername(username);
 
-    if (mounted) {
+      if (!mounted) return;
+
       setState(() => _isSaving = false);
       if (success) {
         final s = S.of(context);
@@ -117,6 +120,12 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
           const SnackBar(content: Text('Failed to save username')),
         );
       }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to save username: $e')));
     }
   }
 
@@ -127,9 +136,11 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_currentUsername != null
-            ? (s?.usernameChange ?? 'Change Username')
-            : (s?.usernameSet ?? 'Set Username')),
+        title: Text(
+          _currentUsername != null
+              ? (s?.usernameChange ?? 'Change Username')
+              : (s?.usernameSet ?? 'Set Username'),
+        ),
         actions: [
           TextButton(
             onPressed: (_isAvailable && !_isSaving) ? _saveUsername : null,
@@ -150,10 +161,7 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
           children: [
             Text(
               s?.usernameTitle ?? 'Username',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -172,10 +180,10 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
                         ),
                       )
                     : _isAvailable && _controller.text.trim().isNotEmpty
-                        ? const Icon(Icons.check_circle, color: Colors.green)
-                        : _errorMessage != null
-                            ? const Icon(Icons.error, color: Colors.red)
-                            : null,
+                    ? const Icon(Icons.check_circle, color: Colors.green)
+                    : _errorMessage != null
+                    ? const Icon(Icons.error, color: Colors.red)
+                    : null,
                 errorText: _errorMessage,
               ),
               autocorrect: false,
