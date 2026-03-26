@@ -61,6 +61,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isNftAvatar = false; // 头像是否来自 NFT
   AvatarDecorationPreset _avatarDecorationPreset = AvatarDecorationPreset.none;
   StreamSubscription<UserEntity?>? _userSubscription;
+  int _loadVersion = 0;
 
   @override
   void initState() {
@@ -78,6 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _handleUserChanged(UserEntity? user) {
     if (!mounted) return;
     if (user == null) {
+      _loadVersion++;
       setState(() {
         _userId = null;
         _displayName = null;
@@ -95,11 +97,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserInfo() async {
     if (!mounted) return;
+    final loadVersion = ++_loadVersion;
     try {
       final clientManager = getIt<MatrixClientManager>();
       final client = clientManager.client;
 
       if (client != null && client.isLogged()) {
+        if (!mounted || loadVersion != _loadVersion) return;
         setState(() {
           _userId = client.userID;
           _displayName =
@@ -119,7 +123,7 @@ class _ProfilePageState extends State<ProfilePage> {
           final email = results[1] as String?;
           final phoneNumber = results[2] as String?;
           final profile = results[3] as UserEntity?;
-          if (mounted) {
+          if (mounted && loadVersion == _loadVersion) {
             setState(() {
               _statusText = status;
               _boundEmail = email;
@@ -135,7 +139,7 @@ class _ProfilePageState extends State<ProfilePage> {
         } catch (e) {
           debugLog('Failed to get my status: $e');
         }
-      } else if (mounted) {
+      } else if (mounted && loadVersion == _loadVersion) {
         setState(() {
           _userId = null;
           _displayName = null;
