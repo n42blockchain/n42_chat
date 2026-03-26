@@ -41,8 +41,8 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
     _tabController = TabController(length: _tabs.length, vsync: this);
     _tabController.addListener(_onTabChanged);
     context.read<StorageManagementBloc>().add(
-          LoadRoomMediaDetail(roomId: widget.roomId),
-        );
+      LoadRoomMediaDetail(roomId: widget.roomId),
+    );
   }
 
   void _onTabChanged() {
@@ -52,11 +52,11 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
       _selectedFiles.clear();
     });
     context.read<StorageManagementBloc>().add(
-          LoadRoomMediaDetail(
-            roomId: widget.roomId,
-            filterCategory: _currentCategory,
-          ),
-        );
+      LoadRoomMediaDetail(
+        roomId: widget.roomId,
+        filterCategory: _currentCategory,
+      ),
+    );
   }
 
   @override
@@ -83,15 +83,18 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
-          unselectedLabelColor:
-              isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          unselectedLabelColor: isDark
+              ? AppColors.textSecondaryDark
+              : AppColors.textSecondary,
           indicatorColor: AppColors.primary,
           tabs: _tabs.map((t) => Tab(text: t)).toList(),
         ),
@@ -104,12 +107,32 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
                 previous.error != current.error),
         listener: (context, state) {
           if (!_deleteRequested || state.isCleaning) return;
+          final messenger = ScaffoldMessenger.of(context);
+          final error = state.error;
+          final cleanupResult = state.lastCleanupResult;
           setState(() {
             _deleteRequested = false;
-            if (state.error == null && state.lastCleanupResult != null) {
+            if (error == null && cleanupResult != null) {
               _selectedFiles.clear();
             }
           });
+          if (error != null) {
+            messenger.showSnackBar(
+              SnackBar(content: Text(error), backgroundColor: Colors.red),
+            );
+            return;
+          }
+          if (cleanupResult != null) {
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Freed ${StorageInfo.formatSize(cleanupResult.bytesFreed)} '
+                  '(${cleanupResult.filesDeleted} files)',
+                ),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
         },
         builder: (context, state) {
           return Column(
@@ -167,12 +190,12 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
               Navigator.pop(dialogContext);
               setState(() => _deleteRequested = true);
               context.read<StorageManagementBloc>().add(
-                    DeleteSelectedFiles(
-                      _selectedFiles.toList(),
-                      roomId: widget.roomId,
-                      filterCategory: _currentCategory,
-                    ),
-                  );
+                DeleteSelectedFiles(
+                  _selectedFiles.toList(),
+                  roomId: widget.roomId,
+                  filterCategory: _currentCategory,
+                ),
+              );
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
@@ -251,7 +274,9 @@ class _StatItem extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
       ],
@@ -280,7 +305,9 @@ class _MediaFileList extends StatelessWidget {
         child: Text(
           'No files found',
           style: TextStyle(
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
       );
@@ -324,9 +351,12 @@ class _MediaFileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     IconData icon;
     Color color;

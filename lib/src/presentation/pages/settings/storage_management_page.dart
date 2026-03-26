@@ -56,13 +56,21 @@ class _StorageManagementView extends StatelessWidget {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: BlocConsumer<StorageManagementBloc, StorageManagementState>(
+        listenWhen: (previous, current) =>
+            previous.lastCleanupResult != current.lastCleanupResult ||
+            previous.error != current.error,
         listener: (context, state) {
+          if (ModalRoute.of(context)?.isCurrent != true) {
+            return;
+          }
           if (state.lastCleanupResult != null) {
             final result = state.lastCleanupResult!;
             ScaffoldMessenger.of(context).showSnackBar(
@@ -90,9 +98,9 @@ class _StorageManagementView extends StatelessWidget {
           }
           return RefreshIndicator(
             onRefresh: () async {
-              context
-                  .read<StorageManagementBloc>()
-                  .add(const LoadStorageInfo());
+              context.read<StorageManagementBloc>().add(
+                const LoadStorageInfo(),
+              );
             },
             child: ListView(
               children: [
@@ -131,9 +139,12 @@ class _StorageOverviewSection extends StatelessWidget {
     if (info == null) return const SizedBox.shrink();
 
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Container(
       color: cardColor,
@@ -174,10 +185,7 @@ class _StorageOverviewSection extends StatelessWidget {
                     ),
                     Text(
                       S.of(context)?.totalUsage ?? 'Total Usage',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: secondaryColor,
-                      ),
+                      style: TextStyle(fontSize: 12, color: secondaryColor),
                     ),
                   ],
                 ),
@@ -236,17 +244,16 @@ class _LegendItem extends StatelessWidget {
         Container(
           width: 10,
           height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(height: 4),
         Text(
           label,
           style: TextStyle(
             fontSize: 11,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
         Text(
@@ -322,7 +329,9 @@ class _SmartCleanupSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
 
     return Container(
       color: cardColor,
@@ -333,8 +342,11 @@ class _SmartCleanupSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                const Icon(Icons.auto_fix_high,
-                    color: AppColors.primary, size: 20),
+                const Icon(
+                  Icons.auto_fix_high,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Smart Cleanup',
@@ -348,13 +360,14 @@ class _SmartCleanupSection extends StatelessWidget {
             ),
           ),
           ...state.recommendations
-              .where((r) =>
-                  r.type != CleanupRecommendationType.roomSpecific)
+              .where((r) => r.type != CleanupRecommendationType.roomSpecific)
               .take(3)
-              .map((rec) => _RecommendationTile(
-                    recommendation: rec,
-                    isCleaning: state.isCleaning,
-                  )),
+              .map(
+                (rec) => _RecommendationTile(
+                  recommendation: rec,
+                  isCleaning: state.isCleaning,
+                ),
+              ),
           const SizedBox(height: 8),
         ],
       ),
@@ -374,8 +387,9 @@ class _RecommendationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final secondaryColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     IconData icon;
     Color color;
@@ -422,9 +436,9 @@ class _RecommendationTile extends StatelessWidget {
       trailing: TextButton(
         onPressed: isCleaning
             ? null
-            : () => context
-                .read<StorageManagementBloc>()
-                .add(ExecuteCleanup(recommendation)),
+            : () => context.read<StorageManagementBloc>().add(
+                ExecuteCleanup(recommendation),
+              ),
         child: Text(
           recommendation.formattedSize,
           style: TextStyle(
@@ -447,9 +461,12 @@ class _RoomStorageSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     if (state.roomStorageList.isEmpty) return const SizedBox.shrink();
 
@@ -469,7 +486,9 @@ class _RoomStorageSection extends StatelessWidget {
               ),
             ),
           ),
-          ...state.roomStorageList.take(5).map(
+          ...state.roomStorageList
+              .take(5)
+              .map(
                 (room) => ListTile(
                   title: Text(
                     room.roomName,
@@ -486,14 +505,14 @@ class _RoomStorageSection extends StatelessWidget {
                     children: [
                       Text(
                         room.formattedSize,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: secondaryColor,
-                        ),
+                        style: TextStyle(fontSize: 14, color: secondaryColor),
                       ),
                       const SizedBox(width: 4),
-                      Icon(Icons.chevron_right,
-                          size: 20, color: secondaryColor),
+                      Icon(
+                        Icons.chevron_right,
+                        size: 20,
+                        color: secondaryColor,
+                      ),
                     ],
                   ),
                   onTap: () {
@@ -515,10 +534,7 @@ class _RoomStorageSection extends StatelessWidget {
             ListTile(
               title: Text(
                 'View all ${state.roomStorageList.length} rooms',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.primary,
-                ),
+                style: const TextStyle(fontSize: 14, color: AppColors.primary),
                 textAlign: TextAlign.center,
               ),
               onTap: () {
@@ -542,9 +558,12 @@ class _StorageSettingsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
     final config = state.storageConfig ?? const StorageConfig();
 
     return Container(
@@ -576,14 +595,15 @@ class _StorageSettingsSection extends StatelessWidget {
             activeTrackColor: AppColors.primary,
             onChanged: (value) {
               context.read<StorageManagementBloc>().add(
-                    UpdateStorageConfig(autoCleanupEnabled: value),
-                  );
+                UpdateStorageConfig(autoCleanupEnabled: value),
+              );
             },
           ),
           Divider(
-              height: 1,
-              indent: 16,
-              color: isDark ? AppColors.dividerDark : AppColors.divider),
+            height: 1,
+            indent: 16,
+            color: isDark ? AppColors.dividerDark : AppColors.divider,
+          ),
           ListTile(
             title: Text(
               'Cleanup Period',
@@ -593,24 +613,22 @@ class _StorageSettingsSection extends StatelessWidget {
               value: config.autoCleanupDays,
               underline: const SizedBox.shrink(),
               items: [30, 60, 90, 180, 365].map((days) {
-                return DropdownMenuItem(
-                  value: days,
-                  child: Text('$days days'),
-                );
+                return DropdownMenuItem(value: days, child: Text('$days days'));
               }).toList(),
               onChanged: (days) {
                 if (days != null) {
                   context.read<StorageManagementBloc>().add(
-                        UpdateStorageConfig(autoCleanupDays: days),
-                      );
+                    UpdateStorageConfig(autoCleanupDays: days),
+                  );
                 }
               },
             ),
           ),
           Divider(
-              height: 1,
-              indent: 16,
-              color: isDark ? AppColors.dividerDark : AppColors.divider),
+            height: 1,
+            indent: 16,
+            color: isDark ? AppColors.dividerDark : AppColors.divider,
+          ),
           SwitchListTile(
             title: Text(
               'Preserve Thumbnails',
@@ -624,8 +642,8 @@ class _StorageSettingsSection extends StatelessWidget {
             activeTrackColor: AppColors.primary,
             onChanged: (value) {
               context.read<StorageManagementBloc>().add(
-                    UpdateStorageConfig(preserveThumbnails: value),
-                  );
+                UpdateStorageConfig(preserveThumbnails: value),
+              );
             },
           ),
           const SizedBox(height: 8),
@@ -659,7 +677,9 @@ class _ClearCacheButton extends StatelessWidget {
         subtitle: Text(
           state.storageInfo?.formattedCache ?? '',
           style: TextStyle(
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
             fontSize: 12,
           ),
         ),
@@ -670,9 +690,7 @@ class _ClearCacheButton extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.chevron_right),
-        onTap: state.isCleaning
-            ? null
-            : () => _confirmClearCache(context),
+        onTap: state.isCleaning ? null : () => _confirmClearCache(context),
       ),
     );
   }
@@ -682,8 +700,9 @@ class _ClearCacheButton extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.clearCache ?? 'Clear Cache'),
-        content: Text(S.of(context)?.confirmClearCache ??
-            'Clear all cache data?'),
+        content: Text(
+          S.of(context)?.confirmClearCache ?? 'Clear all cache data?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -692,9 +711,7 @@ class _ClearCacheButton extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              context
-                  .read<StorageManagementBloc>()
-                  .add(const ClearCache());
+              context.read<StorageManagementBloc>().add(const ClearCache());
             },
             child: Text(S.of(context)?.commonConfirm ?? 'OK'),
           ),
@@ -726,7 +743,9 @@ class _StorageRingPainter extends CustomPainter {
     final radius = math.min(size.width, size.height) / 2;
     const strokeWidth = 16.0;
     final rect = Rect.fromCircle(
-        center: center, radius: radius - strokeWidth / 2);
+      center: center,
+      radius: radius - strokeWidth / 2,
+    );
 
     // 背景圆环
     final bgPaint = Paint()
