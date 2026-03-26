@@ -36,6 +36,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
   List<GroupEntity>? _groups;
   bool _isLoading = true;
   String? _error;
+  int _loadVersion = 0;
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
   }
 
   Future<void> _loadCommonGroups() async {
+    final loadVersion = ++_loadVersion;
     setState(() {
       _isLoading = true;
       _error = null;
@@ -55,24 +57,27 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
 
       // 从本地内存中查找与目标用户共同的群组：
       // 过滤出非 Space、非直聊、且对方也是成员的所有房间
-      final commonGroups = client.rooms.where((room) {
-        // 排除 Space 类型房间
-        final createEvent = room.getState(matrix.EventTypes.RoomCreate);
-        if (createEvent?.content['type'] == 'm.space') return false;
-        // 排除直聊房间（DM）
-        if (room.isDirectChat) return false;
-        // 检查 widget.userId 是否在成员列表中
-        return room.getParticipants().any((u) => u.id == widget.userId);
-      }).map(_roomToGroupEntity).toList();
+      final commonGroups = client.rooms
+          .where((room) {
+            // 排除 Space 类型房间
+            final createEvent = room.getState(matrix.EventTypes.RoomCreate);
+            if (createEvent?.content['type'] == 'm.space') return false;
+            // 排除直聊房间（DM）
+            if (room.isDirectChat) return false;
+            // 检查 widget.userId 是否在成员列表中
+            return room.getParticipants().any((u) => u.id == widget.userId);
+          })
+          .map(_roomToGroupEntity)
+          .toList();
 
-      if (mounted) {
+      if (mounted && loadVersion == _loadVersion) {
         setState(() {
           _groups = commonGroups;
           _isLoading = false;
         });
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted && loadVersion == _loadVersion) {
         setState(() {
           _error = e.toString();
           _isLoading = false;
@@ -103,8 +108,12 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -128,10 +137,16 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
     );
   }
 
-  Widget _buildBody(Color cardColor, Color textColor, Color secondaryTextColor) {
+  Widget _buildBody(
+    Color cardColor,
+    Color textColor,
+    Color secondaryTextColor,
+  ) {
     if (_isLoading) {
       return Center(
-        child: N42Loading(message: S.of(context)?.commonLoading ?? 'Loading...'),
+        child: N42Loading(
+          message: S.of(context)?.commonLoading ?? 'Loading...',
+        ),
       );
     }
 
@@ -150,7 +165,8 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
       return Center(
         child: N42EmptyState.noData(
           title: S.of(context)?.contactNoCommonGroups ?? 'No common groups',
-          description: S.of(context)?.contactNoCommonGroupsDescription ??
+          description:
+              S.of(context)?.contactNoCommonGroupsDescription ??
               'You don\'t have any groups in common',
         ),
       );
@@ -188,10 +204,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
         subtitle: Text(
           S.of(context)?.commonMemberCount(group.memberCount) ??
               '${group.memberCount} members',
-          style: TextStyle(
-            color: secondaryTextColor,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: secondaryTextColor, fontSize: 13),
         ),
         trailing: Icon(
           Icons.chevron_right,
