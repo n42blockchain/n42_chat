@@ -29,6 +29,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   int _currentStep = 0; // 0: 输入密码和邮箱, 1: 输入验证码
   int _countdown = 0;
   Timer? _countdownTimer;
+  _ChangeEmailAction? _pendingAction;
 
   @override
   void initState() {
@@ -47,11 +48,18 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   void _startCountdown() {
+    if (!mounted) {
+      return;
+    }
     setState(() {
       _countdown = 60;
     });
     _countdownTimer?.cancel();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       if (_countdown > 0) {
         setState(() {
           _countdown--;
@@ -64,10 +72,15 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
 
   void _requestCode() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthBloc>().add(AuthRequestChangeEmailRequested(
-            password: _passwordController.text,
-            newEmail: _emailController.text.trim(),
-          ));
+      setState(() {
+        _pendingAction = _ChangeEmailAction.requestCode;
+      });
+      context.read<AuthBloc>().add(
+        AuthRequestChangeEmailRequested(
+          password: _passwordController.text,
+          newEmail: _emailController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -75,24 +88,33 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     if (_codeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.commonEnterVerificationCode ?? 'Please enter verification code'),
+          content: Text(
+            S.of(context)?.commonEnterVerificationCode ??
+                'Please enter verification code',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
       return;
     }
 
-    context.read<AuthBloc>().add(AuthConfirmChangeEmailRequested(
-          newEmail: _emailController.text.trim(),
-          code: _codeController.text.trim(),
-        ));
+    setState(() {
+      _pendingAction = _ChangeEmailAction.confirmChange;
+    });
+    context.read<AuthBloc>().add(
+      AuthConfirmChangeEmailRequested(
+        newEmail: _emailController.text.trim(),
+        code: _codeController.text.trim(),
+      ),
+    );
   }
 
   static final _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return S.of(context)?.commonEnterEmailAddress ?? 'Please enter email address';
+      return S.of(context)?.commonEnterEmailAddress ??
+          'Please enter email address';
     }
     if (!_emailRegex.hasMatch(value)) {
       return S.of(context)?.commonInvalidEmailFormat ?? 'Invalid email format';
@@ -113,40 +135,61 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         onBackPressed: () => Navigator.pop(context),
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
+        listenWhen: (previous, current) =>
+            _pendingAction != null &&
+            (previous.changeEmailStatus != current.changeEmailStatus ||
+                previous.errorMessage != current.errorMessage),
         listener: (context, state) {
-          if (state.changeEmailStatus == ChangeEmailStatus.codeSent) {
+          if (_pendingAction == _ChangeEmailAction.requestCode &&
+              state.changeEmailStatus == ChangeEmailStatus.codeSent) {
             // 验证码发送成功，进入下一步
             setState(() {
               _currentStep = 1;
+              _pendingAction = null;
             });
             _startCountdown();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.settingsVerificationCodeSent ?? 'Verification code sent'),
+                content: Text(
+                  S.of(context)?.settingsVerificationCodeSent ??
+                      'Verification code sent',
+                ),
                 backgroundColor: AppColors.success,
               ),
             );
-          } else if (state.changeEmailStatus == ChangeEmailStatus.success) {
+          } else if (_pendingAction == _ChangeEmailAction.confirmChange &&
+              state.changeEmailStatus == ChangeEmailStatus.success) {
+            setState(() {
+              _pendingAction = null;
+            });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.settingsEmailChangedSuccess ?? 'Email changed successfully'),
+                content: Text(
+                  S.of(context)?.settingsEmailChangedSuccess ??
+                      'Email changed successfully',
+                ),
                 backgroundColor: AppColors.success,
               ),
             );
             Navigator.pop(context);
           } else if (state.changeEmailStatus == ChangeEmailStatus.failed) {
+            setState(() {
+              _pendingAction = null;
+            });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ??
-                    (S.of(context)?.settingsChangeEmailFailed ?? 'Change email failed')),
+                content: Text(
+                  state.errorMessage ??
+                      (S.of(context)?.settingsChangeEmailFailed ??
+                          'Change email failed'),
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
           }
         },
         builder: (context, state) {
-          final isLoading = state.changeEmailStatus == ChangeEmailStatus.sendingCode ||
-              state.changeEmailStatus == ChangeEmailStatus.confirming;
+          final isLoading = _pendingAction != null;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -158,7 +201,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                   const SizedBox(height: 16),
 
                   // 当前绑定邮箱
-                  if (state.boundEmail != null) _buildCurrentEmailCard(isDark, state.boundEmail!),
+                  if (state.boundEmail != null)
+                    _buildCurrentEmailCard(isDark, state.boundEmail!),
 
                   const SizedBox(height: 24),
 
@@ -191,8 +235,12 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
 
   Widget _buildCurrentEmailCard(bool isDark, String email) {
     final cardBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final labelColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -202,22 +250,16 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.email_outlined,
-            color: AppColors.primary,
-            size: 24,
-          ),
+          const Icon(Icons.email_outlined, color: AppColors.primary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  S.of(context)?.settingsCurrentBoundEmail ?? 'Current bound email',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: textColor,
-                  ),
+                  S.of(context)?.settingsCurrentBoundEmail ??
+                      'Current bound email',
+                  style: TextStyle(fontSize: 12, color: textColor),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -237,10 +279,16 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildPasswordField(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,7 +306,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.settingsEnterCurrentPassword ?? 'Enter current password',
+            hintText:
+                S.of(context)?.settingsEnterCurrentPassword ??
+                'Enter current password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -270,10 +320,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -290,7 +337,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.settingsEnterCurrentPassword ?? 'Please enter current password';
+              return S.of(context)?.settingsEnterCurrentPassword ??
+                  'Please enter current password';
             }
             return null;
           },
@@ -300,10 +348,16 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildNewEmailField(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,7 +375,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.settingsEnterNewEmail ?? 'Enter new email address',
+            hintText:
+                S.of(context)?.settingsEnterNewEmail ??
+                'Enter new email address',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -333,10 +389,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.email_outlined,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.email_outlined, color: hintColor),
           ),
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.done,
@@ -347,10 +400,16 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildCodeField(bool isDark) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,17 +425,16 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         const SizedBox(height: 8),
         Text(
           '${S.of(context)?.settingsCodeSentTo ?? 'Verification code sent to'} ${_emailController.text}',
-          style: TextStyle(
-            fontSize: 12,
-            color: hintColor,
-          ),
+          style: TextStyle(fontSize: 12, color: hintColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _codeController,
           style: TextStyle(color: textColor, fontSize: 16),
           decoration: InputDecoration(
-            hintText: S.of(context)?.commonEnterVerificationCode ?? 'Enter verification code',
+            hintText:
+                S.of(context)?.commonEnterVerificationCode ??
+                'Enter verification code',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
@@ -388,10 +446,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               horizontal: 16,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.verified_outlined,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.verified_outlined, color: hintColor),
           ),
           keyboardType: TextInputType.number,
           textInputAction: TextInputAction.done,
@@ -409,9 +464,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
         child: isLoading
@@ -424,7 +477,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                 ),
               )
             : Text(
-                S.of(context)?.commonSendVerificationCode ?? 'Send Verification Code',
+                S.of(context)?.commonSendVerificationCode ??
+                    'Send Verification Code',
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
@@ -437,17 +491,17 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
 
   Widget _buildResendButton(bool isDark, bool isLoading) {
     final canResend = _countdown == 0 && !isLoading;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          S.of(context)?.settingsDidNotReceiveCode ?? "Didn't receive the code?",
-          style: TextStyle(
-            fontSize: 14,
-            color: textColor,
-          ),
+          S.of(context)?.settingsDidNotReceiveCode ??
+              "Didn't receive the code?",
+          style: TextStyle(fontSize: 14, color: textColor),
         ),
         TextButton(
           onPressed: canResend ? _requestCode : null,
@@ -473,9 +527,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
         child: isLoading
@@ -500,7 +552,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildSecurityNote(bool isDark) {
-    final textColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final textColor = isDark
+        ? AppColors.textTertiaryDark
+        : AppColors.textTertiary;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -510,20 +564,13 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.security,
-            color: Colors.orange,
-            size: 20,
-          ),
+          const Icon(Icons.security, color: Colors.orange, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               S.of(context)?.settingsEmailSecurityNote ??
                   'Your email is used for password recovery. Please keep it secure.',
-              style: TextStyle(
-                fontSize: 12,
-                color: textColor,
-              ),
+              style: TextStyle(fontSize: 12, color: textColor),
             ),
           ),
         ],
@@ -531,3 +578,5 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     );
   }
 }
+
+enum _ChangeEmailAction { requestCode, confirmChange }
