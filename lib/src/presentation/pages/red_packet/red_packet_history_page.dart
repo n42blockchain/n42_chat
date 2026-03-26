@@ -45,16 +45,23 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
   }
 
   Future<void> _loadHistory() async {
-    final service = getIt<IRedPacketService>();
-    final history = await service.getRedPacketHistory(
-      roomId: widget.roomId,
-      userId: widget.userId,
-    );
-    if (mounted) {
-      setState(() {
-        _allRedPackets = history;
-        _isLoading = false;
-      });
+    try {
+      final service = getIt<IRedPacketService>();
+      final history = await service.getRedPacketHistory(
+        roomId: widget.roomId,
+        userId: widget.userId,
+      );
+      if (mounted) {
+        setState(() {
+          _allRedPackets = history;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('RedPacketHistoryPage._loadHistory error: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
