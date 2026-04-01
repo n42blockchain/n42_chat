@@ -64,6 +64,7 @@ class SyncOptimizationService {
       );
 
       // 在服务器上创建 filter 并获取 filterId
+      if (client.userID == null) return;
       final filterId = await client.defineFilter(client.userID!, filter);
 
       debugLog('SyncOptimizationService: Sync filter configured: $filterId');

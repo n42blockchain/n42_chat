@@ -259,6 +259,7 @@ class SelfDestructService extends ChangeNotifier {
     clear();
     _destructionCallbacks.clear();
     _countdownCallbacks.clear();
+    _instance = null;
     super.dispose();
   }
 }

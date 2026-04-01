@@ -67,8 +67,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
   void _playMusic(MessageEntity message) {
     final url = message.metadata?.musicUrl;
     if (url != null && url.isNotEmpty) {
-      // 打开音乐链接
-      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      final uri = Uri.tryParse(url);
+      if (uri == null) return;
+      // 只允许 http/https scheme，防止恶意 URL
+      if (uri.scheme != 'http' && uri.scheme != 'https') return;
+      launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 

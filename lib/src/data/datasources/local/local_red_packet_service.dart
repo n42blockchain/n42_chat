@@ -100,28 +100,29 @@ class LocalRedPacketService extends IRedPacketService {
 
   /// 二倍均值随机算法（微信红包算法）
   ///
-  /// 每次随机范围为 [0.01, remainingAmount / remainingCount * 2]
+  /// 使用整数分（cents）计算避免浮点精度误差。
+  /// 每次随机范围为 [1 cent, remainingCents / remainingCount * 2]
   double _calculateClaimAmount(RedPacketEntity redPacket) {
     if (redPacket.type == RedPacketType.normal) {
-      // 等额拆分
-      return double.parse(
-        (redPacket.totalAmount / redPacket.totalCount).toStringAsFixed(2),
-      );
+      // 等额拆分：用整数分计算后转回元
+      final totalCents = (redPacket.totalAmount * 100).round();
+      final perCents = totalCents ~/ redPacket.totalCount;
+      return perCents / 100.0;
     }
 
-    // Lucky 红包 - 二倍均值算法
-    final remaining = redPacket.remainingAmount;
+    // Lucky 红包 - 二倍均值算法（整数分计算）
+    final remainingCents = (redPacket.remainingAmount * 100).round();
     final remainingCount = redPacket.remainingCount;
 
     if (remainingCount == 1) {
       // 最后一个人拿走剩余
-      return double.parse(remaining.toStringAsFixed(2));
+      return remainingCents / 100.0;
     }
 
-    final maxAmount = (remaining / remainingCount) * 2;
-    const minAmount = 0.01;
-    final amount = minAmount + _random.nextDouble() * (maxAmount - minAmount);
-    return double.parse(amount.toStringAsFixed(2));
+    final maxCents = (remainingCents ~/ remainingCount) * 2;
+    const minCents = 1; // 最少 0.01 元
+    final amountCents = minCents + _random.nextInt(maxCents - minCents + 1);
+    return amountCents / 100.0;
   }
 
   @override

@@ -302,6 +302,18 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   // 全文搜索
   // ============================================
 
+  /// Sanitize user input for FTS5 MATCH queries.
+  /// Escapes double quotes and wraps each token in quotes to prevent
+  /// FTS5 operator injection (AND, OR, NOT, NEAR, *, etc.).
+  static String _sanitizeFtsQuery(String query) {
+    // Split into tokens, escape each individually, wrap in quotes
+    return query
+        .split(RegExp(r'\s+'))
+        .where((t) => t.isNotEmpty)
+        .map((t) => '"${t.replaceAll('"', '""')}"')
+        .join(' ');
+  }
+
   /// FTS5 全文搜索
   Future<List<ArchivedMessage>> searchMessages(
     String query, {
@@ -311,7 +323,7 @@ class ArchiveDatabase extends _$ArchiveDatabase {
     int limit = 20,
     int offset = 0,
   }) async {
-    final ftsQuery = query.replaceAll('"', '""');
+    final ftsQuery = _sanitizeFtsQuery(query);
     final conditions = <String>[];
     final variables = <Variable>[];
 
@@ -340,7 +352,7 @@ class ArchiveDatabase extends _$ArchiveDatabase {
     final rows = await customSelect(
       sql,
       variables: [
-        Variable.withString('"$ftsQuery"'),
+        Variable.withString(ftsQuery),
         ...variables,
         Variable.withInt(limit),
         Variable.withInt(offset),
@@ -370,7 +382,7 @@ class ArchiveDatabase extends _$ArchiveDatabase {
     String query, {
     String? roomId,
   }) async {
-    final ftsQuery = query.replaceAll('"', '""');
+    final ftsQuery = _sanitizeFtsQuery(query);
     final conditions = <String>[];
     final variables = <Variable>[];
 
@@ -389,7 +401,7 @@ class ArchiveDatabase extends _$ArchiveDatabase {
     final rows = await customSelect(
       sql,
       variables: [
-        Variable.withString('"$ftsQuery"'),
+        Variable.withString(ftsQuery),
         ...variables,
       ],
     ).get();
@@ -406,6 +418,7 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   static Future<void> closeInstance() async {
     await _instance?.close();
     _instance = null;
+    _initCompleter = null;
   }
 }
 
