@@ -45,6 +45,7 @@ class _OptimizedMessageListViewState extends State<OptimizedMessageListView> {
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     if (widget.controller == null) {
       _scrollController.dispose();
     }

@@ -39,6 +39,12 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           );
         }
 
+        // 清理不再显示的消息 keys，防止无限增长
+        if (_messageKeys.length > state.messages.length + 50) {
+          final validIds = state.messages.map((m) => m.id).toSet();
+          _messageKeys.removeWhere((id, _) => !validIds.contains(id));
+        }
+
         // 额外项数：输入状态(可选) + 加密提示(1) + 加载更多指示器(可选)
         final typingExtraItems = state.hasTypingUsers ? 1 : 0;
         final extraItems = typingExtraItems + 1 + (state.isLoadingMore ? 1 : 0);

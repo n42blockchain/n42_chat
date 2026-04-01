@@ -51,12 +51,24 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   late final LiveKitCallEnhancementController _enhancementController;
 
+  // 保存原始回调以在 dispose 时恢复
+  void Function(MeetingState)? _previousOnStateChanged;
+  void Function(List<MeetingParticipant>)? _previousOnParticipantsChanged;
+  void Function(Duration)? _previousOnDurationUpdate;
+  void Function(MeetingErrorType, [String?])? _previousOnError;
+
   @override
   void initState() {
     super.initState();
 
     WakelockPlus.enable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+    // 保存原始回调
+    _previousOnStateChanged = widget.liveKitService.onStateChanged;
+    _previousOnParticipantsChanged = widget.liveKitService.onParticipantsChanged;
+    _previousOnDurationUpdate = widget.liveKitService.onDurationUpdate;
+    _previousOnError = widget.liveKitService.onError;
 
     // 监听状态
     widget.liveKitService.onStateChanged = _onStateChanged;
@@ -77,10 +89,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
 
   @override
   void dispose() {
-    widget.liveKitService.onStateChanged = null;
-    widget.liveKitService.onParticipantsChanged = null;
-    widget.liveKitService.onDurationUpdate = null;
-    widget.liveKitService.onError = null;
+    // 恢复原始回调而非置 null
+    widget.liveKitService.onStateChanged = _previousOnStateChanged;
+    widget.liveKitService.onParticipantsChanged = _previousOnParticipantsChanged;
+    widget.liveKitService.onDurationUpdate = _previousOnDurationUpdate;
+    widget.liveKitService.onError = _previousOnError;
     _hideControlsTimer?.cancel();
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);

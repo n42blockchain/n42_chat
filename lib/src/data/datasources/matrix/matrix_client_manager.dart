@@ -61,7 +61,7 @@ class MatrixClientManager {
 
   /// 房间更新流
   Stream<String>? get onRoomUpdate =>
-      _client?.onSync.stream.map((sync) => sync.rooms?.join?.keys.first ?? '');
+      _client?.onSync.stream.map((sync) => sync.rooms?.join?.keys.firstOrNull ?? '');
 
   // ============================================
   // 初始化

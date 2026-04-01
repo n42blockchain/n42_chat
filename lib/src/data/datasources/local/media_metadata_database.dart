@@ -327,6 +327,7 @@ class MediaMetadataDatabase extends _$MediaMetadataDatabase {
   static Future<void> closeInstance() async {
     await _instance?.close();
     _instance = null;
+    _initCompleter = null;
   }
 }
 

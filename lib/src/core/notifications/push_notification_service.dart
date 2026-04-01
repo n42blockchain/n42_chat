@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
@@ -69,6 +71,7 @@ class PushNotificationService implements IPushNotificationService {
 
   String? _pushToken;
   bool _isInitialized = false;
+  StreamSubscription<matrix.SyncUpdate>? _syncSubscription;
 
   @override
   Future<void> initialize() async {
@@ -78,7 +81,7 @@ class PushNotificationService implements IPushNotificationService {
     await _initializeLocalNotifications();
 
     // 监听消息更新，发送本地通知
-    _client.onSync.stream.listen(_handleSyncUpdate);
+    _syncSubscription = _client.onSync.stream.listen(_handleSyncUpdate);
 
     _isInitialized = true;
   }
@@ -193,6 +196,9 @@ class PushNotificationService implements IPushNotificationService {
 
   @override
   Future<void> unregisterPush() async {
+    await _syncSubscription?.cancel();
+    _syncSubscription = null;
+
     if (_pushToken == null) return;
 
     try {
@@ -412,10 +418,10 @@ class NotificationConfig {
       'vibrate': vibrate,
       'doNotDisturb': doNotDisturb,
       'dndStartTime': dndStartTime != null
-          ? '${dndStartTime!.hour}:${dndStartTime!.minute}'
+          ? '${dndStartTime!.hour.toString().padLeft(2, '0')}:${dndStartTime!.minute.toString().padLeft(2, '0')}'
           : null,
       'dndEndTime': dndEndTime != null
-          ? '${dndEndTime!.hour}:${dndEndTime!.minute}'
+          ? '${dndEndTime!.hour.toString().padLeft(2, '0')}:${dndEndTime!.minute.toString().padLeft(2, '0')}'
           : null,
       'privacyMode': privacyMode.name,
     };

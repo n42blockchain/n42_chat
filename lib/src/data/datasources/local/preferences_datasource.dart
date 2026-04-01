@@ -59,7 +59,11 @@ class PreferencesDataSource {
       _prefsCompleter = Completer<SharedPreferences>();
       SharedPreferences.getInstance().then(
         _prefsCompleter!.complete,
-        onError: _prefsCompleter!.completeError,
+        onError: (Object e, StackTrace s) {
+          _prefsCompleter!.completeError(e, s);
+          // Reset so next access retries instead of returning stale error
+          _prefsCompleter = null;
+        },
       );
     }
     return _prefsCompleter!.future;
