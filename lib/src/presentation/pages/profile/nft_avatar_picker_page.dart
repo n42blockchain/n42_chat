@@ -135,6 +135,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             imageUrl ?? 'nft://$contract/$tokenId@$_selectedChainId';
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isResolving = false;
         _errorText = e.toString();

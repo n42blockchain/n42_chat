@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../n42_chat.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -20,6 +21,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
   static const _languageSettingKey = 'n42_chat_language';
 
   Locale _currentLocale = N42Chat.locale;
+  bool _isSaving = false;
 
   static String _localeToCode(Locale locale) {
     if (locale.languageCode.toLowerCase() == 'zh') {
@@ -162,31 +164,53 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
   }
 
   Future<void> _setLanguage(Locale locale) async {
-    if (_sameLocale(_resolveLanguageOption(_currentLocale).locale, locale)) {
+    if (_isSaving ||
+        _sameLocale(_resolveLanguageOption(_currentLocale).locale, locale)) {
       return;
     }
 
+    final previousLocale = _currentLocale;
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = S.of(context);
+    final successMessage = l10n?.settingsLanguageChanged ?? 'Language changed';
+    final saveFailedMessage = l10n?.commonSaveFailed ?? 'Save failed';
+
     setState(() {
+      _isSaving = true;
       _currentLocale = locale;
     });
 
-    // 保存到本地存储
-    final storage = getIt<PreferencesDataSource>();
-    await storage.saveSetting(_languageSettingKey, _localeToCode(locale));
+    try {
+      final storage = getIt<PreferencesDataSource>();
+      await storage.saveSetting(_languageSettingKey, _localeToCode(locale));
+      N42Chat.setLocale(locale);
 
-    // 更新 N42Chat 的语言设置
-    N42Chat.setLocale(locale);
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (!mounted) {
+        return;
+      }
+      messenger.showSnackBar(
         SnackBar(
-          content: Text(
-            S.of(context)?.settingsLanguageChanged ?? 'Language changed',
-          ),
+          content: Text(successMessage),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 2),
         ),
       );
+    } catch (e) {
+      debugLog('LanguageSettingsPage: Failed to save language: $e');
+      if (!mounted) {
+        return;
+      }
+      setState(() => _currentLocale = previousLocale);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 
@@ -203,23 +227,37 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        itemCount: _languages.length,
-        itemBuilder: (context, index) {
-          final language = _languages[index];
-          final isSelected = _sameLocale(
-            resolvedCurrentLocale,
-            language.locale,
-          );
+      body: Stack(
+        children: [
+          AbsorbPointer(
+            absorbing: _isSaving,
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              itemCount: _languages.length,
+              itemBuilder: (context, index) {
+                final language = _languages[index];
+                final isSelected = _sameLocale(
+                  resolvedCurrentLocale,
+                  language.locale,
+                );
 
-          return _LanguageItem(
-            language: language,
-            isSelected: isSelected,
-            isDark: isDark,
-            onTap: () => _setLanguage(language.locale),
-          );
-        },
+                return _LanguageItem(
+                  language: language,
+                  isSelected: isSelected,
+                  isDark: isDark,
+                  onTap: () => _setLanguage(language.locale),
+                );
+              },
+            ),
+          ),
+          if (_isSaving)
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: LinearProgressIndicator(minHeight: 2),
+            ),
+        ],
       ),
     );
   }

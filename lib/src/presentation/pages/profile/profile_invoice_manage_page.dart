@@ -35,6 +35,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
             client.userID!,
             'n42.user.invoices',
           );
+          if (!mounted) return;
 
           if (data['invoices'] != null) {
             final invoiceList = data['invoices'] as List;
@@ -61,11 +62,13 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
         }
       }
 
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
     } catch (e) {
       debugLog('Load invoices error: $e');
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

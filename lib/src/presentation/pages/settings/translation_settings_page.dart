@@ -31,6 +31,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
   String _targetLanguage = 'en';
   bool _smartReplyTranslate = false;
   bool _isLoading = true;
+  bool _isSaving = false;
 
   static const _supportedLanguages = [
     TranslationLanguage(code: 'ar', name: 'Arabic', localizedName: 'العربية'),
@@ -114,7 +115,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
     }
   }
 
-  Future<void> _saveSettings() async {
+  Future<bool> _saveSettings() async {
     try {
       final storage = getIt<PreferencesDataSource>();
       await storage.saveTranslationSettings(
@@ -127,9 +128,57 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
         _targetLanguage,
         _smartReplyTranslate,
       );
+      return true;
     } catch (e) {
       debugLog('TranslationSettingsPage: Failed to save: $e');
+      return false;
     }
+  }
+
+  Future<void> _applySettingsUpdate({
+    required bool autoTranslate,
+    required String targetLanguage,
+    required bool smartReplyTranslate,
+  }) async {
+    if (_isSaving) {
+      return;
+    }
+
+    final previousAutoTranslate = _autoTranslate;
+    final previousTargetLanguage = _targetLanguage;
+    final previousSmartReplyTranslate = _smartReplyTranslate;
+    final messenger = ScaffoldMessenger.of(context);
+    final saveFailedMessage = S.of(context)?.commonSaveFailed ?? 'Save failed';
+
+    setState(() {
+      _isSaving = true;
+      _autoTranslate = autoTranslate;
+      _targetLanguage = targetLanguage;
+      _smartReplyTranslate = smartReplyTranslate;
+    });
+
+    final success = await _saveSettings();
+    if (!mounted) {
+      return;
+    }
+
+    if (!success) {
+      setState(() {
+        _autoTranslate = previousAutoTranslate;
+        _targetLanguage = previousTargetLanguage;
+        _smartReplyTranslate = previousSmartReplyTranslate;
+      });
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+
+    setState(() {
+      _isSaving = false;
+    });
   }
 
   void _showLanguagePicker() {
@@ -195,11 +244,16 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       trailing: isSelected
                           ? const Icon(Icons.check, color: AppColors.primary)
                           : null,
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        setState(() => _targetLanguage = lang.code);
-                        _saveSettings();
-                      },
+                      onTap: _isSaving
+                          ? null
+                          : () {
+                              Navigator.pop(ctx);
+                              _applySettingsUpdate(
+                                autoTranslate: _autoTranslate,
+                                targetLanguage: lang.code,
+                                smartReplyTranslate: _smartReplyTranslate,
+                              );
+                            },
                     );
                   },
                 ),
@@ -350,10 +404,13 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                   ),
                   Switch(
                     value: _autoTranslate,
-                    onChanged: (value) {
-                      setState(() => _autoTranslate = value);
-                      _saveSettings();
-                    },
+                    onChanged: _isSaving
+                        ? null
+                        : (value) => _applySettingsUpdate(
+                            autoTranslate: value,
+                            targetLanguage: _targetLanguage,
+                            smartReplyTranslate: _smartReplyTranslate,
+                          ),
                     activeTrackColor: AppColors.primary,
                   ),
                 ],
@@ -396,10 +453,13 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                   ),
                   Switch(
                     value: _smartReplyTranslate,
-                    onChanged: (value) {
-                      setState(() => _smartReplyTranslate = value);
-                      _saveSettings();
-                    },
+                    onChanged: _isSaving
+                        ? null
+                        : (value) => _applySettingsUpdate(
+                            autoTranslate: _autoTranslate,
+                            targetLanguage: _targetLanguage,
+                            smartReplyTranslate: value,
+                          ),
                     activeTrackColor: AppColors.primary,
                   ),
                 ],

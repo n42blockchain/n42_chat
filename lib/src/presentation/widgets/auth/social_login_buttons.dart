@@ -60,6 +60,44 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
   bool _isAppleAvailable = false;
   bool _isWeChatAvailable = false;
 
+  bool get _isAnyLoading =>
+      _isGoogleLoading ||
+      _isAppleLoading ||
+      _isSsoLoading ||
+      _isFacebookLoading ||
+      _isTwitterLoading ||
+      _isWeChatLoading;
+
+  void _setProviderLoading({
+    bool? google,
+    bool? apple,
+    bool? sso,
+    bool? facebook,
+    bool? twitter,
+    bool? weChat,
+  }) {
+    if (!mounted) return;
+    setState(() {
+      if (google != null) _isGoogleLoading = google;
+      if (apple != null) _isAppleLoading = apple;
+      if (sso != null) _isSsoLoading = sso;
+      if (facebook != null) _isFacebookLoading = facebook;
+      if (twitter != null) _isTwitterLoading = twitter;
+      if (weChat != null) _isWeChatLoading = weChat;
+    });
+  }
+
+  void _clearAllLoadingFlags() {
+    _setProviderLoading(
+      google: false,
+      apple: false,
+      sso: false,
+      facebook: false,
+      twitter: false,
+      weChat: false,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -106,10 +144,11 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
     final config = N42Chat.config;
+    final isAnyLoading = _isAnyLoading;
     final buttons = <Widget>[
       if ((config?.enableGoogleLogin ?? true) && _isGoogleAvailable)
         _buildSocialButton(
-          onTap: _isGoogleLoading ? null : _handleGoogleSignIn,
+          onTap: isAnyLoading ? null : _handleGoogleSignIn,
           icon: Icons.g_mobiledata,
           isLoading: _isGoogleLoading,
           tooltip: S.of(context)?.authGoogleLabel ?? 'Google',
@@ -118,7 +157,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         ),
       if ((config?.enableAppleLogin ?? true) && _isAppleAvailable)
         _buildSocialButton(
-          onTap: _isAppleLoading ? null : _handleAppleSignIn,
+          onTap: isAnyLoading ? null : _handleAppleSignIn,
           icon: Icons.apple,
           isLoading: _isAppleLoading,
           tooltip: S.of(context)?.authAppleLabel ?? 'Apple',
@@ -127,7 +166,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         ),
       if (config?.enableSsoLogin ?? false)
         _buildSocialButton(
-          onTap: _isSsoLoading ? null : _handleSsoSignIn,
+          onTap: isAnyLoading ? null : _handleSsoSignIn,
           icon: Icons.login,
           isLoading: _isSsoLoading,
           tooltip: S.of(context)?.authSsoLabel ?? 'SSO',
@@ -136,7 +175,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         ),
       if ((config?.enableFacebookLogin ?? false) && _isFacebookAvailable)
         _buildSocialButton(
-          onTap: _isFacebookLoading ? null : _handleFacebookSignIn,
+          onTap: isAnyLoading ? null : _handleFacebookSignIn,
           icon: Icons.facebook,
           isLoading: _isFacebookLoading,
           tooltip: 'Facebook',
@@ -146,7 +185,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       if ((config?.enableTwitterLogin ?? false) &&
           _authService.isTwitterSignInAvailable())
         _buildSocialButton(
-          onTap: _isTwitterLoading ? null : _handleTwitterSignIn,
+          onTap: isAnyLoading ? null : _handleTwitterSignIn,
           icon: Icons.alternate_email,
           isLoading: _isTwitterLoading,
           tooltip: 'Twitter',
@@ -155,7 +194,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         ),
       if ((config?.enableWeChatLogin ?? false) && _isWeChatAvailable)
         _buildSocialButton(
-          onTap: _isWeChatLoading ? null : _handleWeChatSignIn,
+          onTap: isAnyLoading ? null : _handleWeChatSignIn,
           icon: Icons.chat_bubble,
           isLoading: _isWeChatLoading,
           tooltip: S.of(context)?.commonWechat ?? 'WeChat',
@@ -171,12 +210,17 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
+          _clearAllLoadingFlags();
           widget.onLoginSuccess?.call();
         } else if (state.status == AuthStatus.error &&
             state.errorMessage != null) {
+          _clearAllLoadingFlags();
           widget.onError?.call(
             resolveBlocMessage(context, state.errorMessage!),
           );
+        } else if (state.status == AuthStatus.unauthenticated &&
+            _isAnyLoading) {
+          _clearAllLoadingFlags();
         }
       },
       child: Column(
@@ -283,7 +327,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    setState(() => _isGoogleLoading = true);
+    _setProviderLoading(google: true);
 
     try {
       // 触发 Google 登录事件
@@ -294,11 +338,8 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       }
     } catch (e) {
       if (mounted) {
+        _setProviderLoading(google: false);
         widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isGoogleLoading = false);
       }
     }
   }
@@ -317,7 +358,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    setState(() => _isAppleLoading = true);
+    _setProviderLoading(apple: true);
 
     try {
       // 触发 Apple 登录事件
@@ -328,11 +369,8 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       }
     } catch (e) {
       if (mounted) {
+        _setProviderLoading(apple: false);
         widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isAppleLoading = false);
       }
     }
   }
@@ -351,7 +389,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    setState(() => _isFacebookLoading = true);
+    _setProviderLoading(facebook: true);
 
     try {
       // 触发 Facebook 登录事件
@@ -362,11 +400,8 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       }
     } catch (e) {
       if (mounted) {
+        _setProviderLoading(facebook: false);
         widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isFacebookLoading = false);
       }
     }
   }
@@ -385,7 +420,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    setState(() => _isSsoLoading = true);
+    _setProviderLoading(sso: true);
 
     try {
       final config = N42Chat.config;
@@ -412,16 +447,16 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         mode: LaunchMode.externalApplication,
       );
       if (!launched && mounted) {
+        _setProviderLoading(sso: false);
         widget.onError?.call('Failed to open SSO login page');
       }
     } catch (e) {
       if (mounted) {
+        _setProviderLoading(sso: false);
         widget.onError?.call(e.toString());
       }
     } finally {
-      if (mounted) {
-        setState(() => _isSsoLoading = false);
-      }
+      _setProviderLoading(sso: false);
     }
   }
 
@@ -439,7 +474,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    setState(() => _isTwitterLoading = true);
+    _setProviderLoading(twitter: true);
 
     try {
       // 触发 Twitter 登录事件
@@ -450,11 +485,8 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       }
     } catch (e) {
       if (mounted) {
+        _setProviderLoading(twitter: false);
         widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isTwitterLoading = false);
       }
     }
   }
@@ -473,7 +505,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
 
-    setState(() => _isWeChatLoading = true);
+    _setProviderLoading(weChat: true);
 
     try {
       // 触发微信登录事件
@@ -484,11 +516,8 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       }
     } catch (e) {
       if (mounted) {
+        _setProviderLoading(weChat: false);
         widget.onError?.call(e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isWeChatLoading = false);
       }
     }
   }

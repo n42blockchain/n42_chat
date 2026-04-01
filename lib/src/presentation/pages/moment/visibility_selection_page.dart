@@ -48,7 +48,8 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
   Future<void> _loadTags() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final tagsJson = prefs.getString('contact_tags');
+      final tagsJson =
+          prefs.getString('tags_data') ?? prefs.getString('contact_tags');
       if (tagsJson != null) {
         final list = jsonDecode(tagsJson) as List;
         if (mounted) {

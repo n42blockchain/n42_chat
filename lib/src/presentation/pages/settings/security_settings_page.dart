@@ -40,6 +40,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   bool _isLoading = false;
   KeyBackupInfo? _backupInfo;
   List<DeviceInfo> _devices = [];
+  int _dataLoadVersion = 0;
 
   // 生物识别状态
   bool _isBiometricAvailable = false;
@@ -52,6 +53,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   bool _isPasskeySupported = false;
   List<PasskeyCredential> _registeredPasskeys = [];
   final AuthMethodsService _authMethodsService = AuthMethodsService();
+
+  void _invalidatePendingDataLoads() {
+    _dataLoadVersion++;
+  }
 
   @override
   void initState() {
@@ -106,6 +111,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Future<void> _loadData() async {
+    final loadVersion = ++_dataLoadVersion;
     setState(() => _isLoading = true);
 
     try {
@@ -138,7 +144,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               return (b.lastSeenTs ?? 0).compareTo(a.lastSeenTs ?? 0);
             });
 
-      if (!mounted) return;
+      if (!mounted || loadVersion != _dataLoadVersion) return;
       setState(() {
         _backupInfo = backupInfo;
         _devices = devices;
@@ -146,7 +152,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       });
     } catch (e) {
       debugLog('SecuritySettingsPage: Failed to load data: $e');
-      if (!mounted) return;
+      if (!mounted || loadVersion != _dataLoadVersion) return;
       setState(() => _isLoading = false);
     }
   }
@@ -1195,6 +1201,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Future<void> _performBackup() async {
+    _invalidatePendingDataLoads();
     setState(() => _isLoading = true);
     try {
       // 1. 创建恢复密钥
@@ -1365,6 +1372,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     String input, {
     required bool isRecoveryKey,
   }) async {
+    _invalidatePendingDataLoads();
     setState(() => _isLoading = true);
     try {
       if (isRecoveryKey) {
@@ -1436,6 +1444,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Future<void> _performExport() async {
+    _invalidatePendingDataLoads();
     setState(() => _isLoading = true);
     try {
       // 上传所有密钥到服务端备份
@@ -1484,6 +1493,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
   /// 展示恢复密钥
   Future<void> _showRecoveryKey() async {
+    _invalidatePendingDataLoads();
     setState(() => _isLoading = true);
     try {
       // 尝试获取已有恢复密钥
@@ -1812,6 +1822,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Future<void> _performRemoteLogout(DeviceInfo device) async {
+    _invalidatePendingDataLoads();
     setState(() => _isLoading = true);
     try {
       final authDataSource = MatrixAuthDataSource();
@@ -1855,83 +1866,88 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
   Future<void> _showUiaPasswordDialog(DeviceInfo device) async {
     final passwordController = TextEditingController();
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.settingsVerifyIdentity ?? 'Verify identity'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              S.of(context)?.settingsEnterPasswordToConfirm ??
-                  'Enter your password to confirm this action.',
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: S.of(context)?.settingsPassword ?? 'Password',
-                border: const OutlineInputBorder(),
+    try {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(
+            S.of(context)?.settingsVerifyIdentity ?? 'Verify identity',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                S.of(context)?.settingsEnterPasswordToConfirm ??
+                    'Enter your password to confirm this action.',
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: S.of(context)?.settingsPassword ?? 'Password',
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx, false);
-            },
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx, true);
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
-          ),
-        ],
-      ),
-    );
+      );
 
-    if (confirmed == true) {
-      final password = passwordController.text;
-      passwordController.dispose();
-      if (password.isNotEmpty) {
-        if (!mounted) return;
-        setState(() => _isLoading = true);
-        try {
-          final userId = widget.e2eeManager.client.userID ?? '';
-          final auth = AuthenticationPassword(
-            password: password,
-            identifier: AuthenticationUserIdentifier(user: userId),
-          );
-          final authDataSource = MatrixAuthDataSource();
-          await authDataSource.deleteDevice(device.deviceId, auth: auth);
-          await _loadData();
-          if (mounted) {
+      if (confirmed == true) {
+        final password = passwordController.text;
+        if (password.isNotEmpty) {
+          if (!mounted) return;
+          _invalidatePendingDataLoads();
+          setState(() => _isLoading = true);
+          try {
+            final userId = widget.e2eeManager.client.userID ?? '';
+            final auth = AuthenticationPassword(
+              password: password,
+              identifier: AuthenticationUserIdentifier(user: userId),
+            );
+            final authDataSource = MatrixAuthDataSource();
+            await authDataSource.deleteDevice(device.deviceId, auth: auth);
+            await _loadData();
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    S.of(context)?.settingsDeviceLoggedOut ??
+                        'Device logged out',
+                  ),
+                ),
+              );
+            }
+          } catch (e) {
+            if (!mounted) return;
+            setState(() => _isLoading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  S.of(context)?.settingsDeviceLoggedOut ?? 'Device logged out',
+                  '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
                 ),
               ),
             );
           }
-        } catch (e) {
-          if (!mounted) return;
-          setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${S.of(context)?.settingsLogoutFailed ?? 'Logout failed'}: $e',
-              ),
-            ),
-          );
         }
       }
-    } else {
+    } finally {
       passwordController.dispose();
     }
   }
@@ -1994,6 +2010,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             onPressed: () async {
               Navigator.pop(ctx);
               if (!mounted) return;
+              _invalidatePendingDataLoads();
               setState(() => _isLoading = true);
               try {
                 await widget.keyBackupService.deleteKeyBackup();

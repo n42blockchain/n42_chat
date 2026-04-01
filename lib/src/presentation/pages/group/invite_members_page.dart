@@ -8,6 +8,7 @@ import '../../../domain/entities/contact_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
+import '../../blocs/bloc_message_keys.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
@@ -19,10 +20,7 @@ import '../contact/contact_tile.dart';
 class InviteMembersPage extends StatefulWidget {
   final String roomId;
 
-  const InviteMembersPage({
-    super.key,
-    required this.roomId,
-  });
+  const InviteMembersPage({super.key, required this.roomId});
 
   @override
   State<InviteMembersPage> createState() => _InviteMembersPageState();
@@ -32,6 +30,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
   final TextEditingController _searchController = TextEditingController();
   final Set<String> _selectedUserIds = {};
   bool _isSearching = false;
+  bool _isInviting = false;
 
   @override
   void initState() {
@@ -56,11 +55,12 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
   }
 
   void _inviteMembers() {
-    if (_selectedUserIds.isEmpty) return;
+    if (_selectedUserIds.isEmpty || _isInviting) return;
 
+    setState(() => _isInviting = true);
     context.read<GroupBloc>().add(
-          InviteMembers(widget.roomId, _selectedUserIds.toList()),
-        );
+      InviteMembers(widget.roomId, _selectedUserIds.toList()),
+    );
   }
 
   @override
@@ -69,19 +69,33 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
 
     return BlocListener<GroupBloc, GroupState>(
       listener: (context, state) {
-        if (state.status == GroupStatus.success && state.successMessage != null) {
+        if (!_isInviting) {
+          return;
+        }
+
+        if (state.status == GroupStatus.success &&
+            state.successMessage == BlocMessageKeys.groupMembersInvited) {
+          setState(() => _isInviting = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(resolveBlocMessage(context, state.successMessage!))),
+            SnackBar(
+              content: Text(resolveBlocMessage(context, state.successMessage!)),
+            ),
           );
           Navigator.pop(context);
-        } else if (state.status == GroupStatus.error && state.errorMessage != null) {
+        } else if (state.status == GroupStatus.error &&
+            state.errorMessage != null) {
+          setState(() => _isInviting = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
+            SnackBar(
+              content: Text(resolveBlocMessage(context, state.errorMessage!)),
+            ),
           );
         }
       },
       child: Scaffold(
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.background,
         appBar: N42AppBar(
           title: S.of(context)?.groupInviteMembers ?? 'Invite Members',
           leading: IconButton(
@@ -90,15 +104,26 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
           ),
           actions: [
             TextButton(
-              onPressed: _selectedUserIds.isNotEmpty ? _inviteMembers : null,
-              child: Text(
-                S.of(context)?.groupInviteCount(_selectedUserIds.length) ?? 'Invite(${_selectedUserIds.length})',
-                style: TextStyle(
-                  color: _selectedUserIds.isNotEmpty
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
-                ),
-              ),
+              onPressed: (_selectedUserIds.isNotEmpty && !_isInviting)
+                  ? _inviteMembers
+                  : null,
+              child: _isInviting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(
+                      S
+                              .of(context)
+                              ?.groupInviteCount(_selectedUserIds.length) ??
+                          'Invite(${_selectedUserIds.length})',
+                      style: TextStyle(
+                        color: _selectedUserIds.isNotEmpty
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
             ),
           ],
         ),
@@ -136,7 +161,8 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
               padding: const EdgeInsets.all(12),
               child: N42SearchBar(
                 controller: _searchController,
-                hintText: S.of(context)?.commonSearchContacts ?? 'Search contacts',
+                hintText:
+                    S.of(context)?.commonSearchContacts ?? 'Search contacts',
                 onChanged: (query) {
                   setState(() {
                     _isSearching = query.isNotEmpty;
@@ -173,7 +199,9 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
                     itemCount: contacts.length,
                     itemBuilder: (context, index) {
                       final contact = contacts[index];
-                      final isSelected = _selectedUserIds.contains(contact.userId);
+                      final isSelected = _selectedUserIds.contains(
+                        contact.userId,
+                      );
 
                       return SimpleContactTile(
                         contact: contact,
@@ -241,4 +269,3 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
     );
   }
 }
-

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/quick_reply_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -20,6 +21,7 @@ class QuickRepliesPage extends StatefulWidget {
 class _QuickRepliesPageState extends State<QuickRepliesPage> {
   List<QuickReplyEntity> _replies = [];
   bool _isLoading = true;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -45,9 +47,49 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
     }
   }
 
-  Future<void> _saveReplies() async {
-    final data = _replies.map((e) => e.toJson()).toList();
+  Future<void> _saveReplies(List<QuickReplyEntity> replies) async {
+    final data = replies.map((e) => e.toJson()).toList();
     await widget.storageDataSource.saveQuickReplies(data);
+  }
+
+  Future<void> _applyRepliesUpdate(
+    List<QuickReplyEntity> Function(List<QuickReplyEntity> current) update,
+  ) async {
+    if (_isSaving) {
+      return;
+    }
+
+    final previousReplies = List<QuickReplyEntity>.from(_replies);
+    final messenger = ScaffoldMessenger.of(context);
+    final saveFailedMessage = S.of(context)?.commonSaveFailed ?? 'Save failed';
+    final nextReplies = update(List<QuickReplyEntity>.from(_replies));
+
+    setState(() {
+      _isSaving = true;
+      _replies = nextReplies;
+    });
+
+    try {
+      await _saveReplies(nextReplies);
+    } catch (e) {
+      debugLog('QuickRepliesPage: Failed to save replies: $e');
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _replies = previousReplies;
+      });
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   void _addReply() {
@@ -74,10 +116,10 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              setState(() {
-                _replies.removeWhere((r) => r.id == reply.id);
+              _applyRepliesUpdate((current) {
+                current.removeWhere((r) => r.id == reply.id);
+                return current;
               });
-              _saveReplies();
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: Text(l10n?.commonDelete ?? 'Delete'),
@@ -121,12 +163,12 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
 
               Navigator.pop(ctx);
 
-              setState(() {
+              _applyRepliesUpdate((current) {
                 if (isEditing) {
                   // 编辑现有回复
-                  final index = _replies.indexWhere((r) => r.id == reply.id);
+                  final index = current.indexWhere((r) => r.id == reply.id);
                   if (index != -1) {
-                    _replies[index] = reply.copyWith(content: content);
+                    current[index] = reply.copyWith(content: content);
                   }
                 } else {
                   // 添加新回复
@@ -137,10 +179,10 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
                     isSystem: false,
                     createdAt: DateTime.now(),
                   );
-                  _replies.add(newReply);
+                  current.add(newReply);
                 }
+                return current;
               });
-              _saveReplies();
             },
             child: Text(l10n?.commonSave ?? 'Save'),
           ),
@@ -167,10 +209,9 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              setState(() {
-                _replies = QuickReplyEntity.createDefaultReplies();
-              });
-              _saveReplies();
+              _applyRepliesUpdate(
+                (_) => QuickReplyEntity.createDefaultReplies(),
+              );
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Reset'),
@@ -194,10 +235,11 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: _addReply,
+            onPressed: _isSaving ? null : _addReply,
             tooltip: l10n?.settingsAddQuickReply ?? 'Add',
           ),
           PopupMenuButton<String>(
+            enabled: !_isSaving,
             onSelected: (value) {
               if (value == 'reset') {
                 _resetToDefaults();
@@ -236,18 +278,18 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: _replies.length,
       onReorder: (oldIndex, newIndex) {
-        setState(() {
+        _applyRepliesUpdate((current) {
           if (newIndex > oldIndex) {
             newIndex -= 1;
           }
-          final item = _replies.removeAt(oldIndex);
-          _replies.insert(newIndex, item);
+          final item = current.removeAt(oldIndex);
+          current.insert(newIndex, item);
           // 更新顺序
-          for (var i = 0; i < _replies.length; i++) {
-            _replies[i] = _replies[i].copyWith(order: i);
+          for (var i = 0; i < current.length; i++) {
+            current[i] = current[i].copyWith(order: i);
           }
+          return current;
         });
-        _saveReplies();
       },
       itemBuilder: (context, index) {
         final reply = _replies[index];
@@ -262,11 +304,14 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       margin: const EdgeInsets.only(bottom: 1),
       child: ListTile(
-        leading: ReorderableDragStartListener(
-          index: index,
-          child: Icon(
-            Icons.drag_handle,
-            color: isDark ? Colors.white38 : Colors.black26,
+        leading: IgnorePointer(
+          ignoring: _isSaving,
+          child: ReorderableDragStartListener(
+            index: index,
+            child: Icon(
+              Icons.drag_handle,
+              color: isDark ? Colors.white38 : Colors.black26,
+            ),
           ),
         ),
         title: Text(
@@ -294,14 +339,14 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
                   Icons.edit_outlined,
                   color: isDark ? Colors.white54 : Colors.black45,
                 ),
-                onPressed: () => _editReply(reply),
+                onPressed: _isSaving ? null : () => _editReply(reply),
               ),
             IconButton(
               icon: Icon(
                 Icons.delete_outline,
                 color: AppColors.error.withValues(alpha: 0.7),
               ),
-              onPressed: () => _deleteReply(reply),
+              onPressed: _isSaving ? null : () => _deleteReply(reply),
             ),
           ],
         ),

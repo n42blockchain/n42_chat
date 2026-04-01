@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../domain/entities/token_gate_entity.dart';
+import '../../blocs/bloc_message_keys.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
@@ -86,16 +87,25 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
 
     return BlocListener<GroupBloc, GroupState>(
       listener: (context, state) {
-        if (state.status == GroupStatus.success) {
+        if (!_isSaving) {
+          return;
+        }
+
+        if (state.status == GroupStatus.success &&
+            state.successMessage == BlocMessageKeys.groupTokenGateUpdated) {
           setState(() => _isSaving = false);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(s?.tokenGateSaved ?? 'Token gate saved')),
           );
           Navigator.of(context).pop(true);
-        } else if (state.status == GroupStatus.error && state.errorMessage != null) {
+        } else if (state.status == GroupStatus.error &&
+            state.errorMessage != null) {
           setState(() => _isSaving = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!)), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(resolveBlocMessage(context, state.errorMessage!)),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       },
@@ -107,7 +117,8 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
               onPressed: _isSaving ? null : _save,
               child: _isSaving
                   ? const SizedBox(
-                      width: 20, height: 20,
+                      width: 20,
+                      height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : Text(s?.commonSave ?? 'Save'),
@@ -120,8 +131,10 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
             // 启用开关
             SwitchListTile(
               title: Text(s?.tokenGateEnable ?? 'Enable Token Gate'),
-              subtitle: Text(s?.tokenGateEnableDescription ??
-                  'Require members to hold tokens to join'),
+              subtitle: Text(
+                s?.tokenGateEnableDescription ??
+                    'Require members to hold tokens to join',
+              ),
               value: _enabled,
               onChanged: (value) => setState(() => _enabled = value),
             ),
@@ -200,7 +213,8 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
                 controller: _denialMessageController,
                 decoration: InputDecoration(
                   labelText: s?.tokenGateDenialMessage ?? 'Denial Message',
-                  hintText: s?.tokenGateDenialMessageHint ??
+                  hintText:
+                      s?.tokenGateDenialMessageHint ??
                       'Message shown when verification fails',
                   border: const OutlineInputBorder(),
                 ),
@@ -219,10 +233,7 @@ class _TokenGateRuleCard extends StatelessWidget {
   final TokenGateRule rule;
   final VoidCallback onRemove;
 
-  const _TokenGateRuleCard({
-    required this.rule,
-    required this.onRemove,
-  });
+  const _TokenGateRuleCard({required this.rule, required this.onRemove});
 
   String _getTokenStandardLabel(TokenStandard standard) {
     switch (standard) {
@@ -278,7 +289,9 @@ class _TokenGateRuleCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${s?.tokenGateMinBalance ?? 'Min'}: ${rule.minBalance}'),
-            Text('${_getChainName(rule.chainId)} · ${_getTokenStandardLabel(rule.tokenStandard)}'),
+            Text(
+              '${_getChainName(rule.chainId)} · ${_getTokenStandardLabel(rule.tokenStandard)}',
+            ),
             if (rule.contractAddress != null)
               Text(
                 '${rule.contractAddress!.substring(0, 6)}...${rule.contractAddress!.substring(rule.contractAddress!.length - 4)}',
@@ -331,11 +344,13 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
       contractAddress: _contractController.text.trim().isNotEmpty
           ? _contractController.text.trim()
           : null,
-      minBalance: BigInt.tryParse(_minBalanceController.text.trim()) ?? BigInt.one,
+      minBalance:
+          BigInt.tryParse(_minBalanceController.text.trim()) ?? BigInt.one,
       symbol: _symbolController.text.trim().isNotEmpty
           ? _symbolController.text.trim()
           : null,
-      tokenId: _tokenStandard == TokenStandard.erc1155 &&
+      tokenId:
+          _tokenStandard == TokenStandard.erc1155 &&
               _tokenIdController.text.trim().isNotEmpty
           ? BigInt.tryParse(_tokenIdController.text.trim())
           : null,
@@ -377,13 +392,15 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
               items: TokenStandard.values.map((s) {
                 return DropdownMenuItem(
                   value: s,
-                  child: Text(s == TokenStandard.erc20
-                      ? 'ERC-20'
-                      : s == TokenStandard.erc721
-                          ? 'ERC-721 (NFT)'
-                          : s == TokenStandard.erc1155
-                              ? 'ERC-1155'
-                              : 'Native'),
+                  child: Text(
+                    s == TokenStandard.erc20
+                        ? 'ERC-20'
+                        : s == TokenStandard.erc721
+                        ? 'ERC-721 (NFT)'
+                        : s == TokenStandard.erc1155
+                        ? 'ERC-1155'
+                        : 'Native',
+                  ),
                 );
               }).toList(),
               onChanged: (v) => setState(() => _tokenStandard = v!),

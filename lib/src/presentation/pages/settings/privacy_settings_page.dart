@@ -9,6 +9,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/screenshot_protection_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/user_profile_entity.dart';
@@ -38,6 +39,7 @@ class PrivacySettingsPage extends StatefulWidget {
 class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
   late PrivacySettings _settings;
   bool _screenshotProtection = false;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -56,24 +58,55 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     }
   }
 
-  void _updateSettings(PrivacySettings newSettings) {
-    if (!mounted) return;
-    setState(() => _settings = newSettings);
-    unawaited(_persistSettings(newSettings));
+  Future<void> _updateSettings(PrivacySettings newSettings) async {
+    if (!mounted || _isSaving) {
+      return;
+    }
+
+    final previousSettings = _settings;
+    final messenger = ScaffoldMessenger.of(context);
+    final saveFailedMessage = S.of(context)?.commonSaveFailed ?? 'Save failed';
+
+    setState(() {
+      _isSaving = true;
+      _settings = newSettings;
+    });
     widget.onSave?.call(newSettings);
+
+    try {
+      await _persistSettings(newSettings);
+    } catch (e) {
+      debugLog('PrivacySettingsPage: Failed to persist settings: $e');
+      await _restoreSettings(previousSettings);
+      if (!mounted) {
+        return;
+      }
+      setState(() => _settings = previousSettings);
+      widget.onSave?.call(previousSettings);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
 
   Future<void> _persistSettings(PrivacySettings settings) async {
+    await getIt<PreferencesDataSource>().savePrivacySettingsModel(settings);
+    await MatrixClientManager.instance.updateNetworkPrivacy(settings);
+  }
+
+  Future<void> _restoreSettings(PrivacySettings settings) async {
     try {
       await getIt<PreferencesDataSource>().savePrivacySettingsModel(settings);
       await MatrixClientManager.instance.updateNetworkPrivacy(settings);
     } catch (e) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save privacy settings: $e')),
-      );
+      debugLog('PrivacySettingsPage: Failed to restore settings: $e');
     }
   }
 
@@ -89,288 +122,316 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: ListView(
+      body: Stack(
         children: [
-          const SizedBox(height: 16),
-
-          // 可见性设置
-          _buildSectionHeader(l10n?.settingsWhoCanSee ?? 'Who can see', isDark),
-          Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            child: Column(
+          AbsorbPointer(
+            absorbing: _isSaving,
+            child: ListView(
               children: [
-                _buildVisibilityItem(
-                  context,
-                  l10n?.profileAvatar ?? 'Avatar',
-                  Icons.account_circle_outlined,
-                  _settings.avatarVisibility,
-                  (value) => _updateSettings(
-                    _settings.copyWith(avatarVisibility: value),
-                  ),
+                const SizedBox(height: 16),
+
+                // 可见性设置
+                _buildSectionHeader(
+                  l10n?.settingsWhoCanSee ?? 'Who can see',
                   isDark,
                 ),
-                _buildDivider(isDark),
-                _buildVisibilityItem(
-                  context,
-                  l10n?.profileStatus ?? 'Status',
-                  Icons.info_outline,
-                  _settings.statusVisibility,
-                  (value) => _updateSettings(
-                    _settings.copyWith(statusVisibility: value),
+                Container(
+                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  child: Column(
+                    children: [
+                      _buildVisibilityItem(
+                        context,
+                        l10n?.profileAvatar ?? 'Avatar',
+                        Icons.account_circle_outlined,
+                        _settings.avatarVisibility,
+                        (value) => _updateSettings(
+                          _settings.copyWith(avatarVisibility: value),
+                        ),
+                        isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildVisibilityItem(
+                        context,
+                        l10n?.profileStatus ?? 'Status',
+                        Icons.info_outline,
+                        _settings.statusVisibility,
+                        (value) => _updateSettings(
+                          _settings.copyWith(statusVisibility: value),
+                        ),
+                        isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildVisibilityItem(
+                        context,
+                        l10n?.settingsLastSeen ?? 'Last Seen',
+                        Icons.access_time,
+                        _settings.lastSeenVisibility,
+                        (value) => _updateSettings(
+                          _settings.copyWith(lastSeenVisibility: value),
+                        ),
+                        isDark,
+                      ),
+                    ],
                   ),
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildSectionHeader('Privacy Hardening', isDark),
+                Container(
+                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  child: Column(
+                    children: [
+                      _buildSwitchTile(
+                        title: 'Hide Phone Number',
+                        subtitle:
+                            'Mask any bound phone number in profile-level surfaces on this device',
+                        icon: Icons.phone_disabled_outlined,
+                        value: _settings.hidePhoneNumber,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(hidePhoneNumber: value),
+                        ),
+                        isDark: isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildSwitchTile(
+                        title: 'Encrypt New Chats By Default',
+                        subtitle:
+                            'Start new direct chats and private rooms with E2EE enabled',
+                        icon: Icons.enhanced_encryption_outlined,
+                        value: _settings.defaultEncryptNewChats,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(defaultEncryptNewChats: value),
+                        ),
+                        isDark: isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildSwitchTile(
+                        title: 'Private Chat Mode',
+                        subtitle:
+                            'Temporarily enable screenshot blocking when viewing private or encrypted chats',
+                        icon: Icons.lock_person_outlined,
+                        value: _settings.privateChatMode,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(privateChatMode: value),
+                        ),
+                        isDark: isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildValueItem(
+                        title: 'Default Auto-Destruct Timer',
+                        subtitle:
+                            'Apply a default self-destruct timer to newly sent messages',
+                        icon: Icons.timer_outlined,
+                        value: _formatSelfDestructDuration(
+                          _settings.defaultSelfDestructSeconds,
+                        ),
+                        onTap: _pickDefaultSelfDestructDuration,
+                        isDark: isDark,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildSectionHeader('Network Privacy', isDark),
+                Container(
+                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  child: Column(
+                    children: [
+                      _buildSwitchTile(
+                        title: 'Link Previews',
+                        subtitle:
+                            'Fetch titles, descriptions, and thumbnails when messages contain URLs',
+                        icon: Icons.link_outlined,
+                        value: _settings.showLinkPreviews,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(showLinkPreviews: value),
+                        ),
+                        isDark: isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildSwitchTile(
+                        title: 'IP Address Protection',
+                        subtitle:
+                            'Route Matrix and link-preview requests through your configured HTTP privacy proxy when available',
+                        icon: Icons.shield_outlined,
+                        value: _settings.protectIpAddress,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(protectIpAddress: value),
+                        ),
+                        isDark: isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildSwitchTile(
+                        title: 'Use Tor / Privoxy HTTP Proxy',
+                        subtitle:
+                            'Use a local HTTP proxy endpoint such as Privoxy on 127.0.0.1:8118. Native SOCKS5 Tor routing is not supported here.',
+                        icon: Icons.travel_explore_outlined,
+                        value: _settings.useTor,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(
+                            useTor: value,
+                            proxyEnabled: value
+                                ? false
+                                : _settings.proxyEnabled,
+                          ),
+                        ),
+                        isDark: isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildSwitchTile(
+                        title: 'Custom Proxy',
+                        subtitle:
+                            'Use a custom HTTP or HTTPS proxy for Matrix traffic and link previews',
+                        icon: Icons.route_outlined,
+                        value: _settings.proxyEnabled,
+                        onChanged: (value) async {
+                          await _handleCustomProxyToggle(value);
+                        },
+                        isDark: isDark,
+                      ),
+                      if (_settings.proxyEnabled) ...[
+                        _buildDivider(isDark),
+                        _buildValueItem(
+                          title: 'Proxy Endpoint',
+                          subtitle:
+                              'HTTP/HTTPS proxy address (SOCKS not supported)',
+                          icon: Icons.dns_outlined,
+                          value: _settings.proxyUrl?.trim().isNotEmpty == true
+                              ? (PrivacySecuritySummaryHelper.hasValidCustomProxy(
+                                      _settings,
+                                    )
+                                    ? _settings.proxyUrl!.trim()
+                                    : 'Invalid endpoint')
+                              : 'Not set',
+                          onTap: _editProxyUrl,
+                          isDark: isDark,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 隐藏聊天入口
+                _buildSectionHeader(l10n?.commonChat ?? 'Chat', isDark),
+                Container(
+                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  child: Column(
+                    children: [
+                      _buildNavigationItem(
+                        context,
+                        l10n?.settingsHiddenChats ?? 'Hidden Chats',
+                        Icons.visibility_off_outlined,
+                        () => _navigateToHiddenChats(context),
+                        isDark,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 消息设置
+                _buildSectionHeader(
+                  l10n?.settingsMessagesLabel ?? 'Messages',
                   isDark,
                 ),
-                _buildDivider(isDark),
-                _buildVisibilityItem(
-                  context,
-                  l10n?.settingsLastSeen ?? 'Last Seen',
-                  Icons.access_time,
-                  _settings.lastSeenVisibility,
-                  (value) => _updateSettings(
-                    _settings.copyWith(lastSeenVisibility: value),
+                Container(
+                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  child: Column(
+                    children: [
+                      _buildSwitchTile(
+                        title:
+                            l10n?.settingsAllowStrangerMessages ??
+                            'Allow Stranger Messages',
+                        subtitle:
+                            l10n?.settingsReceiveMessagesFromNonContacts ??
+                            'Receive messages from non-contacts',
+                        icon: Icons.person_add_outlined,
+                        value: _settings.allowStrangerMessage,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(allowStrangerMessage: value),
+                        ),
+                        isDark: isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildSwitchTile(
+                        title: l10n?.settingsReadReceipts ?? 'Read Receipts',
+                        subtitle:
+                            l10n?.settingsLetOthersKnowYouRead ??
+                            'Let others know you read their messages',
+                        icon: Icons.done_all,
+                        value: _settings.showReadReceipts,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(showReadReceipts: value),
+                        ),
+                        isDark: isDark,
+                      ),
+                      _buildDivider(isDark),
+                      _buildSwitchTile(
+                        title:
+                            l10n?.settingsTypingIndicator ?? 'Typing Indicator',
+                        subtitle:
+                            l10n?.settingsLetOthersKnowYouTyping ??
+                            'Let others know you are typing',
+                        icon: Icons.keyboard,
+                        value: _settings.showTypingIndicator,
+                        onChanged: (value) => _updateSettings(
+                          _settings.copyWith(showTypingIndicator: value),
+                        ),
+                        isDark: isDark,
+                      ),
+                    ],
                   ),
-                  isDark,
                 ),
-              ],
-            ),
-          ),
 
-          const SizedBox(height: 16),
-
-          _buildSectionHeader('Privacy Hardening', isDark),
-          Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            child: Column(
-              children: [
-                _buildSwitchTile(
-                  title: 'Hide Phone Number',
-                  subtitle:
-                      'Mask any bound phone number in profile-level surfaces on this device',
-                  icon: Icons.phone_disabled_outlined,
-                  value: _settings.hidePhoneNumber,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(hidePhoneNumber: value),
+                // 移动端显示截图防护
+                if (Platform.isAndroid || Platform.isIOS) ...[
+                  const SizedBox(height: 16),
+                  _buildSectionHeader(
+                    l10n?.settingsSecurity ?? 'Security',
+                    isDark,
                   ),
-                  isDark: isDark,
-                ),
-                _buildDivider(isDark),
-                _buildSwitchTile(
-                  title: 'Encrypt New Chats By Default',
-                  subtitle:
-                      'Start new direct chats and private rooms with E2EE enabled',
-                  icon: Icons.enhanced_encryption_outlined,
-                  value: _settings.defaultEncryptNewChats,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(defaultEncryptNewChats: value),
-                  ),
-                  isDark: isDark,
-                ),
-                _buildDivider(isDark),
-                _buildSwitchTile(
-                  title: 'Private Chat Mode',
-                  subtitle:
-                      'Temporarily enable screenshot blocking when viewing private or encrypted chats',
-                  icon: Icons.lock_person_outlined,
-                  value: _settings.privateChatMode,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(privateChatMode: value),
-                  ),
-                  isDark: isDark,
-                ),
-                _buildDivider(isDark),
-                _buildValueItem(
-                  title: 'Default Auto-Destruct Timer',
-                  subtitle:
-                      'Apply a default self-destruct timer to newly sent messages',
-                  icon: Icons.timer_outlined,
-                  value: _formatSelfDestructDuration(
-                    _settings.defaultSelfDestructSeconds,
-                  ),
-                  onTap: _pickDefaultSelfDestructDuration,
-                  isDark: isDark,
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          _buildSectionHeader('Network Privacy', isDark),
-          Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            child: Column(
-              children: [
-                _buildSwitchTile(
-                  title: 'Link Previews',
-                  subtitle:
-                      'Fetch titles, descriptions, and thumbnails when messages contain URLs',
-                  icon: Icons.link_outlined,
-                  value: _settings.showLinkPreviews,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(showLinkPreviews: value),
-                  ),
-                  isDark: isDark,
-                ),
-                _buildDivider(isDark),
-                _buildSwitchTile(
-                  title: 'IP Address Protection',
-                  subtitle:
-                      'Route Matrix and link-preview requests through your configured HTTP privacy proxy when available',
-                  icon: Icons.shield_outlined,
-                  value: _settings.protectIpAddress,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(protectIpAddress: value),
-                  ),
-                  isDark: isDark,
-                ),
-                _buildDivider(isDark),
-                _buildSwitchTile(
-                  title: 'Use Tor / Privoxy HTTP Proxy',
-                  subtitle:
-                      'Use a local HTTP proxy endpoint such as Privoxy on 127.0.0.1:8118. Native SOCKS5 Tor routing is not supported here.',
-                  icon: Icons.travel_explore_outlined,
-                  value: _settings.useTor,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(
-                      useTor: value,
-                      proxyEnabled: value ? false : _settings.proxyEnabled,
+                  Container(
+                    color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                    child: _buildSwitchTile(
+                      title:
+                          l10n?.settingsScreenshotProtection ??
+                          'Screenshot Protection',
+                      subtitle:
+                          l10n?.settingsScreenshotProtectionDesc ??
+                          'Prevent screenshots and screen recording',
+                      icon: Icons.screenshot_monitor_outlined,
+                      value: _screenshotProtection,
+                      onChanged: (value) async {
+                        await ScreenshotProtectionService.instance.setEnabled(
+                          value,
+                        );
+                        if (mounted) {
+                          setState(() => _screenshotProtection = value);
+                        }
+                      },
+                      isDark: isDark,
+                      iconColor: Colors.red,
                     ),
                   ),
-                  isDark: isDark,
-                ),
-                _buildDivider(isDark),
-                _buildSwitchTile(
-                  title: 'Custom Proxy',
-                  subtitle:
-                      'Use a custom HTTP or HTTPS proxy for Matrix traffic and link previews',
-                  icon: Icons.route_outlined,
-                  value: _settings.proxyEnabled,
-                  onChanged: (value) async {
-                    await _handleCustomProxyToggle(value);
-                  },
-                  isDark: isDark,
-                ),
-                if (_settings.proxyEnabled) ...[
-                  _buildDivider(isDark),
-                  _buildValueItem(
-                    title: 'Proxy Endpoint',
-                    subtitle: 'HTTP/HTTPS proxy address (SOCKS not supported)',
-                    icon: Icons.dns_outlined,
-                    value: _settings.proxyUrl?.trim().isNotEmpty == true
-                        ? (PrivacySecuritySummaryHelper.hasValidCustomProxy(
-                                _settings,
-                              )
-                              ? _settings.proxyUrl!.trim()
-                              : 'Invalid endpoint')
-                        : 'Not set',
-                    onTap: _editProxyUrl,
-                    isDark: isDark,
-                  ),
                 ],
+
+                const SizedBox(height: 24),
               ],
             ),
           ),
-
-          const SizedBox(height: 16),
-
-          // 隐藏聊天入口
-          _buildSectionHeader(l10n?.commonChat ?? 'Chat', isDark),
-          Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            child: Column(
-              children: [
-                _buildNavigationItem(
-                  context,
-                  l10n?.settingsHiddenChats ?? 'Hidden Chats',
-                  Icons.visibility_off_outlined,
-                  () => _navigateToHiddenChats(context),
-                  isDark,
-                ),
-              ],
+          if (_isSaving)
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: LinearProgressIndicator(minHeight: 2),
             ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // 消息设置
-          _buildSectionHeader(
-            l10n?.settingsMessagesLabel ?? 'Messages',
-            isDark,
-          ),
-          Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
-            child: Column(
-              children: [
-                _buildSwitchTile(
-                  title:
-                      l10n?.settingsAllowStrangerMessages ??
-                      'Allow Stranger Messages',
-                  subtitle:
-                      l10n?.settingsReceiveMessagesFromNonContacts ??
-                      'Receive messages from non-contacts',
-                  icon: Icons.person_add_outlined,
-                  value: _settings.allowStrangerMessage,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(allowStrangerMessage: value),
-                  ),
-                  isDark: isDark,
-                ),
-                _buildDivider(isDark),
-                _buildSwitchTile(
-                  title: l10n?.settingsReadReceipts ?? 'Read Receipts',
-                  subtitle:
-                      l10n?.settingsLetOthersKnowYouRead ??
-                      'Let others know you read their messages',
-                  icon: Icons.done_all,
-                  value: _settings.showReadReceipts,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(showReadReceipts: value),
-                  ),
-                  isDark: isDark,
-                ),
-                _buildDivider(isDark),
-                _buildSwitchTile(
-                  title: l10n?.settingsTypingIndicator ?? 'Typing Indicator',
-                  subtitle:
-                      l10n?.settingsLetOthersKnowYouTyping ??
-                      'Let others know you are typing',
-                  icon: Icons.keyboard,
-                  value: _settings.showTypingIndicator,
-                  onChanged: (value) => _updateSettings(
-                    _settings.copyWith(showTypingIndicator: value),
-                  ),
-                  isDark: isDark,
-                ),
-              ],
-            ),
-          ),
-
-          // 移动端显示截图防护
-          if (Platform.isAndroid || Platform.isIOS) ...[
-            const SizedBox(height: 16),
-            _buildSectionHeader(l10n?.settingsSecurity ?? 'Security', isDark),
-            Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
-              child: _buildSwitchTile(
-                title:
-                    l10n?.settingsScreenshotProtection ??
-                    'Screenshot Protection',
-                subtitle:
-                    l10n?.settingsScreenshotProtectionDesc ??
-                    'Prevent screenshots and screen recording',
-                icon: Icons.screenshot_monitor_outlined,
-                value: _screenshotProtection,
-                onChanged: (value) async {
-                  await ScreenshotProtectionService.instance.setEnabled(value);
-                  if (mounted) setState(() => _screenshotProtection = value);
-                },
-                isDark: isDark,
-                iconColor: Colors.red,
-              ),
-            ),
-          ],
-
-          const SizedBox(height: 24),
         ],
       ),
     );
@@ -699,7 +760,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       return;
     }
 
-    _updateSettings(
+    await _updateSettings(
       _settings.copyWith(
         defaultSelfDestructSeconds: result == 'off' ? null : result as int?,
       ),
@@ -711,17 +772,19 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     if (value == null) {
       return;
     }
-    _saveProxyUrl(value, enableProxyAfterSave: _settings.proxyEnabled);
+    await _saveProxyUrl(value, enableProxyAfterSave: _settings.proxyEnabled);
   }
 
   Future<void> _handleCustomProxyToggle(bool value) async {
     if (!value) {
-      _updateSettings(_settings.copyWith(proxyEnabled: false));
+      await _updateSettings(_settings.copyWith(proxyEnabled: false));
       return;
     }
 
     if (PrivacySecuritySummaryHelper.hasValidCustomProxy(_settings)) {
-      _updateSettings(_settings.copyWith(proxyEnabled: true, useTor: false));
+      await _updateSettings(
+        _settings.copyWith(proxyEnabled: true, useTor: false),
+      );
       return;
     }
 
@@ -729,7 +792,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     if (valueFromDialog == null) {
       return;
     }
-    _saveProxyUrl(valueFromDialog, enableProxyAfterSave: true);
+    await _saveProxyUrl(valueFromDialog, enableProxyAfterSave: true);
   }
 
   Future<String?> _showProxyUrlEditor(String initialValue) async {
@@ -767,10 +830,13 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     }
   }
 
-  void _saveProxyUrl(String value, {required bool enableProxyAfterSave}) {
+  Future<void> _saveProxyUrl(
+    String value, {
+    required bool enableProxyAfterSave,
+  }) async {
     final trimmed = value.trim();
     if (trimmed.isEmpty) {
-      _updateSettings(
+      await _updateSettings(
         _settings.copyWith(
           proxyUrl: '',
           proxyEnabled: enableProxyAfterSave ? false : _settings.proxyEnabled,
@@ -798,7 +864,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       return;
     }
 
-    _updateSettings(
+    await _updateSettings(
       _settings.copyWith(
         proxyUrl: trimmed,
         proxyEnabled: enableProxyAfterSave ? true : _settings.proxyEnabled,

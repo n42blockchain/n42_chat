@@ -6,6 +6,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../../blocs/bloc_message_keys.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
@@ -79,7 +80,8 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
         if (!_isSaving) {
           return;
         }
-        if (state.status == GroupStatus.success) {
+        if (state.status == GroupStatus.success &&
+            state.successMessage == BlocMessageKeys.groupContentFilterUpdated) {
           if (mounted) {
             setState(() => _isSaving = false);
           }
