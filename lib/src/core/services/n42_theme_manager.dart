@@ -67,11 +67,14 @@ class _N42ThemeManager {
 
   static Locale _normalizeLocale(Locale locale) {
     final languageCode = locale.languageCode.toLowerCase();
-    if (languageCode == 'zh') {
+    final countryCode = locale.countryCode;
+
+    // Only default bare 'zh' (no country) to zh_TW;
+    // preserve explicit zh_CN, zh_SG, etc.
+    if (languageCode == 'zh' && (countryCode == null || countryCode.isEmpty)) {
       return const Locale('zh', 'TW');
     }
 
-    final countryCode = locale.countryCode;
     if (countryCode == null || countryCode.isEmpty) {
       return Locale(languageCode);
     }

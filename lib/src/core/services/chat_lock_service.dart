@@ -17,13 +17,11 @@ import 'biometric_service.dart';
 class ChatLockService {
   static const String _lockedChatsKey = 'chat_lock_locked_chats';
 
-  // SecureStorage keys
-  static const String _ssPinPrefix = 'chat_lock_pin_';
-  static const String _ssSaltPrefix = 'chat_lock_pin_salt_';
-
-  // Legacy SharedPreferences keys (for migration)
-  static const String _spPinPrefix = 'chat_lock_pin_';
-  static const String _spSaltPrefix = 'chat_lock_pin_salt_';
+  // SecureStorage keys — intentionally same string as legacy SP keys
+  // so migration reads the same logical key from the old store.
+  // Do NOT change these without updating the migration logic.
+  static const String _pinKeyPrefix = 'chat_lock_pin_';
+  static const String _saltKeyPrefix = 'chat_lock_pin_salt_';
 
   final BiometricService _biometricService;
   final FlutterSecureStorage _secureStorage;
@@ -91,15 +89,15 @@ class ChatLockService {
   /// 验证 PIN 码
   Future<bool> verifyPin(String roomId, String pin) async {
     // 尝试从 SecureStorage 读取
-    var storedHash = await _secureStorage.read(key: '$_ssPinPrefix$roomId');
-    var salt = await _secureStorage.read(key: '$_ssSaltPrefix$roomId');
+    var storedHash = await _secureStorage.read(key: '$_pinKeyPrefix$roomId');
+    var salt = await _secureStorage.read(key: '$_saltKeyPrefix$roomId');
 
     // 如果 SecureStorage 中没有，尝试从 SharedPreferences 迁移
     if (storedHash == null) {
       final migrated = await _migrateFromSharedPreferences(roomId);
       if (migrated) {
-        storedHash = await _secureStorage.read(key: '$_ssPinPrefix$roomId');
-        salt = await _secureStorage.read(key: '$_ssSaltPrefix$roomId');
+        storedHash = await _secureStorage.read(key: '$_pinKeyPrefix$roomId');
+        salt = await _secureStorage.read(key: '$_saltKeyPrefix$roomId');
       }
     }
 
@@ -121,12 +119,12 @@ class ChatLockService {
   /// 检查聊天是否设置了 PIN 码
   Future<bool> hasPinSet(String roomId) async {
     // Check SecureStorage first
-    final ssHash = await _secureStorage.read(key: '$_ssPinPrefix$roomId');
+    final ssHash = await _secureStorage.read(key: '$_pinKeyPrefix$roomId');
     if (ssHash != null) return true;
 
     // Check SharedPreferences (not yet migrated)
     final prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey('$_spPinPrefix$roomId');
+    return prefs.containsKey('$_pinKeyPrefix$roomId');
   }
 
   // ============================================
@@ -136,17 +134,17 @@ class ChatLockService {
   /// 保存 PIN 码哈希到 SecureStorage
   Future<void> _savePinHash(String roomId, String pin) async {
     final salt = _generateSalt();
-    await _secureStorage.write(key: '$_ssSaltPrefix$roomId', value: salt);
+    await _secureStorage.write(key: '$_saltKeyPrefix$roomId', value: salt);
     await _secureStorage.write(
-      key: '$_ssPinPrefix$roomId',
+      key: '$_pinKeyPrefix$roomId',
       value: _hashPin(pin, salt),
     );
 
     // 清理旧的 SharedPreferences 数据
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('$_spPinPrefix$roomId');
-      await prefs.remove('$_spSaltPrefix$roomId');
+      await prefs.remove('$_pinKeyPrefix$roomId');
+      await prefs.remove('$_saltKeyPrefix$roomId');
     } catch (_) {
       // Non-critical: old data can remain
     }
@@ -154,14 +152,14 @@ class ChatLockService {
 
   /// 移除 PIN 码
   Future<void> _removePinHash(String roomId) async {
-    await _secureStorage.delete(key: '$_ssPinPrefix$roomId');
-    await _secureStorage.delete(key: '$_ssSaltPrefix$roomId');
+    await _secureStorage.delete(key: '$_pinKeyPrefix$roomId');
+    await _secureStorage.delete(key: '$_saltKeyPrefix$roomId');
 
     // Also clean up any legacy SP data
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('$_spPinPrefix$roomId');
-      await prefs.remove('$_spSaltPrefix$roomId');
+      await prefs.remove('$_pinKeyPrefix$roomId');
+      await prefs.remove('$_saltKeyPrefix$roomId');
     } catch (_) {}
   }
 
@@ -170,20 +168,20 @@ class ChatLockService {
   Future<bool> _migrateFromSharedPreferences(String roomId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final hash = prefs.getString('$_spPinPrefix$roomId');
+      final hash = prefs.getString('$_pinKeyPrefix$roomId');
       if (hash == null) return false;
 
-      final salt = prefs.getString('$_spSaltPrefix$roomId');
+      final salt = prefs.getString('$_saltKeyPrefix$roomId');
 
       // Write to SecureStorage
-      await _secureStorage.write(key: '$_ssPinPrefix$roomId', value: hash);
+      await _secureStorage.write(key: '$_pinKeyPrefix$roomId', value: hash);
       if (salt != null) {
-        await _secureStorage.write(key: '$_ssSaltPrefix$roomId', value: salt);
+        await _secureStorage.write(key: '$_saltKeyPrefix$roomId', value: salt);
       }
 
       // Remove from SharedPreferences after successful migration
-      await prefs.remove('$_spPinPrefix$roomId');
-      await prefs.remove('$_spSaltPrefix$roomId');
+      await prefs.remove('$_pinKeyPrefix$roomId');
+      await prefs.remove('$_saltKeyPrefix$roomId');
 
       return true;
     } catch (_) {

@@ -151,15 +151,6 @@ class _N42CallFacade {
     }
   }
 
-  /// 释放通话管理器
-  static Future<void> disposeCallManager() async {
-    _turnRefreshTimer?.cancel();
-    _turnRefreshTimer = null;
-    await _callManager?.dispose();
-    _callManager = null;
-    _liveKitJwtUrl = null;
-  }
-
   /// 安排 TURN 凭据到期前自动刷新
   static void _scheduleTurnRefresh(matrix.Client c, int ttl) {
     _turnRefreshTimer?.cancel();
@@ -186,7 +177,7 @@ class _N42CallFacade {
     });
   }
 
-  /// 释放通话相关资源
+  /// 释放通话相关资源（disposeCallManager 是别名）
   static Future<void> dispose() async {
     _turnRefreshTimer?.cancel();
     _turnRefreshTimer = null;
@@ -196,4 +187,6 @@ class _N42CallFacade {
     _callManager = null;
     _liveKitJwtUrl = null;
   }
+
+  static Future<void> disposeCallManager() => dispose();
 }
