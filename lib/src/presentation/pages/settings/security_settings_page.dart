@@ -1910,7 +1910,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       );
 
       if (confirmed == true) {
-        final password = passwordController.text;
+        final password = passwordController.text.trim();
         if (password.isNotEmpty) {
           if (!mounted) return;
           _invalidatePendingDataLoads();
@@ -1952,7 +1952,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     }
   }
 
-  void _setupCrossSigning() async {
+  Future<void> _setupCrossSigning() async {
     if (widget.e2eeManager.isCrossSigningEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

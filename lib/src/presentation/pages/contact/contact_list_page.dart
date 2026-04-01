@@ -57,7 +57,6 @@ class _ContactListPageState extends State<ContactListPage> {
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
-    _groupBloc.close();
     super.dispose();
   }
 

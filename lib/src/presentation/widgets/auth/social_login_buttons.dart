@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -113,7 +114,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     }
 
     // 检查 Apple 登录可用性
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
       try {
         final available = await _authService.isAppleSignInAvailable();
         if (mounted) {
@@ -455,8 +456,6 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         _setProviderLoading(sso: false);
         widget.onError?.call(e.toString());
       }
-    } finally {
-      _setProviderLoading(sso: false);
     }
   }
 

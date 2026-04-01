@@ -404,10 +404,12 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   /// 添加新 Story
   void _onAddStory() {
+    final bloc = _storyBloc;
+    if (bloc == null) return;
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => BlocProvider<StoryBloc>.value(
-          value: _storyBloc!,
+          value: bloc,
           child: const CreateStoryPage(),
         ),
       ),
