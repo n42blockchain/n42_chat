@@ -121,7 +121,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
         if (state.status == GroupStatus.created) {
           setState(() => _isCreating = false);
-          Navigator.of(context).pop(state.createdRoomId!);
+          if (state.createdRoomId != null) {
+            Navigator.of(context).pop(state.createdRoomId);
+          }
         } else if (state.status == GroupStatus.error &&
             state.errorMessage != null) {
           setState(() => _isCreating = false);

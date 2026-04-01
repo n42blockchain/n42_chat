@@ -781,6 +781,7 @@ class _StorageRingPainter extends CustomPainter {
     return mediaRatio != oldDelegate.mediaRatio ||
         fileRatio != oldDelegate.fileRatio ||
         cacheRatio != oldDelegate.cacheRatio ||
-        otherRatio != oldDelegate.otherRatio;
+        otherRatio != oldDelegate.otherRatio ||
+        isDark != oldDelegate.isDark;
   }
 }

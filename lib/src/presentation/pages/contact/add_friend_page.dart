@@ -308,6 +308,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         }
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage =
             S.of(context)?.contactSearchFailed(e.toString()) ??
