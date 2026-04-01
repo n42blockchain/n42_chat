@@ -333,7 +333,7 @@ class ChatBackupService {
     final finalJsonStr = _finalizeBackupJson(backupData);
 
     if (password != null && password.isNotEmpty) {
-      final encryptedBytes = _encryptAes256(
+      final encryptedBytes = _encryptAesGcm(
         utf8.encode(finalJsonStr),
         password,
       );
@@ -530,33 +530,46 @@ class ChatBackupService {
           debugLog('ChatBackupService: Timeline error for ${room.id}: $e');
         }
 
-        // 2. 从归档获取历史消息（突破 1000 条限制）
+        // 2. 从归档获取历史消息（分页加载，避免 OOM）
         if (_archiveService != null) {
           try {
-            final archived = await _archiveService!.getArchivedMessages(
-              room.id,
-              beforeTimestamp: lastBackupTs > 0 ? null : null,
-              limit: 100000, // 不设限，全量导出
-            );
-            for (final a in archived) {
-              if (lastBackupTs > 0 && a.originServerTs <= lastBackupTs) {
-                continue;
+            const pageSize = 500;
+            int? cursor; // beforeTimestamp cursor for pagination
+            bool hasMore = true;
+
+            while (hasMore) {
+              final archived = await _archiveService!.getArchivedMessages(
+                room.id,
+                beforeTimestamp: cursor,
+                limit: pageSize,
+              );
+
+              if (archived.isEmpty) break;
+              hasMore = archived.length == pageSize;
+
+              for (final a in archived) {
+                if (lastBackupTs > 0 && a.originServerTs <= lastBackupTs) {
+                  continue;
+                }
+                addMessage({
+                  'eventId': a.eventId,
+                  'sender': a.senderId,
+                  'type': a.type,
+                  'body': a.body ?? '',
+                  'timestamp': DateTime.fromMillisecondsSinceEpoch(
+                    a.originServerTs,
+                  ).toIso8601String(),
+                  'ts': a.originServerTs,
+                  'msgtype': a.msgtype,
+                  'formattedBody': a.formattedBody,
+                  'mediaInfo': a.mediaInfo,
+                  'relatesTo': a.relatesTo,
+                  'isArchived': true,
+                });
               }
-              addMessage({
-                'eventId': a.eventId,
-                'sender': a.senderId,
-                'type': a.type,
-                'body': a.body ?? '',
-                'timestamp': DateTime.fromMillisecondsSinceEpoch(
-                  a.originServerTs,
-                ).toIso8601String(),
-                'ts': a.originServerTs,
-                'msgtype': a.msgtype,
-                'formattedBody': a.formattedBody,
-                'mediaInfo': a.mediaInfo,
-                'relatesTo': a.relatesTo,
-                'isArchived': true,
-              });
+
+              // Move cursor to oldest message timestamp for next page
+              cursor = archived.last.originServerTs;
             }
           } catch (e) {
             debugLog('ChatBackupService: Archive error for ${room.id}: $e');
@@ -579,7 +592,7 @@ class ChatBackupService {
     final finalJsonStr = _finalizeBackupJson(backupData);
 
     if (password != null && password.isNotEmpty) {
-      final encryptedBytes = _encryptAes256(
+      final encryptedBytes = _encryptAesGcm(
         utf8.encode(finalJsonStr),
         password,
       );
@@ -948,6 +961,17 @@ class ChatBackupService {
     final file = File(filePath);
     final bytes = await file.readAsBytes();
 
+    // 检查是否使用 v3 加密 (AES-256-GCM，带认证)
+    final headerV3 = utf8.decode(bytes.take(8).toList(), allowMalformed: true);
+    if (headerV3 == 'N42ENC3:') {
+      if (password == null || password.isEmpty) {
+        throw StateError('This backup is password-protected');
+      }
+      final decrypted = _decryptAesGcm(bytes, password);
+      final jsonStr = utf8.decode(decrypted);
+      return _decodeBackupJson(jsonStr);
+    }
+
     // 检查是否使用 v2 加密 (AES-256-CBC)
     final headerV2 = utf8.decode(bytes.take(8).toList(), allowMalformed: true);
     if (headerV2 == 'N42ENC2:') {
@@ -1061,7 +1085,7 @@ class ChatBackupService {
     return derivator.process(Uint8List.fromList(utf8.encode(password)));
   }
 
-  /// AES-256-CBC 加密
+  /// AES-256-CBC 加密（v2，保留用于向后兼容解密）
   /// 格式: "N42ENC2:" (8字节) + salt (32字节) + iv (16字节) + 加密数据
   static Uint8List _encryptAes256(List<int> plaintext, String password) {
     final random = Random.secure();
@@ -1141,6 +1165,89 @@ class ChatBackupService {
     throw const FormatException('Encrypted backup password is invalid');
   }
 
+  /// AES-256-GCM 加密（v3，带认证标签，防 padding oracle）
+  /// 格式: "N42ENC3:" (8字节) + salt (32字节) + nonce (12字节) + tag (16字节) + 密文
+  static Uint8List _encryptAesGcm(List<int> plaintext, String password) {
+    final random = Random.secure();
+    final salt = Uint8List.fromList(
+      List.generate(32, (_) => random.nextInt(256)),
+    );
+    final nonce = Uint8List.fromList(
+      List.generate(12, (_) => random.nextInt(256)),
+    );
+
+    final key = _pbkdf2(password, salt, iterations: 100000, keyLength: 32);
+
+    final cipher = pc.GCMBlockCipher(pc.AESEngine())
+      ..init(
+        true,
+        pc.AEADParameters(
+          pc.KeyParameter(key),
+          128, // tag length in bits
+          nonce,
+          Uint8List(0), // no associated data
+        ),
+      );
+
+    final input = Uint8List.fromList(plaintext);
+    final output = Uint8List(cipher.getOutputSize(input.length));
+    final len = cipher.processBytes(input, 0, input.length, output, 0);
+    cipher.doFinal(output, len);
+
+    // output contains ciphertext + tag (appended by GCM)
+    // Extract tag (last 16 bytes) and ciphertext
+    final tagStart = output.length - 16;
+    final tag = Uint8List.fromList(output.sublist(tagStart));
+    final ciphertext = Uint8List.fromList(output.sublist(0, tagStart));
+
+    return Uint8List.fromList([
+      ...utf8.encode('N42ENC3:'),
+      ...salt,
+      ...nonce,
+      ...tag,
+      ...ciphertext,
+    ]);
+  }
+
+  /// AES-256-GCM 解密
+  static Uint8List _decryptAesGcm(Uint8List data, String password) {
+    // Header(8) + salt(32) + nonce(12) + tag(16) = 68 minimum
+    if (data.length < 68) {
+      throw const FormatException('Encrypted backup is truncated');
+    }
+
+    final salt = Uint8List.fromList(data.sublist(8, 40));
+    final nonce = Uint8List.fromList(data.sublist(40, 52));
+    final tag = Uint8List.fromList(data.sublist(52, 68));
+    final ciphertext = Uint8List.fromList(data.sublist(68));
+
+    final key = _pbkdf2(password, salt, iterations: 100000, keyLength: 32);
+
+    final cipher = pc.GCMBlockCipher(pc.AESEngine())
+      ..init(
+        false,
+        pc.AEADParameters(
+          pc.KeyParameter(key),
+          128,
+          nonce,
+          Uint8List(0),
+        ),
+      );
+
+    // GCM expects ciphertext + tag concatenated
+    final input = Uint8List.fromList([...ciphertext, ...tag]);
+    final output = Uint8List(cipher.getOutputSize(input.length));
+    try {
+      final len = cipher.processBytes(input, 0, input.length, output, 0);
+      cipher.doFinal(output, len);
+    } on ArgumentError {
+      throw const FormatException('Encrypted backup password is invalid');
+    }
+
+    // GCM output is plaintext (tag is verified internally)
+    return Uint8List.fromList(output.sublist(0, ciphertext.length));
+  }
+
   /// 读取备份 manifest（快速预览，不需要密码）
   ///
   /// 仅读取文件头部来检测加密状态，非加密文件读取前 64KB 解析 manifest。
@@ -1154,7 +1261,7 @@ class ChatBackupService {
       try {
         final header = await raf.read(8);
         final headerStr = utf8.decode(header, allowMalformed: true);
-        if (headerStr == 'N42ENC2:' || headerStr.startsWith('N42ENC:')) {
+        if (headerStr == 'N42ENC3:' || headerStr == 'N42ENC2:' || headerStr.startsWith('N42ENC:')) {
           return null; // 加密文件无法快速预览
         }
       } finally {
