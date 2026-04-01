@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_background_presets.dart';
+import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 
 /// 聊天背景设置页
@@ -18,8 +19,10 @@ class ChatBackgroundPage extends StatefulWidget {
 }
 
 class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
-  final PreferencesDataSource _storage = GetIt.instance<PreferencesDataSource>();
+  final PreferencesDataSource _storage =
+      GetIt.instance<PreferencesDataSource>();
   String? _selectedBackground;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -37,11 +40,44 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
   }
 
   Future<void> _selectBackground(String value) async {
-    setState(() => _selectedBackground = value);
-    if (widget.roomId != null) {
-      await _storage.setChatBackground(widget.roomId!, value);
-    } else {
-      await _storage.setDefaultChatBackground(value);
+    final isDefaultSelection =
+        value == 'default' &&
+        (_selectedBackground == null || _selectedBackground == 'default');
+    if (_isSaving || isDefaultSelection || value == _selectedBackground) {
+      return;
+    }
+
+    final previousBackground = _selectedBackground;
+    final messenger = ScaffoldMessenger.of(context);
+    final saveFailedMessage = S.of(context)?.commonSaveFailed ?? 'Save failed';
+
+    setState(() {
+      _isSaving = true;
+      _selectedBackground = value;
+    });
+
+    try {
+      if (widget.roomId != null) {
+        await _storage.setChatBackground(widget.roomId!, value);
+      } else {
+        await _storage.setDefaultChatBackground(value);
+      }
+    } catch (e) {
+      debugLog('ChatBackgroundPage: Failed to save background: $e');
+      if (!mounted) {
+        return;
+      }
+      setState(() => _selectedBackground = previousBackground);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 
@@ -63,61 +99,84 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Stack(
         children: [
-          // 默认（无背景）
-          _buildDefaultOption(isDark),
+          AbsorbPointer(
+            absorbing: _isSaving,
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // 默认（无背景）
+                _buildDefaultOption(isDark),
 
-          const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-          // 纯色背景
-          Text(
-            S.of(context)?.solidColors ?? 'Solid Colors',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                // 纯色背景
+                Text(
+                  S.of(context)?.solidColors ?? 'Solid Colors',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildColorGrid(),
+
+                const SizedBox(height: 24),
+
+                // 渐变背景
+                Text(
+                  S.of(context)?.gradients ?? 'Gradients',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildGradientGrid(),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          _buildColorGrid(),
-
-          const SizedBox(height: 24),
-
-          // 渐变背景
-          Text(
-            S.of(context)?.gradients ?? 'Gradients',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          if (_isSaving)
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: LinearProgressIndicator(minHeight: 2),
             ),
-          ),
-          const SizedBox(height: 12),
-          _buildGradientGrid(),
         ],
       ),
     );
   }
 
   Widget _buildDefaultOption(bool isDark) {
-    final isSelected = _selectedBackground == null || _selectedBackground == 'default';
+    final isSelected =
+        _selectedBackground == null || _selectedBackground == 'default';
 
     return GestureDetector(
-      onTap: () => _selectBackground('default'),
+      onTap: _isSaving ? null : () => _selectBackground('default'),
       child: Container(
         height: 80,
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.primary : (isDark ? AppColors.dividerDark : AppColors.divider),
+            color: isSelected
+                ? AppColors.primary
+                : (isDark ? AppColors.dividerDark : AppColors.divider),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -143,7 +202,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
         final isSelected = _selectedBackground == colorKey;
 
         return GestureDetector(
-          onTap: () => _selectBackground(colorKey),
+          onTap: _isSaving ? null : () => _selectBackground(colorKey),
           child: Container(
             width: 64,
             height: 64,
@@ -175,7 +234,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
         final isSelected = _selectedBackground == gradientKey;
 
         return GestureDetector(
-          onTap: () => _selectBackground(gradientKey),
+          onTap: _isSaving ? null : () => _selectBackground(gradientKey),
           child: Container(
             width: 80,
             height: 64,

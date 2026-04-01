@@ -29,6 +29,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
   bool _hideMyMoments = false;
   bool _hideTheirMoments = false;
   bool _hideMyStatus = false;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
 
   Future<void> _loadPermissions() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     final key = 'permissions_${widget.userId}';
     final json = prefs.getString(key);
     if (json != null) {
@@ -67,6 +69,51 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
     await prefs.setString(key, jsonEncode(data));
   }
 
+  Future<void> _updatePermissions(VoidCallback update) async {
+    if (_isSaving) {
+      return;
+    }
+
+    final previousState = (
+      chatOnly: _chatOnly,
+      hideMyMoments: _hideMyMoments,
+      hideTheirMoments: _hideTheirMoments,
+      hideMyStatus: _hideMyStatus,
+    );
+    final messenger = ScaffoldMessenger.of(context);
+    final saveFailedMessage = S.of(context)?.commonSaveFailed ?? 'Save failed';
+
+    setState(() {
+      _isSaving = true;
+      update();
+    });
+
+    try {
+      await _savePermissions();
+    } catch (e) {
+      debugLog('ContactPermissionsPage: Failed to save permissions: $e');
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _chatOnly = previousState.chatOnly;
+        _hideMyMoments = previousState.hideMyMoments;
+        _hideTheirMoments = previousState.hideTheirMoments;
+        _hideMyStatus = previousState.hideMyStatus;
+      });
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(saveFailedMessage),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
@@ -91,10 +138,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   title: S.of(context)?.contactSetChatOnly ?? 'Set as chat-only',
                   subtitle: S.of(context)?.contactChatOnlyDesc ?? 'Only allow chatting, hide other content',
                   value: _chatOnly,
-                  onChanged: (v) {
-                    setState(() => _chatOnly = v);
-                    _savePermissions();
-                  },
+                  onChanged: (v) => _updatePermissions(() => _chatOnly = v),
                   textColor: textColor,
                   subtitleColor: subtitleColor,
                 ),
@@ -106,10 +150,8 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   title: S.of(context)?.contactHideMyMoments ?? 'Hide my Moments',
                   subtitle: S.of(context)?.contactHideMyMomentsDesc ?? 'This friend cannot see my Moments',
                   value: _hideMyMoments,
-                  onChanged: (v) {
-                    setState(() => _hideMyMoments = v);
-                    _savePermissions();
-                  },
+                  onChanged: (v) =>
+                      _updatePermissions(() => _hideMyMoments = v),
                   textColor: textColor,
                   subtitleColor: subtitleColor,
                 ),
@@ -121,10 +163,8 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   title: S.of(context)?.contactHideTheirMoments ?? 'Hide their Moments',
                   subtitle: S.of(context)?.contactHideTheirMomentsDesc ?? "Don't see this friend's Moments",
                   value: _hideTheirMoments,
-                  onChanged: (v) {
-                    setState(() => _hideTheirMoments = v);
-                    _savePermissions();
-                  },
+                  onChanged: (v) =>
+                      _updatePermissions(() => _hideTheirMoments = v),
                   textColor: textColor,
                   subtitleColor: subtitleColor,
                 ),
@@ -136,10 +176,8 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   title: S.of(context)?.contactHideMyStatus ?? 'Hide my status',
                   subtitle: S.of(context)?.contactHideMyStatusDesc ?? 'This friend cannot see my status',
                   value: _hideMyStatus,
-                  onChanged: (v) {
-                    setState(() => _hideMyStatus = v);
-                    _savePermissions();
-                  },
+                  onChanged: (v) =>
+                      _updatePermissions(() => _hideMyStatus = v),
                   textColor: textColor,
                   subtitleColor: subtitleColor,
                 ),

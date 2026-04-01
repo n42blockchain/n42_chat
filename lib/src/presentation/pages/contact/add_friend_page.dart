@@ -320,11 +320,15 @@ class _AddFriendPageState extends State<AddFriendPage> {
   // ─── DM creation ──────────────────────────────────────────────────────
 
   Future<void> _startDirectChat(String userId) async {
+    var completedWithExit = false;
     setState(() => _isLoading = true);
 
     try {
       final roomId = await getIt<IContactRepository>().startDirectChat(userId);
-      if (mounted) Navigator.of(context).pop(roomId);
+      if (mounted) {
+        completedWithExit = true;
+        Navigator.of(context).pop(roomId);
+      }
     } catch (e) {
       if (!mounted) return;
       _showError(
@@ -332,7 +336,9 @@ class _AddFriendPageState extends State<AddFriendPage> {
             'Failed to create chat: $e',
       );
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted && !completedWithExit) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -722,27 +728,44 @@ class _SearchEmptyState extends StatelessWidget {
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
 
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.person_search, size: 56, color: color),
-          const SizedBox(height: 16),
-          Text(
-            l10n?.contactSearchUserToChat ?? 'Search user to start chatting',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 15,
-              color: color,
-              fontWeight: FontWeight.w500,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            32,
+            32,
+            32,
+            32 + MediaQuery.of(context).viewInsets.bottom,
+          ),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight > 64
+                  ? constraints.maxHeight - 64
+                  : 0,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.person_search, size: 56, color: color),
+                const SizedBox(height: 16),
+                Text(
+                  l10n?.contactSearchUserToChat ??
+                      'Search user to start chatting',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: color,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _SearchMethodRow(isDark: isDark, l10n: l10n),
+              ],
             ),
           ),
-          const SizedBox(height: 24),
-          // Search method cards
-          _SearchMethodRow(isDark: isDark, l10n: l10n),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -821,28 +844,34 @@ class _MethodCard extends StatelessWidget {
             child: Icon(icon, size: 17, color: color),
           ),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
+                  ),
                 ),
-              ),
-              Text(
-                desc,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontFamily: 'monospace',
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                Text(
+                  desc,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

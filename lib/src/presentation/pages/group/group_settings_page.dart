@@ -53,6 +53,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
     return BlocConsumer<GroupBloc, GroupState>(
       listener: (context, state) {
+        final route = ModalRoute.of(context);
+        if (route?.isCurrent != true) {
+          return;
+        }
+
         if (state.status == GroupStatus.error && state.errorMessage != null) {
           final s = S.of(context);
           String message = state.errorMessage!;

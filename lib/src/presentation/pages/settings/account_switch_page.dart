@@ -26,6 +26,7 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
   List<StoredAccountEntity> _accounts = const [];
   bool _isLoading = true;
   String? _switchingUserId;
+  int _loadVersion = 0;
 
   @override
   void initState() {
@@ -34,9 +35,10 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
   }
 
   Future<void> _loadAccounts() async {
+    final loadVersion = ++_loadVersion;
     setState(() => _isLoading = true);
     final accounts = await _authRepository.getStoredAccounts();
-    if (!mounted) {
+    if (!mounted || loadVersion != _loadVersion) {
       return;
     }
     setState(() {
@@ -166,7 +168,9 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: N42Button.primary(
                       text: l10n?.commonAdd ?? 'Add Account',
-                      onPressed: _switchingUserId == null ? _openAddAccount : null,
+                      onPressed: _switchingUserId == null
+                          ? _openAddAccount
+                          : null,
                     ),
                   ),
                   const SizedBox(height: 24),

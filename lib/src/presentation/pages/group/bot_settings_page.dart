@@ -398,25 +398,38 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
     }
 
     setState(() => _isTestingWebhook = true);
-    final result = await getIt<BotWebhookService>().dispatch(
-      config: config,
-      payload: _buildTestPayload(config, eventType),
-      webhookSecretOverride: _webhookSecretController.text,
-      useStoredSecretFallback: false,
-    );
-    if (!mounted) return;
+    try {
+      final result = await getIt<BotWebhookService>().dispatch(
+        config: config,
+        payload: _buildTestPayload(config, eventType),
+        webhookSecretOverride: _webhookSecretController.text,
+        useStoredSecretFallback: false,
+      );
+      if (!mounted) return;
 
-    setState(() => _isTestingWebhook = false);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          result.success
-              ? 'Test webhook sent successfully'
-              : (result.errorMessage ?? 'Failed to send test webhook'),
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            result.success
+                ? 'Test webhook sent successfully'
+                : (result.errorMessage ?? 'Failed to send test webhook'),
+          ),
+          backgroundColor: result.success ? Colors.green : Colors.red,
         ),
-        backgroundColor: result.success ? Colors.green : Colors.red,
-      ),
-    );
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Failed to send test webhook: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isTestingWebhook = false);
+      }
+    }
   }
 
   Future<void> _save() async {
@@ -430,12 +443,22 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
       );
       return;
     }
-    await secureStorage.saveRoomBotWebhookSecret(
-      widget.roomId,
-      _webhookEnabled ? config.webhookSecret : null,
-    );
-    if (!mounted) return;
-    setState(() => _isSaving = true);
-    context.read<GroupBloc>().add(SetBotConfig(widget.roomId, config));
+    try {
+      await secureStorage.saveRoomBotWebhookSecret(
+        widget.roomId,
+        _webhookEnabled ? config.webhookSecret : null,
+      );
+      if (!mounted) return;
+      setState(() => _isSaving = true);
+      context.read<GroupBloc>().add(SetBotConfig(widget.roomId, config));
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Failed to save bot settings: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

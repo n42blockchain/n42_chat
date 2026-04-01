@@ -35,6 +35,7 @@ class AddressManagePageState extends State<AddressManagePage> {
             client.userID!,
             'n42.user.addresses',
           );
+          if (!mounted) return;
 
           if (data['addresses'] != null) {
             final addressList = data['addresses'] as List;
@@ -58,11 +59,13 @@ class AddressManagePageState extends State<AddressManagePage> {
         }
       }
 
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
     } catch (e) {
       debugLog('Load addresses error: $e');
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

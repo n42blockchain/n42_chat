@@ -164,6 +164,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
   Future<void> _processQRCode(String data) async {
     if (_isProcessing) return;
+    var completedWithExit = false;
     setState(() => _isProcessing = true);
 
     unawaited(_scannerController?.stop());
@@ -178,7 +179,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
       switch (payload.type) {
         case SocialScanPayloadType.matrixUser:
-          await _startChatWithUser(payload.userId!);
+          completedWithExit = await _startChatWithUser(payload.userId!);
           break;
         case SocialScanPayloadType.miniApp:
           await MiniAppLauncherHelper.openApp<void>(
@@ -200,27 +201,29 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       );
       unawaited(_scannerController?.start());
     } finally {
-      if (mounted) {
+      if (mounted && !completedWithExit) {
         setState(() => _isProcessing = false);
       }
     }
   }
 
-  Future<void> _startChatWithUser(String userId) async {
+  Future<bool> _startChatWithUser(String userId) async {
     try {
       final roomId = await getIt<IContactRepository>().startDirectChat(userId);
 
       if (mounted) {
         Navigator.of(context).pop({'roomId': roomId, 'userId': userId});
+        return true;
       }
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) return false;
       _showError(
         S.of(context)?.qrcodeCannotAddFriend(e.toString()) ??
             'Cannot add friend: $e',
       );
       unawaited(_scannerController?.start());
     }
+    return false;
   }
 
   void _showError(String message) {
