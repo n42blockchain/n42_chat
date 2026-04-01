@@ -547,9 +547,13 @@ class ChatBackupService {
               if (archived.isEmpty) break;
               hasMore = archived.length == pageSize;
 
+              bool reachedCutoff = false;
               for (final a in archived) {
+                // Archive is ordered descending; once we pass the cutoff,
+                // all remaining pages are older — stop early.
                 if (lastBackupTs > 0 && a.originServerTs <= lastBackupTs) {
-                  continue;
+                  reachedCutoff = true;
+                  break;
                 }
                 addMessage({
                   'eventId': a.eventId,
@@ -567,6 +571,8 @@ class ChatBackupService {
                   'isArchived': true,
                 });
               }
+
+              if (reachedCutoff) break;
 
               // Move cursor to oldest message timestamp for next page
               cursor = archived.last.originServerTs;
@@ -961,9 +967,9 @@ class ChatBackupService {
     final file = File(filePath);
     final bytes = await file.readAsBytes();
 
-    // 检查是否使用 v3 加密 (AES-256-GCM，带认证)
-    final headerV3 = utf8.decode(bytes.take(8).toList(), allowMalformed: true);
-    if (headerV3 == 'N42ENC3:') {
+    final header = utf8.decode(bytes.take(8).toList(), allowMalformed: true);
+
+    if (header == 'N42ENC3:') {
       if (password == null || password.isEmpty) {
         throw StateError('This backup is password-protected');
       }
@@ -972,9 +978,7 @@ class ChatBackupService {
       return _decodeBackupJson(jsonStr);
     }
 
-    // 检查是否使用 v2 加密 (AES-256-CBC)
-    final headerV2 = utf8.decode(bytes.take(8).toList(), allowMalformed: true);
-    if (headerV2 == 'N42ENC2:') {
+    if (header == 'N42ENC2:') {
       if (password == null || password.isEmpty) {
         throw StateError('This backup is password-protected');
       }

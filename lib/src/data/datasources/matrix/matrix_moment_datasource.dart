@@ -316,9 +316,12 @@ class MatrixMomentDataSource {
     final rooms = await _getFriendMomentRooms();
     final moments = <MomentEntity>[];
 
-    // Rebuild indices during full load
-    _momentRoomIndex.clear();
-    _momentEventIndex.clear();
+    // Only clear indices on full (non-paginated) load to avoid
+    // destroying index entries from previous pages during pagination
+    if (beforeId == null) {
+      _momentRoomIndex.clear();
+      _momentEventIndex.clear();
+    }
 
     for (final room in rooms) {
       try {
