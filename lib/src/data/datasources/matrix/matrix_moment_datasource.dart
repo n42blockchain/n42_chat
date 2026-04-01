@@ -30,6 +30,12 @@ class MatrixMomentDataSource {
   /// 缓存的动态列表
   final List<MomentEntity> _cachedMoments = [];
 
+  /// momentId → roomId 索引（加速 like/unlike/comment/delete 查找）
+  final Map<String, String> _momentRoomIndex = {};
+
+  /// momentId → eventId 索引
+  final Map<String, String> _momentEventIndex = {};
+
   MatrixMomentDataSource(this._clientManager);
 
   matrix.Client? get _client => _clientManager.client;
@@ -291,7 +297,13 @@ class MatrixMomentDataSource {
       'timestamp': DateTime.now().toIso8601String(),
     };
 
-    await room.sendEvent(eventContent, type: momentEventType);
+    final sentEventId = await room.sendEvent(eventContent, type: momentEventType);
+
+    // Update index immediately so subsequent operations can find it
+    _momentRoomIndex[momentId] = room.id;
+    if (sentEventId != null) {
+      _momentEventIndex[momentId] = sentEventId;
+    }
 
     return momentId;
   }
@@ -304,13 +316,22 @@ class MatrixMomentDataSource {
     final rooms = await _getFriendMomentRooms();
     final moments = <MomentEntity>[];
 
+    // Rebuild indices during full load
+    _momentRoomIndex.clear();
+    _momentEventIndex.clear();
+
     for (final room in rooms) {
-      // 使用 getTimeline() 获取时间线
       try {
         final timeline = await room.getTimeline();
 
         for (final event in timeline.events) {
           if (event.type != momentEventType) continue;
+
+          final momentId = event.content['moment_id'] as String?;
+          if (momentId != null) {
+            _momentRoomIndex[momentId] = room.id;
+            _momentEventIndex[momentId] = event.eventId;
+          }
 
           final moment = _parseEventToMoment(event, room);
           if (moment != null && !moment.isDeleted) {
@@ -318,7 +339,6 @@ class MatrixMomentDataSource {
           }
         }
       } catch (e) {
-        // 如果获取时间线失败，继续处理下一个房间
         continue;
       }
     }
@@ -338,14 +358,68 @@ class MatrixMomentDataSource {
     return moments.skip(startIndex).take(limit).toList();
   }
 
-  /// 获取用户的动态
+  /// 获取用户的动态（直接查询该用户的 moment 房间）
   Future<List<MomentEntity>> getUserMoments(
     String userId, {
     int limit = 20,
     String? beforeId,
   }) async {
-    final moments = await getMoments(limit: limit * 2, beforeId: beforeId);
-    return moments.where((m) => m.userId == userId).take(limit).toList();
+    // Optimize: if requesting own moments, use own room directly
+    if (userId == _currentUserId) {
+      final room = await _getOrCreateMomentRoom();
+      if (room == null) return [];
+      return _getMomentsFromRoom(room, limit: limit, beforeId: beforeId);
+    }
+    // For other users, filter from cached moments or reload
+    if (_cachedMoments.isEmpty) {
+      await getMoments(limit: 100);
+    }
+    final userMoments = _cachedMoments.where((m) => m.userId == userId).toList();
+    int startIndex = 0;
+    if (beforeId != null) {
+      startIndex = userMoments.indexWhere((m) => m.id == beforeId) + 1;
+    }
+    return userMoments.skip(startIndex).take(limit).toList();
+  }
+
+  /// 从单个房间获取 moments
+  Future<List<MomentEntity>> _getMomentsFromRoom(
+    matrix.Room room, {
+    int limit = 20,
+    String? beforeId,
+  }) async {
+    final moments = <MomentEntity>[];
+    try {
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        if (event.type != momentEventType) continue;
+        final moment = _parseEventToMoment(event, room);
+        if (moment != null && !moment.isDeleted) {
+          moments.add(moment);
+        }
+      }
+    } catch (_) {}
+    moments.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    int startIndex = 0;
+    if (beforeId != null) {
+      startIndex = moments.indexWhere((m) => m.id == beforeId) + 1;
+    }
+    return moments.skip(startIndex).take(limit).toList();
+  }
+
+  /// 通过索引查找 moment 所在房间，失败时回退全量查找
+  Future<matrix.Room?> _findRoomForMoment(String momentId) async {
+    // 1. Try index
+    final roomId = _momentRoomIndex[momentId];
+    if (roomId != null) {
+      final room = _client?.getRoomById(roomId);
+      if (room != null) return room;
+    }
+    // 2. Fallback: rebuild index
+    await getMoments(limit: 200);
+    final fallbackRoomId = _momentRoomIndex[momentId];
+    if (fallbackRoomId != null) return _client?.getRoomById(fallbackRoomId);
+    return null;
   }
 
   /// 获取单条动态
@@ -354,250 +428,193 @@ class MatrixMomentDataSource {
     final cached = _cachedMoments.where((m) => m.id == momentId).firstOrNull;
     if (cached != null) return cached;
 
-    // 从房间查找
-    final rooms = await _getFriendMomentRooms();
+    // 通过索引定位房间
+    final room = await _findRoomForMoment(momentId);
+    if (room == null) return null;
 
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
-
-        for (final event in timeline.events) {
-          if (event.type != momentEventType) continue;
-
-          final content = event.content;
-          if (content['moment_id'] == momentId) {
-            return _parseEventToMoment(event, room);
-          }
+    try {
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        if (event.type != momentEventType) continue;
+        if (event.content['moment_id'] == momentId) {
+          return _parseEventToMoment(event, room);
         }
-      } catch (e) {
-        continue;
       }
-    }
-
+    } catch (_) {}
     return null;
   }
 
-  /// 删除动态
+  /// 删除动态（使用索引定位 eventId）
   Future<void> deleteMoment(String momentId) async {
     final room = await _getOrCreateMomentRoom();
     if (room == null) return;
 
     try {
-      final timeline = await room.getTimeline();
-
-      for (final event in timeline.events) {
-        if (event.type != momentEventType) continue;
-
-        final content = event.content;
-        if (content['moment_id'] == momentId) {
-          await room.redactEvent(event.eventId);
-          _cachedMoments.removeWhere((m) => m.id == momentId);
-          break;
+      // Use cached eventId if available
+      final eventId = _momentEventIndex[momentId];
+      if (eventId != null) {
+        await room.redactEvent(eventId);
+      } else {
+        // Fallback: search in timeline
+        final timeline = await room.getTimeline();
+        for (final event in timeline.events) {
+          if (event.type != momentEventType) continue;
+          if (event.content['moment_id'] == momentId) {
+            await room.redactEvent(event.eventId);
+            break;
+          }
         }
       }
+      _cachedMoments.removeWhere((m) => m.id == momentId);
+      _momentRoomIndex.remove(momentId);
+      _momentEventIndex.remove(momentId);
     } catch (e) {
-      // 忽略错误
       debugLog('Error: $e');
     }
   }
 
-  /// 点赞动态
+  /// 点赞动态（使用索引定位房间，避免全量遍历）
   Future<void> likeMoment(String momentId) async {
-    final rooms = await _getFriendMomentRooms();
+    final room = await _findRoomForMoment(momentId);
+    if (room == null) return;
 
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
-
-        for (final event in timeline.events) {
-          if (event.type != momentEventType) continue;
-
-          final content = event.content;
-          if (content['moment_id'] == momentId) {
-            // 发送点赞事件
-            await room.sendEvent({
-              'moment_id': momentId,
-              'moment_event_id': event.eventId,
-              'action': 'like',
-              'timestamp': DateTime.now().toIso8601String(),
-            }, type: momentLikeEventType);
-            return;
-          }
-        }
-      } catch (e) {
-        continue;
-      }
-    }
+    final eventId = _momentEventIndex[momentId];
+    await room.sendEvent({
+      'moment_id': momentId,
+      'moment_event_id': eventId ?? '',
+      'action': 'like',
+      'timestamp': DateTime.now().toIso8601String(),
+    }, type: momentLikeEventType);
   }
 
-  /// 取消点赞
+  /// 取消点赞（只需遍历目标房间的 timeline）
   Future<void> unlikeMoment(String momentId) async {
-    final rooms = await _getFriendMomentRooms();
+    final room = await _findRoomForMoment(momentId);
+    if (room == null) return;
 
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
-
-        for (final event in timeline.events) {
-          if (event.type != momentLikeEventType) continue;
-
-          final content = event.content;
-          if (content['moment_id'] == momentId &&
-              event.senderId == _currentUserId) {
-            await room.redactEvent(event.eventId);
-            return;
-          }
+    try {
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        if (event.type != momentLikeEventType) continue;
+        if (event.content['moment_id'] == momentId &&
+            event.senderId == _currentUserId) {
+          await room.redactEvent(event.eventId);
+          return;
         }
-      } catch (e) {
-        continue;
       }
-    }
+    } catch (_) {}
   }
 
-  /// 评论动态
+  /// 评论动态（使用索引定位房间）
   Future<String> commentMoment({
     required String momentId,
     required String content,
     String? replyToCommentId,
     String? replyToUserId,
   }) async {
-    final rooms = await _getFriendMomentRooms();
+    final room = await _findRoomForMoment(momentId);
+    if (room == null) throw Exception('Moment not found');
 
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
+    final eventId = _momentEventIndex[momentId];
+    final commentId = 'comment_${DateTime.now().millisecondsSinceEpoch}';
 
-        for (final event in timeline.events) {
-          if (event.type != momentEventType) continue;
+    await room.sendEvent({
+      'moment_id': momentId,
+      'moment_event_id': eventId ?? '',
+      'comment_id': commentId,
+      'content': content,
+      'reply_to_comment_id': replyToCommentId,
+      'reply_to_user_id': replyToUserId,
+      'timestamp': DateTime.now().toIso8601String(),
+    }, type: momentCommentEventType);
 
-          final eventContent = event.content;
-          if (eventContent['moment_id'] == momentId) {
-            final commentId =
-                'comment_${DateTime.now().millisecondsSinceEpoch}';
-
-            await room.sendEvent({
-              'moment_id': momentId,
-              'moment_event_id': event.eventId,
-              'comment_id': commentId,
-              'content': content,
-              'reply_to_comment_id': replyToCommentId,
-              'reply_to_user_id': replyToUserId,
-              'timestamp': DateTime.now().toIso8601String(),
-            }, type: momentCommentEventType);
-
-            return commentId;
-          }
-        }
-      } catch (e) {
-        continue;
-      }
-    }
-
-    throw Exception('Moment not found');
+    return commentId;
   }
 
-  /// 删除评论
+  /// 删除评论（只遍历目标房间）
   Future<void> deleteComment(String momentId, String commentId) async {
-    final rooms = await _getFriendMomentRooms();
+    final room = await _findRoomForMoment(momentId);
+    if (room == null) return;
 
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
-
-        for (final event in timeline.events) {
-          if (event.type != momentCommentEventType) continue;
-
-          final content = event.content;
-          if (content['moment_id'] == momentId &&
-              content['comment_id'] == commentId) {
-            await room.redactEvent(event.eventId);
-            return;
-          }
+    try {
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        if (event.type != momentCommentEventType) continue;
+        final content = event.content;
+        if (content['moment_id'] == momentId &&
+            content['comment_id'] == commentId) {
+          await room.redactEvent(event.eventId);
+          return;
         }
-      } catch (e) {
-        continue;
       }
-    }
+    } catch (_) {}
   }
 
-  /// 获取动态的点赞列表
+  /// 获取动态的点赞列表（使用索引定位房间）
   Future<List<MomentLike>> getMomentLikes(String momentId) async {
     final likes = <MomentLike>[];
-    final rooms = await _getFriendMomentRooms();
+    final room = await _findRoomForMoment(momentId);
+    if (room == null) return likes;
 
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
-
-        for (final event in timeline.events) {
-          if (event.type != momentLikeEventType) continue;
-
-          final content = event.content;
-          if (content['moment_id'] == momentId) {
-            final user = room.unsafeGetUserFromMemoryOrFallback(event.senderId);
-            likes.add(
-              MomentLike(
-                userId: event.senderId,
-                userName: user.displayName ?? event.senderId,
-                userAvatarUrl: user.avatarUrl?.toString(),
-                timestamp: event.originServerTs,
-              ),
-            );
-          }
+    try {
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        if (event.type != momentLikeEventType) continue;
+        final content = event.content;
+        if (content['moment_id'] == momentId) {
+          final user = room.unsafeGetUserFromMemoryOrFallback(event.senderId);
+          likes.add(
+            MomentLike(
+              userId: event.senderId,
+              userName: user.displayName ?? event.senderId,
+              userAvatarUrl: user.avatarUrl?.toString(),
+              timestamp: event.originServerTs,
+            ),
+          );
         }
-      } catch (e) {
-        continue;
       }
-    }
+    } catch (_) {}
 
     return likes;
   }
 
-  /// 获取动态的评论列表
+  /// 获取动态的评论列表（使用索引定位房间）
   Future<List<MomentComment>> getMomentComments(String momentId) async {
     final comments = <MomentComment>[];
-    final rooms = await _getFriendMomentRooms();
+    final room = await _findRoomForMoment(momentId);
+    if (room == null) return comments;
 
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
-
-        for (final event in timeline.events) {
-          if (event.type != momentCommentEventType) continue;
-
-          final content = event.content;
-          if (content['moment_id'] == momentId) {
-            final user = room.unsafeGetUserFromMemoryOrFallback(event.senderId);
-
-            String? replyToUserName;
-            if (content['reply_to_user_id'] != null) {
-              final replyToUser = room.unsafeGetUserFromMemoryOrFallback(
-                content['reply_to_user_id'] as String,
-              );
-              replyToUserName = replyToUser.displayName;
-            }
-
-            comments.add(
-              MomentComment(
-                id: content['comment_id'] as String,
-                userId: event.senderId,
-                userName: user.displayName ?? event.senderId,
-                userAvatarUrl: user.avatarUrl?.toString(),
-                content: content['content'] as String,
-                timestamp: event.originServerTs,
-                replyToCommentId: content['reply_to_comment_id'] as String?,
-                replyToUserId: content['reply_to_user_id'] as String?,
-                replyToUserName: replyToUserName,
-              ),
+    try {
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events) {
+        if (event.type != momentCommentEventType) continue;
+        final content = event.content;
+        if (content['moment_id'] == momentId) {
+          final user = room.unsafeGetUserFromMemoryOrFallback(event.senderId);
+          String? replyToUserName;
+          if (content['reply_to_user_id'] != null) {
+            final replyToUser = room.unsafeGetUserFromMemoryOrFallback(
+              content['reply_to_user_id'] as String,
             );
+            replyToUserName = replyToUser.displayName;
           }
+          comments.add(
+            MomentComment(
+              id: content['comment_id'] as String,
+              userId: event.senderId,
+              userName: user.displayName ?? event.senderId,
+              userAvatarUrl: user.avatarUrl?.toString(),
+              content: content['content'] as String,
+              timestamp: event.originServerTs,
+              replyToCommentId: content['reply_to_comment_id'] as String?,
+              replyToUserId: content['reply_to_user_id'] as String?,
+              replyToUserName: replyToUserName,
+            ),
+          );
         }
-      } catch (e) {
-        continue;
       }
-    }
+    } catch (_) {}
 
-    // 按时间排序
     comments.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return comments;
   }

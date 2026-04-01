@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pointycastle/export.dart' as pc;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,17 +11,34 @@ import 'biometric_service.dart';
 
 /// 聊天锁服务
 ///
-/// 管理每个聊天的独立锁定状态（本地存储，不上传服务器）
-/// 支持生物识别和 PIN 码两种解锁方式
+/// 管理每个聊天的独立锁定状态。
+/// PIN 哈希和 salt 存储在 FlutterSecureStorage（Keychain/Keystore）中。
+/// 已锁定房间列表（非敏感）保留在 SharedPreferences 中。
 class ChatLockService {
   static const String _lockedChatsKey = 'chat_lock_locked_chats';
-  static const String _chatPinPrefix = 'chat_lock_pin_';
-  static const String _chatPinSaltPrefix = 'chat_lock_pin_salt_';
+
+  // SecureStorage keys
+  static const String _ssPinPrefix = 'chat_lock_pin_';
+  static const String _ssSaltPrefix = 'chat_lock_pin_salt_';
+
+  // Legacy SharedPreferences keys (for migration)
+  static const String _spPinPrefix = 'chat_lock_pin_';
+  static const String _spSaltPrefix = 'chat_lock_pin_salt_';
 
   final BiometricService _biometricService;
+  final FlutterSecureStorage _secureStorage;
 
-  ChatLockService({BiometricService? biometricService})
-      : _biometricService = biometricService ?? BiometricService();
+  ChatLockService({
+    BiometricService? biometricService,
+    FlutterSecureStorage? secureStorage,
+  })  : _biometricService = biometricService ?? BiometricService(),
+        _secureStorage = secureStorage ??
+            const FlutterSecureStorage(
+              aOptions: AndroidOptions(),
+              iOptions: IOSOptions(
+                accessibility: KeychainAccessibility.first_unlock_this_device,
+              ),
+            );
 
   /// 检查聊天是否已锁定
   Future<bool> isChatLocked(String roomId) async {
@@ -30,9 +48,6 @@ class ChatLockService {
   }
 
   /// 锁定聊天
-  ///
-  /// [roomId] 房间ID
-  /// [pin] 可选 PIN 码（如果不设置，则仅使用生物识别）
   Future<void> lockChat(String roomId, {String? pin}) async {
     final prefs = await SharedPreferences.getInstance();
     final lockedChats = prefs.getStringList(_lockedChatsKey) ?? [];
@@ -75,17 +90,29 @@ class ChatLockService {
 
   /// 验证 PIN 码
   Future<bool> verifyPin(String roomId, String pin) async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedHash = prefs.getString('$_chatPinPrefix$roomId');
+    // 尝试从 SecureStorage 读取
+    var storedHash = await _secureStorage.read(key: '$_ssPinPrefix$roomId');
+    var salt = await _secureStorage.read(key: '$_ssSaltPrefix$roomId');
+
+    // 如果 SecureStorage 中没有，尝试从 SharedPreferences 迁移
+    if (storedHash == null) {
+      final migrated = await _migrateFromSharedPreferences(roomId);
+      if (migrated) {
+        storedHash = await _secureStorage.read(key: '$_ssPinPrefix$roomId');
+        salt = await _secureStorage.read(key: '$_ssSaltPrefix$roomId');
+      }
+    }
+
     if (storedHash == null) return false;
 
-    final salt = prefs.getString('$_chatPinSaltPrefix$roomId');
     if (salt != null && salt.isNotEmpty) {
       return _hashPin(pin, salt) == storedHash;
     }
 
+    // Legacy format (plain SHA-256)
     final verified = _hashLegacyPin(pin) == storedHash;
     if (verified) {
+      // Upgrade to PBKDF2 + SecureStorage
       await _savePinHash(roomId, pin);
     }
     return verified;
@@ -93,26 +120,79 @@ class ChatLockService {
 
   /// 检查聊天是否设置了 PIN 码
   Future<bool> hasPinSet(String roomId) async {
+    // Check SecureStorage first
+    final ssHash = await _secureStorage.read(key: '$_ssPinPrefix$roomId');
+    if (ssHash != null) return true;
+
+    // Check SharedPreferences (not yet migrated)
     final prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey('$_chatPinPrefix$roomId');
+    return prefs.containsKey('$_spPinPrefix$roomId');
   }
 
-  /// 保存 PIN 码哈希
+  // ============================================
+  // Private
+  // ============================================
+
+  /// 保存 PIN 码哈希到 SecureStorage
   Future<void> _savePinHash(String roomId, String pin) async {
-    final prefs = await SharedPreferences.getInstance();
     final salt = _generateSalt();
-    await prefs.setString('$_chatPinSaltPrefix$roomId', salt);
-    await prefs.setString('$_chatPinPrefix$roomId', _hashPin(pin, salt));
+    await _secureStorage.write(key: '$_ssSaltPrefix$roomId', value: salt);
+    await _secureStorage.write(
+      key: '$_ssPinPrefix$roomId',
+      value: _hashPin(pin, salt),
+    );
+
+    // 清理旧的 SharedPreferences 数据
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('$_spPinPrefix$roomId');
+      await prefs.remove('$_spSaltPrefix$roomId');
+    } catch (_) {
+      // Non-critical: old data can remain
+    }
   }
 
   /// 移除 PIN 码
   Future<void> _removePinHash(String roomId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('$_chatPinPrefix$roomId');
-    await prefs.remove('$_chatPinSaltPrefix$roomId');
+    await _secureStorage.delete(key: '$_ssPinPrefix$roomId');
+    await _secureStorage.delete(key: '$_ssSaltPrefix$roomId');
+
+    // Also clean up any legacy SP data
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('$_spPinPrefix$roomId');
+      await prefs.remove('$_spSaltPrefix$roomId');
+    } catch (_) {}
   }
 
-  /// 对 PIN 码进行 PBKDF2 哈希（100 000 轮，抵抗 4-6 位 PIN 的暴力破解）
+  /// 从 SharedPreferences 迁移到 SecureStorage
+  /// Returns true if migration was performed.
+  Future<bool> _migrateFromSharedPreferences(String roomId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hash = prefs.getString('$_spPinPrefix$roomId');
+      if (hash == null) return false;
+
+      final salt = prefs.getString('$_spSaltPrefix$roomId');
+
+      // Write to SecureStorage
+      await _secureStorage.write(key: '$_ssPinPrefix$roomId', value: hash);
+      if (salt != null) {
+        await _secureStorage.write(key: '$_ssSaltPrefix$roomId', value: salt);
+      }
+
+      // Remove from SharedPreferences after successful migration
+      await prefs.remove('$_spPinPrefix$roomId');
+      await prefs.remove('$_spSaltPrefix$roomId');
+
+      return true;
+    } catch (_) {
+      // Migration failed silently — next call will retry
+      return false;
+    }
+  }
+
+  /// PBKDF2 哈希（100 000 轮）
   String _hashPin(String pin, String salt) {
     final saltBytes = Uint8List.fromList(utf8.encode(salt));
     final derivator = pc.PBKDF2KeyDerivator(pc.HMac(pc.SHA256Digest(), 64))

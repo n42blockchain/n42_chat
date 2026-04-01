@@ -28,6 +28,12 @@ class MatrixStoryDataSource {
   /// 缓存的 Story 房间
   matrix.Room? _storyRoom;
 
+  /// storyId → roomId 索引
+  final Map<String, String> _storyRoomIndex = {};
+
+  /// storyId → eventId 索引
+  final Map<String, String> _storyEventIndex = {};
+
   /// Story 更新流控制器
   final StreamController<List<Map<String, dynamic>>> _storyStreamController =
       StreamController<List<Map<String, dynamic>>>.broadcast();
@@ -122,6 +128,10 @@ class MatrixStoryDataSource {
     final stories = <Map<String, dynamic>>[];
     final now = DateTime.now();
 
+    // Rebuild indices
+    _storyRoomIndex.clear();
+    _storyEventIndex.clear();
+
     for (final room in rooms) {
       try {
         final timeline = await room.getTimeline();
@@ -131,6 +141,14 @@ class MatrixStoryDataSource {
           if (event.redacted) continue;
 
           final content = event.content;
+          final storyId = content['story_id'] as String?;
+
+          // Build index
+          if (storyId != null) {
+            _storyRoomIndex[storyId] = room.id;
+            _storyEventIndex[storyId] = event.eventId;
+          }
+
           final expiresAtStr = content['expires_at'] as String?;
 
           // 过滤已过期的 Story
@@ -147,7 +165,6 @@ class MatrixStoryDataSource {
           }
         }
       } catch (e) {
-        // 如果获取时间线失败，继续处理下一个房间
         continue;
       }
     }
@@ -233,74 +250,58 @@ class MatrixStoryDataSource {
     }
   }
 
-  /// 记录 Story 查看
-  Future<void> recordStoryView(String storyId) async {
-    final rooms = await _getFriendStoryRooms();
-
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
-
-        for (final event in timeline.events) {
-          if (event.type != storyEventType) continue;
-
-          final content = event.content;
-          if (content['story_id'] == storyId) {
-            // 检查是否已经查看过
-            final existingViews = await _getViewEventsForStory(
-              room,
-              event.eventId,
-            );
-            final alreadyViewed = existingViews.any(
-              (v) => v['user_id'] == _currentUserId,
-            );
-
-            if (!alreadyViewed) {
-              // 发送查看事件
-              await room.sendEvent({
-                'story_id': storyId,
-                'story_event_id': event.eventId,
-                'viewed_at': DateTime.now().toIso8601String(),
-              }, type: storyViewEventType);
-            }
-            return;
-          }
-        }
-      } catch (e) {
-        continue;
-      }
+  /// 通过索引查找 story 所在房间
+  Future<matrix.Room?> _findRoomForStory(String storyId) async {
+    final roomId = _storyRoomIndex[storyId];
+    if (roomId != null) {
+      final room = _client?.getRoomById(roomId);
+      if (room != null) return room;
     }
+    // Fallback: rebuild index
+    await getStories();
+    final fallbackId = _storyRoomIndex[storyId];
+    if (fallbackId != null) return _client?.getRoomById(fallbackId);
+    return null;
   }
 
-  /// 获取 Story 的查看者列表
+  /// 记录 Story 查看（使用索引定位房间）
+  Future<void> recordStoryView(String storyId) async {
+    final room = await _findRoomForStory(storyId);
+    if (room == null) return;
+
+    final eventId = _storyEventIndex[storyId];
+    if (eventId == null) return;
+
+    try {
+      final existingViews = await _getViewEventsForStory(room, eventId);
+      final alreadyViewed = existingViews.any(
+        (v) => v['user_id'] == _currentUserId,
+      );
+
+      if (!alreadyViewed) {
+        await room.sendEvent({
+          'story_id': storyId,
+          'story_event_id': eventId,
+          'viewed_at': DateTime.now().toIso8601String(),
+        }, type: storyViewEventType);
+      }
+    } catch (_) {}
+  }
+
+  /// 获取 Story 的查看者列表（使用索引定位房间）
   Future<List<Map<String, dynamic>>> getStoryViewers(String storyId) async {
-    final rooms = await _getFriendStoryRooms();
     final viewers = <Map<String, dynamic>>[];
 
-    for (final room in rooms) {
-      try {
-        final timeline = await room.getTimeline();
+    final room = await _findRoomForStory(storyId);
+    if (room == null) return viewers;
 
-        // 先找到对应的 Story 事件
-        String? storyEventId;
-        for (final event in timeline.events) {
-          if (event.type != storyEventType) continue;
-          final content = event.content;
-          if (content['story_id'] == storyId) {
-            storyEventId = event.eventId;
-            break;
-          }
-        }
+    final storyEventId = _storyEventIndex[storyId];
+    if (storyEventId == null) return viewers;
 
-        if (storyEventId == null) continue;
-
-        // 获取所有查看事件
-        final viewEvents = await _getViewEventsForStory(room, storyEventId);
-        viewers.addAll(viewEvents);
-      } catch (e) {
-        continue;
-      }
-    }
+    try {
+      final viewEvents = await _getViewEventsForStory(room, storyEventId);
+      viewers.addAll(viewEvents);
+    } catch (_) {}
 
     // 按查看时间排序
     viewers.sort((a, b) {
