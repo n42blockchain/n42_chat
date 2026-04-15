@@ -712,7 +712,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
-                  final url = Uri.parse('https://n42.world/privacy');
+                  final url = Uri.parse('https://www.n42.ai/static/terms_of_use.html');
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url, mode: LaunchMode.externalApplication);
                   }
