@@ -1529,6 +1529,7 @@
   "authGoogleLabel": "Google",
   "authAppleLabel": "Apple",
   "authSsoLabel": "SSO",
+  "authSsoNotConfigured": "該服務器未配置SSO登錄提供商",
   "transferAmountHintZero": "0.00",
   "commonMatrixIdHint": "@username:server.com",
   "authServerAddressHint": "https://m.si46.world",

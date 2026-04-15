@@ -413,7 +413,7 @@ class STa extends S {
   String get authTermsOfService => 'சேவை விதிமுறைகள்';
 
   @override
-  String get authAnd => 'மற்றும்';
+  String get authAnd => ' மற்றும் ';
 
   @override
   String get authPrivacyPolicy => 'தனியுரிமைக் கொள்கை';
@@ -2905,6 +2905,9 @@ class STa extends S {
   @override
   String get authAppleLabel => 'ஆப்பிள்';
 
+
+  @override
+  String get authSsoNotConfigured => 'இந்த சேவையகம் SSO உள்நுழைவு வழங்குநர்களை உள்ளமைக்கவில்லை';
   @override
   String get authSsoLabel => 'SSO';
 

@@ -413,7 +413,7 @@ class SMr extends S {
   String get authTermsOfService => 'सेवा अटी';
 
   @override
-  String get authAnd => 'आणि';
+  String get authAnd => ' आणि ';
 
   @override
   String get authPrivacyPolicy => 'गोपनीयता धोरण';
@@ -2874,6 +2874,9 @@ class SMr extends S {
   @override
   String get authAppleLabel => 'सफरचंद';
 
+
+  @override
+  String get authSsoNotConfigured => 'या सर्व्हरने SSO लॉगिन प्रदाते कॉन्फिगर केलेले नाहीत';
   @override
   String get authSsoLabel => 'SSO';
 

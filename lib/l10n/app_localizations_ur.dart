@@ -413,7 +413,7 @@ class SUr extends S {
   String get authTermsOfService => 'سروس کی شرائط';
 
   @override
-  String get authAnd => 'اور';
+  String get authAnd => ' اور ';
 
   @override
   String get authPrivacyPolicy => 'رازداری کی پالیسی';
@@ -2883,6 +2883,9 @@ class SUr extends S {
   @override
   String get authAppleLabel => 'ایپل';
 
+
+  @override
+  String get authSsoNotConfigured => 'اس سرور نے SSO لاگ ان فراہم کنندگان کو ترتیب نہیں دیا ہے';
   @override
   String get authSsoLabel => 'ایس ایس او';
 

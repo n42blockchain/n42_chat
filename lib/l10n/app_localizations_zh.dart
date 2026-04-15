@@ -2796,6 +2796,9 @@ class SZh extends S {
   @override
   String get authAppleLabel => 'Apple';
 
+
+  @override
+  String get authSsoNotConfigured => '该服务器未配置SSO登录提供商';
   @override
   String get authSsoLabel => 'SSO';
 
@@ -8429,6 +8432,9 @@ class SZhTw extends SZh {
   @override
   String get authAppleLabel => 'Apple';
 
+
+  @override
+  String get authSsoNotConfigured => '该服务器未配置SSO登录提供商';
   @override
   String get authSsoLabel => 'SSO';
 

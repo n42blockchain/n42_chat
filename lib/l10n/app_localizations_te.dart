@@ -415,7 +415,7 @@ class STe extends S {
   String get authTermsOfService => 'సేవా నిబంధనలు';
 
   @override
-  String get authAnd => 'మరియు';
+  String get authAnd => ' మరియు ';
 
   @override
   String get authPrivacyPolicy => 'గోప్యతా విధానం';
@@ -2902,6 +2902,9 @@ class STe extends S {
   @override
   String get authAppleLabel => 'ఆపిల్';
 
+
+  @override
+  String get authSsoNotConfigured => 'ఈ సర్వర్ SSO లాగిన్ ప్రొవైడర్‌లను కాన్ఫిగర్ చేయలేదు';
   @override
   String get authSsoLabel => 'SSO';
 

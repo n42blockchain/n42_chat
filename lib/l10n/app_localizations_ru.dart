@@ -416,7 +416,7 @@ class SRu extends S {
   String get authTermsOfService => 'Условиями использования';
 
   @override
-  String get authAnd => 'и';
+  String get authAnd => ' и ';
 
   @override
   String get authPrivacyPolicy => 'Политикой конфиденциальности';
@@ -2888,6 +2888,9 @@ class SRu extends S {
   @override
   String get authAppleLabel => 'Яблоко';
 
+
+  @override
+  String get authSsoNotConfigured => 'Этот сервер не настроил провайдеров входа SSO';
   @override
   String get authSsoLabel => 'система единого входа';
 

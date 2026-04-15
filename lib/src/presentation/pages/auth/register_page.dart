@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/constants/app_constants.dart';
@@ -47,6 +49,28 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _showInviteCode = false; // 控制是否显示邀请码输入框
   bool _anonymousMode = false;
 
+  late final TapGestureRecognizer _termsRecognizer;
+  late final TapGestureRecognizer _privacyRecognizer;
+
+  @override
+  void initState() {
+    super.initState();
+    _termsRecognizer = TapGestureRecognizer()
+      ..onTap = () async {
+        final url = Uri.parse('https://www.n42.ai/static/terms_of_use.html');
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        }
+      };
+    _privacyRecognizer = TapGestureRecognizer()
+      ..onTap = () async {
+        final url = Uri.parse('https://n42.world/privacy');
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        }
+      };
+  }
+
   @override
   void dispose() {
     _homeserverController.dispose();
@@ -55,6 +79,8 @@ class _RegisterPageState extends State<RegisterPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _inviteCodeController.dispose();
+    _termsRecognizer.dispose();
+    _privacyRecognizer.dispose();
     super.dispose();
   }
 
@@ -795,51 +821,52 @@ class _RegisterPageState extends State<RegisterPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 24,
-          height: 24,
-          child: Checkbox(
-            value: _agreeToTerms,
-            onChanged: (value) {
-              setState(() {
-                _agreeToTerms = value ?? false;
-              });
-            },
-            activeColor: AppColors.primary,
-            checkColor: Colors.white,
-            side: BorderSide(color: textColor),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            setState(() {
+              _agreeToTerms = !_agreeToTerms;
+            });
+          },
+          child: AbsorbPointer(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox(
+                value: _agreeToTerms,
+                onChanged: (_) {},
+                activeColor: AppColors.primary,
+                checkColor: Colors.white,
+                side: BorderSide(color: textColor),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
             ),
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                _agreeToTerms = !_agreeToTerms;
-              });
-            },
-            child: Text.rich(
-              TextSpan(
-                text:
-                    S.of(context)?.authIHaveReadAndAgree ??
-                    'I have read and agree to ',
-                style: TextStyle(fontSize: 13, color: textColor),
-                children: [
-                  TextSpan(
-                    text:
-                        S.of(context)?.authTermsOfService ?? 'Terms of Service',
-                    style: const TextStyle(color: AppColors.textLink),
-                  ),
-                  TextSpan(text: S.of(context)?.authAnd ?? ' and '),
-                  TextSpan(
-                    text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
-                    style: const TextStyle(color: AppColors.textLink),
-                  ),
-                ],
-              ),
+          child: Text.rich(
+            TextSpan(
+              text:
+                  S.of(context)?.authIHaveReadAndAgree ??
+                  'I have read and agree to ',
+              style: TextStyle(fontSize: 13, color: textColor),
+              children: [
+                TextSpan(
+                  text:
+                      S.of(context)?.authTermsOfService ?? 'Terms of Service',
+                  style: const TextStyle(color: AppColors.textLink),
+                  recognizer: _termsRecognizer,
+                ),
+                TextSpan(text: S.of(context)?.authAnd ?? ' and '),
+                TextSpan(
+                  text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
+                  style: const TextStyle(color: AppColors.textLink),
+                  recognizer: _privacyRecognizer,
+                ),
+              ],
             ),
           ),
         ),

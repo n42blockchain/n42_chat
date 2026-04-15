@@ -153,7 +153,7 @@
   "authRegister": "قم بالتسجيل",
   "authAgreeTerms": "بتسجيل الدخول فإنك توافق على",
   "authTermsOfService": "شروط الخدمة",
-  "authAnd": "و",
+  "authAnd": " و ",
   "authPrivacyPolicy": "سياسة الخصوصية",
   "authServerAddress": "عنوان الخادم",
   "authEnterServerAddress": "أدخل عنوان الخادم",

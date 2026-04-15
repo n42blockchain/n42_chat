@@ -414,7 +414,7 @@ class SSw extends S {
   String get authTermsOfService => 'Masharti ya Huduma';
 
   @override
-  String get authAnd => 'na';
+  String get authAnd => ' na ';
 
   @override
   String get authPrivacyPolicy => 'Sera ya Faragha';
@@ -2885,6 +2885,9 @@ class SSw extends S {
   @override
   String get authAppleLabel => 'Apple';
 
+
+  @override
+  String get authSsoNotConfigured => 'Seva hii haijasanidi watoa huduma wa kuingia SSO';
   @override
   String get authSsoLabel => 'SSO';
 

@@ -407,7 +407,7 @@ class SKo extends S {
   String get authTermsOfService => '서비스 약관';
 
   @override
-  String get authAnd => '및';
+  String get authAnd => ' 및 ';
 
   @override
   String get authPrivacyPolicy => '개인정보 처리방침';
@@ -2810,6 +2810,9 @@ class SKo extends S {
   @override
   String get authAppleLabel => '사과';
 
+
+  @override
+  String get authSsoNotConfigured => '이 서버는 SSO 로그인 공급자를 구성하지 않았습니다';
   @override
   String get authSsoLabel => 'SSO';
 

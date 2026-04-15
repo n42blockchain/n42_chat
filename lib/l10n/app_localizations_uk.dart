@@ -415,7 +415,7 @@ class SUk extends S {
   String get authTermsOfService => 'Умови обслуговування';
 
   @override
-  String get authAnd => 'і';
+  String get authAnd => ' і ';
 
   @override
   String get authPrivacyPolicy => 'Політика конфіденційності';
@@ -2885,6 +2885,9 @@ class SUk extends S {
   @override
   String get authAppleLabel => 'Яблуко';
 
+
+  @override
+  String get authSsoNotConfigured => 'Цей сервер не налаштував провайдерів входу SSO';
   @override
   String get authSsoLabel => 'SSO';
 

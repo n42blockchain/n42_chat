@@ -414,7 +414,7 @@ class STr extends S {
   String get authTermsOfService => 'Hizmet Şartları';
 
   @override
-  String get authAnd => 've';
+  String get authAnd => ' ve ';
 
   @override
   String get authPrivacyPolicy => 'Gizlilik Politikası';
@@ -2875,6 +2875,9 @@ class STr extends S {
   @override
   String get authAppleLabel => 'elma';
 
+
+  @override
+  String get authSsoNotConfigured => 'Bu sunucu SSO oturum açma sağlayıcılarını yapılandırmadı';
   @override
   String get authSsoLabel => 'TOA';
 

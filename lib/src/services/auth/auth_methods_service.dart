@@ -1148,10 +1148,7 @@ class AuthMethodsService {
                 );
               }
             }
-            // 如果没有 identity_providers，说明是单一 SSO 登录
-            if (identityProviders == null || identityProviders.isEmpty) {
-              providers.add(const SsoProvider(id: 'sso', name: 'SSO Login'));
-            }
+            // identity_providers 为空说明服务器未配置具体 provider，不添加占位符
           }
         }
 

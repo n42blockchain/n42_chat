@@ -413,7 +413,7 @@ class SCs extends S {
   String get authTermsOfService => 'Podmínky služby';
 
   @override
-  String get authAnd => 'a';
+  String get authAnd => ' a ';
 
   @override
   String get authPrivacyPolicy => 'Zásady ochrany osobních údajů';
@@ -2880,6 +2880,9 @@ class SCs extends S {
   @override
   String get authAppleLabel => 'Jablko';
 
+
+  @override
+  String get authSsoNotConfigured => 'Tento server nenakonfiguroval poskytovatele přihlášení SSO';
   @override
   String get authSsoLabel => 'SSO';
 

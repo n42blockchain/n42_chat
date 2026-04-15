@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
+import '../../helpers/bloc_message_helper.dart';
 
 /// 重置密码页面
 ///
@@ -181,7 +182,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           } else if (state.passwordResetStatus == PasswordResetStatus.failed) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage ?? (S.of(context)?.authResetPasswordFailed ?? 'Reset password failed')),
+                content: Text(state.errorMessage != null
+                    ? resolveBlocMessage(context, state.errorMessage!)
+                    : (S.of(context)?.authResetPasswordFailed ?? 'Reset password failed')),
                 backgroundColor: AppColors.error,
               ),
             );

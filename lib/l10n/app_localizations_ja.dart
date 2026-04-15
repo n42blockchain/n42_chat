@@ -2810,6 +2810,9 @@ class SJa extends S {
   @override
   String get authAppleLabel => 'アップル';
 
+
+  @override
+  String get authSsoNotConfigured => 'このサーバーはSSOログインプロバイダーを設定していません';
   @override
   String get authSsoLabel => 'SSO';
 

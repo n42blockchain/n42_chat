@@ -410,7 +410,7 @@ class SEn extends S {
   String get authTermsOfService => 'Terms of Service';
 
   @override
-  String get authAnd => 'and';
+  String get authAnd => ' and ';
 
   @override
   String get authPrivacyPolicy => 'Privacy Policy';
@@ -2857,6 +2857,9 @@ class SEn extends S {
   @override
   String get authAppleLabel => 'Apple';
 
+
+  @override
+  String get authSsoNotConfigured => 'This server has not configured SSO login providers';
   @override
   String get authSsoLabel => 'SSO';
 
