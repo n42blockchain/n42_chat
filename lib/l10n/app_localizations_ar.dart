@@ -409,7 +409,7 @@ class SAr extends S {
   String get authTermsOfService => 'شروط الخدمة';
 
   @override
-  String get authAnd => 'و';
+  String get authAnd => ' و ';
 
   @override
   String get authPrivacyPolicy => 'سياسة الخصوصية';
@@ -2863,6 +2863,9 @@ class SAr extends S {
   @override
   String get authAppleLabel => 'أبل';
 
+
+  @override
+  String get authSsoNotConfigured => 'لم يقم هذا الخادم بتكوين موفري تسجيل الدخول SSO';
   @override
   String get authSsoLabel => 'الدخول الموحد';
 

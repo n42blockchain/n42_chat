@@ -5285,6 +5285,9 @@ abstract class S {
   /// **'SSO'**
   String get authSsoLabel;
 
+  /// No description provided for @authSsoNotConfigured.
+  String get authSsoNotConfigured;
+
   /// No description provided for @transferAmountHintZero.
   ///
   /// In zh, this message translates to:

@@ -412,7 +412,7 @@ class SDe extends S {
   String get authTermsOfService => 'Nutzungsbedingungen';
 
   @override
-  String get authAnd => 'und';
+  String get authAnd => ' und ';
 
   @override
   String get authPrivacyPolicy => 'Datenschutzrichtlinie';
@@ -2894,6 +2894,9 @@ class SDe extends S {
   @override
   String get authAppleLabel => 'Apfel';
 
+
+  @override
+  String get authSsoNotConfigured => 'Dieser Server hat keine SSO-Anmeldeanbieter konfiguriert';
   @override
   String get authSsoLabel => 'SSO';
 

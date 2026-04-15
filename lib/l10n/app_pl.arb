@@ -153,7 +153,7 @@
   "authRegister": "Zarejestruj sie",
   "authAgreeTerms": "Logujac sie, akceptujesz",
   "authTermsOfService": "Regulamin",
-  "authAnd": "i",
+  "authAnd": " i ",
   "authPrivacyPolicy": "Polityke prywatnosci",
   "authServerAddress": "Adres serwera",
   "authEnterServerAddress": "Wprowadz adres serwera",

@@ -415,7 +415,7 @@ class SEs extends S {
   String get authTermsOfService => 'Terminos de servicio';
 
   @override
-  String get authAnd => 'y';
+  String get authAnd => ' y ';
 
   @override
   String get authPrivacyPolicy => 'Politica de privacidad';
@@ -2894,6 +2894,9 @@ class SEs extends S {
   @override
   String get authAppleLabel => 'manzana';
 
+
+  @override
+  String get authSsoNotConfigured => 'Este servidor no ha configurado proveedores de inicio de sesión SSO';
   @override
   String get authSsoLabel => 'SSO';
 

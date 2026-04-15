@@ -414,7 +414,7 @@ class SHi extends S {
   String get authTermsOfService => 'सेवा की शर्तें';
 
   @override
-  String get authAnd => 'और';
+  String get authAnd => ' और ';
 
   @override
   String get authPrivacyPolicy => 'गोपनीयता नीति';
@@ -2875,6 +2875,9 @@ class SHi extends S {
   @override
   String get authAppleLabel => 'सेब';
 
+
+  @override
+  String get authSsoNotConfigured => 'इस सर्वर ने SSO लॉगिन प्रदाता कॉन्फ़िगर नहीं किए हैं';
   @override
   String get authSsoLabel => 'एसएसओ';
 

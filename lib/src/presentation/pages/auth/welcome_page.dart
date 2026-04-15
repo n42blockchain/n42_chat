@@ -37,21 +37,21 @@ class WelcomePage extends StatelessWidget {
 
             // 主内容
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Column(
                   children: [
-                    const Spacer(flex: 2),
+                    const SizedBox(height: 32),
 
                     // Logo和标题
                     _buildHeader(context, isDark),
 
-                    const Spacer(flex: 3),
+                    const SizedBox(height: 48),
 
                     // 特性列表
                     _buildFeatures(context, isDark),
 
-                    const Spacer(flex: 2),
+                    const SizedBox(height: 32),
 
                     // 按钮
                     _buildButtons(context, isDark),

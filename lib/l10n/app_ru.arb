@@ -153,7 +153,7 @@
   "authRegister": "Зарегистрироваться",
   "authAgreeTerms": "Входя в систему, вы соглашаетесь с",
   "authTermsOfService": "Условиями использования",
-  "authAnd": "и",
+  "authAnd": " и ",
   "authPrivacyPolicy": "Политикой конфиденциальности",
   "authServerAddress": "Адрес сервера",
   "authEnterServerAddress": "Введите адрес сервера",

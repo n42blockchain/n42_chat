@@ -413,7 +413,7 @@ class SBn extends S {
   String get authTermsOfService => 'পরিষেবার শর্তাবলী';
 
   @override
-  String get authAnd => 'এবং';
+  String get authAnd => ' এবং ';
 
   @override
   String get authPrivacyPolicy => 'গোপনীয়তা নীতি';
@@ -2874,6 +2874,9 @@ class SBn extends S {
   @override
   String get authAppleLabel => 'আপেল';
 
+
+  @override
+  String get authSsoNotConfigured => 'এই সার্ভার SSO লগইন প্রদানকারী কনফিগার করেনি';
   @override
   String get authSsoLabel => 'এসএসও';
 

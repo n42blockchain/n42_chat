@@ -1400,6 +1400,7 @@
   "authGoogleLabel": "グーグル",
   "authAppleLabel": "アップル",
   "authSsoLabel": "SSO",
+  "authSsoNotConfigured": "このサーバーはSSOログインプロバイダーを設定していません",
   "transferAmountHintZero": "0.00",
   "commonMatrixIdHint": "@username:server.com",
   "authServerAddressHint": "https://m.si46.world",

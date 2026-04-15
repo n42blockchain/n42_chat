@@ -416,7 +416,7 @@ class SFr extends S {
   String get authTermsOfService => 'Conditions d\'utilisation';
 
   @override
-  String get authAnd => 'et';
+  String get authAnd => ' et ';
 
   @override
   String get authPrivacyPolicy => 'Politique de confidentialite';
@@ -2913,6 +2913,9 @@ class SFr extends S {
   @override
   String get authAppleLabel => 'Pomme';
 
+
+  @override
+  String get authSsoNotConfigured => "Ce serveur n'a pas configuré de fournisseurs de connexion SSO";
   @override
   String get authSsoLabel => 'SSO';
 

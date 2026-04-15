@@ -412,7 +412,7 @@ class SVi extends S {
   String get authTermsOfService => 'Dieu khoan Dich vu';
 
   @override
-  String get authAnd => 'va';
+  String get authAnd => ' va ';
 
   @override
   String get authPrivacyPolicy => 'Chinh sach Bao mat';
@@ -2853,6 +2853,9 @@ class SVi extends S {
   @override
   String get authAppleLabel => 'táo';
 
+
+  @override
+  String get authSsoNotConfigured => 'Máy chủ này chưa cấu hình nhà cung cấp đăng nhập SSO';
   @override
   String get authSsoLabel => 'SSO';
 

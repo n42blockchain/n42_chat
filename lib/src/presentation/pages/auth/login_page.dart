@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/constants/app_constants.dart';
@@ -694,6 +696,13 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 color: AppColors.textLink.withValues(alpha: 0.8),
               ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () async {
+                  final url = Uri.parse('https://www.n42.ai/static/terms_of_use.html');
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  }
+                },
             ),
             TextSpan(text: S.of(context)?.authAnd ?? ' and '),
             TextSpan(
@@ -701,6 +710,13 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 color: AppColors.textLink.withValues(alpha: 0.8),
               ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () async {
+                  final url = Uri.parse('https://n42.world/privacy');
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  }
+                },
             ),
           ],
         ),

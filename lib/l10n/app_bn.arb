@@ -153,7 +153,7 @@
   "authRegister": "সাইন আপ করুন",
   "authAgreeTerms": "লগ ইন করে, আপনি সম্মত হন",
   "authTermsOfService": "পরিষেবার শর্তাবলী",
-  "authAnd": "এবং",
+  "authAnd": " এবং ",
   "authPrivacyPolicy": "গোপনীয়তা নীতি",
   "authServerAddress": "সার্ভার ঠিকানা",
   "authEnterServerAddress": "সার্ভার ঠিকানা লিখুন",

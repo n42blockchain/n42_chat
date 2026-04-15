@@ -413,7 +413,7 @@ class SIt extends S {
   String get authTermsOfService => 'Termini di servizio';
 
   @override
-  String get authAnd => 'e';
+  String get authAnd => ' e ';
 
   @override
   String get authPrivacyPolicy => 'Informativa sulla privacy';
@@ -2882,6 +2882,9 @@ class SIt extends S {
   @override
   String get authAppleLabel => 'mela';
 
+
+  @override
+  String get authSsoNotConfigured => 'Questo server non ha configurato provider di accesso SSO';
   @override
   String get authSsoLabel => 'SSO';
 

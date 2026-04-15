@@ -413,7 +413,7 @@ class SId extends S {
   String get authTermsOfService => 'Ketentuan Layanan';
 
   @override
-  String get authAnd => 'dan';
+  String get authAnd => ' dan ';
 
   @override
   String get authPrivacyPolicy => 'Kebijakan Privasi';
@@ -2877,6 +2877,9 @@ class SId extends S {
   @override
   String get authAppleLabel => 'apel';
 
+
+  @override
+  String get authSsoNotConfigured => 'Server ini belum mengkonfigurasi penyedia login SSO';
   @override
   String get authSsoLabel => 'SSO';
 

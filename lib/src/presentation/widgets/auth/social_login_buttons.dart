@@ -9,7 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../n42_chat.dart' show N42Chat;
-import '../../../services/auth/auth_methods_service.dart';
+import '../../../services/auth/auth_methods_service.dart' show AuthMethodsService, SsoProvider;
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
@@ -60,6 +60,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
   bool _isWeChatLoading = false;
   bool _isAppleAvailable = false;
   bool _isWeChatAvailable = false;
+  bool _isSsoAvailable = false;
 
   bool get _isAnyLoading =>
       _isGoogleLoading ||
@@ -133,8 +134,23 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         setState(() => _isWeChatAvailable = available);
       }
     } catch (e) {
-      // WeChat 不可用
       debugLog('Error: $e');
+    }
+
+    // 检查 SSO 可用性（服务器需有配置 identity_providers）
+    final config = N42Chat.config;
+    if (config?.enableSsoLogin ?? false) {
+      try {
+        final homeserver = widget.homeserverBuilder().trim();
+        if (homeserver.isNotEmpty) {
+          final providers = await _authService.getSsoProviders(homeserver);
+          if (mounted) {
+            setState(() => _isSsoAvailable = providers.isNotEmpty);
+          }
+        }
+      } catch (e) {
+        debugLog('SSO availability check failed: $e');
+      }
     }
   }
 
@@ -165,7 +181,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           backgroundColor: isDark ? Colors.white : Colors.black,
           iconColor: isDark ? Colors.black : Colors.white,
         ),
-      if (config?.enableSsoLogin ?? false)
+      if ((config?.enableSsoLogin ?? false) && _isSsoAvailable)
         _buildSocialButton(
           onTap: isAnyLoading ? null : _handleSsoSignIn,
           icon: Icons.login,
@@ -436,15 +452,72 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           'homeserver': _homeserver,
         },
       );
-      final loginUri = Uri.parse(
-        _authService.getSsoLoginUrl(
-          homeserver: _homeserver,
-          redirectUrl: redirectUri.toString(),
-        ),
-      );
+      final redirectUrl = redirectUri.toString();
 
+      // 先获取服务器支持的 SSO provider 列表
+      debugLog('SSO: fetching providers from $_homeserver');
+      final providers = await _authService.getSsoProviders(_homeserver);
+      debugLog('SSO: got ${providers.length} providers: ${providers.map((p) => "${p.id}/${p.name}").join(", ")}');
+
+      if (!mounted) return;
+
+      String loginUrl;
+      if (providers.length == 1) {
+        // 只有一个 provider，直接使用带 provider ID 的端点
+        final pid = providers.first.id;
+        loginUrl = pid == 'sso'
+            ? _authService.getSsoLoginUrl(homeserver: _homeserver, redirectUrl: redirectUrl)
+            : _authService.getSsoProviderLoginUrl(homeserver: _homeserver, providerId: pid, redirectUrl: redirectUrl);
+      } else if (providers.length > 1) {
+        // 多个 provider，弹出选择框
+        _setProviderLoading(sso: false);
+        final selected = await showModalBottomSheet<SsoProvider>(
+          context: context,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          builder: (ctx) => ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'Choose login method',
+                  style: Theme.of(ctx).textTheme.titleMedium,
+                ),
+              ),
+              ...providers.map(
+                (p) => ListTile(
+                  leading: const Icon(Icons.login),
+                  title: Text(p.name),
+                  onTap: () => Navigator.of(ctx).pop(p),
+                ),
+              ),
+            ],
+          ),
+        );
+        if (selected == null || !mounted) return;
+        _setProviderLoading(sso: true);
+        loginUrl = _authService.getSsoProviderLoginUrl(
+          homeserver: _homeserver,
+          providerId: selected.id,
+          redirectUrl: redirectUrl,
+        );
+      } else {
+        // 服务器未配置任何 SSO provider，无法继续
+        debugLog('SSO: no providers configured on server');
+        _setProviderLoading(sso: false);
+        widget.onError?.call(
+          S.of(context)?.authSsoNotConfigured ??
+              'This server has not configured SSO login providers',
+        );
+        return;
+      }
+
+      debugLog('SSO: launching URL: $loginUrl');
       final launched = await launchUrl(
-        loginUri,
+        Uri.parse(loginUrl),
         mode: LaunchMode.externalApplication,
       );
       if (!launched && mounted) {

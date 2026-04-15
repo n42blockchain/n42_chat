@@ -415,7 +415,7 @@ class SPl extends S {
   String get authTermsOfService => 'Regulamin';
 
   @override
-  String get authAnd => 'i';
+  String get authAnd => ' i ';
 
   @override
   String get authPrivacyPolicy => 'Polityke prywatnosci';
@@ -2893,6 +2893,9 @@ class SPl extends S {
   @override
   String get authAppleLabel => 'Jabłko';
 
+
+  @override
+  String get authSsoNotConfigured => 'Ten serwer nie skonfigurował dostawców logowania SSO';
   @override
   String get authSsoLabel => 'Jednokrotne logowanie';
 

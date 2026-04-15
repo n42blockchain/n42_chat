@@ -415,7 +415,7 @@ class SPt extends S {
   String get authTermsOfService => 'Termos de Serviço';
 
   @override
-  String get authAnd => 'e';
+  String get authAnd => ' e ';
 
   @override
   String get authPrivacyPolicy => 'Política de Privacidade';
@@ -2896,6 +2896,9 @@ class SPt extends S {
   @override
   String get authAppleLabel => 'maçã';
 
+
+  @override
+  String get authSsoNotConfigured => 'Este servidor não configurou provedores de login SSO';
   @override
   String get authSsoLabel => 'SSO';
 
@@ -6218,7 +6221,7 @@ class SPtBr extends SPt {
   String get authTermsOfService => 'Termos de Serviço';
 
   @override
-  String get authAnd => 'e';
+  String get authAnd => ' e ';
 
   @override
   String get authPrivacyPolicy => 'Política de Privacidade';
@@ -8699,6 +8702,9 @@ class SPtBr extends SPt {
   @override
   String get authAppleLabel => 'maçã';
 
+
+  @override
+  String get authSsoNotConfigured => 'Este servidor não configurou provedores de login SSO';
   @override
   String get authSsoLabel => 'SSO';
 
