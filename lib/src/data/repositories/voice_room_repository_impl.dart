@@ -13,15 +13,11 @@ class VoiceRoomRepositoryImpl implements IVoiceRoomRepository {
     required String name,
     String? topic,
     DateTime? scheduledAt,
-  }) async {
-    final roomId = await _dataSource.createVoiceRoom(
-      name: name,
-      topic: topic,
-      scheduledAt: scheduledAt,
-    );
-    if (roomId == null) return null;
-    return _dataSource.getVoiceRoom(roomId);
-  }
+  }) => _dataSource.createVoiceRoom(
+        name: name,
+        topic: topic,
+        scheduledAt: scheduledAt,
+      );
 
   @override
   Future<List<VoiceRoomEntity>> getActiveVoiceRooms() =>

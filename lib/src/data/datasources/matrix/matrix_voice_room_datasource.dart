@@ -22,7 +22,10 @@ class MatrixVoiceRoomDataSource {
   static const String _handRaiseEventType = 'n42.voice_room.hand_raise';
 
   /// 创建语音房间
-  Future<String?> createVoiceRoom({
+  ///
+  /// 创建成功后直接从已知参数构造实体返回，不依赖本地 Matrix 缓存同步，
+  /// 避免 createRoom() 刚返回时 getRoomById() 尚未写入本地缓存导致的空值问题。
+  Future<VoiceRoomEntity?> createVoiceRoom({
     required String name,
     String? topic,
     DateTime? scheduledAt,
@@ -30,6 +33,9 @@ class MatrixVoiceRoomDataSource {
     if (_client == null) return null;
 
     try {
+      final creatorId = _client!.userID!;
+      final now = DateTime.now();
+
       final roomId = await _client!.createRoom(
         name: name,
         topic: topic,
@@ -42,7 +48,7 @@ class MatrixVoiceRoomDataSource {
             stateKey: '',
             content: {
               'status': 'live',
-              'created_at': DateTime.now().millisecondsSinceEpoch,
+              'created_at': now.millisecondsSinceEpoch,
               if (scheduledAt != null)
                 'scheduled_at': scheduledAt.millisecondsSinceEpoch,
             },
@@ -59,15 +65,32 @@ class MatrixVoiceRoomDataSource {
               'kick': 50,
               'ban': 50,
               'redact': 50,
-              'users': {
-                _client!.userID!: 100,
-              },
+              'users': {creatorId: 100},
             },
           ),
         ],
       );
 
-      return roomId;
+      // createRoom() 仅完成服务端写入，本地缓存要等 /sync 才会更新。
+      // 直接用已知数据构造实体，避免立即查 getRoomById() 拿到 null。
+      final displayName = _client!.userID ?? creatorId;
+      return VoiceRoomEntity(
+        roomId: roomId,
+        name: name,
+        topic: topic,
+        status: VoiceRoomStatus.live,
+        participants: [
+          VoiceRoomParticipant(
+            userId: creatorId,
+            displayName: displayName,
+            role: VoiceRoomRole.host,
+            isMuted: false,
+          ),
+        ],
+        creatorId: creatorId,
+        createdAt: now,
+        scheduledAt: scheduledAt,
+      );
     } catch (e) {
       debugLog('MatrixVoiceRoomDataSource: Failed to create voice room: $e');
       return null;

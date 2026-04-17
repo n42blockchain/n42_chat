@@ -139,19 +139,12 @@ class MomentRepositoryImpl implements IMomentRepository {
     MomentVisibility visibility = MomentVisibility.public,
     List<String> visibilityUserIds = const [],
   }) async {
-    final momentId = await _momentDataSource.postMoment(
+    return _momentDataSource.postMoment(
       content: content,
       location: location,
       visibility: visibility,
       visibilityUserIds: visibilityUserIds,
     );
-
-    final moment = await getMomentById(momentId);
-    if (moment == null) {
-      throw Exception('Failed to retrieve posted moment');
-    }
-
-    return moment;
   }
 
   @override
@@ -174,20 +167,13 @@ class MomentRepositoryImpl implements IMomentRepository {
         )
         .toList();
 
-    final momentId = await _momentDataSource.postMoment(
+    return _momentDataSource.postMoment(
       content: content,
       media: mediaData,
       location: location,
       visibility: visibility,
       visibilityUserIds: visibilityUserIds,
     );
-
-    final moment = await getMomentById(momentId);
-    if (moment == null) {
-      throw Exception('Failed to retrieve posted moment');
-    }
-
-    return moment;
   }
 
   @override
@@ -211,20 +197,13 @@ class MomentRepositoryImpl implements IMomentRepository {
       ),
     ];
 
-    final momentId = await _momentDataSource.postMoment(
+    return _momentDataSource.postMoment(
       content: content,
       media: mediaData,
       location: location,
       visibility: visibility,
       visibilityUserIds: visibilityUserIds,
     );
-
-    final moment = await getMomentById(momentId);
-    if (moment == null) {
-      throw Exception('Failed to retrieve posted moment');
-    }
-
-    return moment;
   }
 
   @override

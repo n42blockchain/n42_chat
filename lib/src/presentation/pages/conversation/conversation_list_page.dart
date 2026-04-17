@@ -34,6 +34,7 @@ import '../../widgets/story/story_bar.dart';
 import '../contact/add_friend_page.dart';
 import '../group/create_group_page.dart';
 import '../notification/on_chain_notifications_page.dart';
+import '../../../n42_chat.dart';
 import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
 import '../story/create_story_page.dart';
@@ -699,9 +700,22 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 title: S.of(context)?.commonScan ?? 'Scan',
                 onTap: () {
                   Navigator.pop(ctx);
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => const ScanQRPage()),
-                  );
+                  Navigator.of(context)
+                      .push<Map<String, dynamic>?>(
+                        MaterialPageRoute<Map<String, dynamic>?>(
+                          builder: (_) => const ScanQRPage(),
+                        ),
+                      )
+                      .then((result) {
+                        if (result == null || !context.mounted) return;
+                        final roomId = result['roomId'] as String?;
+                        final userId = result['userId'] as String?;
+                        if (roomId != null) {
+                          N42Chat.openConversation(roomId, context: context);
+                        } else if (userId != null) {
+                          N42Chat.openUserProfile(userId, context: context);
+                        }
+                      });
                 },
               ),
 
