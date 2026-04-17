@@ -384,6 +384,9 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 
     if (images.isNotEmpty) {
       if (!mounted) return;
+      if (_selectedMedia.any((m) => m.isVideo)) {
+        setState(() => _selectedMedia.clear());
+      }
       final shouldOpenEditor = images.length == 1;
       for (final image in images) {
         if (_selectedMedia.length >= 9) break;

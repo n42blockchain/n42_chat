@@ -198,7 +198,7 @@ class MatrixMomentDataSource {
   }
 
   /// 发布动态
-  Future<String> postMoment({
+  Future<MomentEntity> postMoment({
     String? content,
     List<MomentMediaData>? media,
     MomentLocation? location,
@@ -297,6 +297,7 @@ class MatrixMomentDataSource {
       'timestamp': DateTime.now().toIso8601String(),
     };
 
+    final now = DateTime.now();
     final sentEventId = await room.sendEvent(eventContent, type: momentEventType);
 
     // Update index immediately so subsequent operations can find it
@@ -305,7 +306,43 @@ class MatrixMomentDataSource {
       _momentEventIndex[momentId] = sentEventId;
     }
 
-    return momentId;
+    // Build entity directly from known data — local cache needs /sync to
+    // reflect the new event, so getMomentById would return null immediately.
+    final userId = _currentUserId!;
+    final user = room.unsafeGetUserFromMemoryOrFallback(userId);
+    final mediaEntities = uploadedMedia.map((m) {
+      final mxcUrl = m['url'] as String;
+      final thumbMxcUrl = m['thumbnail_url'] as String?;
+      return MomentMedia(
+        url: mxcUrl,
+        httpUrl: _getHttpUrlFromMxc(mxcUrl),
+        thumbnailUrl: thumbMxcUrl != null ? _getHttpUrlFromMxc(thumbMxcUrl) : null,
+        type: m['type'] == 'video' ? MomentMediaType.video : MomentMediaType.image,
+        width: m['width'] as int?,
+        height: m['height'] as int?,
+        duration: m['duration'] as int?,
+        mimeType: m['mimeType'] as String?,
+        size: m['size'] as int?,
+      );
+    }).toList();
+
+    final entity = MomentEntity(
+      id: momentId,
+      userId: userId,
+      userName: user.displayName ?? userId,
+      userAvatarUrl: user.avatarUrl?.toString(),
+      content: content,
+      media: mediaEntities,
+      location: location,
+      timestamp: now,
+      visibility: visibility,
+      visibilityUserIds: visibilityUserIds,
+      isFromMe: true,
+    );
+
+    _cachedMoments.insert(0, entity);
+
+    return entity;
   }
 
   /// 获取动态列表

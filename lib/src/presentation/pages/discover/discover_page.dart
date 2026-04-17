@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../n42_chat.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
+import '../../blocs/search/search_bloc.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../game/game_center_page.dart';
 import '../mini_app/mini_app_market_page.dart';
@@ -247,9 +250,22 @@ class DiscoverPage extends StatelessWidget {
   }
 
   void _openScanQR(BuildContext context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const ScanQRPage()));
+    Navigator.of(context)
+        .push<Map<String, dynamic>?>(
+          MaterialPageRoute<Map<String, dynamic>?>(
+            builder: (_) => const ScanQRPage(),
+          ),
+        )
+        .then((result) {
+          if (result == null || !context.mounted) return;
+          final roomId = result['roomId'] as String?;
+          final userId = result['userId'] as String?;
+          if (roomId != null) {
+            N42Chat.openConversation(roomId, context: context);
+          } else if (userId != null) {
+            N42Chat.openUserProfile(userId, context: context);
+          }
+        });
   }
 
   void _openSocialHub(BuildContext context) {
@@ -336,9 +352,14 @@ class DiscoverPage extends StatelessWidget {
   }
 
   void _openSearch(BuildContext context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const GlobalSearchPage()));
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<SearchBloc>(),
+          child: const GlobalSearchPage(),
+        ),
+      ),
+    );
   }
 
   void _openGames(BuildContext context) {

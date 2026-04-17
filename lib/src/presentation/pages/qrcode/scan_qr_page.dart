@@ -147,6 +147,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       facing: CameraFacing.back,
       torchEnabled: false,
     );
+    _torchEnabled = false;
   }
 
   void _onDetect(BarcodeCapture capture) {
@@ -535,12 +536,12 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           ),
           Positioned(
             left: scanRect.left,
-            bottom: screenSize.height - scanRect.bottom,
+            top: scanRect.bottom - 24,
             child: _buildCorner(isTop: false, isLeft: true),
           ),
           Positioned(
             right: screenSize.width - scanRect.right,
-            bottom: screenSize.height - scanRect.bottom,
+            top: scanRect.bottom - 24,
             child: _buildCorner(isTop: false, isLeft: false),
           ),
         ],

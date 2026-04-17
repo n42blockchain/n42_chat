@@ -12,7 +12,7 @@ import '../../../core/theme/app_colors.dart';
 /// 基于 pro_image_editor 库实现。
 ///
 /// 返回编辑后的图片字节数据 [Uint8List]，如果用户取消则返回 null。
-class MediaEditorPage extends StatelessWidget {
+class MediaEditorPage extends StatefulWidget {
   /// 原始图片字节数据
   final Uint8List imageBytes;
 
@@ -44,6 +44,15 @@ class MediaEditorPage extends StatelessWidget {
   }
 
   @override
+  State<MediaEditorPage> createState() => _MediaEditorPageState();
+}
+
+class _MediaEditorPageState extends State<MediaEditorPage> {
+  // pro_image_editor v11+ 先触发 onImageEditingComplete 再触发 onCloseEditor，
+  // 必须在此暂存 bytes，统一在 onCloseEditor 里 pop，避免双重 pop 弹出上层页面。
+  Uint8List? _editedBytes;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
 
@@ -60,13 +69,13 @@ class MediaEditorPage extends StatelessWidget {
     );
 
     return ProImageEditor.memory(
-      imageBytes,
+      widget.imageBytes,
       callbacks: ProImageEditorCallbacks(
         onImageEditingComplete: (bytes) async {
-          Navigator.of(context).pop(bytes);
+          _editedBytes = bytes;
         },
         onCloseEditor: (_) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(_editedBytes);
         },
       ),
       configs: ProImageEditorConfigs(
