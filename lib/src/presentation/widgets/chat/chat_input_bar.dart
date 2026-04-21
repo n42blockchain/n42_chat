@@ -602,11 +602,11 @@ class ChatInputBarState extends State<ChatInputBar> {
                   : const SizedBox.shrink(),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // 语音/键盘切换按钮
+                  // 语音/键盘切换
                   if (widget.showVoiceButton)
                     _buildIconButton(
                       icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
@@ -621,7 +621,7 @@ class ChatInputBarState extends State<ChatInputBar> {
                         : _buildTextField(isDark),
                   ),
 
-                  // 快捷回复按钮
+                  // 快捷回复
                   if (widget.showQuickReplyButton)
                     _buildIconButton(
                       icon: Icons.flash_on_outlined,
@@ -629,7 +629,7 @@ class ChatInputBarState extends State<ChatInputBar> {
                       isDark: isDark,
                     ),
 
-                  // 表情按钮
+                  // 表情
                   if (widget.showEmojiButton)
                     _buildIconButton(
                       icon: Icons.emoji_emotions_outlined,
@@ -637,25 +637,16 @@ class ChatInputBarState extends State<ChatInputBar> {
                       isDark: isDark,
                     ),
 
-                  // 格式化工具栏切换按钮
-                  _buildIconButton(
-                    icon: Icons.text_format,
-                    onPressed: () => setState(
-                      () => _showFormattingBar = !_showFormattingBar,
-                    ),
-                    isDark: isDark,
-                  ),
-
-                  // 更多/发送按钮
+                  // 附件/更多 或 发送
                   _hasText
                       ? _buildSendButton()
                       : (widget.showMoreButton
-                            ? _buildIconButton(
-                                icon: Icons.add_circle_outline,
-                                onPressed: widget.onMorePressed,
-                                isDark: isDark,
-                              )
-                            : const SizedBox.shrink()),
+                          ? _buildIconButton(
+                              icon: Icons.attach_file,
+                              onPressed: widget.onMorePressed,
+                              isDark: isDark,
+                            )
+                          : const SizedBox.shrink()),
                 ],
               ),
             ),
@@ -756,12 +747,19 @@ class ChatInputBarState extends State<ChatInputBar> {
     required VoidCallback? onPressed,
     required bool isDark,
   }) {
-    return IconButton(
-      icon: Icon(icon, size: 26),
-      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-      onPressed: widget.enabled ? onPressed : null,
-      padding: const EdgeInsets.all(6),
-      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+    final color = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final effectiveCallback = widget.enabled ? onPressed : null;
+    return InkWell(
+      onTap: effectiveCallback,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+        child: Icon(
+          icon,
+          size: 22,
+          color: effectiveCallback != null ? color : color.withValues(alpha: 0.4),
+        ),
+      ),
     );
   }
 
@@ -881,40 +879,26 @@ class ChatInputBarState extends State<ChatInputBar> {
   }
 
   Widget _buildSendButton() {
-    return Container(
-      margin: const EdgeInsets.only(left: 4),
-      child: GestureDetector(
-        onLongPress: widget.enabled && widget.onScheduledSend != null
-            ? () async {
-                if (_controller.text.trim().isEmpty) {
-                  return;
-                }
-                final scheduledAt = await showScheduledSendPicker(context);
-                if (!mounted || scheduledAt == null) {
-                  return;
-                }
-                widget.onScheduledSend?.call(scheduledAt);
-                if (!mounted) {
-                  return;
-                }
-                _controller.clear();
-              }
-            : null,
-        child: ElevatedButton(
-          onPressed: widget.enabled ? _sendMessage : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(60, 36),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-            elevation: 0,
-          ),
-          child: Text(
-            S.of(context)?.commonSend ?? 'Send',
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+    return GestureDetector(
+      onLongPress: widget.enabled && widget.onScheduledSend != null
+          ? () async {
+              if (_controller.text.trim().isEmpty) return;
+              final scheduledAt = await showScheduledSendPicker(context);
+              if (!mounted || scheduledAt == null) return;
+              widget.onScheduledSend?.call(scheduledAt);
+              if (!mounted) return;
+              _controller.clear();
+            }
+          : null,
+      child: InkWell(
+        onTap: widget.enabled ? _sendMessage : null,
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+          child: Icon(
+            Icons.send,
+            size: 22,
+            color: widget.enabled ? AppColors.primary : AppColors.primary.withValues(alpha: 0.4),
           ),
         ),
       ),
