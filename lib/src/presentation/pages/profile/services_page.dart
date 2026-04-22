@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../blocs/transfer/transfer_bloc.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../transfer/receive_page.dart';
 import 'n42_bean_page.dart';
@@ -85,7 +88,12 @@ class ServicesPage extends StatelessWidget {
               textColor: textColor,
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const ReceivePage()),
+                  MaterialPageRoute<void>(
+                    builder: (_) => BlocProvider(
+                      create: (_) => getIt<TransferBloc>(),
+                      child: const ReceivePage(),
+                    ),
+                  ),
                 );
               },
             ),
