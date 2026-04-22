@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
+import 'package:matrix/matrix.dart' show EncryptedFile, decryptFileImplementation;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -223,7 +225,12 @@ class VoiceService {
   /// 播放语音
   /// 
   /// 支持本地文件和 HTTP URL（包括需要认证的 Matrix 媒体 URL）
-  Future<void> play(String url) async {
+  Future<void> play(
+    String url, {
+    String? encryptKey,
+    String? encryptIv,
+    String? encryptSha256,
+  }) async {
     try {
       // 如果正在播放其他语音，先停止
       if (_isPlaying) {
@@ -233,12 +240,16 @@ class VoiceService {
       await _cleanupDownloadedPlaybackFile();
 
       _currentPlayingUrl = url;
-      
+
       if (url.startsWith('http')) {
         // 检查是否是 Matrix 媒体 URL（需要认证）
         if (url.contains('/_matrix/')) {
-          // 下载到本地再播放
-          final localPath = await _downloadWithAuth(url);
+          final localPath = await _downloadWithAuth(
+            url,
+            encryptKey: encryptKey,
+            encryptIv: encryptIv,
+            encryptSha256: encryptSha256,
+          );
           if (localPath != null) {
             _currentDownloadedPlaybackPath = localPath;
             await _player.play(DeviceFileSource(localPath));
@@ -259,10 +270,14 @@ class VoiceService {
     }
   }
   
-  /// 下载需要认证的 Matrix 媒体文件
-  Future<String?> _downloadWithAuth(String url) async {
+  /// 下载需要认证的 Matrix 媒体文件，如有 E2EE key 则解密后保存
+  Future<String?> _downloadWithAuth(
+    String url, {
+    String? encryptKey,
+    String? encryptIv,
+    String? encryptSha256,
+  }) async {
     try {
-      // 获取 access token
       String? accessToken;
       try {
         final matrixManager = getIt<MatrixClientManager>();
@@ -270,27 +285,42 @@ class VoiceService {
       } catch (e) {
         debugLog('Failed to get access token: $e');
       }
-      
-      // 创建请求
+
       final request = http.Request('GET', Uri.parse(url));
       if (accessToken != null) {
         request.headers['Authorization'] = 'Bearer $accessToken';
       }
-      
-      // 发送请求
+
       final client = http.Client();
       try {
         final response = await client.send(request);
-        
+
         if (response.statusCode == 200) {
-          // 保存到临时文件
-          final bytes = await response.stream.toBytes();
+          Uint8List bytes = await response.stream.toBytes();
+
+          // 如果有 E2EE key 材料，解密后再保存
+          if (encryptKey != null && encryptIv != null && encryptSha256 != null) {
+            debugLog('Decrypting encrypted audio file');
+            final encryptedFile = EncryptedFile(
+              data: bytes,
+              k: encryptKey,
+              iv: encryptIv,
+              sha256: encryptSha256,
+            );
+            final decrypted = await decryptFileImplementation(encryptedFile);
+            if (decrypted == null) {
+              debugLog('Failed to decrypt audio file');
+              return null;
+            }
+            bytes = decrypted;
+          }
+
           final dir = await getTemporaryDirectory();
           final filename = '${_uuid.v4()}.m4a';
           final file = File('${dir.path}/$filename');
           await file.writeAsBytes(bytes);
-          
-          debugLog('Downloaded audio to: ${file.path}');
+
+          debugLog('Downloaded${encryptKey != null ? " and decrypted" : ""} audio to: ${file.path}');
           return file.path;
         } else {
           debugLog('Failed to download audio: ${response.statusCode}');

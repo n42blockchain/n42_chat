@@ -573,6 +573,19 @@ class MessageMetadata extends Equatable {
   final bool? isAnonymousPoll;
 
   // ============================================
+  // E2EE 加密媒体属性（file 字段中的 key 材料）
+  // ============================================
+
+  /// AES-CTR 密钥（base64url，来自 file.key.k）
+  final String? encryptKey;
+
+  /// AES-CTR IV（base64，来自 file.iv）
+  final String? encryptIv;
+
+  /// SHA-256 校验（base64，来自 file.hashes.sha256）
+  final String? encryptSha256;
+
+  // ============================================
   // 音乐属性
   // ============================================
 
@@ -644,6 +657,9 @@ class MessageMetadata extends Equatable {
     this.maxSelections,
     this.pollEnded,
     this.isAnonymousPoll,
+    this.encryptKey,
+    this.encryptIv,
+    this.encryptSha256,
     this.musicTitle,
     this.musicArtist,
     this.musicUrl,
@@ -713,6 +729,9 @@ class MessageMetadata extends Equatable {
     maxSelections,
     pollEnded,
     isAnonymousPoll,
+    encryptKey,
+    encryptIv,
+    encryptSha256,
     musicTitle,
     musicArtist,
     musicUrl,

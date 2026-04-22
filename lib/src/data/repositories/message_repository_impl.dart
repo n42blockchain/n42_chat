@@ -140,7 +140,20 @@ class MessageRepositoryImpl implements IMessageRepository {
     // 通过 client 的同步事件监听更新
     final syncStream = _client?.onSync.stream;
     if (syncStream != null) {
-      await for (final _ in syncStream) {
+      await for (final sync in syncStream) {
+        // Matrix 协议中 limited=true 表示 sync 存在时间线缺口（如通话期间大量
+        // 信令事件）。SDK 的 Timeline._removeEventsNotInThisSync 会在此时清空
+        // 本地缓存，只保留本次 sync 的少量事件，导致消息列表骤减。
+        // 检测到 limited sync 后主动补充历史，恢复完整消息列表。
+        if (sync.rooms?.join?[roomId]?.timeline?.limited == true) {
+          try {
+            await timeline.requestHistory(historyCount: 50);
+          } catch (e) {
+            debugLog(
+              'MessageRepositoryImpl: requestHistory after limited sync failed: $e',
+            );
+          }
+        }
         yield _getMessagesFromTimeline(timeline, room);
       }
     }

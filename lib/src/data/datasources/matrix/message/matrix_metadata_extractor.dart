@@ -18,7 +18,9 @@ class MatrixMetadataExtractor {
   /// 提取消息元数据（带 HTTP URL 转换）
   MessageMetadata? extractMetadataWithHttpUrl(matrix.Event event) {
     final info = event.content['info'] as Map<String, dynamic>?;
-    final mxcUrl = event.content['url'] as String?;
+    // 加密房间中媒体 URL 存在 file.url 而非顶层 url 字段
+    final fileContent = event.content['file'] as Map<String, dynamic>?;
+    final mxcUrl = event.content['url'] as String? ?? fileContent?['url'] as String?;
     final thumbnailMxc = info?['thumbnail_url'] as String?;
 
     // 图片信息
@@ -37,8 +39,14 @@ class MatrixMetadataExtractor {
     // 音频信息
     if (event.messageType == matrix.MessageTypes.Audio) {
       final httpUrl = _convertMxcToHttp(mxcUrl);
+      // 提取 E2EE key 材料（加密房间中媒体存于 file 字段）
+      final keyMap = (fileContent?['key'] as Map<String, dynamic>?);
+      final hashMap = (fileContent?['hashes'] as Map<String, dynamic>?);
+      final encryptKey = keyMap?['k'] as String?;
+      final encryptIv = fileContent?['iv'] as String?;
+      final encryptSha256 = hashMap?['sha256'] as String?;
       debugLog(
-        'Audio message metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, senderId=${event.senderId}, status=${event.status}',
+        'Audio message metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, encrypted=${encryptKey != null}, senderId=${event.senderId}, status=${event.status}',
       );
       return MessageMetadata(
         mediaUrl: mxcUrl,
@@ -46,6 +54,9 @@ class MatrixMetadataExtractor {
         duration: info?['duration'] as int?,
         size: info?['size'] as int?,
         mimeType: info?['mimetype'] as String?,
+        encryptKey: encryptKey,
+        encryptIv: encryptIv,
+        encryptSha256: encryptSha256,
       );
     }
 
