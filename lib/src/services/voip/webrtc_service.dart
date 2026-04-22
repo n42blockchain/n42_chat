@@ -145,6 +145,10 @@ class WebRTCService {
   // 使用 LinkedHashSet 保证插入顺序，evict 时移除最老的条目
   final LinkedHashSet<String> _processedCallIds = LinkedHashSet<String>();
 
+  // 已取消的 callId 集合（hangup/reject 先于 invite 到达时记录）
+  // 防止推送延迟导致 invite 晚到后仍然弹出接听界面
+  final LinkedHashSet<String> _cancelledCallIds = LinkedHashSet<String>();
+
   // 清理锁：防止并发清理导致竞态
   bool _isCleaningUp = false;
 
@@ -935,6 +939,13 @@ class WebRTCService {
       _processedCallIds.remove(_processedCallIds.first);
     }
 
+    // 检查该通话是否已经被对方取消（hangup/reject 比 invite 先到达）
+    if (_cancelledCallIds.contains(callId)) {
+      debugLog('WebRTCService: Call $callId already cancelled before invite arrived, ignoring');
+      _cancelledCallIds.remove(callId);
+      return;
+    }
+
     // 允许在 idle、ended、failed 状态时接收来电
     if (_state != CallState.idle && _state != CallState.ended && _state != CallState.failed) {
       debugLog('WebRTCService: Already in a call (state: $_state), rejecting');
@@ -1135,11 +1146,18 @@ class WebRTCService {
     // 如果当前没有通话或者 callId 不匹配，但状态是 incoming，也应该处理
     // 这处理了 answerCall 失败后对方挂断的情况
     if (_currentSession == null) {
-      // 没有当前会话，但如果状态不是 idle，也需要清理
       if (_state != CallState.idle) {
         debugLog('WebRTCService: No current session but state is $_state, cleaning up');
         onStateChanged?.call(CallState.ended);
         await _cleanup();
+      } else if (callId != null) {
+        // invite 还未到达，提前记录此 callId 已被取消
+        // 当 invite 延迟到达时会在 _handleCallInviteFromRoom 中直接丢弃
+        debugLog('WebRTCService: Hangup arrived before invite for callId=$callId, pre-recording cancellation');
+        _cancelledCallIds.add(callId);
+        if (_cancelledCallIds.length > 20) {
+          _cancelledCallIds.remove(_cancelledCallIds.first);
+        }
       }
       return;
     }
@@ -1197,14 +1215,23 @@ class WebRTCService {
 
     debugLog('WebRTCService: Call reject - callId: $callId, reason: $reason, senderId: ${event.senderId}');
 
-    if (callId != _currentSession?.callId) {
-      debugLog('WebRTCService: Ignoring reject - callId mismatch');
-      return;
-    }
-
     // 忽略自己的拒绝事件
     if (event.senderId == _client.userID) {
       debugLog('WebRTCService: Ignoring own reject event');
+      return;
+    }
+
+    if (callId != _currentSession?.callId) {
+      // invite 还未到达，提前记录此 callId 已被取消
+      if (callId != null && _currentSession == null) {
+        debugLog('WebRTCService: Reject arrived before invite for callId=$callId, pre-recording cancellation');
+        _cancelledCallIds.add(callId);
+        if (_cancelledCallIds.length > 20) {
+          _cancelledCallIds.remove(_cancelledCallIds.first);
+        }
+      } else {
+        debugLog('WebRTCService: Ignoring reject - callId mismatch');
+      }
       return;
     }
 

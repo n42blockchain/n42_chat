@@ -885,6 +885,9 @@ class MessageItem extends StatelessWidget {
       convertedText: metadata?.transcription,
       isTranscribing: transcriptionStatus == TranscriptionStatus.transcribing,
       transcriptionFailed: transcriptionStatus == TranscriptionStatus.failed,
+      encryptKey: metadata?.encryptKey,
+      encryptIv: metadata?.encryptIv,
+      encryptSha256: metadata?.encryptSha256,
       onRequestTranscription: voiceUrl != null
           ? () => _requestVoiceToText(context)
           : null,

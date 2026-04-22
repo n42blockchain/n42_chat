@@ -50,6 +50,15 @@ class VoiceMessageWidget extends StatefulWidget {
   /// 外部转文字是否失败
   final bool transcriptionFailed;
 
+  /// E2EE 解密 key（base64url）
+  final String? encryptKey;
+
+  /// E2EE 解密 IV（base64）
+  final String? encryptIv;
+
+  /// E2EE SHA-256 校验（base64）
+  final String? encryptSha256;
+
   /// 语音服务（测试或宿主注入）
   final VoiceService? voiceService;
 
@@ -65,6 +74,9 @@ class VoiceMessageWidget extends StatefulWidget {
     this.convertedText,
     this.isTranscribing = false,
     this.transcriptionFailed = false,
+    this.encryptKey,
+    this.encryptIv,
+    this.encryptSha256,
     this.voiceService,
   });
 
@@ -186,7 +198,12 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
       _voiceService.stop();
     } else {
       debugLog('VoiceMessageWidget: starting playback: ${widget.voiceUrl}');
-      _voiceService.play(widget.voiceUrl!);
+      _voiceService.play(
+        widget.voiceUrl!,
+        encryptKey: widget.encryptKey,
+        encryptIv: widget.encryptIv,
+        encryptSha256: widget.encryptSha256,
+      );
     }
   }
 
@@ -265,6 +282,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
         // 语音消息主体
         GestureDetector(
           onTap: _handleTap,
+          behavior: HitTestBehavior.opaque,
           onLongPress:
               (widget.onConvertToText != null ||
                   widget.onRequestTranscription != null)
