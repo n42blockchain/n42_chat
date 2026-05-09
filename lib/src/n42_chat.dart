@@ -120,6 +120,7 @@ class N42Chat {
 
   /// 通知用户信息变化
   static void notifyUserChanged() {
+    if (_userStreamController.isClosed) return;
     final user = currentUser;
     _userStreamController.add(user);
     debugLog('N42Chat: User changed notification - ${user?.displayName}');
@@ -211,10 +212,10 @@ class N42Chat {
   // ---------------------------------------------------------------------------
 
   /// 获取通话管理器
-  static CallManager? get callManager => _N42CallFacade.callManager;
+  static CallManager? get callManager => _N42CallFacade._callManager;
 
   /// LiveKit JWT URL
-  static String? get liveKitJwtUrl => _N42CallFacade.liveKitJwtUrl;
+  static String? get liveKitJwtUrl => _N42CallFacade._liveKitJwtUrl;
 
   /// 初始化通话管理器
   ///
@@ -231,7 +232,7 @@ class N42Chat {
   // ---------------------------------------------------------------------------
 
   /// 获取推送服务
-  static FirebasePushService? get pushService => _N42PushManager.pushService;
+  static FirebasePushService? get pushService => _N42PushManager._pushService;
 
   /// 注册推送通知
   ///
@@ -410,40 +411,9 @@ class N42Chat {
     NotificationSettings settings,
   ) async {
     await _preferencesDataSource().saveNotificationSettingsModel(settings);
-    _N42PushManager._pushService?.setNotificationConfig(
-      _notificationConfigFromSettings(settings),
+    _N42PushManager.applyNotificationConfig(
+      NotificationConfig.fromSettings(settings),
     );
-  }
-
-  static NotificationConfig _notificationConfigFromSettings(
-    NotificationSettings settings,
-  ) {
-    return NotificationConfig(
-      enabled: settings.enabled,
-      showPreview: settings.showPreview,
-      playSound: settings.playSound,
-      vibrate: settings.vibrate,
-      doNotDisturb: settings.doNotDisturb,
-      dndStartTime: _parseStoredTimeOfDay(settings.doNotDisturbStart),
-      dndEndTime: _parseStoredTimeOfDay(settings.doNotDisturbEnd),
-      privacyMode: settings.privacyMode,
-    );
-  }
-
-  static TimeOfDay? _parseStoredTimeOfDay(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return null;
-    }
-    final parts = value.split(':');
-    if (parts.length != 2) {
-      return null;
-    }
-    final hour = int.tryParse(parts[0]);
-    final minute = int.tryParse(parts[1]);
-    if (hour == null || minute == null) {
-      return null;
-    }
-    return TimeOfDay(hour: hour, minute: minute);
   }
 
   // ---------------------------------------------------------------------------
@@ -464,43 +434,54 @@ class N42Chat {
   /// ```
   static Future<void> initialize(N42ChatConfig config) async {
     if (_initialized) {
-      debugLog('N42Chat: Already initialized');
+      _warnIfDifferentConfig(
+        config,
+        'Already initialized; new config ignored. '
+        'Call dispose() first to reinitialize with a different config.',
+      );
       return;
     }
-    // 防止并发调用：第二次调用等待第一次完成
     if (_initCompleter != null) {
+      _warnIfDifferentConfig(
+        config,
+        'initialize() called with a different config while a previous '
+        'initialization is in progress; new config ignored.',
+      );
       debugLog('N42Chat: Initialization in progress, waiting...');
       return _initCompleter!.future;
     }
-    _initCompleter = Completer<void>();
+    final completer = Completer<void>();
+    _initCompleter = completer;
 
     try {
       _config = config;
       N42ChatRouter.configure(enableDebugLogs: config.enableDebugLogs);
-      await _initializeAuthMethods(config);
 
-      // 重建用户变化流（dispose 后 controller 已关闭，需要新实例）
+      // 上次 init 中途失败会在 GetIt 留下部分注册（`N42ChatConfig` 是
+      // `configureDependencies` 首个注册的对象，所以它存在即等于"残骸"）。
+      // 这一步与第三方登录 SDK 初始化彼此独立，并行执行省一次 round-trip。
+      final priorReset = getIt.isRegistered<N42ChatConfig>()
+          ? () async {
+              debugLog('N42Chat: Resetting previous partial initialization');
+              N42ChatRouter.reset(preserveDebugLogging: true);
+              await resetDependencies();
+            }()
+          : Future<void>.value();
+
+      // 用户流在 dispose 后已 close，需要新实例；与上面的 IO 并行无依赖。
       if (_userStreamController.isClosed) {
         _userStreamController = StreamController<UserEntity?>.broadcast();
       }
 
-      // 如果之前初始化中途失败，GetIt 可能已有部分注册，需要先重置
-      if (getIt.isRegistered<N42ChatConfig>()) {
-        debugLog('N42Chat: Resetting previous partial initialization');
-        N42ChatRouter.reset(preserveDebugLogging: true);
-        await resetDependencies();
-      }
-
-      // 初始化依赖注入
+      await Future.wait([priorReset, _initializeAuthMethods(config)]);
       await configureDependencies(config);
 
-      // 创建全局 AuthBloc 并尝试恢复会话（防御性关闭旧实例）
+      // 防御性关闭旧 AuthBloc：极端情况下 init 失败重试链路上可能残留旧实例。
       await _authBloc?.close();
       _authBloc = getIt<AuthBloc>();
       _authBloc!.add(const AuthRestoreSessionRequested());
 
-      // 初始化推送通知服务（如果启用）
-      // 不阻塞主初始化流程：FCM token 获取在无 GMS 设备上可能耗时 60-90 秒
+      // FCM token 在无 GMS 设备上可能耗时 60-90s，因此 push 初始化不阻塞主流程。
       if (config.enablePushNotifications) {
         unawaited(
           _N42PushManager.initializePushService(config).catchError((Object e) {
@@ -511,50 +492,71 @@ class N42Chat {
         );
       }
 
-      // 如果 Matrix 客户端已登录，立即初始化通话管理器
       try {
         final clientManager = getIt<MatrixClientManager>();
         if (clientManager.client?.isLogged() == true) {
-          debugLog(
-            'N42Chat: Matrix client is logged in, initializing call manager',
-          );
           await initializeCallManager();
         }
       } catch (e) {
         debugLog('N42Chat: Failed to check login status for call manager: $e');
       }
 
-      // 设置 Moment 房间邀请自动加入监听
       _setupMomentInviteListener();
 
       _initialized = true;
       _flushPendingNotificationTap();
       debugLog('N42Chat: Initialized successfully');
-      _initCompleter!.complete();
+      completer.complete();
     } catch (e) {
       debugLog('N42Chat: Initialization failed, cleaning up: $e');
-      // 清理已分配资源，使外部调用方可以重新初始化
-      try {
-        await _authBloc?.close();
-        _authBloc = null;
-      } catch (_) {}
-      try {
-        await _cleanupRuntimeResources();
-      } catch (_) {}
-      try {
-        if (getIt.isRegistered<N42ChatConfig>()) {
-          N42ChatRouter.reset();
-          await resetDependencies();
-        }
-      } catch (_) {}
-      _initialized = false;
-      _config = null;
-      _N42CallFacade._liveKitJwtUrl = null;
-      _initCompleter!.completeError(e);
+      await _resetInitState();
+      completer.completeError(e);
       rethrow;
     } finally {
-      _initCompleter = null;
+      // 仅在自己仍持有 completer 时清空，避免覆盖并发 dispose 写入的状态。
+      if (identical(_initCompleter, completer)) {
+        _initCompleter = null;
+      }
     }
+  }
+
+  /// `N42ChatConfig` 含有 Function 字段（回调）且未重写 `==`，
+  /// value-equality 不可靠；identity 是这个类型唯一稳定的相等性。
+  static void _warnIfDifferentConfig(N42ChatConfig incoming, String message) {
+    if (_config != null && !identical(_config, incoming)) {
+      debugLog('N42Chat: $message');
+    }
+  }
+
+  /// 把 `initialize()` 期间分配的资源回滚到"未初始化"状态，
+  /// 用于 init 失败的清理路径。不清空 pending 通知队列——
+  /// 让用户在 init 前点击的通知在重试 init 后仍能跳转。
+  static Future<void> _resetInitState() async {
+    try {
+      await _authBloc?.close();
+    } catch (e) {
+      debugLog('N42Chat: AuthBloc close failed during init rollback: $e');
+    }
+    _authBloc = null;
+
+    try {
+      await _cleanupRuntimeResources();
+    } catch (e) {
+      debugLog('N42Chat: runtime cleanup failed during init rollback: $e');
+    }
+
+    try {
+      if (getIt.isRegistered<N42ChatConfig>()) {
+        N42ChatRouter.reset();
+        await resetDependencies();
+      }
+    } catch (e) {
+      debugLog('N42Chat: DI reset failed during init rollback: $e');
+    }
+
+    _initialized = false;
+    _config = null;
+    // _N42CallFacade.dispose() (在 _cleanupRuntimeResources 中) 已置空 _liveKitJwtUrl。
   }
 
   static Future<void> _initializeAuthMethods(N42ChatConfig config) async {
@@ -659,32 +661,15 @@ class N42Chat {
   /// 超时时间 30 秒。
   static Future<void> requestChatEmailChange(String password, String newEmail) {
     _ensureInitialized();
-    final completer = Completer<void>();
-    late StreamSubscription<AuthState> sub;
-    sub = _authBloc!.stream.listen((state) {
-      if (completer.isCompleted) {
-        sub.cancel();
-        return;
-      }
-      if (state.changeEmailStatus == ChangeEmailStatus.codeSent) {
-        sub.cancel();
-        completer.complete();
-      } else if (state.changeEmailStatus == ChangeEmailStatus.failed) {
-        sub.cancel();
-        completer.completeError(
-          state.errorMessage ?? 'Failed to send verification code',
-        );
-      }
-    });
-    _authBloc!.add(
-      AuthRequestChangeEmailRequested(password: password, newEmail: newEmail),
-    );
-    return completer.future.timeout(
-      const Duration(seconds: 30),
-      onTimeout: () {
-        sub.cancel();
-        throw TimeoutException('Chat email code request timed out');
-      },
+    return _runAuthEvent(
+      event: AuthRequestChangeEmailRequested(
+        password: password,
+        newEmail: newEmail,
+      ),
+      isSuccess: (s) => s.changeEmailStatus == ChangeEmailStatus.codeSent,
+      isFailure: (s) => s.changeEmailStatus == ChangeEmailStatus.failed,
+      defaultErrorMessage: 'Failed to send verification code',
+      timeoutMessage: 'Chat email code request timed out',
     );
   }
 
@@ -697,32 +682,12 @@ class N42Chat {
   /// 超时时间 30 秒。
   static Future<void> confirmChatEmailChange(String newEmail, String code) {
     _ensureInitialized();
-    final completer = Completer<void>();
-    late StreamSubscription<AuthState> sub;
-    sub = _authBloc!.stream.listen((state) {
-      if (completer.isCompleted) {
-        sub.cancel();
-        return;
-      }
-      if (state.changeEmailStatus == ChangeEmailStatus.success) {
-        sub.cancel();
-        completer.complete();
-      } else if (state.changeEmailStatus == ChangeEmailStatus.failed) {
-        sub.cancel();
-        completer.completeError(
-          state.errorMessage ?? 'Failed to update chat email',
-        );
-      }
-    });
-    _authBloc!.add(
-      AuthConfirmChangeEmailRequested(newEmail: newEmail, code: code),
-    );
-    return completer.future.timeout(
-      const Duration(seconds: 30),
-      onTimeout: () {
-        sub.cancel();
-        throw TimeoutException('Chat email confirmation timed out');
-      },
+    return _runAuthEvent(
+      event: AuthConfirmChangeEmailRequested(newEmail: newEmail, code: code),
+      isSuccess: (s) => s.changeEmailStatus == ChangeEmailStatus.success,
+      isFailure: (s) => s.changeEmailStatus == ChangeEmailStatus.failed,
+      defaultErrorMessage: 'Failed to update chat email',
+      timeoutMessage: 'Chat email confirmation timed out',
     );
   }
 
@@ -875,42 +840,28 @@ class N42Chat {
   /// 清除本地会话数据和缓存
   static Future<void> logout() async {
     _ensureInitialized();
-    final bloc = _authBloc;
-    if (bloc == null) {
-      throw StateError('N42Chat AuthBloc is not available.');
-    }
-    if (bloc.state.status == AuthStatus.unauthenticated && !isLoggedIn) {
+    // bloc 在终态且 repo 也确认未登录时，直接 short-circuit。
+    // 覆盖 unauthenticated 与 initial（启动期未恢复成功）两种情况，
+    // 避免向 bloc 发送一个会被静默忽略的事件而陷入超时。
+    if (_authBloc != null &&
+        _isLoggedOutState(_authBloc!.state.status) &&
+        !isLoggedIn) {
       return;
     }
-
-    final completer = Completer<void>();
-    late final StreamSubscription<AuthState> sub;
-    sub = bloc.stream.listen((state) {
-      if (completer.isCompleted) {
-        sub.cancel();
-        return;
-      }
-      if (state.status == AuthStatus.unauthenticated ||
-          state.status == AuthStatus.initial) {
-        sub.cancel();
-        completer.complete();
-      } else if (state.status == AuthStatus.error) {
-        sub.cancel();
-        completer.completeError(
-          N42ChatException(state.errorMessage ?? 'Failed to logout'),
-        );
-      }
-    });
-
-    bloc.add(const AuthLogoutRequested());
-    await completer.future.timeout(
-      const Duration(seconds: 15),
-      onTimeout: () {
-        sub.cancel();
-        throw TimeoutException('N42Chat.logout() timed out');
-      },
+    await _runAuthEvent(
+      event: const AuthLogoutRequested(),
+      isSuccess: (state) => _isLoggedOutState(state.status),
+      defaultErrorMessage: 'Failed to logout',
+      timeoutMessage: 'N42Chat.logout() timed out',
+      timeout: const Duration(seconds: 15),
     );
   }
+
+  static bool _isLoggedOutState(AuthStatus status) =>
+      status == AuthStatus.unauthenticated || status == AuthStatus.initial;
+
+  static bool _defaultIsFailure(AuthState s) =>
+      s.status == AuthStatus.error;
 
   /// 清理本地持久化的 chat 数据。
   ///
@@ -950,38 +901,37 @@ class N42Chat {
     required bool Function(AuthState state) isSuccess,
     required String defaultErrorMessage,
     required String timeoutMessage,
+    bool Function(AuthState state)? isFailure,
+    Duration timeout = const Duration(seconds: 30),
   }) async {
     final bloc = _authBloc;
     if (bloc == null) {
       throw StateError('N42Chat AuthBloc is not available.');
     }
 
-    final completer = Completer<void>();
-    late final StreamSubscription<AuthState> sub;
-    sub = bloc.stream.listen((state) {
-      if (completer.isCompleted) {
-        sub.cancel();
-        return;
-      }
-      if (isSuccess(state)) {
-        sub.cancel();
-        completer.complete();
-      } else if (state.status == AuthStatus.error) {
-        sub.cancel();
-        completer.completeError(
-          N42ChatException(state.errorMessage ?? defaultErrorMessage),
-        );
-      }
-    });
+    // 默认按 status==error 判失败。邮箱修改这类用 sub-status 的流程
+    // 通过 isFailure 参数自定义（changeEmailStatus == failed 等）。
+    // 提到 tear-off 避免每次调用 alloc 闭包，也消除 `??` 与 `=>` 优先级歧义。
+    final failurePredicate = isFailure ?? _defaultIsFailure;
 
+    // bloc.stream 不重播当前 state。先做同步快照，避免对一个 bloc
+    // 会静默忽略的事件（例如已是 unauthenticated 时再 logout）陷入超时。
+    if (isSuccess(bloc.state)) return;
+
+    // 先订阅再 add(event)：保证 bloc 处理事件产生的状态切换不会被错过。
+    // firstWhere 在命中后自动 cancel 订阅。
+    final terminalFuture = bloc.stream
+        .firstWhere((s) => isSuccess(s) || failurePredicate(s))
+        .timeout(
+          timeout,
+          onTimeout: () => throw TimeoutException(timeoutMessage),
+        );
     bloc.add(event);
-    await completer.future.timeout(
-      const Duration(seconds: 30),
-      onTimeout: () {
-        sub.cancel();
-        throw TimeoutException(timeoutMessage);
-      },
-    );
+
+    final terminal = await terminalFuture;
+    if (!isSuccess(terminal)) {
+      throw N42ChatException(terminal.errorMessage ?? defaultErrorMessage);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -1088,26 +1038,22 @@ class N42Chat {
 
       if (!ctx.mounted) return;
 
-      unawaited(
-        Navigator.of(ctx)
-            .push(
-              MaterialPageRoute<void>(
-                builder: (_) => MultiBlocProvider(
-                  providers: [
-                    BlocProvider(create: (_) => getIt<ChatBloc>()),
-                    BlocProvider(create: (_) => getIt<ContactBloc>()),
-                  ],
-                  child: ChatPage(
-                    conversation: conversation!,
-                    initialTargetMessageId: targetMessageId,
-                    onBack: () => Navigator.of(ctx).pop(),
-                  ),
-                ),
-              ),
-            )
-            .catchError((Object e) {
-              debugLog('N42Chat: Navigation error for room $roomId: $e');
-            }),
+      // 等到 ChatPage 被 pop 才返回。调用方（如 _routeNotificationTap）
+      // 已经用 unawaited 包装本调用，因此不会阻塞触发链。
+      await Navigator.of(ctx).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => getIt<ChatBloc>()),
+              BlocProvider(create: (_) => getIt<ContactBloc>()),
+            ],
+            child: ChatPage(
+              conversation: conversation!,
+              initialTargetMessageId: targetMessageId,
+              onBack: () => Navigator.of(ctx).pop(),
+            ),
+          ),
+        ),
       );
     } catch (e) {
       debugLog('N42Chat: Failed to open conversation $roomId: $e');
@@ -1185,25 +1131,50 @@ class N42Chat {
   ///
   /// 在应用退出前调用，完整清理所有持有的资源
   static Future<void> dispose() async {
+    // 若初始化进行中，先等它落地（无论成败），避免拆掉 init 仍依赖的资源。
+    // 限时 5s——init 内部可能挂在无响应的网络（FCM token、Matrix sync 等），
+    // 不能让 dispose 被无限阻塞；超时后直接走兜底拆除路径。
+    final pending = _initCompleter;
+    if (pending != null && !pending.isCompleted) {
+      debugLog('N42Chat: dispose() waiting for in-progress initialize()');
+      try {
+        await pending.future.timeout(
+          const Duration(seconds: 5),
+          onTimeout: () => debugLog(
+            'N42Chat: dispose() timed out waiting for initialize(); proceeding',
+          ),
+        );
+      } catch (_) {
+        // init 失败已自行清理，继续走 dispose 兜底。
+      }
+    }
+
     if (!_initialized &&
         _authBloc == null &&
-        _N42PushManager._pushService == null &&
-        _N42CallFacade._callManager == null &&
+        !_N42PushManager.hasResources &&
+        !_N42CallFacade.hasResources &&
         !getIt.isRegistered<N42ChatConfig>()) {
       return;
     }
 
-    // 1. 关闭 AuthBloc（取消 loginStateStream 订阅）
-    await _authBloc?.close();
+    try {
+      await _authBloc?.close();
+    } catch (e) {
+      debugLog('N42Chat: AuthBloc close failed during dispose: $e');
+    }
     _authBloc = null;
 
-    // 2. 释放运行时资源
     await _cleanupRuntimeResources();
 
-    // 3. 关闭用户变化流
+    // 通知缓存只在 dispose 时彻底清——init 失败重试路径需要保留 pending key。
+    _pendingNotificationRoomId = null;
+    _pendingNotificationEventId = null;
+    _lastHandledNotificationKey = null;
+    _lastHandledNotificationAt = null;
+
+    // close() 在 dart:async 是 idempotent，不需要 isClosed 守卫。
     await _userStreamController.close();
 
-    // 4. 重置依赖注入容器和路由缓存
     N42ChatRouter.reset();
     if (getIt.isRegistered<N42ChatConfig>()) {
       await resetDependencies();
@@ -1211,10 +1182,13 @@ class N42Chat {
 
     _initialized = false;
     _config = null;
-    _N42CallFacade._liveKitJwtUrl = null;
+    // _liveKitJwtUrl 由 _N42CallFacade.dispose() 置空。
     debugLog('N42Chat: Disposed');
   }
 
+  /// 释放 init 中分配的运行时资源。
+  /// **注意**：本方法**不**清空 pending 通知队列——init 失败的重试路径
+  /// 需要让用户在 init 前点击的通知在重试成功后仍能跳转。dispose() 单独清。
   static Future<void> _cleanupRuntimeResources() async {
     try {
       await _momentSyncSubscription?.cancel();
@@ -1225,10 +1199,6 @@ class N42Chat {
     await _N42PushManager.dispose();
 
     _lastMomentInviteCheck = null;
-    _pendingNotificationRoomId = null;
-    _pendingNotificationEventId = null;
-    _lastHandledNotificationKey = null;
-    _lastHandledNotificationAt = null;
   }
 
   /// 确保已初始化

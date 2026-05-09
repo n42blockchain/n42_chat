@@ -91,9 +91,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (refreshProfile) {
       add(const LoadUserProfileData());
     }
-    await _refreshTimedStatusIfNeeded();
-    // 通话管理器必须在 sync 到达前初始化完成（先于推送注册）
-    await _initializeCallManager();
+    // timed-status 刷新（联系人 HTTP）与通话管理器初始化（平台 init）相互独立，
+    // 并行执行省 50-200ms。两者内部各自捕获异常不会互相牵连。
+    await Future.wait([
+      _refreshTimedStatusIfNeeded(),
+      _initializeCallManager(),
+    ]);
     unawaited(_registerPushNotifications());
   }
 
@@ -108,10 +111,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = _authRepository.currentUser;
       emit(state.copyWith(status: AuthStatus.authenticated, user: user));
       N42Chat.notifyUserChanged();
-      await _refreshTimedStatusIfNeeded();
-      // 已登录状态，注册推送通知并初始化通话管理器
-      await _registerPushNotifications();
-      await _initializeCallManager();
+      // 与 _completeAuthenticatedFlow 同样的 warm-resume 优化：
+      // 三件事彼此独立，并行执行。每次冷启动 hit 这条路径。
+      await Future.wait([
+        _refreshTimedStatusIfNeeded(),
+        _initializeCallManager(),
+      ]);
+      unawaited(_registerPushNotifications());
     } else {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
     }

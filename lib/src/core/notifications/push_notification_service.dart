@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/user_profile_entity.dart'
-    show NotificationPrivacyMode;
+    show NotificationPrivacyMode, NotificationSettings;
 import '../utils/debug_log.dart';
 
 /// 推送通知服务
@@ -337,6 +337,30 @@ class NotificationConfig {
     this.dndEndTime,
     this.privacyMode = NotificationPrivacyMode.full,
   });
+
+  /// 从持久化的 NotificationSettings 构造运行时配置。
+  factory NotificationConfig.fromSettings(NotificationSettings settings) {
+    return NotificationConfig(
+      enabled: settings.enabled,
+      showPreview: settings.showPreview,
+      playSound: settings.playSound,
+      vibrate: settings.vibrate,
+      doNotDisturb: settings.doNotDisturb,
+      dndStartTime: _parseStoredTimeOfDay(settings.doNotDisturbStart),
+      dndEndTime: _parseStoredTimeOfDay(settings.doNotDisturbEnd),
+      privacyMode: settings.privacyMode,
+    );
+  }
+
+  static TimeOfDay? _parseStoredTimeOfDay(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    final parts = value.split(':');
+    if (parts.length != 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return null;
+    return TimeOfDay(hour: hour, minute: minute);
+  }
 
   /// 检查当前是否在免打扰时间内
   bool isInDoNotDisturbPeriod() {

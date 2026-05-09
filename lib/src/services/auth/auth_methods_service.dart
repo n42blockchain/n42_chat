@@ -183,31 +183,10 @@ class AuthMethodsService {
     String? weChatAppId,
     String? weChatUniversalLink,
   }) async {
-    // 初始化 Passkey 配置
     _passkeyRpId = passkeyRpId ?? 'm.si46.world';
-    // passkeyOrigin 参数保留供未来 Web 平台使用
     _passkeyInitialized = true;
     debugLog('AuthMethodsService: Passkey config initialized');
 
-    // 初始化 Google Sign In
-    if (!_googleInitialized) {
-      try {
-        _googleSignIn = GoogleSignIn.instance;
-        await _googleSignIn!.initialize(
-          clientId: googleClientId,
-          serverClientId: googleServerClientId,
-        );
-        _googleInitialized = true;
-        debugLog('AuthMethodsService: Google Sign In initialized');
-      } catch (e) {
-        _googleInitialized = false;
-        debugLog(
-          'AuthMethodsService: Google Sign In init fallback to default config - $e',
-        );
-      }
-    }
-
-    // 初始化 Twitter 配置
     _twitterApiKey = twitterApiKey;
     _twitterApiSecret = twitterApiSecret;
     _twitterRedirectUri = twitterRedirectUri ?? 'n42chat://';
@@ -215,31 +194,66 @@ class AuthMethodsService {
       debugLog('AuthMethodsService: Twitter config initialized');
     }
 
-    // 初始化微信 SDK
-    if (weChatAppId != null) {
-      _weChatAppId = weChatAppId;
-      _weChatUniversalLink = weChatUniversalLink ?? 'https://n42.network/app/';
-      try {
-        await Fluwx().registerApi(
-          appId: _weChatAppId!,
-          universalLink: _weChatUniversalLink!,
-        );
-        _weChatInitialized = true;
-        _ensureWeChatResponseListener();
-        final isInstalled = await Fluwx().isWeChatInstalled;
-        if (isInstalled) {
-          debugLog('AuthMethodsService: WeChat SDK initialized');
-        } else {
-          debugLog('AuthMethodsService: WeChat not installed');
-        }
-      } catch (e) {
-        _removeWeChatResponseListener();
-        _weChatInitialized = false;
-        debugLog('AuthMethodsService: WeChat init failed - $e');
-      }
-    }
+    // Google 与 WeChat SDK 的初始化彼此独立，并行启动可省一次串行 platform-channel 往返。
+    // 各自吞并自己的异常，避免一边失败牵连另一边。
+    await Future.wait([
+      _initGoogleSignIn(googleClientId, googleServerClientId),
+      _initWeChat(weChatAppId, weChatUniversalLink),
+    ]);
 
     debugLog('AuthMethodsService: Initialized');
+  }
+
+  Future<void> _initGoogleSignIn(
+    String? googleClientId,
+    String? googleServerClientId,
+  ) async {
+    if (_googleInitialized) return;
+    try {
+      _googleSignIn = GoogleSignIn.instance;
+      await _googleSignIn!.initialize(
+        clientId: googleClientId,
+        serverClientId: googleServerClientId,
+      );
+      _googleInitialized = true;
+      debugLog('AuthMethodsService: Google Sign In initialized');
+    } catch (e) {
+      _googleInitialized = false;
+      debugLog(
+        'AuthMethodsService: Google Sign In init fallback to default config - $e',
+      );
+    }
+  }
+
+  Future<void> _initWeChat(String? appId, String? universalLink) async {
+    if (appId == null) return;
+    _weChatAppId = appId;
+    _weChatUniversalLink = universalLink ?? 'https://n42.network/app/';
+    try {
+      await Fluwx().registerApi(
+        appId: _weChatAppId!,
+        universalLink: _weChatUniversalLink!,
+      );
+      _weChatInitialized = true;
+      _ensureWeChatResponseListener();
+      // isWeChatInstalled 是 platform-channel 调用 (~10-30ms)，仅用于日志诊断。
+      // release 模式下 debugLog 是 no-op，整个探针都没必要执行。
+      if (kDebugMode) {
+        unawaited(
+          Fluwx().isWeChatInstalled.then((isInstalled) {
+            debugLog(
+              isInstalled
+                  ? 'AuthMethodsService: WeChat SDK initialized'
+                  : 'AuthMethodsService: WeChat not installed',
+            );
+          }),
+        );
+      }
+    } catch (e) {
+      _removeWeChatResponseListener();
+      _weChatInitialized = false;
+      debugLog('AuthMethodsService: WeChat init failed - $e');
+    }
   }
 
   // ============================================

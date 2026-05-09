@@ -505,6 +505,17 @@ Future<void> _registerServices(N42ChatConfig config) async {
       dispose: (svc) => svc.dispose(),
     );
   }
+
+  // 语音房间服务（业务服务，不属于 BLoC 注册区）。
+  // 依赖 IVoiceRoomRepository（_registerRepositories）+ MatrixClientManager；
+  // 用 lazySingleton 推迟到首次解析，避免与 repository 注册顺序耦合。
+  getIt.registerLazySingleton<VoiceRoomService>(
+    () => VoiceRoomService(
+      repository: getIt<IVoiceRoomRepository>(),
+      currentUserIdProvider: () => getIt<MatrixClientManager>().userId,
+    ),
+    dispose: (service) => service.dispose(),
+  );
 }
 
 /// 注册数据源
@@ -885,16 +896,7 @@ void _registerBlocs() {
     () => LiveLocationBloc(messageDataSource: getIt<MatrixMessageDataSource>()),
   );
 
-  // 语音房间服务
-  getIt.registerLazySingleton<VoiceRoomService>(
-    () => VoiceRoomService(
-      repository: getIt<IVoiceRoomRepository>(),
-      currentUserIdProvider: () => getIt<MatrixClientManager>().userId,
-    ),
-    dispose: (service) => service.dispose(),
-  );
-
-  // 语音房间 BLoC
+  // 语音房间 BLoC（VoiceRoomService 在 _registerServices 中注册）
   getIt.registerFactory<VoiceRoomBloc>(
     () => VoiceRoomBloc(
       repository: getIt<IVoiceRoomRepository>(),

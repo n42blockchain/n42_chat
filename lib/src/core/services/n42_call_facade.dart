@@ -7,20 +7,14 @@ part of '../../n42_chat.dart';
 class _N42CallFacade {
   _N42CallFacade._();
 
-  /// 通话管理器
   static CallManager? _callManager;
-
-  /// TURN 凭据自动刷新定时器
   static Timer? _turnRefreshTimer;
 
-  /// LiveKit JWT URL (用于获取访问令牌)
+  /// LiveKit JWT URL，由 well-known 发现填入。
   static String? _liveKitJwtUrl;
 
-  /// 获取通话管理器
-  static CallManager? get callManager => _callManager;
-
-  /// 获取 LiveKit JWT URL
-  static String? get liveKitJwtUrl => _liveKitJwtUrl;
+  /// 是否已分配运行时资源（dispose 短路检查使用）
+  static bool get hasResources => _callManager != null;
 
   /// 初始化通话管理器
   ///
