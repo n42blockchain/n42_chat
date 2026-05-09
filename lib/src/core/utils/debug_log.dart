@@ -32,3 +32,7 @@ void Function(String) taggedLog(String tag) =>
 
 /// 各域常用 tag 实例。新增前先确认 ≥5 处 `debugLog('Foo: ...')` 用法。
 final void Function(String) authLog = taggedLog('AuthRepository');
+final void Function(String) prefsLog = taggedLog('Preferences');
+final void Function(String) secureLog = taggedLog('SecureStorage');
+final void Function(String) mcmLog = taggedLog('MatrixClientManager');
+final void Function(String) msgLog = taggedLog('MatrixMessageDataSource');

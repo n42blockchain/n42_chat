@@ -395,28 +395,20 @@ class MatrixEventMapper {
       case matrix.MessageTypes.Emote:
         return MessageType.text;
       default:
-        if (event.content['msgtype'] == 'n42.red_packet') {
-          return MessageType.redPacket;
-        }
-        if (event.content['msgtype'] == 'n42.transfer') {
-          return MessageType.transfer;
-        }
-        if (event.content['msgtype'] == 'n42.payment_request') {
-          return MessageType.paymentRequest;
-        }
-        if (event.content['msgtype'] == 'n42.music') {
-          return MessageType.music;
-        }
-        if (event.content['msgtype'] == 'n42.contact_card') {
-          return MessageType.contactCard;
-        }
-        final detectedType = _detectMediaTypeFromContent(event);
-        if (detectedType != null) {
-          return detectedType;
-        }
-        return MessageType.text;
+        // 自定义 msgtype 直接查表，避免 5 次串行字符串 ==。
+        final custom = _customMsgTypes[msgType];
+        if (custom != null) return custom;
+        return _detectMediaTypeFromContent(event) ?? MessageType.text;
     }
   }
+
+  static const Map<String, MessageType> _customMsgTypes = {
+    'n42.red_packet': MessageType.redPacket,
+    'n42.transfer': MessageType.transfer,
+    'n42.payment_request': MessageType.paymentRequest,
+    'n42.music': MessageType.music,
+    'n42.contact_card': MessageType.contactCard,
+  };
 
   /// 检测文件类型（用于 m.file 消息，可能是 bridge 发送的图片/视频/音频）
   MessageType _detectFileType(matrix.Event event) {
@@ -569,10 +561,14 @@ class MatrixEventMapper {
           final count = item['count'] as int? ?? 0;
 
           if (emoji != null && emoji.isNotEmpty && count > 0) {
+            // Matrix 聚合事件只给 count，不给具体 userIds——以前用
+            // List.generate(count, (i) => 'user_$i') 合成假 ID 仅为了 .length 正确，
+            // 一个 1000 reaction 的房间会浪费上千次字符串 alloc。
             reactions.add(
               MessageReaction(
                 key: emoji,
-                userIds: List.generate(count, (i) => 'user_$i'),
+                userIds: const [],
+                aggregateCount: count,
                 isMe: false,
               ),
             );

@@ -922,21 +922,27 @@ class MessageReaction extends Equatable {
   /// 反应内容（emoji）
   final String key;
 
-  /// 反应的用户ID列表
+  /// 反应的用户ID列表（Matrix `m.annotation` chunk 不携带具体用户，
+  /// 此时为空列表，[count] 由聚合 `count` 提供）
   final List<String> userIds;
 
   /// 当前用户是否已反应
   final bool isMe;
 
+  /// 服务端聚合数量；优先于 `userIds.length`。
+  /// 仅 Matrix 聚合事件（无 user 列表，仅给 count）会传入；本地操作仍走 userIds。
+  final int? aggregateCount;
+
   const MessageReaction({
     required this.key,
     required this.userIds,
     this.isMe = false,
+    this.aggregateCount,
   });
 
   /// 反应数量
-  int get count => userIds.length;
+  int get count => aggregateCount ?? userIds.length;
 
   @override
-  List<Object?> get props => [key, userIds, isMe];
+  List<Object?> get props => [key, userIds, isMe, aggregateCount];
 }
