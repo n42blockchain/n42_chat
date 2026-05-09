@@ -18,22 +18,40 @@ class MatrixMediaUploader {
 
   matrix.Client? get _client => _clientManager.client;
 
-  /// 检查服务器是否支持认证媒体上传
+  /// 缓存版本探测结果，按 client identity 失效，避免每次上传 HTTP round-trip。
+  matrix.Client? _versionsProbedClient;
+  bool? _supportsAuthMediaCached;
+
+  /// 检查服务器是否支持认证媒体上传（首次调用走 HTTP，之后走缓存）。
   Future<bool> supportsAuthenticatedMedia() async {
+    final client = _client;
+    if (client != null &&
+        identical(client, _versionsProbedClient) &&
+        _supportsAuthMediaCached != null) {
+      return _supportsAuthMediaCached!;
+    }
     try {
-      final versionsResponse = await _client!.getVersions();
-      // 检查 Matrix 版本是否 >= v1.11 (支持认证媒体)
+      final versionsResponse = await client!.getVersions();
+      // 检查 Matrix 版本是否 >= v1.11 (支持认证媒体) 或带稳定 unstable feature flag
       final supportsV111 = versionsResponse.versions.any(
         (v) => _isVersionGreaterThanOrEqualTo(v, 'v1.11'),
       );
-      // 或者检查 unstable feature
-      final hasUnstableFeature =
-          versionsResponse.unstableFeatures?['org.matrix.msc3916.stable'] == true;
+      final hasUnstableFeature = versionsResponse
+              .unstableFeatures?['org.matrix.msc3916.stable'] ==
+          true;
 
-      debugLog('MatrixMessageDataSource: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature');
-      return supportsV111 || hasUnstableFeature;
+      final supported = supportsV111 || hasUnstableFeature;
+      debugLog(
+        'MatrixMessageDataSource: supportsV111=$supportsV111, hasUnstableFeature=$hasUnstableFeature',
+      );
+      _versionsProbedClient = client;
+      _supportsAuthMediaCached = supported;
+      return supported;
     } catch (e) {
-      debugLog('MatrixMessageDataSource: Error checking authenticated media support: $e');
+      debugLog(
+        'MatrixMessageDataSource: Error checking authenticated media support: $e',
+      );
+      // 失败不缓存——下次再试。
       return false;
     }
   }

@@ -40,6 +40,20 @@ class MatrixClientManager {
   /// 获取Matrix客户端实例
   Client? get client => _client;
 
+  /// 获取已初始化的客户端实例；未初始化时抛 [StateError]。
+  /// datasource 各 op 起始统一调用，避免散落的 `if (_client == null) throw ...`。
+  Client requireClient([String? op]) {
+    final c = _client;
+    if (c == null) {
+      throw StateError(
+        op == null
+            ? 'Matrix client not initialized'
+            : 'Matrix client not initialized (op: $op)',
+      );
+    }
+    return c;
+  }
+
   /// 是否已初始化
   bool get isInitialized => _isInitialized;
 

@@ -41,12 +41,16 @@ class MatrixRoomDataSource {
 
   /// 获取私聊房间
   List<matrix.Room> getDirectChats() {
-    return getJoinedRooms().where((room) => room.isDirectChat).toList();
+    return getRooms()
+        .where((r) => r.membership == matrix.Membership.join && r.isDirectChat)
+        .toList();
   }
 
   /// 获取群聊房间
   List<matrix.Room> getGroupChats() {
-    return getJoinedRooms().where((room) => !room.isDirectChat).toList();
+    return getRooms()
+        .where((r) => r.membership == matrix.Membership.join && !r.isDirectChat)
+        .toList();
   }
 
   /// 按最后活动时间排序的房间列表

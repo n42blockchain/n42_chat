@@ -174,9 +174,11 @@ class ConversationRepositoryImpl implements IConversationRepository {
 
   @override
   Stream<int> watchTotalUnreadCount() {
-    return watchConversations().map((conversations) {
-      return conversations.fold<int>(0, (sum, conv) => sum + conv.unreadCount);
-    });
+    // .distinct() 防止未读数未变也触发下游 Tab badge widget 重建。
+    return watchConversations()
+        .map((conversations) =>
+            conversations.fold<int>(0, (sum, conv) => sum + conv.unreadCount))
+        .distinct();
   }
 
   @override
