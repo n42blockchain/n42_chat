@@ -4,91 +4,105 @@ import 'app_colors.dart';
 
 /// 文字样式定义
 ///
-/// 基于微信设计规范
+/// **重要**：常量样式只承载 fontSize/fontWeight/letterSpacing/height。
+/// **颜色** 不内嵌——通过 `Theme.of(context).textTheme.X` 由 [N42ChatTheme]
+/// 注入；直接用 `AppTextStyles.X` 时会得到 [AppColors.textPrimary]（浅色默认）
+/// 作为兜底，深色场景请用 `Theme.of(context).textTheme.X` 或显式 `.dark` 扩展。
+///
+/// ## 行高规范
+/// - 1.2 — 紧凑（徽章、索引字母等单字符容器）
+/// - 1.3 — 标题、列表项、紧凑文本
+/// - 1.4 — UI 组件（按钮、输入、标签）
+/// - 1.5 — 长正文段落
 abstract class AppTextStyles {
   AppTextStyles._();
-
-  // ============================================
-  // 字体族
-  // ============================================
 
   /// 默认字体（跟随系统）
   static const String? fontFamily = null;
 
   // ============================================
-  // 标题样式
+  // 标题样式（与 Material textTheme.headline* 对齐）
   // ============================================
 
-  /// 大标题 - 20sp
+  /// 大标题 - 22sp（页面级 hero 标题）
   static const TextStyle headlineLarge = TextStyle(
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 1.3,
   );
 
-  /// 中标题 - 18sp
+  /// 中标题 - 18sp（卡片/分组标题）
   static const TextStyle headlineMedium = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 1.3,
   );
 
-  /// 小标题 - 17sp (导航栏标题)
+  /// 小标题 - 17sp w600（导航栏标题，比 bodyLarge 17sp w400 更粗）
   static const TextStyle headlineSmall = TextStyle(
     fontSize: 17,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 1.3,
   );
 
   // ============================================
   // 正文样式
   // ============================================
 
-  /// 大正文 - 17sp
+  /// 大正文 - 17sp（默认 iOS 系统字号；适合阅读密集场景）
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 17,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.5,
+    height: 1.4,
   );
 
-  /// 中正文 - 15sp (默认正文)
+  /// 中正文 - 15sp（默认 UI 字号）
   static const TextStyle bodyMedium = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.5,
+    height: 1.4,
   );
 
-  /// 小正文 - 14sp
+  /// 小正文 - 13sp（次级 UI 文字）
   static const TextStyle bodySmall = TextStyle(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.5,
+    height: 1.4,
   );
 
   // ============================================
   // 辅助文字样式
   // ============================================
 
-  /// 辅助文字 - 12sp
+  /// 辅助文字 - 12sp（时间戳、说明文字）
   static const TextStyle caption = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
-    height: 1.4,
+    height: 1.3,
   );
 
-  /// 超小辅助文字 - 10sp
+  /// 超小辅助文字 - 11sp（不再 10sp——低于 iOS/Material 可读阈）
   static const TextStyle captionSmall = TextStyle(
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: FontWeight.w400,
     color: AppColors.textTertiary,
+    height: 1.3,
+  );
+
+  /// 大写小标签 - 11sp（分组段头、状态标签）
+  static const TextStyle overline = TextStyle(
+    fontSize: 11,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary,
     height: 1.4,
+    letterSpacing: 0.5,
   );
 
   // ============================================
@@ -97,7 +111,7 @@ abstract class AppTextStyles {
 
   /// 列表标题
   static const TextStyle listTitle = TextStyle(
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
     height: 1.3,
@@ -105,7 +119,7 @@ abstract class AppTextStyles {
 
   /// 列表副标题
   static const TextStyle listSubtitle = TextStyle(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
     height: 1.3,
@@ -117,15 +131,15 @@ abstract class AppTextStyles {
 
   /// 会话列表 - 名称
   static const TextStyle conversationName = TextStyle(
-    fontSize: 17,
-    fontWeight: FontWeight.w400,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
     height: 1.3,
   );
 
   /// 会话列表 - 最后消息
   static const TextStyle conversationLastMessage = TextStyle(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
     height: 1.3,
@@ -139,11 +153,11 @@ abstract class AppTextStyles {
     height: 1.3,
   );
 
-  /// 消息文字
+  /// 消息文字（颜色由气泡决定，调用方需 copyWith(color)）
   static const TextStyle messageText = TextStyle(
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: FontWeight.w400,
-    color: AppColors.messageTextSent,
+    color: AppColors.textPrimary,
     height: 1.4,
   );
 
@@ -160,7 +174,7 @@ abstract class AppTextStyles {
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.textTertiary,
-    height: 1.3,
+    height: 1.4,
   );
 
   // ============================================
@@ -169,18 +183,20 @@ abstract class AppTextStyles {
 
   /// 主按钮文字
   static const TextStyle buttonPrimary = TextStyle(
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: FontWeight.w500,
     color: Colors.white,
-    height: 1.3,
+    height: 1.4,
+    letterSpacing: 0.2,
   );
 
   /// 次要按钮文字
   static const TextStyle buttonSecondary = TextStyle(
-    fontSize: 17,
-    fontWeight: FontWeight.w400,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
     color: AppColors.primary,
-    height: 1.3,
+    height: 1.4,
+    letterSpacing: 0.2,
   );
 
   /// 文字按钮
@@ -188,7 +204,7 @@ abstract class AppTextStyles {
     fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.primary,
-    height: 1.3,
+    height: 1.4,
   );
 
   // ============================================
@@ -197,7 +213,7 @@ abstract class AppTextStyles {
 
   /// 输入框文字
   static const TextStyle input = TextStyle(
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
     height: 1.4,
@@ -205,10 +221,18 @@ abstract class AppTextStyles {
 
   /// 输入框提示
   static const TextStyle inputHint = TextStyle(
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: FontWeight.w400,
     color: AppColors.textTertiary,
     height: 1.4,
+  );
+
+  /// 表单错误提示
+  static const TextStyle errorText = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.error,
+    height: 1.3,
   );
 
   // ============================================
@@ -237,14 +261,15 @@ abstract class AppTextStyles {
 
   /// 分组标题
   static const TextStyle sectionHeader = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
     height: 1.3,
+    letterSpacing: 0.2,
   );
 }
 
-/// TextStyle扩展方法
+/// TextStyle 扩展方法
 extension TextStyleExtension on TextStyle {
   /// 设置为次要颜色
   TextStyle get secondary => copyWith(color: AppColors.textSecondary);
@@ -264,7 +289,13 @@ extension TextStyleExtension on TextStyle {
   /// 中等粗细
   TextStyle get medium => copyWith(fontWeight: FontWeight.w500);
 
-  /// 设置深色模式颜色
+  /// 设置深色模式主文字色
   TextStyle get dark => copyWith(color: AppColors.textPrimaryDark);
-}
 
+  /// 上下文感知主文字（深浅自适应）
+  TextStyle onBackground(BuildContext ctx) => copyWith(
+    color: Theme.of(ctx).brightness == Brightness.dark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary,
+  );
+}

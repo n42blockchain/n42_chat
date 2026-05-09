@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -85,34 +87,32 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = S.of(context);
 
+    final secondary =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Container(
         color: (isDark ? AppColors.backgroundDark : AppColors.background)
             .withValues(alpha: 0.92),
         child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(
-                width: 48,
-                height: 48,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  color: AppColors.primary,
+          child: Padding(
+            padding: const EdgeInsets.all(AppDimensions.spacingXL),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: CircularProgressIndicator(strokeWidth: 3),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                l10n?.syncInProgress ?? 'Syncing message history...',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                const SizedBox(height: AppDimensions.spacingL),
+                Text(
+                  l10n?.syncInProgress ?? 'Syncing message history...',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyMedium.copyWith(color: secondary),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

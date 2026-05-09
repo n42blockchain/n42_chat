@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 /// 欢迎页面
 ///
@@ -32,35 +35,20 @@ class WelcomePage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // 返回按钮
             _buildBackButton(context, isDark),
-
-            // 主内容
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Column(
                   children: [
                     const SizedBox(height: 32),
-
-                    // Logo和标题
                     _buildHeader(context, isDark),
-
                     const SizedBox(height: 48),
-
-                    // 特性列表
                     _buildFeatures(context, isDark),
-
                     const SizedBox(height: 32),
-
-                    // 按钮
                     _buildButtons(context, isDark),
-
                     const SizedBox(height: 32),
-
-                    // 协议
                     _buildAgreement(context, isDark),
-
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -76,15 +64,20 @@ class WelcomePage extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
-        padding: const EdgeInsets.only(left: 8, top: 8),
+        padding: const EdgeInsets.only(
+          left: AppDimensions.spacingS,
+          top: AppDimensions.spacingS,
+        ),
         child: IconButton(
           onPressed: onBack ?? () => Navigator.of(context).maybePop(),
           icon: Icon(
-            Icons.arrow_back_ios,
+            AppIcons.back,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-            size: 22,
+            size: AppDimensions.iconSizeSmall,
           ),
-          tooltip: 'Back',
+          constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+          splashRadius: 22,
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
       ),
     );
@@ -120,21 +113,30 @@ class WelcomePage extends StatelessWidget {
             size: 50,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           'N42 Chat',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 32,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         Text(
-          S.of(context)?.authSecureDecentralizedChat ?? 'Secure, decentralized messaging',
-          style: TextStyle(
-            fontSize: 16,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          S.of(context)?.authSecureDecentralizedChat ??
+              'Secure, decentralized messaging',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodyLarge.copyWith(
+            color: isDark
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
           ),
         ),
       ],
@@ -169,9 +171,10 @@ class WelcomePage extends StatelessWidget {
   }
 
   Widget _buildButtons(BuildContext context, bool isDark) {
+    final loginText = S.of(context)?.authLogin ?? 'Log In';
+    final signupText = S.of(context)?.authRegister ?? 'Sign Up';
     return Column(
       children: [
-        // 登录按钮
         SizedBox(
           width: double.infinity,
           height: 50,
@@ -179,42 +182,45 @@ class WelcomePage extends StatelessWidget {
             onPressed: onLogin,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
               elevation: 0,
             ),
             child: Text(
-              S.of(context)?.authLogin ?? 'Log In',
+              loginText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                letterSpacing: 0.2,
               ),
             ),
           ),
         ),
-
-        const SizedBox(height: 16),
-
-        // 注册按钮
+        const SizedBox(height: AppDimensions.spacing),
         SizedBox(
           width: double.infinity,
           height: 50,
           child: OutlinedButton(
             onPressed: onRegister,
             style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
               side: const BorderSide(color: AppColors.primary, width: 1.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
             ),
             child: Text(
-              S.of(context)?.authRegister ?? 'Sign Up',
+              signupText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
-                color: AppColors.primary,
+                letterSpacing: 0.2,
               ),
             ),
           ),
@@ -224,12 +230,14 @@ class WelcomePage extends StatelessWidget {
   }
 
   Widget _buildAgreement(BuildContext context, bool isDark) {
-    final tertiaryColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
-    final linkColor = AppColors.textLink.withValues(alpha: 0.8);
-    const textStyle = TextStyle(fontSize: 12);
+    final tertiaryColor =
+        isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final linkColor = AppColors.link.withValues(alpha: 0.85);
+    final textStyle = AppTextStyles.captionSmall.copyWith(fontSize: 12);
 
     return Wrap(
       alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
           S.of(context)?.authAgreeTerms ?? 'By logging in, you agree to ',
@@ -237,6 +245,7 @@ class WelcomePage extends StatelessWidget {
         ),
         GestureDetector(
           onTap: onTermsOfService,
+          behavior: HitTestBehavior.opaque,
           child: Text(
             S.of(context)?.authTermsOfService ?? 'Terms of Service',
             style: textStyle.copyWith(color: linkColor),
@@ -248,6 +257,7 @@ class WelcomePage extends StatelessWidget {
         ),
         GestureDetector(
           onTap: onPrivacyPolicy,
+          behavior: HitTestBehavior.opaque,
           child: Text(
             S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
             style: textStyle.copyWith(color: linkColor),
@@ -274,39 +284,46 @@ class _FeatureItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: AppColors.primary.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           ),
           child: Icon(
             icon,
             color: AppColors.primary,
-            size: 24,
+            size: AppDimensions.iconSize,
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppDimensions.spacing),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 16,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 description,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondary,
                 ),
               ),
             ],
@@ -316,4 +333,5 @@ class _FeatureItem extends StatelessWidget {
     );
   }
 }
+
 

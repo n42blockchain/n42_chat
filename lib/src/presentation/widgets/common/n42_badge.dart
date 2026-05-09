@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 /// 微信风格徽章组件
 ///
@@ -110,8 +112,8 @@ class N42Badge extends StatelessWidget {
 
   Widget _buildDot() {
     return Container(
-      width: 8,
-      height: 8,
+      width: AppDimensions.badgeDotSize,
+      height: AppDimensions.badgeDotSize,
       decoration: BoxDecoration(
         color: color ?? AppColors.badge,
         shape: BoxShape.circle,
@@ -121,7 +123,7 @@ class N42Badge extends StatelessWidget {
 
   Widget _buildCountBadge() {
     // 大于999时显示"..."，大于99显示"99+"，否则显示数字
-    String displayText;
+    final String displayText;
     if (count > 999) {
       displayText = '...';
     } else if (count > maxCount) {
@@ -129,32 +131,26 @@ class N42Badge extends StatelessWidget {
     } else {
       displayText = count.toString();
     }
-    
+
     final isSmall = displayText.length <= 1;
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isSmall ? 0 : 5,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: isSmall ? 0 : 5),
       constraints: const BoxConstraints(
-        minWidth: 18,
-        minHeight: 18,
-        maxHeight: 18,
+        minWidth: AppDimensions.badgeMinWidth,
+        minHeight: AppDimensions.badgeHeight,
+        maxHeight: AppDimensions.badgeHeight,
       ),
       decoration: BoxDecoration(
         color: color ?? AppColors.badge,
-        borderRadius: BorderRadius.circular(9),
-        // 微信风格：无白色边框
+        borderRadius: BorderRadius.circular(AppDimensions.badgeHeight / 2),
       ),
       child: Center(
         child: Text(
           displayText,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            height: 1.2,
-          ),
+          maxLines: 1,
+          overflow: TextOverflow.clip,
+          style: AppTextStyles.badge.copyWith(fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -213,10 +209,14 @@ class N42MutedIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fallback = isDark
+        ? AppColors.textTertiaryDark
+        : AppColors.muted;
     return Icon(
-      Icons.notifications_off,
+      Icons.notifications_off_outlined,
       size: size,
-      color: color ?? AppColors.muted,
+      color: color ?? fallback,
     );
   }
 }

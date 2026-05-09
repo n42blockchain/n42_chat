@@ -9,6 +9,9 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_lock_service.dart';
 import '../../../core/services/on_chain_notification_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../blocs/chat/chat_bloc.dart';
@@ -143,9 +146,11 @@ class _ChatMainPageState extends State<ChatMainPage> {
     showMenu<String>(
       context: context,
       position: position,
-      color: isDark ? const Color(0xFF4C4C4C) : Colors.white,
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      elevation: AppDimensions.overlayElevation,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+      ),
       items: [
         _buildPopupMenuItem(
           value: 'group',
@@ -198,7 +203,8 @@ class _ChatMainPageState extends State<ChatMainPage> {
     required String text,
     required bool isDark,
   }) {
-    final textColor = isDark ? Colors.white : Colors.black87;
+    final textColor =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     return PopupMenuItem<String>(
       value: value,
       height: 48,
@@ -206,12 +212,13 @@ class _ChatMainPageState extends State<ChatMainPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: textColor, size: 22),
-          const SizedBox(width: 14),
+          const SizedBox(width: AppDimensions.spacingM),
           Flexible(
             child: Text(
               text,
-              style: TextStyle(color: textColor, fontSize: 16),
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodyLarge.copyWith(color: textColor),
             ),
           ),
         ],
@@ -356,16 +363,19 @@ class _ChatMainPageState extends State<ChatMainPage> {
               elevation: 0,
               scrolledUnderElevation: 0,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+                icon: Icon(
+                  AppIcons.back,
+                  color: textColor,
+                  size: AppDimensions.iconSizeSmall,
+                ),
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                 onPressed: _handleBack,
               ),
               title: Text(
                 currentTitle,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.headlineSmall.copyWith(color: textColor),
               ),
               centerTitle: true,
               actions: [
@@ -375,8 +385,9 @@ class _ChatMainPageState extends State<ChatMainPage> {
                       icon: Icon(
                         Icons.add_circle_outline,
                         color: textColor,
-                        size: 22,
+                        size: AppDimensions.iconSizeAppBar,
                       ),
+                      tooltip: S.of(ctx)?.commonAdd ?? 'Add',
                       onPressed: () => _showAddMenu(ctx),
                     ),
                   ),
@@ -386,11 +397,12 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     icon: Icon(
                       Icons.person_add_outlined,
                       color: textColor,
-                      size: 22,
+                      size: AppDimensions.iconSizeAppBar,
                     ),
+                    tooltip: S.of(context)?.mainAddFriends ?? 'Add Friends',
                     onPressed: _navigateToAddFriend,
                   ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
               ],
             ),
             body: PageView(
@@ -438,18 +450,20 @@ class _ChatMainPageState extends State<ChatMainPage> {
                   automaticallyImplyLeading: false,
                   leading: IconButton(
                     icon: Icon(
-                      Icons.arrow_back_ios,
+                      AppIcons.back,
                       color: textColor,
-                      size: 20,
+                      size: AppDimensions.iconSizeSmall,
                     ),
+                    tooltip:
+                        MaterialLocalizations.of(context).backButtonTooltip,
                     onPressed: _handleBack,
                   ),
                   title: Text(
                     currentTitle,
-                    style: TextStyle(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.headlineSmall.copyWith(
                       color: textColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   centerTitle: true,
@@ -460,8 +474,9 @@ class _ChatMainPageState extends State<ChatMainPage> {
                           icon: Icon(
                             Icons.add_circle_outline,
                             color: textColor,
-                            size: 20,
+                            size: AppDimensions.iconSizeSmall,
                           ),
+                          tooltip: S.of(ctx)?.commonAdd ?? 'Add',
                           onPressed: () => _showAddMenu(ctx),
                         ),
                       ),
@@ -470,11 +485,13 @@ class _ChatMainPageState extends State<ChatMainPage> {
                         icon: Icon(
                           Icons.person_add_outlined,
                           color: textColor,
-                          size: 20,
+                          size: AppDimensions.iconSizeSmall,
                         ),
+                        tooltip:
+                            S.of(context)?.mainAddFriends ?? 'Add Friends',
                         onPressed: _navigateToAddFriend,
                       ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacingXS),
                   ],
                 ),
                 // 左侧面板内容
@@ -515,6 +532,9 @@ class _ChatMainPageState extends State<ChatMainPage> {
   /// 右侧面板：如果有选中会话则显示 ChatPage，否则显示占位
   Widget _buildRightPanel(bool isDark) {
     if (_selectedConversation == null || _splitChatBloc == null) {
+      final placeholderColor = isDark
+          ? AppColors.textTertiaryDark
+          : AppColors.textTertiary;
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -522,19 +542,15 @@ class _ChatMainPageState extends State<ChatMainPage> {
             Icon(
               Icons.chat_bubble_outline,
               size: 64,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : const Color(0xFFBDBDBD),
+              color: placeholderColor,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               S.of(context)?.commonMessages ?? 'Select a conversation',
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : const Color(0xFF9E9E9E),
-              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodyLarge.copyWith(color: placeholderColor),
             ),
           ],
         ),
@@ -557,7 +573,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   Widget _buildBottomNavigationBar(bool isDark, int totalUnread) {
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    const selectedColor = Color(0xFF07C160);
+    const selectedColor = AppColors.primary;
     final unselectedColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
@@ -644,9 +660,10 @@ class _ChatMainPageState extends State<ChatMainPage> {
     final color = isSelected ? selectedColor : unselectedColor;
 
     return Expanded(
-      child: GestureDetector(
+      child: InkWell(
         onTap: () => _onTabTapped(index),
-        behavior: HitTestBehavior.opaque,
+        splashColor: selectedColor.withValues(alpha: 0.10),
+        highlightColor: selectedColor.withValues(alpha: 0.05),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -654,7 +671,6 @@ class _ChatMainPageState extends State<ChatMainPage> {
               alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                // 动画选中背景胶囊
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
@@ -665,14 +681,13 @@ class _ChatMainPageState extends State<ChatMainPage> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                // 图标 + badge 叠加
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
                     Icon(
                       isSelected ? activeIcon : icon,
                       color: color,
-                      size: 24,
+                      size: AppDimensions.iconSizeBottomNav,
                     ),
                     if (badge > 0)
                       Positioned(
@@ -685,14 +700,19 @@ class _ChatMainPageState extends State<ChatMainPage> {
               ],
             ),
             const SizedBox(height: 3),
+            // 限制 maxLines 防止长翻译撑破 tab 高度。
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
-              style: TextStyle(
+              style: AppTextStyles.captionSmall.copyWith(
                 color: color,
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontWeight:
+                    isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
-              child: Text(label),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
@@ -730,10 +750,13 @@ class _ChatMainPageState extends State<ChatMainPage> {
       child: Center(
         child: Text(
           displayText,
-          style: const TextStyle(
+          maxLines: 1,
+          overflow: TextOverflow.clip,
+          style: AppTextStyles.captionSmall.copyWith(
             color: Colors.white,
             fontSize: 10,
             fontWeight: FontWeight.w600,
+            height: 1.0,
           ),
         ),
       ),

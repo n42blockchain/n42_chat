@@ -2,8 +2,34 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
 import 'n42_avatar.dart';
 import 'n42_badge.dart';
+
+// 文本样式 hoist：会话列表是高频重建路径（每次 sync 重渲染所有可见行）。
+// 提到顶层 static final 避免 4× copyWith × N 行的 TextStyle 分配开销。
+final TextStyle _convNameLight =
+    AppTextStyles.conversationName.copyWith(color: AppColors.textPrimary);
+final TextStyle _convNameDark =
+    AppTextStyles.conversationName.copyWith(color: AppColors.textPrimaryDark);
+final TextStyle _convTimeLight = AppTextStyles.conversationTime
+    .copyWith(color: AppColors.textTertiary);
+final TextStyle _convTimeDark = AppTextStyles.conversationTime
+    .copyWith(color: AppColors.textTertiaryDark);
+final TextStyle _convLastMsgLight = AppTextStyles.conversationLastMessage
+    .copyWith(color: AppColors.textSecondary);
+final TextStyle _convLastMsgDark = AppTextStyles.conversationLastMessage
+    .copyWith(color: AppColors.textSecondaryDark);
+
+const BoxDecoration _mutedDotLight = BoxDecoration(
+  color: AppColors.textTertiary,
+  shape: BoxShape.circle,
+);
+const BoxDecoration _mutedDotDark = BoxDecoration(
+  color: AppColors.textTertiaryDark,
+  shape: BoxShape.circle,
+);
 
 /// 微信风格列表项
 ///
@@ -75,8 +101,8 @@ class N42ListTile extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.showDivider = true,
-    this.dividerIndent = 72,
-    this.height = 72,
+    this.dividerIndent = AppDimensions.dividerIndent,
+    this.height = AppDimensions.conversationItemHeight,
     this.backgroundColor,
   });
 
@@ -85,7 +111,9 @@ class N42ListTile extends StatelessWidget {
     final isDark = context.isDarkMode;
     final bgColor = backgroundColor ??
         (isPinned
-            ? (isDark ? const Color(0xFF252525) : const Color(0xFFF5F5F5))
+            ? (isDark
+                ? AppColors.dividerThinDark
+                : AppColors.dividerThin)
             : (isDark ? AppColors.surfaceDark : AppColors.surface));
 
     return Column(
@@ -98,19 +126,14 @@ class N42ListTile extends StatelessWidget {
             onLongPress: onLongPress,
             child: Container(
               height: height,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.listItemPadding,
+              ),
               child: Row(
                 children: [
-                  // 左侧头像
                   _buildLeading(),
-                  const SizedBox(width: 12),
-
-                  // 中间内容
-                  Expanded(
-                    child: _buildContent(isDark),
-                  ),
-
-                  // 右侧内容
+                  const SizedBox(width: AppDimensions.spacingM),
+                  Expanded(child: _buildContent(isDark)),
                   _buildTrailing(isDark),
                 ],
               ),
@@ -120,7 +143,7 @@ class N42ListTile extends StatelessWidget {
         if (showDivider)
           Container(
             margin: EdgeInsets.only(left: dividerIndent),
-            height: 0.5,
+            height: AppDimensions.dividerThickness,
             color: isDark ? AppColors.dividerDark : AppColors.divider,
           ),
       ],
@@ -129,11 +152,10 @@ class N42ListTile extends StatelessWidget {
 
   Widget _buildLeading() {
     if (leading != null) return leading!;
-
     return N42Avatar(
       imageUrl: avatarUrl,
       name: avatarName ?? title,
-      size: 48,
+      size: AppDimensions.avatarSizeConversation,
     );
   }
 
@@ -142,7 +164,6 @@ class N42ListTile extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 标题行
         Row(
           children: [
             Expanded(
@@ -150,44 +171,34 @@ class N42ListTile extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                ),
+                style: isDark ? _convNameDark : _convNameLight,
               ),
             ),
             if (trailing != null) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Text(
                 trailing!,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textTertiary,
-                ),
+                maxLines: 1,
+                overflow: TextOverflow.clip,
+                style: isDark ? _convTimeDark : _convTimeLight,
               ),
             ],
           ],
         ),
-
-        // 副标题
         if (subtitle != null) ...[
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Row(
             children: [
               if (isMuted) ...[
                 const N42MutedIcon(size: 14),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacingXS),
               ],
               Expanded(
                 child: Text(
                   subtitle!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: isDark ? _convLastMsgDark : _convLastMsgLight,
                 ),
               ),
             ],
@@ -200,17 +211,12 @@ class N42ListTile extends StatelessWidget {
   Widget _buildTrailing(bool isDark) {
     if (trailingWidget != null) return trailingWidget!;
 
-    // 显示未读徽章
     if (unreadCount > 0) {
       if (isMuted) {
-        // 免打扰时显示灰色点
         return Container(
-          width: 8,
-          height: 8,
-          decoration: const BoxDecoration(
-            color: AppColors.textTertiary,
-            shape: BoxShape.circle,
-          ),
+          width: AppDimensions.badgeDotSize,
+          height: AppDimensions.badgeDotSize,
+          decoration: isDark ? _mutedDotDark : _mutedDotLight,
         );
       }
       return N42Badge.count(
@@ -276,6 +282,16 @@ class N42SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textSecondary =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textTertiary =
+        isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    // 当 icon 存在：左侧 icon(28) + 间距(12) + 内边距(16) = 56；否则等于内边距 16。
+    final dividerIndentLeft = icon != null
+        ? AppDimensions.listItemPadding + 28 + AppDimensions.spacingM
+        : AppDimensions.listItemPadding;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -285,45 +301,46 @@ class N42SettingsTile extends StatelessWidget {
           child: InkWell(
             onTap: switchValue == null ? onTap : null,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              constraints: const BoxConstraints(
+                minHeight: AppDimensions.settingsItemHeight,
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.listItemPadding,
+                vertical: AppDimensions.spacingM,
+              ),
               child: Row(
                 children: [
-                  // 图标
                   if (icon != null) ...[
                     _buildIcon(),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacingM),
                   ],
-
-                  // 标题
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.listTitle.copyWith(
+                            color: textPrimary,
                           ),
                         ),
                         if (subtitle != null) ...[
                           const SizedBox(height: 2),
                           Text(
                             subtitle!,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.listSubtitle.copyWith(
+                              color: textSecondary,
                             ),
                           ),
                         ],
                       ],
                     ),
                   ),
-
-                  // 右侧内容
-                  _buildTrailing(isDark),
+                  _buildTrailing(textSecondary, textTertiary),
                 ],
               ),
             ),
@@ -331,8 +348,8 @@ class N42SettingsTile extends StatelessWidget {
         ),
         if (showDivider)
           Container(
-            margin: EdgeInsets.only(left: icon != null ? 56 : 16),
-            height: 0.5,
+            margin: EdgeInsets.only(left: dividerIndentLeft),
+            height: AppDimensions.dividerThickness,
             color: isDark ? AppColors.dividerDark : AppColors.divider,
           ),
       ],
@@ -345,42 +362,39 @@ class N42SettingsTile extends StatelessWidget {
       height: 28,
       decoration: BoxDecoration(
         color: iconBackgroundColor ?? iconColor ?? AppColors.primary,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
-      child: Icon(
-        icon,
-        size: 18,
-        color: Colors.white,
-      ),
+      child: Icon(icon, size: 18, color: Colors.white),
     );
   }
 
-  Widget _buildTrailing(bool isDark) {
+  Widget _buildTrailing(Color textSecondary, Color textTertiary) {
     if (switchValue != null) {
-      return Switch(
-        value: switchValue!,
-        onChanged: onSwitchChanged,
-        activeTrackColor: AppColors.primary,
-      );
+      // Switch 颜色由 SwitchTheme 提供（n42_chat_theme.toThemeData）。
+      return Switch(value: switchValue!, onChanged: onSwitchChanged);
     }
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (trailing != null)
-          Text(
-            trailing!,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
+          // 限宽防止长 trailing（如长地址）挤压标题。
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 160),
+            child: Text(
+              trailing!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.right,
+              style: AppTextStyles.bodySmall.copyWith(color: textSecondary),
             ),
           ),
         if (showArrow) ...[
-          const SizedBox(width: 4),
-          const Icon(
+          const SizedBox(width: AppDimensions.spacingXS),
+          Icon(
             Icons.chevron_right,
-            size: 20,
-            color: AppColors.textTertiary,
+            size: AppDimensions.iconSizeSmall,
+            color: textTertiary,
           ),
         ],
       ],

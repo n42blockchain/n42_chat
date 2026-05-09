@@ -309,6 +309,8 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Text(
               'N42 Chat',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -320,8 +322,11 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               S.of(context)?.authSecureDecentralizedChat ??
                   'Secure, decentralized messaging',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
+                height: 1.4,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -352,7 +357,7 @@ class _LoginPageState extends State<LoginPage> {
           },
           child: Text(
             S.of(context)?.authRegisterAccount ?? 'Sign Up',
-            style: const TextStyle(fontSize: 14, color: AppColors.textLink),
+            style: const TextStyle(fontSize: 14, color: AppColors.link),
           ),
         ),
         const Text('|', style: TextStyle(color: AppColors.textTertiary)),
@@ -360,7 +365,7 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: _showForgotPasswordHelp,
           child: Text(
             S.of(context)?.authForgotPassword ?? 'Forgot Password',
-            style: const TextStyle(fontSize: 14, color: AppColors.textLink),
+            style: const TextStyle(fontSize: 14, color: AppColors.link),
           ),
         ),
       ],
@@ -694,7 +699,7 @@ class _LoginPageState extends State<LoginPage> {
             TextSpan(
               text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
               style: TextStyle(
-                color: AppColors.textLink.withValues(alpha: 0.8),
+                color: AppColors.link.withValues(alpha: 0.8),
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
@@ -708,7 +713,7 @@ class _LoginPageState extends State<LoginPage> {
             TextSpan(
               text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
               style: TextStyle(
-                color: AppColors.textLink.withValues(alpha: 0.8),
+                color: AppColors.link.withValues(alpha: 0.8),
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {

@@ -64,8 +64,11 @@ abstract class AppColors {
   /// 分割线 - 深色
   static const Color dividerDark = Color(0xFF3D3D3D);
 
-  /// 细分割线
+  /// 细分割线 - 浅色
   static const Color dividerThin = Color(0xFFF0F0F0);
+
+  /// 细分割线 - 深色
+  static const Color dividerThinDark = Color(0xFF2A2A2A);
 
   // ============================================
   // 文字颜色
@@ -86,57 +89,64 @@ abstract class AppColors {
   /// 辅助文字 - 浅色模式
   static const Color textTertiary = Color(0xFFB2B2B2);
 
-  /// 辅助文字 - 深色模式
-  static const Color textTertiaryDark = Color(0xFF888888);
+  /// 辅助文字 - 深色模式（比 textSecondaryDark 浅一档，避免与之同色失去层次）
+  static const Color textTertiaryDark = Color(0xFF6B6B6B);
 
-  /// 禁用文字
+  /// 禁用文字 - 浅色
   static const Color textDisabled = Color(0xFFCCCCCC);
 
-  /// 链接文字
-  static const Color textLink = Color(0xFF576B95);
+  /// 禁用文字 - 深色
+  static const Color textDisabledDark = Color(0xFF555555);
 
-  /// 链接颜色
+  /// 链接颜色（textLink 是别名，新代码请用 link）
   static const Color link = Color(0xFF576B95);
+  @Deprecated('Use AppColors.link')
+  static const Color textLink = link;
 
   // ============================================
   // 消息气泡
   // ============================================
 
   /// 发送消息气泡 - 浅色 (微信绿)
-  static const Color messageSent = Color(0xFF95EC69);
-
-  /// 接收消息气泡 - 浅色
-  static const Color messageReceived = Color(0xFFFFFFFF);
-
-  /// 发送消息气泡 - 深色
-  static const Color messageSentDark = Color(0xFF3EB575);
-
-  /// 接收消息气泡 - 深色
-  static const Color messageReceivedDark = Color(0xFF2C2C2C);
-
-  /// 消息文字 - 发送方
-  static const Color messageTextSent = Color(0xFF000000);
-
-  /// 消息文字 - 接收方
-  static const Color messageTextReceived = Color(0xFF000000);
-
-  /// 自己发送的消息气泡 - 浅色
   static const Color bubbleSelf = Color(0xFF95EC69);
 
-  /// 自己发送的消息气泡 - 深色
+  /// 发送消息气泡 - 深色
   static const Color bubbleSelfDark = Color(0xFF3EB575);
 
-  /// 对方发送的消息气泡 - 浅色
+  /// 接收消息气泡 - 浅色
   static const Color bubbleOther = Color(0xFFFFFFFF);
 
-  /// 对方发送的消息气泡 - 深色
-  static const Color bubbleOtherDark = Color(0xFF2C2C2C);
+  /// 接收消息气泡 - 深色（比 backgroundDark 浅一档，保证可视边界）
+  static const Color bubbleOtherDark = Color(0xFF262626);
+
+  /// 消息文字 - 发送方（深浅都用黑——亮绿气泡上黑字最清晰）
+  static const Color messageTextSent = Color(0xFF000000);
+
+  /// 消息文字 - 接收方（白底黑字 / 深底白字由 messageTextReceived* 切换）
+  static const Color messageTextReceived = Color(0xFF181818);
+
+  /// 接收消息文字 - 深色
+  static const Color messageTextReceivedDark = Color(0xFFE5E5E5);
+
+  // 旧别名（保留为弃用兼容）
+  @Deprecated('Use AppColors.bubbleSelf')
+  static const Color messageSent = bubbleSelf;
+  @Deprecated('Use AppColors.bubbleOther')
+  static const Color messageReceived = bubbleOther;
+  @Deprecated('Use AppColors.bubbleSelfDark')
+  static const Color messageSentDark = bubbleSelfDark;
+  @Deprecated('Use AppColors.bubbleOtherDark')
+  static const Color messageReceivedDark = bubbleOtherDark;
 
   /// 自己气泡颜色（微信风格：浅色亮绿，深色暗绿）
   static Color selfBubble(bool isDark) => isDark ? bubbleSelfDark : bubbleSelf;
 
   /// 发送消息文字颜色（微信风格：始终黑色，不论深浅模式）
   static Color sentText(bool isDark) => messageTextSent;
+
+  /// 接收消息文字颜色（深浅模式自适应）
+  static Color receivedText(bool isDark) =>
+      isDark ? messageTextReceivedDark : messageTextReceived;
 
   // ============================================
   // 状态颜色
@@ -145,14 +155,26 @@ abstract class AppColors {
   /// 错误/危险
   static const Color error = Color(0xFFFA5151);
 
+  /// 错误背景（浅色淡红，用于 SnackBar / 错误提示框等）
+  static const Color errorBg = Color(0x14FA5151);
+
   /// 警告
   static const Color warning = Color(0xFFFF9900);
 
-  /// 成功
+  /// 警告背景
+  static const Color warningBg = Color(0x14FF9900);
+
+  /// 成功（同 primary 但语义不同）
   static const Color success = Color(0xFF07C160);
+
+  /// 成功背景
+  static const Color successBg = Color(0x1407C160);
 
   /// 信息
   static const Color info = Color(0xFF10AEFF);
+
+  /// 信息背景
+  static const Color infoBg = Color(0x1410AEFF);
 
   // ============================================
   // 徽章/红点
@@ -196,8 +218,14 @@ abstract class AppColors {
   /// 浅色遮罩
   static const Color overlayLight = Color(0x33000000);
 
-  /// 图片加载占位背景
+  /// 图片加载占位背景 - 浅色
   static const Color placeholder = Color(0xFFE5E5E5);
+
+  /// 图片加载占位背景 - 深色
+  static const Color placeholderDark = Color(0xFF2A2A2A);
+
+  /// 卡片浅阴影色（elevation 替代——AppBar 边界 / 浮层）
+  static const Color cardShadow = Color(0x0F000000);
 
   // ============================================
   // 特殊用途
@@ -212,8 +240,15 @@ abstract class AppColors {
   /// 选中状态
   static const Color selected = Color(0x1A07C160);
 
-  /// 按压状态
+  /// 品牌 ripple/highlight（带主色调的 InkWell 反馈）
+  static const Color brandRipple10 = Color(0x1A07C160);
+  static const Color brandRipple05 = Color(0x0D07C160);
+
+  /// 按压状态 - 浅色
   static const Color pressed = Color(0x0D000000);
+
+  /// 按压状态 - 深色
+  static const Color pressedDark = Color(0x1FFFFFFF);
 
   /// 加密标识
   static const Color encrypted = Color(0xFF07C160);

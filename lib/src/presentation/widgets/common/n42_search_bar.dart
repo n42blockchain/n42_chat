@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 /// 微信风格搜索框
 ///
@@ -129,6 +131,8 @@ class _N42SearchBarState extends State<N42SearchBar> {
     final isDark = context.isDarkMode;
     final bgColor = widget.backgroundColor ??
         (isDark ? AppColors.surfaceDark : AppColors.searchBackground);
+    final tertiary =
+        isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
 
     return Row(
       children: [
@@ -136,26 +140,37 @@ class _N42SearchBarState extends State<N42SearchBar> {
           child: GestureDetector(
             onTap: widget.onTap,
             child: Container(
-              height: 36,
+              height: AppDimensions.searchBarHeight,
               decoration: BoxDecoration(
                 color: bgColor,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(
+                  AppDimensions.searchBarHeight / 2,
+                ),
               ),
               child: widget.onTap != null
-                  ? _buildReadOnlySearch(isDark)
-                  : _buildEditableSearch(isDark),
+                  ? _buildReadOnlySearch(tertiary)
+                  : _buildEditableSearch(isDark, tertiary),
             ),
           ),
         ),
         if (widget.showCancelButton && _isFocused) ...[
-          const SizedBox(width: 12),
-          GestureDetector(
+          const SizedBox(width: AppDimensions.spacingM),
+          // 用 InkWell 包以提供 44px 触摸目标 + ripple 反馈
+          InkWell(
             onTap: _onCancel,
-            child: Text(
-              S.of(context)?.commonCancel ?? 'Cancel',
-              style: TextStyle(
-                fontSize: 15,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingS,
+                vertical: AppDimensions.spacingS,
+              ),
+              child: Text(
+                S.of(context)?.commonCancel ?? 'Cancel',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
+                ),
               ),
             ),
           ),
@@ -164,29 +179,27 @@ class _N42SearchBarState extends State<N42SearchBar> {
     );
   }
 
-  Widget _buildReadOnlySearch(bool isDark) {
+  Widget _buildReadOnlySearch(Color iconColor) {
     final hint = widget.hintText ?? S.of(context)?.commonSearch ?? 'Search';
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(
-          Icons.search,
-          size: 18,
-          color: AppColors.textTertiary,
-        ),
+        Icon(Icons.search_rounded, size: 18, color: iconColor),
         const SizedBox(width: 6),
-        Text(
-          hint,
-          style: const TextStyle(
-            fontSize: 14,
-            color: AppColors.textTertiary,
+        // Flexible 防止超长 hintText 撑破搜索栏
+        Flexible(
+          child: Text(
+            hint,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodySmall.copyWith(color: iconColor),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEditableSearch(bool isDark) {
+  Widget _buildEditableSearch(bool isDark, Color iconColor) {
     final hint = widget.hintText ?? S.of(context)?.commonSearch ?? 'Search';
     return TextField(
       controller: _controller,
@@ -195,40 +208,39 @@ class _N42SearchBarState extends State<N42SearchBar> {
       autofocus: widget.autofocus,
       textInputAction: TextInputAction.search,
       onSubmitted: widget.onSubmitted,
-      style: TextStyle(
-        fontSize: 14,
+      style: AppTextStyles.bodyMedium.copyWith(
         color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
       ),
+      cursorColor: AppColors.primary,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(
-          fontSize: 14,
-          color: AppColors.textTertiary,
-        ),
-        prefixIcon: const Icon(
-          Icons.search,
-          size: 18,
-          color: AppColors.textTertiary,
-        ),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(color: iconColor),
+        prefixIcon: Icon(Icons.search_rounded, size: 18, color: iconColor),
         prefixIconConstraints: const BoxConstraints(
           minWidth: 36,
           minHeight: 36,
         ),
         suffixIcon: _showClear
-            ? GestureDetector(
-                onTap: _onClear,
-                child: const Icon(
-                  Icons.cancel,
-                  size: 18,
-                  color: AppColors.textTertiary,
+            ? IconButton(
+                onPressed: _onClear,
+                icon: Icon(Icons.cancel, size: 18, color: iconColor),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 36,
+                  minHeight: 36,
                 ),
+                splashRadius: 18,
               )
             : null,
         suffixIconConstraints: const BoxConstraints(
           minWidth: 36,
           minHeight: 36,
         ),
+        filled: false,
         border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        isDense: true,
         contentPadding: const EdgeInsets.symmetric(vertical: 8),
       ),
     );
@@ -243,7 +255,10 @@ class N42SearchBarContainer extends StatelessWidget {
   const N42SearchBarContainer({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    this.padding = const EdgeInsets.symmetric(
+      horizontal: AppDimensions.listItemPadding,
+      vertical: AppDimensions.spacingS,
+    ),
   });
 
   @override
