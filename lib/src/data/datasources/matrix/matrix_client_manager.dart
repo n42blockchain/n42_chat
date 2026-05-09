@@ -121,26 +121,23 @@ class MatrixClientManager {
     try {
       _syncWaitTimeout = config?.syncTimeout ?? const Duration(seconds: 3);
 
-      // 初始化 vodozemac 加密后端（必须在 Client.init() 之前）
-      // flutter_rust_bridge 不允许重复初始化，需要单独跟踪状态
-      if (!_vodozemacInitialized) {
-        await vodozemac.init();
+      // 三个独立 I/O 并行：vodozemac FFI init（~50-200ms）、数据库路径解析
+      // （path_provider channel）、隐私配置读取（SharedPreferences）。
+      // vodozemac 必须在 Client.init() 之前完成，但与 path 解析、prefs 读取
+      // 完全无依赖。`null` 表示该步骤无 I/O，跳过 await 也省一次 microtask。
+      final vodozemacFuture = _vodozemacInitialized ? null : vodozemac.init();
+      final dbPathFuture = databasePath == null
+          ? _getDefaultDatabasePath()
+          : null;
+      final privacySettingsFuture =
+          preferencesDataSource?.getPrivacySettingsModel();
+
+      if (vodozemacFuture != null) {
+        await vodozemacFuture;
         _vodozemacInitialized = true;
         debugLog('MatrixClientManager: vodozemac initialized');
-      } else {
-        debugLog(
-          'MatrixClientManager: vodozemac already initialized, skipping',
-        );
       }
-
-      // 获取数据库路径
-      String dbPath;
-      if (databasePath != null) {
-        dbPath = databasePath;
-      } else {
-        dbPath = await _getDefaultDatabasePath();
-      }
-
+      final dbPath = databasePath ?? await dbPathFuture!;
       debugLog('MatrixClientManager: Using database path: $dbPath');
 
       // 确保数据库目录存在（仅在非 Web 平台）
@@ -188,8 +185,7 @@ class MatrixClientManager {
         ),
       );
       final privacySettings =
-          await preferencesDataSource?.getPrivacySettingsModel() ??
-          const PrivacySettings();
+          await privacySettingsFuture ?? const PrivacySettings();
       _swapManagedHttpClient(
         createPrivacyAwareHttpClient(settings: privacySettings),
       );

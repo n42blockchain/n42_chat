@@ -15,3 +15,20 @@ import 'debug_log_impl_stub.dart'
 void debugLog(String message) {
   impl.debugLog(message);
 }
+
+/// 推送日志统一前缀。日志中的 `tag` 用于 grep（如 `INIT_OK`、`REG_FAIL`）。
+void pushLog(String tag, String message) {
+  impl.debugLog('[PUSH_$tag] $message');
+}
+
+/// 创建带固定前缀的日志函数。统一各域日志格式，便于 grep。
+///
+/// ```dart
+/// final authLog = taggedLog('AuthRepository');
+/// authLog('login: ok');  // 输出 'AuthRepository: login: ok'
+/// ```
+void Function(String) taggedLog(String tag) =>
+    (String message) => impl.debugLog('$tag: $message');
+
+/// 各域常用 tag 实例。新增前先确认 ≥5 处 `debugLog('Foo: ...')` 用法。
+final void Function(String) authLog = taggedLog('AuthRepository');

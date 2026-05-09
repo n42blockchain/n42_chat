@@ -113,7 +113,7 @@ class AuthRepositoryImpl implements IAuthRepository {
           homeserver: homeserver,
           username: username,
         );
-        debugLog('AuthRepository: Credentials saved for auto-login');
+        authLog('Credentials saved for auto-login');
       } else {
         // 清除之前保存的凭据
         await _secureStorage.clearCredentials();
@@ -121,12 +121,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       _startMonitoringLoginState();
 
-      // 后台启动同步 —— 不阻塞登录返回，本地缓存数据立即可用
-      unawaited(
-        _authDataSource.clientManager.startSync().catchError((Object e) {
-          debugLog('AuthRepository: Background sync error: $e');
-        }),
-      );
+      _kickOffBackgroundSync();
 
       // 通知登录状态变化
       if (!_isDisposed) _loginStateController.add(true);
@@ -136,13 +131,13 @@ class AuthRepositoryImpl implements IAuthRepository {
       final user =
           userProfile ?? UserEntity(userId: userId, displayName: username);
 
-      debugLog('AuthRepository: Login successful - ${user.userId}');
+      authLog('Login successful - ${user.userId}');
       return AuthResult.success(user);
     } on MatrixException catch (e) {
-      debugLog('AuthRepository: Login failed - ${e.errorMessage}');
+      authLog('Login failed - ${e.errorMessage}');
       return _handleMatrixError(e);
     } catch (e) {
-      debugLog('AuthRepository: Login error - $e');
+      authLog('Login error - $e');
       return AuthResult.failure(
         '登录失败: ${e.toString()}',
         type: AuthErrorType.unknown,
@@ -187,12 +182,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       _startMonitoringLoginState();
 
-      // 后台启动同步 —— 不阻塞会话恢复，本地缓存数据立即可用
-      unawaited(
-        _authDataSource.clientManager.startSync().catchError((Object e) {
-          debugLog('AuthRepository: Background sync error: $e');
-        }),
-      );
+      _kickOffBackgroundSync();
 
       if (!_isDisposed) _loginStateController.add(true);
 
@@ -203,7 +193,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       return AuthResult.success(user);
     } catch (e) {
-      debugLog('AuthRepository: Token login failed - $e');
+      authLog('Token login failed - $e');
       return AuthResult.failure('会话恢复失败', type: AuthErrorType.tokenExpired);
     } finally {
       _isAuthenticating = false;
@@ -227,18 +217,13 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (_authDataSource.isLoggedIn) {
         _clearCachedUserProfile();
         final sdkUserId = _authDataSource.userId;
-        debugLog(
-          'AuthRepository: Matrix SDK already logged in as $sdkUserId, fast restore',
+        authLog(
+          'Matrix SDK already logged in as $sdkUserId, fast restore',
         );
 
         _startMonitoringLoginState();
 
-        // 后台启动同步，不阻塞会话恢复
-        unawaited(
-          _authDataSource.clientManager.startSync().catchError((Object e) {
-            debugLog('AuthRepository: Background sync error: $e');
-          }),
-        );
+        _kickOffBackgroundSync();
 
         if (!_isDisposed) _loginStateController.add(true);
 
@@ -263,9 +248,7 @@ class AuthRepositoryImpl implements IAuthRepository {
               displayName:
                   sdkUserId?.split(':').first.replaceFirst('@', '') ?? '',
             );
-        debugLog(
-          'AuthRepository: Session restored (fast path) - ${user.userId}',
-        );
+        authLog('Session restored (fast path) - ${user.userId}');
         return AuthResult.success(user);
       }
 
@@ -281,7 +264,7 @@ class AuthRepositoryImpl implements IAuthRepository {
             accessToken != null &&
             userId != null &&
             deviceId != null) {
-          debugLog('AuthRepository: Trying to restore with token...');
+          authLog('Trying to restore with token...');
           final result = await loginWithToken(
             homeserver: homeserver,
             accessToken: accessToken,
@@ -290,23 +273,19 @@ class AuthRepositoryImpl implements IAuthRepository {
           );
 
           if (result.success) {
-            debugLog('AuthRepository: Session restored with token');
+            authLog('Session restored with token');
             return result;
           }
 
-          debugLog(
-            'AuthRepository: Token restore failed, trying credentials...',
-          );
+          authLog('Token restore failed, trying credentials');
         }
       }
 
       // Token 恢复失败，要求重新认证（仿微信策略：不自动重试密码登录）
-      debugLog(
-        'AuthRepository: No valid session found, re-authentication required',
-      );
+      authLog('No valid session found, re-authentication required');
       return AuthResult.notLoggedIn();
     } catch (e) {
-      debugLog('AuthRepository: Restore session failed - $e');
+      authLog('Restore session failed - $e');
       return AuthResult.failure('会话恢复失败', type: AuthErrorType.tokenExpired);
     } finally {
       _isAuthenticating = false;
@@ -338,9 +317,9 @@ class AuthRepositoryImpl implements IAuthRepository {
       final isBiometricEnabled = await _secureStorage.isBiometricEnabled();
       if (!isBiometricEnabled) {
         await _secureStorage.clearCredentials();
-        debugLog('AuthRepository: Credentials cleared (biometric not enabled)');
+        authLog('Credentials cleared (biometric not enabled)');
       } else {
-        debugLog('AuthRepository: Credentials preserved for biometric login');
+        authLog('Credentials preserved for biometric login');
       }
 
       // 清除缓存的用户资料
@@ -349,9 +328,9 @@ class AuthRepositoryImpl implements IAuthRepository {
       _cachedDisplayName = null;
 
       if (!_isDisposed) _loginStateController.add(false);
-      debugLog('AuthRepository: Logout successful');
+      authLog('Logout successful');
     } catch (e) {
-      debugLog('AuthRepository: Logout error - $e');
+      authLog('Logout error - $e');
       // 即使出错也清除本地会话
       await _secureStorage.clearSession();
       // 出错时不清除凭据，保守处理
@@ -393,12 +372,7 @@ class AuthRepositoryImpl implements IAuthRepository {
           deviceId: deviceId,
         );
 
-        // 后台启动同步，不阻塞注册成功后的返回
-        unawaited(
-          _authDataSource.clientManager.startSync().catchError((Object e) {
-            debugLog('AuthRepository: Background sync error: $e');
-          }),
-        );
+        _kickOffBackgroundSync();
         if (!_isDisposed) _loginStateController.add(true);
 
         final user = UserEntity(userId: userId, displayName: username);
@@ -436,7 +410,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         registrationToken: registrationToken,
       );
     } catch (e) {
-      debugLog('AuthRepository: Anonymous registration failed - $e');
+      authLog('Anonymous registration failed - $e');
       return AuthResult.failure('匿名注册失败: $e', type: AuthErrorType.unknown);
     }
   }
@@ -493,7 +467,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         supportsRegistration: supportsRegistration,
       );
     } catch (e) {
-      debugLog('AuthRepository: Check homeserver failed - $e');
+      authLog('Check homeserver failed - $e');
       throw HomeserverCheckException('无法连接到服务器: $e');
     }
   }
@@ -533,7 +507,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       await _syncStoredAccountProfile();
       return _buildCurrentUserEntity(userId);
     } catch (e) {
-      debugLog('AuthRepository: Get profile failed - $e');
+      authLog('Get profile failed - $e');
       return currentUser;
     }
   }
@@ -557,19 +531,17 @@ class AuthRepositoryImpl implements IAuthRepository {
         clearNftAvatar: true,
       );
       if (!clearedNftAvatar) {
-        debugLog(
-          'AuthRepository: Avatar uploaded but failed to clear NFT avatar metadata',
-        );
+        authLog('Avatar uploaded but failed to clear NFT avatar metadata');
         return false;
       }
-      debugLog('AuthRepository: Avatar updated successfully');
+      authLog('Avatar updated successfully');
 
       // 刷新用户资料以更新缓存的头像 URL
       await getCurrentUserProfile();
 
       return true;
     } catch (e) {
-      debugLog('AuthRepository: Update avatar failed - $e');
+      authLog('Update avatar failed - $e');
       return false;
     }
   }
@@ -582,10 +554,10 @@ class AuthRepositoryImpl implements IAuthRepository {
       await _authDataSource.clientManager.setDisplayName(displayName);
       // 更新缓存
       _cachedDisplayName = displayName;
-      debugLog('AuthRepository: Display name updated to: $displayName');
+      authLog('Display name updated to: $displayName');
       return true;
     } catch (e) {
-      debugLog('AuthRepository: Update display name failed - $e');
+      authLog('Update display name failed - $e');
       return false;
     }
   }
@@ -647,10 +619,10 @@ class AuthRepositoryImpl implements IAuthRepository {
         await _syncPokeTextToRooms(pokeText);
       }
 
-      debugLog('AuthRepository: Profile data updated (${newData.keys.length} fields)');
+      authLog('Profile data updated (${newData.keys.length} fields)');
       return true;
     } catch (e) {
-      debugLog('AuthRepository: Update profile data failed - $e');
+      authLog('Update profile data failed - $e');
       return false;
     }
   }
@@ -658,8 +630,8 @@ class AuthRepositoryImpl implements IAuthRepository {
   /// 将 pokeText 同步到所有已加入的房间
   Future<void> _syncPokeTextToRooms(String pokeText) async {
     if (_activePokeSyncs >= _maxConcurrentPokeSyncs) {
-      debugLog(
-        'AuthRepository: Skipping poke sync, too many concurrent syncs ($_activePokeSyncs)',
+      authLog(
+        'Skipping poke sync, too many concurrent syncs ($_activePokeSyncs)',
       );
       return;
     }
@@ -682,16 +654,14 @@ class AuthRepositoryImpl implements IAuthRepository {
             client.userID!,
             {'pokeText': pokeText},
           );
-          debugLog('AuthRepository: Synced pokeText to room ${room.id}');
+          authLog('Synced pokeText to room ${room.id}');
         } catch (e) {
           // 某些房间可能没有权限设置状态，忽略错误
-          debugLog(
-            'AuthRepository: Failed to sync pokeText to room ${room.id}: $e',
-          );
+          authLog('Failed to sync pokeText to room ${room.id}: $e');
         }
       }
     } catch (e) {
-      debugLog('AuthRepository: Failed to sync pokeText to rooms: $e');
+      authLog('Failed to sync pokeText to rooms: $e');
     } finally {
       _activePokeSyncs--;
     }
@@ -699,32 +669,30 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   Future<Map<String, dynamic>?> getUserProfileData() async {
-    debugLog('AuthRepository: getUserProfileData called');
+    authLog('getUserProfileData called');
     if (!isLoggedIn) {
-      debugLog('AuthRepository: Not logged in, returning null');
+      authLog('Not logged in, returning null');
       return null;
     }
 
     final client = _authDataSource.clientManager.client;
     if (client == null) {
-      debugLog('AuthRepository: Client is null, returning null');
+      authLog('Client is null, returning null');
       return null;
     }
 
     try {
-      debugLog('AuthRepository: Getting account data for ${client.userID}');
+      authLog('Getting account data for ${client.userID}');
       final data = await client.getAccountData(
         client.userID!,
         'n42.user.profile',
       );
 
       _cachedProfileData = data;
-      debugLog(
-        'AuthRepository: Profile data loaded (${data.keys.length} fields)',
-      );
+      authLog('Profile data loaded (${data.keys.length} fields)');
       return data;
     } catch (e) {
-      debugLog('AuthRepository: Get profile data failed - $e');
+      authLog('Get profile data failed - $e');
       return null;
     }
   }
@@ -739,7 +707,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String email,
   }) async {
     try {
-      debugLog('AuthRepository: Requesting password reset');
+      authLog('Requesting password reset');
 
       // 调用 Matrix 邮箱重置 API
       // POST /_matrix/client/v3/account/password/email/requestToken
@@ -748,12 +716,10 @@ class AuthRepositoryImpl implements IAuthRepository {
         email: email,
       );
 
-      debugLog(
-        'AuthRepository: Password reset email ${success ? 'sent' : 'failed'}',
-      );
+      authLog('Password reset email ${success ? 'sent' : 'failed'}');
       return success;
     } catch (e) {
-      debugLog('AuthRepository: Request password reset failed - $e');
+      authLog('Request password reset failed - $e');
       rethrow;
     }
   }
@@ -766,7 +732,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String newPassword,
   }) async {
     try {
-      debugLog('AuthRepository: Confirming password reset');
+      authLog('Confirming password reset');
 
       // 调用重置密码确认 API
       final success = await _authDataSource.confirmPasswordReset(
@@ -776,12 +742,10 @@ class AuthRepositoryImpl implements IAuthRepository {
         newPassword: newPassword,
       );
 
-      debugLog(
-        'AuthRepository: Password reset ${success ? 'confirmed' : 'failed'}',
-      );
+      authLog('Password reset ${success ? 'confirmed' : 'failed'}');
       return success;
     } catch (e) {
-      debugLog('AuthRepository: Confirm password reset failed - $e');
+      authLog('Confirm password reset failed - $e');
       rethrow;
     }
   }
@@ -796,7 +760,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
 
     try {
-      debugLog('AuthRepository: Changing password');
+      authLog('Changing password');
 
       // 调用 Matrix 修改密码 API
       final success = await _authDataSource.changeUserPassword(
@@ -808,12 +772,12 @@ class AuthRepositoryImpl implements IAuthRepository {
         // 修改密码成功后清除保存的凭据
         // 下次登录需要使用新密码
         await _secureStorage.clearCredentials();
-        debugLog('AuthRepository: Password changed, credentials cleared');
+        authLog('Password changed, credentials cleared');
       }
 
       return success;
     } catch (e) {
-      debugLog('AuthRepository: Change password failed - $e');
+      authLog('Change password failed - $e');
       rethrow;
     }
   }
@@ -833,7 +797,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     Map<String, dynamic>? extra,
   }) async {
     try {
-      debugLog('AuthRepository: Social login with $provider');
+      authLog('Social login with $provider');
 
       final primaryCredential =
           provider == 'google' &&
@@ -906,19 +870,19 @@ class AuthRepositoryImpl implements IAuthRepository {
         );
 
         if (matrixResult.success) {
-          debugLog('AuthRepository: Social login -> Matrix login successful');
+          authLog('Social login -> Matrix login successful');
           return matrixResult;
         }
       }
 
       // 社交登录未返回 Matrix 凭证，无法建立 Matrix 会话
-      debugLog('AuthRepository: Social login missing Matrix credentials');
+      authLog('Social login missing Matrix credentials');
       return AuthResult.failure(
         '社交登录成功但未获得 Matrix 凭证，请联系客服',
         type: AuthErrorType.serverError,
       );
     } catch (e) {
-      debugLog('AuthRepository: Social login failed - $e');
+      authLog('Social login failed - $e');
       return AuthResult.failure('社交登录失败: $e', type: AuthErrorType.unknown);
     }
   }
@@ -957,11 +921,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       _startMonitoringLoginState();
 
-      unawaited(
-        _authDataSource.clientManager.startSync().catchError((Object e) {
-          debugLog('AuthRepository: Background sync error: $e');
-        }),
-      );
+      _kickOffBackgroundSync();
 
       if (!_isDisposed) _loginStateController.add(true);
 
@@ -973,13 +933,13 @@ class AuthRepositoryImpl implements IAuthRepository {
             displayName: userId.split(':').first.replaceFirst('@', ''),
           );
 
-      debugLog('AuthRepository: Login token successful - ${user.userId}');
+      authLog('Login token successful - ${user.userId}');
       return AuthResult.success(user);
     } on MatrixException catch (e) {
-      debugLog('AuthRepository: Login token failed - ${e.errorMessage}');
+      authLog('Login token failed - ${e.errorMessage}');
       return _handleMatrixError(e);
     } catch (e) {
-      debugLog('AuthRepository: Login token error - $e');
+      authLog('Login token error - $e');
       return AuthResult.failure(
         'SSO 登录失败: ${e.toString()}',
         type: AuthErrorType.unknown,
@@ -999,7 +959,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     String? providerId,
   }) async {
     try {
-      debugLog('AuthRepository: Starting SSO login');
+      authLog('Starting SSO login');
 
       // 检查服务器是否支持 SSO
       final homeserverInfo = await checkHomeserver(homeserver);
@@ -1012,7 +972,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       // SSO 登录成功标志，实际的浏览器跳转由 UI 层处理
       // 这里只是检查服务器是否支持并返回成功
-      debugLog('AuthRepository: SSO login ready, homeserver supports SSO');
+      authLog('SSO login ready, homeserver supports SSO');
 
       // 返回一个特殊的结果表示需要浏览器完成
       return AuthResult.failure(
@@ -1020,7 +980,7 @@ class AuthRepositoryImpl implements IAuthRepository {
         type: AuthErrorType.additionalAuthRequired,
       );
     } catch (e) {
-      debugLog('AuthRepository: SSO login failed - $e');
+      authLog('SSO login failed - $e');
       return AuthResult.failure('SSO 登录失败: $e', type: AuthErrorType.unknown);
     }
   }
@@ -1039,7 +999,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
 
     try {
-      debugLog('AuthRepository: Requesting change email');
+      authLog('Requesting change email');
 
       final client = _authDataSource.clientManager.client;
       if (client == null) {
@@ -1074,10 +1034,10 @@ class AuthRepositoryImpl implements IAuthRepository {
         DateTime.now().add(const Duration(hours: 1)).toIso8601String(),
       );
 
-      debugLog('AuthRepository: Email verification sent, sid: ${response.sid}');
+      authLog('Email verification sent, sid: ${response.sid}');
       return true;
     } catch (e) {
-      debugLog('AuthRepository: Request change email failed - $e');
+      authLog('Request change email failed - $e');
       rethrow;
     }
   }
@@ -1092,7 +1052,7 @@ class AuthRepositoryImpl implements IAuthRepository {
     }
 
     try {
-      debugLog('AuthRepository: Confirming email change');
+      authLog('Confirming email change');
 
       final client = _authDataSource.clientManager.client;
       if (client == null) {
@@ -1136,10 +1096,10 @@ class AuthRepositoryImpl implements IAuthRepository {
       await _secureStorage.delete('email_change_sid');
       await _secureStorage.delete('email_change_expires_at');
 
-      debugLog('AuthRepository: Email changed successfully');
+      authLog('Email changed successfully');
       return true;
     } catch (e) {
-      debugLog('AuthRepository: Confirm change email failed - $e');
+      authLog('Confirm change email failed - $e');
       rethrow;
     }
   }
@@ -1163,7 +1123,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (threePids != null) {
         for (final threePid in threePids) {
           if (threePid.medium == ThirdPartyIdentifierMedium.email) {
-            debugLog('AuthRepository: Found bound email');
+            authLog('Found bound email');
             return threePid.address;
           }
         }
@@ -1171,7 +1131,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       return null;
     } catch (e) {
-      debugLog('AuthRepository: Get bound email failed - $e');
+      authLog('Get bound email failed - $e');
       return null;
     }
   }
@@ -1192,7 +1152,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (threePids != null) {
         for (final threePid in threePids) {
           if (threePid.medium == ThirdPartyIdentifierMedium.msisdn) {
-            debugLog('AuthRepository: Found bound phone: ${threePid.address}');
+            authLog('Found bound phone: ${threePid.address}');
             return threePid.address;
           }
         }
@@ -1200,7 +1160,7 @@ class AuthRepositoryImpl implements IAuthRepository {
 
       return null;
     } catch (e) {
-      debugLog('AuthRepository: Get bound phone failed - $e');
+      authLog('Get bound phone failed - $e');
       return null;
     }
   }
@@ -1428,9 +1388,8 @@ class AuthRepositoryImpl implements IAuthRepository {
   }
 
   Future<void> _handleSdkLogout(LoginState loginState) async {
-    debugLog(
-      'AuthRepository: Matrix SDK reported $loginState '
-      '(token expired or revoked), clearing local session',
+    authLog(
+      'Matrix SDK reported $loginState (token expired or revoked), clearing local session',
     );
 
     await _secureStorage.clearSession();
@@ -1450,6 +1409,16 @@ class AuthRepositoryImpl implements IAuthRepository {
       return;
     }
     await _handleSdkLogout(pending);
+  }
+
+  /// 后台启动同步——不阻塞认证返回，本地缓存数据立即可用。
+  /// `startSync()` 自身幂等（重复调用只是把 backgroundSync 设为 true）。
+  void _kickOffBackgroundSync() {
+    unawaited(
+      _authDataSource.clientManager.startSync().catchError((Object e) {
+        authLog('Background sync error: $e');
+      }),
+    );
   }
 
   /// 开始监听 Matrix SDK 的登录状态变化

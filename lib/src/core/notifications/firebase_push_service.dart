@@ -15,7 +15,6 @@ import 'package:uuid/uuid.dart';
 import '../../services/voip/call_manager.dart';
 import '../../services/voip/incoming_call_ringtone_preference.dart';
 import '../../data/datasources/local/preferences_datasource.dart';
-import '../../domain/entities/user_profile_entity.dart' as profile_entity;
 import '../utils/conversation_notification_utils.dart';
 import 'push_notification_service.dart';
 import '../utils/debug_log.dart';
@@ -111,41 +110,10 @@ class FirebasePushService implements IPushNotificationService {
     this.onNotificationTap,
   });
 
-  static NotificationConfig _notificationConfigFromSettings(
-    profile_entity.NotificationSettings settings,
-  ) {
-    return NotificationConfig(
-      enabled: settings.enabled,
-      showPreview: settings.showPreview,
-      playSound: settings.playSound,
-      vibrate: settings.vibrate,
-      doNotDisturb: settings.doNotDisturb,
-      dndStartTime: _parseStoredTimeOfDay(settings.doNotDisturbStart),
-      dndEndTime: _parseStoredTimeOfDay(settings.doNotDisturbEnd),
-      privacyMode: settings.privacyMode,
-    );
-  }
-
-  static TimeOfDay? _parseStoredTimeOfDay(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return null;
-    }
-    final parts = value.split(':');
-    if (parts.length != 2) {
-      return null;
-    }
-    final hour = int.tryParse(parts[0]);
-    final minute = int.tryParse(parts[1]);
-    if (hour == null || minute == null) {
-      return null;
-    }
-    return TimeOfDay(hour: hour, minute: minute);
-  }
-
   static Future<NotificationConfig> _loadPersistedNotificationConfig() async {
     final settings = await PreferencesDataSource()
         .getNotificationSettingsModel();
-    return _notificationConfigFromSettings(settings);
+    return NotificationConfig.fromSettings(settings);
   }
 
   static AndroidNotificationChannel _androidMessageChannelForConfig(
@@ -930,21 +898,22 @@ class FirebasePushService implements IPushNotificationService {
   @override
   Future<void> registerForPush() async {
     if (_isRegistering) {
-      debugLog('[PUSH_REG] Push registration already in progress, waiting...');
+      pushLog('REG', 'Push registration already in progress, waiting');
       await _registrationCompleter?.future;
       return;
     }
     _isRegistering = true;
     _registrationCompleter = Completer<void>();
-    debugLog('[PUSH_REG] Starting push registration...');
+    pushLog('REG', 'Starting push registration');
     try {
       await _registerForPushImpl();
     } finally {
       _isRegistering = false;
       _registrationCompleter?.complete();
       _registrationCompleter = null;
-      debugLog(
-        '[PUSH_REG] Push registration flow completed (verified=$_isPusherVerified)',
+      pushLog(
+        'REG',
+        'Push registration flow completed (verified=$_isPusherVerified)',
       );
     }
   }
@@ -952,16 +921,16 @@ class FirebasePushService implements IPushNotificationService {
   Future<void> _registerForPushImpl() async {
     // 如果 FCM Token 还没有获取到，尝试获取
     if (_fcmToken == null) {
-      debugLog('[PUSH_REG] FCM token is null, attempting to get token...');
+      pushLog('REG', 'FCM token is null, attempting to get token');
       _fcmToken = await _getFCMTokenWithRetry(maxRetries: 2);
     }
 
     if (_fcmToken == null) {
-      debugLog('[PUSH_REG_FAIL] Cannot register push - FCM token is null');
+      pushLog('REG_FAIL', 'Cannot register push - FCM token is null');
       return;
     }
     if (pushGatewayUrl == null) {
-      debugLog('[PUSH_REG_FAIL] Cannot register push - pushGatewayUrl is null');
+      pushLog('REG_FAIL', 'Cannot register push - pushGatewayUrl is null');
       return;
     }
 
@@ -971,10 +940,10 @@ class FirebasePushService implements IPushNotificationService {
     final String pushkey;
     if (Platform.isIOS && _apnsToken != null) {
       pushkey = _apnsToken!;
-      debugLog('[PUSH_REG] iOS using APNs token as pushkey');
+      pushLog('REG', 'iOS using APNs token as pushkey');
     } else {
       pushkey = _fcmToken!;
-      debugLog('[PUSH_REG] Using FCM token as pushkey');
+      pushLog('REG', 'Using FCM token as pushkey');
     }
 
     final previousPushkey = await _getStoredPushkey();
@@ -984,24 +953,21 @@ class FirebasePushService implements IPushNotificationService {
 
     // 指数退避重试：最多 3 次（初始 + 2 次重试），间隔 4s、8s
     const maxAttempts = 3;
-    debugLog(
-      '[PUSH_REG] Config: appId=$appId, type=$pushkeyType, '
-      'gateway=$pushGatewayUrl, pushkey=${_truncateToken(pushkey)}...',
+    pushLog(
+      'REG',
+      'Config: appId=$appId, type=$pushkeyType, '
+      'gateway=$pushGatewayUrl, pushkey=${_truncateToken(pushkey)}',
     );
 
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       // 每次重试前检查登录状态
       if (!_client.isLogged()) {
-        debugLog(
-          '[PUSH_REG_FAIL] Client not logged in, aborting push registration',
-        );
+        pushLog('REG_FAIL', 'Client not logged in, aborting push registration');
         return;
       }
 
       try {
-        debugLog(
-          '[PUSH_REG] Registering pusher (attempt $attempt/$maxAttempts)...',
-        );
+        pushLog('REG', 'Registering pusher (attempt $attempt/$maxAttempts)');
 
         // 注册 Pusher 到 Matrix 服务器
         await _client.postPusher(
@@ -1022,9 +988,7 @@ class FirebasePushService implements IPushNotificationService {
           ),
           append: false,
         );
-        debugLog(
-          '[PUSH_REG_OK] Pusher registered successfully on attempt $attempt',
-        );
+        pushLog('REG_OK', 'Pusher registered successfully on attempt $attempt');
 
         // 注册成功后验证 Pusher 是否确实存在于服务器
         await _verifyPusherRegistration(pushkey);
@@ -1032,14 +996,15 @@ class FirebasePushService implements IPushNotificationService {
         await _storePushkey(pushkey);
         return; // 成功，退出重试循环
       } catch (e) {
-        debugLog('[PUSH_REG_FAIL] Attempt $attempt/$maxAttempts failed: $e');
+        pushLog('REG_FAIL', 'Attempt $attempt/$maxAttempts failed: $e');
         if (attempt < maxAttempts) {
           final delay = Duration(seconds: 4 * attempt); // 4s, 8s
-          debugLog('[PUSH_REG] Retrying in ${delay.inSeconds}s...');
+          pushLog('REG', 'Retrying in ${delay.inSeconds}s');
           await Future<void>.delayed(delay);
         } else {
-          debugLog(
-            '[PUSH_REG_FAIL] All $maxAttempts attempts exhausted, push registration failed',
+          pushLog(
+            'REG_FAIL',
+            'All $maxAttempts attempts exhausted, push registration failed',
           );
         }
       }
@@ -1053,7 +1018,7 @@ class FirebasePushService implements IPushNotificationService {
     try {
       final pushers = await _client.getPushers();
       if (pushers == null) {
-        debugLog('[PUSH_VERIFY_WARN] getPushers() returned null');
+        pushLog('VERIFY_WARN', 'getPushers() returned null');
         _isPusherVerified = false;
         return;
       }
@@ -1064,15 +1029,16 @@ class FirebasePushService implements IPushNotificationService {
 
       _isPusherVerified = found;
       if (found) {
-        debugLog('[PUSH_VERIFY_OK] Pusher verified on server (appId=$appId)');
+        pushLog('VERIFY_OK', 'Pusher verified on server (appId=$appId)');
       } else {
-        debugLog(
-          '[PUSH_VERIFY_FAIL] Pusher NOT found on server after registration! '
+        pushLog(
+          'VERIFY_FAIL',
+          'Pusher NOT found on server after registration! '
           'Registered ${pushers.length} pushers, none match appId=$appId',
         );
       }
     } catch (e) {
-      debugLog('[PUSH_VERIFY_FAIL] Verification failed: $e');
+      pushLog('VERIFY_FAIL', 'Verification failed: $e');
       _isPusherVerified = false;
     }
   }
@@ -1122,13 +1088,14 @@ class FirebasePushService implements IPushNotificationService {
   /// 清除验证状态并重新执行注册流程。
   /// 如果当前有注册正在进行，等待其完成后再触发新的注册。
   Future<void> forceReRegister() async {
-    debugLog('[PUSH_REG] Force re-register requested');
+    pushLog('REG', 'Force re-register requested');
     _isPusherVerified = false;
 
     // 如果正在注册中，等待其完成后再触发（Completer 替代 busy-wait）
     if (_isRegistering) {
-      debugLog(
-        '[PUSH_REG] Waiting for current registration to complete before force re-register...',
+      pushLog(
+        'REG',
+        'Waiting for current registration to complete before force re-register',
       );
       await _registrationCompleter?.future;
     }
