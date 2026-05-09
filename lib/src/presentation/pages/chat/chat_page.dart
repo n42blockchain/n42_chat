@@ -38,6 +38,8 @@ import '../../../domain/entities/red_packet_entity.dart';
 import '../media/media_editor_page.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -1292,7 +1294,6 @@ class _BotResultSheet extends StatelessWidget {
               ),
             ),
           ),
-          // 标题行
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 8, 0),
             child: Row(
@@ -1300,22 +1301,27 @@ class _BotResultSheet extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      height: 1.3,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20),
+                  icon: const Icon(Icons.close_rounded, size: 20),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
           const Divider(height: 1),
-          // 内容（可滚动）
           Flexible(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),

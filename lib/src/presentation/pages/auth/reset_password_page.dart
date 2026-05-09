@@ -6,6 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
@@ -133,8 +136,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textColor),
+          icon: Icon(
+            AppIcons.back,
+            color: textColor,
+            size: AppDimensions.iconSizeSmall,
+          ),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () {
             if (_currentStep > 0) {
               setState(() {
@@ -147,11 +156,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         ),
         title: Text(
           S.of(context)?.authResetPassword ?? 'Reset Password',
-          style: TextStyle(
-            color: textColor,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.headlineSmall.copyWith(color: textColor),
         ),
         centerTitle: true,
       ),

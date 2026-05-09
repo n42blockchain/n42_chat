@@ -44,12 +44,13 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                   Flexible(
                     child: Text(
                       _getDisplayName(),
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                      ),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.headlineSmall.copyWith(
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimary,
+                      ),
                     ),
                   ),
                 ],
@@ -59,9 +60,13 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                   chatState.isChannel
                       ? '${widget.conversation.memberCount} ${S.of(context)?.channelSubscribers ?? 'subscribers'}'
                       : (S.of(context)?.commonMemberCount(widget.conversation.memberCount) ?? '${widget.conversation.memberCount} members'),
-                  style: const TextStyle(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.captionSmall.copyWith(
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
                     fontSize: 12,
-                    color: AppColors.textSecondary,
                   ),
                 ),
             ],
@@ -125,40 +130,36 @@ extension _ChatPageAppBarMethods on _ChatPageState {
 
   /// 构建多选模式下的 AppBar
   PreferredSizeWidget _buildMultiSelectAppBar(bool isDark) {
+    final fgColor =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     return AppBar(
       backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      elevation: 0,
+      scrolledUnderElevation: 0,
       leading: IconButton(
-        icon: Icon(
-          Icons.close,
-          color: isDark ? Colors.white : Colors.black,
-        ),
+        icon: Icon(AppIcons.close, color: fgColor),
+        tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
         onPressed: _exitMultiSelectMode,
       ),
       title: Text(
         _selectedMessageIds.isEmpty
             ? (S.of(context)?.chatSelectMessages ?? 'Select messages')
-            : (S.of(context)?.chatSelectedCount(_selectedMessageIds.length) ?? 'Selected ${_selectedMessageIds.length}'),
-        style: TextStyle(
-          color: isDark ? Colors.white : Colors.black,
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-        ),
+            : (S.of(context)?.chatSelectedCount(_selectedMessageIds.length) ??
+                'Selected ${_selectedMessageIds.length}'),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: AppTextStyles.headlineSmall.copyWith(color: fgColor),
       ),
       centerTitle: true,
       actions: [
-        // 全选按钮
         TextButton(
           onPressed: _selectAllMessages,
           child: Text(
             S.of(context)?.chatSelectAll ?? 'Select All',
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 14,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary),
           ),
         ),
       ],
-      elevation: 0.5,
     );
   }
 
