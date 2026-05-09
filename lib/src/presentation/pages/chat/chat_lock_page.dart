@@ -130,17 +130,27 @@ class _ChatLockPageState extends State<ChatLockPage> {
                 const SizedBox(height: 24),
                 Text(
                   l10n?.chatLockVerifyTitle ?? 'Chat locked',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   widget.chatName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,
@@ -149,8 +159,12 @@ class _ChatLockPageState extends State<ChatLockPage> {
                 const SizedBox(height: 8),
                 Text(
                   l10n?.chatLockVerifySubtitle ?? 'Verify to access this chat',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,

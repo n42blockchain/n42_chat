@@ -9,6 +9,9 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../n42_chat.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
@@ -168,17 +171,21 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textColor),
+          icon: Icon(
+            AppIcons.back,
+            color: textColor,
+            size: AppDimensions.iconSizeSmall,
+          ),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
           S.of(context)?.authRegister ?? 'Sign Up',
-          style: TextStyle(
-            color: textColor,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.headlineSmall.copyWith(color: textColor),
         ),
         centerTitle: true,
       ),
@@ -857,13 +864,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextSpan(
                   text:
                       S.of(context)?.authTermsOfService ?? 'Terms of Service',
-                  style: const TextStyle(color: AppColors.textLink),
+                  style: const TextStyle(color: AppColors.link),
                   recognizer: _termsRecognizer,
                 ),
                 TextSpan(text: S.of(context)?.authAnd ?? ' and '),
                 TextSpan(
                   text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
-                  style: const TextStyle(color: AppColors.textLink),
+                  style: const TextStyle(color: AppColors.link),
                   recognizer: _privacyRecognizer,
                 ),
               ],
@@ -928,7 +935,7 @@ class _RegisterPageState extends State<RegisterPage> {
             S.of(context)?.authLoginNow ?? 'Log In Now',
             style: const TextStyle(
               fontSize: 14,
-              color: AppColors.textLink,
+              color: AppColors.link,
               fontWeight: FontWeight.w500,
             ),
           ),

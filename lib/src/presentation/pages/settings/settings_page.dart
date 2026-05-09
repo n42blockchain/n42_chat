@@ -328,19 +328,25 @@ class SettingsPage extends StatelessWidget {
                         children: [
                           Text(
                             profile!.effectiveDisplayName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
+                              height: 1.3,
                               color: isDark
-                                  ? Colors.white
+                                  ? AppColors.textPrimaryDark
                                   : AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             profile!.userId,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 13,
+                              height: 1.3,
                               color: secondaryColor,
                             ),
                           ),
