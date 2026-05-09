@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 /// 微信风格导航栏
 ///
@@ -105,10 +108,14 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
     if (showBackButton && Navigator.of(context).canPop()) {
       return IconButton(
         icon: Icon(
-          Icons.arrow_back_ios,
+          AppIcons.back,
           color: fgColor,
-          size: 20,
+          size: AppDimensions.iconSizeSmall,
         ),
+        // 保证 44dp iOS / 48dp Material 最小可点目标
+        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        splashRadius: 22,
+        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
       );
     }
@@ -118,19 +125,14 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Widget? _buildTitle(Color fgColor) {
     if (titleWidget != null) return titleWidget;
-
-    if (title != null) {
-      return Text(
-        title!,
-        style: TextStyle(
-          color: fgColor,
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-        ),
-      );
-    }
-
-    return null;
+    if (title == null) return null;
+    // 长标题需省略，避免与 actions 重叠或换行。
+    return Text(
+      title!,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: AppTextStyles.headlineSmall.copyWith(color: fgColor),
+    );
   }
 }
 
@@ -160,22 +162,23 @@ class N42SliverAppBar extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    final fgColor =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     return SliverAppBar(
       backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
-      foregroundColor:
-          isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+      foregroundColor: fgColor,
       pinned: pinned,
       floating: floating,
       expandedHeight: expandedHeight,
       elevation: 0,
+      scrolledUnderElevation: 0,
       title: titleWidget ??
           (title != null
               ? Text(
                   title!,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.headlineSmall.copyWith(color: fgColor),
                 )
               : null),
       actions: actions,

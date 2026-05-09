@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../theme/app_colors.dart';
 
 /// BuildContext 扩展方法
 extension ContextExtension on BuildContext {
@@ -20,6 +21,30 @@ extension ContextExtension on BuildContext {
 
   /// 是否为深色模式
   bool get isDarkMode => theme.brightness == Brightness.dark;
+
+  // ============================================
+  // 品牌 token 颜色（自动深浅切换）
+  // ============================================
+
+  /// 主文字颜色（自动深浅）
+  Color get textPrimary =>
+      isDarkMode ? AppColors.textPrimaryDark : AppColors.textPrimary;
+
+  /// 次文字颜色（自动深浅）
+  Color get textSecondary =>
+      isDarkMode ? AppColors.textSecondaryDark : AppColors.textSecondary;
+
+  /// 辅助文字颜色（自动深浅）
+  Color get textTertiary =>
+      isDarkMode ? AppColors.textTertiaryDark : AppColors.textTertiary;
+
+  /// 卡片/列表项背景（自动深浅）
+  Color get surfaceColor =>
+      isDarkMode ? AppColors.surfaceDark : AppColors.surface;
+
+  /// 分割线颜色（自动深浅）
+  Color get dividerColor =>
+      isDarkMode ? AppColors.dividerDark : AppColors.divider;
 
   // ============================================
   // 屏幕尺寸

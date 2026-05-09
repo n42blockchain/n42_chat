@@ -9,6 +9,8 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_lock_service.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/story_entity.dart';
@@ -434,10 +436,10 @@ class _ConversationListPageState extends State<ConversationListPage> {
         ),
         title: Text(
           S.of(context)?.commonMessages ?? 'Messages',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.headlineSmall.copyWith(
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         actions: [
@@ -485,11 +487,15 @@ class _ConversationListPageState extends State<ConversationListPage> {
                         ),
                         child: Text(
                           unread > 99 ? '99+' : '$unread',
-                          style: const TextStyle(
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.captionSmall.copyWith(
                             color: Colors.white,
                             fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            height: 1.0,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
@@ -510,37 +516,39 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   Widget _buildSearchBar(bool isDark) {
+    final hintColor =
+        isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.listItemPadding,
+        vertical: AppDimensions.spacingS,
+      ),
       child: GestureDetector(
         onTap: widget.onSearchTap ?? _navigateToSearch,
         child: Container(
-          height: 40,
+          height: AppDimensions.searchBarHeight + 4,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF0F0F5),
-            borderRadius: BorderRadius.circular(20),
+            color: isDark ? AppColors.surfaceDark : AppColors.searchBackground,
+            borderRadius:
+                BorderRadius.circular((AppDimensions.searchBarHeight + 4) / 2),
             border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.06)
-                  : Colors.black.withValues(alpha: 0.06),
-              width: 1,
+              color: (isDark ? AppColors.dividerDark : AppColors.divider)
+                  .withValues(alpha: 0.6),
+              width: 0.5,
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.search_rounded,
-                size: 18,
-                color: isDark ? Colors.white38 : Colors.black38,
-              ),
+              Icon(Icons.search_rounded, size: 18, color: hintColor),
               const SizedBox(width: 6),
-              Text(
-                S.of(context)?.commonSearch ?? 'Search',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: isDark ? Colors.white38 : Colors.black38,
+              Flexible(
+                child: Text(
+                  S.of(context)?.commonSearch ?? 'Search',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodyMedium.copyWith(color: hintColor),
                 ),
               ),
             ],
@@ -646,57 +654,54 @@ class _ConversationListPageState extends State<ConversationListPage> {
           : null,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppDimensions.dialogRadius),
+          ),
         ),
         child: SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 拖动指示器
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
+                margin: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.spacingM,
+                ),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.black12,
+                  color: isDark
+                      ? AppColors.textTertiaryDark
+                      : AppColors.textTertiary,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-
-              // 发起群聊
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.group_add,
-                iconColor: const Color(0xFF57BE6A),
+                iconColor: AppColors.primary,
                 title:
                     S.of(context)?.conversationStartGroup ?? 'Start Group Chat',
                 onTap: () => _navigateToCreateGroup(ctx),
               ),
-
-              // 添加朋友
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.person_add,
-                iconColor: const Color(0xFF576B95),
+                iconColor: AppColors.link,
                 title: S.of(context)?.commonAddFriend ?? 'Add Friend',
                 onTap: () => _navigateToAddFriend(ctx),
               ),
-
-              // 钱包地址发消息
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.account_balance_wallet_outlined,
-                iconColor: const Color(0xFFFF9500),
+                iconColor: AppColors.warning,
                 title: S.of(context)?.sendToAddress ?? 'Send to Address',
                 onTap: () => _navigateToAddFriend(ctx),
               ),
-
-              // 扫一扫
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.qr_code_scanner,
-                iconColor: const Color(0xFF10AEFF),
+                iconColor: AppColors.info,
                 title: S.of(context)?.commonScan ?? 'Scan',
                 onTap: () {
                   Navigator.pop(ctx);
@@ -718,20 +723,17 @@ class _ConversationListPageState extends State<ConversationListPage> {
                       });
                 },
               ),
-
-              // 收付款
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.payment,
-                iconColor: const Color(0xFF09BB07),
+                iconColor: AppColors.success,
                 title: S.of(context)?.commonPayment ?? 'Payment',
                 onTap: () {
                   Navigator.pop(ctx);
                   _showComingSoon(S.of(context)?.commonPayment ?? 'Payment');
                 },
               ),
-
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
             ],
           ),
         ),
@@ -754,15 +756,16 @@ class _ConversationListPageState extends State<ConversationListPage> {
         height: 40,
         decoration: BoxDecoration(
           color: iconColor,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Icon(icon, color: Colors.white, size: 22),
       ),
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 16,
-          color: isDark ? Colors.white : Colors.black,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: AppTextStyles.bodyLarge.copyWith(
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       onTap: onTap,
@@ -821,24 +824,28 @@ class _ConversationListPageState extends State<ConversationListPage> {
           : null,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppDimensions.dialogRadius),
+          ),
         ),
         child: SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 拖动指示器
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
+                margin: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.spacingM,
+                ),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.black12,
+                  color: isDark
+                      ? AppColors.textTertiaryDark
+                      : AppColors.textTertiary,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-
               // 标记已读
               if (conversation.unreadCount > 0)
                 _buildMenuTile(
@@ -942,14 +949,19 @@ class _ConversationListPageState extends State<ConversationListPage> {
     final isDark = context.isDarkMode;
     final textColor = isDestructive
         ? AppColors.error
-        : (isDark ? Colors.white : Colors.black);
+        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
     final iconColor = isDestructive
         ? AppColors.error
-        : (isDark ? Colors.white54 : Colors.black54);
+        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
 
     return ListTile(
       leading: Icon(icon, color: iconColor),
-      title: Text(title, style: TextStyle(color: textColor)),
+      title: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: AppTextStyles.bodyLarge.copyWith(color: textColor),
+      ),
       onTap: onTap,
     );
   }

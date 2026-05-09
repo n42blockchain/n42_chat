@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 微信风格按钮组件
 ///
@@ -153,7 +155,7 @@ class N42Button extends StatelessWidget {
     final isDisabled = disabled || isLoading;
     final height = _getHeight();
     final fontSize = _getFontSize();
-    final radius = borderRadius ?? 4.0;
+    final radius = borderRadius ?? AppDimensions.buttonRadius;
 
     return SizedBox(
       width: expanded ? double.infinity : null,
@@ -251,9 +253,11 @@ class N42Button extends StatelessWidget {
 
   Widget _buildContent(double fontSize, Color color) {
     if (isLoading) {
+      // 圆圈大小 ≈ 字号 + 4，与按钮高度比例自适应。
+      final spinnerSize = fontSize + 4;
       return SizedBox(
-        width: 20,
-        height: 20,
+        width: spinnerSize,
+        height: spinnerSize,
         child: CircularProgressIndicator(
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(color),
@@ -261,40 +265,42 @@ class N42Button extends StatelessWidget {
       );
     }
 
+    final textWidget = Text(
+      text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.2,
+      ),
+    );
+
     if (icon != null) {
       return Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: fontSize + 2),
           const SizedBox(width: 6),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          // Flexible 防止图标 + 长文字溢出按钮宽度
+          Flexible(child: textWidget),
         ],
       );
     }
 
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: fontSize,
-        fontWeight: FontWeight.w500,
-      ),
-    );
+    return textWidget;
   }
 
   double _getHeight() {
     switch (size) {
       case N42ButtonSize.small:
-        return 32;
+        return AppDimensions.buttonHeightSmall; // 36
       case N42ButtonSize.medium:
-        return 44;
+        return 44; // iOS 最小可点目标
       case N42ButtonSize.large:
-        return 50;
+        return AppDimensions.buttonHeight; // 48
     }
   }
 
@@ -305,7 +311,7 @@ class N42Button extends StatelessWidget {
       case N42ButtonSize.medium:
         return 15;
       case N42ButtonSize.large:
-        return 17;
+        return 16;
     }
   }
 
@@ -369,23 +375,19 @@ class N42IconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fgColor = color ?? context.textPrimary;
     final button = IconButton(
       icon: Icon(icon, size: size),
-      color: color ?? AppColors.textPrimary,
+      color: fgColor,
+      tooltip: tooltip,
+      // 保证 44dp 触摸目标
+      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+      splashRadius: 22,
       onPressed: onPressed,
       style: backgroundColor != null
-          ? IconButton.styleFrom(
-              backgroundColor: backgroundColor,
-            )
+          ? IconButton.styleFrom(backgroundColor: backgroundColor)
           : null,
     );
-
-    if (tooltip != null) {
-      return Tooltip(
-        message: tooltip!,
-        child: button,
-      );
-    }
 
     return button;
   }

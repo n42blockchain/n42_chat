@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
 import 'n42_button.dart';
 
 /// 空状态组件
@@ -105,56 +107,52 @@ class N42EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textSecondary =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 图标或图片
-            _buildIcon(isDark),
-
-            // 标题
-            if (title != null) ...[
-              const SizedBox(height: 16),
-              Text(
-                title!,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
+        // 限宽防止文案过长在大屏拉成单行 / 过短居中失衡
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildIcon(isDark),
+              if (title != null) ...[
+                const SizedBox(height: AppDimensions.spacing),
+                Text(
+                  title!,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.headlineMedium.copyWith(
+                    color: textPrimary,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-
-            // 描述
-            if (description != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                description!,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
+              ],
+              if (description != null) ...[
+                const SizedBox(height: AppDimensions.spacingS),
+                Text(
+                  description!,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: textSecondary,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
+              ],
+              if (buttonText != null && onButtonPressed != null) ...[
+                const SizedBox(height: AppDimensions.spacingXL),
+                N42Button.primary(
+                  text: buttonText!,
+                  onPressed: onButtonPressed,
+                  expanded: false,
+                  size: N42ButtonSize.medium,
+                ),
+              ],
             ],
-
-            // 按钮
-            if (buttonText != null && onButtonPressed != null) ...[
-              const SizedBox(height: 24),
-              N42Button.primary(
-                text: buttonText!,
-                onPressed: onButtonPressed,
-                expanded: false,
-                size: N42ButtonSize.medium,
-              ),
-            ],
-          ],
+          ),
         ),
       ),
     );
@@ -169,11 +167,13 @@ class N42EmptyState extends StatelessWidget {
         fit: BoxFit.contain,
       );
     }
-
+    final fallback = isDark
+        ? AppColors.textTertiaryDark
+        : AppColors.textTertiary;
     return Icon(
       icon ?? Icons.inbox_outlined,
       size: iconSize,
-      color: iconColor ?? AppColors.textTertiary,
+      color: iconColor ?? fallback,
     );
   }
 }
@@ -194,6 +194,9 @@ class N42Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+    final secondary =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -201,19 +204,14 @@ class N42Loading extends StatelessWidget {
           SizedBox(
             width: size,
             height: size,
-            child: const CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-            ),
+            child: const CircularProgressIndicator(strokeWidth: 2),
           ),
           if (message != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               message!,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodyMedium.copyWith(color: secondary),
             ),
           ],
         ],

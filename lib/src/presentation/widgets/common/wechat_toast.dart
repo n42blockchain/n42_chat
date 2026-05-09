@@ -144,46 +144,55 @@ class _ToastWidgetState extends State<_ToastWidget>
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: IgnorePointer(
-        child: Center(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Container(
-                constraints: const BoxConstraints(
-                  minWidth: 120,
-                  maxWidth: 240,
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: _icon != null ? 20 : 14,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.75),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_icon != null) ...[
-                      Icon(
-                        _icon,
-                        color: Colors.white,
-                        size: 40,
+        child: SafeArea(
+          child: Center(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Container(
+                  constraints: const BoxConstraints(
+                    minWidth: 120,
+                    maxWidth: 280,
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: _icon != null ? 20 : 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.78),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
-                      const SizedBox(height: 12),
                     ],
-                    Text(
-                      widget.message,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.none,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_icon != null) ...[
+                        Icon(_icon, color: Colors.white, size: 40),
+                        const SizedBox(height: 12),
+                      ],
+                      // 限 4 行 + 省略号防止极长文案把 toast 撑过半屏。
+                      Text(
+                        widget.message,
+                        textAlign: TextAlign.center,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          height: 1.4,
+                          decoration: TextDecoration.none,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

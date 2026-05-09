@@ -102,6 +102,12 @@ abstract class AppDimensions {
   /// 列表项内边距
   static const double listItemPadding = 16.0;
 
+  /// 页面水平内边距（标准）
+  static const double screenPaddingH = 16.0;
+
+  /// 页面垂直内边距（标准）
+  static const double screenPaddingV = 12.0;
+
   // ============================================
   // 消息
   // ============================================
@@ -186,8 +192,24 @@ abstract class AppDimensions {
   /// 分割线粗细
   static const double dividerThickness = 0.5;
 
-  /// 分割线缩进
-  static const double dividerIndent = 72.0;
+  /// 分割线缩进（avatarSizeConversation 48 + listItemPadding 16 = 64）
+  static const double dividerIndent = 64.0;
+
+  // ============================================
+  // 浮层 / 卡片
+  // ============================================
+
+  /// 卡片默认 elevation（扁平风格）
+  static const double cardElevation = 0.0;
+
+  /// 浮层（dialog / bottomSheet）elevation
+  static const double overlayElevation = 4.0;
+
+  /// 卡片圆角（标准）
+  static const double cardRadius = 8.0;
+
+  /// 弹窗圆角（dialog / bottomSheet 顶角）
+  static const double dialogRadius = 14.0;
 
   // ============================================
   // 动画时长

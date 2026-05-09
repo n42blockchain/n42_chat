@@ -317,9 +317,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         _displayName ??
                             (S.of(context)?.profileNotLoggedIn ??
                                 'Not Logged In'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
+                          height: 1.3,
                           color: textColor,
                         ),
                       ),
@@ -328,7 +331,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       Text(
                         S.of(context)?.profileN42IdLabel(n42Id) ??
                             'N42 ID: $n42Id',
-                        style: TextStyle(fontSize: 15, color: subtitleColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.3,
+                          color: subtitleColor,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       // 状态和好友
@@ -499,7 +508,13 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 16, color: textColor),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.3,
+                    color: textColor,
+                  ),
                 ),
               ),
               if (badge != null)

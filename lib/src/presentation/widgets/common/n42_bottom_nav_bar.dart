@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
 import 'n42_badge.dart';
 
 /// 微信风格底部导航栏
@@ -83,20 +85,22 @@ class N42BottomNavBar extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Container(
-          height: 56,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Row(
-            children: List.generate(navItems.length, (index) {
-              return Expanded(
-                child: _buildNavItem(
-                  context,
-                  navItems[index],
-                  index,
-                  isDark,
-                ),
-              );
-            }),
+        child: SizedBox(
+          height: AppDimensions.bottomNavBarHeight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              children: List.generate(navItems.length, (index) {
+                return Expanded(
+                  child: _buildNavItem(
+                    context,
+                    navItems[index],
+                    index,
+                    isDark,
+                  ),
+                );
+              }),
+            ),
           ),
         ),
       ),
@@ -114,29 +118,31 @@ class N42BottomNavBar extends StatelessWidget {
         ? AppColors.primary
         : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
 
-    return GestureDetector(
+    // InkWell 提供反馈 + 整 cell 命中（带 splashColor / hoverColor）。
+    return InkWell(
       onTap: () => onTap(index),
-      behavior: HitTestBehavior.opaque,
+      splashColor: AppColors.primary.withValues(alpha: 0.10),
+      highlightColor: AppColors.primary.withValues(alpha: 0.05),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // 图标（带徽章）
           N42Badge(
             count: item.badge,
             dot: item.showDot,
             show: item.badge > 0 || item.showDot,
             child: Icon(
               isSelected ? item.activeIcon : item.icon,
-              size: 24,
+              size: AppDimensions.iconSizeBottomNav,
               color: color,
             ),
           ),
           const SizedBox(height: 2),
-          // 文字
+          // 限制 maxLines/省略号——避免长翻译（如俄语）撑破 tab。
           Text(
             item.label,
-            style: TextStyle(
-              fontSize: 10,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.captionSmall.copyWith(
               color: color,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
