@@ -7,36 +7,48 @@ extension _ChatPageInputMethods on _ChatPageState {
     // 频道只读模式：非管理员不能在公告频道发言
     final chatState = context.read<ChatBloc>().state;
     if (!chatState.canSendMessages) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF1E1E1E)
-              : const Color(0xFFF5F5F5),
+          color: isDark ? AppColors.surfaceDark : AppColors.background,
           border: Border(
             top: BorderSide(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey.shade800
-                  : Colors.grey.shade300,
+              color: isDark ? AppColors.dividerDark : AppColors.divider,
               width: 0.5,
             ),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.campaign_outlined,
-              size: 16,
-              color: Colors.grey.shade500,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              S.of(context)?.channelReadOnly ??
-                  'Only admins can post in this channel',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
-            ),
-          ],
+        child: SafeArea(
+          top: false,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.campaign_outlined,
+                size: 16,
+                color:
+                    isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  S.of(context)?.channelReadOnly ??
+                      'Only admins can post in this channel',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.3,
+                    color: isDark
+                        ? AppColors.textTertiaryDark
+                        : AppColors.textTertiary,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -239,7 +251,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -618,10 +630,13 @@ extension _ChatPageInputMethods on _ChatPageState {
   /// 构建 @ 提醒成员选择器
   Widget _buildMentionPicker() {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? const Color(0xFF2C2C2E) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
-    final subtextColor = isDark ? Colors.white54 : Colors.black54;
-    final borderColor = isDark ? Colors.white10 : Colors.grey[300]!;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final textColor =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final subtextColor =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final borderColor =
+        isDark ? AppColors.dividerDark : AppColors.divider;
 
     return Container(
       constraints: const BoxConstraints(maxHeight: 200),
@@ -688,7 +703,9 @@ extension _ChatPageInputMethods on _ChatPageState {
                         radius: 18,
                         backgroundColor: isRoomMention
                             ? AppColors.primary.withValues(alpha: 0.12)
-                            : Colors.grey[300],
+                            : (isDark
+                                ? AppColors.placeholderDark
+                                : AppColors.placeholder),
                         backgroundImage: !isRoomMention && avatarUrl.isNotEmpty
                             ? NetworkImage(avatarUrl)
                             : null,
@@ -718,19 +735,26 @@ extension _ChatPageInputMethods on _ChatPageState {
                           children: [
                             Text(
                               name,
-                              style: TextStyle(color: textColor, fontSize: 15),
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 15,
+                                height: 1.3,
+                              ),
                             ),
                             if (suggestion.subtitle != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Text(
                                   suggestion.subtitle!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: subtextColor,
                                     fontSize: 12,
+                                    height: 1.3,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                           ],

@@ -84,7 +84,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : AppColors.textPrimary,
+                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                         ),
                       ),
                     ),

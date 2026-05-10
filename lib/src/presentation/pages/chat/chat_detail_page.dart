@@ -426,7 +426,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   Future<void> _showNotificationModeSheet() async {
     final isDark = context.isDarkMode;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
 
     final selected = await showModalBottomSheet<ConversationNotificationMode>(
@@ -554,13 +554,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
           title: Text(
             S.of(context)?.chatGroupName ?? 'Group Name',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
           ),
           content: TextField(
             controller: controller,
             autofocus: true,
             maxLength: 50,
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
             decoration: InputDecoration(
               hintText:
                   S.of(context)?.commonEnterGroupName ?? 'Enter group name',
@@ -630,7 +630,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : const Color(0xFFF5F5F5);
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
 
@@ -1304,13 +1304,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
           title: Text(
             S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
           ),
           content: canEdit
               ? TextField(
                   controller: controller,
                   maxLines: 5,
-                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
                   decoration: InputDecoration(
                     hintText:
                         S.of(context)?.chatGroupAnnouncementHint ??
@@ -1401,13 +1401,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
           title: Text(
             S.of(context)?.chatEditNickname ?? 'Edit Nickname',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
           ),
           content: TextField(
             controller: controller,
             autofocus: true,
             maxLength: 30,
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
             decoration: InputDecoration(
               hintText:
                   S.of(context)?.chatNicknameHint ??
@@ -1468,7 +1468,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
           ),
           content: RadioGroup<String>(
             groupValue: selectedReason,
@@ -1486,7 +1486,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     title: Text(
                       reason,
                       style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       ),
                     ),
                     value: reason,
@@ -1499,7 +1499,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 TextField(
                   controller: descController,
                   maxLines: 2,
-                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
                   decoration: InputDecoration(
                     hintText:
                         S.of(context)?.reportDescription ??
@@ -1825,7 +1825,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : const Color(0xFFF5F5F5);
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
 
     return Scaffold(

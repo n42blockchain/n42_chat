@@ -453,7 +453,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
     return RadioListTile<T>(
       title: Text(
         title,
-        style: TextStyle(color: isDark ? Colors.white : AppColors.textPrimary),
+        style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
       ),
       subtitle: subtitle != null
           ? Text(
@@ -500,7 +500,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
               child: Text(
                 '$label: ${value != null ? _formatDate(value) : "Select date"}',
                 style: TextStyle(
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
             ),

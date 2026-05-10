@@ -295,7 +295,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                       fontSize: 15,
                       fontWeight:
                           unread ? FontWeight.w600 : FontWeight.w500,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

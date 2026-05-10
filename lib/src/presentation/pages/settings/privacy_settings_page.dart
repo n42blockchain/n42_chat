@@ -491,7 +491,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   title,
                   style: TextStyle(
                     fontSize: 16,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 if (subtitle != null)
@@ -550,7 +550,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     title,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                   ),
                   if (subtitle != null)
@@ -620,7 +620,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 title,
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
             ),
@@ -685,7 +685,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 title,
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
             ),
@@ -920,7 +920,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
             ),

@@ -135,7 +135,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
           ),
         ),
@@ -181,7 +181,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -198,7 +198,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             draft.text,
             style: TextStyle(
               fontSize: 15,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
           ),
           if (draft.pollOptions.isNotEmpty ||
@@ -266,7 +266,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         label,
         style: TextStyle(
           fontSize: 12,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
     );

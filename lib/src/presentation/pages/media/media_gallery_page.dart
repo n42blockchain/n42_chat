@@ -426,7 +426,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           fontSize: 15,
         ),
       ),

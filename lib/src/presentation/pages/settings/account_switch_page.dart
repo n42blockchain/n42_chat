@@ -210,7 +210,7 @@ class _AccountTile extends StatelessWidget {
         account.effectiveDisplayName,
         style: TextStyle(
           fontSize: 16,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           fontWeight: account.isCurrent ? FontWeight.w600 : FontWeight.w500,
         ),
       ),

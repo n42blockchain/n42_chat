@@ -275,14 +275,14 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         leading: IconButton(
           icon: Icon(
             Icons.close,
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           S.of(context)?.chatLocationTitle ?? 'Location',
           style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -442,7 +442,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                             title: Text(
                               place.name,
                               style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                                 fontWeight: isSelected
                                     ? FontWeight.w600
                                     : FontWeight.normal,

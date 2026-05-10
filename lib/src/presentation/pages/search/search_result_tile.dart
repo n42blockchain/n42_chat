@@ -98,7 +98,7 @@ class SearchResultTile extends StatelessWidget {
           TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
 

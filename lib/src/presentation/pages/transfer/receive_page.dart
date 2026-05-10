@@ -235,7 +235,7 @@ class _ReceivePageState extends State<ReceivePage> {
                   style: TextStyle(
                     fontSize: 13,
                     fontFamily: 'monospace',
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -270,7 +270,7 @@ class _ReceivePageState extends State<ReceivePage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
           ),
 

@@ -128,7 +128,7 @@ class ChatFolderManagementPage extends StatelessWidget {
           folder.name,
           style: TextStyle(
             fontSize: 15,
-            color: isDark ? Colors.white : Colors.black87,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: isSystem

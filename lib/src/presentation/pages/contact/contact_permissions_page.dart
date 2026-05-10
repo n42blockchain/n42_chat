@@ -118,7 +118,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
     final dividerColor = isDark ? AppColors.dividerDark : AppColors.divider;
 

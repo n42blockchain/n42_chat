@@ -495,7 +495,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
               title: Text(
                 'From Contacts',
                 style: TextStyle(
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -607,7 +607,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             : userId.split(':').first.replaceFirst('@', ''),
         style: TextStyle(
           fontWeight: FontWeight.w500,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
@@ -856,7 +856,7 @@ class _MethodCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 Text(

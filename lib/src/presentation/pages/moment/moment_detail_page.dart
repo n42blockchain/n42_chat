@@ -186,7 +186,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                               Text(
                                 moment.content!,
                                 style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.black87,
+                                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                                   fontSize: 16,
                                 ),
                               ),
@@ -518,7 +518,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   Text(
                     comment.content,
                     style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       fontSize: 14,
                     ),
                   ),

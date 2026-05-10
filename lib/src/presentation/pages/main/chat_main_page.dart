@@ -308,7 +308,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final useSplit = ResponsiveUtils.useSplitLayout(context);
 
     return MultiBlocProvider(

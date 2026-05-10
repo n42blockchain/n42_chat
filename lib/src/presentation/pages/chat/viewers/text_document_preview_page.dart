@@ -132,7 +132,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -167,7 +167,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
         style: TextStyle(
           fontSize: 14,
           height: 1.5,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
     );

@@ -118,7 +118,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -162,7 +162,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 ),
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
                 onChanged: _onSearch,
               ),
@@ -177,7 +177,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 Icon(
                   Icons.tune,
                   color: _messageFilter == null
-                      ? (isDark ? Colors.white : AppColors.textPrimary)
+                      ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary)
                       : AppColors.primary,
                 ),
                 if (_messageFilter != null)
@@ -382,7 +382,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   color: isSelected
                       ? Colors.white
-                      : (isDark ? Colors.white : AppColors.textPrimary),
+                      : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
                 ),
               ),
               if (count > 0) ...[

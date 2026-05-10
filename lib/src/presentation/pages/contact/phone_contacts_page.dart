@@ -140,7 +140,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -218,7 +218,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -323,7 +323,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         displayName,
         style: TextStyle(
           fontWeight: FontWeight.w500,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       subtitle: Column(

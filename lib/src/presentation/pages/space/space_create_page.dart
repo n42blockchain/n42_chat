@@ -252,7 +252,7 @@ class _TypeCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: selected
                     ? AppColors.primary
-                    : (isDark ? Colors.white : AppColors.textPrimary),
+                    : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
               ),
             ),
             const SizedBox(height: 4),

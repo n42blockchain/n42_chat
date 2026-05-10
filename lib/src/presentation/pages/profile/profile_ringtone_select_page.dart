@@ -295,14 +295,14 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           onPressed: () => Navigator.pop(context), // 取消不保存
         ),
         title: Text(
           s?.profileSelectRingtone ?? 'Select Ringtone',
           style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -394,7 +394,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                         title: Text(
                           ringtone.name,
                           style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
+                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                           ),
                           maxLines: 1,

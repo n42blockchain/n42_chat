@@ -102,7 +102,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
     final s = S.of(context);
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryColor = isDark ? Colors.white70 : Colors.black54;
 
     final contacts = _filteredContacts;

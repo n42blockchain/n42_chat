@@ -299,7 +299,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                         title: Text(
                           tag.name,
                           style: TextStyle(
-                            color: isDark ? Colors.white : AppColors.textPrimary,
+                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                           ),
                         ),
                         subtitle: Text(

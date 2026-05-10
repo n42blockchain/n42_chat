@@ -121,7 +121,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               Icons.close,
               color: _mode == StoryMode.text
                   ? _currentTextColor
-                  : (isDark ? Colors.white : Colors.black),
+                  : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
@@ -173,7 +173,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     final s = S.of(context);
     final textColor = _mode == StoryMode.text
         ? _currentTextColor
-        : (isDark ? Colors.white : Colors.black);
+        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -432,7 +432,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),

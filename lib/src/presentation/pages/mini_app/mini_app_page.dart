@@ -282,7 +282,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                   ),
                   Text(
@@ -357,7 +357,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),

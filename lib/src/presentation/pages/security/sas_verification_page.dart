@@ -295,7 +295,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
               'Waiting for the other device to accept...',
           style: TextStyle(
             fontSize: 16,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -331,7 +331,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -416,7 +416,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
               'Waiting for the other device to confirm...',
           style: TextStyle(
             fontSize: 16,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -444,7 +444,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -499,7 +499,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),

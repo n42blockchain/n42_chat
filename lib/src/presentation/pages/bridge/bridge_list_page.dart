@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../integration/bridge/bridge_manager.dart';
 import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/bridge/bridge_state.dart';
@@ -89,7 +90,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
       appBar: AppBar(
         title: const Text('Connected Accounts'),
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
+        foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         elevation: 0.5,
         actions: [
           if (!_isLoading)
@@ -162,7 +163,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
   ) {
     final info = BridgePlatformRegistry.getInfo(state.platform);
     final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0.5),

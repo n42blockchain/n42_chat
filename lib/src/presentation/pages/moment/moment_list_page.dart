@@ -170,7 +170,7 @@ class _MomentListViewState extends State<_MomentListView> {
                   ? (s?.momentUserMoments(widget.userName ?? '') ??
                         '${widget.userName}\'s Moments')
                   : (s?.commonMoments ?? 'Moments'),
-              style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
             ),
             actions: [
               if (!_isUserMode)
@@ -397,7 +397,7 @@ class _MomentTile extends StatelessWidget {
                   Text(
                     moment.content!,
                     style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       fontSize: 15,
                     ),
                   ),
@@ -886,7 +886,7 @@ class _MomentTile extends StatelessWidget {
                 text: TextSpan(
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark ? Colors.white : Colors.black87,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                   children: [
                     TextSpan(
