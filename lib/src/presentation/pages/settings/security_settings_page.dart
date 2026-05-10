@@ -243,7 +243,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             title: Text(
               _biometricTypeDescription ?? 'Biometric',
               style: TextStyle(
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
             subtitle: Text(
@@ -306,7 +306,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               title: Text(
                 l10n?.authPasskeyNoRegistered ?? 'No passkeys registered',
                 style: TextStyle(
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
               subtitle: Text(
@@ -334,7 +334,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 title: Text(
                   passkey.displayName ?? 'Passkey',
                   style: TextStyle(
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 subtitle: Text(
@@ -650,7 +650,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -823,7 +823,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       title: Text(
         device.deviceName,
         style: TextStyle(
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           fontWeight: device.isCurrentDevice
               ? FontWeight.w600
               : FontWeight.normal,
@@ -1115,7 +1115,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }) {
     final color = isDestructive
         ? AppColors.error
-        : (isDark ? Colors.white : AppColors.textPrimary);
+        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
 
     return ListTile(
       leading: Icon(
@@ -1723,7 +1723,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               value,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
           ),

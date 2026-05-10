@@ -155,7 +155,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
         title,
         style: TextStyle(
           fontSize: 15,
-          color: isDark ? Colors.white : Colors.black87,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       trailing: Text(

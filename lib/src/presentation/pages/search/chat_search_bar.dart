@@ -119,7 +119,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                     ),
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                     onChanged: _onSearch,
                   ),
@@ -152,7 +152,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                 icon: const Icon(Icons.keyboard_arrow_up, size: 24),
                 onPressed: hasPrevious ? _onPrevious : null,
                 color: hasPrevious
-                    ? (isDark ? Colors.white : AppColors.textPrimary)
+                    ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary)
                     : (isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary),
@@ -161,7 +161,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                 icon: const Icon(Icons.keyboard_arrow_down, size: 24),
                 onPressed: hasNext ? _onNext : null,
                 color: hasNext
-                    ? (isDark ? Colors.white : AppColors.textPrimary)
+                    ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary)
                     : (isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary),
@@ -171,7 +171,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
               IconButton(
                 icon: const Icon(Icons.close, size: 20),
                 onPressed: widget.onClose,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ],
           ),

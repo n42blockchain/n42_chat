@@ -44,7 +44,7 @@ class _GroupListPageState extends State<GroupListPage> {
           IconButton(
             icon: Icon(
               Icons.add,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
             onPressed: () => _navigateToCreateGroup(),
           ),
@@ -168,7 +168,7 @@ class _GroupListPageState extends State<GroupListPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -210,7 +210,7 @@ class _GroupListPageState extends State<GroupListPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: Text(

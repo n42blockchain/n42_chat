@@ -55,7 +55,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       context: context,
       backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
       builder: (ctx) {
-        final textColor = isDark ? Colors.white : AppColors.textPrimary;
+        final textColor =
+            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
         final secondary = isDark
             ? AppColors.textSecondaryDark
             : AppColors.textSecondary;
@@ -266,7 +267,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   title,
                   style: TextStyle(
                     fontSize: 16,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 if (subtitle != null)
@@ -320,7 +321,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 title,
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
             ),
@@ -377,7 +378,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     title,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                   ),
                   if (subtitle != null)

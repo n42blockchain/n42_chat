@@ -19,7 +19,7 @@ class ServicesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,

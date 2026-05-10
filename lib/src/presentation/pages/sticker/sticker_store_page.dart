@@ -216,7 +216,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                   fontSize: 13,
                   color: isSelected
                       ? AppColors.primary
-                      : (isDark ? Colors.white : AppColors.textPrimary),
+                      : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
                 ),
               ),
             ],

@@ -177,7 +177,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               S.of(context)?.pdfLoadFailed ?? 'Failed to load PDF',
               style: TextStyle(
                 fontSize: 16,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),

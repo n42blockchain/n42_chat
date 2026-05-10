@@ -732,7 +732,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         ? (isDark ? Colors.white38 : Colors.black26)
         : isDestructive
         ? AppColors.error
-        : (isDark ? Colors.white : Colors.black87);
+        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
 
     return GestureDetector(
       onTap: onTap,

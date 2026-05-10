@@ -70,7 +70,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
         title: Text(
           l10n?.miniAppMarketTitle ?? 'Mini Apps',
           style: TextStyle(
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -163,7 +163,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -189,7 +189,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -400,7 +400,7 @@ class _FeaturedCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

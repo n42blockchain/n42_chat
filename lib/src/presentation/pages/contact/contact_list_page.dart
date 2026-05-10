@@ -94,7 +94,7 @@ class _ContactListPageState extends State<ContactListPage> {
                 IconButton(
                   icon: Icon(
                     Icons.person_add_outlined,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                   onPressed: _showAddContactDialog,
                 ),
@@ -176,7 +176,7 @@ class _ContactListPageState extends State<ContactListPage> {
           onChanged: _onSearchChanged,
           style: TextStyle(
             fontSize: 15,
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: S.of(context)?.commonSearch ?? 'Search',
@@ -470,7 +470,7 @@ class _ContactListPageState extends State<ContactListPage> {
     int badgeCount = 0,
     VoidCallback? onTap,
   }) {
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
 
     return Material(
@@ -486,7 +486,13 @@ class _ContactListPageState extends State<ContactListPage> {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 16, color: textColor),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.3,
+                    color: textColor,
+                  ),
                 ),
               ),
               if (badgeCount > 0)
@@ -501,11 +507,18 @@ class _ContactListPageState extends State<ContactListPage> {
                   ),
                   child: Text(
                     '$badgeCount',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.clip,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      height: 1.0,
+                    ),
                   ),
                 ),
               Icon(
-                Icons.chevron_right,
+                Icons.chevron_right_rounded,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -620,17 +633,27 @@ class _ContactListPageState extends State<ContactListPage> {
                         children: [
                           Text(
                             contact.effectiveDisplayName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : Colors.black,
+                              height: 1.3,
+                              color: isDark
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary,
                             ),
                           ),
                           Text(
                             contact.userId,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 13,
-                              color: isDark ? Colors.white54 : Colors.black54,
+                              height: 1.3,
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -1410,7 +1433,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
       appBar: AppBar(
         title: Text(S.of(context)?.contactNewFriends ?? 'New Friends'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black,
+        foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         elevation: 0.5,
       ),
       body: BlocBuilder<ContactBloc, ContactState>(
@@ -1493,7 +1516,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
         displayName,
         style: TextStyle(
           fontWeight: FontWeight.w500,
-          color: isDark ? Colors.white : Colors.black87,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
@@ -1523,7 +1546,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
             onPressed: () => _rejectRequest(request),
             style: TextButton.styleFrom(
               backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
-              foregroundColor: isDark ? Colors.white : Colors.black87,
+              foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
@@ -1648,7 +1671,7 @@ class _GroupListPageState extends State<_GroupListPage> {
       appBar: AppBar(
         title: Text(S.of(context)?.commonGroupChat ?? 'Group Chat'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black,
+        foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         elevation: 0.5,
         actions: [
           IconButton(
@@ -1781,7 +1804,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -1823,7 +1846,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -2044,14 +2067,14 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: widget.isDark ? Colors.white : Colors.black,
+                    color: widget.isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 const Spacer(),
                 IconButton(
                   icon: Icon(
                     Icons.close,
-                    color: widget.isDark ? Colors.white : Colors.black,
+                    color: widget.isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -2109,7 +2132,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                         title: Text(
                           contact.effectiveDisplayName,
                           style: TextStyle(
-                            color: widget.isDark ? Colors.white : Colors.black,
+                            color: widget.isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                           ),
                         ),
                         subtitle: Text(

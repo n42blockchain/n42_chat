@@ -589,7 +589,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -666,7 +666,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),

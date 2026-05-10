@@ -175,7 +175,7 @@ class _FavoriteListView extends StatelessWidget {
     bool isDark,
   ) {
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final subtitleColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;

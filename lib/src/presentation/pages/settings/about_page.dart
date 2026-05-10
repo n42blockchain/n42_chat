@@ -67,7 +67,7 @@ class AboutPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -94,7 +94,7 @@ class AboutPage extends StatelessWidget {
                 title: Text(
                   l10n?.settingsCheckForUpdates ?? 'Check for Updates',
                   style: TextStyle(
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 trailing: Icon(
@@ -172,7 +172,7 @@ class AboutPage extends StatelessWidget {
       title: Text(
         title,
         style: TextStyle(
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       trailing: Icon(

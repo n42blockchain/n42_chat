@@ -211,7 +211,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -226,7 +226,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       title: Text(
                         lang.localizedName,
                         style: TextStyle(
-                          color: isDark ? Colors.white : Colors.black,
+                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.normal,
@@ -398,7 +398,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                           'Auto-translate received messages',
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark ? Colors.white : AppColors.textPrimary,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -447,7 +447,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       'Smart reply translation',
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark ? Colors.white : AppColors.textPrimary,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       ),
                     ),
                   ),

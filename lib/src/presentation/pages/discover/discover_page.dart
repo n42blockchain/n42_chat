@@ -221,15 +221,21 @@ class DiscoverPage extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 16, color: textColor),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.3,
+                    color: textColor,
+                  ),
                 ),
               ),
               ?trailing,
               Icon(
-                Icons.chevron_right,
+                Icons.chevron_right_rounded,
                 color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                    ? AppColors.textTertiaryDark
+                    : AppColors.textTertiary,
                 size: 20,
               ),
             ],

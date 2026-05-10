@@ -203,7 +203,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -354,7 +354,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                         styleSheet: MarkdownStyleSheet(
                           p: TextStyle(
                             fontSize: 15,
-                            color: isDark ? Colors.white : Colors.black87,
+                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                             height: 1.4,
                           ),
                           code: TextStyle(
@@ -375,11 +375,11 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                           ),
                           listBullet: TextStyle(
                             fontSize: 15,
-                            color: isDark ? Colors.white : Colors.black87,
+                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                           ),
                           strong: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black87,
+                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -431,7 +431,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                       text,
                       style: TextStyle(
                         fontSize: 15,
-                        color: isDark ? Colors.white : Colors.black87,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                         height: 1.4,
                       ),
                     ),
@@ -506,7 +506,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 ),
                 style: TextStyle(
                   fontSize: 15,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
                 onSubmitted: (_) => _sendMessage(),
               ),

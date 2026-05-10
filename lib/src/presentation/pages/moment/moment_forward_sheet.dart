@@ -235,7 +235,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : Colors.black,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -286,7 +286,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                             title: Text(
                               conv.name,
                               style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                               ),
                             ),
                             subtitle: conv.lastMessage != null

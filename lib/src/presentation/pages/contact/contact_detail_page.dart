@@ -173,7 +173,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
 
@@ -483,7 +483,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     final isDark = context.isDarkMode;
     final borderColor = isDark ? Colors.white10 : Colors.black12;
     final iconColor = isDark ? Colors.white70 : Colors.black54;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -741,7 +741,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
     final labelColor = isDark ? Colors.white38 : Colors.black38;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
@@ -1023,12 +1023,12 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
         title: Text(
           S.of(context)?.contactNotes ?? 'Notes',
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
         ),
         content: TextField(
           controller: controller,
           maxLines: 4,
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.contactNotesHint ??
@@ -1169,12 +1169,12 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
         title: Text(
           S.of(context)?.contactPhone ?? 'Phone',
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
         ),
         content: TextField(
           controller: phoneController,
           keyboardType: TextInputType.phone,
-          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.contactAddPhoneHint ?? 'Enter phone number',
@@ -1251,7 +1251,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     final cardColor = isDark
         ? const Color(0xFF2C2C2E)
         : const Color(0xFFF2F2F7);
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     final labelColor = isDark ? Colors.white54 : Colors.black54;
 

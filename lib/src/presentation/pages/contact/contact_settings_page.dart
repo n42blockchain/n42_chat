@@ -57,7 +57,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
     final dividerColor = isDark ? Colors.white10 : Colors.black12;
 
@@ -385,7 +385,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
           ),
           content: RadioGroup<String>(
             groupValue: selectedReason,
@@ -403,7 +403,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     title: Text(
                       reason,
                       style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       ),
                     ),
                     value: reason,
@@ -416,7 +416,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                 TextField(
                   controller: descController,
                   maxLines: 2,
-                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
                   decoration: InputDecoration(
                     hintText:
                         S.of(context)?.reportDescription ??

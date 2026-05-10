@@ -340,7 +340,7 @@ class _TransferPageState extends State<TransferPage> {
               ),
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
               onChanged: (value) {
                 _validateAddress(value.trim());
@@ -391,7 +391,7 @@ class _TransferPageState extends State<TransferPage> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
               if (_isAddressValid)
@@ -514,7 +514,7 @@ class _TransferPageState extends State<TransferPage> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? Colors.white : AppColors.textPrimary,
+                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                         ),
                       ),
                       Text(
@@ -580,7 +580,7 @@ class _TransferPageState extends State<TransferPage> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -589,7 +589,7 @@ class _TransferPageState extends State<TransferPage> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
             ],
@@ -647,7 +647,7 @@ class _TransferPageState extends State<TransferPage> {
         ),
         style: TextStyle(
           fontSize: 14,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
         maxLines: 2,
       ),

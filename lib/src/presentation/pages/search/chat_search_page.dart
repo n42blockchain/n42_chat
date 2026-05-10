@@ -133,7 +133,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -173,7 +173,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                 ),
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
                 onChanged: (value) {
                   setState(() {});
@@ -190,7 +190,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                 Icon(
                   Icons.tune,
                   color: _messageFilter == null
-                      ? (isDark ? Colors.white : AppColors.textPrimary)
+                      ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary)
                       : AppColors.primary,
                 ),
                 if (_messageFilter != null)
@@ -327,7 +327,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
           ),

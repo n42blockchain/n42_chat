@@ -90,7 +90,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: conversation.lastMessage != null
@@ -165,7 +165,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 title: Text(
                   l10n?.settingsUnhideChat ?? 'Unhide',
                   style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 onTap: () {
@@ -183,7 +183,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 title: Text(
                   l10n?.commonChat ?? 'Chat',
                   style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
                 onTap: () {

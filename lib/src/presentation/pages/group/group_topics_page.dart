@@ -252,7 +252,7 @@ class _GroupTopicsBody extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                   ),
                 ),

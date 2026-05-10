@@ -92,7 +92,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
         channel.name,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       subtitle: channel.topic != null || channel.category != null

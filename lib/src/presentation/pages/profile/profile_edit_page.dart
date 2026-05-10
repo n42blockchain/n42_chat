@@ -110,7 +110,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         return Scaffold(
           backgroundColor: isDark
               ? AppColors.backgroundDark
-              : const Color(0xFFF5F5F5),
+              : AppColors.background,
           appBar: N42AppBar(
             title: S.of(context)?.profilePersonalProfile ?? 'Personal Profile',
             backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
@@ -351,21 +351,23 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     return InkWell(
       onTap: onTap,
       child: Container(
+        constraints: const BoxConstraints(minHeight: 52),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            // 左侧标题 - 不换行
             Text(
               title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textPrimaryDark
                     : AppColors.textPrimary,
               ),
             ),
             const SizedBox(width: 16),
-            // 右侧内容
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -377,21 +379,25 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       Expanded(
                         child: Text(
                           value,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
                           style: TextStyle(
                             fontSize: 16,
+                            height: 1.3,
                             color: isDark
                                 ? AppColors.textSecondaryDark
                                 : AppColors.textSecondary,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.right,
                         ),
                       ),
                     if (showArrow) ...[
                       const SizedBox(width: 8),
-                      const Icon(
-                        Icons.chevron_right,
-                        color: AppColors.textTertiary,
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: isDark
+                            ? AppColors.textTertiaryDark
+                            : AppColors.textTertiary,
                         size: 20,
                       ),
                     ],
@@ -675,16 +681,22 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
               child: Row(
                 children: [
-                  Text(
-                    S.of(context)?.profileSelectRegion ?? 'Select Region',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      S.of(context)?.profileSelectRegion ?? 'Select Region',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                      ),
                     ),
                   ),
-                  const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close_rounded),
+                    tooltip:
+                        MaterialLocalizations.of(context).closeButtonTooltip,
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -725,9 +737,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     padding: const EdgeInsets.all(16),
                     child: Text(
                       S.of(context)?.profileSelectCity ?? 'Select City',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
                       ),
                     ),
                   ),
@@ -959,12 +974,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             children: [
               Text(
                 S.of(context)?.commonMyQrCode ?? 'My QR Code',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
                 ),
               ),
               const SizedBox(height: 20),
+              // QR code 内层始终白底——保证扫码识别（深色模式同样）。
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -980,8 +999,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               const SizedBox(height: 16),
               Text(
                 userId,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
+                  height: 1.3,
                   color: AppColors.textSecondary,
                 ),
               ),
@@ -989,7 +1012,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               Text(
                 S.of(context)?.profileScanToAddFriend ??
                     'Scan the QR code above to add me as a friend',
-                style: const TextStyle(fontSize: 12),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 12, height: 1.4),
               ),
             ],
           ),

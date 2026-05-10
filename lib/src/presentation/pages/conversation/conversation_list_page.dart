@@ -429,7 +429,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
@@ -453,7 +453,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                   IconButton(
                     icon: Icon(
                       Icons.notifications_outlined,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                     tooltip:
                         S.of(context)?.onChainNotificationsTitle ??
@@ -506,7 +506,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           IconButton(
             icon: Icon(
               Icons.add_circle_outline,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
             onPressed: widget.onAddPressed ?? _showAddMenu,
           ),

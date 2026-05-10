@@ -102,7 +102,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
         leading: IconButton(
           icon: Icon(
             Icons.close,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           onPressed: () => Navigator.pop(context, false),
         ),

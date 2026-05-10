@@ -219,7 +219,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                       ),
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark ? Colors.white : AppColors.textPrimary,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       ),
                     ),
                   ),

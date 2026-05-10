@@ -258,7 +258,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                 'Selected Media (${_selectedMedia.length})',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
               ),
               const Spacer(),
@@ -344,7 +344,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       leading: Icon(icon, color: isDark ? Colors.grey[400] : Colors.grey[600]),
       title: Text(
         title,
-        style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+        style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
       ),
       trailing:
           trailing ??

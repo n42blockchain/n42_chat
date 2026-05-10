@@ -170,7 +170,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         bottom: TabBar(
@@ -209,7 +209,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -242,7 +242,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
 
   Widget _buildCustomTab(bool isDark, S? l10n) {
     final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
@@ -705,7 +705,7 @@ class _CollectionCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
               maxLines: 2,
               textAlign: TextAlign.center,

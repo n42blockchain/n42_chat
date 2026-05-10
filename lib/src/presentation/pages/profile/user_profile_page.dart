@@ -210,7 +210,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   IconButton(
                     icon: Icon(
                       Icons.arrow_back_ios,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -218,7 +218,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   IconButton(
                     icon: Icon(
                       Icons.more_horiz,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                     onPressed: _showMoreOptions,
                   ),
@@ -274,7 +274,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : AppColors.textPrimary,
+                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -358,7 +358,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     contact.statusMessage!,
                     style: TextStyle(
                       fontSize: 15,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -422,7 +422,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             value,
             style: TextStyle(
               fontSize: 15,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
           ),
         ],
