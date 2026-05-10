@@ -419,7 +419,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       ListTile(
         leading: const Icon(Icons.folder_outlined),
         title: Text(S.of(context)?.groupChatFiles ?? 'Chat Files'),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right_rounded),
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -440,7 +440,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               ? 'Share a join link for this room'
               : 'Share a room reference with invited members',
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right_rounded),
         onTap: () => _showInviteLinkActions(group),
       ),
       _buildSettingsDivider(isDark),
@@ -452,7 +452,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               ? 'Browse topics and manage channel structure'
               : 'Browse grouped topics and channel threads',
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right_rounded),
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -474,7 +474,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right_rounded),
         onTap: group.canEditDescription ? () => _editAnnouncement(group) : null,
       ),
       _buildSettingsDivider(isDark),
@@ -488,7 +488,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right_rounded),
         onTap: group.canEditDescription ? () => _editTopic(group) : null,
       ),
     ];
@@ -512,7 +512,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         ListTile(
           leading: const Icon(Icons.smart_toy_outlined),
           title: Text(S.of(context)?.groupBotSettings ?? 'Bot Settings'),
-          trailing: const Icon(Icons.chevron_right),
+          trailing: const Icon(Icons.chevron_right_rounded),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -525,7 +525,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         ListTile(
           leading: const Icon(Icons.filter_list),
           title: Text(S.of(context)?.groupContentFilter ?? 'Content Filter'),
-          trailing: const Icon(Icons.chevron_right),
+          trailing: const Icon(Icons.chevron_right_rounded),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -544,7 +544,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 ? (S.of(context)?.groupMaxMembersUnlimited ?? 'Unlimited')
                 : '${group.memberCount} / ${group.maxMembers}',
           ),
-          trailing: const Icon(Icons.chevron_right),
+          trailing: const Icon(Icons.chevron_right_rounded),
           onTap: () => _showMaxMembersDialog(group),
         ),
       if (group.canManageTokenGate)
@@ -561,7 +561,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 ? ('${group.tokenGate!.rules.length} ${S.of(context)?.tokenGateRulesActive ?? 'rules active'}')
                 : (S.of(context)?.tokenGateDisabled ?? 'Disabled'),
           ),
-          trailing: const Icon(Icons.chevron_right),
+          trailing: const Icon(Icons.chevron_right_rounded),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute<bool>(
@@ -612,7 +612,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             title: Text(
               S.of(context)?.commonClearChatHistory ?? 'Clear Chat History',
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => _clearChatHistory(),
           ),
 

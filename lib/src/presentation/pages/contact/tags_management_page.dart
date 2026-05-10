@@ -313,7 +313,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                         ),
                         trailing: widget.selectMode
                             ? null
-                            : const Icon(Icons.chevron_right, size: 20),
+                            : const Icon(Icons.chevron_right_rounded, size: 20),
                         onTap: widget.selectMode
                             ? () {
                                 setState(() {

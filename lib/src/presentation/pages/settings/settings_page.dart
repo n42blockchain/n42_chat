@@ -392,7 +392,7 @@ class SettingsPage extends StatelessWidget {
                   ),
                 ),
                 Icon(
-                  Icons.chevron_right,
+                  Icons.chevron_right_rounded,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -584,7 +584,7 @@ class _SettingsItem extends StatelessWidget {
               ),
               trailing ??
                   Icon(
-                    Icons.chevron_right,
+                    Icons.chevron_right_rounded,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,

@@ -664,7 +664,7 @@ class _DateTimeTile extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               size: 20,
               color: isDark
                   ? AppColors.textTertiaryDark

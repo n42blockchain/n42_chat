@@ -556,7 +556,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
               '($count)',
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? Colors.white38 : Colors.black38,
+                color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
               ),
             ),
             const Spacer(),
@@ -628,7 +628,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 onPressed: () => _confirmDeleteChannel(context, child),
               ),
             Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -684,7 +684,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
               )
             : null,
         trailing: Icon(
-          Icons.chevron_right,
+          Icons.chevron_right_rounded,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
         onTap: () {
@@ -1060,7 +1060,7 @@ class _MembersBottomSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white24 : Colors.black26,
+              color: isDark ? AppColors.dividerDark : AppColors.divider,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

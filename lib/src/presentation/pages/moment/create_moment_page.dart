@@ -349,7 +349,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       trailing:
           trailing ??
           Icon(
-            Icons.chevron_right,
+            Icons.chevron_right_rounded,
             color: isDark ? Colors.grey[600] : Colors.grey[400],
           ),
       onTap: onTap,

@@ -182,12 +182,12 @@ class _ContactListPageState extends State<ContactListPage> {
             hintText: S.of(context)?.commonSearch ?? 'Search',
             hintStyle: TextStyle(
               fontSize: 15,
-              color: isDark ? Colors.white54 : Colors.black45,
+              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
             prefixIcon: Icon(
               Icons.search,
               size: 20,
-              color: isDark ? Colors.white54 : Colors.black45,
+              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -609,7 +609,7 @@ class _ContactListPageState extends State<ContactListPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -1523,7 +1523,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
         request.userId,
         style: TextStyle(
           fontSize: 13,
-          color: isDark ? Colors.white54 : Colors.black54,
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
       trailing: Row(
@@ -1879,7 +1879,7 @@ class _GroupListPageState extends State<_GroupListPage> {
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -2044,7 +2044,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
       decoration: BoxDecoration(
-        color: widget.isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: widget.isDark ? AppColors.surfaceDark : AppColors.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Column(
@@ -2115,7 +2115,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                       S.of(context)?.contactNoContactsFound ??
                           'No contacts found',
                       style: TextStyle(
-                        color: widget.isDark ? Colors.white54 : Colors.black54,
+                        color: widget.isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                       ),
                     ),
                   )

@@ -232,7 +232,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Widget _buildStepIndicator(bool isDark) {
     const activeColor = AppColors.primary;
-    final inactiveColor = isDark ? Colors.white24 : Colors.black12;
+    final inactiveColor = isDark ? AppColors.dividerDark : AppColors.divider;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

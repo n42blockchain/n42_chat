@@ -362,26 +362,26 @@ class _SpaceListItem extends StatelessWidget {
             children: [
               Icon(Icons.people_outline,
                   size: 14,
-                  color: isDark ? Colors.white38 : Colors.black38),
+                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary),
               const SizedBox(width: 4),
               Text(
                 '${space.memberCount}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.white38 : Colors.black38,
+                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                 ),
               ),
               const SizedBox(width: 12),
               Icon(Icons.tag,
                   size: 14,
-                  color: isDark ? Colors.white38 : Colors.black38),
+                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary),
               const SizedBox(width: 4),
               Text(
                 S.of(context)?.spacesChannelsCount(space.channelCount) ??
                     '${space.channelCount} channels',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.white38 : Colors.black38,
+                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                 ),
               ),
             ],
@@ -401,7 +401,7 @@ class _SpaceListItem extends StatelessWidget {
               ),
             )
           : Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -466,7 +466,7 @@ class _EmptySpaceView extends StatelessWidget {
         children: [
           Icon(icon,
               size: 64,
-              color: isDark ? Colors.white24 : Colors.black26),
+              color: isDark ? AppColors.dividerDark : AppColors.divider),
           const SizedBox(height: 16),
           Text(
             message,

@@ -89,7 +89,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
           ],
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
-          unselectedLabelColor: isDark ? Colors.white60 : Colors.black54,
+          unselectedLabelColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
       body: _isLoading
@@ -152,7 +152,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     };
 
     return Card(
-      color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
       elevation: 0.5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(

@@ -207,7 +207,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
           style: TextStyle(color: secondaryTextColor, fontSize: 13),
         ),
         trailing: Icon(
-          Icons.chevron_right,
+          Icons.chevron_right_rounded,
           color: secondaryTextColor,
           size: 20,
         ),

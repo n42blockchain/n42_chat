@@ -729,7 +729,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
   }) {
     final isDark = context.isDarkMode;
     final color = !enabled
-        ? (isDark ? Colors.white38 : Colors.black26)
+        ? (isDark ? AppColors.textTertiaryDark : AppColors.textTertiary)
         : isDestructive
         ? AppColors.error
         : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);

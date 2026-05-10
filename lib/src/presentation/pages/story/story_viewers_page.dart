@@ -143,7 +143,7 @@ class _ViewerListTile extends StatelessWidget {
               // Arrow indicator if tappable
               if (onTap != null)
                 Icon(
-                  Icons.chevron_right,
+                  Icons.chevron_right_rounded,
                   color: isDark
                       ? AppColors.textTertiaryDark
                       : AppColors.textTertiary,

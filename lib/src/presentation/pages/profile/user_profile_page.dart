@@ -209,7 +209,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 children: [
                   IconButton(
                     icon: Icon(
-                      Icons.arrow_back_ios,
+                      Icons.arrow_back_ios_new_rounded,
                       color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                     ),
                     onPressed: () => Navigator.pop(context),
@@ -481,7 +481,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ListTile(
             title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
             trailing: Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -507,7 +507,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         'Add to Blacklist'),
             ),
             trailing: Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -525,7 +525,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ListTile(
             title: Text(S.of(context)?.commonReport ?? 'Report'),
             trailing: Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,

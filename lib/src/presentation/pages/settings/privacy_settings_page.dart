@@ -580,7 +580,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             ),
             const SizedBox(width: 8),
             Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -634,7 +634,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             ),
             const SizedBox(width: 8),
             Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -690,7 +690,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               ),
             ),
             Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,

@@ -1289,7 +1289,7 @@ class _BotResultSheet extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? Colors.white24 : Colors.black12,
+                color: isDark ? AppColors.dividerDark : AppColors.divider,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

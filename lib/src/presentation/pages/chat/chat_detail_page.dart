@@ -427,11 +427,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   Future<void> _showNotificationModeSheet() async {
     final isDark = context.isDarkMode;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
 
     final selected = await showModalBottomSheet<ConversationNotificationMode>(
       context: context,
-      backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -551,7 +551,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       newName = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           title: Text(
             S.of(context)?.chatGroupName ?? 'Group Name',
             style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
@@ -565,10 +565,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               hintText:
                   S.of(context)?.commonEnterGroupName ?? 'Enter group name',
               hintStyle: TextStyle(
-                color: isDark ? Colors.white54 : Colors.black54,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
               counterStyle: TextStyle(
-                color: isDark ? Colors.white54 : Colors.black54,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
           ),
@@ -628,11 +628,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? Colors.black : const Color(0xFFF5F5F5);
-    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
-    final dividerColor = isDark ? Colors.white10 : Colors.black12;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final dividerColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
 
     final isGroup = widget.conversation.type == ConversationType.group;
 
@@ -652,7 +652,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -1235,7 +1235,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
               ),
             const SizedBox(width: 4),
-            Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
+            Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
           ],
         ),
       ),
@@ -1301,7 +1301,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           title: Text(
             S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
             style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
@@ -1316,7 +1316,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         S.of(context)?.chatGroupAnnouncementHint ??
                         'Enter group announcement',
                     hintStyle: TextStyle(
-                      color: isDark ? Colors.white54 : Colors.black54,
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                     border: const OutlineInputBorder(),
                   ),
@@ -1325,7 +1325,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   S.of(context)?.chatGroupAnnouncementEmpty ??
                       'No announcement',
                   style: TextStyle(
-                    color: isDark ? Colors.white70 : Colors.black87,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
           actions: [
@@ -1398,7 +1398,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       newNickname = await showDialog<String>(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           title: Text(
             S.of(context)?.chatEditNickname ?? 'Edit Nickname',
             style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
@@ -1413,10 +1413,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   S.of(context)?.chatNicknameHint ??
                   'Enter your nickname in this group',
               hintStyle: TextStyle(
-                color: isDark ? Colors.white54 : Colors.black54,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
               counterStyle: TextStyle(
-                color: isDark ? Colors.white54 : Colors.black54,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
           ),
@@ -1465,7 +1465,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
             style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
@@ -1505,7 +1505,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         S.of(context)?.reportDescription ??
                         'Additional description (optional)',
                     hintStyle: TextStyle(
-                      color: isDark ? Colors.white54 : Colors.black54,
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                     border: const OutlineInputBorder(),
                   ),
@@ -1823,10 +1823,10 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? Colors.black : const Color(0xFFF5F5F5);
-    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -1834,7 +1834,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(

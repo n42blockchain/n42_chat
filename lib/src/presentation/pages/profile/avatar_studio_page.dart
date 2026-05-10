@@ -300,7 +300,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: const Icon(Icons.chevron_right_rounded),
       onTap: onTap,
     );
   }

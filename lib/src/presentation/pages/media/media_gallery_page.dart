@@ -327,7 +327,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
             else
               Icon(
                 isVideo ? Icons.videocam : Icons.image,
-                color: isDark ? Colors.white38 : Colors.black26,
+                color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                 size: 32,
               ),
             // 视频标记

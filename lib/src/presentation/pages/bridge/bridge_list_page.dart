@@ -89,7 +89,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
           : const Color(0xFFEDEDED),
       appBar: AppBar(
         title: const Text('Connected Accounts'),
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         elevation: 0.5,
         actions: [
@@ -149,7 +149,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: isDark ? Colors.white54 : Colors.black45,
+          color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
           letterSpacing: 0.5,
         ),
       ),
@@ -162,7 +162,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
     bool isDark,
   ) {
     final info = BridgePlatformRegistry.getInfo(state.platform);
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
     return Container(
@@ -254,7 +254,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
       return const Icon(Icons.error_outline, color: Colors.red, size: 20);
     }
     if (state.isAvailable) {
-      return Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 20);
+      return Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 20);
     }
     return null;
   }
@@ -268,7 +268,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 12,
-          color: isDark ? Colors.white38 : Colors.black38,
+          color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
         ),
       ),
     );

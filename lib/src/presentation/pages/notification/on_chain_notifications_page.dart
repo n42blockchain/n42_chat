@@ -157,7 +157,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
           Icon(
             Icons.notifications_none_outlined,
             size: 64,
-            color: isDark ? Colors.white24 : Colors.black26,
+            color: isDark ? AppColors.dividerDark : AppColors.divider,
           ),
           const SizedBox(height: 16),
           Text(
@@ -194,7 +194,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
           Icon(
             Icons.cloud_off_outlined,
             size: 64,
-            color: isDark ? Colors.white24 : Colors.black26,
+            color: isDark ? AppColors.dividerDark : AppColors.divider,
           ),
           const SizedBox(height: 16),
           Text(

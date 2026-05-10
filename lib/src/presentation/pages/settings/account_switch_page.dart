@@ -228,7 +228,7 @@ class _AccountTile extends StatelessWidget {
             )
           : account.isCurrent
           ? const Icon(Icons.check_circle, color: AppColors.primary)
-          : const Icon(Icons.chevron_right),
+          : const Icon(Icons.chevron_right_rounded),
       onTap: isSwitching ? null : onTap,
     );
   }

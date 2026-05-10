@@ -34,13 +34,13 @@ class OfficialAccountsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.search, size: 20,
-                      color: isDark ? Colors.white54 : Colors.black45),
+                      color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary),
                   const SizedBox(width: 6),
                   Text(
                     S.of(context)?.commonSearch ?? 'Search',
                     style: TextStyle(
                       fontSize: 15,
-                      color: isDark ? Colors.white54 : Colors.black45,
+                      color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                     ),
                   ),
                 ],

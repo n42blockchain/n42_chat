@@ -243,7 +243,7 @@ class _TypeCard extends StatelessWidget {
               icon,
               color: selected
                   ? AppColors.primary
-                  : (isDark ? Colors.white54 : Colors.black54),
+                  : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
             ),
             const SizedBox(height: 8),
             Text(
@@ -260,7 +260,7 @@ class _TypeCard extends StatelessWidget {
               subtitle,
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? Colors.white54 : Colors.black54,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
           ],

@@ -64,13 +64,13 @@ class ChatFolderManagementPage extends StatelessWidget {
                         Icon(
                           Icons.folder_outlined,
                           size: 48,
-                          color: isDark ? Colors.white24 : Colors.black26,
+                          color: isDark ? AppColors.dividerDark : AppColors.divider,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           l10n?.chatFolderEmpty ?? 'No custom folders yet',
                           style: TextStyle(
-                            color: isDark ? Colors.white38 : Colors.black38,
+                            color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                           ),
                         ),
                       ],
@@ -101,7 +101,7 @@ class ChatFolderManagementPage extends StatelessWidget {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: isDark ? Colors.white54 : Colors.black54,
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
     );
@@ -116,7 +116,7 @@ class ChatFolderManagementPage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
         borderRadius: BorderRadius.circular(10),
       ),
       child: ListTile(
@@ -136,7 +136,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                 _getFilterDescription(folder.filter),
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.white38 : Colors.black38,
+                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                 ),
               )
             : null,
@@ -149,7 +149,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                     icon: Icon(
                       Icons.edit_outlined,
                       size: 18,
-                      color: isDark ? Colors.white38 : Colors.black38,
+                      color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                     ),
                     onPressed: () => _showEditDialog(context, folder),
                   ),

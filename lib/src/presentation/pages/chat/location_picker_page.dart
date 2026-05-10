@@ -268,9 +268,9 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
@@ -394,7 +394,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                     // 搜索框
                     Container(
                       padding: const EdgeInsets.all(12),
-                      color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
                       child: TextField(
                         decoration: InputDecoration(
                           hintText: S.of(context)?.chatSearchLocation ?? 'Search location',
@@ -452,7 +452,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               place.address,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isDark ? Colors.white54 : Colors.black54,
+                                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                               ),
                             ),
                             trailing: isSelected
@@ -658,7 +658,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                         height: 4,
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
-                          color: isDark ? Colors.white24 : Colors.black12,
+                          color: isDark ? AppColors.dividerDark : AppColors.divider,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),

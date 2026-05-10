@@ -332,7 +332,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                   Text(
                     s?.profileLoadingRingtones ?? 'Loading ringtones...',
                     style: TextStyle(
-                      color: isDark ? Colors.white70 : Colors.black54,
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -346,13 +346,13 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                       Icon(
                         Icons.music_off,
                         size: 64,
-                        color: isDark ? Colors.white38 : Colors.black26,
+                        color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         s?.profileNoRingtonesFound ?? 'No ringtones found',
                         style: TextStyle(
-                          color: isDark ? Colors.white54 : Colors.black45,
+                          color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                           fontSize: 16,
                         ),
                       ),
@@ -388,7 +388,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                           ),
                           child: Icon(
                             isPlaying ? Icons.pause : ringtone.icon,
-                            color: isPlaying ? AppColors.primary : (isDark ? Colors.white70 : Colors.black54),
+                            color: isPlaying ? AppColors.primary : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
                           ),
                         ),
                         title: Text(

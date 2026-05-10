@@ -78,7 +78,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 ),
               ),
               trailing: Icon(
-                Icons.chevron_right,
+                Icons.chevron_right_rounded,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
               onTap: () {
