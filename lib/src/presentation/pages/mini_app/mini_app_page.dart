@@ -349,7 +349,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
             Icon(
               Icons.cloud_off_outlined,
               size: 64,
-              color: isDark ? Colors.white24 : Colors.black26,
+              color: isDark ? AppColors.dividerDark : AppColors.divider,
             ),
             const SizedBox(height: 16),
             Text(

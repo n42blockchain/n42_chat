@@ -657,7 +657,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildOrDivider() {
     final isDark = context.isDarkMode;
-    final dividerColor = isDark ? Colors.white24 : Colors.black12;
+    final dividerColor = isDark ? AppColors.dividerDark : AppColors.divider;
     final textColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;

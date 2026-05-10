@@ -504,7 +504,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right),
+            const Icon(Icons.chevron_right_rounded),
           ],
         ),
       ),

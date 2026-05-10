@@ -138,7 +138,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -151,7 +151,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.black12,
+                  color: isDark ? AppColors.dividerDark : AppColors.divider,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -160,7 +160,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
               ListTile(
                 leading: Icon(
                   Icons.visibility_outlined,
-                  color: isDark ? Colors.white54 : Colors.black54,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
                 title: Text(
                   l10n?.settingsUnhideChat ?? 'Unhide',
@@ -178,7 +178,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
               ListTile(
                 leading: Icon(
                   Icons.chat_outlined,
-                  color: isDark ? Colors.white54 : Colors.black54,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
                 title: Text(
                   l10n?.commonChat ?? 'Chat',

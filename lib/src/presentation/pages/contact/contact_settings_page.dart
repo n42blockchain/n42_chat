@@ -56,10 +56,10 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
-    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
-    final dividerColor = isDark ? Colors.white10 : Colors.black12;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final dividerColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
 
     return BlocListener<ContactBloc, ContactState>(
       listenWhen: (previous, current) =>
@@ -100,7 +100,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           backgroundColor: bgColor,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
@@ -310,7 +310,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           children: [
             Text(title, style: TextStyle(fontSize: 16, color: textColor)),
             const Spacer(),
-            Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
+            Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
           ],
         ),
       ),
@@ -382,7 +382,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
             style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
@@ -422,7 +422,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                         S.of(context)?.reportDescription ??
                         'Additional description (optional)',
                     hintStyle: TextStyle(
-                      color: isDark ? Colors.white54 : Colors.black54,
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                     border: const OutlineInputBorder(),
                   ),

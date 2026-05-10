@@ -509,7 +509,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                 ),
               ),
               trailing: Icon(
-                Icons.chevron_right,
+                Icons.chevron_right_rounded,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,

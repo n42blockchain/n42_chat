@@ -1826,7 +1826,7 @@ class MessageItem extends StatelessWidget {
 
     final iconColor = isMissed && !message.isFromMe
         ? AppColors.error
-        : (isDark ? Colors.white70 : Colors.black54);
+        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
 
     return MessageBubble(
       isSelf: message.isFromMe,

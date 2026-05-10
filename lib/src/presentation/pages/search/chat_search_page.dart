@@ -132,7 +132,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         children: [
           IconButton(
             icon: Icon(
-              Icons.arrow_back_ios,
+              Icons.arrow_back_ios_new_rounded,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
             onPressed: () => Navigator.pop(context),

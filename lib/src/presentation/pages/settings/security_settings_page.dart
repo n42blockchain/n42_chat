@@ -841,7 +841,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ),
       ),
       trailing: Icon(
-        Icons.chevron_right,
+        Icons.chevron_right_rounded,
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       ),
       onTap: () => _showDeviceDetails(device),
@@ -1134,7 +1134,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             )
           : null,
       trailing: Icon(
-        Icons.chevron_right,
+        Icons.chevron_right_rounded,
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       ),
       onTap: onTap,

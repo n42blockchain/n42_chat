@@ -98,7 +98,7 @@ class AboutPage extends StatelessWidget {
                   ),
                 ),
                 trailing: Icon(
-                  Icons.chevron_right,
+                  Icons.chevron_right_rounded,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -176,7 +176,7 @@ class AboutPage extends StatelessWidget {
         ),
       ),
       trailing: Icon(
-        Icons.chevron_right,
+        Icons.chevron_right_rounded,
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       ),
       onTap: onTap,

@@ -275,7 +275,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                            color: isDark ? AppColors.dividerThinDark : AppColors.dividerThin.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
@@ -379,7 +379,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Icon(Icons.chevron_right, color: secondaryTextColor),
+                      Icon(Icons.chevron_right_rounded, color: secondaryTextColor),
                     ],
                   ),
                 ),
@@ -585,7 +585,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
         decoration: BoxDecoration(
           color: selected
               ? const Color(0xFFE85D04)
-              : (isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05)),
+              : (isDark ? AppColors.dividerThinDark : AppColors.dividerThin.withValues(alpha: 0.05)),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
@@ -702,7 +702,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                        color: isDark ? AppColors.dividerThinDark : AppColors.dividerThin.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(

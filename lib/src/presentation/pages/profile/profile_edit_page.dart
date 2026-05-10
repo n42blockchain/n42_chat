@@ -148,7 +148,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           ),
                         const SizedBox(width: 8),
                         const Icon(
-                          Icons.chevron_right,
+                          Icons.chevron_right_rounded,
                           color: AppColors.textTertiary,
                         ),
                       ],
@@ -228,7 +228,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         ),
                         const SizedBox(width: 8),
                         const Icon(
-                          Icons.chevron_right,
+                          Icons.chevron_right_rounded,
                           color: AppColors.textTertiary,
                         ),
                       ],

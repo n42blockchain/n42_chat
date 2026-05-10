@@ -213,7 +213,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? Colors.white60 : Colors.black54,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
             if (!state.isAvailable) ...[
@@ -285,7 +285,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
         label,
         style: TextStyle(
           fontSize: 13,
-          color: isDark ? Colors.white70 : Colors.black87,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       backgroundColor: isDark
@@ -324,7 +324,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               decoration: BoxDecoration(
                 color: isUser
                     ? AppColors.primary
-                    : (isDark ? const Color(0xFF2C2C2E) : Colors.white),
+                    : (isDark ? AppColors.surfaceDark : AppColors.surface),
                 borderRadius: BorderRadius.circular(16).copyWith(
                   topLeft: isUser ? null : const Radius.circular(4),
                   topRight: isUser ? const Radius.circular(4) : null,
@@ -420,7 +420,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                color: isDark ? AppColors.surfaceDark : AppColors.surface,
                 borderRadius: BorderRadius.circular(
                   16,
                 ).copyWith(topLeft: const Radius.circular(4)),
@@ -470,7 +470,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
         border: Border(
           top: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
         ),
@@ -496,7 +496,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 decoration: InputDecoration(
                   hintText: l10n?.aiAssistantWelcome ?? 'Ask anything...',
                   hintStyle: TextStyle(
-                    color: isDark ? Colors.white38 : Colors.black38,
+                    color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                   ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(

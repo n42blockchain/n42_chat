@@ -310,7 +310,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
             index: index,
             child: Icon(
               Icons.drag_handle,
-              color: isDark ? Colors.white38 : Colors.black26,
+              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
           ),
         ),
@@ -326,7 +326,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
                 'Default',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.white38 : Colors.black38,
+                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                 ),
               )
             : null,
@@ -337,7 +337,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
               IconButton(
                 icon: Icon(
                   Icons.edit_outlined,
-                  color: isDark ? Colors.white54 : Colors.black45,
+                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                 ),
                 onPressed: _isSaving ? null : () => _editReply(reply),
               ),

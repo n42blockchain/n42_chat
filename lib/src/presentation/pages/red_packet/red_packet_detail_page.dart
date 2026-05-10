@@ -196,7 +196,7 @@ class RedPacketDetailPage extends StatelessWidget {
                               ),
                             ),
                             Icon(
-                              Icons.chevron_right,
+                              Icons.chevron_right_rounded,
                               color: Colors.white.withValues(alpha: 0.7),
                               size: 18,
                             ),

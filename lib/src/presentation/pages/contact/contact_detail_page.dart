@@ -172,10 +172,10 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
-    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
-    final dividerColor = isDark ? Colors.white10 : Colors.black12;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final dividerColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
 
     // 检查 ContactBloc 是否可用
     final hasContactBloc = _maybeContactBloc() != null;
@@ -186,7 +186,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
@@ -403,7 +403,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
+            Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
           ],
         ),
       ),
@@ -466,7 +466,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
+                Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
               ],
             ),
           ),
@@ -481,8 +481,8 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     required VoidCallback onTap,
   }) {
     final isDark = context.isDarkMode;
-    final borderColor = isDark ? Colors.white10 : Colors.black12;
-    final iconColor = isDark ? Colors.white70 : Colors.black54;
+    final borderColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
+    final iconColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
     return Padding(
@@ -740,11 +740,11 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? Colors.black : Colors.white;
-    final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
-    final labelColor = isDark ? Colors.white38 : Colors.black38;
-    final dividerColor = isDark ? Colors.white10 : Colors.black12;
+    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final dividerColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
 
     // 检查 ContactBloc 是否可用
     final hasContactBloc = _maybeContactBloc() != null;
@@ -755,7 +755,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -969,7 +969,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             // 右侧箭头
             if (showArrow) ...[
               const SizedBox(width: 4),
-              Icon(Icons.chevron_right, color: secondaryTextColor, size: 20),
+              Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
             ],
           ],
         ),
@@ -1020,7 +1020,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         title: Text(
           S.of(context)?.contactNotes ?? 'Notes',
           style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
@@ -1034,7 +1034,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                 S.of(context)?.contactNotesHint ??
                 'Add notes about this contact',
             hintStyle: TextStyle(
-              color: isDark ? Colors.white54 : Colors.black54,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             ),
             border: const OutlineInputBorder(),
           ),
@@ -1166,7 +1166,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         title: Text(
           S.of(context)?.contactPhone ?? 'Phone',
           style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
@@ -1179,7 +1179,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
             hintText:
                 S.of(context)?.contactAddPhoneHint ?? 'Enter phone number',
             hintStyle: TextStyle(
-              color: isDark ? Colors.white54 : Colors.black54,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             ),
             border: const OutlineInputBorder(),
           ),
@@ -1252,8 +1252,8 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         ? const Color(0xFF2C2C2E)
         : const Color(0xFFF2F2F7);
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? Colors.white38 : Colors.black38;
-    final labelColor = isDark ? Colors.white54 : Colors.black54;
+    final hintColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
 
     final scaffold = Scaffold(
       backgroundColor: bgColor,
@@ -1424,7 +1424,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                         style: TextStyle(fontSize: 16, color: hintColor),
                       ),
                       const Spacer(),
-                      Icon(Icons.chevron_right, color: hintColor, size: 20),
+                      Icon(Icons.chevron_right_rounded, color: hintColor, size: 20),
                     ],
                   ),
                 ),

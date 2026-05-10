@@ -188,7 +188,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+          color: isDark ? AppColors.surfaceDark : AppColors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -356,7 +356,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        Icons.chevron_right,
+                        Icons.chevron_right_rounded,
                         color: isDark
                             ? AppColors.textSecondaryDark
                             : AppColors.textSecondary,

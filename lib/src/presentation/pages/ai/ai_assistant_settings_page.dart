@@ -124,7 +124,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 13,
-              color: isDark ? Colors.white54 : Colors.black54,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -132,7 +132,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(children: children),
@@ -162,7 +162,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
         subtitle,
         style: TextStyle(
           fontSize: 14,
-          color: subtitleColor ?? (isDark ? Colors.white54 : Colors.black54),
+          color: subtitleColor ?? (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
         ),
       ),
     );

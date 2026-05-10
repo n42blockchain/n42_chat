@@ -883,7 +883,7 @@ class _StoryContentState extends State<_StoryContent> {
                     ),
                     const SizedBox(width: 4),
                     Icon(
-                      Icons.chevron_right,
+                      Icons.chevron_right_rounded,
                       color: Colors.white.withValues(alpha: 0.6),
                       size: 20,
                     ),

@@ -428,7 +428,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios,
+            Icons.arrow_back_ios_new_rounded,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             size: 20,
           ),

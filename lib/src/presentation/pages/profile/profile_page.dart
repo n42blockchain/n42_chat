@@ -455,7 +455,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    Icon(Icons.chevron_right, color: subtitleColor, size: 24),
+                    Icon(Icons.chevron_right_rounded, color: subtitleColor, size: 24),
                   ],
                 ),
               ],
@@ -533,7 +533,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               Icon(
-                Icons.chevron_right,
+                Icons.chevron_right_rounded,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -659,7 +659,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.white24 : Colors.black12,
+                    color: isDark ? AppColors.dividerDark : AppColors.divider,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

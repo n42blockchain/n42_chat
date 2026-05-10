@@ -174,10 +174,10 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
     return Scaffold(
       backgroundColor:
-          isDark ? const Color(0xFF111111) : const Color(0xFFEDEDED),
+          isDark ? AppColors.backgroundDark : AppColors.background,
       appBar: AppBar(
         title: Text(_info.displayName),
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         elevation: 0.5,
       ),
@@ -206,7 +206,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
   Widget _buildHeader(bool isDark) {
     return Container(
-      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+      color: isDark ? AppColors.surfaceDark : AppColors.surface,
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
@@ -237,7 +237,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             _info.description,
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? Colors.white54 : Colors.black45,
+              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -247,7 +247,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildStatusSection(bool isDark) {
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
     return Container(
@@ -261,7 +261,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: isDark ? Colors.white54 : Colors.black45,
+              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
               letterSpacing: 0.5,
             ),
           ),
@@ -289,7 +289,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
                           _state.remoteUsername!,
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDark ? Colors.white54 : Colors.black45,
+                            color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                           ),
                         ),
                       ),
@@ -347,7 +347,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildActionsSection(bool isDark) {
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
 
     return Container(
       color: bgColor,
@@ -403,7 +403,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
     VoidCallback? onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final defaultColor = isDark ? Colors.white70 : Colors.black87;
+    final defaultColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
 
     return ListTile(
       leading: Icon(icon, color: color ?? defaultColor, size: 22),
@@ -426,7 +426,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildResponseSection(bool isDark) {
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
 
     return Container(
       color: bgColor,
@@ -439,7 +439,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: isDark ? Colors.white54 : Colors.black45,
+              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
               letterSpacing: 0.5,
             ),
           ),
@@ -448,7 +448,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             _lastResponse!,
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? Colors.white70 : Colors.black54,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               fontFamily: 'monospace',
             ),
           ),
@@ -458,7 +458,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildQRSection(bool isDark) {
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
 
     return Container(
       color: bgColor,
@@ -479,7 +479,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? Colors.white54 : Colors.black45,
+              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
           ),
           const SizedBox(height: 16),
@@ -506,8 +506,8 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildInfoSection(bool isDark) {
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final textColor = isDark ? Colors.white54 : Colors.black45;
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final textColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
 
     return Container(
       color: bgColor,
