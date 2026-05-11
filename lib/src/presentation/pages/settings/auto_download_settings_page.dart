@@ -146,7 +146,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back,
+            Icons.arrow_back_rounded,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),

@@ -55,7 +55,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? Colors.black : Colors.white;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;

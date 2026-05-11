@@ -280,6 +280,8 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                           : AppColors.divider)
                       : (isSelected ? AppColors.primary : Colors.transparent),
                   border: Border.all(
+                    // redacted 用 textTertiary（淡，禁用语义）；可选中状态用 textSecondary
+                    // 保证未选中圆圈在白底上仍清晰可见。
                     color: isRedacted
                         ? (isDark
                             ? AppColors.textTertiaryDark
@@ -287,8 +289,8 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                         : (isSelected
                               ? AppColors.primary
                               : (isDark
-                                  ? AppColors.textTertiaryDark
-                                  : AppColors.textTertiary)),
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondary)),
                     width: 2,
                   ),
                 ),

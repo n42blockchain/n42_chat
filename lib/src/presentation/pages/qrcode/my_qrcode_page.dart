@@ -149,9 +149,9 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED);
+    final bgColor = isDark ? AppColors.surfaceDark : AppColors.background;
     final cardColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF181818);
+    final textColor = isDark ? Colors.white : AppColors.textPrimary;
     final subtitleColor = isDark ? Colors.white70 : AppColors.textSecondary;
 
     return Scaffold(

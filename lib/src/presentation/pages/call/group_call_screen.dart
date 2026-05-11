@@ -539,7 +539,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           children: [
             // 返回按钮
             IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
               onPressed: () => _showLeaveDialog(),
             ),
 

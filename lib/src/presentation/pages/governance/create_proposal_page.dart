@@ -575,7 +575,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: isDark
-              ? const Color(0xFF3D3D3D)
+              ? AppColors.dividerDark
               : const Color(0xFFE0E0E0),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

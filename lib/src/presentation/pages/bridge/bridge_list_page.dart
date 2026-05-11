@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../integration/bridge/bridge_manager.dart';
 import '../../../integration/bridge/bridge_platform.dart';
@@ -81,12 +82,12 @@ class _BridgeListPageState extends State<BridgeListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF111111)
-          : const Color(0xFFEDEDED),
+          ? AppColors.backgroundDark
+          : AppColors.background,
       appBar: AppBar(
         title: const Text('Connected Accounts'),
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,

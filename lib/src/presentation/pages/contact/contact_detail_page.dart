@@ -171,7 +171,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? Colors.black : Colors.white;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
@@ -739,7 +739,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? Colors.black : Colors.white;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
@@ -1247,7 +1247,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? Colors.black : Colors.white;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark
         ? const Color(0xFF2C2C2E)
         : const Color(0xFFF2F2F7);

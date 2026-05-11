@@ -164,7 +164,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: textColor),
+          icon: Icon(Icons.arrow_back_rounded, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
         bottom: PreferredSize(
