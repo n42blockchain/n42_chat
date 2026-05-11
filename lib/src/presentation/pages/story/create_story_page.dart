@@ -385,7 +385,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                     ? AppColors.backgroundDark
                     : AppColors.inputBackground,
                 counterStyle: TextStyle(
-                  color: isDark ? Colors.grey[500] : Colors.grey[600],
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
               ),
             ),
@@ -440,7 +440,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 'Tap to select an image',
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
               ),
             ],

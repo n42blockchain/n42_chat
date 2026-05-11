@@ -226,7 +226,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
   Color _getStatusColor(BridgeState state) {
     switch (state.status) {
       case BridgeConnectionStatus.connected:
-        return const Color(0xFF07C160);
+        return AppColors.primary;
       case BridgeConnectionStatus.connecting:
       case BridgeConnectionStatus.reconnecting:
         return Colors.orange;
@@ -248,7 +248,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
       );
     }
     if (state.isConnected) {
-      return const Icon(Icons.check_circle, color: Color(0xFF07C160), size: 20);
+      return const Icon(Icons.check_circle, color: AppColors.primary, size: 20);
     }
     if (state.hasError) {
       return const Icon(Icons.error_outline, color: Colors.red, size: 20);

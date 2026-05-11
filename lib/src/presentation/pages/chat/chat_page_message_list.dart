@@ -275,14 +275,20 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isRedacted
-                      ? (isDark ? Colors.grey.shade800 : Colors.grey.shade300)
+                      ? (isDark
+                          ? AppColors.dividerDark
+                          : AppColors.divider)
                       : (isSelected ? AppColors.primary : Colors.transparent),
                   border: Border.all(
                     color: isRedacted
-                        ? (isDark ? Colors.grey.shade600 : Colors.grey.shade400)
+                        ? (isDark
+                            ? AppColors.textTertiaryDark
+                            : AppColors.textTertiary)
                         : (isSelected
                               ? AppColors.primary
-                              : (isDark ? Colors.white54 : Colors.black38)),
+                              : (isDark
+                                  ? AppColors.textTertiaryDark
+                                  : AppColors.textTertiary)),
                     width: 2,
                   ),
                 ),

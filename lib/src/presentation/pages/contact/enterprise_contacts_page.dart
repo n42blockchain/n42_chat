@@ -61,7 +61,7 @@ class EnterpriseContactsPage extends StatelessWidget {
                     S.of(context)?.contactNoEnterpriseContacts ?? 'No enterprise contacts',
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -70,7 +70,7 @@ class EnterpriseContactsPage extends StatelessWidget {
                         'Enterprise contacts will appear here',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? Colors.grey[600] : Colors.grey[500],
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                 ],

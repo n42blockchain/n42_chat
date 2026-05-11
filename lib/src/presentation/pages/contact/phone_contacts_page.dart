@@ -237,7 +237,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               'Scanned ${_allPhoneContacts.length} contacts',
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? Colors.grey[600] : Colors.grey[500],
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
           ],
@@ -343,7 +343,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               'In Contacts: ${phoneContact.displayName}',
               style: TextStyle(
                 fontSize: 11,
-                color: isDark ? Colors.grey[600] : Colors.grey[500],
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
         ],

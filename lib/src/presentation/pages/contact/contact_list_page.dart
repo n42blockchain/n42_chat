@@ -1724,7 +1724,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             S.of(context)?.commonNoGroups ?? 'No groups',
             style: TextStyle(
               fontSize: 16,
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 24),

@@ -11,6 +11,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../services/voip/call_manager.dart';
 import '../../../services/voip/webrtc_service.dart';
 import '../../widgets/call/call_enhancement_sheet.dart';
@@ -62,7 +63,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   static const Color _controlBgColor = Color(0xFF3D3D3D);
   static const Color _controlActiveBgColor = Colors.white;
   static const Color _hangupColor = Color(0xFFFA5151);
-  static const Color _answerColor = Color(0xFF07C160);
+  static const Color _answerColor = AppColors.primary;
 
   @override
   void initState() {

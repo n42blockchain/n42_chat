@@ -170,7 +170,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                       Text(
                                         moment.formattedTime,
                                         style: TextStyle(
-                                          color: isDark ? Colors.grey[500] : Colors.grey[600],
+                                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -206,13 +206,13 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   Icon(
                                     Icons.location_on,
                                     size: 16,
-                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     moment.location!.displayText,
                                     style: TextStyle(
-                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -249,7 +249,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   Text(
                                     s?.momentLikesCount(visibleLikes.length) ?? '${visibleLikes.length} likes',
                                     style: TextStyle(
-                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -299,13 +299,13 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   Icon(
                                     Icons.comment,
                                     size: 18,
-                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     s?.momentCommentsCount(visibleComments.length) ?? '${visibleComments.length} comments',
                                     style: TextStyle(
-                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -319,7 +319,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                     child: Text(
                                       s?.momentNoComments ?? 'No comments yet',
                                       style: TextStyle(
-                                        color: isDark ? Colors.grey[500] : Colors.grey[600],
+                                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                                       ),
                                     ),
                                   ),
@@ -526,7 +526,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   Text(
                     _formatCommentTime(comment.timestamp),
                     style: TextStyle(
-                      color: isDark ? Colors.grey[600] : Colors.grey[500],
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                       fontSize: 12,
                     ),
                   ),

@@ -95,7 +95,7 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
                         S.of(context)?.contactNoChatOnlyFriends ?? 'No chat-only friends',
                         style: TextStyle(
                           fontSize: 16,
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                         ),
                       ),
                     ],

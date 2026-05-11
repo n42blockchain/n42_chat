@@ -152,7 +152,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
     final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED);
     final cardColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF181818);
-    final subtitleColor = isDark ? Colors.white70 : const Color(0xFF888888);
+    final subtitleColor = isDark ? Colors.white70 : AppColors.textSecondary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -253,7 +253,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                       backgroundColor: Colors.white,
                       eyeStyle: const QrEyeStyle(
                         eyeShape: QrEyeShape.square,
-                        color: Color(0xFF07C160),
+                        color: AppColors.primary,
                       ),
                       dataModuleStyle: const QrDataModuleStyle(
                         dataModuleShape: QrDataModuleShape.square,
@@ -325,17 +325,17 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF07C160).withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFF07C160), size: 24),
+            child: Icon(icon, color: AppColors.primary, size: 24),
           ),
           const SizedBox(height: 8),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
-              color: isDark ? Colors.white70 : const Color(0xFF888888),
+              color: isDark ? Colors.white70 : AppColors.textSecondary,
             ),
           ),
         ],

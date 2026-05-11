@@ -268,7 +268,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                         child: Text(
                           s?.momentNoConversations ?? 'No conversations',
                           style: TextStyle(
-                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                           ),
                         ),
                       )
@@ -295,7 +295,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                                       fontSize: 13,
                                     ),
                                   )

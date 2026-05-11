@@ -205,7 +205,7 @@ class _MomentListViewState extends State<_MomentListView> {
                         Text(
                           s?.momentNoMomentsYet ?? 'No moments yet',
                           style: TextStyle(
-                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                           ),
                         ),
                       ],
@@ -417,13 +417,13 @@ class _MomentTile extends StatelessWidget {
                       Icon(
                         Icons.location_on,
                         size: 14,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         moment.location!.displayText,
                         style: TextStyle(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                           fontSize: 12,
                         ),
                       ),
@@ -438,7 +438,7 @@ class _MomentTile extends StatelessWidget {
                     Text(
                       moment.formattedTime,
                       style: TextStyle(
-                        color: isDark ? Colors.grey[500] : Colors.grey[600],
+                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                         fontSize: 12,
                       ),
                     ),
@@ -664,7 +664,7 @@ class _MomentTile extends StatelessWidget {
           child: Icon(
             Icons.more_horiz,
             size: 18,
-            color: isDark ? Colors.grey[400] : Colors.grey[600],
+            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
           ),
         ),
       ),

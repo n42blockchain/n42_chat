@@ -62,7 +62,7 @@ class ServiceAccountsPage extends StatelessWidget {
                     S.of(context)?.contactNoServiceAccounts ?? 'No service accounts',
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -71,7 +71,7 @@ class ServiceAccountsPage extends StatelessWidget {
                         'Subscribe to service accounts for convenient services',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? Colors.grey[600] : Colors.grey[500],
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                 ],

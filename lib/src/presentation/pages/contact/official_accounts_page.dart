@@ -63,7 +63,7 @@ class OfficialAccountsPage extends StatelessWidget {
                     S.of(context)?.contactNoOfficialAccounts ?? 'No official accounts',
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -72,7 +72,7 @@ class OfficialAccountsPage extends StatelessWidget {
                         'Follow official accounts to receive updates',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? Colors.grey[600] : Colors.grey[500],
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                 ],
