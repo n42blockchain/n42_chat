@@ -58,11 +58,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   void Function(Duration)? _originalDurationCallback;
   void Function(String)? _originalErrorCallback;
 
-  // 微信风格的颜色
+  // 通话页面始终黑底；_bgColor 略浅给镜头预览容器边界。
   static const Color _bgColor = Color(0xFF1F1F1F);
-  static const Color _controlBgColor = Color(0xFF3D3D3D);
+  static const Color _controlBgColor = AppColors.dividerDark;
   static const Color _controlActiveBgColor = Colors.white;
-  static const Color _hangupColor = Color(0xFFFA5151);
+  static const Color _hangupColor = AppColors.error;
   static const Color _answerColor = AppColors.primary;
 
   @override

@@ -309,7 +309,7 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
           Expanded(

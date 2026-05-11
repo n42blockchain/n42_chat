@@ -421,7 +421,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
             ),
             filled: true,
             fillColor: isDark
-                ? const Color(0xFF2A2A2A)
+                ? AppColors.dividerThinDark
                 : const Color(0xFFF5F5F5),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -601,7 +601,7 @@ class _RuleTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF8F8F8),
+        color: isDark ? AppColors.dividerThinDark : const Color(0xFFF8F8F8),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

@@ -159,7 +159,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
+          icon: Icon(Icons.arrow_back_rounded,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),

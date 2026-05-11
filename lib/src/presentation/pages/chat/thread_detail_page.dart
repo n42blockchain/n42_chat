@@ -77,7 +77,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
       appBar: AppBar(
         title: Text(s?.threadTitle ?? 'Thread'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
