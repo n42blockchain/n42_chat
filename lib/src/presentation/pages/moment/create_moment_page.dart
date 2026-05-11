@@ -167,7 +167,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     hintText: "What's on your mind?",
                     border: InputBorder.none,
                     counterStyle: TextStyle(
-                      color: isDark ? Colors.grey[500] : Colors.grey[600],
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                     ),
                   ),
                   // Text changes are handled by ValueListenableBuilder on the controller
@@ -341,7 +341,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     Widget? trailing,
   }) {
     return ListTile(
-      leading: Icon(icon, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+      leading: Icon(icon, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
       title: Text(
         title,
         style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),

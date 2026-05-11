@@ -50,7 +50,7 @@ class ServicesPage extends StatelessWidget {
             _buildServiceItem(
               context,
               icon: Icons.swap_horiz,
-              color: const Color(0xFF07C160),
+              color: AppColors.primary,
               label: S.of(context)?.commonTransfer ?? 'Transfer',
               cardColor: cardColor,
               textColor: textColor,

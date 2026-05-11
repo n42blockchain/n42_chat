@@ -94,7 +94,7 @@ class OrdersAndCardsPage extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 16,
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -102,7 +102,7 @@ class OrdersAndCardsPage extends StatelessWidget {
             description,
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? Colors.grey[600] : Colors.grey[500],
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             ),
           ),
         ],

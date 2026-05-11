@@ -306,7 +306,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF07C160)),
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
             const SizedBox(height: 16),
             Text(
@@ -364,7 +364,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   ElevatedButton(
                     onPressed: _checkCameraPermission,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF07C160),
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -408,7 +408,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                       : (S.of(context)?.qrcodeManualInputUserId ??
                             'Manual Input User ID'),
                   style: const TextStyle(
-                    color: Color(0xFF07C160),
+                    color: AppColors.primary,
                     fontSize: 14,
                   ),
                 ),
@@ -477,7 +477,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                         : (S.of(context)?.qrcodeManualInputUserId ??
                               'Manual Input User ID'),
                     style: const TextStyle(
-                      color: Color(0xFF07C160),
+                      color: AppColors.primary,
                       fontSize: 14,
                     ),
                   ),
@@ -504,7 +504,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             color: Colors.black54,
             child: const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF07C160)),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             ),
           ),
@@ -556,17 +556,17 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       decoration: BoxDecoration(
         border: Border(
           top: isTop
-              ? const BorderSide(color: Color(0xFF07C160), width: 3)
+              ? const BorderSide(color: AppColors.primary, width: 3)
               : BorderSide.none,
           bottom: isTop
               ? BorderSide.none
-              : const BorderSide(color: Color(0xFF07C160), width: 3),
+              : const BorderSide(color: AppColors.primary, width: 3),
           left: isLeft
-              ? const BorderSide(color: Color(0xFF07C160), width: 3)
+              ? const BorderSide(color: AppColors.primary, width: 3)
               : BorderSide.none,
           right: isLeft
               ? BorderSide.none
-              : const BorderSide(color: Color(0xFF07C160), width: 3),
+              : const BorderSide(color: AppColors.primary, width: 3),
         ),
       ),
     );
@@ -602,7 +602,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           ElevatedButton(
             onPressed: _isProcessing ? null : _submitManualInput,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF07C160),
+              backgroundColor: AppColors.primary,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

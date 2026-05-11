@@ -309,7 +309,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
     switch (_state.status) {
       case BridgeConnectionStatus.connected:
-        color = const Color(0xFF07C160);
+        color = AppColors.primary;
         icon = Icons.check_circle;
       case BridgeConnectionStatus.connecting:
       case BridgeConnectionStatus.reconnecting:

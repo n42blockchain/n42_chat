@@ -253,7 +253,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                         S.of(context)?.contactNoTags ?? 'No tags yet',
                         style: TextStyle(
                           fontSize: 16,
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 24),

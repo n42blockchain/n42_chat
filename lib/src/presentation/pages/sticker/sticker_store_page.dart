@@ -260,7 +260,7 @@ class _StickerStorePageState extends State<StickerStorePage>
             Text(
               'No stickers found',
               style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
           ],
@@ -407,28 +407,28 @@ class _StickerStorePageState extends State<StickerStorePage>
                 Icon(
                   Icons.download,
                   size: 14,
-                  color: isDark ? Colors.grey[500] : Colors.grey[600],
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '${pack.downloadCount}',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? Colors.grey[500] : Colors.grey[600],
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Icon(
                   Icons.emoji_emotions_outlined,
                   size: 14,
-                  color: isDark ? Colors.grey[500] : Colors.grey[600],
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '${pack.stickerCount} stickers',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? Colors.grey[500] : Colors.grey[600],
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -455,7 +455,7 @@ class _StickerStorePageState extends State<StickerStorePage>
               'No stickers installed',
               style: TextStyle(
                 fontSize: 16,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
