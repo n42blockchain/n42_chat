@@ -1546,8 +1546,11 @@ class MessageItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 14,
+                      height: 1.3,
                       fontWeight: FontWeight.w500,
                       color: message.isFromMe
                           ? AppColors.sentText(isDark)
@@ -1555,22 +1558,21 @@ class MessageItem extends StatelessWidget {
                                 ? AppColors.textPrimaryDark
                                 : AppColors.textPrimary),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     artist,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       color: message.isFromMe
                           ? AppColors.sentText(isDark).withValues(alpha: 0.7)
                           : (isDark
                                 ? AppColors.textSecondaryDark
                                 : AppColors.textSecondary),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -1630,8 +1632,11 @@ class MessageItem extends StatelessWidget {
                       maxSelections == 1
                           ? (S.of(context)?.chatSingleChoice ?? 'Single')
                           : (S.of(context)?.chatMultiChoice ?? 'Multi'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 10,
+                        height: 1.3,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1652,7 +1657,9 @@ class MessageItem extends StatelessWidget {
                   ),
                   child: Text(
                     S.of(context)?.chatEnded ?? 'Ended',
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 10, height: 1.3, color: Colors.grey),
                   ),
                 ),
             ],
@@ -1662,8 +1669,11 @@ class MessageItem extends StatelessWidget {
           // 问题
           Text(
             question,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.35,
               fontWeight: FontWeight.w600,
               color: message.isFromMe
                   ? AppColors.sentText(isDark)
@@ -1727,8 +1737,11 @@ class MessageItem extends StatelessWidget {
                         Expanded(
                           child: Text(
                             optionText,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 14,
+                              height: 1.35,
                               color: isDark
                                   ? AppColors.textPrimaryDark
                                   : AppColors.textPrimary,
@@ -1771,8 +1784,11 @@ class MessageItem extends StatelessWidget {
                                   percentage.toStringAsFixed(0),
                                 ) ??
                             '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 11,
+                          height: 1.3,
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -1791,8 +1807,11 @@ class MessageItem extends StatelessWidget {
               Text(
                 S.of(context)?.chatPollParticipantsFormat(totalVoters) ??
                     '$totalVoters participants',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 11,
+                  height: 1.3,
                   color: AppColors.textSecondary,
                 ),
               ),
@@ -1801,8 +1820,11 @@ class MessageItem extends StatelessWidget {
                   onTap: () => onEndPoll?.call(message.id),
                   child: Text(
                     S.of(context)?.chatEndPollButton ?? 'End Poll',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 11,
+                      height: 1.3,
                       color: AppColors.error,
                     ),
                   ),
@@ -1822,8 +1844,11 @@ class MessageItem extends StatelessWidget {
         SizedBox(width: 4),
         Text(
           '[加密消息]',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
+            height: 1.3,
             color: AppColors.textSecondary,
             fontStyle: FontStyle.italic,
           ),
@@ -1901,7 +1926,9 @@ class MessageItem extends StatelessWidget {
           Flexible(
             child: Text(
               callText,
-              style: TextStyle(fontSize: 15, color: textColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
           ),
           // 未接来电显示回拨按钮
@@ -1926,8 +1953,11 @@ class MessageItem extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       S.of(context)?.chatCallBack ?? '回拨',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 12,
+                        height: 1.3,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,
                       ),
