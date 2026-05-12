@@ -208,10 +208,15 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   S.of(context)?.settingsTranslateTextTo ?? 'Translate text to',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -225,8 +230,13 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                     return ListTile(
                       title: Text(
                         lang.localizedName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                          height: 1.3,
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimary,
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.normal,
@@ -234,15 +244,21 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       ),
                       subtitle: Text(
                         lang.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
+                          height: 1.3,
                           color: isDark
                               ? AppColors.textSecondaryDark
                               : AppColors.textSecondary,
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check, color: AppColors.primary)
+                          ? const Icon(
+                              Icons.check_rounded,
+                              color: AppColors.primary,
+                            )
                           : null,
                       onTap: _isSaving
                           ? null
@@ -337,29 +353,40 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       Expanded(
                         child: Text(
                           l10n?.settingsTranslateTextTo ?? 'Translate text to',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 16,
+                            height: 1.3,
                             color: isDark
-                                ? Colors.white
+                                ? AppColors.textPrimaryDark
                                 : AppColors.textPrimary,
                           ),
                         ),
                       ),
-                      Text(
-                        _getLanguageDisplayName(_targetLanguage),
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                      // 限宽防长译名挤压标题
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 160),
+                        child: Text(
+                          _getLanguageDisplayName(_targetLanguage),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontSize: 15,
+                            height: 1.3,
+                            color: isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondary,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
                         Icons.chevron_right_rounded,
                         color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                            ? AppColors.textTertiaryDark
+                            : AppColors.textTertiary,
                       ),
                     ],
                   ),

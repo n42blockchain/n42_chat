@@ -316,17 +316,27 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
         ),
         title: Text(
           reply.content,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            height: 1.3,
+            color: isDark
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimary,
           ),
         ),
         subtitle: reply.isSystem
             ? Text(
                 'Default',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                  height: 1.3,
+                  color: isDark
+                      ? AppColors.textTertiaryDark
+                      : AppColors.textTertiary,
                 ),
               )
             : null,
