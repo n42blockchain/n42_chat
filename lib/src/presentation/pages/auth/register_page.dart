@@ -296,12 +296,12 @@ class _RegisterPageState extends State<RegisterPage> {
       children: [
         Text(
           S.of(context)?.authServerAddress ?? 'Server Address',
-          style: TextStyle(fontSize: 14, color: labelColor),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _homeserverController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.authServerAddressHint ??
@@ -359,7 +359,9 @@ class _RegisterPageState extends State<RegisterPage> {
           const SizedBox(height: 4),
           Text(
             '✓ ${S.of(context)?.authConnectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
-            style: const TextStyle(fontSize: 12, color: AppColors.success),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12, height: 1.3, color: AppColors.success),
           ),
         ],
       ],
@@ -393,15 +395,20 @@ class _RegisterPageState extends State<RegisterPage> {
         activeTrackColor: AppColors.primary.withValues(alpha: 0.35),
         title: Text(
           'Anonymous Registration',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: textColor,
             fontSize: 15,
+            height: 1.3,
             fontWeight: FontWeight.w600,
           ),
         ),
         subtitle: Text(
           'Create an account without binding phone or email. A username will be generated automatically.',
-          style: TextStyle(color: subtitleColor, fontSize: 12),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: subtitleColor, fontSize: 12, height: 1.4),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       ),
@@ -431,16 +438,21 @@ class _RegisterPageState extends State<RegisterPage> {
         children: [
           Text(
             'Anonymous mode is on',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: textColor,
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             'The app will create a random Matrix username for you. You can still sign in later with your generated account and password.',
-            style: TextStyle(color: subtitleColor, fontSize: 13),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: subtitleColor, fontSize: 13, height: 1.4),
           ),
         ],
       ),
@@ -466,18 +478,18 @@ class _RegisterPageState extends State<RegisterPage> {
       children: [
         Text(
           S.of(context)?.authUsername ?? 'Username',
-          style: TextStyle(fontSize: 14, color: labelColor),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _usernameController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           maxLength: 20,
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.authUsernameHint ??
                 '3-20 chars, letters/numbers/_',
-            hintStyle: TextStyle(color: hintColor, fontSize: 14),
+            hintStyle: TextStyle(color: hintColor, fontSize: 14, height: 1.3),
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
@@ -540,7 +552,7 @@ class _RegisterPageState extends State<RegisterPage> {
           children: [
             Text(
               S.of(context)?.authEmailAddress ?? 'Email Address',
-              style: TextStyle(fontSize: 14, color: labelColor),
+              style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
             ),
             const SizedBox(width: 4),
             Text(
@@ -552,11 +564,11 @@ class _RegisterPageState extends State<RegisterPage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _emailController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.commonEnterEmailAddress ?? 'Enter email address',
-            hintStyle: TextStyle(color: hintColor, fontSize: 14),
+            hintStyle: TextStyle(color: hintColor, fontSize: 14, height: 1.3),
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
@@ -588,7 +600,9 @@ class _RegisterPageState extends State<RegisterPage> {
         const SizedBox(height: 4),
         Text(
           S.of(context)?.authEmailRecoveryHint ?? 'Used for password recovery',
-          style: TextStyle(fontSize: 11, color: hintColor),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 11, height: 1.3, color: hintColor),
         ),
       ],
     );
@@ -613,15 +627,15 @@ class _RegisterPageState extends State<RegisterPage> {
       children: [
         Text(
           S.of(context)?.authPassword ?? 'Password',
-          style: TextStyle(fontSize: 14, color: labelColor),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText: S.of(context)?.authPasswordHint ?? 'Min 8 characters',
-            hintStyle: TextStyle(color: hintColor, fontSize: 14),
+            hintStyle: TextStyle(color: hintColor, fontSize: 14, height: 1.3),
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
@@ -682,12 +696,12 @@ class _RegisterPageState extends State<RegisterPage> {
       children: [
         Text(
           S.of(context)?.authConfirmPassword ?? 'Confirm Password',
-          style: TextStyle(fontSize: 14, color: labelColor),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _confirmPasswordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.commonReenterPassword ?? 'Re-enter password',
@@ -768,17 +782,24 @@ class _RegisterPageState extends State<RegisterPage> {
                 size: 20,
               ),
               const SizedBox(width: 4),
-              Text(
-                S.of(context)?.authInviteCodeBuiltIn ??
-                    'Invite Code (Built-in)',
-                style: TextStyle(fontSize: 14, color: labelColor),
+              Flexible(
+                child: Text(
+                  S.of(context)?.authInviteCodeBuiltIn ??
+                      'Invite Code (Built-in)',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
+                ),
               ),
               const Spacer(),
               if (!_showInviteCode)
                 Text(
                   S.of(context)?.authFilled ?? 'Filled',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: AppColors.success,
                   ),
                 ),
@@ -813,7 +834,9 @@ class _RegisterPageState extends State<RegisterPage> {
           Text(
             S.of(context)?.authInviteCodeBuiltInNote ??
                 'Invite code is built-in, usually no need to modify',
-            style: TextStyle(fontSize: 11, color: hintColor),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11, height: 1.4, color: hintColor),
           ),
         ],
       ],
@@ -905,8 +928,11 @@ class _RegisterPageState extends State<RegisterPage> {
               )
             : Text(
                 S.of(context)?.authRegister ?? 'Sign Up',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 17,
+                  height: 1.3,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
