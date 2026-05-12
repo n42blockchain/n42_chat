@@ -142,8 +142,11 @@ class _SocialHubView extends StatelessWidget {
         children: [
           Text(
             'Stories, moments, games and avatars',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 20,
+              height: 1.3,
               fontWeight: FontWeight.w700,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -151,6 +154,8 @@ class _SocialHubView extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Reuse the existing social stack instead of scattering entry points across chat, profile and discover.',
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
@@ -396,8 +401,11 @@ class _ActionGrid extends StatelessWidget {
                   const Spacer(),
                   Text(
                     action.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
+                      height: 1.3,
                       fontWeight: FontWeight.w600,
                       color: isDark
                           ? AppColors.textPrimaryDark

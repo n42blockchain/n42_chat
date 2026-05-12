@@ -187,7 +187,8 @@ class _TransferPageState extends State<TransferPage> {
                 ? (S.of(context)?.commonPayment ?? 'Payment')
                 : (S.of(context)?.transferTitle ?? 'Transfer'),
             leading: IconButton(
-              icon: const Icon(Icons.close),
+              icon: const Icon(Icons.close_rounded, size: 22),
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -296,8 +297,11 @@ class _TransferPageState extends State<TransferPage> {
   Widget _buildSectionTitle(String title, bool isDark) {
     return Text(
       title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontSize: 14,
+        height: 1.3,
         fontWeight: FontWeight.w500,
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       ),
@@ -349,7 +353,8 @@ class _TransferPageState extends State<TransferPage> {
           ),
           if (!_isPaymentRequestMode) ...[
             IconButton(
-              icon: const Icon(Icons.content_paste, size: 20),
+              icon: const Icon(Icons.content_paste_rounded, size: 20),
+              tooltip: 'Paste',
               onPressed: () async {
                 final data = await Clipboard.getData(Clipboard.kTextPlain);
                 if (!mounted) return;
@@ -360,7 +365,8 @@ class _TransferPageState extends State<TransferPage> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.qr_code_scanner, size: 20),
+              icon: const Icon(Icons.qr_code_scanner_rounded, size: 20),
+              tooltip: S.of(context)?.commonScan ?? 'Scan',
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(builder: (_) => const ScanQRPage()),
@@ -383,26 +389,34 @@ class _TransferPageState extends State<TransferPage> {
         children: [
           N42Avatar(imageUrl: avatar, name: name ?? '', size: 36),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name ?? (S.of(context)?.commonUnknownUser ?? 'Unknown User'),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                ),
-              ),
-              if (_isAddressValid)
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  S.of(context)?.transferAddressVerified ?? 'Address verified',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.success,
+                  name ?? (S.of(context)?.commonUnknownUser ?? 'Unknown User'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.3,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
-            ],
+                if (_isAddressValid)
+                  Text(
+                    S.of(context)?.transferAddressVerified ?? 'Address verified',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      height: 1.3,
+                      color: AppColors.success,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
@@ -485,18 +499,24 @@ class _TransferPageState extends State<TransferPage> {
                       children: [
                         Text(
                           token.symbol,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 16,
+                            height: 1.3,
                             fontWeight: FontWeight.w500,
                             color: isDark
-                                ? Colors.white
+                                ? AppColors.textPrimaryDark
                                 : AppColors.textPrimary,
                           ),
                         ),
                         Text(
                           token.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
+                            height: 1.3,
                             color: isDark
                                 ? AppColors.textSecondaryDark
                                 : AppColors.textSecondary,
@@ -511,16 +531,22 @@ class _TransferPageState extends State<TransferPage> {
                     children: [
                       Text(
                         balance,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14,
+                          height: 1.3,
                           fontWeight: FontWeight.w500,
                           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         S.of(context)?.transferAvailable ?? 'Available',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 11,
+                          height: 1.3,
                           color: isDark
                               ? AppColors.textSecondaryDark
                               : AppColors.textSecondary,
@@ -586,8 +612,11 @@ class _TransferPageState extends State<TransferPage> {
               ),
               Text(
                 _selectedToken?.symbol ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 20,
+                  height: 1.3,
                   fontWeight: FontWeight.w500,
                   color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),

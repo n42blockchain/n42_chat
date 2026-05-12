@@ -228,25 +228,24 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.chevron_left, color: textColor, size: 32),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           S.of(context)?.commonSendRedPacket ?? 'Send Red Packet',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: textColor,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
+            fontSize: 17,
+            height: 1.3,
+            fontWeight: FontWeight.w600,
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_horiz, color: textColor),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.only(bottom: bottomInset > 0 ? bottomInset : 48),
@@ -283,7 +282,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             children: [
                               Text(
                                 _selectedToken,
-                                style: TextStyle(color: secondaryTextColor, fontSize: 14),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: secondaryTextColor, fontSize: 14, height: 1.3),
                               ),
                               Icon(Icons.arrow_drop_down, color: secondaryTextColor, size: 18),
                             ],
@@ -352,12 +353,16 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           children: [
                             Text(
                               S.of(context)?.commonRedPacketCover ?? 'Red Packet Cover',
-                              style: TextStyle(color: textColor, fontSize: 16),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               _covers[_selectedCoverIndex].name,
-                              style: TextStyle(color: secondaryTextColor, fontSize: 13),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: secondaryTextColor, fontSize: 13, height: 1.3),
                             ),
                           ],
                         ),
@@ -488,11 +493,18 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 const SizedBox(height: 24),
 
                 // 底部提示
-                Text(
-                  S.of(context)?.commonRedPacketRefundNotice ?? 'Unclaimed red packets will be refunded after 24 hours',
-                  style: TextStyle(
-                    color: secondaryTextColor.withValues(alpha: 0.6),
-                    fontSize: 12,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    S.of(context)?.commonRedPacketRefundNotice ?? 'Unclaimed red packets will be refunded after 24 hours',
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: secondaryTextColor.withValues(alpha: 0.6),
+                      fontSize: 12,
+                      height: 1.4,
+                    ),
                   ),
                 ),
                 
@@ -562,8 +574,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
               Flexible(
                 child: Text(
                   label,
-                  style: TextStyle(color: textColor, fontSize: 16),
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
                 ),
               ),
             const SizedBox(width: 8),
@@ -590,9 +603,12 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
         ),
         child: Text(
           label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: selected ? Colors.white : secondaryTextColor,
             fontSize: 13,
+            height: 1.3,
           ),
         ),
       ),

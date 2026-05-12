@@ -165,7 +165,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             fontSize: 14,
           ),
-          prefixIcon: const Icon(Icons.search, size: 20),
+          prefixIcon: const Icon(Icons.search_rounded, size: 20),
           filled: true,
           fillColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -238,7 +238,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
       itemCount: channels.length,
       separatorBuilder: (_, _) => Divider(
         height: 1,
-        indent: 72,
+        indent: 76,
         color: isDark ? AppColors.dividerDark : AppColors.divider,
       ),
       itemBuilder: (context, index) {
@@ -269,8 +269,11 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
       ),
       title: Text(
         channel.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 15,
+          height: 1.3,
           fontWeight: FontWeight.w600,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
@@ -285,14 +288,18 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 13,
+              height: 1.35,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             '${_formatCount(channel.subscriberCount)} ${l10n?.channelSubscribers ?? 'subscribers'}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11,
+              height: 1.3,
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             ),
           ),
