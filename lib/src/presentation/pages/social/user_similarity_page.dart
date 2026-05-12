@@ -199,27 +199,29 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           const SizedBox(height: 8),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.3,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             _shortenAddress(address),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11,
+              height: 1.3,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
               fontFamily: 'monospace',
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -247,16 +249,22 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 children: [
                   Text(
                     '${(animatedScore * 100).round()}%',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 32,
+                      height: 1.2,
                       fontWeight: FontWeight.w700,
                       color: _scoreColor(percent),
                     ),
                   ),
                   Text(
                     'Similarity',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondary,
@@ -286,8 +294,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
         children: [
           Text(
             'Breakdown',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark
                   ? AppColors.textPrimaryDark
@@ -353,19 +364,28 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimary,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.3,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               '$percent% (weight: $weight)',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -409,8 +429,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
         children: [
           Text(
             'Common On-Chain Activity',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark
                   ? AppColors.textPrimaryDark
@@ -476,8 +499,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             children: [
               Text(
                 title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 14,
+                  height: 1.3,
                   fontWeight: FontWeight.w500,
                   color: isDark
                       ? AppColors.textPrimaryDark
@@ -486,8 +512,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               ),
               Text(
                 subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
+                  height: 1.4,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -511,8 +540,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             const SizedBox(height: 12),
             Text(
               'Failed to calculate similarity',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.textPrimaryDark
@@ -523,8 +555,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             Text(
               message,
               textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
+                height: 1.4,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,

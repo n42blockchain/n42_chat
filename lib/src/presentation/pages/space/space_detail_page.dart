@@ -178,6 +178,8 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 color: isDark ? AppColors.surfaceDark : AppColors.surface,
                 child: Text(
                   space.description!,
+                  maxLines: 6,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
                     color: isDark
@@ -206,7 +208,9 @@ class _SpaceDetailScaffold extends StatelessWidget {
                         (topic) => Chip(
                           label: Text(
                             topic,
-                            style: const TextStyle(fontSize: 12),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12, height: 1.3),
                           ),
                           padding: EdgeInsets.zero,
                           materialTapTargetSize:
@@ -394,7 +398,9 @@ class _SpaceDetailScaffold extends StatelessWidget {
                   Text(
                     S.of(context)?.spacesMembersCount(space.memberCount) ??
                         '${space.memberCount} members',
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.3),
                   ),
                   const SizedBox(width: 16),
                   Icon(
@@ -407,7 +413,9 @@ class _SpaceDetailScaffold extends StatelessWidget {
                     space.type == SpaceType.public
                         ? (S.of(context)?.spacesPublic ?? 'Public')
                         : (S.of(context)?.spacesPrivate ?? 'Private'),
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.3),
                   ),
                 ],
               ),
@@ -545,8 +553,11 @@ class _SpaceDetailScaffold extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white54 : AppColors.textSecondary,
               ),
@@ -554,8 +565,11 @@ class _SpaceDetailScaffold extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               '($count)',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
+                height: 1.3,
                 color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
               ),
             ),
@@ -618,7 +632,14 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 ),
                 child: Text(
                   S.of(context)?.spacesSuggested ?? 'Suggested',
-                  style: const TextStyle(fontSize: 10, color: Colors.green),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    height: 1.3,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.green,
+                  ),
                 ),
               ),
             if (_isAdmin)
@@ -1070,15 +1091,21 @@ class _MembersBottomSheet extends StatelessWidget {
               children: [
                 Text(
                   S.of(context)?.spacesMembers ?? 'Members',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     fontSize: 18,
+                    height: 1.3,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   '(${members.length})',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,
@@ -1110,11 +1137,18 @@ class _MembersBottomSheet extends StatelessWidget {
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                  title: Text(name),
+                  title: Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   subtitle: Text(
                     m.userId,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondary,
@@ -1155,7 +1189,12 @@ class _MembersBottomSheet extends StatelessWidget {
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(label, style: TextStyle(fontSize: 11, color: color)),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 11, height: 1.3, fontWeight: FontWeight.w500, color: color),
+      ),
     );
   }
 
