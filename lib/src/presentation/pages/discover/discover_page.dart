@@ -97,6 +97,41 @@ class DiscoverPage extends StatelessWidget {
 
           const SizedBox(height: 8),
 
+          // 直播、听一听、看一看
+          _buildGroupCard(
+            context,
+            isDark,
+            children: [
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: _LiveIcon(),
+                title: l10n?.discoverLive ?? 'Live',
+                onTap: () => _openVoiceRooms(context),
+              ),
+              _buildDivider(context, isDark),
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: _MusicIcon(),
+                title: l10n?.discoverListen ?? 'Listen',
+                onTap: () =>
+                    _showComingSoon(context, l10n?.discoverListen ?? 'Listen'),
+              ),
+              _buildDivider(context, isDark),
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: _WatchIcon(),
+                title: l10n?.discoverWatch ?? 'Watch',
+                onTap: () =>
+                    _showComingSoon(context, l10n?.discoverWatch ?? 'Watch'),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
           // 游戏
           _buildGroupCard(
             context,
@@ -122,7 +157,10 @@ class DiscoverPage extends StatelessWidget {
                   color: Color(0xFF00B894),
                   size: 26,
                 ),
-                title: l10n?.miniAppMarketTitle ?? 'Mini Apps',
+                title:
+                    l10n?.discoverMiniPrograms ??
+                    l10n?.miniAppMarketTitle ??
+                    'Mini Apps',
                 onTap: () => _openMiniApps(context),
               ),
               _buildDivider(context, isDark),
@@ -159,6 +197,26 @@ class DiscoverPage extends StatelessWidget {
 
           const SizedBox(height: 8),
 
+          // 附近的人
+          _buildGroupCard(
+            context,
+            isDark,
+            children: [
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: _NearbyIcon(),
+                title: l10n?.discoverNearbyPeople ?? 'Nearby',
+                onTap: () => _showComingSoon(
+                  context,
+                  l10n?.discoverNearbyPeople ?? 'Nearby',
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
           // 频道发现
           _buildGroupCard(
             context,
@@ -172,13 +230,15 @@ class DiscoverPage extends StatelessWidget {
                   color: Color(0xFFFF6B6B),
                   size: 26,
                 ),
-                title: l10n?.channelDiscoverTitle ?? 'Channels',
+                title:
+                    l10n?.discoverVideoChannels ??
+                    l10n?.channelDiscoverTitle ??
+                    'Channels',
                 onTap: () => _openChannelDiscover(context),
               ),
             ],
           ),
 
-          // 仍待产品/后端闭环：听一听、看一看、附近的人
           const SizedBox(height: 32),
         ],
       ),
@@ -223,11 +283,7 @@ class DiscoverPage extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.3,
-                    color: textColor,
-                  ),
+                  style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
                 ),
               ),
               ?trailing,
@@ -399,6 +455,18 @@ class DiscoverPage extends StatelessWidget {
       MaterialPageRoute<void>(builder: (_) => const ChannelDiscoverPage()),
     );
   }
+
+  void _showComingSoon(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          S.of(context)?.commonFeatureComingSoon(feature) ??
+              '$feature coming soon',
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 }
 
 // ==================== 图标组件 ====================
@@ -453,7 +521,153 @@ class _MomentsIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// TODO: 待产品闭环后补充：_MusicIcon, _WatchIcon, _NearbyIcon
+/// 直播图标 - 红色同心圆
+class _LiveIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(size: const Size(26, 26), painter: _LiveIconPainter());
+  }
+}
+
+class _LiveIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    const color = Color(0xFFFF4757);
+
+    final outerPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawCircle(center, size.width * 0.38, outerPaint);
+
+    final innerPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, size.width * 0.15, innerPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 听一听图标 - 粉色音符
+class _MusicIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const Icon(Icons.music_note, color: Color(0xFFFF69B4), size: 26);
+  }
+}
+
+/// 看一看图标 - 黄色六边形
+class _WatchIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(size: const Size(26, 26), painter: _WatchIconPainter());
+  }
+}
+
+class _WatchIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const color = Color(0xFFFFB300);
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.38;
+
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeJoin = StrokeJoin.round;
+
+    final path = Path();
+    for (var i = 0; i < 6; i++) {
+      final angle = (i * 60 - 90) * math.pi / 180;
+      final x = cx + r * math.cos(angle);
+      final y = cy + r * math.sin(angle);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+
+    final dotPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(cx, cy), r * 0.22, dotPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// 附近的人图标 - 蓝色雷达人形
+class _NearbyIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(size: const Size(26, 26), painter: _NearbyIconPainter());
+  }
+}
+
+class _NearbyIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const color = Color(0xFF10AEFF);
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawArc(
+      Rect.fromCenter(
+        center: Offset(cx, cy),
+        width: size.width * 0.9,
+        height: size.height * 0.9,
+      ),
+      math.pi * 0.65,
+      math.pi * 0.7,
+      false,
+      paint,
+    );
+    canvas.drawArc(
+      Rect.fromCenter(
+        center: Offset(cx, cy),
+        width: size.width * 0.9,
+        height: size.height * 0.9,
+      ),
+      -math.pi * 0.35,
+      math.pi * 0.7,
+      false,
+      paint,
+    );
+
+    final headPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawCircle(
+      Offset(cx, cy - size.height * 0.1),
+      size.width * 0.1,
+      headPaint,
+    );
+    canvas.drawLine(
+      Offset(cx, cy + size.height * 0.02),
+      Offset(cx, cy + size.height * 0.22),
+      headPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
 
 /// 游戏图标 - 游戏手柄
 class _GameIcon extends StatelessWidget {

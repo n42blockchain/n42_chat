@@ -11,8 +11,8 @@ import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
+import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
-import '../../blocs/chat/chat_event.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
@@ -21,6 +21,11 @@ import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../chat/chat_page.dart';
+import '../contact/chat_only_friends_page.dart';
+import '../contact/enterprise_contacts_page.dart';
+import '../contact/official_accounts_page.dart';
+import '../contact/service_accounts_page.dart';
+import '../contact/tags_management_page.dart';
 import '../group/create_group_page.dart';
 import '../../../n42_chat.dart';
 import 'contact_tile.dart';
@@ -94,7 +99,9 @@ class _ContactListPageState extends State<ContactListPage> {
                 IconButton(
                   icon: Icon(
                     Icons.person_add_outlined,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
                   ),
                   onPressed: _showAddContactDialog,
                 ),
@@ -182,12 +189,16 @@ class _ContactListPageState extends State<ContactListPage> {
             hintText: S.of(context)?.commonSearch ?? 'Search',
             hintStyle: TextStyle(
               fontSize: 15,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: isDark
+                  ? AppColors.textTertiaryDark
+                  : AppColors.textTertiary,
             ),
             prefixIcon: Icon(
               Icons.search,
               size: 20,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: isDark
+                  ? AppColors.textTertiaryDark
+                  : AppColors.textTertiary,
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -375,9 +386,7 @@ class _ContactListPageState extends State<ContactListPage> {
             isDark: isDark,
             icon: _ChatOnlyFriendIcon(),
             title: S.of(context)?.contactChatOnlyFriends ?? 'Chat-only Friends',
-            onTap: () => _showComingSoon(
-              S.of(context)?.contactChatOnlyFriends ?? 'Chat-only Friends',
-            ),
+            onTap: _openChatOnlyFriendsPage,
           ),
 
           const SizedBox(height: 8),
@@ -409,8 +418,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   isDark: isDark,
                   icon: _TagIcon(),
                   title: S.of(context)?.contactTags ?? 'Tags',
-                  onTap: () =>
-                      _showComingSoon(S.of(context)?.contactTags ?? 'Tags'),
+                  onTap: _openTagsManagementPage,
                 ),
                 _buildItemDivider(isDark),
 
@@ -421,10 +429,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   title:
                       S.of(context)?.contactOfficialAccounts ??
                       'Official Accounts',
-                  onTap: () => _showComingSoon(
-                    S.of(context)?.contactOfficialAccounts ??
-                        'Official Accounts',
-                  ),
+                  onTap: _openOfficialAccountsPage,
                 ),
                 _buildItemDivider(isDark),
 
@@ -435,9 +440,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   title:
                       S.of(context)?.contactServiceAccounts ??
                       'Service Accounts',
-                  onTap: () => _showComingSoon(
-                    S.of(context)?.contactServiceAccounts ?? 'Service Accounts',
-                  ),
+                  onTap: _openServiceAccountsPage,
                 ),
                 _buildItemDivider(isDark),
 
@@ -448,10 +451,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   title:
                       S.of(context)?.contactEnterpriseContacts ??
                       'Enterprise Contacts',
-                  onTap: () => _showComingSoon(
-                    S.of(context)?.contactEnterpriseContacts ??
-                        'Enterprise Contacts',
-                  ),
+                  onTap: _openEnterpriseContactsPage,
                 ),
               ],
             ),
@@ -470,7 +470,9 @@ class _ContactListPageState extends State<ContactListPage> {
     int badgeCount = 0,
     VoidCallback? onTap,
   }) {
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
 
     return Material(
@@ -488,11 +490,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.3,
-                    color: textColor,
-                  ),
+                  style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
                 ),
               ),
               if (badgeCount > 0)
@@ -600,6 +598,36 @@ class _ContactListPageState extends State<ContactListPage> {
     _startChatWithContact(contact);
   }
 
+  void _openChatOnlyFriendsPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const ChatOnlyFriendsPage()),
+    );
+  }
+
+  void _openTagsManagementPage() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const TagsManagementPage()));
+  }
+
+  void _openOfficialAccountsPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const OfficialAccountsPage()),
+    );
+  }
+
+  void _openServiceAccountsPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const ServiceAccountsPage()),
+    );
+  }
+
+  void _openEnterpriseContactsPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const EnterpriseContactsPage()),
+    );
+  }
+
   /// 显示联系人操作菜单
   void _showContactMenu(ContactEntity contact) {
     final isDark = context.isDarkMode;
@@ -683,15 +711,6 @@ class _ContactListPageState extends State<ContactListPage> {
                   _recommendToFriend(contact);
                 },
               ),
-              // 设置备注
-              ListTile(
-                leading: const Icon(Icons.edit_outlined),
-                title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _setContactRemark(contact);
-                },
-              ),
               // 添加到桌面
               ListTile(
                 leading: const Icon(Icons.add_to_home_screen),
@@ -700,14 +719,19 @@ class _ContactListPageState extends State<ContactListPage> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        S.of(context)?.commonFeatureInDevelopment('') ??
-                            'Feature in development',
-                      ),
-                    ),
+                  _showComingSoon(
+                    S.of(context)?.contactAddToHomeScreen ??
+                        'Add to home screen',
                   );
+                },
+              ),
+              // 设置备注
+              ListTile(
+                leading: const Icon(Icons.edit_outlined),
+                title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _setContactRemark(contact);
                 },
               ),
               const SizedBox(height: 8),
@@ -761,20 +785,20 @@ class _ContactListPageState extends State<ContactListPage> {
       );
 
       final contactRepository = getIt<IContactRepository>();
+      final messageRepository = getIt<IMessageRepository>();
       final roomId = await contactRepository.startDirectChat(
         selectedContact.userId,
       );
 
-      final cardContent =
-          '''[名片]
-联系人：${contact.effectiveDisplayName}
-ID：${contact.userId}''';
-
-      final chatBloc = getIt<ChatBloc>();
-      chatBloc.add(InitializeChat(roomId));
-
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-      chatBloc.add(SendTextMessage(cardContent));
+      final eventId = await messageRepository.sendContactCard(
+        roomId,
+        userId: contact.userId,
+        displayName: contact.effectiveDisplayName,
+        avatarUrl: contact.avatarUrl,
+      );
+      if (eventId == null || eventId.isEmpty) {
+        throw StateError('Failed to send contact card');
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -1433,7 +1457,9 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
       appBar: AppBar(
         title: Text(S.of(context)?.contactNewFriends ?? 'New Friends'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
-        foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        foregroundColor: isDark
+            ? AppColors.textPrimaryDark
+            : AppColors.textPrimary,
         elevation: 0.5,
       ),
       body: BlocBuilder<ContactBloc, ContactState>(
@@ -1546,7 +1572,9 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
             onPressed: () => _rejectRequest(request),
             style: TextButton.styleFrom(
               backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
-              foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              foregroundColor: isDark
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
@@ -1671,7 +1699,9 @@ class _GroupListPageState extends State<_GroupListPage> {
       appBar: AppBar(
         title: Text(S.of(context)?.commonGroupChat ?? 'Group Chat'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
-        foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        foregroundColor: isDark
+            ? AppColors.textPrimaryDark
+            : AppColors.textPrimary,
         elevation: 0.5,
         actions: [
           IconButton(
@@ -1724,7 +1754,9 @@ class _GroupListPageState extends State<_GroupListPage> {
             S.of(context)?.commonNoGroups ?? 'No groups',
             style: TextStyle(
               fontSize: 16,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 24),
@@ -2067,14 +2099,18 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: widget.isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: widget.isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
                   ),
                 ),
                 const Spacer(),
                 IconButton(
                   icon: Icon(
                     Icons.close,
-                    color: widget.isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: widget.isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
                   ),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -2115,7 +2151,9 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                       S.of(context)?.contactNoContactsFound ??
                           'No contacts found',
                       style: TextStyle(
-                        color: widget.isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                        color: widget.isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondary,
                       ),
                     ),
                   )
@@ -2132,7 +2170,9 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                         title: Text(
                           contact.effectiveDisplayName,
                           style: TextStyle(
-                            color: widget.isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                            color: widget.isDark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimary,
                           ),
                         ),
                         subtitle: Text(

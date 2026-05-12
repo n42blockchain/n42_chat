@@ -206,12 +206,19 @@ extension ChatBlocActionHandlers on ChatBloc {
           if (existingReactionIndex >= 0) {
             // 已有该表情，增加计数
             final existingReaction = msg.reactions[existingReactionIndex];
-            if (existingReaction.userIds.contains(currentUserId)) {
+            final actorId = currentUserId ?? 'me';
+            if (existingReaction.userIds.contains(actorId)) {
               // 用户已经回应过，移除回应
               final newUserIds = existingReaction.userIds
-                  .where((id) => id != currentUserId)
+                  .where((id) => id != actorId)
                   .toList();
-              if (newUserIds.isEmpty) {
+              final newAggregateCount = existingReaction.aggregateCount == null
+                  ? null
+                  : (existingReaction.count > 0
+                        ? existingReaction.count - 1
+                        : 0);
+              if (newUserIds.isEmpty &&
+                  (newAggregateCount == null || newAggregateCount == 0)) {
                 // 没有人回应了，移除整个表情
                 newReactions = [...msg.reactions]
                   ..removeAt(existingReactionIndex);
@@ -220,16 +227,21 @@ extension ChatBlocActionHandlers on ChatBloc {
                 newReactions[existingReactionIndex] = MessageReaction(
                   key: existingReaction.key,
                   userIds: newUserIds,
-                  isMe: false,
+                  isMe: newUserIds.contains(actorId),
+                  aggregateCount: newAggregateCount,
                 );
               }
             } else {
               // 用户没有回应过，添加回应
               newReactions = [...msg.reactions];
+              final newAggregateCount = existingReaction.aggregateCount == null
+                  ? null
+                  : existingReaction.count + 1;
               newReactions[existingReactionIndex] = MessageReaction(
                 key: existingReaction.key,
-                userIds: [...existingReaction.userIds, currentUserId ?? 'me'],
+                userIds: [...existingReaction.userIds, actorId],
                 isMe: true,
+                aggregateCount: newAggregateCount,
               );
             }
           } else {

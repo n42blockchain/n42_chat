@@ -5,27 +5,88 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/repositories/contact_repository.dart';
 import '../../../n42_chat.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/chat/contact_card_select_sheet.dart';
 import '../transfer/receive_page.dart';
+import '../transfer/transfer_page.dart';
 import 'n42_bean_page.dart';
 
 /// 服务页面
 class ServicesPage extends StatelessWidget {
   const ServicesPage({super.key});
 
+  Future<void> _openTransfer(BuildContext context) async {
+    final l10n = S.of(context);
+    final isDark = context.isDarkMode;
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ContactCardSelectSheet(
+        isDark: isDark,
+        selectContactText: l10n?.chatSelectContact ?? 'Select Contact',
+        searchContactHintText: l10n?.chatSearchContactHint ?? 'Search contacts',
+        noContactsFoundText:
+            l10n?.contactNoContactsFound ?? 'No contacts found',
+      ),
+    );
+
+    if (result == null || !context.mounted) {
+      return;
+    }
+
+    final targetUserId = result['id'] as String?;
+    final fallbackName = result['name'] as String?;
+    if (targetUserId == null || targetUserId.isEmpty) {
+      return;
+    }
+
+    try {
+      final contactRepository = getIt<IContactRepository>();
+      final roomId = await contactRepository.startDirectChat(targetUserId);
+      final contact = await contactRepository.getContactById(targetUserId);
+
+      if (!context.mounted) {
+        return;
+      }
+
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<TransferBloc>(),
+            child: TransferPage(
+              roomId: roomId,
+              recipientAddress: contact?.walletAddress,
+              recipientName:
+                  contact?.effectiveDisplayName ?? fallbackName ?? targetUserId,
+            ),
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n?.blocTransferFailed ?? 'Transfer failed')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      appBar: N42AppBar(
-        title: S.of(context)?.profileServices ?? 'Services',
-      ),
+      appBar: N42AppBar(title: S.of(context)?.profileServices ?? 'Services'),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: GridView.count(
@@ -54,15 +115,7 @@ class ServicesPage extends StatelessWidget {
               label: S.of(context)?.commonTransfer ?? 'Transfer',
               cardColor: cardColor,
               textColor: textColor,
-              onTap: () {
-                // 通用转账入口，需要在聊天上下文中使用
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(S.of(context)?.commonFeatureComingSoon(S.of(context)?.commonTransfer ?? 'Transfer') ?? 'Transfer coming soon'),
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
-              },
+              onTap: () => _openTransfer(context),
             ),
             _buildServiceItem(
               context,
@@ -74,7 +127,10 @@ class ServicesPage extends StatelessWidget {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(S.of(context)?.chatSendRedPacketInChat ?? 'Please send red packet in chat'),
+                    content: Text(
+                      S.of(context)?.chatSendRedPacketInChat ??
+                          'Please send red packet in chat',
+                    ),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -165,10 +221,7 @@ class ServicesPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 12,
-              color: textColor,
-            ),
+            style: TextStyle(fontSize: 12, color: textColor),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

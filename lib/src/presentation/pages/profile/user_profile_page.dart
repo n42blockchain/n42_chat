@@ -8,10 +8,13 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
+import '../../../domain/repositories/message_repository.dart';
+import '../../widgets/chat/contact_card_select_sheet.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../n42_chat.dart';
 
 typedef UserProfileChatStartedCallback =
     Future<void> Function(String roomId, BuildContext context);
@@ -210,7 +213,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   IconButton(
                     icon: Icon(
                       Icons.arrow_back_ios_new_rounded,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -218,7 +223,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   IconButton(
                     icon: Icon(
                       Icons.more_horiz,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
                     ),
                     onPressed: _showMoreOptions,
                   ),
@@ -365,7 +372,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     contact.statusMessage!,
                     style: TextStyle(
                       fontSize: 15,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -460,16 +469,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: N42Button(
               text: S.of(context)?.commonVoiceCall ?? 'Voice Call',
               type: N42ButtonType.secondary,
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.profileVoiceCallFeatureInDev ??
-                          'Voice call feature in development...',
-                    ),
-                  ),
-                );
-              },
+              onPressed: _startVoiceCall,
               icon: Icons.call_outlined,
             ),
           ),
@@ -638,12 +638,261 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _report() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          S.of(context)?.profileReportFeatureInDev ??
-              'Report feature in development...',
+    final isDark = context.isDarkMode;
+    final descController = TextEditingController();
+    String? selectedReason;
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          title: Text(
+            S.of(context)?.reportTitle ?? 'Report',
+            style: TextStyle(
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            ),
+          ),
+          content: RadioGroup<String>(
+            groupValue: selectedReason,
+            onChanged: (val) => setDialogState(() => selectedReason = val),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...[
+                  S.of(context)?.reportReasonSpam ?? 'Spam',
+                  S.of(context)?.reportReasonHarassment ?? 'Harassment',
+                  S.of(context)?.reportReasonFraud ?? 'Fraud',
+                  S.of(context)?.reportReasonOther ?? 'Other',
+                ].map(
+                  (reason) => RadioListTile<String>(
+                    title: Text(
+                      reason,
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    value: reason,
+                    activeColor: AppColors.primary,
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: descController,
+                  maxLines: 2,
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    hintText:
+                        S.of(context)?.reportDescription ??
+                        'Additional description (optional)',
+                    hintStyle: TextStyle(
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary,
+                    ),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (selectedReason == null) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        S.of(context)?.reportSelectReason ??
+                            'Please select a reason',
+                      ),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                  return;
+                }
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.reportSubmitted ?? 'Report submitted',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Text(S.of(context)?.commonConfirm ?? 'Submit'),
+            ),
+          ],
         ),
+      ),
+    ).whenComplete(descController.dispose);
+  }
+
+  Future<void> _startVoiceCall() async {
+    final contact = _contact;
+    if (contact == null) return;
+
+    try {
+      final roomId = await N42Chat.createDirectMessage(contact.userId);
+      final callManager = N42Chat.callManager;
+
+      if (callManager == null || !callManager.isInitialized) {
+        await N42Chat.initializeCallManager();
+      }
+
+      final readyCallManager = N42Chat.callManager;
+      if (readyCallManager == null || !readyCallManager.isInitialized) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.chatCallServiceNotInitialized ??
+                  'Call service not available',
+            ),
+          ),
+        );
+        return;
+      }
+
+      await readyCallManager.startVoiceCall(
+        roomId: roomId,
+        peerId: contact.userId,
+        peerName: contact.effectiveDisplayName,
+        peerAvatarUrl: contact.avatarUrl,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            S.of(context)?.chatSendFailed(e.toString()) ??
+                'Operation failed: $e',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _shareContactCard() async {
+    final contact = _contact;
+    if (contact == null) return;
+
+    final l10n = S.of(context);
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ContactCardSelectSheet(
+        isDark: context.isDarkMode,
+        selectContactText:
+            l10n?.contactSelectFriendToRecommend ??
+            'Select friend to recommend',
+        searchContactHintText: l10n?.commonSearchContacts ?? 'Search contacts',
+        noContactsFoundText:
+            l10n?.contactNoContactsFound ?? 'No contacts found',
+        excludeUserId: contact.userId,
+      ),
+    );
+
+    if (result == null || !mounted) return;
+
+    final targetUserId = result['id'] as String;
+    final targetDisplayName = result['name'] as String;
+
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(l10n?.contactSendingCard ?? 'Sending contact card...'),
+            ],
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      final contactRepository = getIt<IContactRepository>();
+      final messageRepository = getIt<IMessageRepository>();
+      final roomId = await contactRepository.startDirectChat(targetUserId);
+      final eventId = await messageRepository.sendContactCard(
+        roomId,
+        userId: contact.userId,
+        displayName: contact.effectiveDisplayName,
+        avatarUrl: contact.avatarUrl,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (eventId == null || eventId.isEmpty) {
+        throw StateError('Failed to send contact card');
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n?.contactRecommendedCardTo(
+                  contact.effectiveDisplayName,
+                  targetDisplayName,
+                ) ??
+                'Recommended ${contact.effectiveDisplayName}\'s card to $targetDisplayName',
+          ),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n?.contactRecommendFailed(e.toString()) ??
+                'Recommend failed: $e',
+          ),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showUserQrCode() async {
+    final contact = _contact;
+    if (contact == null) return;
+
+    await showResolvedShareableLinkQrPage(
+      context,
+      resolveLink: () async => 'n42chat://user/${contact.userId}',
+      presentation: ShareableLinkPresentation(
+        entityName: contact.effectiveDisplayName,
+        linkLabel: contact.userId,
+        qrCodeTitle: S.of(context)?.profileQrCode ?? 'QR Code',
+        qrCodeSubtitle: 'Scan to open this profile or start a chat',
+        errorPrefix: 'Failed to generate user QR code',
+        copySuccessMessage:
+            S.of(context)?.commonCopiedToClipboard ?? 'Copied to clipboard',
+        icon: Icons.person_outline,
       ),
     );
   }
@@ -660,31 +909,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
               title: Text(
                 S.of(context)?.profileShareContactCard ?? 'Share Contact Card',
               ),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(sheetContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.profileShareFeatureInDev ??
-                          'Share feature in development...',
-                    ),
-                  ),
-                );
+                await _shareContactCard();
               },
             ),
             ListTile(
               leading: const Icon(Icons.qr_code),
               title: Text(S.of(context)?.profileQrCode ?? 'QR Code'),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(sheetContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.profileQrCodeFeatureInDev ??
-                          'QR code feature in development...',
-                    ),
-                  ),
-                );
+                await _showUserQrCode();
               },
             ),
           ],

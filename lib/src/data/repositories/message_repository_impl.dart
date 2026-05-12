@@ -582,7 +582,11 @@ class MessageRepositoryImpl implements IMessageRepository {
       }
 
       final homeserver =
-          _client!.homeserver?.toString().replaceAll(_trailingSlashRegExp, '') ?? '';
+          _client!.homeserver?.toString().replaceAll(
+            _trailingSlashRegExp,
+            '',
+          ) ??
+          '';
 
       // 方法1: 使用 Matrix 1.11+ 认证媒体端点 (直接 HTTP 请求)
       final authenticatedUrl = MatrixUtils.getMediaDownloadUrl(
@@ -1009,6 +1013,32 @@ class MessageRepositoryImpl implements IMessageRepository {
       );
     } catch (e) {
       debugLog('MessageRepositoryImpl: Failed to send custom message: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String?> sendContactCard(
+    String roomId, {
+    required String userId,
+    required String displayName,
+    String? avatarUrl,
+    String? matrixId,
+  }) async {
+    try {
+      debugLog(
+        'MessageRepositoryImpl: Sending contact card - userId: $userId, displayName: $displayName',
+      );
+
+      return await _messageDataSource.sendContactCard(
+        roomId,
+        userId: userId,
+        displayName: displayName,
+        avatarUrl: avatarUrl,
+        matrixId: matrixId,
+      );
+    } catch (e) {
+      debugLog('MessageRepositoryImpl: Failed to send contact card: $e');
       rethrow;
     }
   }

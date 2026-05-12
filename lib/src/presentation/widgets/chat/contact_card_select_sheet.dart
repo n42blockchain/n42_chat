@@ -11,6 +11,7 @@ class ContactCardSelectSheet extends StatefulWidget {
   final String selectContactText;
   final String searchContactHintText;
   final String noContactsFoundText;
+  final String? excludeUserId;
 
   const ContactCardSelectSheet({
     super.key,
@@ -18,6 +19,7 @@ class ContactCardSelectSheet extends StatefulWidget {
     required this.selectContactText,
     required this.searchContactHintText,
     required this.noContactsFoundText,
+    this.excludeUserId,
   });
 
   @override
@@ -28,20 +30,23 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
   String _searchQuery = '';
   List<ContactEntity> _contacts = [];
   bool _isLoading = true;
-  
+
   @override
   void initState() {
     super.initState();
     _loadContacts();
   }
-  
+
   Future<void> _loadContacts() async {
     try {
       final contactRepository = getIt<IContactRepository>();
       final contacts = await contactRepository.getContacts();
+      final filteredContacts = widget.excludeUserId == null
+          ? contacts
+          : contacts.where((c) => c.userId != widget.excludeUserId).toList();
       if (mounted) {
         setState(() {
-          _contacts = contacts;
+          _contacts = filteredContacts;
           _isLoading = false;
         });
       }
@@ -54,15 +59,20 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
       }
     }
   }
-  
+
   List<ContactEntity> get _filteredContacts {
     if (_searchQuery.isEmpty) return _contacts;
-    return _contacts.where((c) => 
-      c.effectiveDisplayName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-      c.userId.toLowerCase().contains(_searchQuery.toLowerCase())
-    ).toList();
+    return _contacts
+        .where(
+          (c) =>
+              c.effectiveDisplayName.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ||
+              c.userId.toLowerCase().contains(_searchQuery.toLowerCase()),
+        )
+        .toList();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -112,8 +122,8 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
                 hintText: widget.searchContactHintText,
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: widget.isDark 
-                    ? const Color(0xFF3A3A3C) 
+                fillColor: widget.isDark
+                    ? const Color(0xFF3A3A3C)
                     : const Color(0xFFF2F2F7),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -132,53 +142,58 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _filteredContacts.isEmpty
-                    ? Center(
-                        child: Text(
-                          widget.noContactsFoundText,
+                ? Center(
+                    child: Text(
+                      widget.noContactsFoundText,
+                      style: TextStyle(
+                        color: widget.isDark ? Colors.white54 : Colors.black54,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: _filteredContacts.length,
+                    itemBuilder: (context, index) {
+                      final contact = _filteredContacts[index];
+                      return ListTile(
+                        leading: contact.avatarUrl != null
+                            ? CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  contact.avatarUrl!,
+                                ),
+                              )
+                            : CircleAvatar(
+                                backgroundColor: AppColors.primary,
+                                child: Text(
+                                  contact.effectiveDisplayName.isNotEmpty
+                                      ? contact.effectiveDisplayName[0]
+                                            .toUpperCase()
+                                      : '?',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                        title: Text(
+                          contact.effectiveDisplayName,
                           style: TextStyle(
-                            color: widget.isDark ? Colors.white54 : Colors.black54,
+                            color: widget.isDark ? Colors.white : Colors.black,
                           ),
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: _filteredContacts.length,
-                        itemBuilder: (context, index) {
-                          final contact = _filteredContacts[index];
-                          return ListTile(
-                            leading: contact.avatarUrl != null
-                                ? CircleAvatar(
-                                    backgroundImage: NetworkImage(contact.avatarUrl!),
-                                  )
-                                : CircleAvatar(
-                                    backgroundColor: AppColors.primary,
-                                    child: Text(
-                                      contact.effectiveDisplayName.isNotEmpty 
-                                          ? contact.effectiveDisplayName[0].toUpperCase()
-                                          : '?',
-                                      style: const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                            title: Text(
-                              contact.effectiveDisplayName,
-                              style: TextStyle(
-                                color: widget.isDark ? Colors.white : Colors.black,
-                              ),
-                            ),
-                            subtitle: Text(
-                              contact.userId,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: widget.isDark ? Colors.white54 : Colors.black54,
-                              ),
-                            ),
-                            onTap: () => Navigator.pop(context, {
-                              'id': contact.userId,
-                              'name': contact.effectiveDisplayName,
-                              'avatar': contact.avatarUrl,
-                            }),
-                          );
-                        },
-                      ),
+                        subtitle: Text(
+                          contact.userId,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: widget.isDark
+                                ? Colors.white54
+                                : Colors.black54,
+                          ),
+                        ),
+                        onTap: () => Navigator.pop(context, {
+                          'id': contact.userId,
+                          'name': contact.effectiveDisplayName,
+                          'avatar': contact.avatarUrl,
+                        }),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

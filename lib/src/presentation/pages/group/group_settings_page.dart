@@ -12,9 +12,11 @@ import '../../../domain/repositories/group_repository.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
+import '../../blocs/search/search_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../search/chat_search_page.dart';
 import 'bot_settings_page.dart';
 import 'content_filter_settings_page.dart';
 import 'group_members_page.dart';
@@ -293,7 +295,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
                 ),
               ),
               TextButton(
@@ -917,6 +921,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     );
   }
 
+  Future<void> _searchChatHistory() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider<SearchBloc>(
+          create: (_) => getIt<SearchBloc>(),
+          child: ChatSearchPage(roomId: widget.roomId),
+        ),
+      ),
+    );
+  }
+
   void _confirmLeaveGroup(GroupEntity group) {
     showDialog<void>(
       context: context,
@@ -1001,16 +1016,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               title: Text(
                 S.of(context)?.commonSearchChatHistory ?? 'Search Chat History',
               ),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(sheetContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.commonFeatureInDevelopment('') ??
-                          'Feature in development',
-                    ),
-                  ),
-                );
+                await _searchChatHistory();
               },
             ),
           ],
