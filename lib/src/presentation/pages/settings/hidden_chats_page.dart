@@ -87,9 +87,12 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
         ),
         title: Text(
           conversation.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
+            height: 1.3,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
@@ -100,6 +103,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.3,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -110,9 +114,13 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
           onPressed: () => _unhideChat(context, conversation),
           child: Text(
             l10n?.settingsUnhideChat ?? 'Unhide',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: AppColors.primary,
               fontSize: 14,
+              fontWeight: FontWeight.w500,
+              height: 1.3,
             ),
           ),
         ),
