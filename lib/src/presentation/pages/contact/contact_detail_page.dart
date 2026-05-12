@@ -233,8 +233,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                       children: [
                         Text(
                           _effectiveDisplayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 22,
+                            height: 1.3,
                             fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
@@ -243,8 +246,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                         Text(
                           S.of(context)?.contactN42Id(_n42Id) ??
                               'N42 ID: $_n42Id',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 14,
+                            height: 1.3,
                             color: secondaryTextColor,
                           ),
                         ),
@@ -402,12 +408,19 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(fontSize: 16, color: textColor)),
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
+                  ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: TextStyle(fontSize: 13, color: secondaryTextColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 13, height: 1.3, color: secondaryTextColor),
                     ),
                   ],
                 ],
@@ -434,13 +447,17 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             children: [
               Text(
                 S.of(context)?.contactVideoChannel ?? 'Video Channel',
-                style: TextStyle(fontSize: 16, color: textColor),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
               ),
               const SizedBox(width: 24),
               Expanded(
                 child: Text(
                   _effectiveDisplayName,
-                  style: TextStyle(fontSize: 16, color: textColor),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
                 ),
               ),
             ],
@@ -526,7 +543,12 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             children: [
               Icon(icon, color: iconColor, size: 20),
               const SizedBox(width: 8),
-              Text(label, style: TextStyle(fontSize: 16, color: textColor)),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
+              ),
             ],
           ),
         ),
@@ -565,7 +587,13 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               _isAddingFriend
                   ? (S.of(context)?.contactAddingToContacts ?? 'Adding...')
                   : (S.of(context)?.contactAddToContacts ?? 'Add to Contacts'),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.3,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -786,18 +814,23 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: textColor,
             size: 20,
           ),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           S.of(context)?.contactFriendInfo ?? 'Friend Info',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 17,
+            height: 1.3,
             fontWeight: FontWeight.w600,
             color: textColor,
           ),
@@ -948,7 +981,12 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   Widget _buildSectionLabel(String label, Color color) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-      child: Text(label, style: TextStyle(fontSize: 13, color: color)),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 13, height: 1.3, color: color),
+      ),
     );
   }
 
@@ -984,7 +1022,12 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         child: Row(
           children: [
             // 左侧标题
-            Text(title, style: TextStyle(fontSize: 16, color: textColor)),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
+            ),
             // 中间弹性空间
             Expanded(
               child: value != null
@@ -993,11 +1036,13 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
                       child: Text(
                         value,
                         textAlign: TextAlign.right,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 15,
+                          height: 1.3,
                           color: secondaryTextColor,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
                     )
                   : const SizedBox.shrink(),
