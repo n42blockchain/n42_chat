@@ -147,15 +147,20 @@ class _SendTransferPageState extends State<SendTransferPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF9A825),
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           S.of(context)?.commonTransfer ?? 'Transfer',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 18,
+            fontSize: 17,
+            height: 1.3,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -200,16 +205,22 @@ class _SendTransferPageState extends State<SendTransferPage> {
                       children: [
                         Text(
                           S.of(context)?.commonTransferTo ?? 'Transfer to',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 13,
+                            height: 1.3,
                             color: secondaryTextColor,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           widget.receiverName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 17,
+                            height: 1.3,
                             fontWeight: FontWeight.w500,
                             color: textColor,
                           ),
@@ -232,7 +243,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
                 children: [
                   Text(
                     S.of(context)?.commonTransferAmount ?? 'Transfer Amount',
-                    style: TextStyle(fontSize: 14, color: secondaryTextColor),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 14, height: 1.3, color: secondaryTextColor),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -255,8 +268,11 @@ class _SendTransferPageState extends State<SendTransferPage> {
                             children: [
                               Text(
                                 _selectedToken,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 16,
+                                  height: 1.3,
                                   fontWeight: FontWeight.w500,
                                   color: textColor,
                                 ),
@@ -368,8 +384,11 @@ class _SendTransferPageState extends State<SendTransferPage> {
               padding: const EdgeInsets.all(16),
               child: Text(
                 S.of(ctx)?.chatSelectCurrency ?? 'Select currency',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 16,
+                  height: 1.3,
                   fontWeight: FontWeight.w500,
                   color: textColor,
                 ),

@@ -243,8 +243,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                       child: Center(
                         child: Text(
                           'No rules configured',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 14,
+                            height: 1.3,
                             color: isDark
                                 ? AppColors.textSecondaryDark
                                 : AppColors.textSecondary,
@@ -306,14 +309,19 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
         children: [
           Row(
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+              Flexible(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.3,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -348,8 +356,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.3,
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? AppColors.textPrimaryDark
@@ -359,8 +370,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.4,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,
@@ -393,8 +407,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
       children: [
         Text(
           label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 13,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: isDark
                 ? AppColors.textSecondaryDark
@@ -410,6 +427,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           onChanged: (_) => _markDirty(),
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           decoration: InputDecoration(
@@ -465,8 +483,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                   children: [
                     Text(
                       'Action',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
+                        height: 1.3,
                         fontWeight: FontWeight.w500,
                         color: isDark
                             ? AppColors.textSecondaryDark
@@ -491,8 +512,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                               action: action,
                               points: 0,
                             ).actionLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 14,
+                              height: 1.3,
                               color: isDark
                                   ? AppColors.textPrimaryDark
                                   : AppColors.textPrimary,
@@ -612,8 +636,11 @@ class _RuleTile extends StatelessWidget {
               children: [
                 Text(
                   rule.actionLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.3,
                     fontWeight: FontWeight.w500,
                     color: rule.isEnabled
                         ? (isDark
@@ -625,8 +652,11 @@ class _RuleTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   _buildSubtitle(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textTertiaryDark
                         : AppColors.textTertiary,
