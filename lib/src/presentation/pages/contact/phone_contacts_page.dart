@@ -137,23 +137,29 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             const SizedBox(height: 24),
             Text(
               'Contacts Permission Required',
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 18,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
-              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
               'To find friends from your contacts, please allow access to your contacts.',
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.4,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
               ),
-              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
             ElevatedButton(
@@ -185,12 +191,15 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             const SizedBox(height: 16),
             Text(
               _errorMessage ?? 'Unknown error',
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                height: 1.4,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
               ),
-              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             TextButton(onPressed: _loadContacts, child: const Text('Retry')),
@@ -215,8 +224,11 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             const SizedBox(height: 24),
             Text(
               'No Matches Found',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 18,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
@@ -224,19 +236,25 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             const SizedBox(height: 12),
             Text(
               'None of your contacts are using this app yet. Invite them to join!',
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.4,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
               ),
-              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Text(
               'Scanned ${_allPhoneContacts.length} contacts',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
@@ -261,13 +279,18 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 size: 20,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Found ${_matchedContacts.length} matches from your contacts',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+              Flexible(
+                child: Text(
+                  'Found ${_matchedContacts.length} matches from your contacts',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.3,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -321,8 +344,11 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
       ),
       title: Text(
         displayName,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontWeight: FontWeight.w500,
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
@@ -331,8 +357,11 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         children: [
           Text(
             match.matrixUserId,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 12,
+              height: 1.3,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -341,8 +370,11 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
           if (phoneContact.displayName != displayName)
             Text(
               'In Contacts: ${phoneContact.displayName}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 11,
+                height: 1.3,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),

@@ -212,8 +212,11 @@ class _StickerStorePageState extends State<StickerStorePage>
               const SizedBox(width: 4),
               Text(
                 label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.3,
                   color: isSelected
                       ? AppColors.primary
                       : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
@@ -259,7 +262,10 @@ class _StickerStorePageState extends State<StickerStorePage>
             const SizedBox(height: 16),
             Text(
               'No stickers found',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                height: 1.3,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
@@ -317,13 +323,18 @@ class _StickerStorePageState extends State<StickerStorePage>
                     children: [
                       Row(
                         children: [
-                          Text(
-                            pack.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? Colors.white
-                                  : AppColors.textPrimary,
+                          Flexible(
+                            child: Text(
+                              pack.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
+                                color: isDark
+                                    ? Colors.white
+                                    : AppColors.textPrimary,
+                              ),
                             ),
                           ),
                           if (pack.isOfficial) ...[
@@ -339,8 +350,11 @@ class _StickerStorePageState extends State<StickerStorePage>
                       if (pack.author != null)
                         Text(
                           'by ${pack.author}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
+                            height: 1.3,
                             color: isDark
                                 ? AppColors.textSecondaryDark
                                 : AppColors.textSecondary,
@@ -412,8 +426,11 @@ class _StickerStorePageState extends State<StickerStorePage>
                 const SizedBox(width: 4),
                 Text(
                   '${pack.downloadCount}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                   ),
                 ),
@@ -426,8 +443,11 @@ class _StickerStorePageState extends State<StickerStorePage>
                 const SizedBox(width: 4),
                 Text(
                   '${pack.stickerCount} stickers',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                   ),
                 ),
@@ -453,16 +473,22 @@ class _StickerStorePageState extends State<StickerStorePage>
             const SizedBox(height: 16),
             Text(
               'No stickers installed',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Get stickers from the store',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark ? Colors.grey[500] : Colors.grey[500],
               ),
             ),
