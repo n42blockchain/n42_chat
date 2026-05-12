@@ -175,7 +175,9 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -269,8 +271,8 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(
-                        l10n?.commonFeatureInDevelopment('') ??
-                            'Feature in development...',
+                        l10n?.contactOpenChatFailed(e.toString()) ??
+                            'Failed to open chat: $e',
                       ),
                     ),
                   );

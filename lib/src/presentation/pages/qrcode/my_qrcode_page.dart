@@ -16,6 +16,8 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../core/utils/debug_log.dart';
 
+enum _QRCodeStyle { n42, classic, ocean, berry }
+
 /// 我的二维码页面
 class MyQRCodePage extends StatefulWidget {
   const MyQRCodePage({super.key});
@@ -30,6 +32,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   String? _displayName;
   String? _avatarUrl;
   AvatarDecorationPreset _avatarDecorationPreset = AvatarDecorationPreset.none;
+  _QRCodeStyle _qrStyle = _QRCodeStyle.n42;
 
   @override
   void initState() {
@@ -150,7 +153,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.background;
-    final cardColor = isDark ? const Color(0xFF2C2C2C) : Colors.white;
+    final cardColor = _qrCardColor(isDark);
     final textColor = isDark ? Colors.white : AppColors.textPrimary;
     final subtitleColor = isDark ? Colors.white70 : AppColors.textSecondary;
 
@@ -250,14 +253,14 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                       data: _qrData,
                       version: QrVersions.auto,
                       size: 200,
-                      backgroundColor: Colors.white,
-                      eyeStyle: const QrEyeStyle(
-                        eyeShape: QrEyeShape.square,
-                        color: AppColors.primary,
+                      backgroundColor: _qrBackgroundColor,
+                      eyeStyle: QrEyeStyle(
+                        eyeShape: _qrEyeShape,
+                        color: _qrEyeColor,
                       ),
-                      dataModuleStyle: const QrDataModuleStyle(
-                        dataModuleShape: QrDataModuleShape.square,
-                        color: Colors.black,
+                      dataModuleStyle: QrDataModuleStyle(
+                        dataModuleShape: _qrDataModuleShape,
+                        color: _qrDataColor,
                       ),
                     ),
                   )
@@ -382,18 +385,10 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                   title: Text(
                     S.of(sheetContext)?.qrcodeChangeStyle ?? 'Change Style',
                   ),
+                  subtitle: Text(_qrStyleLabel(_qrStyle)),
                   onTap: () {
                     Navigator.pop(sheetContext);
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            S.of(context)?.qrcodeMoreStylesFeatureComingSoon ??
-                                'More styles coming soon',
-                          ),
-                        ),
-                      );
-                    }
+                    _showStylePicker();
                   },
                 ),
                 const SizedBox(height: 8),
@@ -403,5 +398,247 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
         );
       },
     );
+  }
+
+  Color _qrCardColor(bool isDark) {
+    switch (_qrStyle) {
+      case _QRCodeStyle.n42:
+        return isDark ? const Color(0xFF2C2C2C) : Colors.white;
+      case _QRCodeStyle.classic:
+        return isDark ? const Color(0xFF1E1E1E) : Colors.white;
+      case _QRCodeStyle.ocean:
+        return isDark ? const Color(0xFF112A3A) : const Color(0xFFEAF8FF);
+      case _QRCodeStyle.berry:
+        return isDark ? const Color(0xFF2A1727) : const Color(0xFFFFF1F7);
+    }
+  }
+
+  Color get _qrBackgroundColor {
+    switch (_qrStyle) {
+      case _QRCodeStyle.ocean:
+        return const Color(0xFFF4FCFF);
+      case _QRCodeStyle.berry:
+        return const Color(0xFFFFF8FB);
+      case _QRCodeStyle.n42:
+      case _QRCodeStyle.classic:
+        return Colors.white;
+    }
+  }
+
+  Color get _qrEyeColor {
+    return _qrEyeColorFor(_qrStyle);
+  }
+
+  Color _qrEyeColorFor(_QRCodeStyle style) {
+    switch (style) {
+      case _QRCodeStyle.n42:
+        return AppColors.primary;
+      case _QRCodeStyle.classic:
+        return Colors.black;
+      case _QRCodeStyle.ocean:
+        return const Color(0xFF0077B6);
+      case _QRCodeStyle.berry:
+        return const Color(0xFFB5179E);
+    }
+  }
+
+  Color get _qrDataColor {
+    return _qrDataColorFor(_qrStyle);
+  }
+
+  Color _qrDataColorFor(_QRCodeStyle style) {
+    switch (style) {
+      case _QRCodeStyle.n42:
+      case _QRCodeStyle.classic:
+        return Colors.black;
+      case _QRCodeStyle.ocean:
+        return const Color(0xFF023047);
+      case _QRCodeStyle.berry:
+        return const Color(0xFF3C096C);
+    }
+  }
+
+  QrEyeShape get _qrEyeShape {
+    switch (_qrStyle) {
+      case _QRCodeStyle.classic:
+        return QrEyeShape.square;
+      case _QRCodeStyle.n42:
+      case _QRCodeStyle.ocean:
+      case _QRCodeStyle.berry:
+        return QrEyeShape.circle;
+    }
+  }
+
+  QrDataModuleShape get _qrDataModuleShape {
+    switch (_qrStyle) {
+      case _QRCodeStyle.classic:
+      case _QRCodeStyle.n42:
+        return QrDataModuleShape.square;
+      case _QRCodeStyle.ocean:
+      case _QRCodeStyle.berry:
+        return QrDataModuleShape.circle;
+    }
+  }
+
+  String _qrStyleLabel(_QRCodeStyle style) {
+    switch (style) {
+      case _QRCodeStyle.n42:
+        return 'N42';
+      case _QRCodeStyle.classic:
+        return 'Classic';
+      case _QRCodeStyle.ocean:
+        return 'Ocean';
+      case _QRCodeStyle.berry:
+        return 'Berry';
+    }
+  }
+
+  void _showStylePicker() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        final isDark = sheetContext.isDarkMode;
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.divider,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                for (final style in _QRCodeStyle.values)
+                  ListTile(
+                    leading: _QrStylePreview(
+                      eyeColor: _qrEyeColorFor(style),
+                      dataColor: _qrDataColorFor(style),
+                      rounded:
+                          style == _QRCodeStyle.ocean ||
+                          style == _QRCodeStyle.berry,
+                    ),
+                    title: Text(_qrStyleLabel(style)),
+                    trailing: _qrStyle == style
+                        ? const Icon(Icons.check, color: AppColors.primary)
+                        : null,
+                    onTap: () {
+                      Navigator.pop(sheetContext);
+                      setState(() => _qrStyle = style);
+                    },
+                  ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _QrStylePreview extends StatelessWidget {
+  final Color eyeColor;
+  final Color dataColor;
+  final bool rounded;
+
+  const _QrStylePreview({
+    required this.eyeColor,
+    required this.dataColor,
+    required this.rounded,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.divider),
+      ),
+      child: CustomPaint(
+        painter: _QrStylePreviewPainter(
+          eyeColor: eyeColor,
+          dataColor: dataColor,
+          rounded: rounded,
+        ),
+      ),
+    );
+  }
+}
+
+class _QrStylePreviewPainter extends CustomPainter {
+  final Color eyeColor;
+  final Color dataColor;
+  final bool rounded;
+
+  const _QrStylePreviewPainter({
+    required this.eyeColor,
+    required this.dataColor,
+    required this.rounded,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final eyePaint = Paint()..color = eyeColor;
+    final dataPaint = Paint()..color = dataColor;
+    final radius = rounded ? const Radius.circular(2) : Radius.zero;
+    final cell = size.width / 7;
+
+    void drawCell(int x, int y, Paint paint) {
+      final rect = Rect.fromLTWH(x * cell, y * cell, cell * 0.82, cell * 0.82);
+      canvas.drawRRect(RRect.fromRectAndRadius(rect, radius), paint);
+    }
+
+    for (final point in const [
+      (0, 0),
+      (1, 0),
+      (0, 1),
+      (1, 1),
+      (5, 0),
+      (6, 0),
+      (5, 1),
+      (6, 1),
+      (0, 5),
+      (1, 5),
+      (0, 6),
+      (1, 6),
+    ]) {
+      drawCell(point.$1, point.$2, eyePaint);
+    }
+
+    for (final point in const [
+      (3, 0),
+      (2, 2),
+      (4, 2),
+      (6, 3),
+      (1, 3),
+      (3, 3),
+      (4, 4),
+      (2, 5),
+      (5, 5),
+      (3, 6),
+      (6, 6),
+    ]) {
+      drawCell(point.$1, point.$2, dataPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _QrStylePreviewPainter oldDelegate) {
+    return oldDelegate.eyeColor != eyeColor ||
+        oldDelegate.dataColor != dataColor ||
+        oldDelegate.rounded != rounded;
   }
 }

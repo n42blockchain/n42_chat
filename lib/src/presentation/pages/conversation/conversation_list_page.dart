@@ -28,6 +28,7 @@ import '../../blocs/search/search_bloc.dart';
 import '../../blocs/story/story_bloc.dart';
 import '../../blocs/story/story_event.dart';
 import '../../blocs/story/story_state.dart';
+import '../../blocs/transfer/transfer_bloc.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/common/sync_progress_overlay.dart';
 import '../../widgets/settings/recovery_key_reminder_dialog.dart';
@@ -41,6 +42,7 @@ import '../qrcode/scan_qr_page.dart';
 import '../search/global_search_page.dart';
 import '../story/create_story_page.dart';
 import '../story/story_viewer_page.dart';
+import '../transfer/receive_page.dart';
 import 'conversation_tile.dart';
 
 /// 会话列表页面（仿微信）
@@ -453,7 +455,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
                   IconButton(
                     icon: Icon(
                       Icons.notifications_outlined,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
                     ),
                     tooltip:
                         S.of(context)?.onChainNotificationsTitle ??
@@ -516,8 +520,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   Widget _buildSearchBar(bool isDark) {
-    final hintColor =
-        isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final hintColor = isDark
+        ? AppColors.textTertiaryDark
+        : AppColors.textTertiary;
     return Container(
       color: isDark ? AppColors.surfaceDark : AppColors.surface,
       padding: const EdgeInsets.symmetric(
@@ -530,8 +535,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
           height: AppDimensions.searchBarHeight + 4,
           decoration: BoxDecoration(
             color: isDark ? AppColors.surfaceDark : AppColors.searchBackground,
-            borderRadius:
-                BorderRadius.circular((AppDimensions.searchBarHeight + 4) / 2),
+            borderRadius: BorderRadius.circular(
+              (AppDimensions.searchBarHeight + 4) / 2,
+            ),
             border: Border.all(
               color: (isDark ? AppColors.dividerDark : AppColors.divider)
                   .withValues(alpha: 0.6),
@@ -631,18 +637,6 @@ class _ConversationListPageState extends State<ConversationListPage> {
     );
   }
 
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          S.of(context)?.commonFeatureComingSoon(feature) ??
-              '$feature coming soon',
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
   void _showAddMenu() {
     final isDark = context.isDarkMode;
 
@@ -703,35 +697,14 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 icon: Icons.qr_code_scanner,
                 iconColor: AppColors.info,
                 title: S.of(context)?.commonScan ?? 'Scan',
-                onTap: () {
-                  Navigator.pop(ctx);
-                  Navigator.of(context)
-                      .push<Map<String, dynamic>?>(
-                        MaterialPageRoute<Map<String, dynamic>?>(
-                          builder: (_) => const ScanQRPage(),
-                        ),
-                      )
-                      .then((result) {
-                        if (result == null || !context.mounted) return;
-                        final roomId = result['roomId'] as String?;
-                        final userId = result['userId'] as String?;
-                        if (roomId != null) {
-                          N42Chat.openConversation(roomId, context: context);
-                        } else if (userId != null) {
-                          N42Chat.openUserProfile(userId, context: context);
-                        }
-                      });
-                },
+                onTap: () => _navigateToScan(ctx),
               ),
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.payment,
                 iconColor: AppColors.success,
                 title: S.of(context)?.commonPayment ?? 'Payment',
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showComingSoon(S.of(context)?.commonPayment ?? 'Payment');
-                },
+                onTap: () => _navigateToPayment(ctx),
               ),
               const SizedBox(height: AppDimensions.spacingS),
             ],
@@ -808,6 +781,41 @@ class _ConversationListPageState extends State<ConversationListPage> {
             context.read<ConversationBloc>().add(const RefreshConversations());
           }
         });
+  }
+
+  void _navigateToPayment(BuildContext sheetContext) {
+    Navigator.pop(sheetContext);
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<TransferBloc>(),
+          child: const ReceivePage(),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _navigateToScan(BuildContext sheetContext) async {
+    Navigator.pop(sheetContext);
+
+    final result = await Navigator.of(context).push<Map<String, dynamic>?>(
+      MaterialPageRoute<Map<String, dynamic>?>(
+        builder: (_) => const ScanQRPage(),
+      ),
+    );
+
+    if (!mounted || result == null) {
+      return;
+    }
+
+    final roomId = result['roomId'] as String?;
+    final userId = result['userId'] as String?;
+    if (roomId != null) {
+      await N42Chat.openConversation(roomId, context: context);
+    } else if (userId != null) {
+      await N42Chat.openUserProfile(userId, context: context);
+    }
   }
 
   void _showConversationMenu(

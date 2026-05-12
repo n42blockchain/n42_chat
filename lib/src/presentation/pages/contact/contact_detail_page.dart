@@ -173,9 +173,15 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final dividerColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final dividerColor = isDark
+        ? AppColors.dividerThinDark
+        : AppColors.dividerThin;
 
     // 检查 ContactBloc 是否可用
     final hasContactBloc = _maybeContactBloc() != null;
@@ -186,7 +192,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: textColor,
+            size: 20,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
@@ -403,7 +413,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: secondaryTextColor,
+              size: 20,
+            ),
           ],
         ),
       ),
@@ -466,7 +480,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: secondaryTextColor,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -481,9 +499,15 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     required VoidCallback onTap,
   }) {
     final isDark = context.isDarkMode;
-    final borderColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
-    final iconColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final borderColor = isDark
+        ? AppColors.dividerThinDark
+        : AppColors.dividerThin;
+    final iconColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -741,10 +765,18 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final labelColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
-    final dividerColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final labelColor = isDark
+        ? AppColors.textTertiaryDark
+        : AppColors.textTertiary;
+    final dividerColor = isDark
+        ? AppColors.dividerThinDark
+        : AppColors.dividerThin;
 
     // 检查 ContactBloc 是否可用
     final hasContactBloc = _maybeContactBloc() != null;
@@ -755,7 +787,11 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: textColor,
+            size: 20,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -969,7 +1005,11 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             // 右侧箭头
             if (showArrow) ...[
               const SizedBox(width: 4),
-              Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: secondaryTextColor,
+                size: 20,
+              ),
             ],
           ],
         ),
@@ -1023,18 +1063,24 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         title: Text(
           S.of(context)?.contactNotes ?? 'Notes',
-          style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+          style: TextStyle(
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
         ),
         content: TextField(
           controller: controller,
           maxLines: 4,
-          style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+          style: TextStyle(
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.contactNotesHint ??
                 'Add notes about this contact',
             hintStyle: TextStyle(
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
             border: const OutlineInputBorder(),
           ),
@@ -1062,17 +1108,20 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
   }
 
   void _showPhotosDialog() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          S
-                  .of(context)
-                  ?.commonFeatureComingSoon(
-                    S.of(context)?.contactPhotos ?? 'Photos',
-                  ) ??
-              'Photos coming soon',
+    _openContactMoments();
+  }
+
+  void _openContactMoments() {
+    final displayName = (_currentRemark?.isNotEmpty ?? false)
+        ? _currentRemark!
+        : widget.displayName;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MomentListPage(
+          userId: widget.userId,
+          userName: displayName,
+          userAvatarUrl: widget.avatarUrl,
         ),
-        duration: const Duration(seconds: 1),
       ),
     );
   }
@@ -1169,17 +1218,23 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         title: Text(
           S.of(context)?.contactPhone ?? 'Phone',
-          style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+          style: TextStyle(
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
         ),
         content: TextField(
           controller: phoneController,
           keyboardType: TextInputType.phone,
-          style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+          style: TextStyle(
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.contactAddPhoneHint ?? 'Enter phone number',
             hintStyle: TextStyle(
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
             ),
             border: const OutlineInputBorder(),
           ),
@@ -1248,11 +1303,18 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor =
-        isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final cardColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.inputBackground;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final hintColor = isDark
+        ? AppColors.textTertiaryDark
+        : AppColors.textTertiary;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
 
     final scaffold = Scaffold(
       backgroundColor: bgColor,
@@ -1423,7 +1485,11 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                         style: TextStyle(fontSize: 16, color: hintColor),
                       ),
                       const Spacer(),
-                      Icon(Icons.chevron_right_rounded, color: hintColor, size: 20),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: hintColor,
+                        size: 20,
+                      ),
                     ],
                   ),
                 ),
@@ -1475,17 +1541,13 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
               ),
               child: InkWell(
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        S
-                                .of(context)
-                                ?.commonFeatureComingSoon(
-                                  S.of(context)?.contactPhotos ?? 'Photos',
-                                ) ??
-                            'Photos coming soon',
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => MomentListPage(
+                        userId: widget.userId,
+                        userName: widget.displayName,
+                        userAvatarUrl: null,
                       ),
-                      duration: const Duration(seconds: 1),
                     ),
                   );
                 },

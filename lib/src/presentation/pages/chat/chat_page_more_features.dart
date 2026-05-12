@@ -472,17 +472,13 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       final contactName = result['name'] as String;
       final contactAvatar = result['avatar'] as String?;
 
-      // 发送名片消息（作为自定义消息类型）
-      // 名片消息格式使用固定英文键名便于解析，显示时再本地化
-      // Format: [Contact Card]\nName: xxx\nID: xxx\nAvatar: xxx
-      final cardContent =
-          '''[Contact Card]
-Name: $contactName
-ID: $contactId
-Avatar: ${contactAvatar ?? ''}''';
-
-      // 使用文本消息发送名片信息（后续可改为专门的名片消息类型）
-      context.read<ChatBloc>().add(SendTextMessage(cardContent));
+      context.read<ChatBloc>().add(
+        SendContactCardMessage(
+          userId: contactId,
+          displayName: contactName,
+          avatarUrl: contactAvatar,
+        ),
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

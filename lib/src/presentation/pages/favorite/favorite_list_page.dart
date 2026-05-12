@@ -44,6 +44,10 @@ class _FavoriteListView extends StatelessWidget {
             icon: const Icon(Icons.search),
             onPressed: () => _showSearch(context),
           ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _showAddOptions(context),
+          ),
         ],
       ),
       body: Column(
@@ -175,7 +179,9 @@ class _FavoriteListView extends StatelessWidget {
     bool isDark,
   ) {
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
     final subtitleColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
@@ -319,6 +325,206 @@ class _FavoriteListView extends StatelessWidget {
         );
       },
     ).whenComplete(controller.dispose);
+  }
+
+  void _showAddOptions(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.note_add_outlined),
+              title: Text(S.of(context)?.favoriteNewNote ?? 'New Note'),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _createNote(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.link_outlined),
+              title: Text(S.of(context)?.favoriteLink ?? 'Favorite Link'),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _addLink(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _createNote(BuildContext context) async {
+    final controller = TextEditingController();
+    final l10n = S.of(context);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n?.favoriteNewNote ?? 'New Note'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          minLines: 3,
+          maxLines: 6,
+          decoration: InputDecoration(
+            hintText: l10n?.favoriteEnterNoteContent ?? 'Enter note content',
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final content = controller.text.trim();
+              if (content.isEmpty) {
+                return;
+              }
+              Navigator.pop(dialogContext);
+              await _saveFavoriteMessage(
+                context,
+                _buildLocalFavoriteMessage(
+                  senderName: l10n?.favoriteMyNotes ?? 'My Notes',
+                  content: content,
+                ),
+                successMessage: l10n?.favoriteNoteAdded ?? 'Note added',
+              );
+            },
+            child: Text(l10n?.commonConfirm ?? 'OK'),
+          ),
+        ],
+      ),
+    ).whenComplete(controller.dispose);
+  }
+
+  Future<void> _addLink(BuildContext context) async {
+    final titleController = TextEditingController();
+    final urlController = TextEditingController();
+    final l10n = S.of(context);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n?.favoriteLink ?? 'Favorite Link'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: l10n?.favoriteLinkTitle ?? 'Link title',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: urlController,
+              keyboardType: TextInputType.url,
+              decoration: InputDecoration(
+                hintText: l10n?.favoriteLinkUrl ?? 'https://',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final normalizedUrl = _normalizeUrl(urlController.text);
+              if (normalizedUrl == null) {
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                  const SnackBar(content: Text('Please enter a valid URL')),
+                );
+                return;
+              }
+
+              final title = titleController.text.trim();
+              final content = title.isEmpty
+                  ? normalizedUrl
+                  : '$title\n$normalizedUrl';
+
+              Navigator.pop(dialogContext);
+              await _saveFavoriteMessage(
+                context,
+                _buildLocalFavoriteMessage(
+                  senderName: l10n?.commonMe ?? 'Me',
+                  content: content,
+                  metadata: MessageMetadata(httpUrl: normalizedUrl),
+                ),
+                successMessage: l10n?.favoriteLinkAdded ?? 'Link added',
+              );
+            },
+            child: Text(l10n?.commonConfirm ?? 'OK'),
+          ),
+        ],
+      ),
+    ).whenComplete(() {
+      titleController.dispose();
+      urlController.dispose();
+    });
+  }
+
+  String? _normalizeUrl(String rawUrl) {
+    final trimmed = rawUrl.trim();
+    if (trimmed.isEmpty) {
+      return null;
+    }
+
+    final candidate = trimmed.contains('://') ? trimmed : 'https://$trimmed';
+    final uri = Uri.tryParse(candidate);
+    if (uri == null || !(uri.isScheme('http') || uri.isScheme('https'))) {
+      return null;
+    }
+    return candidate;
+  }
+
+  MessageEntity _buildLocalFavoriteMessage({
+    required String senderName,
+    required String content,
+    MessageMetadata? metadata,
+  }) {
+    final now = DateTime.now();
+    return MessageEntity(
+      id: 'favorite_local_${now.microsecondsSinceEpoch}',
+      roomId: '__favorite_local__',
+      senderId: '@favorite:local',
+      senderName: senderName,
+      content: content,
+      type: MessageType.text,
+      timestamp: now,
+      isFromMe: true,
+      metadata: metadata,
+    );
+  }
+
+  Future<void> _saveFavoriteMessage(
+    BuildContext context,
+    MessageEntity message, {
+    required String successMessage,
+  }) async {
+    final repository = GetIt.instance<IMessageActionRepository>();
+    final favoriteBloc = context.read<FavoriteBloc>();
+    final currentFilter = favoriteBloc.state.filterType;
+
+    await repository.saveMessage(message);
+    if (!context.mounted) {
+      return;
+    }
+
+    favoriteBloc.add(LoadFavorites(filterType: currentFilter));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(successMessage)));
   }
 
   void _showFavoriteOptions(BuildContext context, MessageEntity favorite) {

@@ -11,13 +11,17 @@ class MessageReactionEntity extends Equatable {
   /// 发送该反应的用户名称列表
   final List<String> userNames;
 
+  /// 服务端聚合数量；Matrix 聚合只返回 count，不返回用户列表。
+  final int? aggregateCount;
+
   /// 总数
-  int get count => userIds.length;
+  int get count => aggregateCount ?? userIds.length;
 
   const MessageReactionEntity({
     required this.emoji,
     this.userIds = const [],
     this.userNames = const [],
+    this.aggregateCount,
   });
 
   /// 当前用户是否已添加此反应
@@ -33,17 +37,19 @@ class MessageReactionEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [emoji, userIds, userNames];
+  List<Object?> get props => [emoji, userIds, userNames, aggregateCount];
 
   MessageReactionEntity copyWith({
     String? emoji,
     List<String>? userIds,
     List<String>? userNames,
+    int? aggregateCount,
   }) {
     return MessageReactionEntity(
       emoji: emoji ?? this.emoji,
       userIds: userIds ?? this.userIds,
       userNames: userNames ?? this.userNames,
+      aggregateCount: aggregateCount ?? this.aggregateCount,
     );
   }
 
@@ -53,6 +59,7 @@ class MessageReactionEntity extends Equatable {
     return copyWith(
       userIds: [...userIds, userId],
       userNames: [...userNames, userName],
+      aggregateCount: aggregateCount == null ? null : aggregateCount! + 1,
     );
   }
 
@@ -70,6 +77,9 @@ class MessageReactionEntity extends Equatable {
     return copyWith(
       userIds: newUserIds,
       userNames: newUserNames,
+      aggregateCount: aggregateCount == null
+          ? null
+          : (count > 0 ? count - 1 : 0),
     );
   }
 }
@@ -89,10 +99,37 @@ class CommonEmojis {
   ];
 
   static const List<String> extendedReactions = [
-    '👍', '❤️', '😄', '😮', '😢', '😠', '🎉', '🤔',
-    '👎', '🙏', '💯', '🔥', '👏', '😂', '🥰', '😎',
-    '🤣', '😍', '😘', '😊', '😉', '🙄', '😴', '🤮',
-    '💪', '✨', '⭐', '🌟', '💖', '💕', '💓', '💗',
+    '👍',
+    '❤️',
+    '😄',
+    '😮',
+    '😢',
+    '😠',
+    '🎉',
+    '🤔',
+    '👎',
+    '🙏',
+    '💯',
+    '🔥',
+    '👏',
+    '😂',
+    '🥰',
+    '😎',
+    '🤣',
+    '😍',
+    '😘',
+    '😊',
+    '😉',
+    '🙄',
+    '😴',
+    '🤮',
+    '💪',
+    '✨',
+    '⭐',
+    '🌟',
+    '💖',
+    '💕',
+    '💓',
+    '💗',
   ];
 }
-

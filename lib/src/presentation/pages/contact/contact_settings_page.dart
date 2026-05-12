@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/repositories/contact_repository.dart';
+import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
+import '../../widgets/chat/contact_card_select_sheet.dart';
 import 'contact_detail_page.dart';
 import 'contact_permissions_page.dart';
 import '../../../core/utils/debug_log.dart';
@@ -57,9 +61,15 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final dividerColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimary;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondary;
+    final dividerColor = isDark
+        ? AppColors.dividerThinDark
+        : AppColors.dividerThin;
 
     return BlocListener<ContactBloc, ContactState>(
       listenWhen: (previous, current) =>
@@ -100,7 +110,11 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           backgroundColor: bgColor,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: textColor,
+              size: 20,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
@@ -310,7 +324,11 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           children: [
             Text(title, style: TextStyle(fontSize: 16, color: textColor)),
             const Spacer(),
-            Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: secondaryTextColor,
+              size: 20,
+            ),
           ],
         ),
       ),
@@ -357,20 +375,101 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     );
   }
 
-  void _shareContact() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          S
-                  .of(context)
-                  ?.commonFeatureComingSoon(
-                    S.of(context)?.contactRecommendToFriend ?? 'Share contact',
-                  ) ??
-              'Share contact coming soon',
-        ),
-        duration: const Duration(seconds: 2),
+  Future<void> _shareContact() async {
+    final isDark = context.isDarkMode;
+    final l10n = S.of(context);
+    final currentContact = context
+        .read<ContactBloc>()
+        .state
+        .contacts
+        .where((c) => c.userId == widget.userId)
+        .firstOrNull;
+    final displayName = currentContact?.effectiveDisplayName.isNotEmpty == true
+        ? currentContact!.effectiveDisplayName
+        : widget.displayName;
+
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ContactCardSelectSheet(
+        isDark: isDark,
+        selectContactText:
+            l10n?.contactSelectFriendToRecommend ??
+            'Select friend to recommend',
+        searchContactHintText: l10n?.commonSearchContacts ?? 'Search contacts',
+        noContactsFoundText:
+            l10n?.contactNoContactsFound ?? 'No contacts found',
+        excludeUserId: widget.userId,
       ),
     );
+
+    if (result == null || !mounted) return;
+
+    final targetUserId = result['id'] as String;
+    final targetDisplayName = result['name'] as String;
+
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(l10n?.contactSendingCard ?? 'Sending contact card...'),
+            ],
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      final contactRepository = getIt<IContactRepository>();
+      final messageRepository = getIt<IMessageRepository>();
+      final roomId = await contactRepository.startDirectChat(targetUserId);
+      final eventId = await messageRepository.sendContactCard(
+        roomId,
+        userId: widget.userId,
+        displayName: displayName,
+        avatarUrl: currentContact?.avatarUrl,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (eventId == null || eventId.isEmpty) {
+        throw StateError('Failed to send contact card');
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n?.contactRecommendedCardTo(displayName, targetDisplayName) ??
+                'Recommended $displayName\'s card to $targetDisplayName',
+          ),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } catch (e) {
+      debugLog('Share contact error: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n?.contactRecommendFailed(e.toString()) ??
+                'Recommend failed: $e',
+          ),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   void _showReportDialog() {
@@ -385,7 +484,9 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
-            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+            style: TextStyle(
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            ),
           ),
           content: RadioGroup<String>(
             groupValue: selectedReason,
@@ -403,7 +504,9 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     title: Text(
                       reason,
                       style: TextStyle(
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimary,
                       ),
                     ),
                     value: reason,
@@ -416,13 +519,19 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                 TextField(
                   controller: descController,
                   maxLines: 2,
-                  style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
                   decoration: InputDecoration(
                     hintText:
                         S.of(context)?.reportDescription ??
                         'Additional description (optional)',
                     hintStyle: TextStyle(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary,
                     ),
                     border: const OutlineInputBorder(),
                   ),

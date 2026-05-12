@@ -237,6 +237,15 @@ abstract class IMessageRepository {
     Map<String, dynamic>? additionalData,
   });
 
+  /// 发送联系人名片消息
+  Future<String?> sendContactCard(
+    String roomId, {
+    required String userId,
+    required String displayName,
+    String? avatarUrl,
+    String? matrixId,
+  });
+
   /// 获取房间的本地删除消息ID列表
   Future<Set<String>> getLocallyDeletedMessageIds(String roomId);
 

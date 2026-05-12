@@ -340,7 +340,11 @@ class MessageItem extends StatelessWidget {
   Widget _buildReactionBar(BuildContext context) {
     // 转换 MessageReaction 到 MessageReactionEntity
     final reactionEntities = message.reactions.map((r) {
-      return MessageReactionEntity(emoji: r.key, userIds: r.userIds);
+      return MessageReactionEntity(
+        emoji: r.key,
+        userIds: r.userIds,
+        aggregateCount: r.aggregateCount,
+      );
     }).toList();
 
     return Padding(
@@ -610,18 +614,14 @@ class MessageItem extends StatelessWidget {
             line.startsWith('联系人:') ||
             line.startsWith('Contact：') ||
             line.startsWith('Contact:')) {
-          contactName = line
-              .replaceFirst(_nameRegex, '')
-              .trim();
+          contactName = line.replaceFirst(_nameRegex, '').trim();
         } else if (line.startsWith('ID：') || line.startsWith('ID:')) {
           contactId = line.replaceFirst(_idRegex, '').trim();
         } else if (line.startsWith('头像：') ||
             line.startsWith('头像:') ||
             line.startsWith('Avatar：') ||
             line.startsWith('Avatar:')) {
-          contactAvatar = line
-              .replaceFirst(_avatarRegex, '')
-              .trim();
+          contactAvatar = line.replaceFirst(_avatarRegex, '').trim();
         }
       }
 
