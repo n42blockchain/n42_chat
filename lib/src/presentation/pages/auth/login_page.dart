@@ -183,15 +183,20 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close, color: textColor),
+          icon: Icon(Icons.close_rounded, color: textColor, size: 22),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
           S.of(context)?.authLogin ?? 'Log In',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: textColor,
             fontSize: 17,
+            height: 1.3,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -357,7 +362,9 @@ class _LoginPageState extends State<LoginPage> {
           },
           child: Text(
             S.of(context)?.authRegisterAccount ?? 'Sign Up',
-            style: const TextStyle(fontSize: 14, color: AppColors.link),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 14, height: 1.3, color: AppColors.link),
           ),
         ),
         const Text('|', style: TextStyle(color: AppColors.textTertiary)),
@@ -365,7 +372,9 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: _showForgotPasswordHelp,
           child: Text(
             S.of(context)?.authForgotPassword ?? 'Forgot Password',
-            style: const TextStyle(fontSize: 14, color: AppColors.link),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 14, height: 1.3, color: AppColors.link),
           ),
         ),
       ],
@@ -391,12 +400,12 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Text(
           S.of(context)?.authServerAddress ?? 'Server Address',
-          style: TextStyle(fontSize: 14, color: labelColor),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _homeserverController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.authServerAddressHint ??
@@ -454,7 +463,9 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(height: 4),
           Text(
             '✓ ${S.of(context)?.authConnectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
-            style: const TextStyle(fontSize: 12, color: AppColors.success),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12, height: 1.3, color: AppColors.success),
           ),
         ],
       ],
@@ -482,12 +493,12 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Text(
           S.of(context)?.authUsernameOrEmail ?? 'Username or Email',
-          style: TextStyle(fontSize: 14, color: labelColor),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _usernameController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.authEnterUsernameOrEmail ??
@@ -542,12 +553,12 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Text(
           S.of(context)?.authPassword ?? 'Password',
-          style: TextStyle(fontSize: 14, color: labelColor),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText: S.of(context)?.authEnterPassword ?? 'Enter password',
             hintStyle: TextStyle(color: hintColor),
@@ -615,8 +626,11 @@ class _LoginPageState extends State<LoginPage> {
               )
             : Text(
                 S.of(context)?.authLogin ?? 'Log In',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 17,
+                  height: 1.3,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -644,7 +658,9 @@ class _LoginPageState extends State<LoginPage> {
       label: Text(
         S.of(context)?.authLoginWithBiometric(_biometricTypeDescription) ??
             'Login with $_biometricTypeDescription',
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontSize: 16, height: 1.3, fontWeight: FontWeight.w600),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
@@ -669,7 +685,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             S.of(context)?.authOr ?? 'OR',
-            style: TextStyle(color: textColor, fontSize: 12),
+            style: TextStyle(color: textColor, fontSize: 12, height: 1.3),
           ),
         ),
         Expanded(child: Divider(color: dividerColor)),
