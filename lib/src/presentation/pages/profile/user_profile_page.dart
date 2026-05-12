@@ -271,10 +271,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     children: [
                       Text(
                         contact.effectiveDisplayName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -297,13 +302,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             Flexible(
                               child: Text(
                                 contact.userId,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 14,
+                                  height: 1.3,
                                   color: isDark
                                       ? AppColors.textSecondaryDark
                                       : AppColors.textSecondary,
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 4),
