@@ -295,7 +295,10 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                 Text(
                   S.of(context)?.qrcodeScanQrToAddMe ??
                       'Scan the QR code above to add me as a friend',
-                  style: TextStyle(fontSize: 14, color: subtitleColor),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14, height: 1.4, color: subtitleColor),
                 ),
 
                 const SizedBox(height: 24),
@@ -350,8 +353,11 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
           const SizedBox(height: 8),
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 12,
+              height: 1.3,
               color: isDark ? Colors.white70 : AppColors.textSecondary,
             ),
           ),

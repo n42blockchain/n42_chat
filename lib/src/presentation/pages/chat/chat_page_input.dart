@@ -129,10 +129,13 @@ extension _ChatPageInputMethods on _ChatPageState {
                       const SizedBox(height: 8),
                       Text(
                         _formatDuration(_recordingDuration),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          height: 1.3,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -157,11 +160,15 @@ extension _ChatPageInputMethods on _ChatPageState {
                               'Release to cancel')
                         : (S.of(context)?.chatReleaseToSend ??
                               'Release to send, swipe up to cancel'),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       color: _isRecordingCancelled
                           ? AppColors.error
                           : Colors.white,
                       fontSize: 16,
+                      height: 1.4,
                     ),
                   ),
                 ),
@@ -174,7 +181,9 @@ extension _ChatPageInputMethods on _ChatPageState {
                   icon: const Icon(Icons.close, color: Colors.white70),
                   label: Text(
                     S.of(context)?.chatTapToCancel ?? 'Tap to cancel',
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.3),
                   ),
                 ),
               ],
@@ -208,8 +217,11 @@ extension _ChatPageInputMethods on _ChatPageState {
           Expanded(
             child: Text(
               '${S.of(context)?.chatSelfDestructTimer ?? 'Self-destruct'}: $label',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: Colors.orange,
                 fontWeight: FontWeight.w500,
               ),
@@ -248,8 +260,11 @@ extension _ChatPageInputMethods on _ChatPageState {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   l10n?.chatTimerPickerTitle ?? 'Self-destruct Timer',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 17,
+                    height: 1.3,
                     fontWeight: FontWeight.w600,
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
@@ -313,8 +328,11 @@ extension _ChatPageInputMethods on _ChatPageState {
           Expanded(
             child: Text(
               s?.chatViewOnce ?? 'View Once',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: AppColors.primary,
                 fontWeight: FontWeight.w500,
               ),
