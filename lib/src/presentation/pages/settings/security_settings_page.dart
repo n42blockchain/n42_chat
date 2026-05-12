@@ -224,6 +224,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               S.of(context)?.settingsBiometricLogin ?? 'Biometric Login',
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -285,6 +286,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               l10n?.authPasskeyLabel ?? 'Passkey',
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -647,8 +649,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 Text(
                   S.of(context)?.commonEndToEndEncryption ??
                       'End-to-End Encryption',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 16,
+                    height: 1.3,
                     fontWeight: FontWeight.w600,
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
@@ -656,7 +661,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 const SizedBox(height: 4),
                 Text(
                   statusText,
-                  style: TextStyle(fontSize: 13, color: statusColor),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13, height: 1.3, color: statusColor),
                 ),
               ],
             ),
@@ -686,6 +693,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               S.of(context)?.settingsKeyBackup ?? 'Key Backup',
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -757,6 +765,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               S.of(context)?.settingsLoggedInDevices ?? 'Logged In Devices',
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -822,7 +831,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       ),
       title: Text(
         device.deviceName,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           fontWeight: device.isCurrentDevice
               ? FontWeight.w600
@@ -831,8 +843,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       ),
       subtitle: Text(
         subtitleParts.join(' · '),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 12,
+          height: 1.3,
           color: device.isCurrentDevice
               ? AppColors.primary
               : device.isVerified
@@ -870,6 +885,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               S.of(context)?.settingsAdvanced ?? 'Advanced',
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -1717,6 +1733,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               label,
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,

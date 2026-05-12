@@ -287,24 +287,30 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       children: [
         Text(
           S.of(context)?.authEnterRegisteredEmail ?? 'Enter the email address you registered with',
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
+            height: 1.4,
             color: textColor,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
         Text(
           S.of(context)?.authEmailAddress ?? 'Email Address',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _emailController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText: S.of(context)?.commonEnterEmailAddress ?? 'Enter email address',
             hintStyle: TextStyle(color: hintColor),
@@ -351,8 +357,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   )
                 : Text(
                     S.of(context)?.authSendResetCode ?? 'Send Reset Code',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 17,
+                      height: 1.3,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
@@ -375,17 +384,23 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         Text(
           S.of(context)?.authResetCodeSent(_emailController.text.trim()) ??
               'Reset code sent to ${_emailController.text.trim()}',
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
+            height: 1.4,
             color: textColor,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
         Text(
           S.of(context)?.authEnterResetCode ?? 'Enter reset code',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             color: labelColor,
           ),
         ),
@@ -426,7 +441,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               _resendCountdown > 0
                   ? S.of(context)?.authCanResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'
                   : S.of(context)?.authResendVerificationCode ?? 'Resend verification code',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                height: 1.3,
                 color: _resendCountdown > 0 ? hintColor : AppColors.textLink,
               ),
             ),
@@ -446,8 +464,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ),
             child: Text(
               S.of(context)?.commonConfirm ?? 'Confirm',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 17,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
@@ -469,24 +490,30 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       children: [
         Text(
           S.of(context)?.authSetNewPassword ?? 'Set New Password',
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
+            height: 1.3,
             color: textColor,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
         Text(
           S.of(context)?.commonNewPassword ?? 'New Password',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText: S.of(context)?.authPasswordHint ?? 'Min 8 characters',
             hintStyle: TextStyle(color: hintColor),
@@ -531,15 +558,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         const SizedBox(height: 16),
         Text(
           S.of(context)?.commonConfirmNewPassword ?? 'Confirm New Password',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             color: labelColor,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _confirmPasswordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText: S.of(context)?.commonReenterPassword ?? 'Re-enter password',
             hintStyle: TextStyle(color: hintColor),
@@ -606,8 +636,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   )
                 : Text(
                     S.of(context)?.authResetPassword ?? 'Reset Password',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 17,
+                      height: 1.3,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
