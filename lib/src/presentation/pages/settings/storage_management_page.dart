@@ -47,19 +47,25 @@ class _StorageManagementView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(
           S.of(context)?.storageManagement ?? 'Storage',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
+            height: 1.3,
           ),
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_rounded,
+            Icons.arrow_back_ios_new_rounded,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            size: 20,
           ),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -177,15 +183,24 @@ class _StorageOverviewSection extends StatelessWidget {
                   children: [
                     Text(
                       info.formattedTotal,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
                         color: textColor,
                       ),
                     ),
                     Text(
                       S.of(context)?.totalUsage ?? 'Total Usage',
-                      style: TextStyle(fontSize: 12, color: secondaryColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.3,
+                        color: secondaryColor,
+                      ),
                     ),
                   ],
                 ),
@@ -479,9 +494,12 @@ class _RoomStorageSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               S.of(context)?.roomStorageRanking ?? 'Room Storage',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
+                height: 1.3,
                 color: textColor,
               ),
             ),
@@ -492,9 +510,13 @@ class _RoomStorageSection extends StatelessWidget {
                 (room) => ListTile(
                   title: Text(
                     room.roomName,
-                    style: TextStyle(fontSize: 15, color: textColor),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.3,
+                      color: textColor,
+                    ),
                   ),
                   subtitle: Text(
                     '${room.mediaCount} files',
