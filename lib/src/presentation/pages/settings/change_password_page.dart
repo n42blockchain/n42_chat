@@ -165,8 +165,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                             )
                           : Text(
                               S.of(context)?.commonConfirm ?? 'Confirm',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 17,
+                                height: 1.3,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
@@ -207,7 +210,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             child: Text(
               S.of(context)?.settingsChangePasswordInfo ??
                   'After changing password, you will be logged out and need to login with the new password.',
-              style: TextStyle(fontSize: 14, color: textColor),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14, height: 1.4, color: textColor),
             ),
           ),
         ],
@@ -232,8 +237,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       children: [
         Text(
           S.of(context)?.settingsCurrentPassword ?? 'Current Password',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: labelColor,
           ),
@@ -241,7 +249,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _currentPasswordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.settingsEnterCurrentPassword ??
@@ -303,8 +311,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       children: [
         Text(
           S.of(context)?.commonNewPassword ?? 'New Password',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: labelColor,
           ),
@@ -312,7 +323,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _newPasswordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.settingsEnterNewPassword ?? 'Enter new password',
@@ -379,8 +390,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       children: [
         Text(
           S.of(context)?.commonConfirmNewPassword ?? 'Confirm New Password',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: labelColor,
           ),
@@ -388,7 +402,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _confirmPasswordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.commonReenterPassword ?? 'Re-enter password',
@@ -448,12 +462,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         Text(
           S.of(context)?.settingsPasswordRequirements ??
               'Password requirements:',
-          style: TextStyle(fontSize: 12, color: textColor),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 12, height: 1.3, color: textColor),
         ),
         const SizedBox(height: 4),
         Text(
           '• ${S.of(context)?.commonPasswordMinLength ?? 'At least 8 characters'}',
-          style: TextStyle(fontSize: 12, color: textColor),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 12, height: 1.3, color: textColor),
         ),
       ],
     );
@@ -478,7 +496,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             child: Text(
               S.of(context)?.settingsSecurityNote ??
                   'For security, you will need to re-login on all devices after changing password.',
-              style: TextStyle(fontSize: 12, color: textColor),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12, height: 1.4, color: textColor),
             ),
           ),
         ],

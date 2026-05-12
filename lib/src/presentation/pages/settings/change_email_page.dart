@@ -259,13 +259,18 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                 Text(
                   S.of(context)?.settingsCurrentBoundEmail ??
                       'Current bound email',
-                  style: TextStyle(fontSize: 12, color: textColor),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, height: 1.3, color: textColor),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 16,
+                    height: 1.3,
                     fontWeight: FontWeight.w500,
                     color: labelColor,
                   ),
@@ -295,8 +300,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       children: [
         Text(
           S.of(context)?.settingsCurrentPassword ?? 'Current Password',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: labelColor,
           ),
@@ -304,7 +312,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _passwordController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.settingsEnterCurrentPassword ??
@@ -364,8 +372,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       children: [
         Text(
           S.of(context)?.settingsNewEmailAddress ?? 'New Email Address',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: labelColor,
           ),
@@ -373,7 +384,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _emailController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.settingsEnterNewEmail ??
@@ -416,8 +427,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       children: [
         Text(
           S.of(context)?.settingsVerificationCode ?? 'Verification Code',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: labelColor,
           ),
@@ -425,12 +439,14 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         const SizedBox(height: 8),
         Text(
           '${S.of(context)?.settingsCodeSentTo ?? 'Verification code sent to'} ${_emailController.text}',
-          style: TextStyle(fontSize: 12, color: hintColor),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 12, height: 1.3, color: hintColor),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _codeController,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.commonEnterVerificationCode ??
@@ -479,8 +495,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             : Text(
                 S.of(context)?.commonSendVerificationCode ??
                     'Send Verification Code',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 17,
+                  height: 1.3,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -498,10 +517,14 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          S.of(context)?.settingsDidNotReceiveCode ??
-              "Didn't receive the code?",
-          style: TextStyle(fontSize: 14, color: textColor),
+        Flexible(
+          child: Text(
+            S.of(context)?.settingsDidNotReceiveCode ??
+                "Didn't receive the code?",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 14, height: 1.3, color: textColor),
+          ),
         ),
         TextButton(
           onPressed: canResend ? _requestCode : null,
@@ -509,8 +532,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             _countdown > 0
                 ? '${S.of(context)?.settingsResend ?? 'Resend'} (${_countdown}s)'
                 : S.of(context)?.settingsResend ?? 'Resend',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
+              height: 1.3,
               color: canResend ? AppColors.primary : textColor,
             ),
           ),
@@ -541,8 +567,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               )
             : Text(
                 S.of(context)?.commonConfirm ?? 'Confirm',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 17,
+                  height: 1.3,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -570,7 +599,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             child: Text(
               S.of(context)?.settingsEmailSecurityNote ??
                   'Your email is used for password recovery. Please keep it secure.',
-              style: TextStyle(fontSize: 12, color: textColor),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12, height: 1.4, color: textColor),
             ),
           ),
         ],

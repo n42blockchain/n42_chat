@@ -293,17 +293,23 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         Text(
           S.of(context)?.securityWaitingForDeviceAccept ??
               'Waiting for the other device to accept...',
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
+            height: 1.4,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
           widget.deviceName ?? widget.deviceId ?? '',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondary,
@@ -328,9 +334,12 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         const SizedBox(height: 16),
         Text(
           S.of(context)?.securityVerifyDevice ?? 'Verify this device',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            height: 1.3,
+            fontWeight: FontWeight.w700,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
@@ -338,13 +347,16 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         Text(
           S.of(context)?.securityConfirmEmojiMatch ??
               'Confirm the emoji below are displayed on both devices, in the same order',
+          textAlign: TextAlign.center,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.4,
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondary,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),
 
@@ -373,7 +385,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                 ),
                 child: Text(
                   S.of(context)?.securityEmojiDontMatch ?? 'They don\'t match',
-                  style: const TextStyle(fontSize: 16),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16, height: 1.3),
                 ),
               ),
             ),
@@ -392,7 +406,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                 ),
                 child: Text(
                   S.of(context)?.securityEmojiMatch ?? 'They match',
-                  style: const TextStyle(fontSize: 16),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16, height: 1.3),
                 ),
               ),
             ),
@@ -414,11 +430,14 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         Text(
           S.of(context)?.securityWaitingForDeviceConfirm ??
               'Waiting for the other device to confirm...',
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
+            height: 1.4,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -441,9 +460,12 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         Text(
           S.of(context)?.securityVerificationSuccess ??
               'Verification successful!',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            height: 1.3,
+            fontWeight: FontWeight.w700,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
@@ -451,13 +473,16 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         Text(
           S.of(context)?.securityDeviceVerifiedTrusted ??
               'This device is now verified and trusted.',
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.4,
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondary,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),
         ElevatedButton(
@@ -496,9 +521,12 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         const SizedBox(height: 24),
         Text(
           S.of(context)?.securityVerificationFailed ?? 'Verification failed',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            height: 1.3,
+            fontWeight: FontWeight.w700,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
@@ -508,13 +536,16 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               _errorMessage!,
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.4,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
               ),
-              textAlign: TextAlign.center,
             ),
           ),
         const SizedBox(height: 32),
