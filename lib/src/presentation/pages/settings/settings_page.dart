@@ -355,8 +355,11 @@ class SettingsPage extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               phoneNumber,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 13,
+                                height: 1.3,
                                 color: secondaryColor,
                               ),
                             ),
@@ -365,12 +368,13 @@ class SettingsPage extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               email,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: secondaryColor,
-                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                height: 1.3,
+                                color: secondaryColor,
+                              ),
                             ),
                           ],
                           if (profile!.statusMessage != null &&
@@ -378,12 +382,13 @@ class SettingsPage extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               profile!.statusMessage!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: secondaryColor,
-                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                height: 1.3,
+                                color: secondaryColor,
+                              ),
                             ),
                           ],
                         ],
@@ -564,16 +569,22 @@ class _SettingsItem extends StatelessWidget {
                   children: [
                     Text(
                       title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 16,
+                        height: 1.3,
                         color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       ),
                     ),
                     if (subtitle != null)
                       Text(
                         subtitle!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
+                          height: 1.3,
                           color: isDark
                               ? AppColors.textSecondaryDark
                               : AppColors.textSecondary,

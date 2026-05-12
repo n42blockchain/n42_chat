@@ -242,6 +242,7 @@ class ConversationTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 16,
+                        height: 1.3,
                         fontWeight: FontWeight.w500,
                         color: isDark
                             ? AppColors.textPrimaryDark
@@ -258,8 +259,11 @@ class ConversationTile extends StatelessWidget {
               Text(
                 N42DateUtils.formatConversationTime(
                     conversation.lastMessageTime!),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
+                  height: 1.3,
                   color: isDark ? Colors.white38 : AppColors.textTertiary,
                 ),
               ),
@@ -275,8 +279,11 @@ class ConversationTile extends StatelessWidget {
             if (conversation.draft != null && conversation.draft!.isNotEmpty)
               const Text(
                 '[草稿] ',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.3,
                   color: AppColors.error,
                 ),
               ),
@@ -289,6 +296,7 @@ class ConversationTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.3,
                   color: isDark ? Colors.white38 : AppColors.textSecondary,
                 ),
               ),
