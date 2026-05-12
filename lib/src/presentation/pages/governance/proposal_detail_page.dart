@@ -177,8 +177,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
           // Title
           Text(
             proposal.title,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 20,
+              height: 1.3,
               fontWeight: FontWeight.w700,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -195,13 +198,18 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                     : AppColors.textTertiary,
               ),
               const SizedBox(width: 6),
-              Text(
-                'by ${_shortenAddress(proposal.author)}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+              Flexible(
+                child: Text(
+                  'by ${_shortenAddress(proposal.author)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.3,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -215,8 +223,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               const SizedBox(width: 4),
               Text(
                 '${proposal.votesCount} votes',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 14,
+                  height: 1.3,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -256,8 +267,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
       ),
       child: Text(
         label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 12,
+          height: 1.3,
           fontWeight: FontWeight.w600,
           color: badgeColor,
         ),
@@ -280,7 +294,9 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
         const SizedBox(width: 4),
         Text(
           text,
-          style: TextStyle(fontSize: 13, color: color),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 13, height: 1.3, color: color),
         ),
       ],
     );
@@ -303,8 +319,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
         children: [
           Text(
             'Description',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -343,8 +362,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
             children: [
               Text(
                 'Results',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 15,
+                  height: 1.3,
                   fontWeight: FontWeight.w600,
                   color: isDark
                       ? AppColors.textPrimaryDark
@@ -354,8 +376,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               const Spacer(),
               Text(
                 '${proposal.scoresTotal.toStringAsFixed(0)} total VP',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
+                  height: 1.3,
                   color: isDark
                       ? AppColors.textTertiaryDark
                       : AppColors.textTertiary,
@@ -400,8 +425,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
         children: [
           Text(
             'Cast Your Vote',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -424,8 +452,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                     leading: Radio<int>(value: choiceValue),
                     title: Text(
                       choice,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14,
+                        height: 1.3,
                         color: isDark
                             ? AppColors.textPrimaryDark
                             : AppColors.textPrimary,
@@ -471,8 +502,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                     )
                   : const Text(
                       'Cast Vote',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 16,
+                        height: 1.3,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -541,8 +575,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
         children: [
           Text(
             'Recent Votes (${votes.length})',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -559,8 +596,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                     flex: 3,
                     child: Text(
                       _shortenAddress(vote.voter),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
+                        height: 1.3,
                         color: isDark
                             ? AppColors.textPrimaryDark
                             : AppColors.textPrimary,
@@ -573,15 +613,16 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                     flex: 3,
                     child: Text(
                       choiceName,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
+                        height: 1.3,
                         color: isDark
                             ? AppColors.textSecondaryDark
                             : AppColors.textSecondary,
                       ),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   // Voting power
@@ -589,8 +630,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                     flex: 2,
                     child: Text(
                       '${vote.votingPower.toStringAsFixed(vote.votingPower == vote.votingPower.roundToDouble() ? 0 : 2)} VP',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
+                        height: 1.3,
                         fontWeight: FontWeight.w500,
                         color: isDark
                             ? AppColors.textPrimaryDark

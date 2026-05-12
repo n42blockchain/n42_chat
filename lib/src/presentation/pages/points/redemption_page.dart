@@ -172,8 +172,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
             children: [
               Text(
                 'Available Points',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
+                  height: 1.3,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -181,9 +184,12 @@ class _RedemptionPageState extends State<RedemptionPage> {
               ),
               Text(
                 '${state.balance?.availablePoints ?? 0}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  height: 1.3,
+                  fontWeight: FontWeight.w700,
                   color: isDark
                       ? AppColors.textPrimaryDark
                       : AppColors.textPrimary,
@@ -210,8 +216,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
           const SizedBox(height: 16),
           Text(
             'No items available',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
+              height: 1.3,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -220,8 +229,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
           const SizedBox(height: 8),
           Text(
             'Check back later for new rewards',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
+              height: 1.3,
               color:
                   isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
@@ -242,8 +254,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
             const SizedBox(height: 16),
             Text(
               'Failed to load rewards',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 fontWeight: FontWeight.w500,
                 color:
                     isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -254,14 +269,15 @@ class _RedemptionPageState extends State<RedemptionPage> {
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.4,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
                 ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
             const SizedBox(height: 24),
@@ -287,8 +303,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
             Text(
               message,
               textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 15,
+                height: 1.4,
                 fontWeight: FontWeight.w500,
                 color:
                     isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -437,27 +456,29 @@ class _RedemptionCard extends StatelessWidget {
                 children: [
                   Text(
                     item.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13,
+                      height: 1.3,
                       fontWeight: FontWeight.w600,
                       color: isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimary,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     item.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 11,
+                      height: 1.4,
                       color: isDark
                           ? AppColors.textTertiaryDark
                           : AppColors.textTertiary,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const Spacer(),
                   // Cost and stock
@@ -465,9 +486,12 @@ class _RedemptionCard extends StatelessWidget {
                     children: [
                       Text(
                         '${item.cost} pts',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.bold,
+                          height: 1.3,
+                          fontWeight: FontWeight.w700,
                           color: canAfford
                               ? AppColors.primary
                               : AppColors.error,
@@ -477,8 +501,11 @@ class _RedemptionCard extends StatelessWidget {
                       if (item.stock != null)
                         Text(
                           '${item.stock} left',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 11,
+                            height: 1.3,
                             color: item.isInStock
                                 ? (isDark
                                     ? AppColors.textTertiaryDark
