@@ -165,10 +165,23 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
       appBar: AppBar(
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 20,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text(
           l10n?.nftPickerTitle ?? 'Select NFT Avatar',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 17,
+            height: 1.3,
             fontWeight: FontWeight.w600,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
@@ -206,8 +219,11 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
         const SizedBox(height: 16),
         Text(
           l10n?.nftPickerPopularCollections ?? 'Popular Collections',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 15,
+            height: 1.3,
             fontWeight: FontWeight.w600,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
@@ -255,8 +271,11 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           // Chain selector
           Text(
             l10n?.nftPickerChain ?? 'Chain',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
+              height: 1.3,
               fontWeight: FontWeight.w500,
               color: secondaryColor,
             ),
@@ -273,8 +292,11 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           // Contract address
           Text(
             l10n?.nftPickerContract ?? 'Contract Address',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
+              height: 1.3,
               fontWeight: FontWeight.w500,
               color: secondaryColor,
             ),
@@ -290,7 +312,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             ),
             child: TextField(
               controller: _contractController,
-              style: TextStyle(fontSize: 14, color: textColor),
+              style: TextStyle(fontSize: 14, height: 1.3, color: textColor),
               decoration: InputDecoration(
                 hintText: '0x...',
                 hintStyle: TextStyle(color: secondaryColor),
@@ -316,8 +338,11 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           // Token ID
           Text(
             l10n?.nftPickerTokenId ?? 'Token ID',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
+              height: 1.3,
               fontWeight: FontWeight.w500,
               color: secondaryColor,
             ),
@@ -335,7 +360,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               controller: _tokenIdController,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: TextStyle(fontSize: 14, color: textColor),
+              style: TextStyle(fontSize: 14, height: 1.3, color: textColor),
               decoration: InputDecoration(
                 hintText: '1234',
                 hintStyle: TextStyle(color: secondaryColor),
@@ -357,7 +382,13 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               ),
               child: Text(
                 _errorText!,
-                style: const TextStyle(color: AppColors.error, fontSize: 13),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppColors.error,
+                  fontSize: 13,
+                  height: 1.4,
+                ),
               ),
             ),
 
@@ -408,8 +439,11 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                   : Text(
                       l10n?.nftPickerVerifyOwnership ??
                           'Verify Ownership & Preview',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 16,
+                        height: 1.3,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -442,8 +476,11 @@ class _NftPreview extends StatelessWidget {
       children: [
         Text(
           l10n?.nftPickerPreview ?? 'Preview',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: isDark
                 ? AppColors.textSecondaryDark
@@ -512,8 +549,11 @@ class _NftPreview extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 l10n?.web3NftAvatar ?? 'NFT Avatar',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 11,
+                  height: 1.3,
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
@@ -568,8 +608,11 @@ class _InfoBanner extends StatelessWidget {
               children: [
                 Text(
                   l10n?.nftPickerInfoTitle ?? 'NFT Avatar — Verified On-Chain',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 13,
+                    height: 1.3,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primary,
                   ),
@@ -578,6 +621,8 @@ class _InfoBanner extends StatelessWidget {
                 Text(
                   l10n?.nftPickerInfoDesc ??
                       'Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.',
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark
@@ -650,8 +695,11 @@ class _ChainSelector extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     chain.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       fontWeight: FontWeight.w500,
                       color: selected
                           ? Colors.white
@@ -714,8 +762,11 @@ class _CollectionCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               'ERC-721',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 10,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
