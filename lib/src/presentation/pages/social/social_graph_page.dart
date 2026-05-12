@@ -191,8 +191,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                         children: [
                           Text(
                             profile.displayName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 17,
+                              height: 1.3,
                               fontWeight: FontWeight.w600,
                               color: isDark
                                   ? AppColors.textPrimaryDark
@@ -202,8 +205,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                           const SizedBox(height: 2),
                           Text(
                             _shortenAddress(profile.address),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 13,
+                              height: 1.3,
                               color: isDark
                                   ? AppColors.textSecondaryDark
                                   : AppColors.textSecondary,
@@ -265,8 +271,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                         ),
                         child: Text(
                           chain.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 11,
+                            height: 1.3,
                             fontWeight: FontWeight.w500,
                             color: AppColors.primary,
                           ),
@@ -326,8 +335,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
         children: [
           Text(
             value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark
                   ? AppColors.textPrimaryDark
@@ -337,8 +349,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
           const SizedBox(height: 2),
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11,
+              height: 1.3,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -386,8 +401,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
       child: Text(
         title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 15,
+          height: 1.3,
           fontWeight: FontWeight.w600,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
@@ -410,8 +428,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
           const SizedBox(height: 12),
           Text(
             'No connections found',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -420,8 +441,12 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
           const SizedBox(height: 4),
           Text(
             'Connections appear as you build on-chain activity',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
+              height: 1.4,
               color: isDark
                   ? AppColors.textTertiaryDark
                   : AppColors.textTertiary,
@@ -447,8 +472,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             const SizedBox(height: 12),
             Text(
               'Failed to load social graph',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.textPrimaryDark
@@ -459,8 +487,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             Text(
               message,
               textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
+                height: 1.4,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,

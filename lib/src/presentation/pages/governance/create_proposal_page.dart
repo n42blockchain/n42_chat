@@ -278,8 +278,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
         children: [
           Text(
             'Title',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -335,8 +338,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
         children: [
           Text(
             'Description',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -404,8 +410,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               const Spacer(),
               Text(
                 '${_choiceControllers.length}/10',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.3,
                   color: isDark
                       ? AppColors.textTertiaryDark
                       : AppColors.textTertiary,
@@ -424,8 +433,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                     width: 28,
                     child: Text(
                       '${index + 1}.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14,
+                        height: 1.3,
                         fontWeight: FontWeight.w500,
                         color: isDark
                             ? AppColors.textSecondaryDark
@@ -524,8 +536,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
         children: [
           Text(
             'Voting Period',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 15,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -550,8 +565,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
           const SizedBox(height: 8),
           Text(
             'Duration: ${_formatDuration(_endTime.difference(_startTime))}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 12,
+              height: 1.3,
               color: isDark
                   ? AppColors.textTertiaryDark
                   : AppColors.textTertiary,
@@ -591,7 +609,9 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               )
             : const Text(
                 'Create Proposal',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16, height: 1.3, fontWeight: FontWeight.w600),
               ),
       ),
     );
@@ -644,8 +664,11 @@ class _DateTimeTile extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -654,8 +677,11 @@ class _DateTimeTile extends StatelessWidget {
             const Spacer(),
             Text(
               _formatDateTime(dateTime),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.3,
                 fontWeight: FontWeight.w500,
                 color: isDark
                     ? AppColors.textPrimaryDark
