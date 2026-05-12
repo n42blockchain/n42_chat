@@ -84,15 +84,11 @@ class RedPacketDetailPage extends StatelessWidget {
                         children: [
                           IconButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            icon: const Icon(Icons.chevron_left,
-                                color: Colors.white, size: 32),
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                                color: Colors.white, size: 20),
+                            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                           ),
                           const Spacer(),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.more_horiz,
-                                color: Colors.white),
-                          ),
                         ],
                       ),
                     ),
@@ -120,13 +116,18 @@ class RedPacketDetailPage extends StatelessWidget {
                               : null,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          S.of(context)?.commonSenderSentRedPacket(senderName) ??
-                              '$senderName sent a red packet',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
+                        Flexible(
+                          child: Text(
+                            S.of(context)?.commonSenderSentRedPacket(senderName) ??
+                                '$senderName sent a red packet',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              height: 1.3,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ],
@@ -135,13 +136,20 @@ class RedPacketDetailPage extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     // Greeting
-                    Text(
-                      greeting ??
-                          S.of(context)?.commonRedPacketDefaultGreeting ??
-                          'Best wishes',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
-                        fontSize: 15,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Text(
+                        greeting ??
+                            S.of(context)?.commonRedPacketDefaultGreeting ??
+                            'Best wishes',
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 15,
+                          height: 1.4,
+                        ),
                       ),
                     ),
 
@@ -187,12 +195,17 @@ class RedPacketDetailPage extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              S.of(context)?.commonSavedToBalance ??
-                                  'Saved to balance, can transfer directly',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
-                                fontSize: 14,
+                            Flexible(
+                              child: Text(
+                                S.of(context)?.commonSavedToBalance ??
+                                    'Saved to balance, can transfer directly',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                  fontSize: 14,
+                                  height: 1.3,
+                                ),
                               ),
                             ),
                             Icon(
@@ -232,21 +245,31 @@ class RedPacketDetailPage extends StatelessWidget {
                             Text(
                               S.of(context)?.commonReplyWithEmoji ??
                                   'Reply with this emoji',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: 14,
+                                height: 1.3,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ] else ...[
-                      Text(
-                        S.of(context)?.commonRedPacketExpiredOrEmpty ??
-                            'Red packet expired/all claimed',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          S.of(context)?.commonRedPacketExpiredOrEmpty ??
+                              'Red packet expired/all claimed',
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                            height: 1.4,
+                          ),
                         ),
                       ),
                     ],
@@ -325,11 +348,16 @@ class _StatsBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Text(
-                  '$statsText$amountText',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 13,
+                Expanded(
+                  child: Text(
+                    '$statsText$amountText',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 13,
+                      height: 1.3,
+                    ),
                   ),
                 ),
               ],
@@ -383,10 +411,14 @@ class _ClaimerRow extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        claimer.name,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 16),
+                      Flexible(
+                        child: Text(
+                          claimer.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16, height: 1.3),
+                        ),
                       ),
                       if (claimer.isBestLuck) ...[
                         const SizedBox(width: 6),
@@ -398,9 +430,12 @@ class _ClaimerRow extends StatelessWidget {
                   if (claimer.claimTime != null)
                     Text(
                       claimer.claimTime!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.5),
                         fontSize: 13,
+                        height: 1.3,
                       ),
                     ),
                 ],
@@ -529,15 +564,22 @@ class ConfirmReceiveDialog extends StatelessWidget {
 
             Text(
               S.of(context)?.commonReceivedTransfer ?? 'Received Transfer',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w600),
+                fontSize: 18,
+                height: 1.3,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 8),
 
             Text(
               S.of(context)?.commonFromSender(senderName, senderName) ??
                   'From $senderName',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14, height: 1.3, color: Colors.grey[600]),
             ),
             const SizedBox(height: 24),
 
@@ -571,8 +613,10 @@ class ConfirmReceiveDialog extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(memo!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style:
-                        TextStyle(fontSize: 14, color: Colors.grey[600])),
+                        TextStyle(fontSize: 14, height: 1.4, color: Colors.grey[600])),
               ),
             ],
 
