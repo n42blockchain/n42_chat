@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/services/username_service.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/username_validator.dart';
 
 /// 设置用户名页面
@@ -161,7 +162,13 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
           children: [
             Text(
               s?.usernameTitle ?? 'Username',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                height: 1.3,
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -180,9 +187,12 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
                         ),
                       )
                     : _isAvailable && _controller.text.trim().isNotEmpty
-                    ? const Icon(Icons.check_circle, color: Colors.green)
+                    ? const Icon(
+                        Icons.check_circle_rounded,
+                        color: AppColors.success,
+                      )
                     : _errorMessage != null
-                    ? const Icon(Icons.error, color: Colors.red)
+                    ? const Icon(Icons.error_outline, color: AppColors.error)
                     : null,
                 errorText: _errorMessage,
               ),
@@ -199,6 +209,7 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
                   '3-30 characters, lowercase letters, numbers, underscore. Must start with a letter.',
               style: TextStyle(
                 fontSize: 12,
+                height: 1.4,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
@@ -206,10 +217,13 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
               const SizedBox(height: 8),
               Text(
                 s?.usernameAvailable ?? 'Username available',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 13,
-                  color: Colors.green,
+                  color: AppColors.success,
                   fontWeight: FontWeight.w500,
+                  height: 1.3,
                 ),
               ),
             ],

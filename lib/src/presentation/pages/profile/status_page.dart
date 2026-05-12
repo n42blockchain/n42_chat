@@ -217,18 +217,26 @@ class _StatusPageState extends State<StatusPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.close, color: Colors.white, size: 28),
+          IconButton(
+            icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+            splashRadius: 22,
+            onPressed: () => Navigator.pop(context),
           ),
           Expanded(
             child: Column(
               children: [
                 Text(
                   S.of(context)?.profileSetStatus ?? 'Set Status',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
+                    height: 1.3,
                     color: Colors.white,
                   ),
                 ),
@@ -236,8 +244,12 @@ class _StatusPageState extends State<StatusPage> {
                 Text(
                   S.of(context)?.profileVisibleToFriends24h ??
                       'Visible to friends for 24 hours',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
@@ -350,10 +362,15 @@ class _StatusPageState extends State<StatusPage> {
             const SizedBox(height: 6),
             Text(
               item.text,
-              style: const TextStyle(fontSize: 12, color: Colors.white),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                height: 1.3,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
             ),
           ],
         ),
