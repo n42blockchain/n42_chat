@@ -746,8 +746,11 @@ class MessageItem extends StatelessWidget {
                       children: [
                         Text(
                           contactName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 16,
+                            height: 1.3,
                             fontWeight: FontWeight.w500,
                             color: message.isFromMe
                                 ? AppColors.sentText(isDark)
@@ -755,14 +758,15 @@ class MessageItem extends StatelessWidget {
                                       ? AppColors.textPrimaryDark
                                       : AppColors.messageTextReceived),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
                         Text(
                           'ID: ${contactId.length > 12 ? '${contactId.substring(0, 12)}...' : contactId}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
+                            height: 1.3,
                             color: message.isFromMe
                                 ? AppColors.sentText(
                                     isDark,
@@ -771,8 +775,6 @@ class MessageItem extends StatelessWidget {
                                       ? AppColors.textSecondaryDark
                                       : AppColors.textSecondary),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -798,8 +800,11 @@ class MessageItem extends StatelessWidget {
               ),
               child: Text(
                 S.of(context)?.chatPersonalCard ?? 'Contact Card',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 11,
+                  height: 1.3,
                   color: message.isFromMe
                       ? AppColors.sentText(isDark).withValues(alpha: 0.5)
                       : (isDark
@@ -951,9 +956,12 @@ class MessageItem extends StatelessWidget {
                     message.isExpired
                         ? (s?.chatViewOnceExpired ?? 'Expired')
                         : (s?.chatViewOnceViewed ?? 'Viewed'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.textTertiary,
                       fontSize: 12,
+                      height: 1.3,
                     ),
                   ),
                 ],
@@ -997,18 +1005,24 @@ class MessageItem extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     s?.chatViewOnceVideo ?? 'View Once Video',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 13,
+                      height: 1.3,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     s?.chatViewOnceTap ?? 'Tap to view',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 11,
+                      height: 1.3,
                     ),
                   ),
                 ],
@@ -1052,17 +1066,23 @@ class MessageItem extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       S.of(context)?.chatVideoTitle ?? 'Video',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.6),
                         fontSize: 14,
+                        height: 1.3,
                       ),
                     ),
                     if (fileSize != null)
                       Text(
                         _formatFileSize(fileSize),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.4),
                           fontSize: 12,
+                          height: 1.3,
                         ),
                       ),
                   ],
@@ -1099,8 +1119,11 @@ class MessageItem extends StatelessWidget {
                   ),
                   child: Text(
                     _formatDuration((durationMs / 1000).round()),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1145,8 +1168,11 @@ class MessageItem extends StatelessWidget {
                       const SizedBox(width: 3),
                       Text(
                         s?.chatViewOnce ?? 'View Once',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 10,
+                          height: 1.3,
                           color: Colors.white,
                         ),
                       ),
@@ -1202,6 +1228,7 @@ class MessageItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.35,
                     color: message.isFromMe
                         ? AppColors.sentText(isDark)
                         : (isDark
@@ -1212,8 +1239,11 @@ class MessageItem extends StatelessWidget {
                 if (size != null)
                   Text(
                     _formatFileSize(size),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       color: message.isFromMe
                           ? AppColors.textSecondary
                           : AppColors.textSecondary,
@@ -1329,6 +1359,7 @@ class MessageItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14,
+                          height: 1.3,
                           fontWeight: FontWeight.w500,
                           color: message.isFromMe
                               ? AppColors.sentText(isDark)
@@ -1340,8 +1371,11 @@ class MessageItem extends StatelessWidget {
                       if (latitude != null && longitude != null)
                         Text(
                           '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 11,
+                            height: 1.3,
                             color: message.isFromMe
                                 ? AppColors.sentText(
                                     isDark,
