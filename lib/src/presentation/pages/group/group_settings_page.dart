@@ -214,14 +214,16 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       Flexible(
                         child: Text(
                           group.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
                             color: isDark
-                                ? Colors.white
+                                ? AppColors.textPrimaryDark
                                 : AppColors.textPrimary,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -344,7 +346,14 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     ),
                     child: Text(
                       S.of(context)?.commonGroupOwner ?? 'Owner',
-                      style: const TextStyle(fontSize: 8, color: Colors.white),
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: const TextStyle(
+                        fontSize: 9,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        height: 1.0,
+                      ),
                     ),
                   ),
                 )
@@ -363,7 +372,14 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     ),
                     child: Text(
                       S.of(context)?.commonGroupAdmin ?? 'Admin',
-                      style: const TextStyle(fontSize: 8, color: Colors.white),
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: const TextStyle(
+                        fontSize: 9,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        height: 1.0,
+                      ),
                     ),
                   ),
                 ),

@@ -46,6 +46,14 @@ extension ContextExtension on BuildContext {
   Color get dividerColor =>
       isDarkMode ? AppColors.dividerDark : AppColors.divider;
 
+  /// 极细分割线 / 列表分组背景（自动深浅）
+  Color get dividerThin =>
+      isDarkMode ? AppColors.dividerThinDark : AppColors.dividerThin;
+
+  /// 页面背景（自动深浅）
+  Color get pageBackground =>
+      isDarkMode ? AppColors.backgroundDark : AppColors.background;
+
   // ============================================
   // 屏幕尺寸
   // ============================================
