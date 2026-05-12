@@ -425,13 +425,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     const SizedBox(width: 2),
                                   ],
-                                  Text(
-                                    _statusText ??
-                                        (S.of(context)?.profileStatus ??
-                                            'Status'),
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: subtitleColor,
+                                  Flexible(
+                                    child: Text(
+                                      _statusText ??
+                                          (S.of(context)?.profileStatus ??
+                                              'Status'),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        height: 1.3,
+                                        color: subtitleColor,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -529,7 +534,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: Text(
                     badge,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.clip,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      height: 1.0,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               Icon(
@@ -688,8 +700,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 title: const Text('Avatar Studio'),
                 subtitle: Text(
                   'NFT Avatar / Decorations',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,
