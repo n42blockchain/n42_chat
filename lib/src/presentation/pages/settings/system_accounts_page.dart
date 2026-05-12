@@ -261,7 +261,8 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
         actions: [
           IconButton(
             onPressed: _isLoading ? null : _loadSummary,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Refresh',
           ),
         ],
       ),
