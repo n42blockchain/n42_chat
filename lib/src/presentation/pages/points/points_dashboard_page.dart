@@ -151,17 +151,23 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
         children: [
           const Text(
             'Total Points',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
+              height: 1.3,
               color: Colors.white70,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             '${balance?.totalPoints ?? 0}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 36,
-              fontWeight: FontWeight.bold,
+              height: 1.2,
+              fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
           ),
@@ -193,8 +199,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                       SizedBox(width: 4),
                       Text(
                         'Active today',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 11,
+                          height: 1.3,
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
                         ),
@@ -258,8 +267,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             Expanded(
               child: Text(
                 'Points are disabled in this room.',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 14,
+                  height: 1.4,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -311,8 +323,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   Widget _buildRecentTransactionsHeader(bool isDark) {
     return Text(
       'Recent Activity',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontSize: 16,
+        height: 1.3,
         fontWeight: FontWeight.w600,
         color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
       ),
@@ -334,8 +349,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             const SizedBox(height: 8),
             Text(
               'No activity yet',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -344,8 +362,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             const SizedBox(height: 4),
             Text(
               'Start earning points by participating!',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textTertiaryDark
                     : AppColors.textTertiary,
@@ -367,8 +388,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             const SizedBox(height: 8),
             Text(
               'Failed to load recent activity',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.3,
                 fontWeight: FontWeight.w500,
                 color: isDark
                     ? AppColors.textPrimaryDark
@@ -380,14 +404,15 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
+                  height: 1.4,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
             const SizedBox(height: 12),
@@ -421,8 +446,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             const SizedBox(height: 16),
             Text(
               'Failed to load points',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 fontWeight: FontWeight.w500,
                 color:
                     isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -433,14 +461,15 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.4,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
                 ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
             const SizedBox(height: 24),
@@ -515,13 +544,18 @@ class _BalanceStat extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: Colors.white60),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 11, height: 1.3, color: Colors.white60),
         ),
         const SizedBox(height: 2),
         Text(
           value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             fontSize: 16,
+            height: 1.3,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -570,8 +604,11 @@ class _StatCard extends StatelessWidget {
             children: [
               Text(
                 label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
+                  height: 1.3,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -579,9 +616,12 @@ class _StatCard extends StatelessWidget {
               ),
               Text(
                 value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  height: 1.3,
+                  fontWeight: FontWeight.w700,
                   color: isDark
                       ? AppColors.textPrimaryDark
                       : AppColors.textPrimary,
@@ -628,8 +668,11 @@ class _ActionButton extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.3,
                 fontWeight: FontWeight.w500,
                 color:
                     isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -685,21 +728,25 @@ class _TransactionTile extends StatelessWidget {
               children: [
                 Text(
                   transaction.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.3,
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? AppColors.textPrimaryDark
                         : AppColors.textPrimary,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   _formatTime(transaction.createdAt),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textTertiaryDark
                         : AppColors.textTertiary,
@@ -710,9 +757,12 @@ class _TransactionTile extends StatelessWidget {
           ),
           Text(
             '${isPositive ? '+' : '-'}${transaction.amount}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.w600,
+              height: 1.3,
+              fontWeight: FontWeight.w700,
               color: isPositive ? AppColors.success : AppColors.error,
             ),
           ),

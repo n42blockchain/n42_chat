@@ -188,8 +188,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           const SizedBox(height: 16),
           Text(
             'No rankings yet',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
+              height: 1.3,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -198,8 +201,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           const SizedBox(height: 8),
           Text(
             'Start earning points to appear on the leaderboard',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
+              height: 1.4,
               color:
                   isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
@@ -221,8 +228,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             Text(
               message,
               textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 15,
+                height: 1.4,
                 fontWeight: FontWeight.w500,
                 color:
                     isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -245,8 +255,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             const SizedBox(height: 16),
             Text(
               'Failed to load leaderboard',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 fontWeight: FontWeight.w500,
                 color:
                     isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -257,14 +270,15 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.4,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
                 ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
             const SizedBox(height: 24),
@@ -361,9 +375,12 @@ class _PodiumItem extends StatelessWidget {
                 children: [
                   Text(
                     '${balance.totalPoints}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      height: 1.3,
+                      fontWeight: FontWeight.w700,
                       color: isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimary,
@@ -371,8 +388,11 @@ class _PodiumItem extends StatelessWidget {
                   ),
                   Text(
                     'pts',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 11,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondary,
@@ -429,8 +449,11 @@ class _LeaderboardTile extends StatelessWidget {
             width: 32,
             child: Text(
               '#$rank',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.textSecondaryDark
@@ -459,22 +482,26 @@ class _LeaderboardTile extends StatelessWidget {
               children: [
                 Text(
                   balance.userId,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.3,
                     fontWeight:
                         isCurrentUser ? FontWeight.w600 : FontWeight.w400,
                     color: isDark
                         ? AppColors.textPrimaryDark
                         : AppColors.textPrimary,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 if (balance.streakDays > 0)
                   Text(
                     '${balance.streakDays} day streak',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textTertiaryDark
                           : AppColors.textTertiary,
@@ -485,9 +512,12 @@ class _LeaderboardTile extends StatelessWidget {
           ),
           Text(
             '${balance.totalPoints}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.bold,
+              height: 1.3,
+              fontWeight: FontWeight.w700,
               color: isDark
                   ? AppColors.textPrimaryDark
                   : AppColors.textPrimary,
@@ -495,8 +525,11 @@ class _LeaderboardTile extends StatelessWidget {
           ),
           Text(
             ' pts',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 12,
+              height: 1.3,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
