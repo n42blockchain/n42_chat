@@ -240,8 +240,11 @@ class MessageItem extends StatelessWidget {
                     ),
                     child: const Text(
                       'BOT',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 9,
+                        height: 1.2,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primary,
                         letterSpacing: 0.5,
@@ -2127,8 +2130,11 @@ class MessageItem extends StatelessWidget {
                 address.length > 20
                     ? '${address.substring(0, 10)}...${address.substring(address.length - 8)}'
                     : address,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 14,
+                  height: 1.3,
                   fontWeight: FontWeight.w500,
                 ),
               ),
