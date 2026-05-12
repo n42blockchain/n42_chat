@@ -336,15 +336,26 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             children: [
               Text(
                 S.of(context)?.commonTransfer ?? 'Transfer',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 18,
+                  height: 1.3,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 16),
-              Text('$amount $token'),
+              Text(
+                '$amount $token',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               const SizedBox(height: 8),
-              Text('Status: $status'),
+              Text(
+                'Status: $status',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               if (txHash?.isNotEmpty == true) ...[
                 const SizedBox(height: 8),
                 SelectableText(txHash!),
