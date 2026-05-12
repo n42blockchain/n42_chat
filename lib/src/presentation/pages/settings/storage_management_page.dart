@@ -264,8 +264,11 @@ class _LegendItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 11,
+            height: 1.3,
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondary,
@@ -273,8 +276,11 @@ class _LegendItem extends StatelessWidget {
         ),
         Text(
           size,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 12,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
@@ -322,8 +328,11 @@ class _StorageWarningBanner extends StatelessWidget {
               isCritical
                   ? 'Storage is critically low. Please clean up to free space.'
                   : 'Storage usage is high. Consider cleaning up old files.',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
+                height: 1.4,
                 color: isCritical ? Colors.red[800] : Colors.orange[800],
               ),
             ),
@@ -365,8 +374,11 @@ class _SmartCleanupSection extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   'Smart Cleanup',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 16,
+                    height: 1.3,
                     fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
@@ -439,14 +451,19 @@ class _RecommendationTile extends StatelessWidget {
       ),
       title: Text(
         recommendation.title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 15,
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
         recommendation.description,
-        style: TextStyle(fontSize: 12, color: secondaryColor),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 12, height: 1.4, color: secondaryColor),
       ),
       trailing: TextButton(
         onPressed: isCleaning
@@ -520,14 +537,18 @@ class _RoomStorageSection extends StatelessWidget {
                   ),
                   subtitle: Text(
                     '${room.mediaCount} files',
-                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, height: 1.3, color: secondaryColor),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         room.formattedSize,
-                        style: TextStyle(fontSize: 14, color: secondaryColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 14, height: 1.3, color: secondaryColor),
                       ),
                       const SizedBox(width: 4),
                       Icon(
@@ -597,8 +618,11 @@ class _StorageSettingsSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               'Storage Settings',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),
@@ -607,11 +631,15 @@ class _StorageSettingsSection extends StatelessWidget {
           SwitchListTile(
             title: Text(
               'Auto Cleanup',
-              style: TextStyle(fontSize: 15, color: textColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             subtitle: Text(
               'Automatically clean files older than ${config.autoCleanupDays} days',
-              style: TextStyle(fontSize: 12, color: secondaryColor),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12, height: 1.4, color: secondaryColor),
             ),
             value: config.autoCleanupEnabled,
             activeTrackColor: AppColors.primary,
@@ -629,7 +657,9 @@ class _StorageSettingsSection extends StatelessWidget {
           ListTile(
             title: Text(
               'Cleanup Period',
-              style: TextStyle(fontSize: 15, color: textColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             trailing: DropdownButton<int>(
               value: config.autoCleanupDays,
@@ -654,11 +684,15 @@ class _StorageSettingsSection extends StatelessWidget {
           SwitchListTile(
             title: Text(
               'Preserve Thumbnails',
-              style: TextStyle(fontSize: 15, color: textColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             subtitle: Text(
               'Keep image thumbnails during cleanup',
-              style: TextStyle(fontSize: 12, color: secondaryColor),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12, height: 1.4, color: secondaryColor),
             ),
             value: config.preserveThumbnails,
             activeTrackColor: AppColors.primary,
@@ -692,17 +726,23 @@ class _ClearCacheButton extends StatelessWidget {
         leading: const Icon(Icons.cleaning_services, color: AppColors.primary),
         title: Text(
           S.of(context)?.clearCache ?? 'Clear Cache',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
+            height: 1.3,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: Text(
           state.storageInfo?.formattedCache ?? '',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondary,
             fontSize: 12,
+            height: 1.3,
           ),
         ),
         trailing: state.isCleaning
