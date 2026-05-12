@@ -126,17 +126,25 @@ class ChatFolderManagementPage extends StatelessWidget {
         ),
         title: Text(
           folder.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 15,
+            height: 1.3,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: isSystem
             ? Text(
                 _getFilterDescription(folder.filter),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                  height: 1.3,
+                  color: isDark
+                      ? AppColors.textTertiaryDark
+                      : AppColors.textTertiary,
                 ),
               )
             : null,

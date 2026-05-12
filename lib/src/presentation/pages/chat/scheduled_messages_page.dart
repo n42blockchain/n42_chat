@@ -83,19 +83,25 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
       appBar: AppBar(
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(
           'Scheduled Messages',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
+            height: 1.3,
           ),
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_rounded,
+            Icons.arrow_back_ios_new_rounded,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            size: 20,
           ),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -132,20 +138,27 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         Center(
           child: Text(
             'No scheduled messages yet',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
+              height: 1.3,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
           ),
         ),
         const SizedBox(height: 8),
-        Center(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Text(
             'Long press Send, Photos, Files, a GIF, or a sticker to schedule follow-ups and reminders.',
             textAlign: TextAlign.center,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 13,
+              height: 1.4,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
