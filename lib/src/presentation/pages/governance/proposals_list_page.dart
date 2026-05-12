@@ -207,8 +207,11 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
           const SizedBox(height: 16),
           Text(
             'No proposals found',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
+              height: 1.3,
               color:
                   isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             ),
@@ -218,8 +221,12 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
             _selectedFilter != null
                 ? 'Try changing the filter'
                 : 'Create the first proposal for this space',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
+              height: 1.4,
               color:
                   isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
@@ -244,8 +251,11 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
             const SizedBox(height: 16),
             Text(
               'Failed to load proposals',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 fontWeight: FontWeight.w500,
                 color: isDark
                     ? AppColors.textPrimaryDark
@@ -257,14 +267,15 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
+                  height: 1.4,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
                 ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
             const SizedBox(height: 24),
@@ -340,8 +351,11 @@ class _FilterChip extends StatelessWidget {
         ),
         child: Text(
           label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 13,
+            height: 1.3,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             color: isSelected
                 ? Colors.white
@@ -396,8 +410,11 @@ class _ProposalCard extends StatelessWidget {
                 const Spacer(),
                 Text(
                   _formatTimeRemaining(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textTertiaryDark
                         : AppColors.textTertiary,
@@ -409,14 +426,15 @@ class _ProposalCard extends StatelessWidget {
             // Title
             Text(
               proposal.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.35,
                 fontWeight: FontWeight.w600,
                 color:
                     isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
             // Author
@@ -430,13 +448,18 @@ class _ProposalCard extends StatelessWidget {
                       : AppColors.textTertiary,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  _shortenAddress(proposal.author),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                Flexible(
+                  child: Text(
+                    _shortenAddress(proposal.author),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.3,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary,
+                    ),
                   ),
                 ),
                 const Spacer(),
@@ -450,8 +473,11 @@ class _ProposalCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${proposal.votesCount} votes',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,
@@ -492,8 +518,11 @@ class _ProposalCard extends StatelessWidget {
       ),
       child: Text(
         label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 11,
+          height: 1.3,
           fontWeight: FontWeight.w600,
           color: badgeColor,
         ),
