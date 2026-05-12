@@ -208,8 +208,11 @@ class _AccountTile extends StatelessWidget {
       ),
       title: Text(
         account.effectiveDisplayName,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 16,
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           fontWeight: account.isCurrent ? FontWeight.w600 : FontWeight.w500,
         ),
@@ -218,7 +221,11 @@ class _AccountTile extends StatelessWidget {
         '${account.userId}\n${account.homeserver}',
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(fontSize: 12, color: secondaryColor),
+        style: TextStyle(
+          fontSize: 12,
+          height: 1.4,
+          color: secondaryColor,
+        ),
       ),
       trailing: isSwitching
           ? const SizedBox(

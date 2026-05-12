@@ -677,9 +677,12 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
               Text(
                 S.of(context)?.chatNoteOtherMessages(otherMessages.length) ??
                     'Note: ${otherMessages.length} messages are from others, can only delete locally.',
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
+                  height: 1.4,
                 ),
               ),
             ],
@@ -690,9 +693,12 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                         .of(context)
                         ?.chatMyMessagesWillBeRecalled(myMessages.length) ??
                     '${myMessages.length} messages from you will be recalled.',
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
+                  height: 1.4,
                 ),
               ),
             ],
