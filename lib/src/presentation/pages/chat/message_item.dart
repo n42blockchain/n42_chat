@@ -213,13 +213,18 @@ class MessageItem extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  displayName,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark
-                        ? const Color(0xFF999999)
-                        : AppColors.textSecondary,
+                Flexible(
+                  child: Text(
+                    displayName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.3,
+                      color: isDark
+                          ? const Color(0xFF999999)
+                          : AppColors.textSecondary,
+                    ),
                   ),
                 ),
                 if (message.isBotMessage) ...[
@@ -309,11 +314,16 @@ class MessageItem extends StatelessWidget {
               children: [
                 const Icon(Icons.schedule, size: 12, color: AppColors.primary),
                 const SizedBox(width: 4),
-                Text(
-                  '${S.of(context)?.scheduledMessageLabel ?? 'Scheduled'} ${_formatScheduledTime(message.scheduledAt!)}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.primary,
+                Flexible(
+                  child: Text(
+                    '${S.of(context)?.scheduledMessageLabel ?? 'Scheduled'} ${_formatScheduledTime(message.scheduledAt!)}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      height: 1.3,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ],
@@ -476,8 +486,11 @@ class MessageItem extends StatelessWidget {
             if (message.replyToSender != null)
               Text(
                 message.replyToSender!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 12,
+                  height: 1.3,
                   fontWeight: FontWeight.w500,
                   color: AppColors.primary,
                 ),
@@ -486,7 +499,7 @@ class MessageItem extends StatelessWidget {
               message.replyToContent ?? '',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 13, color: textColor),
+              style: TextStyle(fontSize: 13, height: 1.35, color: textColor),
             ),
           ],
         ),
@@ -527,8 +540,11 @@ class MessageItem extends StatelessWidget {
             onTap: () => _showEditHistory(context),
             child: Text(
               S.of(context)?.chatEdited ?? 'Edited',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 10,
+                height: 1.3,
                 color: message.isFromMe
                     ? AppColors.sentText(isDark).withValues(alpha: 0.5)
                     : (isDark ? Colors.grey[500] : Colors.grey),
