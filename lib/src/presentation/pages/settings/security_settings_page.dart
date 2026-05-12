@@ -1584,21 +1584,26 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       children: [
                         Text(
                           device.deviceName,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? Colors.white
-                                : AppColors.textPrimary,
-                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
+                            color: isDark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimary,
+                          ),
                         ),
                         if (device.isCurrentDevice)
                           Text(
                             S.of(context)?.settingsThisDevice ?? 'This device',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 13,
+                              height: 1.3,
+                              fontWeight: FontWeight.w500,
                               color: AppColors.primary,
                             ),
                           ),

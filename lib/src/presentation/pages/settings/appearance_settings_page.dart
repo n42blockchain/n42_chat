@@ -162,23 +162,26 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     return ListTile(
       title: Text(
         title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 16,
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
         subtitle,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 13,
+          height: 1.3,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
       trailing: isSelected
-          ? const Icon(
-              Icons.check,
-              color: AppColors.primary,
-            )
+          ? const Icon(Icons.check_rounded, color: AppColors.primary)
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(themeMode: value));
@@ -361,23 +364,26 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     return ListTile(
       title: Text(
         title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 16,
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
         subtitle,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 13,
+          height: 1.3,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
       trailing: isSelected
-          ? const Icon(
-              Icons.check,
-              color: AppColors.primary,
-            )
+          ? const Icon(Icons.check_rounded, color: AppColors.primary)
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(bubbleStyle: value));

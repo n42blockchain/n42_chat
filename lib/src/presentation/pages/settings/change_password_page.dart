@@ -188,7 +188,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Widget _buildInfoCard(bool isDark) {
-    final cardBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final cardBgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
@@ -219,7 +219,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;
@@ -290,7 +290,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;
@@ -366,7 +366,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;

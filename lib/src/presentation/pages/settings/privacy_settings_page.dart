@@ -489,16 +489,24 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 16,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    height: 1.3,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
                   ),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondary,
@@ -548,16 +556,24 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 children: [
                   Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      height: 1.3,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
                     ),
                   ),
                   if (subtitle != null)
                     Text(
                       subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
+                        height: 1.3,
                         color: isDark
                             ? AppColors.textSecondaryDark
                             : AppColors.textSecondary,
@@ -618,15 +634,24 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             Expanded(
               child: Text(
                 title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  height: 1.3,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
                 ),
               ),
             ),
             Text(
               _getVisibilityLabel(context, value),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                fontSize: 14,
+                height: 1.3,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,
@@ -636,8 +661,8 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             Icon(
               Icons.chevron_right_rounded,
               color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+                  ? AppColors.textTertiaryDark
+                  : AppColors.textTertiary,
             ),
           ],
         ),
@@ -683,9 +708,14 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             Expanded(
               child: Text(
                 title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  height: 1.3,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
                 ),
               ),
             ),
