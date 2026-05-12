@@ -349,8 +349,11 @@ class _LanguageItem extends StatelessWidget {
                     children: [
                       Text(
                         language.nativeName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 16,
+                          height: 1.3,
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.normal,
@@ -360,15 +363,20 @@ class _LanguageItem extends StatelessWidget {
                       if (language.name != language.nativeName)
                         Text(
                           language.name,
-                          style: TextStyle(fontSize: 13, color: subtitleColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            height: 1.3,
+                            color: subtitleColor,
+                          ),
                         ),
                     ],
                   ),
                 ),
-                // 选中标识
                 if (isSelected)
                   const Icon(
-                    Icons.check_circle,
+                    Icons.check_circle_rounded,
                     color: AppColors.primary,
                     size: 24,
                   ),
