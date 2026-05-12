@@ -64,8 +64,11 @@ class AboutPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   appName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 24,
+                    height: 1.3,
                     fontWeight: FontWeight.bold,
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
@@ -73,8 +76,11 @@ class AboutPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   l10n?.settingsVersionInfo(version) ?? 'Version $version',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,
@@ -93,7 +99,10 @@ class AboutPage extends StatelessWidget {
               child: ListTile(
                 title: Text(
                   l10n?.settingsCheckForUpdates ?? 'Check for Updates',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
+                    height: 1.3,
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
                 ),
@@ -140,8 +149,11 @@ class AboutPage extends StatelessWidget {
               children: [
                 Text(
                   l10n?.settingsBuiltOnMatrix ?? 'Built on Matrix Protocol',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,
@@ -150,8 +162,11 @@ class AboutPage extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '© 2024 N42. All rights reserved.',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,
@@ -171,7 +186,10 @@ class AboutPage extends StatelessWidget {
     return ListTile(
       title: Text(
         title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),

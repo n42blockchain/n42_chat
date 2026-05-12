@@ -141,9 +141,12 @@ class AddressManagePageState extends State<AddressManagePage> {
                   Text(
                     S.of(context)?.profileNoShippingAddress ??
                         'No shipping address',
-                    style: const TextStyle(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
                       fontSize: 16,
-                      color: AppColors.textSecondary,
+                      height: 1.3,
+                      color: context.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -175,18 +178,29 @@ class AddressManagePageState extends State<AddressManagePage> {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              address.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                            Flexible(
+                              child: Text(
+                                address.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  height: 1.3,
+                                  fontWeight: FontWeight.w600,
+                                  color: context.textPrimary,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Text(
-                              address.phone,
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
+                            Flexible(
+                              child: Text(
+                                address.phone,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  height: 1.3,
+                                  color: context.textSecondary,
+                                ),
                               ),
                             ),
                             const Spacer(),
@@ -205,8 +219,12 @@ class AddressManagePageState extends State<AddressManagePage> {
                                 child: Text(
                                   S.of(context)?.profileDefaultLabel ??
                                       'Default',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 12,
+                                    height: 1.3,
+                                    fontWeight: FontWeight.w500,
                                     color: AppColors.primary,
                                   ),
                                 ),
@@ -216,8 +234,11 @@ class AddressManagePageState extends State<AddressManagePage> {
                         const SizedBox(height: 8),
                         Text(
                           address.fullAddress,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            height: 1.4,
+                            color: context.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 12),
