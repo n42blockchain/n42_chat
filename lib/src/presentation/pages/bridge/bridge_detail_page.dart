@@ -226,8 +226,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
           const SizedBox(height: 12),
           Text(
             _info.displayName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 20,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -235,11 +238,14 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
           const SizedBox(height: 4),
           Text(
             _info.description,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
+              height: 1.4,
               color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -258,8 +264,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
         children: [
           Text(
             'STATUS',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 13,
+              height: 1.3,
               fontWeight: FontWeight.w500,
               color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
               letterSpacing: 0.5,
@@ -276,8 +285,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
                   children: [
                     Text(
                       _statusTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 16,
+                        height: 1.3,
                         fontWeight: FontWeight.w500,
                         color: textColor,
                       ),
@@ -287,8 +299,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
                           _state.remoteUsername!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 14,
+                            height: 1.3,
                             color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
                           ),
                         ),
@@ -409,9 +424,12 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
       leading: Icon(icon, color: color ?? defaultColor, size: 22),
       title: Text(
         title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: color ?? defaultColor,
           fontSize: 16,
+          height: 1.3,
         ),
       ),
       trailing: _isActionInProgress
@@ -436,8 +454,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
         children: [
           Text(
             'BRIDGE RESPONSE',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 13,
+              height: 1.3,
               fontWeight: FontWeight.w500,
               color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
               letterSpacing: 0.5,
@@ -467,8 +488,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
         children: [
           Text(
             'Scan QR Code',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
+              height: 1.3,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
@@ -477,8 +501,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
           Text(
             'Open ${_info.displayName} on your phone and scan this QR code to link your account.',
             textAlign: TextAlign.center,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
+              height: 1.4,
               color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
             ),
           ),
@@ -548,13 +575,21 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label, style: TextStyle(fontSize: 14, color: color)),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14, height: 1.3, color: color),
+            ),
           ),
           Expanded(
             child: Text(
               value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.3,
                 color: color.withValues(alpha: 0.8),
               ),
             ),

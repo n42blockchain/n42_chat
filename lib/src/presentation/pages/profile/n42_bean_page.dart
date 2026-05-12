@@ -90,8 +90,11 @@ class _N42BeanPageState extends State<N42BeanPage> {
                   // N42豆文字
                   Text(
                     s?.profileN42BeanTitle ?? 'N42 Bean',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 20,
+                      height: 1.3,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
@@ -101,8 +104,11 @@ class _N42BeanPageState extends State<N42BeanPage> {
                   // 豆数量
                   Text(
                     _beanCount > 0 ? '$_beanCount' : (s?.profileNoN42Bean ?? 'No N42 Bean'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
+                      height: 1.3,
                       color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
@@ -168,6 +174,8 @@ class _N42BeanPageState extends State<N42BeanPage> {
             // 说明标题
             Text(
               s?.profileN42BeanDescription ?? 'N42 Bean is a token used to redeem virtual items and services in N42. Currently available for:',
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -211,8 +219,11 @@ class _N42BeanPageState extends State<N42BeanPage> {
                   ),
                   child: Text(
                     s?.profileGotIt ?? 'Got it',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 16,
+                      height: 1.3,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -289,8 +300,11 @@ class _BeanDetailSheet extends StatelessWidget {
                 const Spacer(),
                 Text(
                   s?.profileN42BeanDetails ?? 'N42 Bean Details',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 18,
+                    height: 1.3,
                     fontWeight: FontWeight.w600,
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                   ),
@@ -298,9 +312,11 @@ class _BeanDetailSheet extends StatelessWidget {
                 const Spacer(),
                 IconButton(
                   icon: Icon(
-                    Icons.close,
+                    Icons.close_rounded,
+                    size: 22,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                   ),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -326,8 +342,11 @@ class _BeanDetailSheet extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     s?.profileNoN42BeanRecords ?? 'No N42 Bean records',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 16,
+                      height: 1.3,
                       color: AppColors.textSecondary,
                     ),
                   ),
