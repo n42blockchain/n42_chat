@@ -208,10 +208,13 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         children: [
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: isSelected ? textColor : textColor.withValues(alpha: 0.5),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,
               fontSize: 16,
+              height: 1.3,
             ),
           ),
           const SizedBox(height: 4),
@@ -429,8 +432,11 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               const SizedBox(height: 16),
               Text(
                 s?.contactPhotos ?? 'Add Photo',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 18,
+                  height: 1.3,
                   fontWeight: FontWeight.w500,
                   color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
@@ -438,8 +444,11 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               const SizedBox(height: 8),
               Text(
                 'Tap to select an image',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 14,
+                  height: 1.3,
                   color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                 ),
               ),
@@ -627,15 +636,16 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               Flexible(
                 child: Text(
                   hasMusic ? _musicSelection!.fileName : 'Add Music',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
+                    height: 1.3,
                     color: _mode == StoryMode.text
                         ? _currentTextColor
                         : AppColors.primary,
                     fontWeight: FontWeight.w500,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (hasMusic) ...[
