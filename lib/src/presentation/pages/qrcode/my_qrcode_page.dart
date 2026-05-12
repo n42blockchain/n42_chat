@@ -162,18 +162,28 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           S.of(context)?.commonMyQrCode ?? 'My QR Code',
-          style: TextStyle(color: textColor, fontSize: 18),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            height: 1.3,
+          ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.more_horiz, color: textColor),
+            icon: Icon(Icons.more_horiz_rounded, color: textColor),
+            tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
             onPressed: _showMoreOptions,
           ),
         ],
@@ -217,21 +227,25 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                           Text(
                             _displayName ??
                                 (S.of(context)?.commonLoading ?? 'Loading...'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
+                              height: 1.3,
                               color: textColor,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             _userId ?? '',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: subtitleColor,
-                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              height: 1.3,
+                              color: subtitleColor,
+                            ),
                           ),
                         ],
                       ),
