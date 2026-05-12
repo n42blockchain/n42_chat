@@ -10,6 +10,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../blocs/backup/backup_bloc.dart';
 import '../../blocs/backup/backup_event.dart';
 import '../../blocs/backup/backup_state.dart';
+import '../../widgets/common/common_widgets.dart';
 
 /// 备份与恢复页面
 class BackupRestorePage extends StatelessWidget {
@@ -35,22 +36,10 @@ class _BackupRestoreView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-      appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
-        elevation: 0,
-        title: Text(
-          'Backup & Restore',
-          style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: N42AppBar(
+        title: 'Backup & Restore',
+        showBackButton: true,
+        onBackPressed: () => Navigator.pop(context),
       ),
       body: BlocConsumer<BackupBloc, BackupState>(
         listener: (context, state) {
@@ -129,8 +118,11 @@ class _BackupSectionState extends State<_BackupSection> {
                 const SizedBox(width: 8),
                 Text(
                   'Create Backup',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 16,
+                    height: 1.3,
                     fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
@@ -143,7 +135,7 @@ class _BackupSectionState extends State<_BackupSection> {
             child: Text(
               'Backup your local chat settings. '
               'Messages will be restored from server after re-login.',
-              style: TextStyle(fontSize: 13, color: secondaryColor),
+              style: TextStyle(fontSize: 13, height: 1.4, color: secondaryColor),
             ),
           ),
           const SizedBox(height: 12),
@@ -151,17 +143,23 @@ class _BackupSectionState extends State<_BackupSection> {
             leading: const Icon(Icons.key_outlined, color: Colors.orange),
             title: Text(
               'Encryption keys are managed separately',
-              style: TextStyle(fontSize: 15, color: textColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             subtitle: Text(
               'Use Security > Recovery Key to back up encrypted message access.',
-              style: TextStyle(fontSize: 12, color: secondaryColor),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12, height: 1.4, color: secondaryColor),
             ),
           ),
           CheckboxListTile(
             title: Text(
               'Password protect',
-              style: TextStyle(fontSize: 15, color: textColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             value: _usePassword,
             activeColor: AppColors.primary,
@@ -247,8 +245,11 @@ class _BackupHistorySection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               'Backup History',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
+                height: 1.3,
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),
@@ -259,7 +260,7 @@ class _BackupHistorySection extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Text(
                 'No backups yet',
-                style: TextStyle(fontSize: 14, color: secondaryColor),
+                style: TextStyle(fontSize: 14, height: 1.3, color: secondaryColor),
               ),
             )
           else
@@ -276,11 +277,15 @@ class _BackupHistorySection extends StatelessWidget {
                   ),
                   title: Text(
                     backup.formattedDate,
-                    style: TextStyle(fontSize: 15, color: textColor),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
                   ),
                   subtitle: Text(
                     '${backup.roomCount} rooms  ${backup.formattedSize}',
-                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, height: 1.3, color: secondaryColor),
                   ),
                   trailing: PopupMenuButton<String>(
                     onSelected: (action) {
@@ -382,8 +387,11 @@ class _RestoreSection extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   'Restore from File',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 16,
+                    height: 1.3,
                     fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
@@ -396,7 +404,7 @@ class _RestoreSection extends StatelessWidget {
             child: Text(
               'Import a .n42backup file from another device or previous backup. '
               'Encryption keys are restored separately with your Recovery Key.',
-              style: TextStyle(fontSize: 13, color: secondaryColor),
+              style: TextStyle(fontSize: 13, height: 1.4, color: secondaryColor),
             ),
           ),
           Padding(

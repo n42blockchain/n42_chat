@@ -146,9 +146,12 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                   const SizedBox(height: 16),
                   Text(
                     S.of(context)?.profileNoInvoice ?? 'No invoice',
-                    style: const TextStyle(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
                       fontSize: 16,
-                      color: AppColors.textSecondary,
+                      height: 1.3,
+                      color: context.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -197,8 +200,12 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                           'Company')
                                     : (S.of(context)?.profilePersonal ??
                                           'Personal'),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 12,
+                                  height: 1.3,
+                                  fontWeight: FontWeight.w500,
                                   color: invoice.type == 'company'
                                       ? AppColors.primary
                                       : Colors.orange,
@@ -209,11 +216,14 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                             Expanded(
                               child: Text(
                                 invoice.title,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  height: 1.3,
+                                  fontWeight: FontWeight.w600,
+                                  color: context.textPrimary,
+                                ),
                               ),
                             ),
                             if (invoice.isDefault)
@@ -231,8 +241,12 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                 child: Text(
                                   S.of(context)?.profileDefaultLabel ??
                                       'Default',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 12,
+                                    height: 1.3,
+                                    fontWeight: FontWeight.w500,
                                     color: AppColors.primary,
                                   ),
                                 ),
@@ -244,9 +258,12 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                           const SizedBox(height: 8),
                           Text(
                             '${S.of(context)?.profileTaxNumber ?? 'Tax Number'}: ${invoice.taxNumber}',
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: context.textSecondary,
                               fontSize: 14,
+                              height: 1.3,
                             ),
                           ),
                         ],
