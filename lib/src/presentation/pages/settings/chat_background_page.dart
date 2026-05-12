@@ -90,19 +90,25 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
       appBar: AppBar(
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(
           S.of(context)?.chatBackground ?? 'Chat Background',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
+            height: 1.3,
           ),
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_rounded,
+            Icons.arrow_back_ios_new_rounded,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            size: 20,
           ),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -216,7 +222,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
             ),
             child: isSelected
                 ? const Center(
-                    child: Icon(Icons.check, color: Colors.white, size: 24),
+                    child: Icon(Icons.check_rounded, color: Colors.white, size: 24),
                   )
                 : null,
           ),
@@ -252,7 +258,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
             ),
             child: isSelected
                 ? const Center(
-                    child: Icon(Icons.check, color: Colors.white, size: 24),
+                    child: Icon(Icons.check_rounded, color: Colors.white, size: 24),
                   )
                 : null,
           ),
