@@ -233,7 +233,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           child: Text(
             S.of(context)?.callWaitingForParticipants ??
                 'Waiting for participants to join...',
-            style: const TextStyle(color: Colors.white54, fontSize: 16),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white54, fontSize: 16, height: 1.4),
           ),
         ),
       );
@@ -396,12 +399,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                                         ?.callParticipantMe(participant.name) ??
                                     '${participant.name} (Me)')
                               : participant.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
+                            height: 1.3,
                             fontWeight: FontWeight.w500,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
@@ -434,9 +439,13 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       const SizedBox(width: 4),
                       Text(
                         S.of(context)?.callSharingLabel ?? 'Sharing',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
+                          height: 1.3,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -490,10 +499,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       size: 18,
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      S.of(context)?.callScreenSharingBy(sharer.name) ??
-                          '${sharer.name} is sharing screen',
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    Flexible(
+                      child: Text(
+                        S.of(context)?.callScreenSharingBy(sharer.name) ??
+                            '${sharer.name} is sharing screen',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.3),
+                      ),
                     ),
                   ],
                 ),
@@ -551,24 +564,31 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 children: [
                   Text(
                     widget.roomName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
+                      height: 1.3,
                       fontWeight: FontWeight.w600,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      Text(
-                        S
-                                .of(context)
-                                ?.callParticipantCount(_participants.length) ??
-                            '${_participants.length} participants',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 12,
+                      Flexible(
+                        child: Text(
+                          S
+                                  .of(context)
+                                  ?.callParticipantCount(_participants.length) ??
+                              '${_participants.length} participants',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7),
+                            fontSize: 12,
+                            height: 1.3,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -583,9 +603,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       const SizedBox(width: 4),
                       Text(
                         _formatDuration(_duration),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
+                          height: 1.3,
                           fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
@@ -746,9 +769,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           const SizedBox(height: 6),
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.8),
               fontSize: 11,
+              height: 1.3,
             ),
           ),
         ],
@@ -785,9 +811,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 children: [
                   Text(
                     S.of(context)?.callParticipantsLabel ?? 'Participants',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
+                      height: 1.3,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -803,16 +832,20 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     ),
                     child: Text(
                       '${_participants.length}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 14,
+                        height: 1.3,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+                    tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                     onPressed: () {
                       setState(() {
                         _showParticipantsList = false;
@@ -853,7 +886,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             ? (S.of(context)?.callParticipantMe(participant.name) ??
                   '${participant.name} (Me)')
             : participant.name,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.3),
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -897,7 +932,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               const SizedBox(height: 24),
               Text(
                 S.of(context)?.callJoiningMeeting ?? 'Joining meeting...',
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white, fontSize: 16, height: 1.3),
               ),
             ],
           ),
