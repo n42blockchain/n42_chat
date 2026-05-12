@@ -36,8 +36,11 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                   ),
                   title: Text(
                     S.of(context)?.chatSendLocation ?? 'Send Location',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimary,
@@ -46,8 +49,11 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                   subtitle: Text(
                     S.of(context)?.chatSelectLocationAndSend ??
                         'Select location and send',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondary,
@@ -80,8 +86,11 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                   title: Text(
                     S.of(context)?.chatShareRealTimeLocation ??
                         'Share Real-time Location',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimary,
@@ -90,8 +99,11 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                   subtitle: Text(
                     S.of(context)?.chatShareLocationForOneHour ??
                         'Share real-time location with friend for 1 hour',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.3,
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondary,
@@ -115,7 +127,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     style: TextButton.styleFrom(
                       backgroundColor: isDark
                           ? AppColors.backgroundDark
-                          : Colors.grey[100],
+                          : AppColors.inputBackground,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -123,11 +135,14 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     ),
                     child: Text(
                       S.of(context)?.commonCancel ?? 'Cancel',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: isDark
                             ? AppColors.textPrimaryDark
-                            : Colors.black87,
+                            : AppColors.textPrimary,
                         fontSize: 16,
+                        height: 1.3,
                       ),
                     ),
                   ),

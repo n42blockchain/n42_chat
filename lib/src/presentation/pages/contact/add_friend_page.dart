@@ -418,11 +418,11 @@ class _AddFriendPageState extends State<AddFriendPage> {
                                   : AppColors.textSecondary,
                             ),
                             prefixIcon: Icon(
-                              Icons.search,
+                              Icons.search_rounded,
                               size: 20,
                               color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
+                                  ? AppColors.textTertiaryDark
+                                  : AppColors.textTertiary,
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -432,10 +432,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
                           ),
                           style: TextStyle(
                             fontSize: 14,
+                            height: 1.3,
                             color: isDark
-                                ? Colors.white
+                                ? AppColors.textPrimaryDark
                                 : AppColors.textPrimary,
                           ),
+                          cursorColor: AppColors.primary,
                           onSubmitted: (_) => _searchUser(),
                         ),
                       ),
