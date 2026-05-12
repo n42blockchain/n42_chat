@@ -136,19 +136,25 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
       appBar: AppBar(
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(
           S.of(context)?.autoDownload ?? 'Auto-Download',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
+            height: 1.3,
           ),
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_rounded,
+            Icons.arrow_back_ios_new_rounded,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            size: 20,
           ),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -330,9 +336,12 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
+                    height: 1.3,
                     color: isDark
                         ? AppColors.textPrimaryDark
                         : AppColors.textPrimary,
@@ -341,6 +350,8 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                 const SizedBox(height: 4),
                 Text(
                   message,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
