@@ -200,9 +200,12 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             const SizedBox(height: 16),
             Text(
               state.assistant?.name ?? 'N42 AI',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 24,
-                fontWeight: FontWeight.bold,
+                height: 1.3,
+                fontWeight: FontWeight.w700,
                 color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               ),
             ),
@@ -211,8 +214,11 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               l10n?.aiAssistantWelcome ??
                   'Ask me anything! I can help with questions, writing, analysis, and more.',
               textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 14,
+                height: 1.4,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
             ),
@@ -231,7 +237,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   l10n?.aiAssistantNotConfigured ??
                       'AI service not configured. Please set API key in settings.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 13, color: Colors.orange),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13, height: 1.4, color: Colors.orange),
                 ),
               ),
             ],
@@ -283,8 +291,11 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
       avatar: Icon(icon, size: 16, color: AppColors.primary),
       label: Text(
         label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 13,
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
@@ -506,6 +517,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 ),
                 style: TextStyle(
                   fontSize: 15,
+                  height: 1.4,
                   color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                 ),
                 onSubmitted: (_) => _sendMessage(),
