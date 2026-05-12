@@ -181,20 +181,23 @@ class _ContactListPageState extends State<ContactListPage> {
         child: TextField(
           controller: _searchController,
           onChanged: _onSearchChanged,
+          cursorColor: AppColors.primary,
           style: TextStyle(
             fontSize: 15,
+            height: 1.3,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: S.of(context)?.commonSearch ?? 'Search',
             hintStyle: TextStyle(
               fontSize: 15,
+              height: 1.3,
               color: isDark
                   ? AppColors.textTertiaryDark
                   : AppColors.textTertiary,
             ),
             prefixIcon: Icon(
-              Icons.search,
+              Icons.search_rounded,
               size: 20,
               color: isDark
                   ? AppColors.textTertiaryDark
@@ -545,8 +548,11 @@ class _ContactListPageState extends State<ContactListPage> {
       color: isDark ? AppColors.backgroundDark : AppColors.background,
       child: Text(
         letter,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 14,
+          height: 1.3,
           fontWeight: FontWeight.w500,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
@@ -560,8 +566,11 @@ class _ContactListPageState extends State<ContactListPage> {
       color: isDark ? AppColors.backgroundDark : AppColors.background,
       child: Text(
         title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 13,
+          height: 1.3,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
@@ -574,8 +583,11 @@ class _ContactListPageState extends State<ContactListPage> {
       alignment: Alignment.center,
       child: Text(
         S.of(context)?.contactCount(count) ?? '$count contacts',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 14,
+          height: 1.3,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
@@ -1476,15 +1488,25 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.person_add_disabled,
+                    Icons.person_add_disabled_rounded,
                     size: 64,
-                    color: Colors.grey[400],
+                    color: isDark
+                        ? AppColors.textTertiaryDark
+                        : AppColors.textTertiary,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     S.of(context)?.contactNoFriendRequests ??
                         'No friend requests',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.3,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -1540,15 +1562,21 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
       ),
       title: Text(
         displayName,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontWeight: FontWeight.w500,
+          height: 1.3,
           color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
         request.userId,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 13,
+          height: 1.3,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
@@ -1747,13 +1775,18 @@ class _GroupListPageState extends State<_GroupListPage> {
           Icon(
             Icons.group_outlined,
             size: 64,
-            color: isDark ? Colors.grey[600] : Colors.grey[400],
+            color: isDark
+                ? AppColors.textTertiaryDark
+                : AppColors.textTertiary,
           ),
           const SizedBox(height: 16),
           Text(
             S.of(context)?.commonNoGroups ?? 'No groups',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
+              height: 1.3,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -1813,8 +1846,11 @@ class _GroupListPageState extends State<_GroupListPage> {
       color: isDark ? AppColors.backgroundDark : AppColors.background,
       child: Text(
         title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 13,
+          height: 1.3,
           fontWeight: FontWeight.w500,
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
@@ -1833,8 +1869,11 @@ class _GroupListPageState extends State<_GroupListPage> {
         ),
         title: Text(
           group.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
@@ -1842,8 +1881,11 @@ class _GroupListPageState extends State<_GroupListPage> {
         subtitle: Text(
           S.of(context)?.commonMemberCount(group.memberCount) ??
               '${group.memberCount} members',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 13,
+            height: 1.3,
             color: isDark
                 ? AppColors.textSecondaryDark
                 : AppColors.textSecondary,
@@ -1875,15 +1917,20 @@ class _GroupListPageState extends State<_GroupListPage> {
         ),
         title: Text(
           group.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 16,
+            height: 1.3,
             fontWeight: FontWeight.w500,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
         ),
         subtitle: Text(
           S.of(context)?.commonInvitedToJoinGroup ?? 'Invited to join group',
-          style: const TextStyle(fontSize: 13, color: AppColors.primary),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 13, height: 1.3, color: AppColors.primary),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -2093,25 +2140,31 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
             ),
             child: Row(
               children: [
-                Text(
-                  S.of(context)?.contactSelectFriendToRecommend ??
-                      'Select friend to recommend',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: widget.isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                Expanded(
+                  child: Text(
+                    S.of(context)?.contactSelectFriendToRecommend ??
+                        'Select friend to recommend',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 17,
+                      height: 1.3,
+                      fontWeight: FontWeight.w600,
+                      color: widget.isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 IconButton(
                   icon: Icon(
-                    Icons.close,
+                    Icons.close_rounded,
+                    size: 22,
                     color: widget.isDark
                         ? AppColors.textPrimaryDark
                         : AppColors.textPrimary,
                   ),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -2121,10 +2174,11 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextField(
+              cursorColor: AppColors.primary,
               decoration: InputDecoration(
                 hintText:
                     S.of(context)?.commonSearchContacts ?? 'Search contacts',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search_rounded),
                 filled: true,
                 fillColor: widget.isDark
                     ? const Color(0xFF3A3A3C)
