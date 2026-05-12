@@ -287,10 +287,13 @@ class _MomentListViewState extends State<_MomentListView> {
                     _isUserMode
                         ? (widget.userName ?? '')
                         : _getCurrentUserName(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      height: 1.3,
+                      fontWeight: FontWeight.w700,
                       shadows: [
                         Shadow(
                           color: Colors.black.withValues(alpha: 0.3),
@@ -384,9 +387,12 @@ class _MomentTile extends StatelessWidget {
                 // 用户名
                 Text(
                   moment.userName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: isDark ? Colors.blue[300] : Colors.blue[700],
                     fontWeight: FontWeight.w500,
+                    height: 1.3,
                   ),
                 ),
 
@@ -399,6 +405,7 @@ class _MomentTile extends StatelessWidget {
                     style: TextStyle(
                       color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
                       fontSize: 15,
+                      height: 1.4,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -420,11 +427,16 @@ class _MomentTile extends StatelessWidget {
                         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        moment.location!.displayText,
-                        style: TextStyle(
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
-                          fontSize: 12,
+                      Flexible(
+                        child: Text(
+                          moment.location!.displayText,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                            fontSize: 12,
+                            height: 1.3,
+                          ),
                         ),
                       ),
                     ],
@@ -437,9 +449,12 @@ class _MomentTile extends StatelessWidget {
                   children: [
                     Text(
                       moment.formattedTime,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                         fontSize: 12,
+                        height: 1.3,
                       ),
                     ),
                     // 自己的动态显示可见性状态（非公开时显示图标，微信风格）
@@ -817,7 +832,9 @@ class _MomentTile extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.3),
             ),
           ],
         ),
@@ -861,12 +878,13 @@ class _MomentTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     visibleLikes.map((l) => l.userName).join(', '),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: isDark ? Colors.blue[300] : Colors.blue[700],
                       fontSize: 13,
+                      height: 1.4,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -1237,7 +1255,9 @@ class _MomentImageGalleryPageState extends State<_MomentImageGalleryPage> {
         title: widget.imageUrls.length > 1
             ? Text(
                 '${_currentIndex + 1}/${widget.imageUrls.length}',
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white, fontSize: 16, height: 1.3),
               )
             : null,
         centerTitle: true,
