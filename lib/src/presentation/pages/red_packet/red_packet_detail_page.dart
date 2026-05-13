@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_icons.dart';
 
 class RedPacketDetailPage extends StatelessWidget {
   /// 发送者名称
@@ -84,7 +85,7 @@ class RedPacketDetailPage extends StatelessWidget {
                         children: [
                           IconButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                            icon: const Icon(AppIcons.back,
                                 color: Colors.white, size: 20),
                             tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                           ),

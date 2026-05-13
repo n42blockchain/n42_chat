@@ -10,6 +10,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../n42_chat.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -185,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close_rounded, color: textColor, size: 22),
+          icon: Icon(AppIcons.close, color: textColor, size: 22),
           tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.of(context).maybePop(),
         ),

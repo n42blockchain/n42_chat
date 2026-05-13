@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 频道分类
@@ -165,7 +166,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
             fontSize: 14,
           ),
-          prefixIcon: const Icon(Icons.search_rounded, size: 20),
+          prefixIcon: const Icon(AppIcons.search, size: 20),
           filled: true,
           fillColor: isDark ? AppColors.surfaceDark : AppColors.surface,
           contentPadding: const EdgeInsets.symmetric(vertical: 8),

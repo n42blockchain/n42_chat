@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/services/nft_metadata_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../integration/wallet_bridge.dart';
 
 /// NFT avatar picker page — Status.im inspired.
@@ -168,7 +169,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            AppIcons.back,
             size: 20,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
           ),
