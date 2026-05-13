@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/storage_manager_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/media_metadata_database.dart';
 import '../../blocs/storage/storage_management_bloc.dart';
 import '../../blocs/storage/storage_management_event.dart';
@@ -88,7 +89,7 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            AppIcons.back,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             size: 20,
           ),

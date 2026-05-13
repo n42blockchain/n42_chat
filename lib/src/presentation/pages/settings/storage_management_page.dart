@@ -11,6 +11,7 @@ import '../../../core/services/storage_cleanup_service.dart';
 import '../../../core/services/storage_manager_service.dart';
 import '../../../core/services/storage_monitor_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../blocs/storage/storage_management_bloc.dart';
 import '../../blocs/storage/storage_management_event.dart';
 import '../../blocs/storage/storage_management_state.dart';
@@ -61,7 +62,7 @@ class _StorageManagementView extends StatelessWidget {
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            AppIcons.back,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             size: 20,
           ),

@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../integration/wallet_bridge.dart';
@@ -418,7 +419,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                                   : AppColors.textSecondary,
                             ),
                             prefixIcon: Icon(
-                              Icons.search_rounded,
+                              AppIcons.search,
                               size: 20,
                               color: isDark
                                   ? AppColors.textTertiaryDark

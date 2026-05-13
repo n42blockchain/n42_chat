@@ -14,6 +14,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/livekit_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../widgets/chat/in_call_chat_panel.dart';
 import '../../widgets/call/call_enhancement_sheet.dart';
 import '../../widgets/common/n42_avatar.dart';
@@ -844,7 +845,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+                    icon: const Icon(AppIcons.close, color: Colors.white, size: 22),
                     tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                     onPressed: () {
                       setState(() {

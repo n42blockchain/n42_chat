@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/group_entity.dart';
@@ -197,7 +198,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   : AppColors.textTertiary,
             ),
             prefixIcon: Icon(
-              Icons.search_rounded,
+              AppIcons.search,
               size: 20,
               color: isDark
                   ? AppColors.textTertiaryDark
@@ -2158,7 +2159,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                 ),
                 IconButton(
                   icon: Icon(
-                    Icons.close_rounded,
+                    AppIcons.close,
                     size: 22,
                     color: widget.isDark
                         ? AppColors.textPrimaryDark
@@ -2178,7 +2179,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
               decoration: InputDecoration(
                 hintText:
                     S.of(context)?.commonSearchContacts ?? 'Search contacts',
-                prefixIcon: const Icon(Icons.search_rounded),
+                prefixIcon: const Icon(AppIcons.search),
                 filled: true,
                 fillColor: widget.isDark
                     ? const Color(0xFF3A3A3C)

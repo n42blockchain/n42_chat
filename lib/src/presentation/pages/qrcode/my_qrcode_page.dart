@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -164,7 +165,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
+          icon: Icon(AppIcons.back, color: textColor, size: 20),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
@@ -182,7 +183,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.more_horiz_rounded, color: textColor),
+            icon: Icon(AppIcons.more, color: textColor),
             tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
             onPressed: _showMoreOptions,
           ),

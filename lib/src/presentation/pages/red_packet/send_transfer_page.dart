@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../widgets/common/slide_to_pay_button.dart';
 
 class SendTransferPage extends StatefulWidget {
@@ -149,7 +150,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+          icon: const Icon(AppIcons.close, color: Colors.white, size: 22),
           tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),

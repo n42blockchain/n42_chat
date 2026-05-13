@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
 import '../../blocs/transfer/transfer_event.dart';
@@ -187,7 +188,7 @@ class _TransferPageState extends State<TransferPage> {
                 ? (S.of(context)?.commonPayment ?? 'Payment')
                 : (S.of(context)?.transferTitle ?? 'Transfer'),
             leading: IconButton(
-              icon: const Icon(Icons.close_rounded, size: 22),
+              icon: const Icon(AppIcons.close, size: 22),
               tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
               onPressed: () => Navigator.pop(context),
             ),

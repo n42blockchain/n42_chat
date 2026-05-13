@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 
 /// N42豆页面（类似微信豆）
 class N42BeanPage extends StatefulWidget {
@@ -312,7 +313,7 @@ class _BeanDetailSheet extends StatelessWidget {
                 const Spacer(),
                 IconButton(
                   icon: Icon(
-                    Icons.close_rounded,
+                    AppIcons.close,
                     size: 22,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                   ),

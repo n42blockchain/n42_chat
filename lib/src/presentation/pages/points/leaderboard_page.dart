@@ -331,7 +331,7 @@ class _PodiumItem extends StatelessWidget {
                 _shortName(balance.userId),
                 style: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                   fontSize: 12,
                 ),
               ),
@@ -349,7 +349,7 @@ class _PodiumItem extends StatelessWidget {
                   '#$rank',
                   style: const TextStyle(
                     fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
                 ),
