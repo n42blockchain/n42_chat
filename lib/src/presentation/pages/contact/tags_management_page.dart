@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -313,7 +314,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                         ),
                         trailing: widget.selectMode
                             ? null
-                            : const Icon(Icons.chevron_right_rounded, size: 20),
+                            : const Icon(AppIcons.chevron, size: 20),
                         onTap: widget.selectMode
                             ? () {
                                 setState(() {

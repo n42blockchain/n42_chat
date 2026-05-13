@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'chat_background_page.dart';
@@ -78,7 +79,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 ),
               ),
               trailing: Icon(
-                Icons.chevron_right_rounded,
+                AppIcons.chevron,
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
               ),
               onTap: () {

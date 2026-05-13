@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../blocs/governance/governance_bloc.dart';
 import '../../blocs/governance/governance_event.dart';
 import '../../blocs/governance/governance_state.dart';
@@ -690,7 +691,7 @@ class _DateTimeTile extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               size: 20,
               color: isDark
                   ? AppColors.textTertiaryDark

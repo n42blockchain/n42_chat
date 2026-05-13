@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_icons.dart';
 
 /// Status setting page (WeChat-style)
 class StatusPage extends StatefulWidget {
@@ -218,7 +219,7 @@ class _StatusPageState extends State<StatusPage> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
+            icon: const Icon(AppIcons.close, color: Colors.white, size: 28),
             tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 44, minHeight: 44),

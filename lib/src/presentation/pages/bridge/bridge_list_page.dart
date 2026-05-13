@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../integration/bridge/bridge_manager.dart';
 import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/bridge/bridge_state.dart';
@@ -255,7 +256,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
       return const Icon(Icons.error_outline, color: Colors.red, size: 20);
     }
     if (state.isAvailable) {
-      return Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 20);
+      return Icon(AppIcons.chevron, color: Colors.grey.shade400, size: 20);
     }
     return null;
   }

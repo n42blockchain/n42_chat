@@ -157,7 +157,7 @@ extension ContextExtension on BuildContext {
 
   /// 显示成功SnackBar
   void showSuccessSnackBar(String message, {Duration duration = const Duration(seconds: 2)}) {
-    showSnackBar(message, duration: duration, backgroundColor: const Color(0xFF07C160));
+    showSnackBar(message, duration: duration, backgroundColor: AppColors.primary);
   }
 
   /// 清除所有 SnackBar
@@ -186,7 +186,7 @@ extension ContextExtension on BuildContext {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               cancel,
-              style: const TextStyle(color: Color(0xFF888888)),
+              style: const TextStyle(color: AppColors.textTertiary),
             ),
           ),
           TextButton(
@@ -194,7 +194,7 @@ extension ContextExtension on BuildContext {
             child: Text(
               confirm,
               style: TextStyle(
-                color: isDanger ? Colors.red : const Color(0xFF07C160),
+                color: isDanger ? AppColors.error : AppColors.primary,
               ),
             ),
           ),
@@ -216,7 +216,7 @@ extension ContextExtension on BuildContext {
             mainAxisSize: MainAxisSize.min,
             children: [
               const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF07C160)),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
               if (message != null) ...[
                 const SizedBox(width: 16),

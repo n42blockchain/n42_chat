@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../n42_chat.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
@@ -288,7 +289,7 @@ class DiscoverPage extends StatelessWidget {
               ),
               ?trailing,
               Icon(
-                Icons.chevron_right_rounded,
+                AppIcons.chevron,
                 color: isDark
                     ? AppColors.textTertiaryDark
                     : AppColors.textTertiary,

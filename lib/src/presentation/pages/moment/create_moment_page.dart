@@ -10,6 +10,7 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/moment/moment_bloc.dart';
@@ -349,7 +350,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
       trailing:
           trailing ??
           Icon(
-            Icons.chevron_right_rounded,
+            AppIcons.chevron,
             color: isDark ? Colors.grey[600] : Colors.grey[400],
           ),
       onTap: onTap,

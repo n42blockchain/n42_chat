@@ -8,6 +8,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -148,7 +149,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           ),
                         const SizedBox(width: 8),
                         const Icon(
-                          Icons.chevron_right_rounded,
+                          AppIcons.chevron,
                           color: AppColors.textTertiary,
                         ),
                       ],
@@ -228,7 +229,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         ),
                         const SizedBox(width: 8),
                         const Icon(
-                          Icons.chevron_right_rounded,
+                          AppIcons.chevron,
                           color: AppColors.textTertiary,
                         ),
                       ],
@@ -394,7 +395,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     if (showArrow) ...[
                       const SizedBox(width: 8),
                       Icon(
-                        Icons.chevron_right_rounded,
+                        AppIcons.chevron,
                         color: isDark
                             ? AppColors.textTertiaryDark
                             : AppColors.textTertiary,
@@ -694,7 +695,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded),
+                    icon: const Icon(AppIcons.close),
                     tooltip:
                         MaterialLocalizations.of(context).closeButtonTooltip,
                     onPressed: () => Navigator.pop(context),

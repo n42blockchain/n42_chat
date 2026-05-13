@@ -9,6 +9,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/screenshot_protection_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -596,7 +597,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             ),
             const SizedBox(width: 8),
             Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -659,7 +660,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             ),
             const SizedBox(width: 8),
             Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: isDark
                   ? AppColors.textTertiaryDark
                   : AppColors.textTertiary,
@@ -720,7 +721,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               ),
             ),
             Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,

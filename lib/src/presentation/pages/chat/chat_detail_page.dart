@@ -15,6 +15,7 @@ import '../../../core/services/storage_cleanup_service.dart';
 import '../../../core/services/storage_manager_service.dart';
 import '../../../core/services/storage_monitor_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -652,7 +653,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
+          icon: Icon(AppIcons.back, color: textColor, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -1235,7 +1236,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
               ),
             const SizedBox(width: 4),
-            Icon(Icons.chevron_right_rounded, color: secondaryTextColor, size: 20),
+            Icon(AppIcons.chevron, color: secondaryTextColor, size: 20),
           ],
         ),
       ),
@@ -1834,7 +1835,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
         backgroundColor: bgColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20),
+          icon: Icon(AppIcons.back, color: textColor, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(

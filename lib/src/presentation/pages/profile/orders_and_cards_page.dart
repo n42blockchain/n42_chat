@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 
 /// 订单与卡包页面
 class OrdersAndCardsPage extends StatelessWidget {
@@ -21,7 +22,7 @@ class OrdersAndCardsPage extends StatelessWidget {
           elevation: 0,
           leading: IconButton(
             icon: Icon(
-              Icons.arrow_back_ios_new_rounded,
+              AppIcons.back,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
               size: 20,
             ),

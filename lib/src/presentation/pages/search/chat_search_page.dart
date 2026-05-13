@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/search_result_entity.dart';
 import '../../blocs/search/search_bloc.dart';
@@ -132,7 +133,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         children: [
           IconButton(
             icon: Icon(
-              Icons.arrow_back_ios_new_rounded,
+              AppIcons.back,
               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             ),
             onPressed: () => Navigator.pop(context),

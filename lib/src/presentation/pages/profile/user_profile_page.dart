@@ -6,6 +6,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
@@ -212,7 +213,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 children: [
                   IconButton(
                     icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
+                      AppIcons.back,
                       color: isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimary,
@@ -488,7 +489,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ListTile(
             title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
             trailing: Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -514,7 +515,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         'Add to Blacklist'),
             ),
             trailing: Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,
@@ -532,7 +533,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ListTile(
             title: Text(S.of(context)?.commonReport ?? 'Report'),
             trailing: Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -300,7 +301,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
           color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right_rounded),
+      trailing: const Icon(AppIcons.chevron),
       onTap: onTap,
     );
   }

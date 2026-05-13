@@ -9,6 +9,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_lock_service.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -430,7 +431,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            AppIcons.back,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             size: 20,
           ),
@@ -547,7 +548,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.search_rounded, size: 18, color: hintColor),
+              Icon(AppIcons.search, size: 18, color: hintColor),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(

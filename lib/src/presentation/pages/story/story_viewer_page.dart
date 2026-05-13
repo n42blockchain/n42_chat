@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/story_entity.dart';
@@ -883,7 +884,7 @@ class _StoryContentState extends State<_StoryContent> {
                     ),
                     const SizedBox(width: 4),
                     Icon(
-                      Icons.chevron_right_rounded,
+                      AppIcons.chevron,
                       color: Colors.white.withValues(alpha: 0.6),
                       size: 20,
                     ),
