@@ -426,13 +426,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   }
 
   Future<void> _showNotificationModeSheet() async {
-    final isDark = context.isDarkMode;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
 
     final selected = await showModalBottomSheet<ConversationNotificationMode>(
       context: context,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: context.surfaceColor,
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -545,31 +544,30 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     }
 
     final controller = TextEditingController(text: _groupName);
-    final isDark = context.isDarkMode;
 
     String? newName;
     try {
       newName = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          backgroundColor: context.surfaceColor,
           title: Text(
             S.of(context)?.chatGroupName ?? 'Group Name',
-            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+            style: TextStyle(color: context.textPrimary),
           ),
           content: TextField(
             controller: controller,
             autofocus: true,
             maxLength: 50,
-            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+            style: TextStyle(color: context.textPrimary),
             decoration: InputDecoration(
               hintText:
                   S.of(context)?.commonEnterGroupName ?? 'Enter group name',
               hintStyle: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
               counterStyle: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -628,12 +626,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final dividerColor = isDark ? AppColors.dividerThinDark : AppColors.dividerThin;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
+    final dividerColor = context.dividerThin;
 
     final isGroup = widget.conversation.type == ConversationType.group;
 
@@ -1294,7 +1291,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 显示群公告对话框
   void _showGroupAnnouncementDialog() async {
-    final isDark = context.isDarkMode;
     final controller = TextEditingController();
     final canEdit = widget.canChangeSettings;
 
@@ -1302,22 +1298,22 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          backgroundColor: context.surfaceColor,
           title: Text(
             S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
-            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+            style: TextStyle(color: context.textPrimary),
           ),
           content: canEdit
               ? TextField(
                   controller: controller,
                   maxLines: 5,
-                  style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                  style: TextStyle(color: context.textPrimary),
                   decoration: InputDecoration(
                     hintText:
                         S.of(context)?.chatGroupAnnouncementHint ??
                         'Enter group announcement',
                     hintStyle: TextStyle(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                     border: const OutlineInputBorder(),
                   ),
@@ -1326,7 +1322,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   S.of(context)?.chatGroupAnnouncementEmpty ??
                       'No announcement',
                   style: TextStyle(
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
           actions: [
@@ -1391,7 +1387,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 显示编辑群昵称对话框
   void _showEditNicknameDialog() async {
-    final isDark = context.isDarkMode;
     final controller = TextEditingController();
 
     String? newNickname;
@@ -1399,25 +1394,25 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       newNickname = await showDialog<String>(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          backgroundColor: context.surfaceColor,
           title: Text(
             S.of(context)?.chatEditNickname ?? 'Edit Nickname',
-            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+            style: TextStyle(color: context.textPrimary),
           ),
           content: TextField(
             controller: controller,
             autofocus: true,
             maxLength: 30,
-            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+            style: TextStyle(color: context.textPrimary),
             decoration: InputDecoration(
               hintText:
                   S.of(context)?.chatNicknameHint ??
                   'Enter your nickname in this group',
               hintStyle: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
               counterStyle: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -1458,7 +1453,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 显示投诉对话框
   void _showReportDialog() {
-    final isDark = context.isDarkMode;
     final descController = TextEditingController();
     String? selectedReason;
 
@@ -1466,10 +1460,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          backgroundColor: context.surfaceColor,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
-            style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+            style: TextStyle(color: context.textPrimary),
           ),
           content: RadioGroup<String>(
             groupValue: selectedReason,
@@ -1487,7 +1481,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     title: Text(
                       reason,
                       style: TextStyle(
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                     value: reason,
@@ -1500,13 +1494,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 TextField(
                   controller: descController,
                   maxLines: 2,
-                  style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                  style: TextStyle(color: context.textPrimary),
                   decoration: InputDecoration(
                     hintText:
                         S.of(context)?.reportDescription ??
                         'Additional description (optional)',
                     hintStyle: TextStyle(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                     border: const OutlineInputBorder(),
                   ),
@@ -1824,10 +1818,10 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
 
     return Scaffold(
       backgroundColor: bgColor,

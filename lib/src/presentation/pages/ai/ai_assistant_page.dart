@@ -123,9 +123,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
         final assistantName = state.assistant?.name ?? 'N42 AI';
 
         return Scaffold(
-          backgroundColor: isDark
-              ? AppColors.backgroundDark
-              : AppColors.background,
+          backgroundColor: context.pageBackground,
           appBar: N42AppBar(
             title: assistantName,
             actions: [
@@ -206,7 +204,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 fontSize: 24,
                 height: 1.3,
                 fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -219,7 +217,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.4,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             if (!state.isAvailable) ...[
@@ -296,7 +294,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
         style: TextStyle(
           fontSize: 13,
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       backgroundColor: isDark
@@ -335,7 +333,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               decoration: BoxDecoration(
                 color: isUser
                     ? AppColors.primary
-                    : (isDark ? AppColors.surfaceDark : AppColors.surface),
+                    : context.surfaceColor,
                 borderRadius: BorderRadius.circular(16).copyWith(
                   topLeft: isUser ? null : const Radius.circular(4),
                   topRight: isUser ? const Radius.circular(4) : null,
@@ -365,7 +363,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                         styleSheet: MarkdownStyleSheet(
                           p: TextStyle(
                             fontSize: 15,
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                            color: context.textPrimary,
                             height: 1.4,
                           ),
                           code: TextStyle(
@@ -386,11 +384,11 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                           ),
                           listBullet: TextStyle(
                             fontSize: 15,
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                           strong: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -431,7 +429,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(
                   16,
                 ).copyWith(topLeft: const Radius.circular(4)),
@@ -442,7 +440,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                       text,
                       style: TextStyle(
                         fontSize: 15,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: context.textPrimary,
                         height: 1.4,
                       ),
                     ),
@@ -481,7 +479,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         border: Border(
           top: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
         ),
@@ -507,7 +505,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 decoration: InputDecoration(
                   hintText: l10n?.aiAssistantWelcome ?? 'Ask anything...',
                   hintStyle: TextStyle(
-                    color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                    color: context.textTertiary,
                   ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
@@ -518,7 +516,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 style: TextStyle(
                   fontSize: 15,
                   height: 1.4,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
                 onSubmitted: (_) => _sendMessage(),
               ),

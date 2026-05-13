@@ -148,12 +148,10 @@ class QuickReactionPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -199,7 +197,7 @@ class FullReactionPicker extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: Column(
@@ -221,7 +219,7 @@ class FullReactionPicker extends StatelessWidget {
                 IconButton(
                   icon: Icon(
                     Icons.close,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
@@ -234,7 +232,7 @@ class FullReactionPicker extends StatelessWidget {
               'Frequently Used',
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
@@ -252,7 +250,7 @@ class FullReactionPicker extends StatelessWidget {
                     height: 40,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.backgroundDark : AppColors.background,
+                      color: context.pageBackground,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

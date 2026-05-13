@@ -115,16 +115,14 @@ class _StickerStorePageState extends State<StickerStorePage>
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Sticker Store'),
         backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
-          unselectedLabelColor: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondary,
+          unselectedLabelColor: context.textSecondary,
           indicatorColor: AppColors.primary,
           tabs: const [
             Tab(text: 'Store'),
@@ -156,7 +154,7 @@ class _StickerStorePageState extends State<StickerStorePage>
   Widget _buildCategoryTabs(bool isDark) {
     return Container(
       height: 44,
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -219,7 +217,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                   height: 1.3,
                   color: isSelected
                       ? AppColors.primary
-                      : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                      : context.textPrimary,
                 ),
               ),
             ],
@@ -266,7 +264,7 @@ class _StickerStorePageState extends State<StickerStorePage>
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 height: 1.3,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -421,7 +419,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                 Icon(
                   Icons.download,
                   size: 14,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -431,14 +429,14 @@ class _StickerStorePageState extends State<StickerStorePage>
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Icon(
                   Icons.emoji_emotions_outlined,
                   size: 14,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -448,7 +446,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -478,7 +476,7 @@ class _StickerStorePageState extends State<StickerStorePage>
               style: TextStyle(
                 fontSize: 16,
                 height: 1.3,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 8),

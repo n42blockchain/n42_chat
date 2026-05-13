@@ -180,9 +180,7 @@ class _TransferPageState extends State<TransferPage> {
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: isDark
-              ? AppColors.backgroundDark
-              : AppColors.background,
+          backgroundColor: context.pageBackground,
           appBar: N42AppBar(
             title: _isPaymentRequestMode
                 ? (S.of(context)?.commonPayment ?? 'Payment')
@@ -304,7 +302,7 @@ class _TransferPageState extends State<TransferPage> {
         fontSize: 14,
         height: 1.3,
         fontWeight: FontWeight.w500,
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        color: context.textSecondary,
       ),
     );
   }
@@ -312,14 +310,14 @@ class _TransferPageState extends State<TransferPage> {
   Widget _buildAddressInput(bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _isAddressValid
               ? AppColors.success
               : (_addressController.text.isNotEmpty
                     ? AppColors.error
-                    : (isDark ? AppColors.dividerDark : AppColors.divider)),
+                    : context.dividerColor),
         ),
       ),
       child: Row(
@@ -338,14 +336,12 @@ class _TransferPageState extends State<TransferPage> {
                   vertical: 14,
                 ),
                 hintStyle: TextStyle(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
               onChanged: (value) {
                 _validateAddress(value.trim());
@@ -402,7 +398,7 @@ class _TransferPageState extends State<TransferPage> {
                     fontSize: 14,
                     height: 1.3,
                     fontWeight: FontWeight.w500,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 if (_isAddressValid)
@@ -437,7 +433,7 @@ class _TransferPageState extends State<TransferPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -461,7 +457,7 @@ class _TransferPageState extends State<TransferPage> {
                     : Colors.transparent,
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                     width: 0.5,
                   ),
                 ),
@@ -473,9 +469,7 @@ class _TransferPageState extends State<TransferPage> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.backgroundDark
-                          : AppColors.background,
+                      color: context.pageBackground,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -506,9 +500,7 @@ class _TransferPageState extends State<TransferPage> {
                             fontSize: 16,
                             height: 1.3,
                             fontWeight: FontWeight.w500,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                         Text(
@@ -518,9 +510,7 @@ class _TransferPageState extends State<TransferPage> {
                           style: TextStyle(
                             fontSize: 12,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ],
@@ -538,7 +528,7 @@ class _TransferPageState extends State<TransferPage> {
                           fontSize: 14,
                           height: 1.3,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                          color: context.textPrimary,
                         ),
                       ),
                       Text(
@@ -548,9 +538,7 @@ class _TransferPageState extends State<TransferPage> {
                         style: TextStyle(
                           fontSize: 11,
                           height: 1.3,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                     ],
@@ -579,7 +567,7 @@ class _TransferPageState extends State<TransferPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.all(16),
@@ -599,15 +587,13 @@ class _TransferPageState extends State<TransferPage> {
                     border: InputBorder.none,
                     hintStyle: TextStyle(
                       fontSize: 32,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -619,7 +605,7 @@ class _TransferPageState extends State<TransferPage> {
                   fontSize: 20,
                   height: 1.3,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -634,9 +620,7 @@ class _TransferPageState extends State<TransferPage> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ),
@@ -659,7 +643,7 @@ class _TransferPageState extends State<TransferPage> {
   Widget _buildMemoInput(bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
@@ -670,14 +654,12 @@ class _TransferPageState extends State<TransferPage> {
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16),
           hintStyle: TextStyle(
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         style: TextStyle(
           fontSize: 14,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
         maxLines: 2,
       ),

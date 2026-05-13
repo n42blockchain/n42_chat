@@ -219,9 +219,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final bgColor = context.pageBackground;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -556,9 +556,8 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     Widget? child,
     VoidCallback? onTap,
   }) {
-    final isDark = context.isDarkMode;
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final surfaceColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     return GestureDetector(
       onTap: onTap,
@@ -590,7 +589,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   
   Widget _buildTypeChip(BuildContext context, String label, bool selected, VoidCallback onTap) {
     final isDark = context.isDarkMode;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final secondaryTextColor = context.textSecondary;
 
     return GestureDetector(
       onTap: onTap,
@@ -617,9 +616,8 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   }
   
   void _showTokenPicker() {
-    final isDark = context.isDarkMode;
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final surfaceColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     showModalBottomSheet<void>(
       context: context,
@@ -662,8 +660,8 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   /// 显示表情选择器
   void _showEmojiPicker() {
     final isDark = context.isDarkMode;
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final surfaceColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     showModalBottomSheet<void>(
       context: context,
@@ -742,10 +740,9 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
 
   /// 显示红包封面选择器
   void _showCoverPicker() {
-    final isDark = context.isDarkMode;
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final surfaceColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
 
     showModalBottomSheet<void>(
       context: context,

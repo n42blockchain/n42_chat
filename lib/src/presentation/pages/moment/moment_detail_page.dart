@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
@@ -120,7 +121,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
         final moment = _getLatestMoment(context);
 
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: context.pageBackground,
           appBar: AppBar(
             title: Text(s?.momentMoment ?? 'Moment'),
             backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
@@ -170,7 +171,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                       Text(
                                         moment.formattedTime,
                                         style: TextStyle(
-                                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                          color: context.textSecondary,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -186,7 +187,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                               Text(
                                 moment.content!,
                                 style: TextStyle(
-                                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                                  color: context.textPrimary,
                                   fontSize: 16,
                                 ),
                               ),
@@ -206,13 +207,13 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   Icon(
                                     Icons.location_on,
                                     size: 16,
-                                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                    color: context.textSecondary,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     moment.location!.displayText,
                                     style: TextStyle(
-                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                      color: context.textSecondary,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -249,7 +250,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   Text(
                                     s?.momentLikesCount(visibleLikes.length) ?? '${visibleLikes.length} likes',
                                     style: TextStyle(
-                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                      color: context.textSecondary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -299,13 +300,13 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   Icon(
                                     Icons.comment,
                                     size: 18,
-                                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                    color: context.textSecondary,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     s?.momentCommentsCount(visibleComments.length) ?? '${visibleComments.length} comments',
                                     style: TextStyle(
-                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                      color: context.textSecondary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -319,7 +320,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                     child: Text(
                                       s?.momentNoComments ?? 'No comments yet',
                                       style: TextStyle(
-                                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                        color: context.textSecondary,
                                       ),
                                     ),
                                   ),

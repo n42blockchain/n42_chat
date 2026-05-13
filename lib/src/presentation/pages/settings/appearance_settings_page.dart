@@ -43,7 +43,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.settingsAppearance ?? 'Appearance',
         showBackButton: true,
@@ -68,19 +68,19 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           // 聊天背景
           _buildSectionHeader(l10n?.chatBackground ?? 'Chat Background', isDark),
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: ListTile(
               leading: const Icon(Icons.wallpaper),
               title: Text(
                 l10n?.chatBackground ?? 'Chat Background',
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               trailing: Icon(
                 AppIcons.chevron,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
               onTap: () {
                 Navigator.of(context).push(
@@ -124,7 +124,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Widget _buildThemeModeSection(BuildContext context, bool isDark) {
     final l10n = S.of(context);
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         children: [
           _buildThemeModeItem(
@@ -193,7 +193,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Widget _buildFontSizeSection(BuildContext context, bool isDark) {
     final l10n = S.of(context);
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         children: [
           _buildFontSizeItem(
@@ -273,7 +273,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     ];
 
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +282,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             labels[sliderValue.round()],
             style: TextStyle(
               fontSize: _fontSizeToDouble(_fontSizeValues[sliderValue.round()]),
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -306,14 +306,14 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 'A',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
               Text(
                 'A',
                 style: TextStyle(
                   fontSize: 22,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -326,7 +326,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Widget _buildBubbleStyleSection(BuildContext context, bool isDark) {
     final l10n = S.of(context);
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         children: [
           _buildBubbleStyleItem(

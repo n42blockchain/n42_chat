@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../blocs/story/story_bloc.dart';
@@ -108,9 +109,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         Navigator.of(context).pop();
       },
       child: Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: AppBar(
           backgroundColor: _mode == StoryMode.text
               ? _currentBackgroundColor
@@ -121,7 +120,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               Icons.close,
               color: _mode == StoryMode.text
                   ? _currentTextColor
-                  : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                  : context.textPrimary,
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
@@ -173,7 +172,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     final s = S.of(context);
     final textColor = _mode == StoryMode.text
         ? _currentTextColor
-        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+        : context.textPrimary;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -367,13 +366,13 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -388,7 +387,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                     ? AppColors.backgroundDark
                     : AppColors.inputBackground,
                 counterStyle: TextStyle(
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ),
@@ -408,7 +407,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           color: isDark ? AppColors.surfaceDark : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 2,
           ),
         ),
@@ -438,7 +437,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   fontSize: 18,
                   height: 1.3,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -449,7 +448,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.3,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],

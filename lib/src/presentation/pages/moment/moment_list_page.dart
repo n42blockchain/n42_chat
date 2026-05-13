@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
@@ -153,7 +154,7 @@ class _MomentListViewState extends State<_MomentListView> {
     final s = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
@@ -170,7 +171,7 @@ class _MomentListViewState extends State<_MomentListView> {
                   ? (s?.momentUserMoments(widget.userName ?? '') ??
                         '${widget.userName}\'s Moments')
                   : (s?.commonMoments ?? 'Moments'),
-              style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+              style: TextStyle(color: context.textPrimary),
             ),
             actions: [
               if (!_isUserMode)
@@ -205,7 +206,7 @@ class _MomentListViewState extends State<_MomentListView> {
                         Text(
                           s?.momentNoMomentsYet ?? 'No moments yet',
                           style: TextStyle(
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ],

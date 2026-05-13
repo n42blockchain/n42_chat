@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/moment_entity.dart';
@@ -168,7 +169,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     hintText: "What's on your mind?",
                     border: InputBorder.none,
                     counterStyle: TextStyle(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   // Text changes are handled by ValueListenableBuilder on the controller
@@ -199,7 +200,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     ),
                     Divider(
                       height: 1,
-                      color: isDark ? AppColors.dividerDark : AppColors.divider,
+                      color: context.dividerColor,
                     ),
                     _buildOptionTile(
                       icon: Icons.videocam,
@@ -209,7 +210,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     ),
                     Divider(
                       height: 1,
-                      color: isDark ? AppColors.dividerDark : AppColors.divider,
+                      color: context.dividerColor,
                     ),
                     _buildOptionTile(
                       icon: Icons.location_on,
@@ -225,7 +226,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     ),
                     Divider(
                       height: 1,
-                      color: isDark ? AppColors.dividerDark : AppColors.divider,
+                      color: context.dividerColor,
                     ),
                     _buildOptionTile(
                       icon: Icons.visibility,
@@ -259,7 +260,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                 'Selected Media (${_selectedMedia.length})',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               const Spacer(),
@@ -342,10 +343,10 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     Widget? trailing,
   }) {
     return ListTile(
-      leading: Icon(icon, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+      leading: Icon(icon, color: context.textSecondary),
       title: Text(
         title,
-        style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+        style: TextStyle(color: context.textPrimary),
       ),
       trailing:
           trailing ??
