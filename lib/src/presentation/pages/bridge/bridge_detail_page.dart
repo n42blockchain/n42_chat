@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../integration/bridge/bridge_manager.dart';
 import '../../../integration/bridge/bridge_platform.dart';
@@ -173,12 +174,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: Text(_info.displayName),
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
-        foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        backgroundColor: context.surfaceColor,
+        foregroundColor: context.textPrimary,
         elevation: 0.5,
       ),
       body: ListView(
@@ -417,8 +417,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
     Color? color,
     VoidCallback? onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final defaultColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final defaultColor = context.textPrimary;
 
     return ListTile(
       leading: Icon(icon, color: color ?? defaultColor, size: 22),

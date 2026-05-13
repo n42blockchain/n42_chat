@@ -163,7 +163,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.settingsSecurityTitle ?? 'Security',
         showBackButton: true,
@@ -1607,9 +1607,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                         if (device.isCurrentDevice)

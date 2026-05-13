@@ -117,7 +117,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.settingsPrivacy ?? 'Privacy',
         showBackButton: true,
@@ -137,7 +137,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   isDark,
                 ),
                 Container(
-                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  color: context.surfaceColor,
                   child: Column(
                     children: [
                       _buildVisibilityItem(
@@ -180,7 +180,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
                 _buildSectionHeader('Privacy Hardening', isDark),
                 Container(
-                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  color: context.surfaceColor,
                   child: Column(
                     children: [
                       _buildSwitchTile(
@@ -238,7 +238,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
                 _buildSectionHeader('Network Privacy', isDark),
                 Container(
-                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  color: context.surfaceColor,
                   child: Column(
                     children: [
                       _buildSwitchTile(
@@ -320,7 +320,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 // 隐藏聊天入口
                 _buildSectionHeader(l10n?.commonChat ?? 'Chat', isDark),
                 Container(
-                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  color: context.surfaceColor,
                   child: Column(
                     children: [
                       _buildNavigationItem(
@@ -342,7 +342,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   isDark,
                 ),
                 Container(
-                  color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  color: context.surfaceColor,
                   child: Column(
                     children: [
                       _buildSwitchTile(
@@ -398,7 +398,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     isDark,
                   ),
                   Container(
-                    color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                    color: context.surfaceColor,
                     child: _buildSwitchTile(
                       title:
                           l10n?.settingsScreenshotProtection ??
@@ -932,12 +932,11 @@ class _VisibilityPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: SafeArea(
@@ -951,7 +950,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ),

@@ -88,7 +88,7 @@ class _ContactListPageState extends State<ContactListPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -100,9 +100,7 @@ class _ContactListPageState extends State<ContactListPage> {
                 IconButton(
                   icon: Icon(
                     Icons.person_add_outlined,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                   onPressed: _showAddContactDialog,
                 ),
@@ -643,14 +641,12 @@ class _ContactListPageState extends State<ContactListPage> {
 
   /// 显示联系人操作菜单
   void _showContactMenu(ContactEntity contact) {
-    final isDark = context.isDarkMode;
-
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -680,9 +676,7 @@ class _ContactListPageState extends State<ContactListPage> {
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
                               height: 1.3,
-                              color: isDark
-                                  ? AppColors.textPrimaryDark
-                                  : AppColors.textPrimary,
+                              color: context.textPrimary,
                             ),
                           ),
                           Text(
@@ -692,9 +686,7 @@ class _ContactListPageState extends State<ContactListPage> {
                             style: TextStyle(
                               fontSize: 13,
                               height: 1.3,
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
+                              color: context.textSecondary,
                             ),
                           ),
                         ],
@@ -1434,9 +1426,7 @@ class _WeChatIndexBarState extends State<_WeChatIndexBar> {
                               : FontWeight.w500,
                           color: isActive
                               ? Colors.white
-                              : (isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondary),
+                              : context.textSecondary,
                         ),
                       ),
                     ),
@@ -1470,9 +1460,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
       appBar: AppBar(
         title: Text(S.of(context)?.contactNewFriends ?? 'New Friends'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
-        foregroundColor: isDark
-            ? AppColors.textPrimaryDark
-            : AppColors.textPrimary,
+        foregroundColor: context.textPrimary,
         elevation: 0.5,
       ),
       body: BlocBuilder<ContactBloc, ContactState>(
@@ -1491,9 +1479,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                   Icon(
                     Icons.person_add_disabled_rounded,
                     size: 64,
-                    color: isDark
-                        ? AppColors.textTertiaryDark
-                        : AppColors.textTertiary,
+                    color: context.textTertiary,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -1504,9 +1490,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],
@@ -1520,7 +1504,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
             separatorBuilder: (_, _) => Divider(
               height: 1,
               indent: 72,
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
+              color: context.dividerColor,
             ),
             itemBuilder: (context, index) {
               final request = requests[index];
@@ -1724,13 +1708,11 @@ class _GroupListPageState extends State<_GroupListPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: Text(S.of(context)?.commonGroupChat ?? 'Group Chat'),
         backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
-        foregroundColor: isDark
-            ? AppColors.textPrimaryDark
-            : AppColors.textPrimary,
+        foregroundColor: context.textPrimary,
         elevation: 0.5,
         actions: [
           IconButton(
@@ -1955,11 +1937,9 @@ class _GroupListPageState extends State<_GroupListPage> {
   }
 
   void _showGroupOptions(GroupEntity group) {
-    final isDark = context.isDarkMode;
-
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: context.surfaceColor,
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

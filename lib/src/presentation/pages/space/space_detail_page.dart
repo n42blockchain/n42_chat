@@ -166,7 +166,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           ..sort((a, b) => a.order.compareTo(b.order));
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       body: CustomScrollView(
         slivers: [
           _buildHeader(context, isDark),
@@ -176,16 +176,14 @@ class _SpaceDetailScaffold extends StatelessWidget {
             SliverToBoxAdapter(
               child: Container(
                 padding: const EdgeInsets.all(16),
-                color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                color: context.surfaceColor,
                 child: Text(
                   space.description!,
                   maxLines: 6,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                     height: 1.5,
                   ),
                 ),
@@ -200,7 +198,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                   horizontal: 16,
                   vertical: 8,
                 ),
-                color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                color: context.surfaceColor,
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 4,
@@ -571,7 +569,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 height: 1.3,
-                color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                color: context.textTertiary,
               ),
             ),
             const Spacer(),
@@ -588,7 +586,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
     bool isDark,
   ) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListTile(
         leading: Container(
           width: 40,
@@ -604,7 +602,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -668,7 +666,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
     bool isDark,
   ) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListTile(
         leading: Container(
           width: 40,
@@ -688,7 +686,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -699,15 +697,13 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               )
             : null,
         trailing: Icon(
           AppIcons.chevron,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
         onTap: () {
           // 进入子 Space 详情
@@ -1072,7 +1068,7 @@ class _MembersBottomSheet extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Column(
@@ -1082,7 +1078,7 @@ class _MembersBottomSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
+              color: context.dividerColor,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -1107,9 +1103,7 @@ class _MembersBottomSheet extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 const Spacer(),
@@ -1150,9 +1144,7 @@ class _MembersBottomSheet extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   trailing: _buildRoleBadge(m.role, isDark),

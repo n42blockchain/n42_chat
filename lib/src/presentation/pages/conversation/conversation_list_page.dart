@@ -165,7 +165,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
 
     // 检查 ContactBloc 是否可用
     final hasContactBloc = context.read<ContactBloc?>() != null;
@@ -426,13 +426,13 @@ class _ConversationListPageState extends State<ConversationListPage> {
     return PreferredSize(
       preferredSize: const Size.fromHeight(56),
       child: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
             AppIcons.back,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             size: 20,
           ),
           onPressed: () => Navigator.of(context).pop(),
@@ -442,7 +442,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: AppTextStyles.headlineSmall.copyWith(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         actions: [
@@ -456,9 +456,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                   IconButton(
                     icon: Icon(
                       Icons.notifications_outlined,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                     tooltip:
                         S.of(context)?.onChainNotificationsTitle ??
@@ -511,7 +509,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           IconButton(
             icon: Icon(
               Icons.add_circle_outline,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
             onPressed: widget.onAddPressed ?? _showAddMenu,
           ),
@@ -639,8 +637,6 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   void _showAddMenu() {
-    final isDark = context.isDarkMode;
-
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -649,7 +645,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           : null,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(AppDimensions.dialogRadius),
           ),
@@ -665,9 +661,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -722,8 +716,6 @@ class _ConversationListPageState extends State<ConversationListPage> {
     required String title,
     required VoidCallback onTap,
   }) {
-    final isDark = context.isDarkMode;
-
     return ListTile(
       leading: Container(
         width: 40,
@@ -739,7 +731,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: AppTextStyles.bodyLarge.copyWith(
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       onTap: onTap,
@@ -823,8 +815,6 @@ class _ConversationListPageState extends State<ConversationListPage> {
     BuildContext context,
     ConversationEntity conversation,
   ) {
-    final isDark = context.isDarkMode;
-
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -833,7 +823,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           : null,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(AppDimensions.dialogRadius),
           ),
@@ -849,9 +839,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -955,13 +943,12 @@ class _ConversationListPageState extends State<ConversationListPage> {
     bool isDestructive = false,
     required VoidCallback onTap,
   }) {
-    final isDark = context.isDarkMode;
     final textColor = isDestructive
         ? AppColors.error
-        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+        : context.textPrimary;
     final iconColor = isDestructive
         ? AppColors.error
-        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
+        : context.textSecondary;
 
     return ListTile(
       leading: Icon(icon, color: iconColor),

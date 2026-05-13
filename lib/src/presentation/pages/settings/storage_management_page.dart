@@ -41,12 +41,10 @@ class _StorageManagementView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
@@ -54,7 +52,7 @@ class _StorageManagementView extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
             height: 1.3,
@@ -63,7 +61,7 @@ class _StorageManagementView extends StatelessWidget {
         leading: IconButton(
           icon: Icon(
             AppIcons.back,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             size: 20,
           ),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
@@ -145,13 +143,9 @@ class _StorageOverviewSection extends StatelessWidget {
     final info = state.storageInfo;
     if (info == null) return const SizedBox.shrink();
 
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     return Container(
       color: cardColor,
@@ -254,7 +248,6 @@ class _LegendItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     return Column(
       children: [
         Container(
@@ -270,9 +263,7 @@ class _LegendItem extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             height: 1.3,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         Text(
@@ -283,7 +274,7 @@ class _LegendItem extends StatelessWidget {
             fontSize: 12,
             height: 1.3,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
       ],
@@ -352,11 +343,8 @@ class _SmartCleanupSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     return Container(
       color: cardColor,
@@ -414,10 +402,7 @@ class _RecommendationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final secondaryColor = context.textSecondary;
 
     IconData icon;
     Color color;
@@ -457,7 +442,7 @@ class _RecommendationTile extends StatelessWidget {
         style: TextStyle(
           fontSize: 15,
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Text(
@@ -492,14 +477,9 @@ class _RoomStorageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     if (state.roomStorageList.isEmpty) return const SizedBox.shrink();
 
@@ -600,14 +580,9 @@ class _StorageSettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
     final config = state.storageConfig ?? const StorageConfig();
 
     return Container(
@@ -653,7 +628,7 @@ class _StorageSettingsSection extends StatelessWidget {
           Divider(
             height: 1,
             indent: 16,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
           ListTile(
             title: Text(
@@ -680,7 +655,7 @@ class _StorageSettingsSection extends StatelessWidget {
           Divider(
             height: 1,
             indent: 16,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
           SwitchListTile(
             title: Text(
@@ -718,8 +693,7 @@ class _ClearCacheButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final cardColor = context.surfaceColor;
 
     return Container(
       color: cardColor,
@@ -731,7 +705,7 @@ class _ClearCacheButton extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             height: 1.3,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -739,9 +713,7 @@ class _ClearCacheButton extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
             fontSize: 12,
             height: 1.3,
           ),

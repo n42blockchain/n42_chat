@@ -129,7 +129,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = context.textPrimary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -232,7 +232,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Widget _buildStepIndicator(bool isDark) {
     const activeColor = AppColors.primary;
-    final inactiveColor = isDark ? AppColors.dividerDark : AppColors.divider;
+    final inactiveColor = context.dividerColor;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -277,10 +277,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   Widget _buildEmailStep(bool isDark, bool isLoading) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = context.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,10 +373,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   Widget _buildCodeStep(bool isDark, bool isLoading, AuthState state) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = context.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -480,10 +480,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   Widget _buildPasswordStep(bool isDark, bool isLoading) {
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final labelColor = context.textSecondary;
     final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

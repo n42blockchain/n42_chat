@@ -268,21 +268,21 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: context.surfaceColor,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.close,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           S.of(context)?.chatLocationTitle ?? 'Location',
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -394,7 +394,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                     // 搜索框
                     Container(
                       padding: const EdgeInsets.all(12),
-                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                      color: context.surfaceColor,
                       child: TextField(
                         decoration: InputDecoration(
                           hintText: S.of(context)?.chatSearchLocation ?? 'Search location',
@@ -442,7 +442,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                             title: Text(
                               place.name,
                               style: TextStyle(
-                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                                color: context.textPrimary,
                                 fontWeight: isSelected
                                     ? FontWeight.w600
                                     : FontWeight.normal,
@@ -452,7 +452,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               place.address,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                color: context.textSecondary,
                               ),
                             ),
                             trailing: isSelected
@@ -538,7 +538,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
     final center = LatLng(widget.latitude, widget.longitude);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       body: Stack(
         children: [
           // 全屏地图
@@ -658,7 +658,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                         height: 4,
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
-                          color: isDark ? AppColors.dividerDark : AppColors.divider,
+                          color: context.dividerColor,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -688,7 +688,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                                    color: context.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -696,7 +696,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                   '${widget.latitude.toStringAsFixed(6)}, ${widget.longitude.toStringAsFixed(6)}',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                    color: context.textSecondary,
                                   ),
                                 ),
                               ],
