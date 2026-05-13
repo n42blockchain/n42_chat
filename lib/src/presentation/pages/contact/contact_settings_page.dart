@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -111,7 +112,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           elevation: 0,
           leading: IconButton(
             icon: Icon(
-              Icons.arrow_back_ios_new_rounded,
+              AppIcons.back,
               color: textColor,
               size: 20,
             ),
@@ -325,7 +326,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
             Text(title, style: TextStyle(fontSize: 16, color: textColor)),
             const Spacer(),
             Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: secondaryTextColor,
               size: 20,
             ),

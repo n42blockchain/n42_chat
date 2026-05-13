@@ -385,7 +385,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Icon(Icons.chevron_right_rounded, color: secondaryTextColor),
+                      Icon(AppIcons.chevron, color: secondaryTextColor),
                     ],
                   ),
                 ),

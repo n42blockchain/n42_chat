@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
@@ -97,7 +98,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            AppIcons.back,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             size: 20,
           ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/theme/app_icons.dart';
+
 /// WeChat-inspired slide-to-confirm payment button.
 ///
 /// The user must drag the thumb from left to right to trigger [onConfirmed].
@@ -273,7 +275,7 @@ class _Thumb extends StatelessWidget {
         ],
       ),
       child: Icon(
-        isCompleted ? Icons.check_rounded : Icons.chevron_right_rounded,
+        isCompleted ? Icons.check_rounded : AppIcons.chevron,
         color: isCompleted ? Colors.white : color,
         size: 24,
       ),

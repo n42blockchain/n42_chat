@@ -4,6 +4,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -207,7 +208,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
           style: TextStyle(color: secondaryTextColor, fontSize: 13),
         ),
         trailing: Icon(
-          Icons.chevron_right_rounded,
+          AppIcons.chevron,
           color: secondaryTextColor,
           size: 20,
         ),

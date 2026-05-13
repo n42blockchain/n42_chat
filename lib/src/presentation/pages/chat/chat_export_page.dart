@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_export_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -504,7 +505,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right_rounded),
+            const Icon(AppIcons.chevron),
           ],
         ),
       ),

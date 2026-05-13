@@ -553,7 +553,7 @@ class _RoomStorageSection extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        Icons.chevron_right_rounded,
+                        AppIcons.chevron,
                         size: 20,
                         color: secondaryColor,
                       ),
@@ -752,7 +752,7 @@ class _ClearCacheButton extends StatelessWidget {
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-            : const Icon(Icons.chevron_right_rounded),
+            : const Icon(AppIcons.chevron),
         onTap: state.isCleaning ? null : () => _confirmClearCache(context),
       ),
     );

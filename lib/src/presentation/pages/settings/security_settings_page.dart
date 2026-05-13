@@ -9,6 +9,7 @@ import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/utils/matrix_uia_utils.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
@@ -856,7 +857,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ),
       ),
       trailing: Icon(
-        Icons.chevron_right_rounded,
+        AppIcons.chevron,
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       ),
       onTap: () => _showDeviceDetails(device),
@@ -1150,7 +1151,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             )
           : null,
       trailing: Icon(
-        Icons.chevron_right_rounded,
+        AppIcons.chevron,
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
       ),
       onTap: onTap,

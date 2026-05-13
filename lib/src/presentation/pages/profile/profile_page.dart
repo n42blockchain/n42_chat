@@ -9,6 +9,7 @@ import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -460,7 +461,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    Icon(Icons.chevron_right_rounded, color: subtitleColor, size: 24),
+                    Icon(AppIcons.chevron, color: subtitleColor, size: 24),
                   ],
                 ),
               ],
@@ -545,7 +546,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               Icon(
-                Icons.chevron_right_rounded,
+                AppIcons.chevron,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,

@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/space_entity.dart';
 import '../../blocs/space/space_bloc.dart';
@@ -401,7 +402,7 @@ class _SpaceListItem extends StatelessWidget {
               ),
             )
           : Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: isDark
                   ? AppColors.textSecondaryDark
                   : AppColors.textSecondary,

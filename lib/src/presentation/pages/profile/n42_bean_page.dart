@@ -131,7 +131,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
         children: [
           IconButton(
             icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
+              AppIcons.back,
               color: Colors.white,
             ),
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,

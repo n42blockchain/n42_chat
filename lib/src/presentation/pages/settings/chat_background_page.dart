@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/chat_background_presets.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
@@ -104,7 +105,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            AppIcons.back,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
             size: 20,
           ),

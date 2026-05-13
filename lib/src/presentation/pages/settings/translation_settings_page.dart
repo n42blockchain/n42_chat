@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../core/utils/debug_log.dart';
@@ -383,7 +384,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        Icons.chevron_right_rounded,
+                        AppIcons.chevron,
                         color: isDark
                             ? AppColors.textTertiaryDark
                             : AppColors.textTertiary,

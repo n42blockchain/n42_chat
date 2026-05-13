@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/utils/privacy_redaction_utils.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/user_profile_entity.dart';
@@ -397,7 +398,7 @@ class SettingsPage extends StatelessWidget {
                   ),
                 ),
                 Icon(
-                  Icons.chevron_right_rounded,
+                  AppIcons.chevron,
                   color: isDark
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondary,
@@ -595,7 +596,7 @@ class _SettingsItem extends StatelessWidget {
               ),
               trailing ??
                   Icon(
-                    Icons.chevron_right_rounded,
+                    AppIcons.chevron,
                     color: isDark
                         ? AppColors.textSecondaryDark
                         : AppColors.textSecondary,

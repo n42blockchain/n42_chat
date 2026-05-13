@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -184,7 +185,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.search_rounded, size: 18, color: iconColor),
+        Icon(AppIcons.search, size: 18, color: iconColor),
         const SizedBox(width: 6),
         // Flexible 防止超长 hintText 撑破搜索栏
         Flexible(
@@ -215,7 +216,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: AppTextStyles.bodyMedium.copyWith(color: iconColor),
-        prefixIcon: Icon(Icons.search_rounded, size: 18, color: iconColor),
+        prefixIcon: Icon(AppIcons.search, size: 18, color: iconColor),
         prefixIconConstraints: const BoxConstraints(
           minWidth: 36,
           minHeight: 36,

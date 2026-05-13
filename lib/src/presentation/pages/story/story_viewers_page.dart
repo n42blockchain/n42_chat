@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../../widgets/common/n42_empty_state.dart';
@@ -143,7 +144,7 @@ class _ViewerListTile extends StatelessWidget {
               // Arrow indicator if tappable
               if (onTap != null)
                 Icon(
-                  Icons.chevron_right_rounded,
+                  AppIcons.chevron,
                   color: isDark
                       ? AppColors.textTertiaryDark
                       : AppColors.textTertiary,

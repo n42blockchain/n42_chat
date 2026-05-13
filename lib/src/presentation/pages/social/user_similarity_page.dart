@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../data/models/social/social_similarity_model.dart';
 import '../../blocs/social/social_graph_bloc.dart';
 import '../../blocs/social/social_graph_event.dart';
@@ -79,7 +80,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          icon: const Icon(AppIcons.back, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),

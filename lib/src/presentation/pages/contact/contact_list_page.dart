@@ -520,7 +520,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   ),
                 ),
               Icon(
-                Icons.chevron_right_rounded,
+                AppIcons.chevron,
                 color: isDark
                     ? AppColors.textSecondaryDark
                     : AppColors.textSecondary,

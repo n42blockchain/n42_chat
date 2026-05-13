@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/stored_account_entity.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../blocs/auth/auth_bloc.dart';
@@ -235,7 +236,7 @@ class _AccountTile extends StatelessWidget {
             )
           : account.isCurrent
           ? const Icon(Icons.check_circle, color: AppColors.primary)
-          : const Icon(Icons.chevron_right_rounded),
+          : const Icon(AppIcons.chevron),
       onTap: isSwitching ? null : onTap,
     );
   }

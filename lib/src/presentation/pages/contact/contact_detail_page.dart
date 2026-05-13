@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
@@ -193,7 +194,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            AppIcons.back,
             color: textColor,
             size: 20,
           ),
@@ -427,7 +428,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               ),
             ),
             Icon(
-              Icons.chevron_right_rounded,
+              AppIcons.chevron,
               color: secondaryTextColor,
               size: 20,
             ),
@@ -498,7 +499,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                 ),
                 const SizedBox(width: 8),
                 Icon(
-                  Icons.chevron_right_rounded,
+                  AppIcons.chevron,
                   color: secondaryTextColor,
                   size: 20,
                 ),
@@ -817,7 +818,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
+            AppIcons.back,
             color: textColor,
             size: 20,
           ),
@@ -1051,7 +1052,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             if (showArrow) ...[
               const SizedBox(width: 4),
               Icon(
-                Icons.chevron_right_rounded,
+                AppIcons.chevron,
                 color: secondaryTextColor,
                 size: 20,
               ),
@@ -1531,7 +1532,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                       ),
                       const Spacer(),
                       Icon(
-                        Icons.chevron_right_rounded,
+                        AppIcons.chevron,
                         color: hintColor,
                         size: 20,
                       ),
