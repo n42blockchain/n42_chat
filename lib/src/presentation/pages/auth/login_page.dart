@@ -223,68 +223,55 @@ class _LoginPageState extends State<LoginPage> {
         },
         builder: (context, state) {
           final isDarkMode = context.isDarkMode;
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 20),
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 20),
 
-                  // Logo（紧凑版）
-                  _buildCompactLogo(isDarkMode),
+                        // Logo（紧凑版）
+                        _buildCompactLogo(isDarkMode),
 
-                  const SizedBox(height: 24),
+                        const SizedBox(height: 24),
 
-                  // 服务器输入
-                  _buildServerInput(state, isDarkMode),
+                        // 服务器输入
+                        _buildServerInput(state, isDarkMode),
 
-                  const SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
-                  // 用户名输入
-                  _buildUsernameInput(isDarkMode),
+                        // 用户名输入
+                        _buildUsernameInput(isDarkMode),
 
-                  const SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
-                  // 密码输入
-                  _buildPasswordInput(isDarkMode),
+                        // 密码输入
+                        _buildPasswordInput(isDarkMode),
 
-                  const SizedBox(height: 20),
+                        const SizedBox(height: 16),
 
-                  // 生物识别快捷登录（如果已启用且有凭据）- 显示在登录按钮上方
-                  if (_isBiometricAvailable &&
-                      _isBiometricEnabled &&
-                      _hasCredentials) ...[
-                    _buildBiometricQuickLogin(),
-                    const SizedBox(height: 12),
-                    _buildOrDivider(),
-                    const SizedBox(height: 12),
-                  ],
+                        // 第三方登录
+                        SocialLoginButtons(
+                          isAgreedToTerms: true,
+                          homeserverBuilder: () =>
+                              _homeserverController.text.trim(),
+                        ),
 
-                  // 登录按钮
-                  _buildLoginButton(state),
-
-                  const SizedBox(height: 16),
-
-                  // 注册和忘记密码链接
-                  _buildQuickLinks(),
-
-                  const SizedBox(height: 16),
-
-                  // 第三方登录
-                  SocialLoginButtons(
-                    isAgreedToTerms: true,
-                    homeserverBuilder: () => _homeserverController.text.trim(),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ),
-
-                  const SizedBox(height: 16),
-
-                  // 底部协议
-                  _buildAgreement(isDarkMode),
-                ],
+                ),
               ),
-            ),
+
+              // 固定底部：生物识别、登录按钮、注册链接、服务条款
+              _buildFixedBottom(state, isDarkMode),
+            ],
           );
         },
       ),
@@ -297,19 +284,19 @@ class _LoginPageState extends State<LoginPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: 48,
-          height: 48,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             color: AppColors.primary,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: const Icon(
             Icons.chat_bubble_rounded,
             color: Colors.white,
-            size: 24,
+            size: 18,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -318,7 +305,7 @@ class _LoginPageState extends State<LoginPage> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.textPrimaryDark
@@ -331,7 +318,7 @@ class _LoginPageState extends State<LoginPage> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 height: 1.4,
                 color: isDark
                     ? AppColors.textSecondaryDark
@@ -743,6 +730,48 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
         textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  /// 固定底部区域：生物识别、登录按钮、注册链接、服务条款
+  Widget _buildFixedBottom(AuthState state, bool isDark) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 10, 24, 12),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.backgroundDark : Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_isBiometricAvailable &&
+                _isBiometricEnabled &&
+                _hasCredentials) ...[
+              _buildBiometricQuickLogin(),
+              const SizedBox(height: 8),
+              _buildOrDivider(),
+              const SizedBox(height: 8),
+            ],
+
+            // 登录按钮
+            _buildLoginButton(state),
+
+            // 注册和忘记密码链接
+            _buildQuickLinks(),
+
+            // 服务条款
+            _buildAgreement(isDark),
+          ],
+        ),
       ),
     );
   }
