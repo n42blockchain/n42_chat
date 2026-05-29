@@ -41,19 +41,16 @@ class WelcomePage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Column(
                   children: [
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
                     _buildHeader(context, isDark),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 32),
                     _buildFeatures(context, isDark),
-                    const SizedBox(height: 32),
-                    _buildButtons(context, isDark),
-                    const SizedBox(height: 32),
-                    _buildAgreement(context, isDark),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),
             ),
+            _buildFixedBottom(context, isDark),
           ],
         ),
       ),
@@ -87,8 +84,8 @@ class WelcomePage extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 100,
-          height: 100,
+          width: 68,
+          height: 68,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
@@ -98,29 +95,29 @@ class WelcomePage extends StatelessWidget {
                 AppColors.primaryLight,
               ],
             ),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary.withValues(alpha: 0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
           child: const Icon(
             Icons.chat_bubble_rounded,
             color: Colors.white,
-            size: 50,
+            size: 34,
           ),
         ),
-        const SizedBox(height: AppDimensions.spacingXL),
+        const SizedBox(height: AppDimensions.spacingL),
         Text(
           'N42 Chat',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 24,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
             color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
@@ -264,6 +261,30 @@ class WelcomePage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildFixedBottom(BuildContext context, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(32, 12, 32, 24),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.backgroundDark : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildButtons(context, isDark),
+          const SizedBox(height: 16),
+          _buildAgreement(context, isDark),
+        ],
+      ),
     );
   }
 }
