@@ -550,7 +550,7 @@ class MessageItem extends StatelessWidget {
                 height: 1.3,
                 color: message.isFromMe
                     ? AppColors.sentText(isDark).withValues(alpha: 0.5)
-                    : (isDark ? Colors.grey[500] : Colors.grey),
+                    : context.textTertiary,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -774,9 +774,7 @@ class MessageItem extends StatelessWidget {
                                 ? AppColors.sentText(
                                     isDark,
                                   ).withValues(alpha: 0.6)
-                                : (isDark
-                                      ? AppColors.textSecondaryDark
-                                      : AppColors.textSecondary),
+                                : context.textSecondary,
                           ),
                         ),
                       ],
@@ -1557,9 +1555,7 @@ class MessageItem extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                       color: message.isFromMe
                           ? AppColors.sentText(isDark)
-                          : (isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary),
+                          : context.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -1572,9 +1568,7 @@ class MessageItem extends StatelessWidget {
                       height: 1.3,
                       color: message.isFromMe
                           ? AppColors.sentText(isDark).withValues(alpha: 0.7)
-                          : (isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary),
+                          : context.textSecondary,
                     ),
                   ),
                 ],
@@ -1662,7 +1656,7 @@ class MessageItem extends StatelessWidget {
                     S.of(context)?.chatEnded ?? 'Ended',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 10, height: 1.3, color: Colors.grey),
+                    style: TextStyle(fontSize: 10, height: 1.3, color: context.textTertiary),
                   ),
                 ),
             ],
@@ -1745,9 +1739,7 @@ class MessageItem extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.35,
-                              color: isDark
-                                  ? AppColors.textPrimaryDark
-                                  : AppColors.textPrimary,
+                              color: context.textPrimary,
                               fontWeight: isSelected
                                   ? FontWeight.w600
                                   : FontWeight.normal,
@@ -1904,7 +1896,7 @@ class MessageItem extends StatelessWidget {
 
     final iconColor = isMissed && !message.isFromMe
         ? AppColors.error
-        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
+        : context.textSecondary;
 
     return MessageBubble(
       isSelf: message.isFromMe,

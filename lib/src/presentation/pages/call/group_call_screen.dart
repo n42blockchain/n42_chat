@@ -150,7 +150,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           message = details ?? (s?.qrcodeUnknownError ?? 'Unknown error');
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
+        SnackBar(content: Text(message), backgroundColor: AppColors.error),
       );
     }
   }
@@ -370,7 +370,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.8),
+                          color: AppColors.error.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Icon(
@@ -688,7 +688,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   ? (S.of(context)?.callUnmuteLabel ?? 'Unmute')
                   : (S.of(context)?.callMuteLabel ?? 'Mute'),
               isActive: _isMuted,
-              activeColor: Colors.red,
+              activeColor: AppColors.error,
               onPressed: _toggleMute,
             ),
 
@@ -699,7 +699,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                   ? (S.of(context)?.callTurnOffVideo ?? 'Turn off video')
                   : (S.of(context)?.callTurnOnVideo ?? 'Turn on video'),
               isActive: !_isVideoEnabled,
-              activeColor: Colors.red,
+              activeColor: AppColors.error,
               onPressed: _toggleVideo,
             ),
 
@@ -732,7 +732,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             _buildControlButton(
               icon: Icons.call_end,
               label: S.of(context)?.callLeaveLabel ?? 'Leave',
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               onPressed: _showLeaveDialog,
             ),
           ],
@@ -895,11 +895,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (participant.isMuted)
-            const Icon(Icons.mic_off, color: Colors.red, size: 18),
+            const Icon(Icons.mic_off, color: AppColors.error, size: 18),
           if (!participant.isVideoEnabled)
             const Padding(
               padding: EdgeInsets.only(left: 8),
-              child: Icon(Icons.videocam_off, color: Colors.red, size: 18),
+              child: Icon(Icons.videocam_off, color: AppColors.error, size: 18),
             ),
           if (participant.isScreenSharing)
             const Padding(
@@ -1035,7 +1035,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               Navigator.of(ctx).pop();
               _leaveMeeting();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: Text(S.of(context)?.callLeaveLabel ?? 'Leave'),
           ),
         ],

@@ -160,8 +160,6 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
@@ -176,46 +174,46 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 const SizedBox(height: 16),
 
                 // 加密状态
-                _buildEncryptionStatus(isDark),
+                _buildEncryptionStatus(),
 
                 const SizedBox(height: 16),
 
                 // 生物识别登录
                 if (_isBiometricAvailable) ...[
-                  _buildBiometricSection(isDark),
+                  _buildBiometricSection(),
                   const SizedBox(height: 16),
                 ],
 
                 // Passkey 管理
                 if (_isPasskeySupported) ...[
-                  _buildPasskeySection(isDark),
+                  _buildPasskeySection(),
                   const SizedBox(height: 16),
                 ],
 
                 // 密钥备份
-                _buildKeyBackupSection(isDark),
+                _buildKeyBackupSection(),
 
                 const SizedBox(height: 16),
 
                 // 设备管理
-                _buildDevicesSection(isDark),
+                _buildDevicesSection(),
 
                 const SizedBox(height: 16),
 
                 // 高级选项
-                _buildAdvancedSection(isDark),
+                _buildAdvancedSection(),
               ],
             ),
     );
   }
 
-  Widget _buildBiometricSection(bool isDark) {
+  Widget _buildBiometricSection() {
     final biometricIcon = _biometricTypeDescription?.contains('Face') == true
         ? Icons.face
         : Icons.fingerprint;
 
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -226,9 +224,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -237,15 +233,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
+                color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(biometricIcon, color: Colors.green),
+              child: Icon(biometricIcon, color: AppColors.success),
             ),
             title: Text(
               _biometricTypeDescription ?? 'Biometric',
               style: TextStyle(
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             subtitle: Text(
@@ -255,9 +251,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   : (S.of(context)?.settingsBiometricDisabled ??
                         'Disabled - Tap to enable'),
               style: TextStyle(
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             trailing: Switch(
@@ -273,11 +267,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     );
   }
 
-  Widget _buildPasskeySection(bool isDark) {
+  Widget _buildPasskeySection() {
     final l10n = S.of(context);
 
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -288,9 +282,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -309,16 +301,14 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               title: Text(
                 l10n?.authPasskeyNoRegistered ?? 'No passkeys registered',
                 style: TextStyle(
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               subtitle: Text(
                 l10n?.authPasskeyRegisterHint ??
                     'Register a passkey for this account. Standalone passkey sign-in will be enabled later.',
                 style: TextStyle(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             )
@@ -329,15 +319,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.1),
+                    color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.key, color: Colors.green),
+                  child: const Icon(Icons.key, color: AppColors.success),
                 ),
                 title: Text(
                   passkey.displayName ?? 'Passkey',
                   style: TextStyle(
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 subtitle: Text(
@@ -346,9 +336,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       : passkey.credentialId,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 trailing: IconButton(
@@ -414,7 +402,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 l10n?.authPasskeyRequiresServer ??
                     'Passkey registration requires server support',
               ),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.warning,
             ),
           );
         }
@@ -619,7 +607,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     }
   }
 
-  Widget _buildEncryptionStatus(bool isDark) {
+  Widget _buildEncryptionStatus() {
     final status = widget.e2eeManager.status;
     final statusText = _getStatusText(status);
     final statusColor = _getStatusColor(status);
@@ -628,7 +616,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -656,7 +644,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                     fontSize: 16,
                     height: 1.3,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -682,9 +670,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     );
   }
 
-  Widget _buildKeyBackupSection(bool isDark) {
+  Widget _buildKeyBackupSection() {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -695,9 +683,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -711,9 +697,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       '${_backupInfo!.count} keys backed up'
                 : S.of(context)?.settingsBackupNotSet ?? 'Backup not set',
             onTap: _showBackupDialog,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildListItem(
             icon: Icons.cloud_download,
             title: S.of(context)?.settingsRestoreKeys ?? 'Restore Keys',
@@ -721,9 +706,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 S.of(context)?.settingsRestoreKeysFromBackup ??
                 'Restore encryption keys from backup',
             onTap: _showRestoreDialog,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildListItem(
             icon: Icons.key,
             title: S.of(context)?.settingsExportKeys ?? 'Export Keys',
@@ -731,32 +715,29 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 S.of(context)?.settingsExportKeysToFile ??
                 'Export keys to file',
             onTap: _showExportDialog,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildListItem(
             icon: Icons.vpn_key,
             title: 'Show Recovery Key',
             subtitle: 'Display your recovery key for backup',
             onTap: _showRecoveryKey,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildListItem(
             icon: Icons.upload_file,
             title: 'Import Recovery Key',
             subtitle: 'Restore messages using a recovery key',
             onTap: _importRecoveryKey,
-            isDark: isDark,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDevicesSection(bool isDark) {
+  Widget _buildDevicesSection() {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -767,9 +748,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -779,20 +758,18 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               child: Text(
                 S.of(context)?.settingsNoOtherDevices ?? 'No other devices',
                 style: TextStyle(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             )
           else
-            ..._devices.map((device) => _buildDeviceItem(device, isDark)),
+            ..._devices.map((device) => _buildDeviceItem(device)),
         ],
       ),
     );
   }
 
-  Widget _buildDeviceItem(DeviceInfo device, bool isDark) {
+  Widget _buildDeviceItem(DeviceInfo device) {
     final lastSeenText = device.lastSeen != null
         ? _formatLastSeen(device.lastSeen!)
         : '';
@@ -817,8 +794,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           color: device.isCurrentDevice
               ? AppColors.primary.withValues(alpha: 0.1)
               : device.isVerified
-              ? Colors.green.withValues(alpha: 0.1)
-              : Colors.orange.withValues(alpha: 0.1),
+              ? AppColors.success.withValues(alpha: 0.1)
+              : AppColors.warning.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
@@ -826,8 +803,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           color: device.isCurrentDevice
               ? AppColors.primary
               : device.isVerified
-              ? Colors.green
-              : Colors.orange,
+              ? AppColors.success
+              : AppColors.warning,
         ),
       ),
       title: Text(
@@ -836,7 +813,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
           fontWeight: device.isCurrentDevice
               ? FontWeight.w600
               : FontWeight.normal,
@@ -852,13 +829,13 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           color: device.isCurrentDevice
               ? AppColors.primary
               : device.isVerified
-              ? Colors.green
-              : Colors.orange,
+              ? AppColors.success
+              : AppColors.warning,
         ),
       ),
       trailing: Icon(
         AppIcons.chevron,
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        color: context.textSecondary,
       ),
       onTap: () => _showDeviceDetails(device),
     );
@@ -874,9 +851,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     return '${lastSeen.month}/${lastSeen.day}/${lastSeen.year}';
   }
 
-  Widget _buildAdvancedSection(bool isDark) {
+  Widget _buildAdvancedSection() {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -887,9 +864,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -900,9 +875,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 ? S.of(context)?.settingsEnabled ?? 'Enabled'
                 : S.of(context)?.settingsNotEnabled ?? 'Not enabled',
             onTap: _setupCrossSigning,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildListItem(
             icon: Icons.delete_forever,
             title: S.of(context)?.settingsResetEncryption ?? 'Reset Encryption',
@@ -910,16 +884,14 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 S.of(context)?.settingsDeleteAllEncryptionKeys ??
                 'Delete all encryption keys',
             onTap: _showResetConfirmation,
-            isDark: isDark,
             isDestructive: true,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildListItem(
             icon: Icons.person_remove_outlined,
             title: 'Delete Account',
             subtitle: 'Deactivate this account and erase local encrypted data',
             onTap: _showDeleteAccountConfirmation,
-            isDark: isDark,
             isDestructive: true,
           ),
         ],
@@ -1127,12 +1099,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     required String title,
     String? subtitle,
     required VoidCallback onTap,
-    required bool isDark,
     bool isDestructive = false,
   }) {
-    final color = isDestructive
-        ? AppColors.error
-        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+    final color = isDestructive ? AppColors.error : context.textPrimary;
 
     return ListTile(
       leading: Icon(
@@ -1144,26 +1113,24 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ? Text(
               subtitle,
               style: TextStyle(
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             )
           : null,
       trailing: Icon(
         AppIcons.chevron,
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        color: context.textSecondary,
       ),
       onTap: onTap,
     );
   }
 
-  Widget _buildDivider(bool isDark) {
+  Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.only(left: 56),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }
@@ -1185,9 +1152,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       case E2EEStatus.notSupported:
         return AppColors.error;
       case E2EEStatus.notInitialized:
-        return Colors.orange;
+        return AppColors.warning;
       case E2EEStatus.ready:
-        return Colors.green;
+        return AppColors.success;
     }
   }
 
@@ -1280,9 +1247,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.1),
+                color: context.dividerColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: context.dividerColor.withValues(alpha: 0.3),
+                ),
               ),
               child: SelectableText(
                 recoveryKey,
@@ -1544,7 +1513,6 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   void _showDeviceDetails(DeviceInfo device) {
-    final isDark = context.isDarkMode;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -1563,7 +1531,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[400],
+                    color: context.dividerColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1578,8 +1546,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       color: device.isCurrentDevice
                           ? AppColors.primary.withValues(alpha: 0.1)
                           : device.isVerified
-                          ? Colors.green.withValues(alpha: 0.1)
-                          : Colors.orange.withValues(alpha: 0.1),
+                          ? AppColors.success.withValues(alpha: 0.1)
+                          : AppColors.warning.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -1589,8 +1557,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       color: device.isCurrentDevice
                           ? AppColors.primary
                           : device.isVerified
-                          ? Colors.green
-                          : Colors.orange,
+                          ? AppColors.success
+                          : AppColors.warning,
                       size: 28,
                     ),
                   ),
@@ -1631,26 +1599,22 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               _buildDeviceDetailRow(
                 S.of(context)?.settingsDeviceId ?? 'Device ID',
                 device.deviceId,
-                isDark,
               ),
               _buildDeviceDetailRow(
                 S.of(context)?.settingsStatus ?? 'Status',
                 device.isVerified
                     ? (S.of(context)?.settingsVerified ?? 'Verified')
                     : (S.of(context)?.settingsUnverified ?? 'Unverified'),
-                isDark,
               ),
               if (device.lastSeen != null)
                 _buildDeviceDetailRow(
                   S.of(context)?.settingsLastActive ?? 'Last active',
                   _formatLastSeen(device.lastSeen!),
-                  isDark,
                 ),
               if (device.lastSeenIp != null && device.lastSeenIp!.isNotEmpty)
                 _buildDeviceDetailRow(
                   S.of(context)?.settingsIpAddress ?? 'IP address',
                   device.lastSeenIp!,
-                  isDark,
                 ),
               const SizedBox(height: 20),
               // Action buttons
@@ -1720,7 +1684,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     );
   }
 
-  Widget _buildDeviceDetailRow(String label, String value, bool isDark) {
+  Widget _buildDeviceDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -1733,9 +1697,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -1744,7 +1706,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               value,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
           ),
