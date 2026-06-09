@@ -169,7 +169,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       // 固定高度 = 内容高度 + 底部安全区域
       height: contentHeight + bottomPadding,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+        color: context.inputBarColor,
         border: Border(
           top: BorderSide(
             color: context.dividerColor,

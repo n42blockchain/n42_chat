@@ -95,13 +95,11 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
-        child: SafeArea(child: _buildSearchBar(isDark)),
+        child: SafeArea(child: _buildSearchBar()),
       ),
       body: BlocBuilder<SearchBloc, SearchState>(
         builder: (context, state) {
@@ -116,7 +114,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           }
 
           if (state is ChatSearchState) {
-            return _buildResults(state, isDark);
+            return _buildResults(state);
           }
 
           return _buildInitialState();
@@ -125,16 +123,16 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
     );
   }
 
-  Widget _buildSearchBar(bool isDark) {
+  Widget _buildSearchBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Row(
         children: [
           IconButton(
             icon: Icon(
               AppIcons.back,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -142,7 +140,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
             child: Container(
               height: 36,
               decoration: BoxDecoration(
-                color: isDark ? AppColors.backgroundDark : AppColors.background,
+                color: context.pageBackground,
                 borderRadius: BorderRadius.circular(18),
               ),
               child: TextField(
@@ -152,16 +150,12 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                   hintText: S.of(context)?.chatSearchHint ?? 'Search messages',
                   hintStyle: TextStyle(
                     fontSize: 14,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                   prefixIcon: Icon(
                     Icons.search,
                     size: 20,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -174,7 +168,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                 ),
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
                 onChanged: (value) {
                   setState(() {});
@@ -191,7 +185,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                 Icon(
                   Icons.tune,
                   color: _messageFilter == null
-                      ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary)
+                      ? context.textPrimary
                       : AppColors.primary,
                 ),
                 if (_messageFilter != null)
@@ -228,7 +222,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
     );
   }
 
-  Widget _buildResults(ChatSearchState state, bool isDark) {
+  Widget _buildResults(ChatSearchState state) {
     final results = state.results;
     if (results.query.isEmpty) {
       return _buildInitialState();
@@ -249,7 +243,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -257,9 +251,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                 '${results.totalCount} ${S.of(context)?.searchMessageLabel ?? 'messages'}',
                 style: TextStyle(
                   fontSize: 13,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
               if (results.filter != null) ...[
@@ -268,9 +260,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                   'Filters active: ${results.filter!.activeCount}',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -283,7 +273,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
             separatorBuilder: (_, _) => Divider(
               height: 1,
               indent: 72,
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
+              color: context.dividerColor,
             ),
             itemBuilder: (context, index) {
               if (index >= results.messages.length) {
@@ -304,7 +294,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
               }
 
               final message = results.messages[index];
-              return _buildMessageTile(message, isDark);
+              return _buildMessageTile(message);
             },
           ),
         ),
@@ -312,7 +302,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
     );
   }
 
-  Widget _buildMessageTile(MessageEntity message, bool isDark) {
+  Widget _buildMessageTile(MessageEntity message) {
     final preview = _messagePreview(message);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -328,7 +318,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
           ),
@@ -337,9 +327,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
             DateFormat('MM-dd HH:mm').format(message.timestamp),
             style: TextStyle(
               fontSize: 12,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -352,9 +340,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 13,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       ),

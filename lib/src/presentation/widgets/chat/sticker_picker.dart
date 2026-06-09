@@ -108,7 +108,7 @@ class _StickerPickerState extends State<StickerPicker> {
     return Container(
       height: widget.height + bottomPadding,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+        color: context.inputBarColor,
         border: Border(
           top: BorderSide(
             color: context.dividerColor,

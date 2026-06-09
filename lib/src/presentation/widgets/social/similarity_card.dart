@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/social/social_connection.dart';
 import '../../../domain/entities/social/social_recommendation.dart';
@@ -40,7 +41,7 @@ class SimilarityCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: isDark
               ? null
@@ -55,7 +56,7 @@ class SimilarityCard extends StatelessWidget {
         child: Row(
           children: [
             // Avatar
-            _buildAvatar(profile.address, isDark),
+            _buildAvatar(profile.address),
             const SizedBox(width: 12),
 
             // Name + reason
@@ -71,16 +72,14 @@ class SimilarityCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      _buildSimilarityBadge(isDark),
+                      _buildSimilarityBadge(),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -88,9 +87,7 @@ class SimilarityCard extends StatelessWidget {
                     recommendation.reason,
                     style: TextStyle(
                       fontSize: 13,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -99,11 +96,11 @@ class SimilarityCard extends StatelessWidget {
                   Row(
                     children: [
                       // Connection type icons
-                      ..._buildConnectionIcons(isDark),
+                      ..._buildConnectionIcons(context),
                       const Spacer(),
                       // Connect button
                       if (onConnect != null)
-                        _buildConnectButton(context, isDark),
+                        _buildConnectButton(context),
                     ],
                   ),
                 ],
@@ -115,7 +112,7 @@ class SimilarityCard extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar(String address, bool isDark) {
+  Widget _buildAvatar(String address) {
     // Generate a deterministic color from the address
     final color = _addressColor(address);
     final initials = address.length >= 4
@@ -146,7 +143,7 @@ class SimilarityCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSimilarityBadge(bool isDark) {
+  Widget _buildSimilarityBadge() {
     final percent = recommendation.similarityPercent;
     final badgeColor = percent >= 60
         ? AppColors.primary
@@ -171,10 +168,9 @@ class SimilarityCard extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildConnectionIcons(bool isDark) {
+  List<Widget> _buildConnectionIcons(BuildContext context) {
     final types = recommendation.topConnectionTypes;
-    final iconColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final iconColor = context.textSecondary;
 
     return types.take(4).map((type) {
       final icon = _iconForType(type);
@@ -188,7 +184,7 @@ class SimilarityCard extends StatelessWidget {
     }).toList();
   }
 
-  Widget _buildConnectButton(BuildContext context, bool isDark) {
+  Widget _buildConnectButton(BuildContext context) {
     return SizedBox(
       height: 28,
       child: TextButton(

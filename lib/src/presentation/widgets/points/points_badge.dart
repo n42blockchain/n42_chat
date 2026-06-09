@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// Compact points badge for use in chat headers, message rows, etc.
@@ -30,8 +31,6 @@ class PointsBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (points == 0 && !showWhenZero) return const SizedBox.shrink();
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
@@ -71,8 +70,7 @@ class PointsBadge extends StatelessWidget {
               style: TextStyle(
                 fontSize: _fontSize,
                 fontWeight: FontWeight.w600,
-                color:
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             if (symbol != null) ...[
@@ -81,9 +79,7 @@ class PointsBadge extends StatelessWidget {
                 symbol!,
                 style: TextStyle(
                   fontSize: _fontSize - 2,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],

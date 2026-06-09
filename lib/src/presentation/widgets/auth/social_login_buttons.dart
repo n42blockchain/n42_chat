@@ -157,9 +157,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final textColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = context.textSecondary;
     final config = N42Chat.config;
     final isAnyLoading = _isAnyLoading;
     final buttons = <Widget>[
@@ -288,8 +286,6 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     required Color backgroundColor,
     required Color iconColor,
   }) {
-    final isDark = context.isDarkMode;
-
     return Tooltip(
       message: tooltip,
       child: InkWell(
@@ -302,7 +298,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
             color: backgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
+              color: context.dividerColor,
             ),
             boxShadow: [
               BoxShadow(

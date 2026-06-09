@@ -23,8 +23,6 @@ class MessageReactionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (reactions.isEmpty) return const SizedBox.shrink();
 
-    final isDark = context.isDarkMode;
-
     return Wrap(
       spacing: 4,
       runSpacing: 4,
@@ -33,12 +31,10 @@ class MessageReactionBar extends StatelessWidget {
               reaction: reaction,
               hasReacted: reaction.hasReacted(currentUserId),
               onTap: () => onReactionTap?.call(reaction.emoji),
-              isDark: isDark,
             )),
         if (onAddReaction != null)
           _AddReactionButton(
             onTap: onAddReaction,
-            isDark: isDark,
           ),
       ],
     );
@@ -50,12 +46,10 @@ class _ReactionChip extends StatelessWidget {
   final MessageReactionEntity reaction;
   final bool hasReacted;
   final VoidCallback? onTap;
-  final bool isDark;
 
   const _ReactionChip({
     required this.reaction,
     required this.hasReacted,
-    required this.isDark,
     this.onTap,
   });
 
@@ -68,12 +62,12 @@ class _ReactionChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: hasReacted
               ? AppColors.primary.withValues(alpha: 0.2)
-              : (isDark ? AppColors.surfaceDark : AppColors.surface),
+              : context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasReacted
                 ? AppColors.primary
-                : (isDark ? AppColors.dividerDark : AppColors.divider),
+                : context.dividerColor,
             width: 1,
           ),
         ),
@@ -92,7 +86,7 @@ class _ReactionChip extends StatelessWidget {
                   fontSize: 12,
                   color: hasReacted
                       ? AppColors.primary
-                      : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                      : context.textSecondary,
                 ),
               ),
             ],
@@ -106,11 +100,9 @@ class _ReactionChip extends StatelessWidget {
 /// 添加反应按钮
 class _AddReactionButton extends StatelessWidget {
   final VoidCallback? onTap;
-  final bool isDark;
 
   const _AddReactionButton({
     this.onTap,
-    required this.isDark,
   });
 
   @override
@@ -120,17 +112,17 @@ class _AddReactionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 1,
           ),
         ),
         child: Icon(
           Icons.add,
           size: 14,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
