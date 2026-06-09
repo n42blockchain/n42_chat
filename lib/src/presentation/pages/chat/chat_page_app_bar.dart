@@ -3,10 +3,10 @@ part of 'chat_page.dart';
 
 /// AppBar 构建相关方法
 extension _ChatPageAppBarMethods on _ChatPageState {
-  PreferredSizeWidget _buildAppBar(bool isDark) {
+  PreferredSizeWidget _buildAppBar() {
     // 多选模式下显示特殊的工具栏
     if (_isMultiSelectMode) {
-      return _buildMultiSelectAppBar(isDark);
+      return _buildMultiSelectAppBar();
     }
 
     // 检测桥接平台
@@ -28,7 +28,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                       child: Icon(
                         Icons.campaign,
                         size: 18,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                   // 桥接平台小图标
@@ -47,9 +47,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.headlineSmall.copyWith(
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                   ),
@@ -63,9 +61,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.captionSmall.copyWith(
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                     fontSize: 12,
                   ),
                 ),
@@ -129,11 +125,10 @@ extension _ChatPageAppBarMethods on _ChatPageState {
   }
 
   /// 构建多选模式下的 AppBar
-  PreferredSizeWidget _buildMultiSelectAppBar(bool isDark) {
-    final fgColor =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+  PreferredSizeWidget _buildMultiSelectAppBar() {
+    final fgColor = context.textPrimary;
     return AppBar(
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: context.surfaceColor,
       elevation: 0,
       scrolledUnderElevation: 0,
       leading: IconButton(

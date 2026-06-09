@@ -105,9 +105,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: AppBar(
           title: const Text('Create Moment'),
           backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,

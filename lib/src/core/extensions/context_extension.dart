@@ -54,6 +54,13 @@ extension ContextExtension on BuildContext {
   Color get pageBackground =>
       isDarkMode ? AppColors.backgroundDark : AppColors.background;
 
+  /// 导航栏背景（自动深浅）
+  Color get navBarColor => isDarkMode ? AppColors.navBarDark : AppColors.navBar;
+
+  /// 输入栏背景（自动深浅）
+  Color get inputBarColor =>
+      isDarkMode ? AppColors.inputBarDark : AppColors.inputBar;
+
   // ============================================
   // 屏幕尺寸
   // ============================================

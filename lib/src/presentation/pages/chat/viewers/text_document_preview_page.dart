@@ -90,20 +90,18 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: widget.fileName,
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: _buildBody(isDark, context),
+      body: _buildBody(context),
     );
   }
 
-  Widget _buildBody(bool isDark, BuildContext context) {
+  Widget _buildBody(BuildContext context) {
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(
@@ -122,9 +120,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
               Icon(
                 Icons.description_outlined,
                 size: 56,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
               const SizedBox(height: 16),
               Text(
@@ -132,7 +128,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -140,9 +136,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
                 _error!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -167,7 +161,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
         style: TextStyle(
           fontSize: 14,
           height: 1.5,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
     );

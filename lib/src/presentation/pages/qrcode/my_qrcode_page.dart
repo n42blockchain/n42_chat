@@ -372,10 +372,9 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) {
-        final isDark = sheetContext.isDarkMode;
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: sheetContext.surfaceColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: SafeArea(
@@ -519,10 +518,9 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) {
-        final isDark = sheetContext.isDarkMode;
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: sheetContext.surfaceColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: SafeArea(

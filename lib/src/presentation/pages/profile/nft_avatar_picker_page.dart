@@ -215,7 +215,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _InfoBanner(isDark: isDark, l10n: l10n),
+        _InfoBanner(l10n: l10n),
         const SizedBox(height: 16),
         Text(
           l10n?.nftPickerPopularCollections ?? 'Popular Collections',
@@ -580,10 +580,9 @@ class _NftPreview extends StatelessWidget {
 // ─── Info banner ─────────────────────────────────────────────────────────────
 
 class _InfoBanner extends StatelessWidget {
-  final bool isDark;
   final S? l10n;
 
-  const _InfoBanner({required this.isDark, required this.l10n});
+  const _InfoBanner({required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -621,9 +620,7 @@ class _InfoBanner extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                     height: 1.4,
                   ),
                 ),

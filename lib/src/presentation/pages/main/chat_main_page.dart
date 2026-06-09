@@ -127,7 +127,6 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   /// 显示微信风格的 "+" 弹出菜单
   void _showAddMenu(BuildContext context) {
-    final isDark = context.isDarkMode;
     final RenderBox button = context.findRenderObject() as RenderBox;
     final RenderBox overlay =
         Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
@@ -146,35 +145,35 @@ class _ChatMainPageState extends State<ChatMainPage> {
     showMenu<String>(
       context: context,
       position: position,
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       elevation: AppDimensions.overlayElevation,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       items: [
         _buildPopupMenuItem(
+          context: context,
           value: 'group',
           icon: Icons.chat_bubble_outline,
           text: S.of(context)?.mainStartGroupChat ?? 'Start Group Chat',
-          isDark: isDark,
         ),
         _buildPopupMenuItem(
+          context: context,
           value: 'add_friend',
           icon: Icons.person_add_outlined,
           text: S.of(context)?.mainAddFriends ?? 'Add Friends',
-          isDark: isDark,
         ),
         _buildPopupMenuItem(
+          context: context,
           value: 'scan',
           icon: Icons.qr_code_scanner,
           text: S.of(context)?.commonScan ?? 'Scan',
-          isDark: isDark,
         ),
         _buildPopupMenuItem(
+          context: context,
           value: 'payment',
           icon: Icons.payment_outlined,
           text: S.of(context)?.mainPaymentAndCollection ?? 'Payment',
-          isDark: isDark,
         ),
       ],
     ).then((value) {
@@ -198,13 +197,12 @@ class _ChatMainPageState extends State<ChatMainPage> {
   }
 
   PopupMenuItem<String> _buildPopupMenuItem({
+    required BuildContext context,
     required String value,
     required IconData icon,
     required String text,
-    required bool isDark,
   }) {
-    final textColor =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = context.textPrimary;
     return PopupMenuItem<String>(
       value: value,
       height: 48,
@@ -306,9 +304,8 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final bgColor = context.surfaceColor;
+    final textColor = context.textPrimary;
     final useSplit = ResponsiveUtils.useSplitLayout(context);
 
     return MultiBlocProvider(
@@ -345,7 +342,6 @@ class _ChatMainPageState extends State<ChatMainPage> {
           if (useSplit) {
             // === iPad / 宽屏分屏模式 ===
             return _buildSplitLayout(
-              isDark: isDark,
               bgColor: bgColor,
               textColor: textColor,
               totalUnread: totalUnread,
@@ -355,9 +351,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
           // === 手机模式：保持原有布局 ===
           return Scaffold(
-            backgroundColor: isDark
-                ? AppColors.backgroundDark
-                : AppColors.background,
+            backgroundColor: context.pageBackground,
             appBar: AppBar(
               backgroundColor: bgColor,
               elevation: 0,
@@ -418,7 +412,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
                 const _ProfileTabContent(),
               ],
             ),
-            bottomNavigationBar: _buildBottomNavigationBar(isDark, totalUnread),
+            bottomNavigationBar: _buildBottomNavigationBar(totalUnread),
           );
         },
       ),
@@ -427,14 +421,13 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   /// iPad 分屏布局
   Widget _buildSplitLayout({
-    required bool isDark,
     required Color bgColor,
     required Color textColor,
     required int totalUnread,
     required String currentTitle,
   }) {
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       body: Row(
         children: [
           // --- 左侧面板：会话列表 + Tab 切换 ---
@@ -513,28 +506,26 @@ class _ChatMainPageState extends State<ChatMainPage> {
                   ),
                 ),
                 // 底部导航栏
-                _buildBottomNavigationBar(isDark, totalUnread),
+                _buildBottomNavigationBar(totalUnread),
               ],
             ),
           ),
           // 分隔线
           VerticalDivider(
             width: 1,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
           // --- 右侧面板：聊天内容或空状态 ---
-          Expanded(child: _buildRightPanel(isDark)),
+          Expanded(child: _buildRightPanel()),
         ],
       ),
     );
   }
 
   /// 右侧面板：如果有选中会话则显示 ChatPage，否则显示占位
-  Widget _buildRightPanel(bool isDark) {
+  Widget _buildRightPanel() {
     if (_selectedConversation == null || _splitChatBloc == null) {
-      final placeholderColor = isDark
-          ? AppColors.textTertiaryDark
-          : AppColors.textTertiary;
+      final placeholderColor = context.textTertiary;
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -571,12 +562,10 @@ class _ChatMainPageState extends State<ChatMainPage> {
     );
   }
 
-  Widget _buildBottomNavigationBar(bool isDark, int totalUnread) {
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+  Widget _buildBottomNavigationBar(int totalUnread) {
+    final bgColor = context.surfaceColor;
     const selectedColor = AppColors.primary;
-    final unselectedColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final unselectedColor = context.textSecondary;
 
     return Container(
       decoration: BoxDecoration(
@@ -590,8 +579,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
         ],
         border: Border(
           top: BorderSide(
-            color: (isDark ? AppColors.dividerDark : AppColors.divider)
-                .withValues(alpha: 0.6),
+            color: context.dividerColor.withValues(alpha: 0.6),
             width: 0.5,
           ),
         ),

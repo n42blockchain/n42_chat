@@ -21,7 +21,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
     final isDark = context.isDarkMode;
     
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       body: Column(
         children: [
           // 顶部绿色区域
@@ -161,7 +161,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -180,7 +180,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
                 height: 1.5,
               ),
             ),
@@ -209,9 +209,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                     backgroundColor: isDark
                         ? AppColors.surfaceDark.withValues(alpha: 0.5)
                         : const Color(0xFFF5F5F5),
-                    foregroundColor: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    foregroundColor: context.textPrimary,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -240,14 +238,13 @@ class _N42BeanPageState extends State<N42BeanPage> {
   }
 
   Widget _buildFeatureItem(String text) {
-    final isDark = context.isDarkMode;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Text(
         text,
         style: TextStyle(
           fontSize: 15,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
           height: 1.5,
         ),
       ),
@@ -268,13 +265,12 @@ class _N42BeanPageState extends State<N42BeanPage> {
 class _BeanDetailSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final s = S.of(context);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -307,7 +303,7 @@ class _BeanDetailSheet extends StatelessWidget {
                     fontSize: 18,
                     height: 1.3,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const Spacer(),
@@ -315,7 +311,7 @@ class _BeanDetailSheet extends StatelessWidget {
                   icon: Icon(
                     AppIcons.close,
                     size: 22,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                   tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.pop(context),
@@ -326,7 +322,7 @@ class _BeanDetailSheet extends StatelessWidget {
 
           Divider(
             height: 1,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
 
           // 空状态

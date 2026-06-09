@@ -175,9 +175,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final textColor = context.textPrimary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -233,22 +231,22 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
 
                   // Logo（紧凑版）
-                  _buildCompactLogo(isDarkMode),
+                  _buildCompactLogo(context),
 
                   const SizedBox(height: 24),
 
                   // 服务器输入
-                  _buildServerInput(state, isDarkMode),
+                  _buildServerInput(context, state, isDarkMode),
 
                   const SizedBox(height: 12),
 
                   // 用户名输入
-                  _buildUsernameInput(isDarkMode),
+                  _buildUsernameInput(context, isDarkMode),
 
                   const SizedBox(height: 12),
 
                   // 密码输入
-                  _buildPasswordInput(isDarkMode),
+                  _buildPasswordInput(context, isDarkMode),
 
                   const SizedBox(height: 20),
 
@@ -292,7 +290,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   /// 紧凑版 Logo
-  Widget _buildCompactLogo(bool isDark) {
+  Widget _buildCompactLogo(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -320,9 +318,7 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             Text(
@@ -333,9 +329,7 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(
                 fontSize: 12,
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -382,19 +376,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildServerInput(AuthState state, bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildServerInput(BuildContext context, AuthState state, bool isDark) {
+    final labelColor = context.textSecondary;
     final inputBgColor = isDark
         ? AppColors.surfaceDark
         : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -473,19 +461,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildUsernameInput(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildUsernameInput(BuildContext context, bool isDark) {
+    final labelColor = context.textSecondary;
     final inputBgColor = isDark
         ? AppColors.surfaceDark
         : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     final isEmail = _usernameController.text.contains('@');
 
@@ -535,19 +517,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildPasswordInput(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildPasswordInput(BuildContext context, bool isDark) {
+    final labelColor = context.textSecondary;
     final inputBgColor = isDark
         ? AppColors.surfaceDark
         : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -673,11 +649,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildOrDivider() {
-    final isDark = context.isDarkMode;
-    final dividerColor = isDark ? AppColors.dividerDark : AppColors.divider;
-    final textColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final dividerColor = context.dividerColor;
+    final textColor = context.textSecondary;
 
     return Row(
       children: [

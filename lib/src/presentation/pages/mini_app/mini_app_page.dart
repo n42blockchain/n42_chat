@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/mini_app_bridge_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/di/injection.dart';
@@ -247,13 +248,12 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -282,16 +282,14 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   Text(
                     widget.app.developer ?? 'N42',
                     style: TextStyle(
                       fontSize: 11,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],
@@ -317,13 +315,13 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
               )
             : null,
       ),
-      body: _buildBody(l10n, isDark),
+      body: _buildBody(l10n),
     );
   }
 
-  Widget _buildBody(S? l10n, bool isDark) {
+  Widget _buildBody(S? l10n) {
     if (_errorMessage != null) {
-      return _buildError(l10n, isDark);
+      return _buildError(l10n);
     }
 
     final controller = _webController;
@@ -339,7 +337,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildError(S? l10n, bool isDark) {
+  Widget _buildError(S? l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -349,7 +347,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
             Icon(
               Icons.cloud_off_outlined,
               size: 64,
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
+              color: context.dividerColor,
             ),
             const SizedBox(height: 16),
             Text(
@@ -357,7 +355,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -366,9 +364,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 24),
