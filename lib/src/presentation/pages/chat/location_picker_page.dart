@@ -210,7 +210,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude,
         longitude: position.longitude,
         icon: Icons.location_on,
-        iconColor: Colors.red,
+        iconColor: AppColors.error,
       ),
       NearbyPlace(
         name: l10n?.chatNearbyPlace(1) ?? 'Nearby Place 1',
@@ -218,7 +218,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude + 0.001,
         longitude: position.longitude + 0.001,
         icon: Icons.place,
-        iconColor: Colors.orange,
+        iconColor: AppColors.warning,
       ),
       NearbyPlace(
         name: l10n?.chatNearbyPlace(2) ?? 'Nearby Place 2',
@@ -226,7 +226,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude - 0.001,
         longitude: position.longitude + 0.002,
         icon: Icons.place,
-        iconColor: Colors.orange,
+        iconColor: AppColors.warning,
       ),
       NearbyPlace(
         name: l10n?.chatNearbyPlace(3) ?? 'Nearby Place 3',
@@ -234,7 +234,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude + 0.002,
         longitude: position.longitude - 0.002,
         icon: Icons.place,
-        iconColor: Colors.orange,
+        iconColor: AppColors.warning,
       ),
     ];
   }
@@ -296,7 +296,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
               style: TextStyle(
                 color: _currentPosition != null
                     ? AppColors.primary
-                    : Colors.grey,
+                    : context.textTertiary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -320,15 +320,15 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_off,
                         size: 64,
-                        color: Colors.grey,
+                        color: context.textTertiary,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         _errorMessage!,
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(color: context.textTertiary),
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
@@ -369,7 +369,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               padding: EdgeInsets.only(bottom: 20),
                               child: Icon(
                                 Icons.location_on,
-                                color: Colors.red,
+                                color: AppColors.error,
                                 size: 40,
                               ),
                             ),

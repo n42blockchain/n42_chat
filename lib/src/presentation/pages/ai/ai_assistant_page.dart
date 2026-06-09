@@ -228,7 +228,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.1),
+                  color: AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -237,7 +237,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, height: 1.4, color: Colors.orange),
+                  style: const TextStyle(fontSize: 13, height: 1.4, color: AppColors.warning),
                 ),
               ),
             ],
@@ -531,7 +531,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: AppColors.error,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(Icons.stop, color: Colors.white, size: 18),
@@ -603,7 +603,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             },
             child: Text(
               l10n?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],

@@ -169,7 +169,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
   Widget _buildSearchBar(bool isDark) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Container(
         height: 36,
@@ -184,23 +184,19 @@ class _ContactListPageState extends State<ContactListPage> {
           style: TextStyle(
             fontSize: 15,
             height: 1.3,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: S.of(context)?.commonSearch ?? 'Search',
             hintStyle: TextStyle(
               fontSize: 15,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
             prefixIcon: Icon(
               AppIcons.search,
               size: 20,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -261,9 +257,7 @@ class _ContactListPageState extends State<ContactListPage> {
                             padding: const EdgeInsets.only(left: 72),
                             child: Divider(
                               height: 1,
-                              color: isDark
-                                  ? AppColors.dividerDark
-                                  : AppColors.divider,
+                              color: context.dividerColor,
                             ),
                           ),
                       ],
@@ -367,7 +361,7 @@ class _ContactListPageState extends State<ContactListPage> {
   }
 
   Widget _buildFunctionEntries(ContactState state, bool isDark) {
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final surfaceColor = context.surfaceColor;
 
     return Container(
       color: surfaceColor,
@@ -472,10 +466,8 @@ class _ContactListPageState extends State<ContactListPage> {
     int badgeCount = 0,
     VoidCallback? onTap,
   }) {
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final textColor = context.textPrimary;
+    final bgColor = context.surfaceColor;
 
     return Material(
       color: bgColor,
@@ -519,9 +511,7 @@ class _ContactListPageState extends State<ContactListPage> {
                 ),
               Icon(
                 AppIcons.chevron,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
                 size: 20,
               ),
             ],
@@ -536,7 +526,7 @@ class _ContactListPageState extends State<ContactListPage> {
       padding: const EdgeInsets.only(left: 72),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }
@@ -544,7 +534,7 @@ class _ContactListPageState extends State<ContactListPage> {
   Widget _buildLetterHeader(String letter, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      color: isDark ? AppColors.backgroundDark : AppColors.background,
+      color: context.pageBackground,
       child: Text(
         letter,
         maxLines: 1,
@@ -553,7 +543,7 @@ class _ContactListPageState extends State<ContactListPage> {
           fontSize: 14,
           height: 1.3,
           fontWeight: FontWeight.w500,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -562,7 +552,7 @@ class _ContactListPageState extends State<ContactListPage> {
   Widget _buildSectionHeader(String title, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: isDark ? AppColors.backgroundDark : AppColors.background,
+      color: context.pageBackground,
       child: Text(
         title,
         maxLines: 1,
@@ -570,7 +560,7 @@ class _ContactListPageState extends State<ContactListPage> {
         style: TextStyle(
           fontSize: 13,
           height: 1.3,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -587,7 +577,7 @@ class _ContactListPageState extends State<ContactListPage> {
         style: TextStyle(
           fontSize: 14,
           height: 1.3,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -1552,7 +1542,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
         style: TextStyle(
           fontWeight: FontWeight.w500,
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Text(
@@ -1562,7 +1552,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
         style: TextStyle(
           fontSize: 13,
           height: 1.3,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
       trailing: Row(
@@ -1585,9 +1575,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
             onPressed: () => _rejectRequest(request),
             style: TextButton.styleFrom(
               backgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
-              foregroundColor: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimary,
+              foregroundColor: context.textPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
@@ -1608,7 +1596,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
           S.of(context)?.contactAcceptedFriendRequest(request.userName) ??
               'Accepted ${request.userName}\'s friend request',
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
       ),
     );
   }
@@ -1758,9 +1746,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           Icon(
             Icons.group_outlined,
             size: 64,
-            color: isDark
-                ? AppColors.textTertiaryDark
-                : AppColors.textTertiary,
+            color: context.textTertiary,
           ),
           const SizedBox(height: 16),
           Text(
@@ -1770,9 +1756,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             style: TextStyle(
               fontSize: 16,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 24),
@@ -1826,7 +1810,7 @@ class _GroupListPageState extends State<_GroupListPage> {
   Widget _buildSectionHeader(String title, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: isDark ? AppColors.backgroundDark : AppColors.background,
+      color: context.pageBackground,
       child: Text(
         title,
         maxLines: 1,
@@ -1835,7 +1819,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           fontSize: 13,
           height: 1.3,
           fontWeight: FontWeight.w500,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -1843,7 +1827,7 @@ class _GroupListPageState extends State<_GroupListPage> {
 
   Widget _buildGroupTile(GroupEntity group, bool isDark) {
     return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListTile(
         leading: N42Avatar(
           imageUrl: group.avatarUrl,
@@ -1858,7 +1842,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             fontSize: 16,
             height: 1.3,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -1869,18 +1853,14 @@ class _GroupListPageState extends State<_GroupListPage> {
           style: TextStyle(
             fontSize: 13,
             height: 1.3,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         trailing: group.isEncrypted
             ? Icon(
                 Icons.lock,
                 size: 16,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               )
             : null,
         onTap: () => _navigateToChat(group.roomId),
@@ -1891,7 +1871,7 @@ class _GroupListPageState extends State<_GroupListPage> {
 
   Widget _buildInviteTile(GroupEntity group, bool isDark) {
     return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListTile(
         leading: N42Avatar(
           imageUrl: group.avatarUrl,
@@ -1906,7 +1886,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             fontSize: 16,
             height: 1.3,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -1954,10 +1934,10 @@ class _GroupListPageState extends State<_GroupListPage> {
             ),
             if (group.isOwner)
               ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
+                leading: const Icon(Icons.delete_outline, color: AppColors.error),
                 title: Text(
                   S.of(context)?.commonDissolveGroup ?? 'Dissolve Group',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: AppColors.error),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -1966,10 +1946,10 @@ class _GroupListPageState extends State<_GroupListPage> {
               )
             else
               ListTile(
-                leading: const Icon(Icons.exit_to_app, color: Colors.red),
+                leading: const Icon(Icons.exit_to_app, color: AppColors.error),
                 title: Text(
                   S.of(context)?.commonLeaveGroup ?? 'Leave Group',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: AppColors.error),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -2002,7 +1982,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             },
             child: Text(
               S.of(context)?.commonLeave ?? 'Leave',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -2030,7 +2010,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             },
             child: Text(
               S.of(context)?.commonDissolve ?? 'Dissolve',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -2104,7 +2084,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
       decoration: BoxDecoration(
-        color: widget.isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Column(
@@ -2131,9 +2111,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                       fontSize: 17,
                       height: 1.3,
                       fontWeight: FontWeight.w600,
-                      color: widget.isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                 ),
@@ -2141,9 +2119,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                   icon: Icon(
                     AppIcons.close,
                     size: 22,
-                    color: widget.isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                   tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.pop(context),
@@ -2186,9 +2162,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                       S.of(context)?.contactNoContactsFound ??
                           'No contacts found',
                       style: TextStyle(
-                        color: widget.isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                   )
@@ -2205,9 +2179,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                         title: Text(
                           contact.effectiveDisplayName,
                           style: TextStyle(
-                            color: widget.isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                         subtitle: Text(

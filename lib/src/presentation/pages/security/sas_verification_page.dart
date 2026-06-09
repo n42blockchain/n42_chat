@@ -252,7 +252,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.securityVerifyDevice ?? 'Verify Device',
         showBackButton: true,
@@ -299,7 +299,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           style: TextStyle(
             fontSize: 16,
             height: 1.4,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -310,9 +310,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           style: TextStyle(
             fontSize: 14,
             height: 1.3,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         const SizedBox(height: 32),
@@ -340,7 +338,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             fontSize: 20,
             height: 1.3,
             fontWeight: FontWeight.w700,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -353,9 +351,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           style: TextStyle(
             fontSize: 14,
             height: 1.4,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         const SizedBox(height: 32),
@@ -397,7 +393,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
               child: ElevatedButton(
                 onPressed: _onConfirm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -424,7 +420,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.success),
         ),
         const SizedBox(height: 24),
         Text(
@@ -436,7 +432,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           style: TextStyle(
             fontSize: 16,
             height: 1.4,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
       ],
@@ -451,10 +447,10 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: Colors.green.withValues(alpha: 0.1),
+            color: AppColors.success.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.verified, color: Colors.green, size: 48),
+          child: const Icon(Icons.verified, color: AppColors.success, size: 48),
         ),
         const SizedBox(height: 24),
         Text(
@@ -466,7 +462,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             fontSize: 20,
             height: 1.3,
             fontWeight: FontWeight.w700,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -479,16 +475,14 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           style: TextStyle(
             fontSize: 14,
             height: 1.4,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         const SizedBox(height: 32),
         ElevatedButton(
           onPressed: () => Navigator.pop(context, true),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 14),
             shape: RoundedRectangleBorder(
@@ -527,7 +521,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             fontSize: 20,
             height: 1.3,
             fontWeight: FontWeight.w700,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -542,9 +536,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),

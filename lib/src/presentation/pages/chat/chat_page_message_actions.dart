@@ -100,7 +100,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                   'Forward failed: $e',
             ),
             duration: const Duration(seconds: 2),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -449,7 +449,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
               S.of(context)?.chatMessageForwarded ?? 'Message forwarded',
             ),
             duration: const Duration(seconds: 1),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
       }
@@ -762,7 +762,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(message),
           duration: const Duration(seconds: 2),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -827,7 +827,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                 '已撤回 ${myMessages.length} 条消息',
           ),
           duration: const Duration(seconds: 2),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -858,7 +858,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
             S.of(context)?.chatRedPacketTransferCannotForward ??
                 'Red envelopes, transfers and payment requests cannot be forwarded',
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;
@@ -909,7 +909,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(resultMsg),
           duration: const Duration(seconds: 2),
-          backgroundColor: failCount == 0 ? Colors.green : Colors.orange,
+          backgroundColor: failCount == 0 ? AppColors.success : AppColors.warning,
         ),
       );
     }

@@ -65,7 +65,7 @@ class SettingsPage extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.commonSettings ?? 'Settings',
         showBackButton: true,
@@ -88,7 +88,6 @@ class SettingsPage extends StatelessWidget {
                     S.of(context)?.settingsNotificationSettings ??
                     'Notifications',
                 onTap: onNotification,
-                isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.shield_moon_outlined,
@@ -97,7 +96,6 @@ class SettingsPage extends StatelessWidget {
                 subtitle:
                     'E2EE, disappearing messages, screenshot protection, and proxies',
                 onTap: () => _navigateToPrivacySecurity(context),
-                isDark: isDark,
               ),
             ],
           ),
@@ -112,35 +110,30 @@ class SettingsPage extends StatelessWidget {
                 iconColor: Colors.purple,
                 title: S.of(context)?.settingsAppearance ?? 'Appearance',
                 onTap: onAppearance,
-                isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.chat_outlined,
                 iconColor: Colors.green,
                 title: S.of(context)?.commonChat ?? 'Chat',
                 onTap: onChat,
-                isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.flash_on_outlined,
                 iconColor: Colors.orange,
                 title: S.of(context)?.settingsQuickReply ?? 'Quick Reply',
                 onTap: () => _navigateToQuickReplies(context),
-                isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.language_outlined,
                 iconColor: Colors.blue,
                 title: S.of(context)?.settingsLanguage ?? 'Language',
                 onTap: onLanguage,
-                isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.translate,
                 iconColor: Colors.teal,
                 title: S.of(context)?.settingsTranslation ?? 'Translation',
                 onTap: () => _navigateToTranslation(context),
-                isDark: isDark,
               ),
             ],
           ),
@@ -161,7 +154,6 @@ class SettingsPage extends StatelessWidget {
                     ),
                   );
                 },
-                isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.download,
@@ -174,7 +166,6 @@ class SettingsPage extends StatelessWidget {
                     ),
                   );
                 },
-                isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.backup,
@@ -187,7 +178,6 @@ class SettingsPage extends StatelessWidget {
                     ),
                   );
                 },
-                isDark: isDark,
               ),
             ],
           ),
@@ -204,7 +194,6 @@ class SettingsPage extends StatelessWidget {
                 subtitle:
                     'Accounts, devices, usernames, notifications, and bridges',
                 onTap: () => _navigateToSystemAccounts(context),
-                isDark: isDark,
               ),
             ],
           ),
@@ -232,7 +221,6 @@ class SettingsPage extends StatelessWidget {
                   onTap: onBiometricToggle != null
                       ? () => onBiometricToggle!(!isBiometricEnabled)
                       : null,
-                  isDark: isDark,
                 ),
               _SettingsItem(
                 icon: Icons.lock_outline,
@@ -240,14 +228,12 @@ class SettingsPage extends StatelessWidget {
                 title:
                     S.of(context)?.settingsChangePassword ?? 'Change Password',
                 onTap: onChangePassword,
-                isDark: isDark,
               ),
               _SettingsItem(
                 icon: Icons.email_outlined,
                 iconColor: Colors.cyan,
                 title: S.of(context)?.commonChangeEmail ?? 'Change Email',
                 onTap: onChangeEmail,
-                isDark: isDark,
               ),
             ],
           ),
@@ -262,7 +248,6 @@ class SettingsPage extends StatelessWidget {
                 iconColor: Colors.orange,
                 title: S.of(context)?.settingsAbout ?? 'About',
                 onTap: onAbout,
-                isDark: isDark,
               ),
             ],
           ),
@@ -286,14 +271,12 @@ class SettingsPage extends StatelessWidget {
   }
 
   Widget _buildProfileCard(BuildContext context, bool isDark) {
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final secondaryColor = context.textSecondary;
 
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
@@ -335,9 +318,7 @@ class SettingsPage extends StatelessWidget {
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               height: 1.3,
-                              color: isDark
-                                  ? AppColors.textPrimaryDark
-                                  : AppColors.textPrimary,
+                              color: context.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -399,9 +380,7 @@ class SettingsPage extends StatelessWidget {
                 ),
                 Icon(
                   AppIcons.chevron,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ],
             ),
@@ -502,10 +481,8 @@ class _SettingsGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         children: List.generate(children.length * 2 - 1, (index) {
           if (index.isOdd) {
@@ -513,7 +490,7 @@ class _SettingsGroup extends StatelessWidget {
               padding: const EdgeInsets.only(left: 56),
               child: Divider(
                 height: 1,
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                color: context.dividerColor,
               ),
             );
           }
@@ -532,7 +509,6 @@ class _SettingsItem extends StatelessWidget {
   final String? subtitle;
   final Widget? trailing;
   final VoidCallback? onTap;
-  final bool isDark;
 
   const _SettingsItem({
     required this.icon,
@@ -541,7 +517,6 @@ class _SettingsItem extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.onTap,
-    required this.isDark,
   });
 
   @override
@@ -575,7 +550,7 @@ class _SettingsItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         height: 1.3,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                     if (subtitle != null)
@@ -586,9 +561,7 @@ class _SettingsItem extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           height: 1.3,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                   ],
@@ -597,9 +570,7 @@ class _SettingsItem extends StatelessWidget {
               trailing ??
                   Icon(
                     AppIcons.chevron,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
             ],
           ),

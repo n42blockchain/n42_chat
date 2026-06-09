@@ -93,7 +93,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
           Icon(
             result.passed ? Icons.check_circle : Icons.cancel,
             size: 80,
-            color: result.passed ? Colors.green : Colors.red,
+            color: result.passed ? AppColors.success : AppColors.error,
           ),
           const SizedBox(height: 16),
           Text(
@@ -103,7 +103,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: result.passed ? Colors.green : Colors.red,
+              color: result.passed ? AppColors.success : AppColors.error,
             ),
           ),
           const SizedBox(height: 8),
@@ -115,7 +115,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ),
@@ -156,7 +156,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          const Icon(Icons.error_outline, size: 64, color: AppColors.error),
           const SizedBox(height: 16),
           Text(message, textAlign: TextAlign.center),
           const SizedBox(height: 24),
@@ -201,7 +201,7 @@ class _RuleResultCard extends StatelessWidget {
       child: ListTile(
         leading: Icon(
           ruleResult.passed ? Icons.check_circle : Icons.cancel,
-          color: ruleResult.passed ? Colors.green : Colors.red,
+          color: ruleResult.passed ? AppColors.success : AppColors.error,
         ),
         title: Text(
           rule.symbol ?? _getTokenStandardLabel(rule.tokenStandard),
@@ -216,13 +216,13 @@ class _RuleResultCard extends StatelessWidget {
             Text(
               '${s?.tokenGateYourBalance ?? 'Your balance'}: ${ruleResult.actualBalance}',
               style: TextStyle(
-                color: ruleResult.passed ? Colors.green : Colors.red,
+                color: ruleResult.passed ? AppColors.success : AppColors.error,
               ),
             ),
             if (ruleResult.errorMessage != null)
               Text(
                 ruleResult.errorMessage!,
-                style: const TextStyle(color: Colors.red, fontSize: 12),
+                style: const TextStyle(color: AppColors.error, fontSize: 12),
               ),
           ],
         ),

@@ -1725,7 +1725,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             },
             child: Text(
               S.of(context)?.chatClearAction ?? 'Clear',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -1923,14 +1923,14 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.orange.withValues(alpha: 0.2),
+                                  color: AppColors.warning.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   S.of(context)?.commonGroupOwner ?? 'Owner',
                                   style: const TextStyle(
                                     fontSize: 10,
-                                    color: Colors.orange,
+                                    color: AppColors.warning,
                                   ),
                                 ),
                               ),
@@ -1942,14 +1942,14 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.withValues(alpha: 0.2),
+                                  color: AppColors.info.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   S.of(context)?.commonGroupAdmin ?? 'Admin',
                                   style: const TextStyle(
                                     fontSize: 10,
-                                    color: Colors.blue,
+                                    color: AppColors.info,
                                   ),
                                 ),
                               ),
