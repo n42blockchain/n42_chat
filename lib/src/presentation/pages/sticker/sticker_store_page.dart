@@ -88,7 +88,7 @@ class _StickerStorePageState extends State<StickerStorePage>
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+            child: const Text('Remove', style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -353,9 +353,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                           style: TextStyle(
                             fontSize: 12,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                     ],

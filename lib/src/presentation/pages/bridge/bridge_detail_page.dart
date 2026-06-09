@@ -96,7 +96,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Disconnect'),
           ),
         ],
@@ -206,7 +206,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
   Widget _buildHeader(bool isDark) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
@@ -232,7 +232,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               fontSize: 20,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -244,7 +244,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ),
         ],
@@ -253,8 +253,8 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildStatusSection(bool isDark) {
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final bgColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     return Container(
       color: bgColor,
@@ -270,7 +270,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               fontSize: 13,
               height: 1.3,
               fontWeight: FontWeight.w500,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
               letterSpacing: 0.5,
             ),
           ),
@@ -304,7 +304,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
                           style: TextStyle(
                             fontSize: 14,
                             height: 1.3,
-                            color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                            color: context.textTertiary,
                           ),
                         ),
                       ),
@@ -328,16 +328,16 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
         icon = Icons.check_circle;
       case BridgeConnectionStatus.connecting:
       case BridgeConnectionStatus.reconnecting:
-        color = Colors.orange;
+        color = AppColors.warning;
         icon = Icons.sync;
       case BridgeConnectionStatus.error:
-        color = Colors.red;
+        color = AppColors.error;
         icon = Icons.error;
       case BridgeConnectionStatus.disconnected:
-        color = Colors.grey;
+        color = AppColors.textTertiary;
         icon = Icons.remove_circle_outline;
       case BridgeConnectionStatus.notAvailable:
-        color = Colors.grey.shade400;
+        color = AppColors.textTertiary;
         icon = Icons.block;
     }
 
@@ -362,7 +362,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildActionsSection(bool isDark) {
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final bgColor = context.surfaceColor;
 
     return Container(
       color: bgColor,
@@ -390,7 +390,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             _buildActionTile(
               icon: Icons.logout,
               title: 'Disconnect',
-              color: Colors.red,
+              color: AppColors.error,
               onTap: _isActionInProgress ? null : _handleLogout,
             ),
           ],
@@ -403,7 +403,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             _buildActionTile(
               icon: Icons.refresh,
               title: 'Retry Connection',
-              color: Colors.orange,
+              color: AppColors.warning,
               onTap: _isActionInProgress ? null : _handleLogin,
             ),
         ],
@@ -443,7 +443,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildResponseSection(bool isDark) {
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final bgColor = context.surfaceColor;
 
     return Container(
       color: bgColor,
@@ -459,7 +459,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               fontSize: 13,
               height: 1.3,
               fontWeight: FontWeight.w500,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
               letterSpacing: 0.5,
             ),
           ),
@@ -468,7 +468,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             _lastResponse!,
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
               fontFamily: 'monospace',
             ),
           ),
@@ -478,7 +478,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildQRSection(bool isDark) {
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final bgColor = context.surfaceColor;
 
     return Container(
       color: bgColor,
@@ -493,7 +493,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               fontSize: 16,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -505,7 +505,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ),
           const SizedBox(height: 16),
@@ -516,13 +516,13 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: AppColors.divider),
             ),
             child: const Center(
               child: Text(
                 'QR Code\n(from bridge bot)',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: AppColors.textTertiary),
               ),
             ),
           ),
@@ -532,8 +532,8 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   }
 
   Widget _buildInfoSection(bool isDark) {
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final bgColor = context.surfaceColor;
+    final textColor = context.textTertiary;
 
     return Container(
       color: bgColor,

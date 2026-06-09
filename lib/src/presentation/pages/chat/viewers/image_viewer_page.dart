@@ -12,6 +12,7 @@ import 'package:saver_gallery/saver_gallery.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../../core/utils/debug_log.dart';
@@ -64,7 +65,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                 content: Text(
                   S.of(context)?.commonSavedToGallery ?? 'Saved to gallery',
                 ),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
               ),
             );
           } else {
@@ -73,7 +74,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                 content: Text(
                   S.of(context)?.commonFailedToSave ?? 'Failed to save',
                 ),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -88,7 +89,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                         ?.chatDownloadFailed(response.statusCode.toString()) ??
                     'Download failed: ${response.statusCode}',
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -101,7 +102,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
             content: Text(
               S.of(context)?.chatErrorWithMessage(e.toString()) ?? 'Error: $e',
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -146,7 +147,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
               S.of(context)?.commonShareFailed(e.toString()) ??
                   'Share failed: $e',
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -251,7 +252,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                 errorWidget: (context, url, error) => Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error, color: Colors.red, size: 48),
+                    const Icon(Icons.error, color: AppColors.error, size: 48),
                     const SizedBox(height: 16),
                     Text(
                       S.of(context)?.chatFailedToLoadImage ??

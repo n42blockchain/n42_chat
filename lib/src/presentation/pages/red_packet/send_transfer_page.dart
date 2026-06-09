@@ -133,14 +133,12 @@ class _SendTransferPageState extends State<SendTransferPage> {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5);
     final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final textColor = context.textPrimary;
     final secondaryTextColor = isDark
         ? AppColors.textSecondaryDark
         : Colors.grey;
     final chipBgColor = isDark ? Colors.white10 : Colors.grey[100];
-    final dividerColor = isDark ? AppColors.dividerDark : AppColors.divider;
+    final dividerColor = context.dividerColor;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -367,9 +365,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
   void _showTokenPicker() {
     final isDark = context.isDarkMode;
     final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final textColor = context.textPrimary;
 
     showModalBottomSheet<void>(
       context: context,

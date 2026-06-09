@@ -262,7 +262,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         color: isSelected
             ? (isDark
                   ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.blue.withValues(alpha: 0.1))
+                  : AppColors.info.withValues(alpha: 0.1))
             : Colors.transparent,
         child: Row(
           children: [
@@ -275,22 +275,16 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isRedacted
-                      ? (isDark
-                          ? AppColors.dividerDark
-                          : AppColors.divider)
+                      ? context.dividerColor
                       : (isSelected ? AppColors.primary : Colors.transparent),
                   border: Border.all(
                     // redacted 用 textTertiary（淡，禁用语义）；可选中状态用 textSecondary
                     // 保证未选中圆圈在白底上仍清晰可见。
                     color: isRedacted
-                        ? (isDark
-                            ? AppColors.textTertiaryDark
-                            : AppColors.textTertiary)
+                        ? context.textTertiary
                         : (isSelected
                               ? AppColors.primary
-                              : (isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary)),
+                              : context.textSecondary),
                     width: 2,
                   ),
                 ),
@@ -298,9 +292,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     ? Icon(
                         Icons.block,
                         size: 14,
-                        color: isDark
-                            ? Colors.grey.shade500
-                            : Colors.grey.shade500,
+                        color: context.textTertiary,
                       )
                     : (isSelected
                           ? const Icon(
@@ -385,14 +377,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         final msg = state.currentPinnedMessage;
         if (msg == null) return const SizedBox.shrink();
 
-        final isDark = context.isDarkMode;
-        final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-        final textColor = isDark
-            ? AppColors.textPrimaryDark
-            : AppColors.textPrimary;
-        final secondaryTextColor = isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondary;
+        final bgColor = context.surfaceColor;
+        final textColor = context.textPrimary;
+        final secondaryTextColor = context.textSecondary;
 
         return GestureDetector(
           onTap: () => _scrollToMessage(msg.id),
@@ -402,7 +389,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
               color: bgColor,
               border: Border(
                 bottom: BorderSide(
-                  color: isDark ? AppColors.dividerDark : AppColors.divider,
+                  color: context.dividerColor,
                   width: 0.5,
                 ),
               ),
@@ -514,7 +501,6 @@ extension _ChatPageMessageListMethods on _ChatPageState {
   Widget _buildReplyPreview() {
     // 预先从父级 context 获取本地化，避免 BlocBuilder 内部 context 语言不正确
     final l10n = S.of(context);
-    final isDark = context.isDarkMode;
 
     return BlocBuilder<ChatBloc, ChatState>(
       buildWhen: (prev, curr) => prev.replyTarget != curr.replyTarget,
@@ -530,10 +516,10 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             border: Border(
               top: BorderSide(
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                color: context.dividerColor,
                 width: 0.5,
               ),
             ),
@@ -590,7 +576,6 @@ extension _ChatPageMessageListMethods on _ChatPageState {
 
   Widget _buildEditPreview() {
     final l10n = S.of(context);
-    final isDark = context.isDarkMode;
 
     return BlocBuilder<ChatBloc, ChatState>(
       buildWhen: (prev, curr) => prev.editingMessage != curr.editingMessage,
@@ -602,10 +587,10 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             border: Border(
               top: BorderSide(
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                color: context.dividerColor,
                 width: 0.5,
               ),
             ),
@@ -616,7 +601,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 width: 3,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.orange,
+                  color: AppColors.warning,
                   borderRadius: BorderRadius.circular(1.5),
                 ),
               ),
@@ -629,7 +614,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                       l10n?.commonEdit ?? 'Edit',
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.orange,
+                        color: AppColors.warning,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -663,7 +648,6 @@ extension _ChatPageMessageListMethods on _ChatPageState {
 
   /// 构建多选模式底部工具栏
   Widget _buildMultiSelectBottomBar() {
-    final isDark = context.isDarkMode;
     final hasSelection = _selectedMessageIds.isNotEmpty;
 
     // 是否有可撤回的消息（自己发的、未被撤回的）
@@ -685,7 +669,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         bottom: MediaQuery.of(context).padding.bottom + 12,
       ),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -735,12 +719,11 @@ extension _ChatPageMessageListMethods on _ChatPageState {
     VoidCallback? onTap,
     bool isDestructive = false,
   }) {
-    final isDark = context.isDarkMode;
     final color = !enabled
-        ? (isDark ? AppColors.textTertiaryDark : AppColors.textTertiary)
+        ? context.textTertiary
         : isDestructive
         ? AppColors.error
-        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+        : context.textPrimary;
 
     return GestureDetector(
       onTap: onTap,

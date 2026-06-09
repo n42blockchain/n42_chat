@@ -37,14 +37,14 @@ class _GroupListPageState extends State<GroupListPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.commonGroupChat ?? 'Group Chat',
         actions: [
           IconButton(
             icon: Icon(
               Icons.add,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
             onPressed: () => _navigateToCreateGroup(),
           ),
@@ -142,13 +142,13 @@ class _GroupListPageState extends State<GroupListPage> {
   Widget _buildSectionHeader(String title, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: isDark ? AppColors.backgroundDark : AppColors.background,
+      color: context.pageBackground,
       child: Text(
         title,
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -156,7 +156,7 @@ class _GroupListPageState extends State<GroupListPage> {
 
   Widget _buildGroupTile(GroupEntity group, bool isDark) {
     return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListTile(
         leading: N42Avatar(
           imageUrl: group.avatarUrl,
@@ -168,7 +168,7 @@ class _GroupListPageState extends State<GroupListPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -176,18 +176,14 @@ class _GroupListPageState extends State<GroupListPage> {
               '${group.memberCount} members',
           style: TextStyle(
             fontSize: 13,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         trailing: group.isEncrypted
             ? Icon(
                 Icons.lock,
                 size: 16,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               )
             : null,
         onTap: () => _navigateToChat(group.roomId),
@@ -198,7 +194,7 @@ class _GroupListPageState extends State<GroupListPage> {
 
   Widget _buildInviteTile(GroupEntity group, bool isDark) {
     return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListTile(
         leading: N42Avatar(
           imageUrl: group.avatarUrl,
@@ -210,7 +206,7 @@ class _GroupListPageState extends State<GroupListPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -287,10 +283,10 @@ class _GroupListPageState extends State<GroupListPage> {
             ),
             if (group.isOwner)
               ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
+                leading: const Icon(Icons.delete_outline, color: AppColors.error),
                 title: Text(
                   S.of(context)?.commonDissolveGroup ?? 'Dissolve Group',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: AppColors.error),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -299,10 +295,10 @@ class _GroupListPageState extends State<GroupListPage> {
               )
             else
               ListTile(
-                leading: const Icon(Icons.exit_to_app, color: Colors.red),
+                leading: const Icon(Icons.exit_to_app, color: AppColors.error),
                 title: Text(
                   S.of(context)?.commonLeaveGroup ?? 'Leave Group',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: AppColors.error),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -336,7 +332,7 @@ class _GroupListPageState extends State<GroupListPage> {
             },
             child: Text(
               S.of(context)?.commonLeave ?? 'Leave',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -365,7 +361,7 @@ class _GroupListPageState extends State<GroupListPage> {
             },
             child: Text(
               S.of(context)?.commonDissolve ?? 'Dissolve',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
