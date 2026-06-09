@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/nft_metadata_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
@@ -162,16 +163,16 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: Icon(
             AppIcons.back,
             size: 20,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
@@ -184,16 +185,14 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             fontSize: 17,
             height: 1.3,
             fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
-          unselectedLabelColor: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondary,
+          unselectedLabelColor: context.textSecondary,
           tabs: [
             Tab(text: l10n?.nftPickerTabPopular ?? 'Popular'),
             Tab(text: l10n?.nftPickerTabCustom ?? 'Custom'),
@@ -226,7 +225,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             fontSize: 15,
             height: 1.3,
             fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -259,10 +258,8 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
 
   Widget _buildCustomTab(bool isDark, S? l10n) {
     final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -483,9 +480,7 @@ class _NftPreview extends StatelessWidget {
             fontSize: 14,
             height: 1.3,
             fontWeight: FontWeight.w500,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         const SizedBox(height: 12),
@@ -754,7 +749,7 @@ class _CollectionCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
               maxLines: 2,
               textAlign: TextAlign.center,
@@ -768,9 +763,7 @@ class _CollectionCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -801,9 +794,7 @@ class _WalletConnectHint extends StatelessWidget {
           Icon(
             Icons.info_outline,
             size: 16,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -812,9 +803,7 @@ class _WalletConnectHint extends StatelessWidget {
                   'Connect your N42 wallet to automatically discover your NFTs across 236+ chains.',
               style: TextStyle(
                 fontSize: 12,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
                 height: 1.4,
               ),
             ),

@@ -205,7 +205,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -218,7 +218,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.contactTags ?? 'Tags',
         actions: [
@@ -254,7 +254,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                         S.of(context)?.contactNoTags ?? 'No tags yet',
                         style: TextStyle(
                           fontSize: 16,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -275,12 +275,12 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                   separatorBuilder: (_, _) => Divider(
                     height: 1,
                     indent: 16,
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                   ),
                   itemBuilder: (context, index) {
                     final tag = _tags[index];
                     return Material(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                      color: context.surfaceColor,
                       child: ListTile(
                         leading: widget.selectMode
                             ? Checkbox(
@@ -300,16 +300,14 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                         title: Text(
                           tag.name,
                           style: TextStyle(
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                         subtitle: Text(
                           '${tag.contactIds.length} ${S.of(context)?.commonContacts ?? "contacts"}',
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                         trailing: widget.selectMode
@@ -352,9 +350,9 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
+              leading: const Icon(Icons.delete, color: AppColors.error),
               title: Text(S.of(context)?.commonDelete ?? 'Delete',
-                  style: const TextStyle(color: Colors.red)),
+                  style: const TextStyle(color: AppColors.error)),
               onTap: () {
                 Navigator.pop(ctx);
                 _deleteTag(index);

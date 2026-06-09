@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
+
 /// 滑动删除组件
 class SlideToDeleteWidget extends StatefulWidget {
   /// 子组件
@@ -23,7 +25,7 @@ class SlideToDeleteWidget extends StatefulWidget {
     this.onDelete,
     this.deleteLabel = 'Delete',
     this.actions,
-    this.backgroundColor = Colors.red,
+    this.backgroundColor = AppColors.error,
   });
 
   @override
@@ -102,7 +104,7 @@ class _SlideToDeleteWidgetState extends State<SlideToDeleteWidget>
                   _buildAction(SlideAction(
                     icon: Icons.delete,
                     label: widget.deleteLabel,
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppColors.error,
                     onTap: () {
                       _close();
                       widget.onDelete?.call();
@@ -233,7 +235,7 @@ class PullToRefreshIndicator extends StatelessWidget {
         return const Icon(
           Icons.check,
           size: 24,
-          color: Colors.green,
+          color: AppColors.success,
         );
       case RefreshIndicatorState.idle:
         return const SizedBox.shrink();

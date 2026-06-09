@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/channel_entity.dart';
 import '../../blocs/group/group_bloc.dart';
@@ -31,7 +32,6 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = S.of(context);
 
     return BlocBuilder<GroupBloc, GroupState>(
@@ -40,9 +40,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
 
         return Scaffold(
           appBar: N42AppBar(title: l10n?.groupChannels ?? 'Topic Channels'),
-          backgroundColor: isDark
-              ? AppColors.backgroundDark
-              : AppColors.background,
+          backgroundColor: context.pageBackground,
           floatingActionButton: canManage
               ? FloatingActionButton(
                   onPressed: () => _showCreateChannelDialog(context),
@@ -60,7 +58,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
                   separatorBuilder: (_, _) => Divider(
                     height: 1,
                     indent: 16,
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                   ),
                   itemBuilder: (context, index) {
                     final channel = state.channels[index];
@@ -68,7 +66,6 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
                       context,
                       channel,
                       canManage,
-                      isDark,
                     );
                   },
                 ),
@@ -81,7 +78,6 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
     BuildContext context,
     ChannelEntity channel,
     bool canManage,
-    bool isDark,
   ) {
     return ListTile(
       leading: CircleAvatar(
@@ -92,7 +88,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
         channel.name,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: channel.topic != null || channel.category != null
@@ -104,9 +100,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             )
           : null,
@@ -167,10 +161,10 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              leading: const Icon(Icons.delete_outline, color: AppColors.error),
               title: Text(
                 l10n?.groupChannelDelete ?? 'Delete Channel',
-                style: const TextStyle(color: Colors.red),
+                style: const TextStyle(color: AppColors.error),
               ),
               onTap: () {
                 Navigator.pop(sheetCtx);
@@ -237,7 +231,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
             },
             child: Text(
               l10n?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],

@@ -83,11 +83,10 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
   }
 
   Widget _buildTabBar(BuildContext context) {
-    final isDark = context.isDarkMode;
     return TabBar(
       controller: _tabController,
       labelColor: AppColors.primary,
-      unselectedLabelColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+      unselectedLabelColor: context.textSecondary,
       indicatorColor: AppColors.primary,
       tabs: [
         Tab(text: S.of(context)?.commonAll ?? 'All'),
@@ -151,10 +150,9 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     // 嵌入模式：不显示 Scaffold+AppBar，仅返回 TabBar + body
     if (widget.embedded) {
@@ -197,8 +195,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
 
   Widget _buildStats(BuildContext context, GroupAlbumState state) {
     final stats = state.stats;
-    final isDark = context.isDarkMode;
-    final textColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = context.textSecondary;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -263,8 +260,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
   }
 
   Widget _buildDateGroup(BuildContext context, AlbumDateGroup group) {
-    final isDark = context.isDarkMode;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor = context.textPrimary;
 
     return SliverToBoxAdapter(
       child: Column(
@@ -327,7 +323,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
             ),
             errorWidget: (_, _, _) => Container(
               color: Colors.grey[300],
-              child: const Icon(Icons.broken_image, color: Colors.grey),
+              child: Icon(Icons.broken_image, color: context.textTertiary),
             ),
           ),
           // 视频标识

@@ -172,7 +172,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
         color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -253,13 +253,13 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       icon: Icons.request_quote_outlined,
                       label: S.of(context)?.transferReceive ?? 'Receive',
                       onTap: widget.onReceivePressed,
-                      iconColor: Colors.green,
+                      iconColor: AppColors.success,
                     ),
                     _MoreItem(
                       icon: Icons.storefront_outlined,
                       label: widget.shopLabel ?? 'Shop',
                       onTap: widget.onShopPressed,
-                      iconColor: Colors.amber,
+                      iconColor: AppColors.warning,
                     ),
                     _MoreItem(
                       icon: Icons.poll_outlined,
@@ -277,7 +277,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       icon: Icons.emoji_emotions_outlined,
                       label: S.of(context)?.profileStickers ?? 'Stickers',
                       onTap: widget.onStickerPressed,
-                      iconColor: Colors.orange,
+                      iconColor: AppColors.warning,
                     ),
                     _MoreItem(
                       icon: widget.isViewOnce
@@ -311,7 +311,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       label: S.of(context)?.chatSelfDestructTimer ?? 'Timer',
                       onTap: widget.onSelfDestructTimerPressed,
                       iconColor: widget.selfDestructAfter != null
-                          ? Colors.orange
+                          ? AppColors.warning
                           : null,
                     ),
                     _MoreItem(
@@ -405,10 +405,8 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
   }
 
   Widget _buildItem(BuildContext context, _MoreItem item, bool isDark) {
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final defaultIconColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final bgColor = context.surfaceColor;
+    final defaultIconColor = context.textSecondary;
 
     return GestureDetector(
       onTap: item.onTap,
@@ -436,9 +434,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
               item.label,
               style: TextStyle(
                 fontSize: 11,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

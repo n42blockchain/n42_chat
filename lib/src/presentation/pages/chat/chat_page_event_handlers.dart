@@ -226,7 +226,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Payment request is unavailable'),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;
@@ -243,7 +243,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.commonExpired ?? 'Expired'),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;
@@ -478,7 +478,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           content: Text(
             S.of(context)?.chatInvalidVideoUrl ?? 'Invalid video URL',
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;
@@ -603,7 +603,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                     content: Text(
                       '${S.of(context)?.downloadFailed ?? 'Download failed'}: $e',
                     ),
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppColors.error,
                   ),
                 );
               }
@@ -673,7 +673,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           content: Text(
             S.of(context)?.chatInvalidLocation ?? 'Invalid location',
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;

@@ -20,10 +20,8 @@ class SearchResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -37,11 +35,11 @@ class SearchResultTile extends StatelessWidget {
 
               // 内容
               Expanded(
-                child: _buildContent(isDark),
+                child: _buildContent(context),
               ),
 
               // 时间/类型标签
-              _buildTrailing(isDark, context),
+              _buildTrailing(context),
             ],
           ),
         ),
@@ -62,7 +60,7 @@ class SearchResultTile extends StatelessWidget {
         break;
       case SearchResultType.message:
         icon = Icons.chat_bubble_outline;
-        iconBgColor = Colors.orange;
+        iconBgColor = AppColors.warning;
         break;
       default:
         break;
@@ -87,7 +85,7 @@ class SearchResultTile extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(bool isDark) {
+  Widget _buildContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -98,7 +96,7 @@ class SearchResultTile extends StatelessWidget {
           TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
 
@@ -111,7 +109,7 @@ class SearchResultTile extends StatelessWidget {
             item.matchedKeyword,
             TextStyle(
               fontSize: 13,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             maxLines: 2,
           )
@@ -120,7 +118,7 @@ class SearchResultTile extends StatelessWidget {
             item.subtitle!,
             style: TextStyle(
               fontSize: 13,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -183,7 +181,7 @@ class SearchResultTile extends StatelessWidget {
     );
   }
 
-  Widget _buildTrailing(bool isDark, BuildContext context) {
+  Widget _buildTrailing(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
@@ -194,7 +192,7 @@ class SearchResultTile extends StatelessWidget {
             chat_date.N42DateUtils.formatConversationTime(item.timestamp!),
             style: TextStyle(
               fontSize: 12,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
 
@@ -237,15 +235,15 @@ class SearchResultTile extends StatelessWidget {
   Color _getTypeColor() {
     switch (item.type) {
       case SearchResultType.contact:
-        return Colors.blue;
+        return AppColors.info;
       case SearchResultType.group:
         return AppColors.primary;
       case SearchResultType.conversation:
         return Colors.purple;
       case SearchResultType.message:
-        return Colors.orange;
+        return AppColors.warning;
       case SearchResultType.all:
-        return Colors.grey;
+        return AppColors.textTertiary;
     }
   }
 }

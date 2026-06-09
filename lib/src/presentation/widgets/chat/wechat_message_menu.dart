@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'message_reaction_bar.dart';
 
@@ -432,7 +433,7 @@ class WeChatMessageMenu extends StatelessWidget {
     VoidCallback? onTap,
     bool isHighlighted = false,
   }) {
-    final color = isHighlighted ? Colors.amber : Colors.white;
+    final color = isHighlighted ? AppColors.warning : Colors.white;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -512,7 +513,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                       S.of(context)?.commonRecallThisMessage ?? 'Recall this message?',
                       style: TextStyle(
                         fontSize: 13,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: context.textTertiary,
                       ),
                     ),
                   ),
@@ -598,7 +599,7 @@ class RecalledMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final textColor = isDark ? Colors.grey[500] : Colors.grey[600];
+    final textColor = context.textTertiary;
     final s = S.of(context);
 
     return Center(
