@@ -366,7 +366,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.commonAddFriend ?? 'Add Friend',
         leading: IconButton(
@@ -378,7 +378,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         children: [
           // ── Search bar
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,9 +388,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                       '@matrix:id  •  0x wallet address  •  name.eth',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -414,16 +412,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
                                 'Search by ID, wallet, or ENS...',
                             hintStyle: TextStyle(
                               fontSize: 14,
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
+                              color: context.textSecondary,
                             ),
                             prefixIcon: Icon(
                               AppIcons.search,
                               size: 20,
-                              color: isDark
-                                  ? AppColors.textTertiaryDark
-                                  : AppColors.textTertiary,
+                              color: context.textTertiary,
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -434,9 +428,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                           style: TextStyle(
                             fontSize: 14,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                           cursorColor: AppColors.primary,
                           onSubmitted: (_) => _searchUser(),
@@ -479,7 +471,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
           // ── Phone contacts entry
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             margin: const EdgeInsets.only(top: 8),
             child: ListTile(
               leading: Container(
@@ -498,7 +490,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
               title: Text(
                 'From Contacts',
                 style: TextStyle(
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -506,16 +498,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
                 'Find friends from your phone contacts',
                 style: TextStyle(
                   fontSize: 13,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
               trailing: Icon(
                 AppIcons.chevron,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
               onTap: _openPhoneContacts,
             ),
@@ -610,14 +598,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
             : userId.split(':').first.replaceFirst('@', ''),
         style: TextStyle(
           fontWeight: FontWeight.w500,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Text(
         userId,
         style: TextStyle(
           fontSize: 13,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
       trailing: OutlinedButton(
@@ -728,9 +716,7 @@ class _SearchEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
-    final color = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final color = context.textSecondary;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -859,7 +845,7 @@ class _MethodCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 Text(
@@ -869,9 +855,7 @@ class _MethodCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontFamily: 'monospace',
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],

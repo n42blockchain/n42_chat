@@ -111,8 +111,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return BlocListener<GroupBloc, GroupState>(
       listener: (context, state) {
         if (!_isCreating) {
@@ -135,9 +133,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: N42AppBar(
           title: S.of(context)?.commonCreateGroup ?? 'Create Group',
           leading: IconButton(
@@ -171,7 +167,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
           children: [
             // 群信息输入
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
@@ -182,9 +178,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.backgroundDark
-                            : AppColors.background,
+                        color: context.pageBackground,
                         borderRadius: BorderRadius.circular(8),
                         image: _avatarBytes != null
                             ? DecorationImage(
@@ -212,14 +206,12 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                             'Enter group name',
                         border: InputBorder.none,
                         hintStyle: TextStyle(
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                   ),
@@ -233,7 +225,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             if (_selectedUserIds.isNotEmpty)
               Container(
                 height: 80,
-                color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                color: context.surfaceColor,
                 child: BlocBuilder<ContactBloc, ContactState>(
                   builder: (context, state) {
                     if (!state.isLoaded) return const SizedBox.shrink();
@@ -257,7 +249,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
             // 搜索栏
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               padding: const EdgeInsets.all(12),
               child: N42SearchBar(
                 controller: _searchController,
@@ -340,7 +332,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                      color: Colors.red,
+                      color: AppColors.error,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

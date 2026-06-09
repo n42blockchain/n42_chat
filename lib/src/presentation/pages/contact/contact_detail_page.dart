@@ -171,18 +171,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final secondaryTextColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final dividerColor = isDark
-        ? AppColors.dividerThinDark
-        : AppColors.dividerThin;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
+    final dividerColor = context.dividerThin;
 
     // 检查 ContactBloc 是否可用
     final hasContactBloc = _maybeContactBloc() != null;
@@ -516,16 +509,9 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     required String label,
     required VoidCallback onTap,
   }) {
-    final isDark = context.isDarkMode;
-    final borderColor = isDark
-        ? AppColors.dividerThinDark
-        : AppColors.dividerThin;
-    final iconColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final borderColor = context.dividerThin;
+    final iconColor = context.textSecondary;
+    final textColor = context.textPrimary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -791,21 +777,12 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final secondaryTextColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final labelColor = isDark
-        ? AppColors.textTertiaryDark
-        : AppColors.textTertiary;
-    final dividerColor = isDark
-        ? AppColors.dividerThinDark
-        : AppColors.dividerThin;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
+    final labelColor = context.textTertiary;
+    final dividerColor = context.dividerThin;
 
     // 检查 ContactBloc 是否可用
     final hasContactBloc = _maybeContactBloc() != null;
@@ -1102,31 +1079,28 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
 
   void _showNotesDialog() {
     final controller = TextEditingController();
-    final isDark = context.isDarkMode;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         title: Text(
           S.of(context)?.contactNotes ?? 'Notes',
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         content: TextField(
           controller: controller,
           maxLines: 4,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.contactNotesHint ??
                 'Add notes about this contact',
             hintStyle: TextStyle(
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             border: const OutlineInputBorder(),
           ),
@@ -1257,30 +1231,27 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
 
   void _showAddPhoneDialog() {
     final phoneController = TextEditingController();
-    final isDark = context.isDarkMode;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         title: Text(
           S.of(context)?.contactPhone ?? 'Phone',
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         content: TextField(
           controller: phoneController,
           keyboardType: TextInputType.phone,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           decoration: InputDecoration(
             hintText:
                 S.of(context)?.contactAddPhoneHint ?? 'Enter phone number',
             hintStyle: TextStyle(
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             border: const OutlineInputBorder(),
           ),
@@ -1348,19 +1319,13 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
     final cardColor = isDark
         ? AppColors.surfaceDark
         : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textTertiaryDark
-        : AppColors.textTertiary;
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final hintColor = context.textTertiary;
+    final labelColor = context.textSecondary;
 
     final scaffold = Scaffold(
       backgroundColor: bgColor,

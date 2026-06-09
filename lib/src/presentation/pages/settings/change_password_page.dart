@@ -53,10 +53,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.settingsChangePassword ?? 'Change Password',
         showBackButton: true,
@@ -485,12 +484,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orange.withValues(alpha: 0.1),
+        color: AppColors.warning.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          const Icon(Icons.security, color: Colors.orange, size: 20),
+          const Icon(Icons.security, color: AppColors.warning, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

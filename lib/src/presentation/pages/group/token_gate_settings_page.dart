@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/token_gate_entity.dart';
 import '../../blocs/bloc_message_keys.dart';
 import '../../blocs/group/group_bloc.dart';
@@ -104,7 +105,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(resolveBlocMessage(context, state.errorMessage!)),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -300,7 +301,7 @@ class _TokenGateRuleCard extends StatelessWidget {
           ],
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.delete_outline, color: Colors.red),
+          icon: const Icon(Icons.delete_outline, color: AppColors.error),
           onPressed: onRemove,
         ),
         isThreeLine: true,

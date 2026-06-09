@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -71,10 +70,8 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.contactChatOnlyFriends ?? 'Chat-only Friends',
       ),
@@ -88,14 +85,14 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
                       Icon(
                         Icons.person_outline,
                         size: 64,
-                        color: isDark ? Colors.grey[600] : Colors.grey[400],
+                        color: context.textTertiary,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         S.of(context)?.contactNoChatOnlyFriends ?? 'No chat-only friends',
                         style: TextStyle(
                           fontSize: 16,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                     ],
@@ -107,7 +104,7 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
                     padding: const EdgeInsets.only(left: 72),
                     child: Divider(
                       height: 1,
-                      color: isDark ? AppColors.dividerDark : AppColors.divider,
+                      color: context.dividerColor,
                     ),
                   ),
                   itemBuilder: (context, index) {

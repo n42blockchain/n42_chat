@@ -485,7 +485,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                           minHeight: 16,
                         ),
                         decoration: const BoxDecoration(
-                          color: Colors.red,
+                          color: AppColors.error,
                           shape: BoxShape.circle,
                         ),
                         child: Text(
@@ -519,11 +519,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
   }
 
   Widget _buildSearchBar(bool isDark) {
-    final hintColor = isDark
-        ? AppColors.textTertiaryDark
-        : AppColors.textTertiary;
+    final hintColor = context.textTertiary;
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.listItemPadding,
         vertical: AppDimensions.spacingS,
@@ -538,8 +536,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
               (AppDimensions.searchBarHeight + 4) / 2,
             ),
             border: Border.all(
-              color: (isDark ? AppColors.dividerDark : AppColors.divider)
-                  .withValues(alpha: 0.6),
+              color: context.dividerColor.withValues(alpha: 0.6),
               width: 0.5,
             ),
           ),
@@ -581,7 +578,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         if (state.pinnedConversations.isNotEmpty) ...[
           SliverToBoxAdapter(
             child: Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               child: Column(
                 children: state.pinnedConversations.asMap().entries.map((
                   entry,
@@ -606,7 +603,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           SliverToBoxAdapter(
             child: Container(
               height: 8,
-              color: isDark ? AppColors.backgroundDark : AppColors.background,
+              color: context.pageBackground,
             ),
           ),
         ],
@@ -614,7 +611,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
         // 普通会话
         SliverToBoxAdapter(
           child: Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: Column(
               children: state.normalConversations.asMap().entries.map((entry) {
                 return ListItemAnimation(
