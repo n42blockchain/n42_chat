@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/governance/proposal_entity.dart';
 import '../../../domain/entities/governance/vote_entity.dart';
@@ -48,13 +49,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Proposal'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
+        backgroundColor: context.navBarColor,
         elevation: 0.5,
       ),
       body: BlocConsumer<GovernanceBloc, GovernanceState>(
@@ -120,9 +119,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               child: Text(
                 'Proposal not found',
                 style: TextStyle(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             );
@@ -133,17 +130,17 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(proposal, isDark),
+                _buildHeader(proposal),
                 const SizedBox(height: 16),
-                _buildBody(proposal, isDark),
+                _buildBody(proposal),
                 const SizedBox(height: 24),
-                _buildVoteResults(proposal, isDark),
+                _buildVoteResults(proposal),
                 const SizedBox(height: 24),
                 if (proposal.isActive) ...[
-                  _buildVotingSection(proposal, state, isDark),
+                  _buildVotingSection(proposal, state),
                   const SizedBox(height: 24),
                 ],
-                _buildRecentVotes(state.votes, proposal, isDark),
+                _buildRecentVotes(state.votes, proposal),
                 const SizedBox(height: 32),
               ],
             ),
@@ -155,11 +152,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
 
   // -- Header: title, state badge, time, author --
 
-  Widget _buildHeader(ProposalEntity proposal, bool isDark) {
+  Widget _buildHeader(ProposalEntity proposal) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -170,7 +167,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
             children: [
               _buildStateBadge(proposal),
               const Spacer(),
-              _buildTimeIndicator(proposal, isDark),
+              _buildTimeIndicator(proposal),
             ],
           ),
           const SizedBox(height: 12),
@@ -183,7 +180,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               fontSize: 20,
               height: 1.3,
               fontWeight: FontWeight.w700,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -193,9 +190,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               Icon(
                 Icons.person_outline,
                 size: 16,
-                color: isDark
-                    ? AppColors.textTertiaryDark
-                    : AppColors.textTertiary,
+                color: context.textTertiary,
               ),
               const SizedBox(width: 6),
               Flexible(
@@ -206,9 +201,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ),
@@ -216,9 +209,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               Icon(
                 Icons.how_to_vote_outlined,
                 size: 16,
-                color: isDark
-                    ? AppColors.textTertiaryDark
-                    : AppColors.textTertiary,
+                color: context.textTertiary,
               ),
               const SizedBox(width: 4),
               Text(
@@ -228,9 +219,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -279,13 +268,13 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
     );
   }
 
-  Widget _buildTimeIndicator(ProposalEntity proposal, bool isDark) {
+  Widget _buildTimeIndicator(ProposalEntity proposal) {
     final text = proposal.hasEnded
         ? 'Ended'
         : _formatDuration(proposal.timeRemaining);
     final color = proposal.isActive
         ? AppColors.success
-        : (isDark ? AppColors.textTertiaryDark : AppColors.textTertiary);
+        : context.textTertiary;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -304,14 +293,14 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
 
   // -- Body: proposal description --
 
-  Widget _buildBody(ProposalEntity proposal, bool isDark) {
+  Widget _buildBody(ProposalEntity proposal) {
     if (proposal.body.isEmpty) return const SizedBox.shrink();
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -325,7 +314,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -334,9 +323,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.5,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -346,13 +333,13 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
 
   // -- Vote results: progress bars --
 
-  Widget _buildVoteResults(ProposalEntity proposal, bool isDark) {
+  Widget _buildVoteResults(ProposalEntity proposal) {
     final winningChoice = proposal.winningChoice;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -368,9 +355,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                   fontSize: 15,
                   height: 1.3,
                   fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               const Spacer(),
@@ -381,9 +366,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
               ),
             ],
@@ -410,14 +393,14 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
   Widget _buildVotingSection(
     ProposalEntity proposal,
     GovernanceState state,
-    bool isDark,
   ) {
+    final isDark = context.isDarkMode;
     final isVoting = _voteInFlight && state.status == GovernanceStatus.voting;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -431,7 +414,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -457,9 +440,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                       style: TextStyle(
                         fontSize: 14,
                         height: 1.3,
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                     contentPadding: EdgeInsets.zero,
@@ -560,14 +541,13 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
   Widget _buildRecentVotes(
     List<VoteEntity> votes,
     ProposalEntity proposal,
-    bool isDark,
   ) {
     if (votes.isEmpty) return const SizedBox.shrink();
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -581,7 +561,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -601,9 +581,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                       style: TextStyle(
                         fontSize: 13,
                         height: 1.3,
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                         fontFamily: 'monospace',
                       ),
                     ),
@@ -619,9 +597,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                       style: TextStyle(
                         fontSize: 13,
                         height: 1.3,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                   ),
@@ -636,9 +612,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                         fontSize: 13,
                         height: 1.3,
                         fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                       textAlign: TextAlign.right,
                     ),

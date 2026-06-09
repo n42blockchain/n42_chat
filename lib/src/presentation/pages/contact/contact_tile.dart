@@ -24,10 +24,8 @@ class ContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
@@ -55,7 +53,7 @@ class ContactTile extends StatelessWidget {
                           color: AppColors.success,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                            color: context.surfaceColor,
                             width: 2,
                           ),
                         ),
@@ -77,7 +75,7 @@ class ContactTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -93,9 +91,7 @@ class ContactTile extends StatelessWidget {
                         contact.statusMessage!,
                         style: TextStyle(
                           fontSize: 13,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -106,9 +102,7 @@ class ContactTile extends StatelessWidget {
                         contact.formattedLastActive,
                         style: TextStyle(
                           fontSize: 13,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -147,7 +141,7 @@ class SimpleContactTile extends StatelessWidget {
     return Material(
       color: selected
           ? (isDark ? AppColors.primaryDark.withValues(alpha: 0.2) : AppColors.primary.withValues(alpha: 0.1))
-          : (isDark ? AppColors.surfaceDark : AppColors.surface),
+          : context.surfaceColor,
       child: InkWell(
         onTap: onTap,
         child: Container(
@@ -165,7 +159,7 @@ class SimpleContactTile extends StatelessWidget {
                   contact.effectiveDisplayName,
                   style: TextStyle(
                     fontSize: 15,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

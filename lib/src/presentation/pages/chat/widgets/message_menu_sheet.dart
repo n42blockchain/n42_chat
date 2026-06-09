@@ -33,11 +33,9 @@ class MessageMenuSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: SafeArea(
@@ -102,9 +100,7 @@ class MessageMenuSheet extends StatelessWidget {
     Color? color,
     VoidCallback? onTap,
   }) {
-    final isDark = context.isDarkMode;
-    final textColor = color ??
-        (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+    final textColor = color ?? context.textPrimary;
 
     return ListTile(
       leading: Icon(icon, color: color ?? AppColors.textSecondary),

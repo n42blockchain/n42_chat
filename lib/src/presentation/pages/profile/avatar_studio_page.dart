@@ -35,9 +35,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final backgroundColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.background;
+    final backgroundColor = context.pageBackground;
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
@@ -72,16 +70,16 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
           backgroundColor: backgroundColor,
           appBar: N42AppBar(
             title: 'Avatar Studio',
-            backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+            backgroundColor: context.surfaceColor,
           ),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
             children: [
               _buildHeroCard(context, isDark, user),
               const SizedBox(height: 16),
-              _buildDecorationSection(context, isDark, user),
+              _buildDecorationSection(context, user),
               const SizedBox(height: 16),
-              _buildNftSection(context, isDark, user),
+              _buildNftSection(context, user),
             ],
           ),
         );
@@ -90,13 +88,9 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
   }
 
   Widget _buildHeroCard(BuildContext context, bool isDark, UserEntity? user) {
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final subtitleColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final surfaceColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final subtitleColor = context.textSecondary;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -178,13 +172,10 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
 
   Widget _buildDecorationSection(
     BuildContext context,
-    bool isDark,
     UserEntity? user,
   ) {
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final surfaceColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -208,9 +199,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
             'Reuse one decoration selector for profile and avatar entry points.',
             style: TextStyle(
               fontSize: 13,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 16),
@@ -242,8 +231,8 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
     );
   }
 
-  Widget _buildNftSection(BuildContext context, bool isDark, UserEntity? user) {
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+  Widget _buildNftSection(BuildContext context, UserEntity? user) {
+    final surfaceColor = context.surfaceColor;
 
     return Container(
       decoration: BoxDecoration(
@@ -266,7 +255,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
             Divider(
               height: 1,
               indent: 56,
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
+              color: context.dividerColor,
             ),
             _buildActionTile(
               context,
@@ -290,15 +279,13 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
     required Color iconColor,
     required VoidCallback onTap,
   }) {
-    final isDark = context.isDarkMode;
-
     return ListTile(
       leading: Icon(icon, color: iconColor),
       title: Text(title),
       subtitle: Text(
         subtitle,
         style: TextStyle(
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
       trailing: const Icon(AppIcons.chevron),
@@ -390,8 +377,6 @@ class _DecorationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -404,7 +389,7 @@ class _DecorationCard extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? AppColors.primary
-                  : (isDark ? AppColors.dividerDark : AppColors.divider),
+                  : context.dividerColor,
               width: isSelected ? 2 : 1,
             ),
           ),

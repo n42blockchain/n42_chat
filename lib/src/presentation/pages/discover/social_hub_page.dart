@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../../domain/entities/user_entity.dart';
@@ -42,14 +41,13 @@ class _SocialHubView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
 
     return Scaffold(
       backgroundColor: bgColor,
       appBar: N42AppBar(
         title: 'Stories & Fun',
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
       ),
       body: BlocBuilder<StoryBloc, StoryState>(
         builder: (context, state) {
@@ -60,7 +58,7 @@ class _SocialHubView extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildHero(context, isDark),
+                child: _buildHero(context),
               ),
               const SizedBox(height: 16),
               StoryBar(
@@ -130,11 +128,11 @@ class _SocialHubView extends StatelessWidget {
     );
   }
 
-  Widget _buildHero(BuildContext context, bool isDark) {
+  Widget _buildHero(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -148,7 +146,7 @@ class _SocialHubView extends StatelessWidget {
               fontSize: 20,
               height: 1.3,
               fontWeight: FontWeight.w700,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -159,9 +157,7 @@ class _SocialHubView extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -373,7 +369,6 @@ class _ActionGrid extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final action = actions[index];
-        final isDark = context.isDarkMode;
 
         return Material(
           color: Colors.transparent,
@@ -383,7 +378,7 @@ class _ActionGrid extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -407,9 +402,7 @@ class _ActionGrid extends StatelessWidget {
                       fontSize: 16,
                       height: 1.3,
                       fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -420,9 +413,7 @@ class _ActionGrid extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.35,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],

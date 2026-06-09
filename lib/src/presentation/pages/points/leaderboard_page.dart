@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/points/points_balance.dart';
 import '../../blocs/points/points_bloc.dart';
@@ -43,14 +44,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Leaderboard'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
+        backgroundColor: context.navBarColor,
         elevation: 0.5,
       ),
       body: BlocBuilder<PointsBloc, PointsState>(
@@ -58,14 +56,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           final config = state.config;
           if (config != null && !config.isEnabled) {
             return _buildUnavailableState(
-              isDark,
               message: 'Points are disabled in this room.',
             );
           }
 
           if (config != null && !config.showLeaderboard) {
             return _buildUnavailableState(
-              isDark,
               message: 'Leaderboard is disabled in this room.',
             );
           }
@@ -77,11 +73,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
 
           if (state.leaderboardStatus == PointsLoadStatus.error &&
               state.leaderboard.isEmpty) {
-            return _buildErrorState(state.leaderboardErrorMessage, isDark);
+            return _buildErrorState(state.leaderboardErrorMessage);
           }
 
           if (state.leaderboard.isEmpty) {
-            return _buildEmptyState(isDark);
+            return _buildEmptyState();
           }
 
           return RefreshIndicator(
@@ -91,7 +87,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               padding: const EdgeInsets.all(16),
               children: [
                 if (state.leaderboard.length >= 3) ...[
-                  _buildPodium(state.leaderboard.take(3).toList(), isDark),
+                  _buildPodium(state.leaderboard.take(3).toList()),
                   const SizedBox(height: 24),
                 ],
                 ...state.leaderboard
@@ -107,7 +103,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                     rank: rank,
                     isCurrentUser:
                         entry.value.userId == widget.currentUserId,
-                    isDark: isDark,
                   );
                 }),
               ],
@@ -122,7 +117,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   // Podium (top 3)
   // ---------------------------------------------------------------------------
 
-  Widget _buildPodium(List<PointsBalance> top3, bool isDark) {
+  Widget _buildPodium(List<PointsBalance> top3) {
     return SizedBox(
       height: 200,
       child: Row(
@@ -137,7 +132,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 height: 130,
                 medalColor: const Color(0xFFC0C0C0),
                 isCurrentUser: top3[1].userId == widget.currentUserId,
-                isDark: isDark,
               ),
             ),
           const SizedBox(width: 8),
@@ -149,7 +143,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               height: 170,
               medalColor: const Color(0xFFFFD700),
               isCurrentUser: top3[0].userId == widget.currentUserId,
-              isDark: isDark,
             ),
           ),
           const SizedBox(width: 8),
@@ -162,7 +155,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 height: 110,
                 medalColor: const Color(0xFFCD7F32),
                 isCurrentUser: top3[2].userId == widget.currentUserId,
-                isDark: isDark,
               ),
             ),
         ],
@@ -174,7 +166,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   // Empty / Error states
   // ---------------------------------------------------------------------------
 
-  Widget _buildEmptyState(bool isDark) {
+  Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -182,8 +174,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           Icon(
             Icons.emoji_events_outlined,
             size: 64,
-            color:
-                isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+            color: context.textTertiary,
           ),
           const SizedBox(height: 16),
           Text(
@@ -193,9 +184,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             style: TextStyle(
               fontSize: 16,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -207,8 +196,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color:
-                  isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ),
         ],
@@ -216,7 +204,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     );
   }
 
-  Widget _buildUnavailableState(bool isDark, {required String message}) {
+  Widget _buildUnavailableState({required String message}) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -234,8 +222,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 fontSize: 15,
                 height: 1.4,
                 fontWeight: FontWeight.w500,
-                color:
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
           ],
@@ -244,7 +231,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     );
   }
 
-  Widget _buildErrorState(String? errorMessage, bool isDark) {
+  Widget _buildErrorState(String? errorMessage) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -261,8 +248,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 fontSize: 16,
                 height: 1.3,
                 fontWeight: FontWeight.w500,
-                color:
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             if (errorMessage != null) ...[
@@ -275,9 +261,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.4,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -303,7 +287,6 @@ class _PodiumItem extends StatelessWidget {
   final double height;
   final Color medalColor;
   final bool isCurrentUser;
-  final bool isDark;
 
   const _PodiumItem({
     required this.balance,
@@ -311,7 +294,6 @@ class _PodiumItem extends StatelessWidget {
     required this.height,
     required this.medalColor,
     required this.isCurrentUser,
-    required this.isDark,
   });
 
   @override
@@ -381,9 +363,7 @@ class _PodiumItem extends StatelessWidget {
                       fontSize: 16,
                       height: 1.3,
                       fontWeight: FontWeight.w700,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   Text(
@@ -393,9 +373,7 @@ class _PodiumItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],
@@ -420,13 +398,11 @@ class _LeaderboardTile extends StatelessWidget {
   final PointsBalance balance;
   final int rank;
   final bool isCurrentUser;
-  final bool isDark;
 
   const _LeaderboardTile({
     required this.balance,
     required this.rank,
     required this.isCurrentUser,
-    required this.isDark,
   });
 
   @override
@@ -437,7 +413,7 @@ class _LeaderboardTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: isCurrentUser
             ? AppColors.primary.withValues(alpha: 0.08)
-            : (isDark ? AppColors.surfaceDark : AppColors.surface),
+            : context.surfaceColor,
         borderRadius: BorderRadius.circular(10),
         border: isCurrentUser
             ? Border.all(color: AppColors.primary.withValues(alpha: 0.3))
@@ -455,9 +431,7 @@ class _LeaderboardTile extends StatelessWidget {
                 fontSize: 14,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -489,9 +463,7 @@ class _LeaderboardTile extends StatelessWidget {
                     height: 1.3,
                     fontWeight:
                         isCurrentUser ? FontWeight.w600 : FontWeight.w400,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 if (balance.streakDays > 0)
@@ -502,9 +474,7 @@ class _LeaderboardTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textTertiaryDark
-                          : AppColors.textTertiary,
+                      color: context.textTertiary,
                     ),
                   ),
               ],
@@ -518,9 +488,7 @@ class _LeaderboardTile extends StatelessWidget {
               fontSize: 16,
               height: 1.3,
               fontWeight: FontWeight.w700,
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           Text(
@@ -530,9 +498,7 @@ class _LeaderboardTile extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/points/points_config.dart';
 import '../../../domain/entities/points/reward_rule.dart';
@@ -99,13 +100,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Points Settings'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
+        backgroundColor: context.navBarColor,
         elevation: 0.5,
         actions: [
           if (_isDirty)
@@ -161,14 +160,12 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
             children: [
               _buildSection(
                 title: 'General',
-                isDark: isDark,
                 children: [
                   _buildSwitchTile(
                     title: 'Enable Points System',
                     subtitle:
                         'Turn on points earning and rewards for this room',
                     value: _isEnabled,
-                    isDark: isDark,
                     onChanged: (v) {
                       setState(() => _isEnabled = v);
                       _markDirty();
@@ -178,14 +175,12 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     label: 'Points Name',
                     controller: _nameController,
                     hint: 'e.g. Points, Tokens, Stars',
-                    isDark: isDark,
                   ),
                   const SizedBox(height: 12),
                   _buildTextField(
                     label: 'Points Symbol',
                     controller: _symbolController,
                     hint: 'e.g. PTS, TKN',
-                    isDark: isDark,
                     maxLength: 5,
                   ),
                 ],
@@ -193,13 +188,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
               const SizedBox(height: 16),
               _buildSection(
                 title: 'Features',
-                isDark: isDark,
                 children: [
                   _buildSwitchTile(
                     title: 'Show Leaderboard',
                     subtitle: 'Display public rankings for room members',
                     value: _showLeaderboard,
-                    isDark: isDark,
                     onChanged: (v) {
                       setState(() => _showLeaderboard = v);
                       _markDirty();
@@ -209,7 +202,6 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     title: 'Allow Transfers',
                     subtitle: 'Let members transfer points to each other',
                     value: _allowTransfers,
-                    isDark: isDark,
                     onChanged: (v) {
                       setState(() => _allowTransfers = v);
                       _markDirty();
@@ -219,7 +211,6 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     label: 'Daily Earn Limit',
                     controller: _dailyLimitController,
                     hint: 'No limit',
-                    isDark: isDark,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
@@ -228,13 +219,12 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
               const SizedBox(height: 16),
               _buildSection(
                 title: 'Reward Rules',
-                isDark: isDark,
                 trailing: IconButton(
                   icon: const Icon(
                     Icons.add_circle_outline,
                     color: AppColors.primary,
                   ),
-                  onPressed: () => _showAddRuleDialog(isDark),
+                  onPressed: _showAddRuleDialog,
                 ),
                 children: [
                   if (_rules.isEmpty)
@@ -248,9 +238,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                           style: TextStyle(
                             fontSize: 14,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ),
@@ -259,7 +247,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     ..._rules.asMap().entries.map(
                       (entry) => _RuleTile(
                         rule: entry.value,
-                        isDark: isDark,
+                        isDark: context.isDarkMode,
                         onToggle: (enabled) {
                           setState(() {
                             _rules[entry.key] = RewardRule(
@@ -294,14 +282,13 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
 
   Widget _buildSection({
     required String title,
-    required bool isDark,
     required List<Widget> children,
     Widget? trailing,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -318,9 +305,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     fontSize: 15,
                     height: 1.3,
                     fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -343,7 +328,6 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
     required String title,
     required String subtitle,
     required bool value,
-    required bool isDark,
     required ValueChanged<bool> onChanged,
   }) {
     return Padding(
@@ -362,9 +346,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     fontSize: 14,
                     height: 1.3,
                     fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -375,9 +357,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.4,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -396,12 +376,12 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
   Widget _buildTextField({
     required String label,
     required TextEditingController controller,
-    required bool isDark,
     String? hint,
     int? maxLength,
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
   }) {
+    final isDark = context.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -413,9 +393,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
             fontSize: 13,
             height: 1.3,
             fontWeight: FontWeight.w500,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -428,14 +406,12 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           style: TextStyle(
             fontSize: 14,
             height: 1.3,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
             filled: true,
             fillColor: isDark
@@ -460,7 +436,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
   // Add rule dialog
   // ---------------------------------------------------------------------------
 
-  void _showAddRuleDialog(bool isDark) {
+  void _showAddRuleDialog() {
     PointsAction selectedAction = PointsAction.sendMessage;
     final pointsController = TextEditingController(text: '1');
     final dailyLimitController = TextEditingController();
@@ -472,9 +448,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              backgroundColor: isDark
-                  ? AppColors.surfaceDark
-                  : AppColors.surface,
+              backgroundColor: context.surfaceColor,
               title: const Text('Add Reward Rule'),
               content: SingleChildScrollView(
                 child: Column(
@@ -489,9 +463,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                         fontSize: 13,
                         height: 1.3,
                         fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -517,9 +489,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.3,
-                              color: isDark
-                                  ? AppColors.textPrimaryDark
-                                  : AppColors.textPrimary,
+                              color: context.textPrimary,
                             ),
                           ),
                         );
@@ -643,9 +613,7 @@ class _RuleTile extends StatelessWidget {
                     height: 1.3,
                     fontWeight: FontWeight.w500,
                     color: rule.isEnabled
-                        ? (isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimary)
+                        ? context.textPrimary
                         : AppColors.textDisabled,
                   ),
                 ),
@@ -657,9 +625,7 @@ class _RuleTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textTertiaryDark
-                        : AppColors.textTertiary,
+                    color: context.textTertiary,
                   ),
                 ),
               ],
@@ -674,9 +640,7 @@ class _RuleTile extends StatelessWidget {
             icon: Icon(
               Icons.delete_outline,
               size: 20,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
             onPressed: onDelete,
           ),

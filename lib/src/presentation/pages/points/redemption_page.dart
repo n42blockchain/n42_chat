@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/points/redemption_item.dart';
 import '../../blocs/points/points_bloc.dart';
@@ -47,11 +48,10 @@ class _RedemptionPageState extends State<RedemptionPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Redeem Points'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
+        backgroundColor: context.navBarColor,
         elevation: 0.5,
       ),
       body: BlocConsumer<PointsBloc, PointsState>(
@@ -86,7 +86,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
           final config = state.config;
           if (config != null && !config.isEnabled) {
             return _buildUnavailableState(
-              isDark,
+              context,
               message: 'Points are disabled in this room.',
             );
           }
@@ -98,7 +98,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
 
           if (state.redemptionItemsStatus == PointsLoadStatus.error &&
               state.redemptionItems.isEmpty) {
-            return _buildErrorState(state.redemptionItemsErrorMessage, isDark);
+            return _buildErrorState(context, state.redemptionItemsErrorMessage);
           }
 
           return RefreshIndicator(
@@ -107,11 +107,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
             child: CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
-                  child: _buildPointsHeader(state, isDark),
+                  child: _buildPointsHeader(context, state),
                 ),
                 if (state.redemptionItems.isEmpty)
                   SliverFillRemaining(
-                    child: _buildEmptyState(isDark),
+                    child: _buildEmptyState(context),
                   )
                 else
                   SliverPadding(
@@ -155,12 +155,12 @@ class _RedemptionPageState extends State<RedemptionPage> {
     );
   }
 
-  Widget _buildPointsHeader(PointsState state, bool isDark) {
+  Widget _buildPointsHeader(BuildContext context, PointsState state) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -177,9 +177,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
               Text(
@@ -190,9 +188,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
                   fontSize: 22,
                   height: 1.3,
                   fontWeight: FontWeight.w700,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -202,7 +198,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -210,8 +206,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
           Icon(
             Icons.storefront_outlined,
             size: 64,
-            color:
-                isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+            color: context.textTertiary,
           ),
           const SizedBox(height: 16),
           Text(
@@ -221,9 +216,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
             style: TextStyle(
               fontSize: 16,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -234,8 +227,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.3,
-              color:
-                  isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ),
         ],
@@ -243,7 +235,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
     );
   }
 
-  Widget _buildErrorState(String? errorMessage, bool isDark) {
+  Widget _buildErrorState(BuildContext context, String? errorMessage) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -260,8 +252,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
                 fontSize: 16,
                 height: 1.3,
                 fontWeight: FontWeight.w500,
-                color:
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             if (errorMessage != null) ...[
@@ -274,9 +265,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.4,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -291,7 +280,10 @@ class _RedemptionPageState extends State<RedemptionPage> {
     );
   }
 
-  Widget _buildUnavailableState(bool isDark, {required String message}) {
+  Widget _buildUnavailableState(
+    BuildContext context, {
+    required String message,
+  }) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -309,8 +301,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
                 fontSize: 15,
                 height: 1.4,
                 fontWeight: FontWeight.w500,
-                color:
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
           ],
@@ -329,10 +320,8 @@ class _RedemptionPageState extends State<RedemptionPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) {
-        final isDark = Theme.of(dialogContext).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor:
-              isDark ? AppColors.surfaceDark : AppColors.surface,
+          backgroundColor: dialogContext.surfaceColor,
           title: const Text('Confirm Redemption'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -344,9 +333,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
                 item.description,
                 style: TextStyle(
                   fontSize: 13,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: dialogContext.textSecondary,
                 ),
               ),
             ],
@@ -357,9 +344,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
               child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: dialogContext.textSecondary,
                 ),
               ),
             ),
@@ -412,7 +397,7 @@ class _RedemptionCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: isDark
             ? null
@@ -462,9 +447,7 @@ class _RedemptionCard extends StatelessWidget {
                       fontSize: 13,
                       height: 1.3,
                       fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -475,9 +458,7 @@ class _RedemptionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       height: 1.4,
-                      color: isDark
-                          ? AppColors.textTertiaryDark
-                          : AppColors.textTertiary,
+                      color: context.textTertiary,
                     ),
                   ),
                   const Spacer(),
@@ -507,9 +488,7 @@ class _RedemptionCard extends StatelessWidget {
                             fontSize: 11,
                             height: 1.3,
                             color: item.isInStock
-                                ? (isDark
-                                    ? AppColors.textTertiaryDark
-                                    : AppColors.textTertiary)
+                                ? context.textTertiary
                                 : AppColors.error,
                           ),
                         ),

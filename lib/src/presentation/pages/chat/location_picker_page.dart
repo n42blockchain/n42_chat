@@ -795,14 +795,14 @@ class _LocationActionButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 22,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],

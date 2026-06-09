@@ -106,15 +106,10 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final secondaryTextColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
 
     return Scaffold(
       backgroundColor: bgColor,

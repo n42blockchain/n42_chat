@@ -1108,8 +1108,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     // 检查 ContactBloc 是否可用
     bool hasContactBloc = false;
     try {
@@ -1123,10 +1121,8 @@ class _ChatPageState extends State<ChatPage> {
     final Widget content = Stack(
       children: [
         Scaffold(
-          backgroundColor: isDark
-              ? AppColors.backgroundDark
-              : AppColors.background,
-          appBar: _buildAppBar(isDark),
+          backgroundColor: context.pageBackground,
+          appBar: _buildAppBar(),
           body: Column(
             children: [
               // 聊天内搜索栏
@@ -1268,15 +1264,13 @@ class _BotResultSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.6,
       ),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -1289,7 +1283,7 @@ class _BotResultSheet extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                color: context.dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1307,9 +1301,7 @@ class _BotResultSheet extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                 ),
@@ -1330,9 +1322,7 @@ class _BotResultSheet extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.6,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ),

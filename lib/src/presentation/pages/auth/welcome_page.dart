@@ -35,16 +35,16 @@ class WelcomePage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buildBackButton(context, isDark),
+            _buildBackButton(context),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    _buildHeader(context, isDark),
+                    _buildHeader(context),
                     const SizedBox(height: 32),
-                    _buildFeatures(context, isDark),
+                    _buildFeatures(context),
                     const SizedBox(height: 8),
                   ],
                 ),
@@ -57,7 +57,7 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBackButton(BuildContext context, bool isDark) {
+  Widget _buildBackButton(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
@@ -69,7 +69,7 @@ class WelcomePage extends StatelessWidget {
           onPressed: onBack ?? () => Navigator.of(context).maybePop(),
           icon: Icon(
             AppIcons.back,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             size: AppDimensions.iconSizeSmall,
           ),
           constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
@@ -80,7 +80,7 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark) {
+  Widget _buildHeader(BuildContext context) {
     return Column(
       children: [
         Container(
@@ -120,7 +120,7 @@ class WelcomePage extends StatelessWidget {
             fontSize: 24,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: AppDimensions.spacingS),
@@ -131,37 +131,32 @@ class WelcomePage extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
           style: AppTextStyles.bodyLarge.copyWith(
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFeatures(BuildContext context, bool isDark) {
+  Widget _buildFeatures(BuildContext context) {
     return Column(
       children: [
         _FeatureItem(
           icon: Icons.security,
           title: S.of(context)?.commonEndToEndEncryption ?? 'End-to-end encryption',
           description: S.of(context)?.authMessagesOnlyYouCanSee ?? 'Messages visible only to you and the recipient',
-          isDark: isDark,
         ),
         const SizedBox(height: 20),
         _FeatureItem(
           icon: Icons.public,
           title: S.of(context)?.authDecentralized ?? 'Decentralized',
           description: S.of(context)?.authBasedOnMatrix ?? 'Built on the Matrix open protocol',
-          isDark: isDark,
         ),
         const SizedBox(height: 20),
         _FeatureItem(
           icon: Icons.account_balance_wallet,
           title: S.of(context)?.authWalletIntegration ?? 'Wallet Integration',
           description: S.of(context)?.authEasyCryptoTransfer ?? 'Easy cryptocurrency transfers',
-          isDark: isDark,
         ),
       ],
     );
@@ -226,9 +221,8 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildAgreement(BuildContext context, bool isDark) {
-    final tertiaryColor =
-        isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+  Widget _buildAgreement(BuildContext context) {
+    final tertiaryColor = context.textTertiary;
     final linkColor = AppColors.link.withValues(alpha: 0.85);
     final textStyle = AppTextStyles.captionSmall.copyWith(fontSize: 12);
 
@@ -282,7 +276,7 @@ class WelcomePage extends StatelessWidget {
         children: [
           _buildButtons(context, isDark),
           const SizedBox(height: 16),
-          _buildAgreement(context, isDark),
+          _buildAgreement(context),
         ],
       ),
     );
@@ -293,13 +287,11 @@ class _FeatureItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String description;
-  final bool isDark;
 
   const _FeatureItem({
     required this.icon,
     required this.title,
     required this.description,
-    required this.isDark,
   });
 
   @override
@@ -331,9 +323,7 @@ class _FeatureItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
@@ -342,9 +332,7 @@ class _FeatureItem extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],

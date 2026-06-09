@@ -363,7 +363,7 @@ class _MomentTile extends StatelessWidget {
         color: isDark ? AppColors.surfaceDark : Colors.white,
         border: Border(
           bottom: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),

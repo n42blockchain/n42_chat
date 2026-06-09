@@ -33,7 +33,7 @@ class _FavoriteListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
 
     return Scaffold(
       backgroundColor: bgColor,
