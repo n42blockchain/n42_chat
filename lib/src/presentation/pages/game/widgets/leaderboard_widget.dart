@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../models/game_score.dart';
 import '../services/game_score_service.dart';
 
@@ -31,7 +32,7 @@ class LeaderboardWidget extends StatelessWidget {
               padding: const EdgeInsets.all(32),
               child: Text(
                 l10n?.gameNoScores ?? 'No scores yet',
-                style: TextStyle(fontSize: 16, color: Colors.grey[500]),
+                style: TextStyle(fontSize: 16, color: context.textTertiary),
               ),
             ),
           );
@@ -64,7 +65,7 @@ class LeaderboardWidget extends StatelessWidget {
                   ),
                   trailing: Text(
                     _formatDate(s.playedAt),
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 12, color: context.textTertiary),
                   ),
                 ),
               );
