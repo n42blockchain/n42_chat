@@ -10,7 +10,6 @@ import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/screenshot_protection_service.dart';
 import '../../../core/services/username_service.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -243,7 +242,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
     final overviewTitle = _username?.trim().isNotEmpty == true
         ? '@${_username!.trim()}'
@@ -251,7 +249,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
               'Privacy & Security');
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: 'Privacy & Security',
         showBackButton: true,

@@ -128,7 +128,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.chatMediaGallery ?? 'Media Gallery',
         showBackButton: true,
@@ -138,14 +138,12 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
         children: [
           // 类型过滤 Tab
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: TabBar(
               controller: _tabController,
               isScrollable: true,
               labelColor: AppColors.primary,
-              unselectedLabelColor: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              unselectedLabelColor: context.textSecondary,
               indicatorColor: AppColors.primary,
               tabs: [
                 Tab(text: S.of(context)?.mediaAll ?? 'All'),
@@ -167,9 +165,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
                       '${_filteredMessages.length} items',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -195,18 +191,14 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
           Icon(
             _getFilterIcon(),
             size: 64,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(
             S.of(context)?.mediaNoMediaFound ?? 'No media found',
             style: TextStyle(
               fontSize: 16,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -327,7 +319,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
             else
               Icon(
                 isVideo ? Icons.videocam : Icons.image,
-                color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                color: context.textTertiary,
                 size: 32,
               ),
             // 视频标记
@@ -426,7 +418,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
           fontSize: 15,
         ),
       ),
@@ -436,9 +428,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
             fileSize,
             style: TextStyle(
               fontSize: 12,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(width: 8),
@@ -446,9 +436,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
             message.senderName,
             style: TextStyle(
               fontSize: 12,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -526,7 +514,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
           content: Text(
             '${S.of(context)?.downloadFailed ?? 'Download failed'}: $e',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }

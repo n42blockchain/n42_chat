@@ -100,10 +100,10 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final s = S.of(context);
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
     final cardColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     final contacts = _filteredContacts;
 
@@ -248,7 +248,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
               color: cardColor,
               border: Border(
                 top: BorderSide(
-                  color: isDark ? AppColors.dividerDark : AppColors.divider,
+                  color: context.dividerColor,
                 ),
               ),
             ),

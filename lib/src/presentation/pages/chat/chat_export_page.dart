@@ -193,7 +193,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.chatExportTitle ?? 'Export Chat',
         showBackButton: true,
@@ -208,7 +208,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.08),
+                color: AppColors.info.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -251,7 +251,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                   Divider(
                     height: 1,
                     indent: 56,
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                   ),
                   _buildRadioTile(
                     title: 'JSON',
@@ -264,7 +264,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                   Divider(
                     height: 1,
                     indent: 56,
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                   ),
                   _buildRadioTile(
                     title: 'TXT',
@@ -317,9 +317,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                       Divider(
                         height: 1,
                         indent: 56,
-                        color: isDark
-                            ? AppColors.dividerDark
-                            : AppColors.divider,
+                        color: context.dividerColor,
                       ),
                   ],
                 ],
@@ -329,7 +327,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
 
           if (_dateRange == ExportDateRange.custom)
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Column(
                 children: [
@@ -357,7 +355,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.08),
+              color: AppColors.info.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -431,14 +429,12 @@ class _ChatExportPageState extends State<ChatExportPage> {
             title,
             style: TextStyle(
               fontSize: 13,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ),
         Container(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           child: child,
         ),
       ],
@@ -454,16 +450,14 @@ class _ChatExportPageState extends State<ChatExportPage> {
     return RadioListTile<T>(
       title: Text(
         title,
-        style: TextStyle(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+        style: TextStyle(color: context.textPrimary),
       ),
       subtitle: subtitle != null
           ? Text(
               subtitle,
               style: TextStyle(
                 fontSize: 12,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             )
           : null,
@@ -486,7 +480,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
         ),
         child: Row(
@@ -501,7 +495,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
               child: Text(
                 '$label: ${value != null ? _formatDate(value) : "Select date"}',
                 style: TextStyle(
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ),

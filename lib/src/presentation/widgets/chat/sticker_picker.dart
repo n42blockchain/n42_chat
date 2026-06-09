@@ -111,7 +111,7 @@ class _StickerPickerState extends State<StickerPicker> {
         color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -139,10 +139,10 @@ class _StickerPickerState extends State<StickerPicker> {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         border: Border(
           bottom: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -218,9 +218,7 @@ class _StickerPickerState extends State<StickerPicker> {
                   size: 22,
                   color: isSelected
                       ? AppColors.primary
-                      : (isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary),
+                      : context.textSecondary,
                 )
               : Text(
                   emoji ?? label?.substring(0, 1) ?? '?',
@@ -228,9 +226,7 @@ class _StickerPickerState extends State<StickerPicker> {
                     fontSize: emoji != null ? 22 : 14,
                     color: isSelected
                         ? AppColors.primary
-                        : (isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary),
+                        : context.textSecondary,
                   ),
                 ),
         ),
@@ -349,13 +345,13 @@ class _StickerPickerState extends State<StickerPicker> {
           Icon(
             Icons.emoji_emotions_outlined,
             size: 48,
-            color: isDark ? Colors.grey[600] : Colors.grey[400],
+            color: context.textTertiary,
           ),
           const SizedBox(height: 8),
           Text(
             'No stickers yet',
             style: TextStyle(
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
+              color: context.textTertiary,
             ),
           ),
           if (widget.onOpenStore != null) ...[

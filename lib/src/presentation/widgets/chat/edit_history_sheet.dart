@@ -98,7 +98,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
               ),
               Divider(
                 height: 0.5,
-                color: isDark ? Colors.grey[800] : Colors.grey[200],
+                color: context.dividerColor,
               ),
               // 内容
               Expanded(
@@ -152,7 +152,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
         height: 0.5,
         indent: 16,
         endIndent: 16,
-        color: isDark ? Colors.grey[800] : Colors.grey[200],
+        color: context.dividerColor,
       ),
       itemBuilder: (context, index) {
         final entry = reversed[index];
@@ -197,14 +197,14 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                 Icon(
                   Icons.edit,
                   size: 12,
-                  color: isDark ? Colors.grey[500] : Colors.grey,
+                  color: context.textTertiary,
                 ),
               if (!entry.isOriginal) const SizedBox(width: 4),
               Text(
                 timeStr,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.grey[500] : Colors.grey,
+                  color: context.textTertiary,
                 ),
               ),
             ],

@@ -41,10 +41,8 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.groupMembersTitle ?? 'Group Members',
       ),
@@ -79,13 +77,13 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             );
           }
 
-          return _buildBody(state, isDark);
+          return _buildBody(state);
         },
       ),
     );
   }
 
-  Widget _buildBody(GroupState state, bool isDark) {
+  Widget _buildBody(GroupState state) {
     final group = state.currentGroup!;
     var members = state.members;
 
@@ -115,7 +113,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
       children: [
         // 搜索栏
         Container(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           padding: const EdgeInsets.all(12),
           child: N42SearchBar(
             controller: _searchController,
@@ -137,9 +135,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 '${state.currentGroup!.memberCount} members',
             style: TextStyle(
               fontSize: 13,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ),
@@ -150,7 +146,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             itemCount: members.length,
             itemBuilder: (context, index) {
               final member = members[index];
-              return _buildMemberTile(member, group, isDark);
+              return _buildMemberTile(member, group);
             },
           ),
         ),
@@ -158,9 +154,9 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
     );
   }
 
-  Widget _buildMemberTile(GroupMember member, GroupEntity group, bool isDark) {
+  Widget _buildMemberTile(GroupMember member, GroupEntity group) {
     return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListTile(
         leading: N42Avatar(
           imageUrl: member.avatarUrl,
@@ -175,9 +171,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -187,7 +181,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.orange,
+                  color: AppColors.warning,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -215,9 +209,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
           member.userId,
           style: TextStyle(
             fontSize: 13,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
         onTap: () => _showMemberOptions(member, group),
@@ -308,11 +300,11 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             // 移出群聊
             if (canManage)
               ListTile(
-                leading: const Icon(Icons.person_remove, color: Colors.red),
+                leading: const Icon(Icons.person_remove, color: AppColors.error),
                 title: Text(
                   S.of(this.context)?.chatRemoveFromGroup ??
                       'Remove from Group',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: AppColors.error),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -364,7 +356,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             },
             child: Text(
               S.of(context)?.commonRemove ?? 'Remove',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
