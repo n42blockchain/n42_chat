@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import 'n42_button.dart';
@@ -106,11 +105,8 @@ class N42EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final textPrimary =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final textSecondary =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final textPrimary = context.textPrimary;
+    final textSecondary = context.textSecondary;
 
     return Center(
       child: Padding(
@@ -121,7 +117,7 @@ class N42EmptyState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildIcon(isDark),
+              _buildIcon(context),
               if (title != null) ...[
                 const SizedBox(height: AppDimensions.spacing),
                 Text(
@@ -158,7 +154,7 @@ class N42EmptyState extends StatelessWidget {
     );
   }
 
-  Widget _buildIcon(bool isDark) {
+  Widget _buildIcon(BuildContext context) {
     if (imagePath != null) {
       return Image.asset(
         imagePath!,
@@ -167,9 +163,7 @@ class N42EmptyState extends StatelessWidget {
         fit: BoxFit.contain,
       );
     }
-    final fallback = isDark
-        ? AppColors.textTertiaryDark
-        : AppColors.textTertiary;
+    final fallback = context.textTertiary;
     return Icon(
       icon ?? Icons.inbox_outlined,
       size: iconSize,
@@ -194,9 +188,7 @@ class N42Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final secondary =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final secondary = context.textSecondary;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,

@@ -110,11 +110,7 @@ class N42ListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = backgroundColor ??
-        (isPinned
-            ? (isDark
-                ? AppColors.dividerThinDark
-                : AppColors.dividerThin)
-            : (isDark ? AppColors.surfaceDark : AppColors.surface));
+        (isPinned ? context.dividerThin : context.surfaceColor);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -144,7 +140,7 @@ class N42ListTile extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(left: dividerIndent),
             height: AppDimensions.dividerThickness,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
       ],
     );
@@ -281,13 +277,9 @@ class N42SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final textPrimary =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final textSecondary =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final textTertiary =
-        isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final textPrimary = context.textPrimary;
+    final textSecondary = context.textSecondary;
+    final textTertiary = context.textTertiary;
     // 当 icon 存在：左侧 icon(28) + 间距(12) + 内边距(16) = 56；否则等于内边距 16。
     final dividerIndentLeft = icon != null
         ? AppDimensions.listItemPadding + 28 + AppDimensions.spacingM
@@ -297,7 +289,7 @@ class N42SettingsTile extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Material(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           child: InkWell(
             onTap: switchValue == null ? onTap : null,
             child: Container(
@@ -350,7 +342,7 @@ class N42SettingsTile extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(left: dividerIndentLeft),
             height: AppDimensions.dividerThickness,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
       ],
     );

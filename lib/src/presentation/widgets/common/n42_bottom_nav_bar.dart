@@ -70,15 +70,14 @@ class N42BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final navItems = items ?? defaultItems;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.navBarDark : AppColors.navBar,
+        color: context.navBarColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -96,7 +95,6 @@ class N42BottomNavBar extends StatelessWidget {
                     context,
                     navItems[index],
                     index,
-                    isDark,
                   ),
                 );
               }),
@@ -111,12 +109,11 @@ class N42BottomNavBar extends StatelessWidget {
     BuildContext context,
     N42BottomNavItem item,
     int index,
-    bool isDark,
   ) {
     final isSelected = currentIndex == index;
     final color = isSelected
         ? AppColors.primary
-        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
+        : context.textSecondary;
 
     // InkWell 提供反馈 + 整 cell 命中（带 splashColor / hoverColor）。
     return InkWell(

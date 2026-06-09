@@ -84,12 +84,10 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
@@ -97,7 +95,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
             height: 1.3,
@@ -106,7 +104,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
         leading: IconButton(
           icon: Icon(
             AppIcons.back,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             size: 20,
           ),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
@@ -121,7 +119,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
               padding: const EdgeInsets.all(16),
               children: [
                 // 默认（无背景）
-                _buildDefaultOption(isDark),
+                _buildDefaultOption(),
 
                 const SizedBox(height: 24),
 
@@ -131,9 +129,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -147,9 +143,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -169,7 +163,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
     );
   }
 
-  Widget _buildDefaultOption(bool isDark) {
+  Widget _buildDefaultOption() {
     final isSelected =
         _selectedBackground == null || _selectedBackground == 'default';
 
@@ -178,12 +172,12 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
       child: Container(
         height: 80,
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
-                : (isDark ? AppColors.dividerDark : AppColors.divider),
+                : context.dividerColor,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -191,7 +185,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
           child: Text(
             S.of(context)?.defaultBackground ?? 'Default',
             style: TextStyle(
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
               fontSize: 15,
             ),
           ),

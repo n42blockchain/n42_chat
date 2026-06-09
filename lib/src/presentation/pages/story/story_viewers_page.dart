@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../widgets/common/n42_avatar.dart';
@@ -30,10 +30,9 @@ class StoryViewersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: Column(
           mainAxisSize: MainAxisSize.min,
@@ -45,17 +44,14 @@ class StoryViewersPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
           ],
         ),
         centerTitle: true,
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
-        foregroundColor:
-            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        backgroundColor: context.surfaceColor,
+        foregroundColor: context.textPrimary,
         elevation: 0,
       ),
       body: viewers.isEmpty
@@ -72,7 +68,6 @@ class StoryViewersPage extends StatelessWidget {
                   onTap: onUserTap != null
                       ? () => onUserTap!(viewer.userId)
                       : null,
-                  isDark: isDark,
                 );
               },
             ),
@@ -84,18 +79,16 @@ class StoryViewersPage extends StatelessWidget {
 class _ViewerListTile extends StatelessWidget {
   final StoryViewer viewer;
   final VoidCallback? onTap;
-  final bool isDark;
 
   const _ViewerListTile({
     required this.viewer,
     this.onTap,
-    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -121,9 +114,7 @@ class _ViewerListTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -133,9 +124,7 @@ class _ViewerListTile extends StatelessWidget {
                       _formatTimeAgo(viewer.viewedAt),
                       style: TextStyle(
                         fontSize: 13,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                   ],
@@ -145,9 +134,7 @@ class _ViewerListTile extends StatelessWidget {
               if (onTap != null)
                 Icon(
                   AppIcons.chevron,
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                   size: 20,
                 ),
             ],

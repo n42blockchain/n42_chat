@@ -204,10 +204,10 @@ class _GifPickerState extends State<GifPicker> {
     return Container(
       height: widget.height + bottomPadding,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+        color: context.inputBarColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -217,7 +217,7 @@ class _GifPickerState extends State<GifPicker> {
         child: Column(
           children: [
             // 搜索栏
-            _buildSearchBar(isDark),
+            _buildSearchBar(),
 
             // GIF 网格
             Expanded(child: _buildGifGrid(isDark)),
@@ -230,35 +230,31 @@ class _GifPickerState extends State<GifPicker> {
     );
   }
 
-  Widget _buildSearchBar(bool isDark) {
+  Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Container(
         height: 36,
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextField(
           controller: _searchController,
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: 'Search GIFs...',
             hintStyle: TextStyle(
               fontSize: 14,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
             prefixIcon: Icon(
               Icons.search,
               size: 20,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
@@ -438,9 +434,7 @@ Future<GifPickerResult?> showGifPicker(BuildContext context) async {
     builder: (context) => Container(
       height: MediaQuery.of(context).size.height * 0.6,
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.inputBarDark
-            : AppColors.inputBar,
+        color: context.inputBarColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Column(

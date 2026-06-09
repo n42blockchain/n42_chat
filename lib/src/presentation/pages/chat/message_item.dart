@@ -429,7 +429,7 @@ class MessageItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildReplyQuote(isDark),
+          _buildReplyQuote(isDark, context),
           const SizedBox(height: 4),
           content,
         ],
@@ -455,7 +455,7 @@ class MessageItem extends StatelessWidget {
   }
 
   /// 构建回复引用块
-  Widget _buildReplyQuote(bool isDark) {
+  Widget _buildReplyQuote(bool isDark, BuildContext context) {
     final bgColor = message.isFromMe
         ? Colors.black.withValues(alpha: 0.1)
         : (isDark
@@ -464,7 +464,7 @@ class MessageItem extends StatelessWidget {
 
     final textColor = message.isFromMe
         ? AppColors.sentText(isDark).withValues(alpha: 0.8)
-        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary);
+        : context.textSecondary;
 
     // 包装 GestureDetector 以支持点击跳转到原消息
     return GestureDetector(

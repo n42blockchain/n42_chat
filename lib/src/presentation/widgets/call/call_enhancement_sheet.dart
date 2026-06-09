@@ -232,7 +232,7 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final backgroundColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final backgroundColor = context.surfaceColor;
     final dividerColor = Colors.white.withValues(alpha: isDark ? 0.10 : 0.08);
     final subtitleColor = isDark ? Colors.white70 : Colors.black54;
     final audioConfig = _controller.audioProcessingConfig;

@@ -23,7 +23,7 @@ class AiSmartReplyBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final backgroundColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final backgroundColor = context.surfaceColor;
     final borderColor = isDark ? Colors.white10 : Colors.black12;
     final titleColor = isDark ? Colors.white : AppColors.textPrimary;
     final subtitleColor = isDark ? Colors.white70 : AppColors.textSecondary;

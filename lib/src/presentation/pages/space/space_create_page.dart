@@ -48,9 +48,7 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: N42AppBar(
           title: S.of(context)?.spacesCreate ?? 'Create Community',
           showBackButton: true,
@@ -168,8 +166,6 @@ class _TypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Row(
       children: [
         Expanded(
@@ -181,7 +177,6 @@ class _TypeSelector extends StatelessWidget {
                 S.of(context)?.spacesPublicDesc ??
                 'Anyone can discover and join',
             onTap: () => onChanged(SpaceType.public),
-            isDark: isDark,
           ),
         ),
         const SizedBox(width: 12),
@@ -194,7 +189,6 @@ class _TypeSelector extends StatelessWidget {
                 S.of(context)?.spacesPrivateDesc ??
                 'Only invited members can join',
             onTap: () => onChanged(SpaceType.private),
-            isDark: isDark,
           ),
         ),
       ],
@@ -208,7 +202,6 @@ class _TypeCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final bool isDark;
 
   const _TypeCard({
     required this.selected,
@@ -216,7 +209,6 @@ class _TypeCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
-    required this.isDark,
   });
 
   @override
@@ -229,7 +221,7 @@ class _TypeCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.1)
-              : (isDark ? AppColors.surfaceDark : AppColors.surface),
+              : context.surfaceColor,
           border: Border.all(
             color: selected ? AppColors.primary : Colors.transparent,
             width: 2,
@@ -243,7 +235,7 @@ class _TypeCard extends StatelessWidget {
               icon,
               color: selected
                   ? AppColors.primary
-                  : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                  : context.textSecondary,
             ),
             const SizedBox(height: 8),
             Text(
@@ -252,7 +244,7 @@ class _TypeCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: selected
                     ? AppColors.primary
-                    : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                    : context.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -260,7 +252,7 @@ class _TypeCard extends StatelessWidget {
               subtitle,
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ],

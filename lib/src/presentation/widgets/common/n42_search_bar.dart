@@ -132,8 +132,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
     final isDark = context.isDarkMode;
     final bgColor = widget.backgroundColor ??
         (isDark ? AppColors.surfaceDark : AppColors.searchBackground);
-    final tertiary =
-        isDark ? AppColors.textTertiaryDark : AppColors.textTertiary;
+    final tertiary = context.textTertiary;
 
     return Row(
       children: [
@@ -150,7 +149,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
               ),
               child: widget.onTap != null
                   ? _buildReadOnlySearch(tertiary)
-                  : _buildEditableSearch(isDark, tertiary),
+                  : _buildEditableSearch(tertiary),
             ),
           ),
         ),
@@ -168,9 +167,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
               child: Text(
                 S.of(context)?.commonCancel ?? 'Cancel',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ),
@@ -200,7 +197,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
     );
   }
 
-  Widget _buildEditableSearch(bool isDark, Color iconColor) {
+  Widget _buildEditableSearch(Color iconColor) {
     final hint = widget.hintText ?? S.of(context)?.commonSearch ?? 'Search';
     return TextField(
       controller: _controller,
@@ -210,7 +207,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
       textInputAction: TextInputAction.search,
       onSubmitted: widget.onSubmitted,
       style: AppTextStyles.bodyMedium.copyWith(
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        color: context.textPrimary,
       ),
       cursorColor: AppColors.primary,
       decoration: InputDecoration(
@@ -264,10 +261,8 @@ class N42SearchBarContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Container(
-      color: isDark ? AppColors.navBarDark : AppColors.navBar,
+      color: context.navBarColor,
       padding: padding,
       child: child,
     );

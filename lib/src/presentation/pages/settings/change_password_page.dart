@@ -52,8 +52,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
@@ -112,27 +110,27 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   const SizedBox(height: 16),
 
                   // 说明文字
-                  _buildInfoCard(isDark),
+                  _buildInfoCard(),
 
                   const SizedBox(height: 24),
 
                   // 当前密码
-                  _buildCurrentPasswordField(isDark),
+                  _buildCurrentPasswordField(),
 
                   const SizedBox(height: 16),
 
                   // 新密码
-                  _buildNewPasswordField(isDark),
+                  _buildNewPasswordField(),
 
                   const SizedBox(height: 16),
 
                   // 确认新密码
-                  _buildConfirmPasswordField(isDark),
+                  _buildConfirmPasswordField(),
 
                   const SizedBox(height: 8),
 
                   // 密码要求提示
-                  _buildPasswordRequirements(isDark),
+                  _buildPasswordRequirements(),
 
                   const SizedBox(height: 32),
 
@@ -179,7 +177,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   const SizedBox(height: 16),
 
                   // 安全提示
-                  _buildSecurityNote(isDark),
+                  _buildSecurityNote(),
                 ],
               ),
             ),
@@ -189,11 +187,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildInfoCard(bool isDark) {
-    final cardBgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildInfoCard() {
+    final cardBgColor = context.surfaceColor;
+    final textColor = context.textSecondary;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -219,17 +215,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildCurrentPasswordField(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildCurrentPasswordField() {
+    final labelColor = context.textSecondary;
+    final inputBgColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,17 +283,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildNewPasswordField(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildNewPasswordField() {
+    final labelColor = context.textSecondary;
+    final inputBgColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,17 +356,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildConfirmPasswordField(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildConfirmPasswordField() {
+    final labelColor = context.textSecondary;
+    final inputBgColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,10 +428,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildPasswordRequirements(bool isDark) {
-    final textColor = isDark
-        ? AppColors.textTertiaryDark
-        : AppColors.textTertiary;
+  Widget _buildPasswordRequirements() {
+    final textColor = context.textTertiary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,10 +452,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildSecurityNote(bool isDark) {
-    final textColor = isDark
-        ? AppColors.textTertiaryDark
-        : AppColors.textTertiary;
+  Widget _buildSecurityNote() {
+    final textColor = context.textTertiary;
 
     return Container(
       padding: const EdgeInsets.all(12),

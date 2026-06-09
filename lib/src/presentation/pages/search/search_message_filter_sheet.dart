@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/search_result_entity.dart';
@@ -57,15 +58,13 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
         ),
         child: SafeArea(
@@ -84,7 +83,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                          color: context.textPrimary,
                         ),
                       ),
                     ),
@@ -109,9 +108,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                   'Type',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -133,9 +130,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                   'Time',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 8),

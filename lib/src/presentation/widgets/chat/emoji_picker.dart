@@ -193,10 +193,10 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
     return Container(
       height: widget.height,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+        color: context.inputBarColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -219,10 +219,10 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
             Container(
               height: 44,
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                color: context.surfaceColor,
                 border: Border(
                   top: BorderSide(
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                     width: 0.5,
                   ),
                 ),
@@ -235,9 +235,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
                       controller: _tabController,
                       isScrollable: true,
                       labelColor: AppColors.primary,
-                      unselectedLabelColor: isDark 
-                          ? AppColors.textSecondaryDark 
-                          : AppColors.textSecondary,
+                      unselectedLabelColor: context.textSecondary,
                       indicatorColor: AppColors.primary,
                       indicatorSize: TabBarIndicatorSize.label,
                       tabs: _categories.map((category) {
@@ -262,7 +260,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
                         decoration: BoxDecoration(
                           border: Border(
                             left: BorderSide(
-                              color: isDark ? AppColors.dividerDark : AppColors.divider,
+                              color: context.dividerColor,
                               width: 0.5,
                             ),
                           ),
@@ -270,7 +268,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
                         child: Icon(
                           Icons.backspace_outlined,
                           size: 20,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                     ),

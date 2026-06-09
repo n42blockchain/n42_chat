@@ -23,11 +23,9 @@ class SettingsHubOverviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final cardColor = context.surfaceColor;
     final titleColor = isDark ? Colors.white : AppColors.textPrimary;
-    final subtitleColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final subtitleColor = context.textSecondary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -88,10 +86,8 @@ class SettingsHubSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -102,9 +98,7 @@ class SettingsHubSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -114,7 +108,7 @@ class SettingsHubSection extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 60),
                 child: Divider(
                   height: 1,
-                  color: isDark ? AppColors.dividerDark : AppColors.divider,
+                  color: context.dividerColor,
                 ),
               );
             }
@@ -182,9 +176,7 @@ class SettingsHubActionTile extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 13,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                     ],
@@ -193,9 +185,7 @@ class SettingsHubActionTile extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ],
           ),

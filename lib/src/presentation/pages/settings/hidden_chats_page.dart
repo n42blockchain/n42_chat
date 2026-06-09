@@ -34,11 +34,10 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.settingsHiddenChats ?? 'Hidden Chats',
         showBackButton: true,
@@ -62,7 +61,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
             itemCount: state.hiddenConversations.length,
             itemBuilder: (context, index) {
               final conversation = state.hiddenConversations[index];
-              return _buildConversationTile(context, conversation, isDark);
+              return _buildConversationTile(context, conversation);
             },
           );
         },
@@ -73,12 +72,11 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
   Widget _buildConversationTile(
     BuildContext context,
     ConversationEntity conversation,
-    bool isDark,
   ) {
     final l10n = S.of(context);
 
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListTile(
         leading: N42Avatar(
           imageUrl: conversation.avatarUrl,
@@ -93,7 +91,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
             fontSize: 16,
             fontWeight: FontWeight.w500,
             height: 1.3,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: conversation.lastMessage != null
@@ -104,9 +102,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               )
             : null,
@@ -138,7 +134,6 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
   }
 
   void _showOptions(BuildContext context, ConversationEntity conversation) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     showModalBottomSheet<void>(
@@ -146,7 +141,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -159,7 +154,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.dividerDark : AppColors.divider,
+                  color: context.dividerColor,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -168,12 +163,12 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
               ListTile(
                 leading: Icon(
                   Icons.visibility_outlined,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
                 title: Text(
                   l10n?.settingsUnhideChat ?? 'Unhide',
                   style: TextStyle(
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 onTap: () {
@@ -186,12 +181,12 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
               ListTile(
                 leading: Icon(
                   Icons.chat_outlined,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
                 title: Text(
                   l10n?.commonChat ?? 'Chat',
                   style: TextStyle(
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 onTap: () {
