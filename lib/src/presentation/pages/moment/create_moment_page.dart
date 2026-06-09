@@ -108,7 +108,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
         backgroundColor: context.pageBackground,
         appBar: AppBar(
           title: const Text('Create Moment'),
-          backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
+          backgroundColor: context.surfaceColor,
           actions: [
             BlocBuilder<MomentBloc, MomentState>(
               buildWhen: (prev, curr) => prev.isPosting != curr.isPosting,
@@ -156,7 +156,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
+                  color: context.surfaceColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: TextField(
@@ -178,14 +178,14 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 
               // 已选择的媒体
               if (_selectedMedia.isNotEmpty) ...[
-                _buildMediaPreview(isDark),
+                _buildMediaPreview(),
                 const SizedBox(height: 16),
               ],
 
               // 操作按钮
               Container(
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
+                  color: context.surfaceColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -242,11 +242,11 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     );
   }
 
-  Widget _buildMediaPreview(bool isDark) {
+  Widget _buildMediaPreview() {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

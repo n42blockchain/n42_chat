@@ -370,7 +370,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surfaceDark : Colors.white,
+                        color: context.surfaceColor,
                         borderRadius: BorderRadius.circular(8),
                         border: isSelected
                             ? Border.all(color: AppColors.primary, width: 2)

@@ -818,7 +818,7 @@ class _MethodCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: isDark ? Colors.white10 : AppColors.divider),
       ),

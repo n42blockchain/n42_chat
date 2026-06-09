@@ -257,7 +257,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
   // ─── Custom tab ──────────────────────────────────────────────────────────
 
   Widget _buildCustomTab(bool isDark, S? l10n) {
-    final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final surfaceColor = context.surfaceColor;
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 
@@ -396,7 +396,6 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
           if (_resolvedImageUrl != null) ...[
             _NftPreview(
               imageUrl: _resolvedImageUrl!,
-              isDark: isDark,
               l10n: l10n,
               onConfirm: () {
                 final tokenId = int.tryParse(_tokenIdController.text.trim());
@@ -457,13 +456,11 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
 
 class _NftPreview extends StatelessWidget {
   final String imageUrl;
-  final bool isDark;
   final S? l10n;
   final VoidCallback onConfirm;
 
   const _NftPreview({
     required this.imageUrl,
-    required this.isDark,
     required this.l10n,
     required this.onConfirm,
   });
@@ -499,7 +496,7 @@ class _NftPreview extends StatelessWidget {
             padding: const EdgeInsets.all(3),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : Colors.white,
+                color: context.surfaceColor,
                 shape: BoxShape.circle,
               ),
               child: ClipOval(
@@ -730,7 +727,7 @@ class _CollectionCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isDark ? Colors.white10 : AppColors.divider,

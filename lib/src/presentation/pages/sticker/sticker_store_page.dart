@@ -118,7 +118,7 @@ class _StickerStorePageState extends State<StickerStorePage>
       backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Sticker Store'),
-        backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
+        backgroundColor: context.surfaceColor,
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
@@ -286,7 +286,7 @@ class _StickerStorePageState extends State<StickerStorePage>
   Widget _buildPackCard(StickerPack pack, bool isInstalled, bool isDark) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
-      color: isDark ? AppColors.surfaceDark : Colors.white,
+      color: context.surfaceColor,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
