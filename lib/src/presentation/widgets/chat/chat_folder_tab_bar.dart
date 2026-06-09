@@ -100,7 +100,7 @@ class ChatFolderTabBar extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: AppColors.error,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

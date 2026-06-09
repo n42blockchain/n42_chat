@@ -141,26 +141,25 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final center = _computeCenter();
     final markers = _buildMarkers();
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         title: Text(
           S.of(context)?.liveLocation ?? 'Live Location',
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
           ),
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+              color: context.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -193,11 +192,9 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
   }
 
   Widget _buildBottomPanel(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -229,7 +226,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
                               .add(StopLiveLocation(roomId: widget.roomId));
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: AppColors.error,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -267,8 +264,6 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
   }
 
   Widget _buildSharingItem(BuildContext context, LiveLocationEntity location) {
-    final isDark = context.isDarkMode;
-
     return ListTile(
       leading: N42Avatar(
         imageUrl: location.avatarUrl,
@@ -278,7 +273,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
       title: Text(
         location.displayName,
         style: TextStyle(
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
           fontSize: 15,
           fontWeight: FontWeight.w500,
         ),
@@ -286,7 +281,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
       subtitle: Text(
         _formatRemaining(context, location),
         style: TextStyle(
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
           fontSize: 12,
         ),
       ),

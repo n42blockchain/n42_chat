@@ -77,12 +77,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
@@ -90,7 +88,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
             height: 1.3,
@@ -99,7 +97,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         leading: IconButton(
           icon: Icon(
             AppIcons.back,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             size: 20,
           ),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
@@ -111,7 +109,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : (_drafts.isEmpty
-                  ? _buildEmptyState(isDark)
+                  ? _buildEmptyState()
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
                       itemCount: _drafts.length,
@@ -119,21 +117,21 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
                           const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final draft = _drafts[index];
-                        return _buildDraftCard(draft, isDark);
+                        return _buildDraftCard(draft);
                       },
                     )),
       ),
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
+  Widget _buildEmptyState() {
     return ListView(
       children: [
         SizedBox(height: MediaQuery.of(context).size.height * 0.18),
         Icon(
           Icons.schedule_send_outlined,
           size: 56,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
         const SizedBox(height: 16),
         Center(
@@ -145,7 +143,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
               fontSize: 16,
               fontWeight: FontWeight.w600,
               height: 1.3,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
         ),
@@ -160,9 +158,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             style: TextStyle(
               fontSize: 13,
               height: 1.4,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ),
@@ -170,11 +166,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     );
   }
 
-  Widget _buildDraftCard(ScheduledMessageDraft draft, bool isDark) {
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildDraftCard(ScheduledMessageDraft draft) {
+    final cardColor = context.surfaceColor;
+    final secondaryColor = context.textSecondary;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -187,7 +181,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         children: [
           Row(
             children: [
-              Icon(_iconForDraft(draft), size: 18, color: Colors.blue[700]),
+              Icon(_iconForDraft(draft), size: 18, color: AppColors.info),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -195,7 +189,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -206,13 +200,13 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             ],
           ),
           const SizedBox(height: 10),
-          _buildChip(label: draft.typeLabel, isDark: isDark),
+          _buildChip(label: draft.typeLabel),
           const SizedBox(height: 10),
           Text(
             draft.text,
             style: TextStyle(
               fontSize: 15,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           if (draft.pollOptions.isNotEmpty ||
@@ -227,19 +221,16 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
                 if (draft.pollOptions.isNotEmpty)
                   _buildChip(
                     label: '${draft.pollOptions.length} options',
-                    isDark: isDark,
                   ),
                 if (draft.mentionsRoom)
-                  _buildChip(label: '@all', isDark: isDark),
+                  _buildChip(label: '@all'),
                 if (draft.mentionedUserIds.isNotEmpty)
                   _buildChip(
                     label: '@${draft.mentionedUserIds.length} members',
-                    isDark: isDark,
                   ),
                 if (draft.selfDestructAfter != null)
                   _buildChip(
                     label: 'Auto-delete ${draft.selfDestructAfter}s',
-                    isDark: isDark,
                   ),
               ],
             ),
@@ -269,7 +260,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     }
   }
 
-  Widget _buildChip({required String label, required bool isDark}) {
+  Widget _buildChip({required String label}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -280,7 +271,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         label,
         style: TextStyle(
           fontSize: 12,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
     );

@@ -253,7 +253,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                   // 删除按钮
                   IconButton(
                     onPressed: _removeMusic,
-                    icon: const Icon(Icons.close, size: 18, color: Colors.red),
+                    icon: const Icon(Icons.close, size: 18, color: AppColors.error),
                   ),
                 ],
               ),

@@ -183,13 +183,12 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
   }
 
   void _showLanguagePicker() {
-    final isDark = context.isDarkMode;
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -201,7 +200,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[400],
+                  color: context.dividerColor,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -215,9 +214,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -235,9 +232,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           height: 1.3,
-                          color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimary,
+                          color: context.textPrimary,
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.normal,
@@ -250,9 +245,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                         style: TextStyle(
                           fontSize: 13,
                           height: 1.3,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                       trailing: isSelected
@@ -294,14 +287,11 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: N42AppBar(
           title: l10n?.settingsTranslation ?? 'Translation',
           showBackButton: true,
@@ -312,7 +302,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
     }
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.settingsTranslation ?? 'Translation',
         showBackButton: true,
@@ -339,7 +329,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 卡片1：目标语言选择
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: Material(
               color: Colors.transparent,
               child: InkWell(
@@ -359,9 +349,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                           style: TextStyle(
                             fontSize: 16,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -376,18 +364,14 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                           style: TextStyle(
                             fontSize: 15,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
                         AppIcons.chevron,
-                        color: isDark
-                            ? AppColors.textTertiaryDark
-                            : AppColors.textTertiary,
+                        color: context.textTertiary,
                       ),
                     ],
                   ),
@@ -404,9 +388,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                   'Select the language you want messages to be translated into.',
               style: TextStyle(
                 fontSize: 13,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -415,7 +397,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 卡片2：自动翻译开关
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               child: Row(
@@ -426,7 +408,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                           'Auto-translate received messages',
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                   ),
@@ -454,9 +436,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                   'Automatically translate messages received in chat to your selected language.',
               style: TextStyle(
                 fontSize: 13,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -465,7 +445,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 卡片3：智能回复翻译开关
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               child: Row(
@@ -475,7 +455,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       'Smart reply translation',
                       style: TextStyle(
                         fontSize: 16,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                   ),
@@ -502,9 +482,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
               'Automatically translate your messages to match the recipient\'s language before sending.',
               style: TextStyle(
                 fontSize: 13,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
