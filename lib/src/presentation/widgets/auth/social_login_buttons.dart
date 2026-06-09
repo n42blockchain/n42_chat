@@ -215,6 +215,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           icon: Icons.chat_bubble,
           isLoading: _isWeChatLoading,
           tooltip: S.of(context)?.commonWechat ?? 'WeChat',
+          // 微信登录按钮保留微信官方品牌绿以保证识别度
           backgroundColor: const Color(0xFF07C160),
           iconColor: Colors.white,
         ),

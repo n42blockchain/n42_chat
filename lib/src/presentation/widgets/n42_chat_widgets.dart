@@ -153,7 +153,7 @@ class _LoadingPage extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xFF07C160),
+                color: const Color(0xFF5B6CFF),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
@@ -177,7 +177,7 @@ class _LoadingPage extends StatelessWidget {
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF07C160)),
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5B6CFF)),
               ),
             ),
           ],
@@ -363,7 +363,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                 child: ElevatedButton(
                   onPressed: _isRetrying ? null : _retry,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF07C160),
+                    backgroundColor: const Color(0xFF5B6CFF),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

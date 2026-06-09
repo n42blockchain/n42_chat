@@ -7,20 +7,22 @@ abstract class AppColors {
   AppColors._();
 
   // ============================================
-  // 主色调 - WeChat Green
+  // 主色调 - 品牌靛蓝 (AI-native, 与主 App 对齐 #5B6CFF)
+  // 注意: 微信绿仅保留于消息气泡 / success / 在线 / 加密标识等语义场景,
+  //       品牌 CTA / 强调 / 选中 / 焦点 / ripple 统一走品牌靛蓝。
   // ============================================
 
-  /// 主色 - 微信绿
-  static const Color primary = Color(0xFF07C160);
+  /// 主色 - 品牌靛蓝
+  static const Color primary = Color(0xFF5B6CFF);
 
   /// 主色 - 浅色变体
-  static const Color primaryLight = Color(0xFF4CD964);
+  static const Color primaryLight = Color(0xFF8290FF);
 
   /// 主色 - 深色变体
-  static const Color primaryDark = Color(0xFF06AD56);
+  static const Color primaryDark = Color(0xFF4856E6);
 
   /// 主色 - 透明变体
-  static const Color primaryWithOpacity = Color(0x1A07C160);
+  static const Color primaryWithOpacity = Color(0x1A5B6CFF);
 
   // ============================================
   // 背景色
@@ -164,7 +166,7 @@ abstract class AppColors {
   /// 警告背景
   static const Color warningBg = Color(0x14FF9900);
 
-  /// 成功（同 primary 但语义不同）
+  /// 成功（微信绿，独立于品牌主色靛蓝）
   static const Color success = Color(0xFF07C160);
 
   /// 成功背景
@@ -196,8 +198,8 @@ abstract class AppColors {
   /// 输入框边框
   static const Color inputBorder = Color(0xFFE5E5E5);
 
-  /// 输入框焦点边框
-  static const Color inputFocusBorder = Color(0xFF07C160);
+  /// 输入框焦点边框 (品牌强调)
+  static const Color inputFocusBorder = Color(0xFF5B6CFF);
 
   /// 搜索框背景
   static const Color searchBackground = Color(0xFFEDEDED);
@@ -237,12 +239,12 @@ abstract class AppColors {
   /// 离线状态
   static const Color offline = Color(0xFFCCCCCC);
 
-  /// 选中状态
-  static const Color selected = Color(0x1A07C160);
+  /// 选中状态 (品牌强调)
+  static const Color selected = Color(0x1A5B6CFF);
 
   /// 品牌 ripple/highlight（带主色调的 InkWell 反馈）
-  static const Color brandRipple10 = Color(0x1A07C160);
-  static const Color brandRipple05 = Color(0x0D07C160);
+  static const Color brandRipple10 = Color(0x1A5B6CFF);
+  static const Color brandRipple05 = Color(0x0D5B6CFF);
 
   /// 按压状态 - 浅色
   static const Color pressed = Color(0x0D000000);
