@@ -233,7 +233,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildCurrentEmailCard(bool isDark, String email) {
-    final cardBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final cardBgColor = context.surfaceColor;
     final textColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
@@ -286,7 +286,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = context.surfaceColor;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;
@@ -358,7 +358,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = context.surfaceColor;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;
@@ -413,7 +413,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = context.surfaceColor;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;

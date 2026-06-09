@@ -132,7 +132,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5);
-    final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final surfaceColor = context.surfaceColor;
     final textColor = context.textPrimary;
     final secondaryTextColor = isDark
         ? AppColors.textSecondaryDark
@@ -363,8 +363,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
   }
 
   void _showTokenPicker() {
-    final isDark = context.isDarkMode;
-    final surfaceColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final surfaceColor = context.surfaceColor;
     final textColor = context.textPrimary;
 
     showModalBottomSheet<void>(

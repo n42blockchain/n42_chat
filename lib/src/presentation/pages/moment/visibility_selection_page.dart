@@ -101,7 +101,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
     final isDark = context.isDarkMode;
     final s = S.of(context);
     final bgColor = context.pageBackground;
-    final cardColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final cardColor = context.surfaceColor;
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 

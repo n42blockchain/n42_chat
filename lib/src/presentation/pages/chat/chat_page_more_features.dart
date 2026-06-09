@@ -12,7 +12,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         backgroundColor: Colors.transparent,
         builder: (context) => Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
+            color: context.surfaceColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
           ),
           child: SafeArea(

@@ -635,7 +635,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
             right: 0,
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : Colors.white,
+                color: context.surfaceColor,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(

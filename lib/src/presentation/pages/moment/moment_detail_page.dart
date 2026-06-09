@@ -124,7 +124,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
           backgroundColor: context.pageBackground,
           appBar: AppBar(
             title: Text(s?.momentMoment ?? 'Moment'),
-            backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
+            backgroundColor: context.surfaceColor,
             actions: [
               IconButton(
                 icon: const Icon(Icons.share_outlined),
@@ -142,7 +142,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                       // 动态内容
                       Container(
                         padding: const EdgeInsets.all(16),
-                        color: isDark ? AppColors.surfaceDark : Colors.white,
+                        color: context.surfaceColor,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -235,7 +235,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         if (visibleLikes.isEmpty) return const SizedBox.shrink();
                         return Container(
                           padding: const EdgeInsets.all(16),
-                          color: isDark ? AppColors.surfaceDark : Colors.white,
+                          color: context.surfaceColor,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -291,7 +291,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         );
                         return Container(
                           padding: const EdgeInsets.all(16),
-                          color: isDark ? AppColors.surfaceDark : Colors.white,
+                          color: context.surfaceColor,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -549,7 +549,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: context.surfaceColor,
         border: Border(
           top: BorderSide(
             color: context.dividerColor,

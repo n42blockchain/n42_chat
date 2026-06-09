@@ -119,7 +119,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
       return _buildNoMatches(isDark);
     }
 
-    return _buildMatchedList(isDark);
+    return _buildMatchedList();
   }
 
   Widget _buildPermissionRequest(bool isDark) {
@@ -258,7 +258,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
     );
   }
 
-  Widget _buildMatchedList(bool isDark) {
+  Widget _buildMatchedList() {
     return Column(
       children: [
         // 统计信息
@@ -295,7 +295,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             itemCount: _matchedContacts.length,
             itemBuilder: (context, index) {
               final match = _matchedContacts[index];
-              return _buildMatchTile(match, isDark);
+              return _buildMatchTile(match);
             },
           ),
         ),
@@ -303,7 +303,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
     );
   }
 
-  Widget _buildMatchTile(MatchedContact match, bool isDark) {
+  Widget _buildMatchTile(MatchedContact match) {
     final phoneContact = match.phoneContact;
     final displayName = match.matrixDisplayName ?? phoneContact.displayName;
 
@@ -325,7 +325,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 color: AppColors.primary,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
+                  color: context.surfaceColor,
                   width: 2,
                 ),
               ),

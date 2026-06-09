@@ -242,7 +242,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
     final backgroundColor = isDark
         ? AppColors.backgroundDark
         : const Color(0xFFF3F5F7);
-    final cardColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final cardColor = context.surfaceColor;
     final primaryText = isDark ? Colors.white : AppColors.textPrimary;
     final secondaryText = isDark
         ? AppColors.textSecondaryDark

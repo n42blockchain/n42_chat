@@ -162,7 +162,7 @@ class _MomentListViewState extends State<_MomentListView> {
           SliverAppBar(
             expandedHeight: 280,
             pinned: true,
-            backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
+            backgroundColor: context.surfaceColor,
             flexibleSpace: FlexibleSpaceBar(
               background: _buildCoverSection(context, isDark),
             ),
@@ -360,7 +360,7 @@ class _MomentTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: context.surfaceColor,
         border: Border(
           bottom: BorderSide(
             color: context.dividerColor,
