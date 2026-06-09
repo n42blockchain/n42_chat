@@ -213,7 +213,9 @@ class N42ChatTheme {
       textSecondaryColor:
           theme.textTheme.bodySmall?.color ?? AppColors.textSecondary,
       textTertiaryColor: AppColors.textTertiary,
-      messageBubbleSentColor: theme.primaryColor.withValues(alpha: 0.3),
+      // 气泡固定走微信绿专用色,不随品牌主色(靛蓝)漂移
+      messageBubbleSentColor:
+          isDark ? AppColors.bubbleSelfDark : AppColors.bubbleSelf,
       messageBubbleReceivedColor: theme.cardColor,
       messageTextSentColor: isDark ? Colors.white : AppColors.messageTextSent,
       messageTextReceivedColor:
