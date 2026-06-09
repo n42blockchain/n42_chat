@@ -29,7 +29,7 @@ class EmojiVerificationWidget extends StatelessWidget {
           S.of(context)?.securityCompareEmoji ?? 'Compare the emoji on both devices',
           style: TextStyle(
             fontSize: 15,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -110,7 +110,7 @@ class NumberVerificationWidget extends StatelessWidget {
           S.of(context)?.securityCompareNumbers ?? 'Compare the numbers on both devices',
           style: TextStyle(
             fontSize: 15,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -133,7 +133,7 @@ class NumberVerificationWidget extends StatelessWidget {
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'monospace',
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             );

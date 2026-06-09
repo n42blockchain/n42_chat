@@ -152,7 +152,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                           ? (_mode == StoryMode.text
                                 ? _currentTextColor
                                 : Theme.of(context).primaryColor)
-                          : Colors.grey,
+                          : context.textTertiary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -658,7 +658,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                     size: 14,
                     color: _mode == StoryMode.text
                         ? _currentTextColor.withValues(alpha: 0.7)
-                        : Colors.red,
+                        : AppColors.error,
                   ),
                 ),
               ],

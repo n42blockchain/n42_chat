@@ -267,7 +267,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: Text(
           '${step + 1}',
           style: TextStyle(
-            color: isActive ? Colors.white : Colors.grey,
+            color: isActive ? Colors.white : AppColors.textTertiary,
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/router/routes.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/voice_room_entity.dart';
 import '../../../domain/repositories/voice_room_repository.dart';
 import '../../../services/voip/voice_room_service.dart';
@@ -268,7 +269,7 @@ class _VoiceRoomCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      color: AppColors.success,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(

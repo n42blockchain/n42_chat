@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 
 /// 线程指示器
@@ -64,7 +65,7 @@ class ThreadIndicator extends StatelessWidget {
                 width: 8,
                 height: 8,
                 decoration: const BoxDecoration(
-                  color: Colors.red,
+                  color: AppColors.error,
                   shape: BoxShape.circle,
                 ),
               ),

@@ -14,6 +14,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../../core/utils/debug_log.dart';
@@ -122,7 +123,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error, color: Colors.red, size: 48),
+              const Icon(Icons.error, color: AppColors.error, size: 48),
               const SizedBox(height: 16),
               Text(
                 '${S.of(ctx)?.chatVideoPlaybackFailed ?? 'Video playback failed'}\n$errorMessage',
@@ -190,7 +191,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error, color: Colors.red, size: 48),
+                  const Icon(Icons.error, color: AppColors.error, size: 48),
                   const SizedBox(height: 16),
                   Text(
                     '${S.of(context)?.chatVideoLoadFailed ?? 'Video load failed'}\n$_error',

@@ -51,16 +51,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Future<void> _selectPrivacyMode() async {
-    final isDark = context.isDarkMode;
     final selected = await showModalBottomSheet<NotificationPrivacyMode>(
       context: context,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: context.surfaceColor,
       builder: (ctx) {
-        final textColor =
-            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-        final secondary = isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondary;
+        final textColor = context.textPrimary;
+        final secondary = context.textSecondary;
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -100,7 +96,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.settingsMessageNotifications ?? 'Message Notifications',
         showBackButton: true,
@@ -112,7 +108,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
           // 通知开关
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: Column(
               children: [
                 _buildSwitchTile(
@@ -137,7 +133,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           // 通知详情设置
           if (_settings.enabled) ...[
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               child: Column(
                 children: [
                   _buildSwitchTile(
@@ -196,7 +192,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
             // 免打扰设置
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               child: Column(
                 children: [
                   _buildSwitchTile(
@@ -311,7 +307,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: AppColors.info,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(icon, color: Colors.white, size: 20),
