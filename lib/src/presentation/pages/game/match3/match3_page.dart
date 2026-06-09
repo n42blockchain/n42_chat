@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../services/game_score_service.dart';
 import '../widgets/game_over_dialog.dart';
 import '../widgets/game_scaffold.dart';
@@ -82,7 +83,7 @@ class _Match3PageState extends State<Match3Page> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: _logic.timeLeft <= 10 ? Colors.red : null,
+                  color: _logic.timeLeft <= 10 ? AppColors.error : null,
                 ),
               ),
               Text(
@@ -96,7 +97,7 @@ class _Match3PageState extends State<Match3Page> {
             value: progress,
             backgroundColor: Colors.grey[300],
             valueColor: AlwaysStoppedAnimation(
-              _logic.timeLeft <= 10 ? Colors.red : Colors.blue,
+              _logic.timeLeft <= 10 ? AppColors.error : AppColors.info,
             ),
           ),
         ],

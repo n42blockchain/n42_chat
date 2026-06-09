@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../services/game_score_service.dart';
 import '../widgets/game_over_dialog.dart';
 import '../widgets/game_scaffold.dart';
@@ -125,7 +126,7 @@ class _BlockDropPageState extends State<BlockDropPage> {
           Column(
             children: [
               Text(l10n?.gameLevel ?? 'Level',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                  style: TextStyle(fontSize: 12, color: context.textTertiary)),
               Text('${_logic.level}',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
@@ -133,7 +134,7 @@ class _BlockDropPageState extends State<BlockDropPage> {
           Column(
             children: [
               Text(l10n?.gameNext ?? 'Next',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                  style: TextStyle(fontSize: 12, color: context.textTertiary)),
               const SizedBox(height: 4),
               NextPieceWidget(piece: _logic.nextPiece),
             ],
@@ -141,7 +142,7 @@ class _BlockDropPageState extends State<BlockDropPage> {
           Column(
             children: [
               Text(l10n?.gameLines ?? 'Lines',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                  style: TextStyle(fontSize: 12, color: context.textTertiary)),
               Text('${_logic.totalLines}',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],

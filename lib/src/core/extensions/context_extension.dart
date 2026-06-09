@@ -152,12 +152,12 @@ extension ContextExtension on BuildContext {
 
   /// 显示错误SnackBar
   void showErrorSnackBar(String message, {Duration duration = const Duration(seconds: 3)}) {
-    showSnackBar(message, duration: duration, backgroundColor: Colors.red);
+    showSnackBar(message, duration: duration, backgroundColor: AppColors.error);
   }
 
   /// 显示成功SnackBar
   void showSuccessSnackBar(String message, {Duration duration = const Duration(seconds: 2)}) {
-    showSnackBar(message, duration: duration, backgroundColor: AppColors.primary);
+    showSnackBar(message, duration: duration, backgroundColor: AppColors.success);
   }
 
   /// 清除所有 SnackBar
