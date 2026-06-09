@@ -59,18 +59,11 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final secondaryTextColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final dividerColor = isDark
-        ? AppColors.dividerThinDark
-        : AppColors.dividerThin;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryTextColor = context.textSecondary;
+    final dividerColor = context.dividerThin;
 
     return BlocListener<ContactBloc, ContactState>(
       listenWhen: (previous, current) =>
@@ -270,7 +263,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                                 'Delete Contact',
                             style: const TextStyle(
                               fontSize: 16,
-                              color: Colors.red,
+                              color: AppColors.error,
                             ),
                           ),
                         ),
@@ -474,7 +467,6 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   }
 
   void _showReportDialog() {
-    final isDark = context.isDarkMode;
     final descController = TextEditingController();
     String? selectedReason;
 
@@ -482,11 +474,11 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          backgroundColor: context.surfaceColor,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
             style: TextStyle(
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           content: RadioGroup<String>(
@@ -505,9 +497,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     title: Text(
                       reason,
                       style: TextStyle(
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                     value: reason,
@@ -521,18 +511,14 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                   controller: descController,
                   maxLines: 2,
                   style: TextStyle(
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                   decoration: InputDecoration(
                     hintText:
                         S.of(context)?.reportDescription ??
                         'Additional description (optional)',
                     hintStyle: TextStyle(
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                     border: const OutlineInputBorder(),
                   ),
@@ -625,7 +611,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],

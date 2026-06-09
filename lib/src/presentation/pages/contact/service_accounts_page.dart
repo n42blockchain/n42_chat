@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
 
 /// 服务号列表页面
@@ -14,7 +13,7 @@ class ServiceAccountsPage extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.contactServiceAccounts ?? 'Service Accounts',
       ),
@@ -22,7 +21,7 @@ class ServiceAccountsPage extends StatelessWidget {
         children: [
           // 搜索栏
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Container(
               height: 36,
@@ -34,13 +33,13 @@ class ServiceAccountsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.search, size: 20,
-                      color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary),
+                      color: context.textTertiary),
                   const SizedBox(width: 6),
                   Text(
                     S.of(context)?.commonSearch ?? 'Search',
                     style: TextStyle(
                       fontSize: 15,
-                      color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                      color: context.textTertiary,
                     ),
                   ),
                 ],
@@ -62,7 +61,7 @@ class ServiceAccountsPage extends StatelessWidget {
                     S.of(context)?.contactNoServiceAccounts ?? 'No service accounts',
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -71,7 +70,7 @@ class ServiceAccountsPage extends StatelessWidget {
                         'Subscribe to service accounts for convenient services',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],

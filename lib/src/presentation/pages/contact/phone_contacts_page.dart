@@ -96,7 +96,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: const N42AppBar(title: 'From Contacts'),
       body: _buildBody(isDark),
     );
@@ -144,7 +144,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 fontSize: 18,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -156,9 +156,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 32),
@@ -196,9 +194,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 24),
@@ -230,7 +226,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 fontSize: 18,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -242,9 +238,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 16),
@@ -255,7 +249,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -270,7 +264,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         // 统计信息
         Container(
           padding: const EdgeInsets.all(16),
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           child: Row(
             children: [
               const Icon(
@@ -287,9 +281,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ),
@@ -349,7 +341,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         style: TextStyle(
           fontWeight: FontWeight.w500,
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Column(
@@ -362,9 +354,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             style: TextStyle(
               fontSize: 12,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           if (phoneContact.displayName != displayName)
@@ -375,7 +365,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 11,
                 height: 1.3,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
         ],

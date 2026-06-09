@@ -83,7 +83,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(successMessage),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
               ),
             );
           }
@@ -109,12 +109,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         final user = state.user;
 
         return Scaffold(
-          backgroundColor: isDark
-              ? AppColors.backgroundDark
-              : AppColors.background,
+          backgroundColor: context.pageBackground,
           appBar: N42AppBar(
             title: S.of(context)?.profilePersonalProfile ?? 'Personal Profile',
-            backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+            backgroundColor: context.surfaceColor,
           ),
           body: ListView(
             children: [
@@ -223,9 +221,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         Icon(
                           Icons.qr_code,
                           size: 20,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                         const SizedBox(width: 8),
                         const Icon(

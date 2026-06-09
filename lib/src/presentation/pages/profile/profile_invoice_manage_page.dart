@@ -117,13 +117,11 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: Text(S.of(context)?.profileMyInvoices ?? 'My Invoices'),
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         actions: [
           TextButton(
             onPressed: _addInvoice,
@@ -191,7 +189,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                               decoration: BoxDecoration(
                                 color: invoice.type == 'company'
                                     ? AppColors.primary.withValues(alpha: 0.1)
-                                    : Colors.orange.withValues(alpha: 0.1),
+                                    : AppColors.warning.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -208,7 +206,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                   fontWeight: FontWeight.w500,
                                   color: invoice.type == 'company'
                                       ? AppColors.primary
-                                      : Colors.orange,
+                                      : AppColors.warning,
                                 ),
                               ),
                             ),
