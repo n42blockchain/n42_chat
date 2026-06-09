@@ -281,28 +281,28 @@ class _GifPickerState extends State<GifPicker> {
   Widget _buildGifGrid(bool isDark) {
     // 服务不可用时显示提示
     if (!_serviceAvailable) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.warning_amber_outlined,
               size: 48,
-              color: isDark ? Colors.grey[600] : Colors.grey[400],
+              color: AppColors.textTertiary,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               'GIF service not configured',
               style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: AppColors.textTertiary,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               'Please configure Giphy API key',
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? Colors.grey[500] : Colors.grey[500],
+                color: AppColors.textTertiary,
               ),
             ),
           ],
@@ -319,16 +319,16 @@ class _GifPickerState extends State<GifPicker> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.gif_box_outlined,
               size: 48,
-              color: isDark ? Colors.grey[600] : Colors.grey[400],
+              color: AppColors.textTertiary,
             ),
             const SizedBox(height: 8),
             Text(
               _currentQuery.isEmpty ? 'No trending GIFs' : 'No GIFs found',
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              style: const TextStyle(
+                color: AppColors.textTertiary,
               ),
             ),
           ],
@@ -400,22 +400,22 @@ class _GifPickerState extends State<GifPicker> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
+          const Text(
             'Powered by ',
             style: TextStyle(
               fontSize: 10,
-              color: isDark ? Colors.grey[500] : Colors.grey[600],
+              color: AppColors.textTertiary,
             ),
           ),
           Image.network(
             'https://giphy.com/static/img/giphy_logo_small.png',
             height: 12,
-            errorBuilder: (_, _, _) => Text(
+            errorBuilder: (_, _, _) => const Text(
               'GIPHY',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.grey[400] : Colors.grey[700],
+                color: AppColors.textTertiary,
               ),
             ),
           ),
@@ -451,7 +451,7 @@ Future<GifPickerResult?> showGifPicker(BuildContext context) async {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey[400],
+              color: AppColors.textTertiary,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

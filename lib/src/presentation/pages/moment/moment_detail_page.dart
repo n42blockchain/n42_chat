@@ -161,8 +161,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                     children: [
                                       Text(
                                         moment.userName,
-                                        style: TextStyle(
-                                          color: isDark ? Colors.blue[300] : Colors.blue[700],
+                                        style: const TextStyle(
+                                          color: AppColors.info,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 16,
                                         ),
@@ -241,10 +241,10 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.favorite,
                                     size: 18,
-                                    color: isDark ? Colors.red[300] : Colors.red,
+                                    color: AppColors.error,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -496,8 +496,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                     children: [
                       Text(
                         comment.userName,
-                        style: TextStyle(
-                          color: isDark ? Colors.blue[300] : Colors.blue[700],
+                        style: const TextStyle(
+                          color: AppColors.info,
                           fontWeight: FontWeight.w500,
                           fontSize: 14,
                         ),
@@ -506,8 +506,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         const Text(' ▸ '),
                         Text(
                           comment.replyToUserName ?? '',
-                          style: TextStyle(
-                            color: isDark ? Colors.blue[300] : Colors.blue[700],
+                          style: const TextStyle(
+                            color: AppColors.info,
                             fontWeight: FontWeight.w500,
                             fontSize: 14,
                           ),
@@ -519,7 +519,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   Text(
                     comment.content,
                     style: TextStyle(
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: context.textPrimary,
                       fontSize: 14,
                     ),
                   ),
@@ -527,7 +527,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   Text(
                     _formatCommentTime(comment.timestamp),
                     style: TextStyle(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -552,7 +552,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
         color: isDark ? AppColors.surfaceDark : Colors.white,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
         ),
       ),
@@ -570,7 +570,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
             },
             icon: Icon(
               moment.isLikedByMe ? Icons.favorite : Icons.favorite_border,
-              color: moment.isLikedByMe ? Colors.red : null,
+              color: moment.isLikedByMe ? AppColors.error : null,
             ),
           ),
 

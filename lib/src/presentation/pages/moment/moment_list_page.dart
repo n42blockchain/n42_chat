@@ -200,7 +200,7 @@ class _MomentListViewState extends State<_MomentListView> {
                         Icon(
                           Icons.photo_library_outlined,
                           size: 64,
-                          color: isDark ? Colors.grey[600] : Colors.grey[400],
+                          color: context.textTertiary,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -390,8 +390,8 @@ class _MomentTile extends StatelessWidget {
                   moment.userName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: isDark ? Colors.blue[300] : Colors.blue[700],
+                  style: const TextStyle(
+                    color: AppColors.info,
                     fontWeight: FontWeight.w500,
                     height: 1.3,
                   ),
@@ -404,7 +404,7 @@ class _MomentTile extends StatelessWidget {
                   Text(
                     moment.content!,
                     style: TextStyle(
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: context.textPrimary,
                       fontSize: 15,
                       height: 1.4,
                     ),
@@ -425,7 +425,7 @@ class _MomentTile extends StatelessWidget {
                       Icon(
                         Icons.location_on,
                         size: 14,
-                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                       const SizedBox(width: 4),
                       Flexible(
@@ -434,7 +434,7 @@ class _MomentTile extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                            color: context.textSecondary,
                             fontSize: 12,
                             height: 1.3,
                           ),
@@ -453,7 +453,7 @@ class _MomentTile extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                        color: context.textSecondary,
                         fontSize: 12,
                         height: 1.3,
                       ),
@@ -640,7 +640,7 @@ class _MomentTile extends StatelessWidget {
           child: Icon(
             Icons.lock_outline,
             size: 13,
-            color: isDark ? Colors.grey[400] : Colors.grey[500],
+            color: context.textTertiary,
           ),
         );
       case MomentVisibility.partial:
@@ -649,7 +649,7 @@ class _MomentTile extends StatelessWidget {
           child: Icon(
             Icons.group_outlined,
             size: 13,
-            color: isDark ? Colors.grey[400] : Colors.grey[500],
+            color: context.textTertiary,
           ),
         );
       case MomentVisibility.excluded:
@@ -658,7 +658,7 @@ class _MomentTile extends StatelessWidget {
           child: Icon(
             Icons.person_off_outlined,
             size: 13,
-            color: isDark ? Colors.grey[400] : Colors.grey[500],
+            color: context.textTertiary,
           ),
         );
       case MomentVisibility.public:
@@ -680,7 +680,7 @@ class _MomentTile extends StatelessWidget {
           child: Icon(
             Icons.more_horiz,
             size: 18,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       ),
@@ -870,10 +870,10 @@ class _MomentTile extends StatelessWidget {
           if (visibleLikes.isNotEmpty) ...[
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.favorite,
                   size: 14,
-                  color: isDark ? Colors.red[300] : Colors.red,
+                  color: AppColors.error,
                 ),
                 const SizedBox(width: 4),
                 Expanded(
@@ -881,8 +881,8 @@ class _MomentTile extends StatelessWidget {
                     visibleLikes.map((l) => l.userName).join(', '),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: isDark ? Colors.blue[300] : Colors.blue[700],
+                    style: const TextStyle(
+                      color: AppColors.info,
                       fontSize: 13,
                       height: 1.4,
                     ),
@@ -892,7 +892,7 @@ class _MomentTile extends StatelessWidget {
             ),
             if (visibleComments.isNotEmpty)
               Divider(
-                color: isDark ? Colors.grey[700] : Colors.grey[300],
+                color: context.dividerColor,
                 height: 16,
               ),
           ],
@@ -905,13 +905,13 @@ class _MomentTile extends StatelessWidget {
                 text: TextSpan(
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                   children: [
                     TextSpan(
                       text: comment.userName,
-                      style: TextStyle(
-                        color: isDark ? Colors.blue[300] : Colors.blue[700],
+                      style: const TextStyle(
+                        color: AppColors.info,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -921,8 +921,8 @@ class _MomentTile extends StatelessWidget {
                       ),
                       TextSpan(
                         text: comment.replyToUserName,
-                        style: TextStyle(
-                          color: isDark ? Colors.blue[300] : Colors.blue[700],
+                        style: const TextStyle(
+                          color: AppColors.info,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1193,7 +1193,7 @@ class _MomentDeleteDialogState extends State<_MomentDeleteDialog> {
                   )
                 : Text(
                     s?.commonDelete ?? 'Delete',
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: AppColors.error),
                   ),
           ),
         ],
@@ -1288,7 +1288,7 @@ class _MomentImageGalleryPageState extends State<_MomentImageGalleryPage> {
                     errorWidget: (_, _, _) => Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error, color: Colors.red, size: 48),
+                        const Icon(Icons.error, color: AppColors.error, size: 48),
                         const SizedBox(height: 16),
                         Text(
                           S.of(context)?.momentFailedToLoad ??
