@@ -184,7 +184,10 @@ dependencies:
   # Push Notifications & Call Kit - 来电推送
   # ============================================
   # MIT License
-  flutter_callkit_incoming: ^3.0.0
+  # 收紧到 <3.1.0：3.1.x（2026-05 末）把 CallKitParams.textAccept/textDecline
+  # 移进了 AndroidParams，本仓 voip/call_notification_service.dart 仍用顶层写法，
+  # 漂到 3.1.x 会编译失败。如需升级 3.1.x 须先把 text 参数迁入 AndroidParams 并真机验证。
+  flutter_callkit_incoming: ">=3.0.0 <3.1.0"
   firebase_core: ^4.5.0
   firebase_messaging: ^16.1.2
   flutter_local_notifications: ^20.1.0
