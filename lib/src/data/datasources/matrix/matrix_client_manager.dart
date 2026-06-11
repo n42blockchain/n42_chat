@@ -327,8 +327,11 @@ class MatrixClientManager {
 
       if (isEmail) {
         debugLog('MatrixClientManager: Using email identifier for login');
-        // 先尝试新式 identifier 格式；部分服务器（如 Conduit/旧 Synapse）
-        // 不支持 m.id.thirdparty，遇到 M_UNKNOWN 时回退到旧式顶层字段。
+        // 尝试顺序：
+        // 1. 新式 m.id.thirdparty identifier（标准 Matrix 邮箱登录）
+        // 2. legacy address/medium 顶层字段（旧版 Matrix 邮箱登录）
+        // 3. 邮箱 @ 前的本地部分作为用户名（服务器不支持邮箱登录时的兜底）
+        MatrixException? lastEmailError;
         try {
           final response = await _client!.login(
             LoginType.mLoginPassword,
@@ -343,10 +346,14 @@ class MatrixClientManager {
           return response;
         } on MatrixException catch (e) {
           if (e.errcode != 'M_UNKNOWN') rethrow;
+          lastEmailError = e;
           debugLog(
             'MatrixClientManager: Email identifier rejected (M_UNKNOWN), '
             'retrying with legacy address/medium fields',
           );
+        }
+
+        try {
           // ignore: deprecated_member_use
           final response = await _client!.login(
             LoginType.mLoginPassword,
@@ -361,7 +368,35 @@ class MatrixClientManager {
             'MatrixClientManager: Login successful (legacy) - ${response.userId}',
           );
           return response;
+        } on MatrixException catch (e) {
+          if (e.errcode != 'M_UNKNOWN') rethrow;
+          lastEmailError = e;
+          debugLog(
+            'MatrixClientManager: Legacy email fields also rejected (M_UNKNOWN), '
+            'retrying with email local-part as username',
+          );
         }
+
+        // 服务器不支持邮箱登录（如 N42 Conduit），用 @ 前的本地部分作为用户名兜底
+        final localPart = username.substring(0, username.indexOf('@'));
+        if (localPart.isNotEmpty) {
+          try {
+            final response = await _client!.login(
+              LoginType.mLoginPassword,
+              identifier: AuthenticationUserIdentifier(user: localPart),
+              password: password,
+              initialDeviceDisplayName: deviceName ?? 'N42Chat',
+            );
+            debugLog(
+              'MatrixClientManager: Login successful (local-part fallback) - ${response.userId}',
+            );
+            return response;
+          } on MatrixException catch (_) {
+            // 三次全部失败，抛出原始邮箱错误，保留更清晰的提示信息
+            throw lastEmailError;
+          }
+        }
+        throw lastEmailError;
       } else {
         debugLog('MatrixClientManager: Using username identifier for login');
         final response = await _client!.login(
