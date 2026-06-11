@@ -325,29 +325,54 @@ class MatrixClientManager {
           username.indexOf('@') < username.length - 1 &&
           username.substring(username.indexOf('@') + 1).contains('.');
 
-      // 根据输入类型选择认证标识
-      final AuthenticationIdentifier identifier;
       if (isEmail) {
-        identifier = AuthenticationThirdPartyIdentifier(
-          medium: 'email',
-          address: username,
-        );
         debugLog('MatrixClientManager: Using email identifier for login');
+        // 先尝试新式 identifier 格式；部分服务器（如 Conduit/旧 Synapse）
+        // 不支持 m.id.thirdparty，遇到 M_UNKNOWN 时回退到旧式顶层字段。
+        try {
+          final response = await _client!.login(
+            LoginType.mLoginPassword,
+            identifier: AuthenticationThirdPartyIdentifier(
+              medium: 'email',
+              address: username,
+            ),
+            password: password,
+            initialDeviceDisplayName: deviceName ?? 'N42Chat',
+          );
+          debugLog('MatrixClientManager: Login successful - ${response.userId}');
+          return response;
+        } on MatrixException catch (e) {
+          if (e.errcode != 'M_UNKNOWN') rethrow;
+          debugLog(
+            'MatrixClientManager: Email identifier rejected (M_UNKNOWN), '
+            'retrying with legacy address/medium fields',
+          );
+          // ignore: deprecated_member_use
+          final response = await _client!.login(
+            LoginType.mLoginPassword,
+            // ignore: deprecated_member_use
+            address: username,
+            // ignore: deprecated_member_use
+            medium: 'email',
+            password: password,
+            initialDeviceDisplayName: deviceName ?? 'N42Chat',
+          );
+          debugLog(
+            'MatrixClientManager: Login successful (legacy) - ${response.userId}',
+          );
+          return response;
+        }
       } else {
-        identifier = AuthenticationUserIdentifier(user: username);
         debugLog('MatrixClientManager: Using username identifier for login');
+        final response = await _client!.login(
+          LoginType.mLoginPassword,
+          identifier: AuthenticationUserIdentifier(user: username),
+          password: password,
+          initialDeviceDisplayName: deviceName ?? 'N42Chat',
+        );
+        debugLog('MatrixClientManager: Login successful - ${response.userId}');
+        return response;
       }
-
-      // 登录
-      final response = await _client!.login(
-        LoginType.mLoginPassword,
-        identifier: identifier,
-        password: password,
-        initialDeviceDisplayName: deviceName ?? 'N42Chat',
-      );
-
-      debugLog('MatrixClientManager: Login successful - ${response.userId}');
-      return response;
     } catch (e) {
       debugLog('MatrixClientManager: Login failed: $e');
       rethrow;
