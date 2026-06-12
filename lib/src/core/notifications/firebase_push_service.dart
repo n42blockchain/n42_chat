@@ -617,11 +617,11 @@ class FirebasePushService implements IPushNotificationService {
     }
 
     // 跨通道去重：同一事件可能已经由 Matrix sync 监听（主 isolate）
-    // 或 FCM 后台 isolate 弹过通知。键优先用 Matrix event_id，
-    // 缺失时退回 FCM messageId（兼防 FCM at-least-once 重发）。
-    final dedupKey = (eventId != null && eventId.isNotEmpty)
-        ? eventId
-        : message.messageId;
+    // 或 FCM 后台 isolate 弹过通知。
+    final dedupKey = PushDedupStore.dedupKeyFor(
+      eventId: eventId,
+      messageId: message.messageId,
+    );
     if (dedupKey != null &&
         !await PushDedupStore.instance.tryMarkNotified(dedupKey)) {
       debugLog(
@@ -773,9 +773,10 @@ class FirebasePushService implements IPushNotificationService {
       // 跨 isolate 去重：app 刚切后台/灭屏时主 isolate 的 sync 监听
       // 往往还活跃，同一事件会同时走 sync 路径和这里的后台 isolate
       // 路径；FCM 自身也可能重发同一条消息（进程重启场景）。
-      final dedupKey = (eventId != null && eventId.isNotEmpty)
-          ? eventId
-          : message.messageId;
+      final dedupKey = PushDedupStore.dedupKeyFor(
+        eventId: eventId,
+        messageId: message.messageId,
+      );
       if (dedupKey != null &&
           !await PushDedupStore.instance.tryMarkNotified(dedupKey)) {
         debugLog(
