@@ -100,6 +100,15 @@ class PushDedupStore {
     return true;
   }
 
+  /// 推送消息的去重键：Matrix `event_id` 全局唯一、跨通道一致，优先；
+  /// 缺失时退回 FCM `messageId`（仅防同通道的 at-least-once 重发）。
+  /// 两者都缺时返回 null —— 调用方应放行展示（无键可去重）。
+  ///
+  /// 所有通知路径（FCM 前台 / 后台 isolate / 宿主侧）必须经此派生，
+  /// 保证同一条消息在任何通道上算出同一个键。
+  static String? dedupKeyFor({String? eventId, String? messageId}) =>
+      (eventId != null && eventId.isNotEmpty) ? eventId : messageId;
+
   /// 由 [key] 派生稳定的本地通知 ID（FNV-1a 32 位，截到正 int 范围）。
   ///
   /// 同一条消息无论从哪条路径弹出都映射到同一通知 ID —— 即使去重
