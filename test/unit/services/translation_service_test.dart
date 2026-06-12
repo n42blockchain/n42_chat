@@ -103,9 +103,16 @@ void main() {
   // ─────────────────────────────────────────────────
 
   group('GoogleTranslationService.getSupportedLanguages', () {
-    test('returns 10 languages', () {
+    test('returns the full shared language list (25 languages)', () {
       final langs = buildService().getSupportedLanguages();
-      expect(langs.length, 10);
+      expect(langs.length, 25);
+    });
+
+    test('includes Simplified Chinese (zh) alongside zh_TW', () {
+      // 回归：detectLanguage 返回 'zh'，支持列表曾漏掉简体中文导致
+      // 检测结果在语言选择中找不到对应项。
+      final codes = buildService().getSupportedLanguages().map((l) => l.code);
+      expect(codes, containsAll(['zh', 'zh_TW']));
     });
 
     test('includes zh, en, ja, ko', () {
