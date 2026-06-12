@@ -143,7 +143,7 @@ void main() {
 
       when(
         () => mockMomentDS.postMoment(content: 'Hello world'),
-      ).thenAnswer((_) async => momentId);
+      ).thenAnswer((_) async => moment);
       when(
         () => mockMomentDS.getMomentById(momentId),
       ).thenAnswer((_) async => moment);
