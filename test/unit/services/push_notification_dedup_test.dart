@@ -282,6 +282,135 @@ void main() {
     });
   });
 
+  group('foreground message routing (audit regressions)', () {
+    late MockMatrixClient client;
+    late FirebasePushService service;
+
+    setUp(() {
+      client = MockMatrixClient();
+      when(() => client.userID).thenReturn('@me:m.org');
+      when(() => client.getRoomById(any())).thenReturn(null);
+      service = FirebasePushService(client);
+    });
+
+    tearDown(() async {
+      await service.dispose();
+    });
+
+    test('non-chat message is ignored and does not consume dedup mark',
+        () async {
+      const message = RemoteMessage(
+        messageId: 'host-msg-1',
+        data: <String, dynamic>{'type': 'device_login', 'device_id': 'x'},
+      );
+
+      await service.handleForegroundMessageForTest(message);
+
+      expect(showCalls(), isEmpty,
+          reason: '无 room_id 的宿主推送不归聊天插件展示');
+      expect(
+        await PushDedupStore.instance.tryMarkNotified('host-msg-1'),
+        isTrue,
+        reason: '不得抢占宿主监听器的 messageId 去重标记',
+      );
+    });
+
+    test('chat message shows once, duplicate delivery is skipped', () async {
+      const message = RemoteMessage(
+        messageId: 'fcm-fg-1',
+        data: <String, dynamic>{
+          'room_id': '!room:m.org',
+          'event_id': r'$fg-evt-1',
+        },
+      );
+
+      await service.handleForegroundMessageForTest(message);
+      expect(showCalls(), hasLength(1));
+
+      await service.handleForegroundMessageForTest(message);
+      expect(showCalls(), hasLength(1));
+    });
+
+    test('active room message is skipped without consuming dedup mark',
+        () async {
+      service.setActiveRoom('!active:m.org');
+      const message = RemoteMessage(
+        data: <String, dynamic>{
+          'room_id': '!active:m.org',
+          'event_id': r'$active-evt',
+        },
+      );
+
+      await service.handleForegroundMessageForTest(message);
+
+      expect(showCalls(), isEmpty);
+      expect(
+        await PushDedupStore.instance.tryMarkNotified(r'$active-evt'),
+        isTrue,
+        reason: '正在查看的房间不弹通知，但不应消耗其他通道的去重标记',
+      );
+    });
+  });
+
+  group('sync path dedup ordering (audit regressions)', () {
+    late MockMatrixClient client;
+    late FirebasePushService service;
+
+    setUp(() {
+      client = MockMatrixClient();
+      when(() => client.userID).thenReturn('@me:m.org');
+      when(() => client.getRoomById(any())).thenReturn(null);
+      service = FirebasePushService(client);
+    });
+
+    tearDown(() async {
+      await service.dispose();
+    });
+
+    matrix.SyncUpdate syncWithMessage(String eventId) {
+      return matrix.SyncUpdate(
+        nextBatch: 'batch',
+        rooms: matrix.RoomsUpdate(
+          join: <String, matrix.JoinedRoomUpdate>{
+            '!room:m.org': matrix.JoinedRoomUpdate(
+              timeline: matrix.TimelineUpdate(
+                events: <matrix.MatrixEvent>[
+                  matrix.MatrixEvent(
+                    type: 'm.room.message',
+                    content: const <String, Object?>{
+                      'msgtype': 'm.text',
+                      'body': 'hi',
+                    },
+                    senderId: '@other:m.org',
+                    eventId: eventId,
+                    originServerTs: DateTime.now(),
+                  ),
+                ],
+              ),
+            ),
+          },
+        ),
+      );
+    }
+
+    test('unknown room does not consume the dedup mark', () async {
+      // 首次 sync 仅记录时间、跳过历史消息。
+      service.handleSyncUpdateForTest(syncWithMessage(r'$warmup'));
+      // 第二次 sync：事件可见，但 getRoomById 返回 null → 不弹。
+      service.handleSyncUpdateForTest(syncWithMessage(r'$no-room-evt'));
+      // 让 fire-and-forget 的通知 future 完成。
+      await Future<void>.delayed(Duration.zero);
+
+      expect(showCalls(), isEmpty);
+      expect(
+        await PushDedupStore.instance.tryMarkNotified(r'$no-room-evt'),
+        isTrue,
+        reason: 'room 未同步到本地时不得消耗去重标记，'
+            '否则 FCM 路径的同一事件会被跳过、通知永久丢失',
+      );
+    });
+  });
+
   group('showLocalNotification stable id', () {
     late FirebasePushService service;
 
