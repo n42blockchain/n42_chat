@@ -48,10 +48,15 @@ class PushDedupStore {
   /// 若 [key] 未被通知过则标记并返回 true；已通知过返回 false。
   ///
   /// 返回 true 的调用方应继续展示通知；返回 false 的调用方跳过。
+  ///
+  /// fail-open：去重存储自身异常（SharedPreferences 平台错误等）时
+  /// 返回 true —— 宁可冒重复通知的小风险，也不能因存储故障丢通知，
+  /// 更不能把异常抛进各通知路径（多为无人捕获的 async 回调）。
   Future<bool> tryMarkNotified(String key) {
-    final result = _pending.then((_) => _tryMarkNotifiedImpl(key));
-    // 失败（如 prefs 平台异常）不阻塞后续调用。
-    _pending = result.then((_) {}, onError: (_) {});
+    final result = _pending
+        .then((_) => _tryMarkNotifiedImpl(key))
+        .catchError((Object _) => true);
+    _pending = result.then((_) {});
     return result;
   }
 

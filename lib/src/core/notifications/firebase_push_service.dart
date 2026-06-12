@@ -97,6 +97,9 @@ class FirebasePushService implements IPushNotificationService {
   /// 本地通知插件
   static FlutterLocalNotificationsPlugin? _localNotifications;
 
+  /// 冷启动本地通知点击是否已 replay（进程生命周期内仅一次）
+  static bool _coldStartTapReplayed = false;
+
   /// Android 通知渠道基础定义
   static const String _messageChannelBaseId = 'n42_chat_messages';
   static const String _messageChannelName = 'N42 Chat Messages';
@@ -416,21 +419,28 @@ class FirebasePushService implements IPushNotificationService {
     // FirebaseMessaging.getInitialMessage 拿不到（那个 API 只覆盖 FCM
     // 系统通知），必须从本地通知插件的启动详情里补回点击事件，
     // 否则用户点了聊天通知却停在首页。
-    try {
-      final launchDetails = await _localNotifications!
-          .getNotificationAppLaunchDetails();
-      final response = launchDetails?.notificationResponse;
-      if (launchDetails?.didNotificationLaunchApp == true && response != null) {
+    // 进程生命周期内只 replay 一次：dispose 后重新 initialize（如登出
+    // 再登录）时 launch details 仍是旧值，二次 replay 会把用户莫名
+    // 跳转回旧会话。
+    if (!_coldStartTapReplayed) {
+      _coldStartTapReplayed = true;
+      try {
+        final launchDetails = await _localNotifications!
+            .getNotificationAppLaunchDetails();
+        final response = launchDetails?.notificationResponse;
+        if (launchDetails?.didNotificationLaunchApp == true &&
+            response != null) {
+          debugLog(
+            'FirebasePushService: App launched from local notification, '
+            'replaying tap',
+          );
+          _onNotificationResponse(response);
+        }
+      } catch (e) {
         debugLog(
-          'FirebasePushService: App launched from local notification, '
-          'replaying tap',
+          'FirebasePushService: getNotificationAppLaunchDetails failed: $e',
         );
-        _onNotificationResponse(response);
       }
-    } catch (e) {
-      debugLog(
-        'FirebasePushService: getNotificationAppLaunchDetails failed: $e',
-      );
     }
   }
 
@@ -584,9 +594,31 @@ class FirebasePushService implements IPushNotificationService {
     final roomId = message.data['room_id'] as String?;
     final eventId = message.data['event_id'] as String?;
 
+    // 非聊天推送（无 room_id 且非 m.call.*，上面已过滤 call）不属于
+    // 本插件：宿主 app 自己也监听 onMessage 并负责展示。这里若继续
+    // 处理，既会弹误导性的「You have a new message」，也会用
+    // messageId 抢占去重标记、按监听器注册顺序与宿主竞态。
+    if (roomId == null || roomId.isEmpty) {
+      debugLog(
+        'FirebasePushService: Ignoring non-chat foreground message '
+        '(${message.messageId})',
+      );
+      return;
+    }
+
+    // 用户正在查看的房间不弹通知（与 sync 路径的 activeRoom 检查对称）。
+    // 不消耗去重标记：sync 路径对活跃房间同样跳过，不会造成重复。
+    if (roomId == _activeRoomId) {
+      debugLog(
+        'FirebasePushService: Skipping foreground notification for active '
+        'room $roomId',
+      );
+      return;
+    }
+
     // 跨通道去重：同一事件可能已经由 Matrix sync 监听（主 isolate）
     // 或 FCM 后台 isolate 弹过通知。键优先用 Matrix event_id，
-    // 非 Matrix 推送退回 FCM messageId（兼防 FCM at-least-once 重发）。
+    // 缺失时退回 FCM messageId（兼防 FCM at-least-once 重发）。
     final dedupKey = (eventId != null && eventId.isNotEmpty)
         ? eventId
         : message.messageId;
@@ -599,27 +631,26 @@ class FirebasePushService implements IPushNotificationService {
       return;
     }
 
-    if (roomId != null) {
-      final room = _client.getRoomById(roomId);
-      if (room != null) {
-        // 检查房间是否静音
-        if (room.pushRuleState == matrix.PushRuleState.dontNotify) {
-          return;
-        }
-
-        // 从房间获取信息显示通知
-        final roomName = room.getLocalizedDisplayname();
-        await showLocalNotification(
-          title: roomName,
-          body: 'You have a new message',
-          roomId: roomId,
-          eventId: eventId,
-        );
+    final room = _client.getRoomById(roomId);
+    if (room != null) {
+      // 检查房间是否静音
+      if (room.pushRuleState == matrix.PushRuleState.dontNotify) {
         return;
       }
+
+      // 从房间获取信息显示通知
+      final roomName = room.getLocalizedDisplayname();
+      await showLocalNotification(
+        title: roomName,
+        body: 'You have a new message',
+        roomId: roomId,
+        eventId: eventId,
+      );
+      return;
     }
 
-    // 如果有 notification payload，使用它
+    // 房间尚未同步到本地（如刚被拉入的新房间）：退回 notification
+    // payload 或通用文案。
     final notification = message.notification;
     if (notification != null) {
       await showLocalNotification(
@@ -631,7 +662,6 @@ class FirebasePushService implements IPushNotificationService {
             notification.android?.imageUrl ?? notification.apple?.imageUrl,
       );
     } else {
-      // 没有 notification payload，显示默认通知
       await showLocalNotification(
         title: 'N42 Chat',
         body: 'You have a new message',
@@ -728,6 +758,17 @@ class FirebasePushService implements IPushNotificationService {
       }
       final roomId = message.data['room_id'] as String?;
       final eventId = message.data['event_id'] as String?;
+
+      // 非聊天 data-only 推送不属于本插件（集成模式下宿主已按
+      // room_id 过滤后才委托到这里；独立使用模式下也不应为非
+      // Matrix 推送弹「You have a new message」误导用户）。
+      if (roomId == null || roomId.isEmpty) {
+        debugLog(
+          'FirebasePushService: Ignoring non-chat background message '
+          '(${message.messageId})',
+        );
+        return;
+      }
 
       // 跨 isolate 去重：app 刚切后台/灭屏时主 isolate 的 sync 监听
       // 往往还活跃，同一事件会同时走 sync 路径和这里的后台 isolate
@@ -994,6 +1035,12 @@ class FirebasePushService implements IPushNotificationService {
     String roomId,
     matrix.MatrixEvent event,
   ) async {
+    // room 判空必须先于去重标记：若先标记再因 room == null 返回，
+    // 标记已被消耗但通知没弹，随后 FCM 路径的同一事件会被去重
+    // 跳过，造成通知永久丢失。
+    final room = _client.getRoomById(roomId);
+    if (room == null) return;
+
     // 跨通道去重：同一事件可能已由 FCM 前台/后台路径弹过。
     if (!await PushDedupStore.instance.tryMarkNotified(event.eventId)) {
       debugLog(
@@ -1002,9 +1049,6 @@ class FirebasePushService implements IPushNotificationService {
       );
       return;
     }
-
-    final room = _client.getRoomById(roomId);
-    if (room == null) return;
 
     final senderName = room
         .unsafeGetUserFromMemoryOrFallback(event.senderId)
@@ -1462,6 +1506,17 @@ class FirebasePushService implements IPushNotificationService {
   @visibleForTesting
   void handleNotificationResponseForTest(NotificationResponse response) =>
       _onNotificationResponse(response);
+
+  /// 测试入口：直接驱动前台消息处理
+  @visibleForTesting
+  Future<void> handleForegroundMessageForTest(RemoteMessage message) =>
+      _handleForegroundMessage(message);
+
+  /// 测试入口：重置冷启动 replay 守卫
+  @visibleForTesting
+  static void resetColdStartTapReplayForTest() {
+    _coldStartTapReplayed = false;
+  }
 
   /// 释放资源
   Future<void> dispose() async {
