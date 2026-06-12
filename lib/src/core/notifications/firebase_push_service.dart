@@ -12,10 +12,13 @@ import 'package:matrix/matrix.dart' as matrix;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../domain/entities/user_profile_entity.dart'
+    show NotificationPrivacyMode;
 import '../../services/voip/call_manager.dart';
 import '../../services/voip/incoming_call_ringtone_preference.dart';
 import '../../data/datasources/local/preferences_datasource.dart';
 import '../utils/conversation_notification_utils.dart';
+import 'push_dedup_store.dart';
 import 'push_notification_service.dart';
 import '../utils/debug_log.dart';
 
@@ -29,6 +32,35 @@ import '../utils/debug_log.dart';
 Future<void> firebasePushBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   await FirebasePushService.handleBackgroundMessage(message);
+}
+
+/// 判断一个 sync timeline 事件是否属于「resume catch-up」——
+/// app 在后台/锁屏期间产生、回到前台后才由 sync 补拉回来的消息。
+///
+/// 这类消息在后台期间已经由 FCM 后台 isolate（Android）或 APNs 系统
+/// 通知（iOS）展示过；iOS 场景下 Dart 侧完全没被唤醒、去重存储里没有
+/// 标记，所以必须用时间闸门兜底，否则解锁瞬间会收到一整波重复通知。
+///
+/// [tolerance] 吸收服务器与设备的时钟偏差：真正的前台实时消息即使
+/// 服务器时钟略慢也不会被误杀（且 FCM 前台路径仍是第一道展示渠道）。
+bool isResumeCatchUpEvent({
+  required DateTime originServerTs,
+  required DateTime lastResumedAt,
+  Duration tolerance = const Duration(seconds: 30),
+}) {
+  return originServerTs.isBefore(lastResumedAt.subtract(tolerance));
+}
+
+/// 把 AppLifecycle 回调转发给 [FirebasePushService] 的轻量观察者。
+class _PushLifecycleObserver with WidgetsBindingObserver {
+  _PushLifecycleObserver(this._onStateChanged);
+
+  final void Function(AppLifecycleState state) _onStateChanged;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _onStateChanged(state);
+  }
 }
 
 /// Firebase 推送通知服务实现
@@ -52,6 +84,15 @@ class FirebasePushService implements IPushNotificationService {
 
   /// 通知点击回调
   final void Function(String? roomId, String? eventId)? onNotificationTap;
+
+  /// 宿主 app 注册的非聊天本地通知点击回退处理器。
+  ///
+  /// 宿主与本插件共享同一个 `FlutterLocalNotificationsPlugin` 单例，
+  /// 后初始化的一方会覆盖先注册的点击回调（本插件通常后初始化）。
+  /// 没有这个回退时，宿主弹的本地通知（交易、设备登录等，payload
+  /// 不含 `room_id`）点击后会被本插件吞掉、不再跳转。
+  /// 宿主在自己的推送初始化里赋值即可，参数为通知原始 payload。
+  static void Function(String payload)? hostFallbackNotificationTapHandler;
 
   /// 本地通知插件
   static FlutterLocalNotificationsPlugin? _localNotifications;
@@ -101,6 +142,13 @@ class FirebasePushService implements IPushNotificationService {
 
   /// 上次同步时间（用于过滤旧消息）
   DateTime? _lastSyncTime;
+
+  /// 最近一次回到前台的时刻。构造时即视为前台（app 启动）。
+  /// sync 补拉的后台期间消息以此为闸门跳过通知（见 [isResumeCatchUpEvent]）。
+  DateTime _lastResumedAt = DateTime.now();
+
+  /// 生命周期观察者（initialize 注册，dispose 移除）。
+  _PushLifecycleObserver? _lifecycleObserver;
 
   FirebasePushService(
     this._client, {
@@ -155,6 +203,14 @@ class FirebasePushService implements IPushNotificationService {
       groupKey: groupKey,
       category: category,
       fullScreenIntent: fullScreenIntent,
+      // 锁屏可见性跟随隐私模式：完整预览 → 锁屏直接显示内容；
+      // 否则锁屏只显示应用名（系统默认 private 行为），保证灭屏/
+      // 屏保状态下通知依然可见而不泄露内容。
+      visibility:
+          config.privacyMode == NotificationPrivacyMode.full &&
+              config.showPreview
+          ? NotificationVisibility.public
+          : NotificationVisibility.private,
     );
   }
 
@@ -205,12 +261,15 @@ class FirebasePushService implements IPushNotificationService {
     if (!Platform.isIOS) {
       return;
     }
-    final allowNativePreview = config.allowsNativeForegroundPreview;
+    // iOS 前台一律由 [_handleForegroundMessage] 手动弹本地通知
+    //（带隐私设置与去重），因此必须关闭系统级前台 alert/sound 展示，
+    // 否则同一条 APNs 推送会出现「系统横幅 + 本地通知」双显。
+    // badge 仍交给系统按 payload 维护。
     unawaited(
       FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-        alert: allowNativePreview,
+        alert: false,
         badge: config.enabled,
-        sound: allowNativePreview && config.playSound,
+        sound: false,
       ),
     );
   }
@@ -261,6 +320,11 @@ class FirebasePushService implements IPushNotificationService {
     try {
       // 初始化本地通知
       await _initializeLocalNotifications();
+
+      // 监听 app 前后台切换：回到前台的时刻是 sync catch-up 通知
+      // 抑制的闸门（后台期间的消息已由 FCM/APNs 通知过）。
+      _lifecycleObserver = _PushLifecycleObserver(_onAppLifecycleChanged);
+      WidgetsBinding.instance.addObserver(_lifecycleObserver!);
 
       // 注意：后台消息处理器由主 app 统一注册（全局只允许一个）。
       // 主 app 的处理器会将 Matrix/Chat 消息委托给
@@ -346,6 +410,28 @@ class FirebasePushService implements IPushNotificationService {
     );
 
     await _ensureAndroidMessageChannels();
+
+    // 冷启动点击补偿：data-only 推送在后台 isolate 弹的是
+    // flutter_local_notifications 本地通知，点击它冷启动 app 时
+    // FirebaseMessaging.getInitialMessage 拿不到（那个 API 只覆盖 FCM
+    // 系统通知），必须从本地通知插件的启动详情里补回点击事件，
+    // 否则用户点了聊天通知却停在首页。
+    try {
+      final launchDetails = await _localNotifications!
+          .getNotificationAppLaunchDetails();
+      final response = launchDetails?.notificationResponse;
+      if (launchDetails?.didNotificationLaunchApp == true && response != null) {
+        debugLog(
+          'FirebasePushService: App launched from local notification, '
+          'replaying tap',
+        );
+        _onNotificationResponse(response);
+      }
+    } catch (e) {
+      debugLog(
+        'FirebasePushService: getNotificationAppLaunchDetails failed: $e',
+      );
+    }
   }
 
   Future<void> _initializeToken() async {
@@ -446,7 +532,7 @@ class FirebasePushService implements IPushNotificationService {
   }
 
   /// 处理前台消息
-  void _handleForegroundMessage(RemoteMessage message) {
+  Future<void> _handleForegroundMessage(RemoteMessage message) async {
     // 检查通知配置
     if (!_notificationConfig.enabled) return;
     if (_notificationConfig.isInDoNotDisturbPeriod()) return;
@@ -471,11 +557,11 @@ class FirebasePushService implements IPushNotificationService {
         debugLog(
           'FirebasePushService: CallManager not handling call, showing CallKit as fallback',
         );
-        _showBackgroundCallKit(message).catchError((Object e) {
+        unawaited(_showBackgroundCallKit(message).catchError((Object e) {
           debugLog(
             'FirebasePushService: Failed to show foreground CallKit fallback: $e',
           );
-        });
+        }));
       }
       return;
     }
@@ -498,6 +584,21 @@ class FirebasePushService implements IPushNotificationService {
     final roomId = message.data['room_id'] as String?;
     final eventId = message.data['event_id'] as String?;
 
+    // 跨通道去重：同一事件可能已经由 Matrix sync 监听（主 isolate）
+    // 或 FCM 后台 isolate 弹过通知。键优先用 Matrix event_id，
+    // 非 Matrix 推送退回 FCM messageId（兼防 FCM at-least-once 重发）。
+    final dedupKey = (eventId != null && eventId.isNotEmpty)
+        ? eventId
+        : message.messageId;
+    if (dedupKey != null &&
+        !await PushDedupStore.instance.tryMarkNotified(dedupKey)) {
+      debugLog(
+        'FirebasePushService: Skipping duplicate foreground notification '
+        '($dedupKey)',
+      );
+      return;
+    }
+
     if (roomId != null) {
       final room = _client.getRoomById(roomId);
       if (room != null) {
@@ -508,7 +609,7 @@ class FirebasePushService implements IPushNotificationService {
 
         // 从房间获取信息显示通知
         final roomName = room.getLocalizedDisplayname();
-        showLocalNotification(
+        await showLocalNotification(
           title: roomName,
           body: 'You have a new message',
           roomId: roomId,
@@ -521,7 +622,7 @@ class FirebasePushService implements IPushNotificationService {
     // 如果有 notification payload，使用它
     final notification = message.notification;
     if (notification != null) {
-      showLocalNotification(
+      await showLocalNotification(
         title: notification.title ?? 'New Message',
         body: notification.body ?? '',
         roomId: roomId,
@@ -531,7 +632,7 @@ class FirebasePushService implements IPushNotificationService {
       );
     } else {
       // 没有 notification payload，显示默认通知
-      showLocalNotification(
+      await showLocalNotification(
         title: 'N42 Chat',
         body: 'You have a new message',
         roomId: roomId,
@@ -628,11 +729,31 @@ class FirebasePushService implements IPushNotificationService {
       final roomId = message.data['room_id'] as String?;
       final eventId = message.data['event_id'] as String?;
 
+      // 跨 isolate 去重：app 刚切后台/灭屏时主 isolate 的 sync 监听
+      // 往往还活跃，同一事件会同时走 sync 路径和这里的后台 isolate
+      // 路径；FCM 自身也可能重发同一条消息（进程重启场景）。
+      final dedupKey = (eventId != null && eventId.isNotEmpty)
+          ? eventId
+          : message.messageId;
+      if (dedupKey != null &&
+          !await PushDedupStore.instance.tryMarkNotified(dedupKey)) {
+        debugLog(
+          'FirebasePushService: Skipping duplicate background notification '
+          '($dedupKey)',
+        );
+        return;
+      }
+
       // 构建 payload
       final payload = json.encode({'room_id': roomId, 'event_id': eventId});
 
-      // 使用原子计数器生成唯一通知 ID（避免时间戳在同一毫秒内碰撞）
-      final notificationId = _nextNotificationId();
+      // 通知 ID 取事件键的稳定哈希：后台 isolate 的内存计数器每次进程
+      // 重启都从 0 开始，会把通知栏里的旧通知逐条覆盖掉（用户表现为
+      // 「多条消息只剩一条」）；稳定哈希保证不同事件各占一条、同一
+      // 事件幂等覆盖。
+      final notificationId = dedupKey != null
+          ? PushDedupStore.notificationIdForKey(dedupKey)
+          : _nextNotificationId();
 
       final androidDetails = _androidMessageDetails(
         config,
@@ -708,16 +829,24 @@ class FirebasePushService implements IPushNotificationService {
 
   /// 本地通知点击响应
   void _onNotificationResponse(NotificationResponse response) {
-    if (response.payload != null) {
-      try {
-        final data = json.decode(response.payload!);
-        final roomId = data['room_id'] as String?;
-        final eventId = data['event_id'] as String?;
-        onNotificationTap?.call(roomId, eventId);
-      } catch (e) {
-        // 忽略解析错误
-        debugLog('Error: $e');
+    final payload = response.payload;
+    if (payload == null) return;
+    try {
+      final data = json.decode(payload);
+      final roomId = data is Map ? data['room_id'] as String? : null;
+      final eventId = data is Map ? data['event_id'] as String? : null;
+      if ((roomId == null || roomId.isEmpty) &&
+          hostFallbackNotificationTapHandler != null) {
+        // 非聊天 payload：这是宿主 app 弹的本地通知（交易、设备登录等）。
+        // 因为本插件后初始化、覆盖了共享单例的点击回调，必须转交回
+        // 宿主处理，否则宿主通知点击后无任何跳转。
+        hostFallbackNotificationTapHandler!(payload);
+        return;
       }
+      onNotificationTap?.call(roomId, eventId);
+    } catch (e) {
+      // 忽略解析错误
+      debugLog('Error: $e');
     }
   }
 
@@ -753,7 +882,7 @@ class FirebasePushService implements IPushNotificationService {
 
       for (final event in events) {
         if (_shouldShowNotification(event, roomId)) {
-          _showNotificationForEvent(roomId, event);
+          unawaited(_showNotificationForEvent(roomId, event));
         }
       }
     }
@@ -819,6 +948,21 @@ class FirebasePushService implements IPushNotificationService {
       }
     }
 
+    // resume catch-up 抑制：回到前台后 sync 补拉的后台期间消息，
+    // 已经由 FCM（Android 后台 isolate）或 APNs 系统通知（iOS，Dart
+    // 完全未被唤醒、去重存储无标记）展示过，这里再弹就是解锁瞬间的
+    // 重复通知风暴。
+    if (isResumeCatchUpEvent(
+      originServerTs: originServerTs,
+      lastResumedAt: _lastResumedAt,
+    )) {
+      debugLog(
+        'FirebasePushService: Skipping resume catch-up notification '
+        '(${originServerTs.toIso8601String()} < resume $_lastResumedAt)',
+      );
+      return false;
+    }
+
     // 检查房间是否静音
     final room = _client.getRoomById(roomId);
     if (room == null) {
@@ -846,7 +990,19 @@ class FirebasePushService implements IPushNotificationService {
     return true;
   }
 
-  void _showNotificationForEvent(String roomId, matrix.MatrixEvent event) {
+  Future<void> _showNotificationForEvent(
+    String roomId,
+    matrix.MatrixEvent event,
+  ) async {
+    // 跨通道去重：同一事件可能已由 FCM 前台/后台路径弹过。
+    if (!await PushDedupStore.instance.tryMarkNotified(event.eventId)) {
+      debugLog(
+        'FirebasePushService: Skipping duplicate sync notification '
+        '(${event.eventId})',
+      );
+      return;
+    }
+
     final room = _client.getRoomById(roomId);
     if (room == null) return;
 
@@ -863,7 +1019,7 @@ class FirebasePushService implements IPushNotificationService {
       title = roomName;
     }
 
-    showLocalNotification(
+    await showLocalNotification(
       title: title,
       body: body,
       roomId: roomId,
@@ -1189,8 +1345,13 @@ class FirebasePushService implements IPushNotificationService {
       // 构建 payload
       final payload = json.encode({'room_id': roomId, 'event_id': eventId});
 
-      // 使用原子计数器生成唯一通知 ID（避免时间戳在同一毫秒内碰撞）
-      final notificationId = _nextNotificationId();
+      // 通知 ID：有 event_id 时取稳定哈希——同一事件无论从哪条路径
+      // （FCM 前台 / sync / 后台 isolate）弹出都映射到同一 ID，去重
+      // 竞态下也只会原地覆盖而不会在通知栏叠加第二条；无 event_id
+      // 时退回进程内计数器。
+      final notificationId = (eventId != null && eventId.isNotEmpty)
+          ? PushDedupStore.notificationIdForKey(eventId)
+          : _nextNotificationId();
       // 记录 roomId → notificationId 映射，供 clearNotificationsForRoom 使用
       if (roomId != null) {
         _roomNotificationIds[roomId] = notificationId;
@@ -1279,6 +1440,29 @@ class FirebasePushService implements IPushNotificationService {
   /// 获取当前 APNs Token (iOS only)
   String? get apnsToken => _apnsToken;
 
+  void _onAppLifecycleChanged(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _lastResumedAt = DateTime.now();
+      debugLog('FirebasePushService: App resumed at $_lastResumedAt');
+    }
+  }
+
+  /// 测试入口：覆写最近一次回前台时间
+  @visibleForTesting
+  void setLastResumedAtForTest(DateTime time) {
+    _lastResumedAt = time;
+  }
+
+  /// 测试入口：直接驱动 sync 更新处理
+  @visibleForTesting
+  void handleSyncUpdateForTest(matrix.SyncUpdate syncUpdate) =>
+      _handleSyncUpdate(syncUpdate);
+
+  /// 测试入口：直接驱动本地通知点击响应
+  @visibleForTesting
+  void handleNotificationResponseForTest(NotificationResponse response) =>
+      _onNotificationResponse(response);
+
   /// 释放资源
   Future<void> dispose() async {
     await _foregroundSubscription?.cancel();
@@ -1286,6 +1470,10 @@ class FirebasePushService implements IPushNotificationService {
     await _tokenRefreshSubscription?.cancel();
     await _syncSubscription?.cancel();
     _callStateResetTimer?.cancel();
+    if (_lifecycleObserver != null) {
+      WidgetsBinding.instance.removeObserver(_lifecycleObserver!);
+      _lifecycleObserver = null;
+    }
     _roomNotificationIds.clear();
     _isInitialized = false;
   }

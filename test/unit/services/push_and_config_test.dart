@@ -236,7 +236,7 @@ void main() {
       expect(json['vibrate'], isFalse);
       expect(json['doNotDisturb'], isTrue);
       expect(json['dndStartTime'], equals('22:30'));
-      expect(json['dndEndTime'], equals('7:0'));
+      expect(json['dndEndTime'], equals('07:00'));
       expect(json['privacyMode'], equals('senderOnly'));
     });
 
