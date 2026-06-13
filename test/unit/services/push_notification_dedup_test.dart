@@ -352,6 +352,49 @@ void main() {
     });
   });
 
+  group('active room suppression is foreground-only (T2 #6 regression)', () {
+    late MockMatrixClient client;
+    late FirebasePushService service;
+
+    setUp(() {
+      client = MockMatrixClient();
+      when(() => client.userID).thenReturn('@me:m.org');
+      when(() => client.getRoomById(any())).thenReturn(null);
+      service = FirebasePushService(client);
+    });
+    tearDown(() async {
+      await service.dispose();
+    });
+
+    matrix.MatrixEvent freshMsg() => matrix.MatrixEvent(
+          type: 'm.room.message',
+          content: const <String, Object?>{'msgtype': 'm.text', 'body': 'hi'},
+          senderId: '@other:m.org',
+          eventId: r'$t2-6',
+          originServerTs: DateTime.now(),
+        );
+
+    test('foreground + active room -> suppressed', () {
+      service.setActiveRoom('!room:m.org');
+      service.setAppInForegroundForTest(value: true);
+      expect(
+        service.shouldShowNotificationForTest(freshMsg(), '!room:m.org'),
+        isFalse,
+      );
+    });
+
+    test('background + active room -> notifies (not suppressed)', () {
+      // 真机 T2 #6：按 Home 键后台，activeRoom 残留，sync 投递的消息
+      // 不应被 active-room 静默——后台用户并未「正在查看」。
+      service.setActiveRoom('!room:m.org');
+      service.setAppInForegroundForTest(value: false);
+      expect(
+        service.shouldShowNotificationForTest(freshMsg(), '!room:m.org'),
+        isTrue,
+      );
+    });
+  });
+
   group('sync path dedup ordering (audit regressions)', () {
     late MockMatrixClient client;
     late FirebasePushService service;
