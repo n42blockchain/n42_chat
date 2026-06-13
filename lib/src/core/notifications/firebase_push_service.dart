@@ -150,6 +150,13 @@ class FirebasePushService implements IPushNotificationService {
   /// sync 补拉的后台期间消息以此为闸门跳过通知（见 [isResumeCatchUpEvent]）。
   DateTime _lastResumedAt = DateTime.now();
 
+  /// app 是否在前台。activeRoom「正在查看」抑制仅在前台成立。
+  /// 真机 T2 #6：Android 进程后台存活时 Matrix sync 仍会投递消息，
+  /// 而按 Home 键不会 dispose chat page / 触发 setActiveRoom(null)，
+  /// 残留的 activeRoom 会把后台 sync 投递的消息全部静默。后台时
+  /// 用户并未「正在查看」，故此抑制必须以前台为前提。
+  bool _appInForeground = true;
+
   /// 生命周期观察者（initialize 注册，dispose 移除）。
   _PushLifecycleObserver? _lifecycleObserver;
 
@@ -968,8 +975,9 @@ class FirebasePushService implements IPushNotificationService {
     // 不显示自己发送的消息
     if (event.senderId == _client.userID) return false;
 
-    // 不显示当前正在查看的房间的消息
-    if (_activeRoomId == roomId) {
+    // 不显示当前正在查看的房间的消息（仅前台成立；后台 sync 投递的
+    // 消息即使 activeRoom 残留也应照常通知——见 _appInForeground 注释）
+    if (_appInForeground && _activeRoomId == roomId) {
       debugLog(
         'FirebasePushService: Skipping notification for active room $roomId',
       );
@@ -1487,8 +1495,15 @@ class FirebasePushService implements IPushNotificationService {
 
   void _onAppLifecycleChanged(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _appInForeground = true;
       _lastResumedAt = DateTime.now();
       debugLog('FirebasePushService: App resumed at $_lastResumedAt');
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      _appInForeground = false;
+      debugLog('FirebasePushService: App backgrounded ($state)');
     }
   }
 
@@ -1497,6 +1512,17 @@ class FirebasePushService implements IPushNotificationService {
   void setLastResumedAtForTest(DateTime time) {
     _lastResumedAt = time;
   }
+
+  /// 测试入口：覆写前台状态
+  @visibleForTesting
+  void setAppInForegroundForTest({required bool value}) {
+    _appInForeground = value;
+  }
+
+  /// 测试入口：暴露通知判定（active-room / resume 闸门等分支）
+  @visibleForTesting
+  bool shouldShowNotificationForTest(matrix.MatrixEvent event, String roomId) =>
+      _shouldShowNotification(event, roomId);
 
   /// 测试入口：直接驱动 sync 更新处理
   @visibleForTesting
