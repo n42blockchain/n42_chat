@@ -17,6 +17,12 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
   Locale _currentLocale = _N42ThemeManager._locale;
   FontSize _fontSize = N42Chat.fontSize;
 
+  // 嵌套 Navigator：承载 chat 内部所有 push 的子页面，使其留在
+  // _wrapChatPresentation 的 Theme + textScaler 缩放层之下（否则会逃到
+  // 宿主根 Navigator 而丢失字体缩放与主题）。
+  final GlobalKey<NavigatorState> _nestedNavKey = GlobalKey<NavigatorState>();
+  final HeroController _heroController = HeroController();
+
   void _onLocaleChanged(Locale locale) {
     if (mounted) setState(() => _currentLocale = locale);
   }
@@ -33,7 +39,11 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     try {
       final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
       if (!mounted) return;
-      N42Chat.setThemeMode(appearanceSettings.themeMode);
+      // 宿主接管明暗模式时不要用自存值覆盖宿主下发的 themeMode，
+      // 否则每次打开 chat 都会把宿主设置还原。字体大小仍由 chat 自身管理。
+      if (!N42Chat.hostControlsAppearance) {
+        N42Chat.setThemeMode(appearanceSettings.themeMode);
+      }
       N42Chat.setFontSize(appearanceSettings.fontSize);
     } catch (e) {
       debugLog('N42Chat: Failed to load appearance settings: $e');
@@ -56,6 +66,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     N42Chat.removeLocaleListener(_onLocaleChanged);
     N42Chat.removeThemeListener(_onThemeChanged);
     N42Chat.removeFontSizeListener(_onFontSizeChanged);
+    _heroController.dispose();
     super.dispose();
   }
 
@@ -94,39 +105,53 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
       context,
       locale: _currentLocale,
       fontSize: _fontSize,
-      child: BlocProvider.value(
-        value: N42Chat.authBloc,
-        child: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            // 检查中或初始状态 - 显示加载
-            if (state.status == AuthStatus.initial ||
-                state.status == AuthStatus.checking) {
-              return const _LoadingPage();
-            }
+      // 嵌套 Navigator：chat 内部所有 push（会话/设置等）都进入本层导航栈，
+      // 从而继承上方 _wrapChatPresentation 的 Theme + textScaler，字体缩放
+      // 与主题在子页面同样生效。NavigatorPopHandler 把系统返回键优先转交
+      // 嵌套栈；当嵌套栈已在根（无可弹）时放行给外层，弹出整个 chat 路由。
+      child: NavigatorPopHandler(
+        onPopWithResult: (_) => _nestedNavKey.currentState?.maybePop(),
+        child: Navigator(
+          key: _nestedNavKey,
+          observers: [_heroController],
+          onGenerateRoute: (settings) => MaterialPageRoute<void>(
+            settings: settings,
+            builder: (context) => BlocProvider.value(
+              value: N42Chat.authBloc,
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  // 检查中或初始状态 - 显示加载
+                  if (state.status == AuthStatus.initial ||
+                      state.status == AuthStatus.checking) {
+                    return const _LoadingPage();
+                  }
 
-            // 已登录 - 显示主框架（微信风格底部Tab）
-            if (state.isAuthenticated) {
-              return ChatMainPage(
-                onBackToMain: () {
-                  // 返回主应用 - 由外部处理
-                  Navigator.of(context).maybePop();
+                  // 已登录 - 显示主框架（微信风格底部Tab）
+                  if (state.isAuthenticated) {
+                    return ChatMainPage(
+                      onBackToMain: () {
+                        // 返回主应用 - 弹出整个 chat 路由（外层宿主导航栈）
+                        Navigator.of(context, rootNavigator: true).maybePop();
+                      },
+                    );
+                  }
+
+                  // 未登录 - 显示欢迎页面
+                  return WelcomePage(
+                    onLogin: () => _navigateToLogin(context),
+                    onRegister: () => _navigateToRegister(context),
+                    onTermsOfService: () => _launchUrl(
+                      N42Chat._config?.termsOfServiceUrl ?? 'https://www.n42.ai/static/terms_of_use.html',
+                    ),
+                    onPrivacyPolicy: () => _launchUrl(
+                      N42Chat._config?.privacyPolicyUrl ??
+                          'https://www.n42.ai/static/terms_of_use.html',
+                    ),
+                  );
                 },
-              );
-            }
-
-            // 未登录 - 显示欢迎页面
-            return WelcomePage(
-              onLogin: () => _navigateToLogin(context),
-              onRegister: () => _navigateToRegister(context),
-              onTermsOfService: () => _launchUrl(
-                N42Chat._config?.termsOfServiceUrl ?? 'https://www.n42.ai/static/terms_of_use.html',
               ),
-              onPrivacyPolicy: () => _launchUrl(
-                N42Chat._config?.privacyPolicyUrl ??
-                    'https://www.n42.ai/static/terms_of_use.html',
-              ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
@@ -443,7 +468,11 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
     try {
       final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
       if (!mounted) return;
-      N42Chat.setThemeMode(appearanceSettings.themeMode);
+      // 宿主接管明暗模式时不要用自存值覆盖宿主下发的 themeMode，
+      // 否则每次打开 chat 都会把宿主设置还原。字体大小仍由 chat 自身管理。
+      if (!N42Chat.hostControlsAppearance) {
+        N42Chat.setThemeMode(appearanceSettings.themeMode);
+      }
       N42Chat.setFontSize(appearanceSettings.fontSize);
     } catch (e) {
       debugLog('N42Chat: Failed to load appearance settings: $e');

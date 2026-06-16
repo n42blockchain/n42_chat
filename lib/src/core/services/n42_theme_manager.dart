@@ -10,9 +10,24 @@ class _N42ThemeManager {
   static ThemeMode _themeMode = ThemeMode.system;
   static FontSize _fontSize = FontSize.medium;
   static Locale _locale = const Locale('en');
+  static bool _hostControlsAppearance = false;
   static final List<void Function(ThemeMode)> _themeListeners = [];
   static final List<void Function(FontSize)> _fontSizeListeners = [];
   static final List<void Function(Locale)> _localeListeners = [];
+
+  /// 宿主 App 是否接管外观（明暗模式）。
+  ///
+  /// 嵌入主 App 时由宿主置为 true：此时 chat 不再用自身存储的
+  /// themeMode 覆盖宿主下发的设置（详见入口 widget 的
+  /// `_loadAppearanceSettings`），明暗模式以宿主为唯一来源。
+  static bool get hostControlsAppearance => _hostControlsAppearance;
+
+  static set hostControlsAppearance(bool value) {
+    if (_hostControlsAppearance != value) {
+      _hostControlsAppearance = value;
+      debugLog('N42Chat: hostControlsAppearance = $value');
+    }
+  }
 
   /// 获取当前主题模式
   static ThemeMode get themeMode => _themeMode;
