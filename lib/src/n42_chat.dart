@@ -145,6 +145,17 @@ class N42Chat {
   /// 获取当前语言设置
   static Locale get locale => _N42ThemeManager.locale;
 
+  /// 宿主 App 是否接管外观（明暗模式）。
+  ///
+  /// 嵌入主 App 时由宿主在初始化后置为 true：此后 chat 不再用自身存储的
+  /// 外观设置覆盖宿主下发的 [setThemeMode]，明暗模式以宿主为唯一来源，
+  /// 避免每次打开 chat 时被自存值还原。
+  static bool get hostControlsAppearance =>
+      _N42ThemeManager.hostControlsAppearance;
+
+  static set hostControlsAppearance(bool value) =>
+      _N42ThemeManager.hostControlsAppearance = value;
+
   /// 设置主题模式
   ///
   /// 用于与主应用同步主题设置

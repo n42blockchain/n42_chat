@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../n42_chat.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
@@ -53,10 +54,13 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           const SizedBox(height: 16),
 
           // 深色模式设置
-          _buildSectionHeader(l10n?.settingsDarkMode ?? 'Dark Mode'),
-          _buildThemeModeSection(context),
-
-          const SizedBox(height: 24),
+          // 宿主 App 接管明暗模式时隐藏此项，避免与宿主设置页双重控制冲突，
+          // 明暗模式统一在宿主 App 的设置页中切换。
+          if (!N42Chat.hostControlsAppearance) ...[
+            _buildSectionHeader(l10n?.settingsDarkMode ?? 'Dark Mode'),
+            _buildThemeModeSection(context),
+            const SizedBox(height: 24),
+          ],
 
           // 字体大小设置
           _buildSectionHeader(l10n?.settingsFontSize ?? 'Font Size'),
