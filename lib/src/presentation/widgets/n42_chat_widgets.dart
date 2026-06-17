@@ -37,7 +37,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     try {
       final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
       if (!mounted) return;
-      N42Chat.setThemeMode(appearanceSettings.themeMode);
+      // 主题模式由宿主 app 通过 N42Chat.setThemeMode() 控制，此处只恢复字体大小
       N42Chat.setFontSize(appearanceSettings.fontSize);
     } catch (e) {
       debugLog('N42Chat: Failed to load appearance settings: $e');
@@ -454,7 +454,7 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
     try {
       final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
       if (!mounted) return;
-      N42Chat.setThemeMode(appearanceSettings.themeMode);
+      // 主题模式由宿主 app 通过 N42Chat.setThemeMode() 控制，此处只恢复字体大小
       N42Chat.setFontSize(appearanceSettings.fontSize);
     } catch (e) {
       debugLog('N42Chat: Failed to load appearance settings: $e');
