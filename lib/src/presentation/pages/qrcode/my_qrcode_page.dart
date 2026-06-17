@@ -549,7 +549,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                     ),
                     title: Text(_qrStyleLabel(style)),
                     trailing: _qrStyle == style
-                        ? const Icon(Icons.check, color: AppColors.primary)
+                        ? Icon(Icons.check, color: AppColors.primary)
                         : null,
                     onTap: () {
                       Navigator.pop(sheetContext);

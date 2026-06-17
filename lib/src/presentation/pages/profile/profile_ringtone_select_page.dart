@@ -313,7 +313,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
             onPressed: _confirmSave,
             child: Text(
               s?.commonConfirm ?? 'Confirm',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.primary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -420,7 +420,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                               ),
                             // 选中标记
                             if (isSelected)
-                              const Icon(
+                              Icon(
                                 Icons.check_circle,
                                 color: AppColors.primary,
                               ),

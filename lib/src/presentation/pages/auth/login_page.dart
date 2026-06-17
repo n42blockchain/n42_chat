@@ -424,7 +424,7 @@ class _LoginPageState extends State<LoginPage> {
               vertical: 14,
             ),
             suffixIcon: state.isCheckingHomeserver
-                ? const Padding(
+                ? Padding(
                     padding: EdgeInsets.all(12),
                     child: SizedBox(
                       width: 20,

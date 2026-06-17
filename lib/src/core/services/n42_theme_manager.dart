@@ -13,6 +13,7 @@ class _N42ThemeManager {
   static final List<void Function(ThemeMode)> _themeListeners = [];
   static final List<void Function(FontSize)> _fontSizeListeners = [];
   static final List<void Function(Locale)> _localeListeners = [];
+  static final List<void Function(Color)> _accentColorListeners = [];
 
   /// 获取当前主题模式
   static ThemeMode get themeMode => _themeMode;
@@ -22,6 +23,29 @@ class _N42ThemeManager {
 
   /// 获取当前语言设置
   static Locale get locale => _locale;
+
+  /// 获取当前 accent 主色（默认微信绿，可被宿主 app 覆盖）
+  static Color get accentColor => AppColors.primary;
+
+  /// 设置 accent 主色
+  static void setAccentColor(Color color) {
+    if (AppColors.primary == color) return;
+    AppColors.primary = color;
+    for (final listener in List.of(_accentColorListeners)) {
+      listener(color);
+    }
+    debugLog('N42Chat: Accent color changed to $color');
+  }
+
+  /// 添加 accent 主色变化监听器
+  static void addAccentColorListener(void Function(Color) listener) {
+    _accentColorListeners.add(listener);
+  }
+
+  /// 移除 accent 主色变化监听器
+  static void removeAccentColorListener(void Function(Color) listener) {
+    _accentColorListeners.remove(listener);
+  }
 
   /// 设置主题模式
   static void setThemeMode(ThemeMode mode) {

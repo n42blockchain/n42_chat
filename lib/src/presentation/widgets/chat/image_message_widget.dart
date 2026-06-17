@@ -437,7 +437,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       width: size.width,
       height: size.height,
       color: AppColors.placeholder,
-      child: const Center(
+      child: Center(
         child: SizedBox(
           width: 24,
           height: 24,

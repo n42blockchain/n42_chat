@@ -111,7 +111,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           if (_isDirty)
             TextButton(
               onPressed: _save,
-              child: const Text(
+              child: Text(
                 'Save',
                 style: TextStyle(
                   color: AppColors.primary,
@@ -230,7 +230,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                 title: 'Reward Rules',
                 isDark: isDark,
                 trailing: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.add_circle_outline,
                     color: AppColors.primary,
                   ),

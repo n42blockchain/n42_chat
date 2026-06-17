@@ -304,7 +304,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.key, color: AppColors.primary),
+                child: Icon(Icons.key, color: AppColors.primary),
               ),
               title: Text(
                 l10n?.authPasskeyNoRegistered ?? 'No passkeys registered',
@@ -1615,7 +1615,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                             S.of(context)?.settingsThisDevice ?? 'This device',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               height: 1.3,
                               fontWeight: FontWeight.w500,

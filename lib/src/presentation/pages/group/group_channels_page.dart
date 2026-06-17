@@ -86,7 +86,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-        child: const Icon(Icons.tag, color: AppColors.primary, size: 18),
+        child: Icon(Icons.tag, color: AppColors.primary, size: 18),
       ),
       title: Text(
         channel.name,

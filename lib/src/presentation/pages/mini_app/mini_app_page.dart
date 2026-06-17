@@ -269,7 +269,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                 color: AppColors.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(Icons.apps, size: 16, color: AppColors.primary),
+              child: Icon(Icons.apps, size: 16, color: AppColors.primary),
             ),
             const SizedBox(width: 8),
             Expanded(

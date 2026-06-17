@@ -116,7 +116,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
             l10n?.settingsUnhideChat ?? 'Unhide',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.primary,
               fontSize: 14,
               fontWeight: FontWeight.w500,

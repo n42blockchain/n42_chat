@@ -238,7 +238,7 @@ class MessageItem extends StatelessWidget {
                       color: AppColors.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text(
+                    child: Text(
                       'BOT',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -315,14 +315,14 @@ class MessageItem extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.schedule, size: 12, color: AppColors.primary),
+                Icon(Icons.schedule, size: 12, color: AppColors.primary),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
                     '${S.of(context)?.scheduledMessageLabel ?? 'Scheduled'} ${_formatScheduledTime(message.scheduledAt!)}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       height: 1.3,
                       color: AppColors.primary,
@@ -478,7 +478,7 @@ class MessageItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(4),
-          border: const Border(
+          border: Border(
             left: BorderSide(color: AppColors.primary, width: 2),
           ),
         ),
@@ -491,7 +491,7 @@ class MessageItem extends StatelessWidget {
                 message.replyToSender!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
                   fontWeight: FontWeight.w500,
@@ -1215,7 +1215,7 @@ class MessageItem extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.insert_drive_file,
               color: AppColors.primary,
             ),
@@ -1344,7 +1344,7 @@ class MessageItem extends StatelessWidget {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_on,
                     color: AppColors.primary,
                     size: 20,
@@ -1528,14 +1528,14 @@ class MessageItem extends StatelessWidget {
                       child: Image.network(
                         cover,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => const Icon(
+                        errorBuilder: (_, _, _) => Icon(
                           Icons.music_note,
                           size: 24,
                           color: AppColors.primary,
                         ),
                       ),
                     )
-                  : const Icon(
+                  : Icon(
                       Icons.music_note,
                       size: 24,
                       color: AppColors.primary,
@@ -1581,7 +1581,7 @@ class MessageItem extends StatelessWidget {
               ),
             ),
             // 播放图标
-            const Icon(
+            Icon(
               Icons.play_circle_filled,
               size: 32,
               color: AppColors.primary,
@@ -1629,7 +1629,7 @@ class MessageItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.poll, size: 12, color: AppColors.primary),
+                    Icon(Icons.poll, size: 12, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(
                       maxSelections == 1
@@ -1637,7 +1637,7 @@ class MessageItem extends StatelessWidget {
                           : (S.of(context)?.chatMultiChoice ?? 'Multi'),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         height: 1.3,
                         color: AppColors.primary,
@@ -1755,7 +1755,7 @@ class MessageItem extends StatelessWidget {
                           ),
                         ),
                         if (isSelected)
-                          const Icon(
+                          Icon(
                             Icons.check_circle,
                             size: 18,
                             color: AppColors.primary,
@@ -1958,7 +1958,7 @@ class MessageItem extends StatelessWidget {
                       S.of(context)?.chatCallBack ?? '回拨',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         height: 1.3,
                         color: AppColors.primary,

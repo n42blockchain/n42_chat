@@ -198,7 +198,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
@@ -235,7 +235,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                           backgroundColor: AppColors.primary.withValues(
                             alpha: 0.2,
                           ),
-                          valueColor: const AlwaysStoppedAnimation(
+                          valueColor: AlwaysStoppedAnimation(
                             AppColors.primary,
                           ),
                         ),

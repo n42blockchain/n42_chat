@@ -678,7 +678,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.photo_library_outlined,
                   color: AppColors.primary,
                 ),

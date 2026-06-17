@@ -87,7 +87,7 @@ class WelcomePage extends StatelessWidget {
           width: 68,
           height: 68,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
@@ -205,7 +205,7 @@ class WelcomePage extends StatelessWidget {
             onPressed: onRegister,
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary, width: 1.5),
+              side: BorderSide(color: AppColors.primary, width: 1.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),

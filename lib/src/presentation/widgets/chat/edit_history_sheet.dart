@@ -186,7 +186,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                   ),
                   child: Text(
                     s?.chatOriginalMessage ?? 'Original',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       color: AppColors.primary,
                       fontWeight: FontWeight.w500,

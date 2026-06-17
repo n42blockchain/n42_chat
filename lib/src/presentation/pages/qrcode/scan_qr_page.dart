@@ -305,7 +305,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(
+            CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
             const SizedBox(height: 16),
@@ -407,7 +407,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                             'Close Manual Input')
                       : (S.of(context)?.qrcodeManualInputUserId ??
                             'Manual Input User ID'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.primary,
                     fontSize: 14,
                   ),
@@ -476,7 +476,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                               'Close Manual Input')
                         : (S.of(context)?.qrcodeManualInputUserId ??
                               'Manual Input User ID'),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.primary,
                       fontSize: 14,
                     ),
@@ -502,7 +502,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         if (_isProcessing)
           Container(
             color: Colors.black54,
-            child: const Center(
+            child: Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
@@ -556,17 +556,17 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       decoration: BoxDecoration(
         border: Border(
           top: isTop
-              ? const BorderSide(color: AppColors.primary, width: 3)
+              ? BorderSide(color: AppColors.primary, width: 3)
               : BorderSide.none,
           bottom: isTop
               ? BorderSide.none
-              : const BorderSide(color: AppColors.primary, width: 3),
+              : BorderSide(color: AppColors.primary, width: 3),
           left: isLeft
-              ? const BorderSide(color: AppColors.primary, width: 3)
+              ? BorderSide(color: AppColors.primary, width: 3)
               : BorderSide.none,
           right: isLeft
               ? BorderSide.none
-              : const BorderSide(color: AppColors.primary, width: 3),
+              : BorderSide(color: AppColors.primary, width: 3),
         ),
       ),
     );

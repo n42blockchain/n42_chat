@@ -121,7 +121,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(40),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.lock,
                     size: 40,
                     color: AppColors.primary,

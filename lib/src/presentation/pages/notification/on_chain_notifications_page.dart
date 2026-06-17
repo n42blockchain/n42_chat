@@ -71,7 +71,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
                     .add(const MarkAllOnChainNotificationsRead()),
                 child: Text(
                   l10n?.onChainMarkAllRead ?? 'Mark all read',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.primary,
                     fontSize: 13,
                   ),
@@ -320,7 +320,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.open_in_new,
                           size: 12,
                           color: AppColors.primary,
@@ -328,7 +328,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           S.of(context)?.onChainViewDetails ?? 'View details',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.primary,
                           ),
@@ -346,7 +346,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                 width: 8,
                 height: 8,
                 margin: const EdgeInsets.only(top: 6),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),

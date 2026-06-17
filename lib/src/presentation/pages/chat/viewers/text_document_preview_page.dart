@@ -105,7 +105,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
 
   Widget _buildBody(bool isDark, BuildContext context) {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),

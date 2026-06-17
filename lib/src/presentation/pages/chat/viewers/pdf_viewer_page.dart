@@ -155,7 +155,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
   Widget _buildBody(bool isDark) {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),

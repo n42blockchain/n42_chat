@@ -227,7 +227,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
               onPressed: () => Navigator.pop(context, _selectedTags.toList()),
               child: Text(
                 S.of(context)?.commonConfirm ?? 'OK',
-                style: const TextStyle(color: AppColors.primary),
+                style: TextStyle(color: AppColors.primary),
               ),
             )
           else

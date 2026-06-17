@@ -28,7 +28,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.location_on,
                       color: AppColors.primary,
                       size: 24,

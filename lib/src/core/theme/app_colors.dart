@@ -7,11 +7,17 @@ abstract class AppColors {
   AppColors._();
 
   // ============================================
-  // 主色调 - WeChat Green
+  // 主色调 - WeChat Green (可被宿主 app setAccentColor 覆盖)
   // ============================================
 
-  /// 主色 - 微信绿
-  static const Color primary = Color(0xFF07C160);
+  /// 默认主色 - 微信绿
+  static const Color _defaultPrimary = Color(0xFF07C160);
+
+  /// 当前主色（可由宿主 app 通过 N42Chat.setAccentColor 动态修改）
+  static Color primary = _defaultPrimary;
+
+  /// 重置为默认主色
+  static void resetPrimary() => primary = _defaultPrimary;
 
   /// 主色 - 浅色变体
   static const Color primaryLight = Color(0xFF4CD964);

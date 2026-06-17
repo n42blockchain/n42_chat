@@ -91,7 +91,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           if (state.isSimilarityLoading ||
               (similarity == null &&
                   state.similarityStatus != SocialGraphStatus.error)) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }

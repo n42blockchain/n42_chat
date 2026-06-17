@@ -279,7 +279,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                 ),
                 title: Text(l10n?.chatTimerOff ?? 'Off'),
                 trailing: _selfDestructAfter == null
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primary)
                     : null,
                 onTap: () => Navigator.pop(ctx, -1),
               ),
@@ -323,14 +323,14 @@ extension _ChatPageInputMethods on _ChatPageState {
       color: AppColors.primary.withValues(alpha: 0.1),
       child: Row(
         children: [
-          const Icon(Icons.timer, size: 16, color: AppColors.primary),
+          Icon(Icons.timer, size: 16, color: AppColors.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               s?.chatViewOnce ?? 'View Once',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
                 color: AppColors.primary,
@@ -728,7 +728,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                             ? NetworkImage(avatarUrl)
                             : null,
                         child: isRoomMention
-                            ? const Icon(
+                            ? Icon(
                                 Icons.alternate_email,
                                 size: 18,
                                 color: AppColors.primary,

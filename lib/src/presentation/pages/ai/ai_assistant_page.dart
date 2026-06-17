@@ -400,7 +400,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              child: const Icon(
+              child: Icon(
                 Icons.person,
                 size: 18,
                 color: AppColors.primary,
@@ -660,7 +660,7 @@ class _TypingDotState extends State<_TypingDot>
           child: Container(
             width: 6,
             height: 6,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),

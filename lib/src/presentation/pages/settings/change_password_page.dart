@@ -204,7 +204,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, color: AppColors.primary, size: 24),
+          Icon(Icons.info_outline, color: AppColors.primary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

@@ -573,7 +573,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
 
   Widget _buildBottomNavigationBar(bool isDark, int totalUnread) {
     final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    const selectedColor = AppColors.primary;
+    final selectedColor = AppColors.primary;
     final unselectedColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;

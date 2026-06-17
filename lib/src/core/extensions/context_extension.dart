@@ -215,7 +215,7 @@ extension ContextExtension on BuildContext {
           content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
               if (message != null) ...[

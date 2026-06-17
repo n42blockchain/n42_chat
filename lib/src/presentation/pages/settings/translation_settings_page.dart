@@ -256,7 +256,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(
+                          ? Icon(
                               Icons.check_rounded,
                               color: AppColors.primary,
                             )

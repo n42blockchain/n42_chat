@@ -304,7 +304,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppColors.primary),
+                borderSide: BorderSide(color: AppColors.primary),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -364,7 +364,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppColors.primary),
+                borderSide: BorderSide(color: AppColors.primary),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -465,7 +465,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
+                          borderSide: BorderSide(
                             color: AppColors.primary,
                           ),
                         ),

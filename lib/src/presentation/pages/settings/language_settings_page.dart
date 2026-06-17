@@ -375,7 +375,7 @@ class _LanguageItem extends StatelessWidget {
                   ),
                 ),
                 if (isSelected)
-                  const Icon(
+                  Icon(
                     Icons.check_circle_rounded,
                     color: AppColors.primary,
                     size: 24,

@@ -262,7 +262,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
           color: AppColors.primary.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Icon(
+        child: Icon(
           Icons.campaign,
           color: AppColors.primary,
           size: 24,
@@ -310,7 +310,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
         onPressed: () => _joinChannel(channel),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary),
+          side: BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           minimumSize: const Size(0, 32),
         ),

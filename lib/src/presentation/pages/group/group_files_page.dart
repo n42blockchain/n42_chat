@@ -265,7 +265,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
           ],
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.download, color: AppColors.primary),
+          icon: Icon(Icons.download, color: AppColors.primary),
           onPressed: () => _downloadFile(file),
         ),
         onTap: () => _openFile(file),

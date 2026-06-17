@@ -293,7 +293,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                           color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.music_note,
                           color: AppColors.primary,
                         ),
@@ -311,7 +311,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                           color: widget.isDark ? Colors.white54 : Colors.black54,
                         ),
                       ),
-                      trailing: const Icon(
+                      trailing: Icon(
                         Icons.send,
                         color: AppColors.primary,
                       ),
@@ -343,7 +343,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, color: AppColors.primary, size: 20),
+                Icon(Icons.info_outline, color: AppColors.primary, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -450,7 +450,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.audio_file,
                 size: 50,
                 color: AppColors.primary,

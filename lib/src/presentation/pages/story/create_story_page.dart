@@ -377,7 +377,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
+                  borderSide: BorderSide(
                     color: AppColors.primary,
                     width: 2,
                   ),
@@ -422,7 +422,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.add_photo_alternate_outlined,
                   size: 40,
                   color: AppColors.primary,

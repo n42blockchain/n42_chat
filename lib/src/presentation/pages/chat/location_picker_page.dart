@@ -382,7 +382,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               heroTag: 'relocate',
                               onPressed: _moveToCurrentLocation,
                               backgroundColor: Colors.white,
-                              child: const Icon(
+                              child: Icon(
                                 Icons.my_location,
                                 color: AppColors.primary,
                               ),
@@ -456,7 +456,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               ),
                             ),
                             trailing: isSelected
-                                ? const Icon(
+                                ? Icon(
                                     Icons.check_circle,
                                     color: AppColors.primary,
                                   )
@@ -576,7 +576,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.location_on,
                               color: AppColors.primary,
                               size: 24,
@@ -672,7 +672,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.location_on,
                               color: AppColors.primary,
                               size: 28,

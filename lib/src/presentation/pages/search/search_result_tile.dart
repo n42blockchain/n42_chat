@@ -167,7 +167,7 @@ class SearchResultTile extends StatelessWidget {
       // 添加高亮文本
       spans.add(TextSpan(
         text: text.substring(matchIndex, matchIndex + keyword.length),
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.primary,
           fontWeight: FontWeight.w600,
         ),

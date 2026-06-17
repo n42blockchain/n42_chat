@@ -159,6 +159,27 @@ class N42Chat {
   /// ```
   static void setThemeMode(ThemeMode mode) => _N42ThemeManager.setThemeMode(mode);
 
+  /// 获取当前 accent 主色
+  static Color get accentColor => _N42ThemeManager.accentColor;
+
+  /// 设置 accent 主色（宿主 app 的 accent color 同步入口）
+  ///
+  /// 调用后 n42_chat 所有使用 [AppColors.primary] 的组件均采用新颜色。
+  ///
+  /// ```dart
+  /// // 在主应用 AccentColorNotifier 中同步
+  /// if (N42Chat.isInitialized) N42Chat.setAccentColor(color);
+  /// ```
+  static void setAccentColor(Color color) => _N42ThemeManager.setAccentColor(color);
+
+  /// 添加 accent 主色变化监听器
+  static void addAccentColorListener(void Function(Color) listener) =>
+      _N42ThemeManager.addAccentColorListener(listener);
+
+  /// 移除 accent 主色变化监听器
+  static void removeAccentColorListener(void Function(Color) listener) =>
+      _N42ThemeManager.removeAccentColorListener(listener);
+
   /// 添加主题变化监听器
   static void addThemeListener(void Function(ThemeMode) listener) =>
       _N42ThemeManager.addThemeListener(listener);

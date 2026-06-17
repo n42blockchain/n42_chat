@@ -79,7 +79,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     'Display a generic private notification',
                 }, style: TextStyle(color: secondary)),
                 trailing: mode == _settings.privacyMode
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primary)
                     : null,
                 onTap: () => Navigator.pop(ctx, mode),
               );
