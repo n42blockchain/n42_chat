@@ -313,7 +313,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           ),
           child: Center(
             child: isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator(

@@ -273,7 +273,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
           color: isDark ? AppColors.surfaceDark : AppColors.surface,
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle,
                 color: AppColors.primary,
                 size: 20,
@@ -385,7 +385,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         onPressed: () => _startDirectChat(match.matrixUserId),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary),
+          side: BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
         child: const Text('Chat'),

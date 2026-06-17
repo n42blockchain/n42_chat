@@ -289,7 +289,7 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildSendingIndicator() {
-    return const SizedBox(
+    return SizedBox(
       width: 14,
       height: 14,
       child: CircularProgressIndicator(

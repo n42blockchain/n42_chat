@@ -478,7 +478,7 @@ class _TransferPageState extends State<TransferPage> {
                           0,
                           token.symbol.length.clamp(0, 2),
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
@@ -546,7 +546,7 @@ class _TransferPageState extends State<TransferPage> {
                   const SizedBox(width: 8),
                   // 选中标记
                   if (isSelected)
-                    const Icon(
+                    Icon(
                       Icons.check_circle,
                       color: AppColors.primary,
                       size: 20,

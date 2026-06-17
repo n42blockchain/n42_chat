@@ -250,7 +250,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.email_outlined, color: AppColors.primary, size: 24),
+          Icon(Icons.email_outlined, color: AppColors.primary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

@@ -777,7 +777,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 (seconds) => ListTile(
                   title: Text(_formatSelfDestructDuration(seconds)),
                   trailing: _settings.defaultSelfDestructSeconds == seconds
-                      ? const Icon(Icons.check, color: AppColors.primary)
+                      ? Icon(Icons.check, color: AppColors.primary)
                       : null,
                   onTap: () => Navigator.pop(ctx, seconds ?? 'off'),
                 ),
@@ -959,7 +959,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
               (level) => ListTile(
                 title: Text(_getLabel(context, level)),
                 trailing: currentValue == level
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primary)
                     : null,
                 onTap: () => Navigator.pop(context, level),
               ),

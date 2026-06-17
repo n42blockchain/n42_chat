@@ -120,7 +120,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
 
         // Content
         if (state.isRecommendationsLoading && state.recommendations.isEmpty)
-          const SliverFillRemaining(
+          SliverFillRemaining(
             child: Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             ),
@@ -274,7 +274,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                           chain.toUpperCase(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             height: 1.3,
                             fontWeight: FontWeight.w500,

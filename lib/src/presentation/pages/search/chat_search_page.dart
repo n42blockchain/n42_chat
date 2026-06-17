@@ -201,7 +201,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                     child: Container(
                       width: 8,
                       height: 8,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
@@ -288,7 +288,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
             itemBuilder: (context, index) {
               if (index >= results.messages.length) {
                 return ListTile(
-                  title: const Text(
+                  title: Text(
                     'Load more',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppColors.primary),

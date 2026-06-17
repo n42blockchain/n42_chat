@@ -114,7 +114,7 @@ class _BackupSectionState extends State<_BackupSection> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                const Icon(Icons.backup, color: AppColors.primary, size: 20),
+                Icon(Icons.backup, color: AppColors.primary, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Create Backup',

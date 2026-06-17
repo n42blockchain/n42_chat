@@ -46,7 +46,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
           Icon(Icons.key, color: AppColors.primary),
           SizedBox(width: 8),
@@ -91,7 +91,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: AppColors.primary),
+                  borderSide: BorderSide(color: AppColors.primary),
                 ),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste, size: 20),

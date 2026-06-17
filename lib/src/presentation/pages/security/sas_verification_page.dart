@@ -286,7 +286,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const CircularProgressIndicator(
+        CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),
         const SizedBox(height: 24),
@@ -330,7 +330,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         const Spacer(),
 
         // 标题
-        const Icon(Icons.security, size: 48, color: AppColors.primary),
+        Icon(Icons.security, size: 48, color: AppColors.primary),
         const SizedBox(height: 16),
         Text(
           S.of(context)?.securityVerifyDevice ?? 'Verify this device',

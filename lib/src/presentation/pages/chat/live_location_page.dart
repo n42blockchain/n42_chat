@@ -290,7 +290,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
           fontSize: 12,
         ),
       ),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.my_location,
         color: AppColors.primary,
         size: 20,

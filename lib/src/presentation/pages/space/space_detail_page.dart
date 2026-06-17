@@ -595,7 +595,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.tag, color: AppColors.primary, size: 20),
+          child: Icon(Icons.tag, color: AppColors.primary, size: 20),
         ),
         title: Text(
           child.name,

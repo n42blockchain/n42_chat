@@ -191,7 +191,7 @@ abstract class AppTextStyles {
   );
 
   /// 次要按钮文字
-  static const TextStyle buttonSecondary = TextStyle(
+  static TextStyle buttonSecondary = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,
     color: AppColors.primary,
@@ -200,7 +200,7 @@ abstract class AppTextStyles {
   );
 
   /// 文字按钮
-  static const TextStyle buttonText = TextStyle(
+  static TextStyle buttonText = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.primary,

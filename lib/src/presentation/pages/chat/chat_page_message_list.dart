@@ -351,14 +351,14 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.lock_outline, size: 16, color: AppColors.primary),
+            Icon(Icons.lock_outline, size: 16, color: AppColors.primary),
             const SizedBox(width: 8),
             Flexible(
               child: Text(
                 S.of(context)?.chatEncryptionNotice ??
                     'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   color: AppColors.primary,
                   height: 1.4,
@@ -410,7 +410,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             child: Row(
               children: [
                 // 置顶图标
-                const Icon(Icons.push_pin, size: 16, color: AppColors.primary),
+                Icon(Icons.push_pin, size: 16, color: AppColors.primary),
                 const SizedBox(width: 8),
                 // 消息内容预览
                 Expanded(
@@ -420,7 +420,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     children: [
                       Text(
                         msg.senderName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: AppColors.primary,
@@ -455,7 +455,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                       ),
                       child: Text(
                         '${state.currentPinnedIndex + 1}/${state.pinnedMessages.length}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.primary,
                           fontWeight: FontWeight.w500,
@@ -555,7 +555,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                   children: [
                     Text(
                       replyToText,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,

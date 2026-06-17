@@ -231,7 +231,7 @@ class _LinksTabState extends State<_LinksTab> {
           color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Icon(Icons.link, color: AppColors.primary, size: 20),
+        child: Icon(Icons.link, color: AppColors.primary, size: 20),
       ),
       title: Text(
         link.title ?? link.url,

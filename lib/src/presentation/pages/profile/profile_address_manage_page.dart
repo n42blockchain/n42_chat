@@ -221,7 +221,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                                       'Default',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     height: 1.3,
                                     fontWeight: FontWeight.w500,

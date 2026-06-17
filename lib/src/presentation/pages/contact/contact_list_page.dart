@@ -1913,7 +1913,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           S.of(context)?.commonInvitedToJoinGroup ?? 'Invited to join group',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 13, height: 1.3, color: AppColors.primary),
+          style: TextStyle(fontSize: 13, height: 1.3, color: AppColors.primary),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

@@ -243,7 +243,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                       'Default',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     height: 1.3,
                                     fontWeight: FontWeight.w500,

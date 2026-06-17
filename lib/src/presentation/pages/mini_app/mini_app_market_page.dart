@@ -98,7 +98,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: l10n?.miniAppSearch ?? 'Search apps...',
-                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                prefixIcon: Icon(Icons.search, color: AppColors.primary),
                 filled: true,
                 fillColor: isDark ? AppColors.surfaceDark : AppColors.surface,
                 border: OutlineInputBorder(
@@ -293,7 +293,7 @@ class _AppListTile extends StatelessWidget {
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Official',
                               style: TextStyle(
                                 fontSize: 10,

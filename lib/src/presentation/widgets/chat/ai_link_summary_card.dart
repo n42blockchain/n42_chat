@@ -63,12 +63,12 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
             onTap: () => setState(() => _isExpanded = !_isExpanded),
             child: Row(
               children: [
-                const Icon(Icons.auto_awesome, size: 14, color: AppColors.primary),
+                Icon(Icons.auto_awesome, size: 14, color: AppColors.primary),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     l10n?.aiLinkSummary ?? 'AI Summary',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primary,
@@ -89,7 +89,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
             if (widget.isLoading)
               Row(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 12,
                     height: 12,
                     child: CircularProgressIndicator(
@@ -100,7 +100,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
                   const SizedBox(width: 8),
                   Text(
                     l10n?.aiLinkSummaryAnalyzing ?? 'Analyzing...',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColors.primary,
                     ),
@@ -138,11 +138,11 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.auto_awesome, size: 12, color: AppColors.primary),
+            Icon(Icons.auto_awesome, size: 12, color: AppColors.primary),
             const SizedBox(width: 4),
             Text(
               l10n?.aiLinkSummary ?? 'AI Summary',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 color: AppColors.primary,
                 fontWeight: FontWeight.w500,

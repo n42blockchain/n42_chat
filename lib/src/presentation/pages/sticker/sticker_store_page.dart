@@ -337,7 +337,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                           ),
                           if (pack.isOfficial) ...[
                             const SizedBox(width: 4),
-                            const Icon(
+                            Icon(
                               Icons.verified,
                               size: 16,
                               color: AppColors.primary,

@@ -570,7 +570,7 @@ class _NftPreview extends StatelessWidget {
           label: Text(l10n?.nftPickerUseAsAvatar ?? 'Use as Avatar'),
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.primary,
-            side: const BorderSide(color: AppColors.primary),
+            side: BorderSide(color: AppColors.primary),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -611,7 +611,7 @@ class _InfoBanner extends StatelessWidget {
                   l10n?.nftPickerInfoTitle ?? 'NFT Avatar — Verified On-Chain',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     height: 1.3,
                     fontWeight: FontWeight.w600,

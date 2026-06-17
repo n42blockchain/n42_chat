@@ -158,7 +158,7 @@ class N42ChatTheme {
   });
 
   /// 微信浅色主题
-  factory N42ChatTheme.wechatLight() => const N42ChatTheme(
+  factory N42ChatTheme.wechatLight() => N42ChatTheme(
         primaryColor: AppColors.primary,
         backgroundColor: AppColors.background,
         surfaceColor: AppColors.surface,
@@ -178,7 +178,7 @@ class N42ChatTheme {
       );
 
   /// 微信深色主题
-  factory N42ChatTheme.wechatDark() => const N42ChatTheme(
+  factory N42ChatTheme.wechatDark() => N42ChatTheme(
         primaryColor: AppColors.primary,
         backgroundColor: AppColors.backgroundDark,
         surfaceColor: AppColors.surfaceDark,

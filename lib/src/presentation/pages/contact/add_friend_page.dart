@@ -489,7 +489,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.contacts,
                   color: AppColors.primary,
                   size: 22,
@@ -624,7 +624,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         onPressed: () => _startDirectChat(userId),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary),
+          side: BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
         child: Text(S.of(context)?.commonChat ?? 'Chat'),

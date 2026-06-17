@@ -215,7 +215,7 @@ class _GroupListPageState extends State<GroupListPage> {
         ),
         subtitle: Text(
           S.of(context)?.commonInvitedToJoinGroup ?? 'Invited to join group',
-          style: const TextStyle(fontSize: 13, color: AppColors.primary),
+          style: TextStyle(fontSize: 13, color: AppColors.primary),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

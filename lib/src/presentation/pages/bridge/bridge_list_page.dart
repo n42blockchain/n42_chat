@@ -250,7 +250,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
       );
     }
     if (state.isConnected) {
-      return const Icon(Icons.check_circle, color: AppColors.primary, size: 20);
+      return Icon(Icons.check_circle, color: AppColors.primary, size: 20);
     }
     if (state.hasError) {
       return const Icon(Icons.error_outline, color: Colors.red, size: 20);

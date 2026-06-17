@@ -319,7 +319,7 @@ class _RegisterPageState extends State<RegisterPage> {
               vertical: 14,
             ),
             suffixIcon: state.isCheckingHomeserver
-                ? const Padding(
+                ? Padding(
                     padding: EdgeInsets.all(12),
                     child: SizedBox(
                       width: 20,

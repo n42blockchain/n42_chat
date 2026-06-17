@@ -98,7 +98,7 @@ class _GroupTopicsBody extends StatelessWidget {
                   ),
                   child: Text(
                     l10n?.commonEdit ?? 'Edit',
-                    style: const TextStyle(color: AppColors.primary),
+                    style: TextStyle(color: AppColors.primary),
                   ),
                 ),
             ],
@@ -268,7 +268,7 @@ class _GroupTopicsBody extends StatelessWidget {
                     ),
                     child: Text(
                       channel.category!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,

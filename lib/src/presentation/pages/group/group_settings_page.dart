@@ -171,7 +171,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     bottom: 0,
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),

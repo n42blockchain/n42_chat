@@ -235,7 +235,7 @@ class _AccountTile extends StatelessWidget {
               child: CircularProgressIndicator(strokeWidth: 2),
             )
           : account.isCurrent
-          ? const Icon(Icons.check_circle, color: AppColors.primary)
+          ? Icon(Icons.check_circle, color: AppColors.primary)
           : const Icon(AppIcons.chevron),
       onTap: isSwitching ? null : onTap,
     );

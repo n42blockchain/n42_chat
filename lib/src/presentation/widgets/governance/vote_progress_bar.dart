@@ -69,7 +69,7 @@ class VoteProgressBar extends StatelessWidget {
           Row(
             children: [
               if (isSelected)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(right: 6),
                   child: Icon(
                     Icons.check_circle,

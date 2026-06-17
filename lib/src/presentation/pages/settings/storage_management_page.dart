@@ -355,7 +355,7 @@ class _SmartCleanupSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.auto_fix_high,
                   color: AppColors.primary,
                   size: 20,
@@ -558,7 +558,7 @@ class _RoomStorageSection extends StatelessWidget {
             ListTile(
               title: Text(
                 'View all ${state.roomStorageList.length} rooms',
-                style: const TextStyle(fontSize: 14, color: AppColors.primary),
+                style: TextStyle(fontSize: 14, color: AppColors.primary),
                 textAlign: TextAlign.center,
               ),
               onTap: () {
@@ -698,7 +698,7 @@ class _ClearCacheButton extends StatelessWidget {
     return Container(
       color: cardColor,
       child: ListTile(
-        leading: const Icon(Icons.cleaning_services, color: AppColors.primary),
+        leading: Icon(Icons.cleaning_services, color: AppColors.primary),
         title: Text(
           S.of(context)?.clearCache ?? 'Clear Cache',
           maxLines: 1,

@@ -141,7 +141,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
               onPressed: _isSaving ? null : _save,
               child: Text(
                 l10n?.commonConfirm ?? 'Save',
-                style: const TextStyle(color: AppColors.primary),
+                style: TextStyle(color: AppColors.primary),
               ),
             ),
           ],

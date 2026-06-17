@@ -494,7 +494,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.screen_share,
                       color: AppColors.primary,
                       size: 18,
@@ -596,7 +596,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       Container(
                         width: 6,
                         height: 6,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
                         ),
@@ -835,7 +835,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       '${_participants.length}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 14,
                         height: 1.3,
@@ -902,7 +902,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               child: Icon(Icons.videocam_off, color: Colors.red, size: 18),
             ),
           if (participant.isScreenSharing)
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 8),
               child: Icon(
                 Icons.screen_share,
@@ -929,7 +929,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(color: AppColors.primary),
+              CircularProgressIndicator(color: AppColors.primary),
               const SizedBox(height: 24),
               Text(
                 S.of(context)?.callJoiningMeeting ?? 'Joining meeting...',

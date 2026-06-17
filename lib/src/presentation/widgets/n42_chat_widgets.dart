@@ -29,6 +29,10 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     if (mounted) setState(() => _fontSize = fontSize);
   }
 
+  void _onAccentColorChanged(Color _) {
+    if (mounted) setState(() {});
+  }
+
   Future<void> _loadAppearanceSettings() async {
     try {
       final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
@@ -46,6 +50,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     N42Chat.addLocaleListener(_onLocaleChanged);
     N42Chat.addThemeListener(_onThemeChanged);
     N42Chat.addFontSizeListener(_onFontSizeChanged);
+    N42Chat.addAccentColorListener(_onAccentColorChanged);
     unawaited(_loadAppearanceSettings());
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
@@ -56,6 +61,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     N42Chat.removeLocaleListener(_onLocaleChanged);
     N42Chat.removeThemeListener(_onThemeChanged);
     N42Chat.removeFontSizeListener(_onFontSizeChanged);
+    N42Chat.removeAccentColorListener(_onAccentColorChanged);
     super.dispose();
   }
 
@@ -422,6 +428,7 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
     N42Chat.addLocaleListener(_onLocaleChanged);
     N42Chat.addThemeListener(_onThemeChanged);
     N42Chat.addFontSizeListener(_onFontSizeChanged);
+    N42Chat.addAccentColorListener(_onAccentColorChanged);
     unawaited(_loadAppearanceSettings());
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
@@ -437,6 +444,10 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
 
   void _onFontSizeChanged(FontSize fontSize) {
     if (mounted) setState(() => _fontSize = fontSize);
+  }
+
+  void _onAccentColorChanged(Color _) {
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadAppearanceSettings() async {
@@ -455,6 +466,7 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
     N42Chat.removeLocaleListener(_onLocaleChanged);
     N42Chat.removeThemeListener(_onThemeChanged);
     N42Chat.removeFontSizeListener(_onFontSizeChanged);
+    N42Chat.removeAccentColorListener(_onAccentColorChanged);
     super.dispose();
   }
 

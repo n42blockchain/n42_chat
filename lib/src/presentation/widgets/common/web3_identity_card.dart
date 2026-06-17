@@ -186,12 +186,12 @@ class Web3IdentityCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.copy_rounded,
+                        Icon(Icons.copy_rounded,
                             size: 14, color: AppColors.primary),
                         const SizedBox(width: 4),
                         Text(
                           l10n?.web3Copy ?? 'Copy',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.primary,
                           ),
@@ -359,7 +359,7 @@ class _N42Badge extends StatelessWidget {
           width: 0.5,
         ),
       ),
-      child: const Text(
+      child: Text(
         'N42',
         style: TextStyle(
           fontSize: 10,

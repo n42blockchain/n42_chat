@@ -182,7 +182,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ),
       ),
       trailing: isSelected
-          ? const Icon(Icons.check_rounded, color: AppColors.primary)
+          ? Icon(Icons.check_rounded, color: AppColors.primary)
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(themeMode: value));
@@ -248,7 +248,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ),
       ),
       trailing: isSelected
-          ? const Icon(
+          ? Icon(
               Icons.check,
               color: AppColors.primary,
             )
@@ -384,7 +384,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ),
       ),
       trailing: isSelected
-          ? const Icon(Icons.check_rounded, color: AppColors.primary)
+          ? Icon(Icons.check_rounded, color: AppColors.primary)
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(bubbleStyle: value));

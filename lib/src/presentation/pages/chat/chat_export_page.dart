@@ -491,7 +491,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.calendar_today_outlined,
               size: 18,
               color: AppColors.primary,

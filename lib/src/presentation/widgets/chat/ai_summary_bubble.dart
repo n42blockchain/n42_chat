@@ -68,7 +68,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.auto_awesome,
                     size: 18,
                     color: AppColors.primary,
@@ -79,7 +79,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
                       widget.messageCount > 0
                           ? (l10n?.aiSummarizeUnread(widget.messageCount) ?? 'AI Summary (${widget.messageCount} messages)')
                           : (l10n?.aiSummarize ?? 'AI Summary'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primary,
@@ -130,7 +130,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
     final l10n = S.of(context);
     return Row(
       children: [
-        const SizedBox(
+        SizedBox(
           width: 16,
           height: 16,
           child: CircularProgressIndicator(
@@ -141,7 +141,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
         const SizedBox(width: 8),
         Text(
           l10n?.aiSummarizeLoading ?? 'Generating summary...',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             color: AppColors.primary,
           ),
@@ -193,7 +193,7 @@ class AiSummarizeButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isLoading)
-              const SizedBox(
+              SizedBox(
                 width: 14,
                 height: 14,
                 child: CircularProgressIndicator(
@@ -202,13 +202,13 @@ class AiSummarizeButton extends StatelessWidget {
                 ),
               )
             else
-              const Icon(Icons.auto_awesome, size: 14, color: AppColors.primary),
+              Icon(Icons.auto_awesome, size: 14, color: AppColors.primary),
             const SizedBox(width: 6),
             Text(
               isLoading
                   ? (l10n?.aiSummarizeLoading ?? 'Summarizing...')
                   : (l10n?.aiSummarizeUnread(unreadCount) ?? 'AI Summarize $unreadCount messages'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 color: AppColors.primary,
                 fontWeight: FontWeight.w500,
