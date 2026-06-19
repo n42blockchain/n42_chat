@@ -166,11 +166,11 @@ abstract class AppColors {
   /// 警告背景
   static const Color warningBg = Color(0x14FF9900);
 
-  /// 成功（微信绿，独立于品牌主色靛蓝）
-  static const Color success = Color(0xFF07C160);
+  /// 成功（对齐设计系统 success 绿 #1FB67A，§1.1；微信绿仅保留给聊天气泡）
+  static const Color success = Color(0xFF1FB67A);
 
   /// 成功背景
-  static const Color successBg = Color(0x1407C160);
+  static const Color successBg = Color(0x141FB67A);
 
   /// 信息
   static const Color info = Color(0xFF10AEFF);
@@ -233,8 +233,8 @@ abstract class AppColors {
   // 特殊用途
   // ============================================
 
-  /// 在线状态
-  static const Color online = Color(0xFF07C160);
+  /// 在线状态（对齐设计系统 success 绿 #1FB67A，§1.1）
+  static const Color online = Color(0xFF1FB67A);
 
   /// 离线状态
   static const Color offline = Color(0xFFCCCCCC);
@@ -252,8 +252,8 @@ abstract class AppColors {
   /// 按压状态 - 深色
   static const Color pressedDark = Color(0x1FFFFFFF);
 
-  /// 加密标识
-  static const Color encrypted = Color(0xFF07C160);
+  /// 加密标识（对齐设计系统 success 绿 #1FB67A，§1.1）
+  static const Color encrypted = Color(0xFF1FB67A);
 
   /// 红包
   static const Color redPacket = Color(0xFFFD9B2D);
