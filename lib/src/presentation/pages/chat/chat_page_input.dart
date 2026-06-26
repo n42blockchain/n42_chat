@@ -714,9 +714,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                         radius: 18,
                         backgroundColor: isRoomMention
                             ? AppColors.primary.withValues(alpha: 0.12)
-                            : (isDark
-                                ? AppColors.placeholderDark
-                                : AppColors.placeholder),
+                            : AppColors.placeholderOf(isDark),
                         backgroundImage: !isRoomMention && avatarUrl.isNotEmpty
                             ? NetworkImage(avatarUrl)
                             : null,

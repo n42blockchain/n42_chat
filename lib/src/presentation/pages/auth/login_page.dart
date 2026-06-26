@@ -174,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
+    final bgColor = AppColors.bgOf(isDark);
     final textColor = context.textPrimary;
 
     return Scaffold(
@@ -378,9 +378,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildServerInput(BuildContext context, AuthState state, bool isDark) {
     final labelColor = context.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
+    final inputBgColor = AppColors.inputBgOf(isDark);
     final textColor = context.textPrimary;
     final hintColor = context.textSecondary;
 
@@ -463,9 +461,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildUsernameInput(BuildContext context, bool isDark) {
     final labelColor = context.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
+    final inputBgColor = AppColors.inputBgOf(isDark);
     final textColor = context.textPrimary;
     final hintColor = context.textSecondary;
 
@@ -519,9 +515,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildPasswordInput(BuildContext context, bool isDark) {
     final labelColor = context.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
+    final inputBgColor = AppColors.inputBgOf(isDark);
     final textColor = context.textPrimary;
     final hintColor = context.textSecondary;
 

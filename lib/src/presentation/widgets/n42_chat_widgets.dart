@@ -167,9 +167,7 @@ class _LoadingPage extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF1E1E1E)
-          : const Color(0xFFEDEDED),
+      backgroundColor: AppColors.bgOf(isDark),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -193,7 +191,7 @@ class _LoadingPage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: isDark ? Colors.white : const Color(0xFF181818),
+                color: AppColors.textPrimaryOf(isDark),
               ),
             ),
             const SizedBox(height: 16),
@@ -335,9 +333,9 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
     }
 
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED);
-    final textColor = isDark ? Colors.white : const Color(0xFF181818);
-    final subtitleColor = isDark ? Colors.white70 : const Color(0xFF888888);
+    final bgColor = AppColors.bgOf(isDark);
+    final textColor = AppColors.textPrimaryOf(isDark);
+    final subtitleColor = AppColors.textSecondaryOf(isDark);
 
     return Scaffold(
       backgroundColor: bgColor,
