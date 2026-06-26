@@ -298,6 +298,11 @@ class MatrixEventMapper {
       return MessageType.poll;
     }
 
+    // 贴纸事件（m.sticker 是独立 event type，无 msgtype）
+    if (event.type == matrix.EventTypes.Sticker) {
+      return MessageType.sticker;
+    }
+
     // 检查是否是通话结束事件
     if (event.type == 'm.call.hangup') {
       final callType = event.content['call_type'] as String?;

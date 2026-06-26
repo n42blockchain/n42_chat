@@ -240,3 +240,5 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/animations/
+    - assets/stickers/n42_faces/
+    - assets/stickers/n42_reactions/
