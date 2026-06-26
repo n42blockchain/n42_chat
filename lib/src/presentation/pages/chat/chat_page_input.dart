@@ -544,10 +544,12 @@ extension _ChatPageInputMethods on _ChatPageState {
   void _onEmojiPressed() {
     // 隐藏键盘
     _inputFocusNode.unfocus();
-    // 切换表情选择器
+    // 切换统一表情面板（默认 emoji 分页）
     setState(() {
       _showEmojiPicker = !_showEmojiPicker;
+      _expressionInitialTab = ExpressionTab.emoji;
       _showMorePanel = false;
+      _showStickerPicker = false;
     });
   }
 
@@ -562,8 +564,9 @@ extension _ChatPageInputMethods on _ChatPageState {
   }
 
   Widget _buildEmojiPicker() {
-    return EmojiPicker(
-      height: 260,
+    return ExpressionPanel(
+      height: 320,
+      initialTab: _expressionInitialTab,
       onEmojiSelected: (emoji) {
         // 在当前光标位置插入表情
         final text = _inputController.text;
@@ -638,6 +641,10 @@ extension _ChatPageInputMethods on _ChatPageState {
               });
             }
           : null,
+      onStickerSelected: _onStickerSelected,
+      onStickerLongPressed: _onStickerLongPressed,
+      onOpenStickerStore: _openStickerStore,
+      onGifSelected: _onGifSelectedInline,
     );
   }
 
