@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -921,23 +922,35 @@ class MessageItem extends StatelessWidget {
       client: client,
     );
 
-    final isSvg = mimeType.contains('svg') || url.toLowerCase().endsWith('.svg');
+    final lower = url.toLowerCase();
+    final isLottie = mimeType.contains('lottie') ||
+        mimeType.contains('json') ||
+        lower.endsWith('.json');
+    final isSvg = mimeType.contains('svg') || lower.endsWith('.svg');
     return SizedBox(
       width: size,
       height: size,
-      child: isSvg
-          ? SvgPicture.network(
+      child: isLottie
+          ? Lottie.network(
               url,
               headers: headers,
               fit: BoxFit.contain,
-              placeholderBuilder: (_) => fallback(),
-            )
-          : Image.network(
-              url,
-              fit: BoxFit.contain,
-              headers: headers,
+              repeat: true,
               errorBuilder: (_, _, _) => fallback(),
-            ),
+            )
+          : isSvg
+              ? SvgPicture.network(
+                  url,
+                  headers: headers,
+                  fit: BoxFit.contain,
+                  placeholderBuilder: (_) => fallback(),
+                )
+              : Image.network(
+                  url,
+                  fit: BoxFit.contain,
+                  headers: headers,
+                  errorBuilder: (_, _, _) => fallback(),
+                ),
     );
   }
 

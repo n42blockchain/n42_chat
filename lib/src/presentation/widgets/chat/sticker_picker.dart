@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
@@ -315,16 +316,19 @@ class _StickerPickerState extends State<StickerPicker> {
       return Text(emoji, style: const TextStyle(fontSize: 32));
     }
 
-    // 内置 asset 贴纸（SVG）
+    // 内置 asset 贴纸（Lottie 动画 / SVG 静态）
     if (BundledStickerPacks.isAssetSticker(sticker.url)) {
+      final path = BundledStickerPacks.assetPath(sticker.url);
       return Padding(
         padding: const EdgeInsets.all(6),
-        child: SvgPicture.asset(
-          BundledStickerPacks.assetPath(sticker.url),
-          fit: BoxFit.contain,
-          placeholderBuilder: (_) =>
-              Text(sticker.emoji ?? '🙂', style: const TextStyle(fontSize: 32)),
-        ),
+        child: BundledStickerPacks.isLottie(sticker.url)
+            ? Lottie.asset(path, fit: BoxFit.contain, repeat: true)
+            : SvgPicture.asset(
+                path,
+                fit: BoxFit.contain,
+                placeholderBuilder: (_) => Text(sticker.emoji ?? '🙂',
+                    style: const TextStyle(fontSize: 32)),
+              ),
       );
     }
 
