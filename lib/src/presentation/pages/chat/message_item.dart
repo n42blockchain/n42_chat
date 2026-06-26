@@ -3,9 +3,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/utils/matrix_utils.dart' as mx_utils;
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/services/url_preview_service.dart';
@@ -384,6 +387,9 @@ class MessageItem extends StatelessWidget {
         break;
       case MessageType.image:
         content = _buildImageMessage();
+        break;
+      case MessageType.sticker:
+        content = _buildStickerMessage();
         break;
       case MessageType.voice:
       case MessageType.audio:
@@ -888,6 +894,50 @@ class MessageItem extends StatelessWidget {
       isExpired: message.isExpired,
       isViewed: message.isDestructionStarted && !message.isExpired,
       isFromMe: message.isFromMe,
+    );
+  }
+
+  Widget _buildStickerMessage() {
+    final metadata = message.metadata;
+    final url = metadata?.httpUrl ?? metadata?.mediaUrl ?? '';
+    final mimeType = metadata?.mimeType ?? '';
+    const double size = 120;
+
+    Widget fallback() => Text(
+          message.content.isNotEmpty ? message.content : '🙂',
+          style: const TextStyle(fontSize: 40),
+        );
+
+    // 无有效媒体 URL（未上传/解析失败）时回退显示 body 文本
+    if (!url.startsWith('http')) {
+      return fallback();
+    }
+
+    final client = getIt.isRegistered<MatrixClientManager>()
+        ? getIt<MatrixClientManager>().client
+        : null;
+    final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+      url,
+      client: client,
+    );
+
+    final isSvg = mimeType.contains('svg') || url.toLowerCase().endsWith('.svg');
+    return SizedBox(
+      width: size,
+      height: size,
+      child: isSvg
+          ? SvgPicture.network(
+              url,
+              headers: headers,
+              fit: BoxFit.contain,
+              placeholderBuilder: (_) => fallback(),
+            )
+          : Image.network(
+              url,
+              fit: BoxFit.contain,
+              headers: headers,
+              errorBuilder: (_, _, _) => fallback(),
+            ),
     );
   }
 
