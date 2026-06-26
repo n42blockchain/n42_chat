@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/giphy_service.dart';
+import '../../../core/services/gif_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
 import 'scheduled_send_picker.dart';
@@ -58,7 +59,7 @@ class GifPicker extends StatefulWidget {
 }
 
 class _GifPickerState extends State<GifPicker> {
-  GiphyService? _giphyService;
+  GifService? _gifService;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -78,8 +79,8 @@ class _GifPickerState extends State<GifPicker> {
 
   void _initializeService() {
     try {
-      if (GetIt.instance.isRegistered<GiphyService>()) {
-        _giphyService = GetIt.instance<GiphyService>();
+      if (GetIt.instance.isRegistered<GifService>()) {
+        _gifService = GetIt.instance<GifService>();
         _serviceAvailable = true;
         _loadTrendingGifs();
         _scrollController.addListener(_onScroll);
@@ -95,7 +96,7 @@ class _GifPickerState extends State<GifPicker> {
     _debounceTimer?.cancel();
     _scrollController.dispose();
     _searchController.dispose();
-    // 不要 dispose _giphyService，因为它是单例
+    // 不要 dispose _gifService，因为它是单例
     super.dispose();
   }
 
@@ -132,14 +133,14 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Future<void> _loadTrendingGifs() async {
-    if (_isLoading || _giphyService == null) return;
+    if (_isLoading || _gifService == null) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final result = await _giphyService!.getTrendingGifs(offset: _offset);
+      final result = await _gifService!.getTrendingGifs(offset: _offset);
       if (mounted) {
         setState(() {
           _gifs.addAll(result.gifs);
@@ -158,14 +159,14 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Future<void> _searchGifs() async {
-    if (_isLoading || _currentQuery.isEmpty || _giphyService == null) return;
+    if (_isLoading || _currentQuery.isEmpty || _gifService == null) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final result = await _giphyService!.searchGifs(
+      final result = await _gifService!.searchGifs(
         query: _currentQuery,
         offset: _offset,
       );

@@ -4,6 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/giphy_service.dart';
+import '../services/tenor_service.dart';
+import '../services/gif_service.dart';
 import '../services/remark_service.dart';
 import '../services/mymemory_translation_service.dart';
 import '../services/translation_service.dart';
@@ -263,6 +265,33 @@ Future<void> _registerServices(N42ChatConfig config) async {
         ),
       ),
       dispose: (service) => service.dispose(),
+    );
+  }
+
+  // Tenor 服务（配置了 API Key 或代理端点时注册）
+  if ((config.tenorApiKey != null && config.tenorApiKey!.isNotEmpty) ||
+      config.tenorUseProxyEndpoint) {
+    getIt.registerLazySingleton<TenorService>(
+      () => TenorService(
+        config: TenorConfig(
+          apiKey: config.tenorApiKey ?? '',
+          baseUrl: config.tenorBaseUrl,
+          authToken: config.proxyAuthToken,
+          useProxyEndpoint: config.tenorUseProxyEndpoint,
+        ),
+      ),
+      dispose: (service) => service.dispose(),
+    );
+  }
+
+  // 统一 GIF 服务（Giphy 主 + Tenor 兜底，任一可用即注册，供 GifPicker 使用）
+  final gifProviders = <GifService>[
+    if (getIt.isRegistered<GiphyService>()) getIt<GiphyService>(),
+    if (getIt.isRegistered<TenorService>()) getIt<TenorService>(),
+  ];
+  if (gifProviders.isNotEmpty) {
+    getIt.registerLazySingleton<GifService>(
+      () => CompositeGifService(gifProviders),
     );
   }
 
