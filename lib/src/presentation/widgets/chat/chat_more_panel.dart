@@ -95,6 +95,9 @@ class ChatMorePanel extends StatefulWidget {
   /// Mini Apps 回调
   final VoidCallback? onMiniAppsPressed;
 
+  /// 代码块
+  final VoidCallback? onCodePressed;
+
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
@@ -125,6 +128,7 @@ class ChatMorePanel extends StatefulWidget {
     this.onScheduledPressed,
     this.selfDestructAfter,
     this.onMiniAppsPressed,
+    this.onCodePressed,
   });
 
   @override
@@ -235,6 +239,11 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       icon: Icons.person_outline,
                       label: S.of(context)?.searchContactLabel ?? 'Contact',
                       onTap: widget.onContactCardPressed,
+                    ),
+                    _MoreItem(
+                      icon: Icons.code,
+                      label: 'Code',
+                      onTap: widget.onCodePressed,
                     ),
                   ]),
                   // 第二页

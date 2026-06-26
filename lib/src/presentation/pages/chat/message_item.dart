@@ -27,6 +27,7 @@ import '../../../core/services/ai_service.dart';
 import '../../widgets/chat/message_reaction_bar.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
 import '../../widgets/chat/thread_indicator.dart';
+import '../../widgets/chat/code_block_message_widget.dart';
 import 'message_item_helpers.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -391,6 +392,9 @@ class MessageItem extends StatelessWidget {
         break;
       case MessageType.sticker:
         content = _buildStickerMessage();
+        break;
+      case MessageType.codeBlock:
+        content = CodeBlockMessageWidget(raw: message.content);
         break;
       case MessageType.voice:
       case MessageType.audio:
