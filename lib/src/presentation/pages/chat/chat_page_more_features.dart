@@ -808,6 +808,23 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     }
   }
 
+  /// 统一表情面板内联发送 GIF（不经模态对话框）
+  void _onGifSelectedInline(GiphyGif gif) {
+    debugLog('ChatPage: Sending GIF (inline) - ${gif.title}');
+    context.read<ChatBloc>().add(
+      SendGifMessage(
+        gifUrl: gif.originalUrl,
+        previewUrl: gif.previewUrl,
+        width: gif.width,
+        height: gif.height,
+        title: gif.title,
+      ),
+    );
+    setState(() {
+      _showEmojiPicker = false;
+    });
+  }
+
   /// 显示/隐藏贴纸选择器面板
   void _toggleStickerPicker() {
     setState(() {
