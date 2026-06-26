@@ -366,7 +366,7 @@ class _GifPickerState extends State<GifPicker> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          color: isDark ? Colors.grey[800] : Colors.grey[200],
+          color: AppColors.placeholderOf(isDark),
           child: Image.network(
             gif.previewUrl,
             fit: BoxFit.cover,

@@ -1719,7 +1719,7 @@ class MessageItem extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? AppColors.primary.withValues(alpha: 0.1)
-                      : (isDark ? Colors.grey[800] : Colors.grey[100]),
+                      : AppColors.inputBgOf(isDark),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isSelected ? AppColors.primary : Colors.transparent,

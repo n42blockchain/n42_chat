@@ -262,7 +262,7 @@ class WelcomePage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(32, 12, 32, 24),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.backgroundDark : Colors.white,
+        color: AppColors.bgOf(isDark),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),

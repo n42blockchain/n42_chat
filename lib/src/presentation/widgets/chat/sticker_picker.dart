@@ -298,7 +298,7 @@ class _StickerPickerState extends State<StickerPicker> {
           : () => widget.onStickerLongPressed!(sticker, packId),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? Colors.grey[800] : Colors.grey[100],
+          color: AppColors.placeholderOf(isDark),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(child: _buildStickerContent(sticker)),

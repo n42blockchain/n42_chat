@@ -22,6 +22,7 @@ import 'services/voip/call_manager.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
+import 'core/theme/app_colors.dart';
 import 'domain/entities/conversation_entity.dart';
 import 'domain/entities/user_entity.dart';
 import 'domain/entities/user_profile_entity.dart';
