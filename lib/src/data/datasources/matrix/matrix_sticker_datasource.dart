@@ -415,10 +415,11 @@ class MatrixStickerDataSource {
           final path = BundledStickerPacks.assetPath(sticker.url);
           final data = await rootBundle.load(path);
           final bytes = data.buffer.asUint8List();
+          final filename = path.split('/').last;
           final uploaded = await uploadStickerImage(
             bytes,
-            '${sticker.id}.svg',
-            'image/svg+xml',
+            filename,
+            BundledStickerPacks.mimeForAsset(sticker.url),
           );
           if (uploaded == null) {
             // 上传失败兜底：发 emoji 文本，保证用户操作有反馈

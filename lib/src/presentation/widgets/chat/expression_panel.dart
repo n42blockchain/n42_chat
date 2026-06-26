@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
@@ -354,8 +355,12 @@ class _StickerThumb extends StatelessWidget {
           style: const TextStyle(fontSize: 28));
     }
     if (BundledStickerPacks.isAssetSticker(sticker.url)) {
+      final path = BundledStickerPacks.assetPath(sticker.url);
+      if (BundledStickerPacks.isLottie(sticker.url)) {
+        return Lottie.asset(path, fit: BoxFit.contain, repeat: true);
+      }
       return SvgPicture.asset(
-        BundledStickerPacks.assetPath(sticker.url),
+        path,
         fit: BoxFit.contain,
         placeholderBuilder: (_) =>
             Text(sticker.emoji ?? '🙂', style: const TextStyle(fontSize: 28)),
