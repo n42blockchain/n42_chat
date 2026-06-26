@@ -413,6 +413,10 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _shareMusic();
       },
+      onCodePressed: () {
+        _hideMorePanel();
+        _composeCodeBlock();
+      },
       onReceivePressed: () {
         _hideMorePanel();
         _openReceive();
@@ -561,6 +565,66 @@ extension _ChatPageInputMethods on _ChatPageState {
       _showMorePanel = !_showMorePanel;
       _showEmojiPicker = false;
     });
+  }
+
+  /// 代码块输入对话框 → 发送 n42.code_block 消息
+  Future<void> _composeCodeBlock() async {
+    final codeController = TextEditingController();
+    final langController = TextEditingController();
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: context.surfaceColor,
+        title: const Text('Send code'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: langController,
+                decoration: const InputDecoration(
+                  labelText: 'Language',
+                  hintText: 'dart / js / python …',
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: codeController,
+                minLines: 4,
+                maxLines: 12,
+                autofocus: true,
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                decoration: const InputDecoration(
+                  hintText: 'Paste code here',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(S.of(context)?.commonSend ?? 'Send'),
+          ),
+        ],
+      ),
+    );
+    if (send == true && mounted && codeController.text.trim().isNotEmpty) {
+      final lang = langController.text.trim();
+      final fenced = '```$lang\n${codeController.text}\n```';
+      context.read<ChatBloc>().add(
+            SendCustomMessage(content: fenced, type: MessageType.codeBlock),
+          );
+    }
+    codeController.dispose();
+    langController.dispose();
   }
 
   Widget _buildEmojiPicker() {
