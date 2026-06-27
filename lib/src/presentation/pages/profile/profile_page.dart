@@ -22,6 +22,7 @@ import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../favorite/favorite_list_page.dart';
+import '../subscription/subscription_page.dart';
 import '../qrcode/my_qrcode_page.dart';
 import '../settings/change_email_page.dart';
 import '../settings/account_switch_page.dart';
@@ -236,6 +237,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 iconColor: const Color(0xFFFFCC00),
                 title: S.of(context)?.profileStickers ?? 'Stickers',
                 onTap: () => _openStickers(context),
+              ),
+              _buildDivider(context),
+              _buildMenuItem(
+                context,
+                icon: Icons.workspace_premium_outlined,
+                iconColor: const Color(0xFF9B59B6),
+                title: 'Subscriptions',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const SubscriptionPage(),
+                  ),
+                ),
               ),
             ],
           ),

@@ -1396,6 +1396,32 @@ class PreferencesDataSource {
     return p.getString(_keyReminders);
   }
 
+  /// 订阅计划列表存储 key
+  static const String _keySubscriptionPlans = 'n42_chat_subscription_plans';
+
+  /// 用户订阅记录存储 key
+  static const String _keyUserSubscriptions = 'n42_chat_user_subscriptions';
+
+  Future<void> saveSubscriptionPlans(String json) async {
+    final p = await prefs;
+    await p.setString(_keySubscriptionPlans, json);
+  }
+
+  Future<String?> getSubscriptionPlans() async {
+    final p = await prefs;
+    return p.getString(_keySubscriptionPlans);
+  }
+
+  Future<void> saveUserSubscriptions(String json) async {
+    final p = await prefs;
+    await p.setString(_keyUserSubscriptions, json);
+  }
+
+  Future<String?> getUserSubscriptions() async {
+    final p = await prefs;
+    return p.getString(_keyUserSubscriptions);
+  }
+
   // ============================================
   // 草稿持久化
   // ============================================
