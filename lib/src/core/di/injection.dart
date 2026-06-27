@@ -9,6 +9,7 @@ import '../services/gif_service.dart';
 import '../services/reminder_service.dart';
 import '../services/subscription_service.dart';
 import '../services/fiat_ramp_service.dart';
+import '../services/live_caption_service.dart';
 import '../services/remark_service.dart';
 import '../services/mymemory_translation_service.dart';
 import '../services/translation_service.dart';
@@ -254,6 +255,19 @@ Future<void> _registerServices(N42ChatConfig config) async {
       );
     }
   }
+
+  if (!getIt.isRegistered<SpeechToTextService>()) {
+    getIt.registerSingleton<SpeechToTextService>(speechService);
+  }
+
+  // 实时字幕服务（复用 STT + Voice；音频源可插拔——通话音频管道/麦克风喂 chunk）
+  getIt.registerLazySingleton<LiveCaptionService>(
+    () => LiveCaptionService(
+      getIt<SpeechToTextService>(),
+      getIt<VoiceService>(),
+    ),
+    dispose: (svc) => svc.dispose(),
+  );
 
   // Giphy 服务（配置了 API Key 或代理端点时注册）
   if ((config.giphyApiKey != null && config.giphyApiKey!.isNotEmpty) ||
