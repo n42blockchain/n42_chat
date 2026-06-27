@@ -11,6 +11,8 @@ import '../services/subscription_service.dart';
 import '../services/fiat_ramp_service.dart';
 import '../services/live_caption_service.dart';
 import '../services/system_integration_service.dart';
+import '../services/local_llm_service.dart';
+import '../services/ai_provider_router.dart';
 import '../services/remark_service.dart';
 import '../services/mymemory_translation_service.dart';
 import '../services/translation_service.dart';
@@ -273,6 +275,20 @@ Future<void> _registerServices(N42ChatConfig config) async {
   // 系统级集成（MethodChannel 桥；原生未实现时优雅 no-op）
   getIt.registerLazySingleton<SystemIntegrationService>(
     () => SystemIntegrationService(),
+  );
+
+  // 端侧推理（Dart 桥+服务；原生未接入时 unavailable）
+  getIt.registerLazySingleton<LocalLlmBridge>(() => LocalLlmBridge());
+  getIt.registerLazySingleton<LocalLlmService>(
+    () => LocalLlmService(getIt<LocalLlmBridge>()),
+    dispose: (s) => s.dispose(),
+  );
+  // AI 云↔端路由（端侧就绪走本地，否则云端；端侧失败回退云端）
+  getIt.registerLazySingleton<AiProviderRouter>(
+    () => AiProviderRouter(
+      cloud: getIt.isRegistered<AiService>() ? getIt<AiService>() : null,
+      local: getIt<LocalLlmService>(),
+    ),
   );
 
   // Giphy 服务（配置了 API Key 或代理端点时注册）
