@@ -13,6 +13,8 @@ import '../services/live_caption_service.dart';
 import '../services/system_integration_service.dart';
 import '../services/local_llm_service.dart';
 import '../services/ai_provider_router.dart';
+import '../encryption/mls_protocol.dart';
+import '../encryption/mls_manager.dart';
 import '../services/remark_service.dart';
 import '../services/mymemory_translation_service.dart';
 import '../services/translation_service.dart';
@@ -289,6 +291,11 @@ Future<void> _registerServices(N42ChatConfig config) async {
       cloud: getIt.isRegistered<AiService>() ? getIt<AiService>() : null,
       local: getIt<LocalLlmService>(),
     ),
+  );
+
+  // MLS 双栈调度（默认 Olm；底层 OpenMLS FFI 未绑定时 mlsAvailable=false）
+  getIt.registerLazySingleton<MlsManager>(
+    () => MlsManager(const UnboundMlsProtocol()),
   );
 
   // Giphy 服务（配置了 API Key 或代理端点时注册）
