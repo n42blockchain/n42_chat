@@ -1381,6 +1381,21 @@ class PreferencesDataSource {
     return p.getString(_keyFavoriteMeta);
   }
 
+  /// 待办提醒列表存储 key
+  static const String _keyReminders = 'n42_chat_reminders';
+
+  /// 保存待办提醒列表（JSON）
+  Future<void> saveReminders(String json) async {
+    final p = await prefs;
+    await p.setString(_keyReminders, json);
+  }
+
+  /// 获取待办提醒列表（JSON）
+  Future<String?> getReminders() async {
+    final p = await prefs;
+    return p.getString(_keyReminders);
+  }
+
   // ============================================
   // 草稿持久化
   // ============================================
