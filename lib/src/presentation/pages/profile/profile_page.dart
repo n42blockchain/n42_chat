@@ -24,6 +24,7 @@ import '../../widgets/common/common_widgets.dart';
 import '../favorite/favorite_list_page.dart';
 import '../subscription/subscription_page.dart';
 import '../fiat_ramp/fiat_ramp_page.dart';
+import '../settings/local_llm_settings_page.dart';
 import '../qrcode/my_qrcode_page.dart';
 import '../settings/change_email_page.dart';
 import '../settings/account_switch_page.dart';
@@ -260,6 +261,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const FiatRampPage(),
+                  ),
+                ),
+              ),
+              _buildDivider(context),
+              _buildMenuItem(
+                context,
+                icon: Icons.memory,
+                iconColor: const Color(0xFF34A853),
+                title: 'On-device AI',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const LocalLlmSettingsPage(),
                   ),
                 ),
               ),
