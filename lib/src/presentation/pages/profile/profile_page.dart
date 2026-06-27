@@ -23,6 +23,7 @@ import '../../blocs/auth/auth_event.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../favorite/favorite_list_page.dart';
 import '../subscription/subscription_page.dart';
+import '../fiat_ramp/fiat_ramp_page.dart';
 import '../qrcode/my_qrcode_page.dart';
 import '../settings/change_email_page.dart';
 import '../settings/account_switch_page.dart';
@@ -247,6 +248,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const SubscriptionPage(),
+                  ),
+                ),
+              ),
+              _buildDivider(context),
+              _buildMenuItem(
+                context,
+                icon: Icons.account_balance_outlined,
+                iconColor: const Color(0xFF2ECC71),
+                title: 'Buy / Sell crypto',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const FiatRampPage(),
                   ),
                 ),
               ),

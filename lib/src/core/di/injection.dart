@@ -8,6 +8,7 @@ import '../services/tenor_service.dart';
 import '../services/gif_service.dart';
 import '../services/reminder_service.dart';
 import '../services/subscription_service.dart';
+import '../services/fiat_ramp_service.dart';
 import '../services/remark_service.dart';
 import '../services/mymemory_translation_service.dart';
 import '../services/translation_service.dart';
@@ -294,6 +295,16 @@ Future<void> _registerServices(N42ChatConfig config) async {
   if (gifProviders.isNotEmpty) {
     getIt.registerLazySingleton<GifService>(
       () => CompositeGifService(gifProviders),
+    );
+  }
+
+  // 法币出入金（配置了 key 才注册；未注册时入口/页面降级提示）
+  if (config.fiatRampApiKey != null && config.fiatRampApiKey!.isNotEmpty) {
+    getIt.registerLazySingleton<FiatRampService>(
+      () => FiatRampService(FiatRampConfig(
+        provider: config.fiatRampProvider,
+        apiKey: config.fiatRampApiKey!,
+      )),
     );
   }
 
