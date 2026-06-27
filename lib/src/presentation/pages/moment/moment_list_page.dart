@@ -16,6 +16,7 @@ import '../../widgets/common/n42_avatar.dart';
 import '../chat/viewers/video_player_page.dart';
 import 'create_moment_page.dart';
 import 'moment_forward_sheet.dart';
+import 'video_feed_page.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 朋友圈列表页面
@@ -174,6 +175,16 @@ class _MomentListViewState extends State<_MomentListView> {
               style: TextStyle(color: context.textPrimary),
             ),
             actions: [
+              if (!_isUserMode)
+                IconButton(
+                  icon: const Icon(Icons.video_collection_outlined),
+                  tooltip: 'Videos',
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const VideoFeedPage(),
+                    ),
+                  ),
+                ),
               if (!_isUserMode)
                 IconButton(
                   icon: const Icon(Icons.camera_alt_outlined),
