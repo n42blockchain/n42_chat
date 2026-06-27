@@ -14,7 +14,7 @@ class OfficialAccountsPage extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.contactOfficialAccounts ?? 'Official Accounts',
       ),
@@ -22,25 +22,25 @@ class OfficialAccountsPage extends StatelessWidget {
         children: [
           // 搜索栏
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Container(
               height: 36,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7),
+                color: AppColors.inputBgOf(isDark),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.search, size: 20,
-                      color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary),
+                      color: context.textTertiary),
                   const SizedBox(width: 6),
                   Text(
                     S.of(context)?.commonSearch ?? 'Search',
                     style: TextStyle(
                       fontSize: 15,
-                      color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                      color: context.textTertiary,
                     ),
                   ),
                 ],
@@ -56,14 +56,14 @@ class OfficialAccountsPage extends StatelessWidget {
                   Icon(
                     Icons.campaign_outlined,
                     size: 64,
-                    color: isDark ? Colors.grey[600] : Colors.grey[400],
+                    color: context.textTertiary,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     S.of(context)?.contactNoOfficialAccounts ?? 'No official accounts',
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -72,7 +72,7 @@ class OfficialAccountsPage extends StatelessWidget {
                         'Follow official accounts to receive updates',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],

@@ -1,11 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart' as matrix;
 
 import '../../domain/entities/user_profile_entity.dart'
     show NotificationPrivacyMode, NotificationSettings;
-import '../utils/debug_log.dart';
 
 /// 推送通知服务
 ///
@@ -45,237 +41,6 @@ abstract class IPushNotificationService {
   Future<bool> requestPermission();
 }
 
-/// 推送通知服务实现
-class PushNotificationService implements IPushNotificationService {
-  final matrix.Client _client;
-
-  /// 推送网关URL（用于注册推送）
-  final String? pushGatewayUrl;
-
-  /// 应用标识符
-  final String appId;
-
-  /// 推送器类型
-  final String pushkeyType;
-
-  /// 通知点击回调
-  final void Function(String? roomId, String? eventId)? onNotificationTap;
-
-  PushNotificationService(
-    this._client, {
-    this.pushGatewayUrl,
-    this.appId = 'com.n42.chat',
-    this.pushkeyType = 'http',
-    this.onNotificationTap,
-  });
-
-  String? _pushToken;
-  bool _isInitialized = false;
-  StreamSubscription<matrix.SyncUpdate>? _syncSubscription;
-
-  @override
-  Future<void> initialize() async {
-    if (_isInitialized) return;
-
-    // 初始化本地通知
-    await _initializeLocalNotifications();
-
-    // 监听消息更新，发送本地通知
-    _syncSubscription = _client.onSync.stream.listen(_handleSyncUpdate);
-
-    _isInitialized = true;
-  }
-
-  Future<void> _initializeLocalNotifications() async {
-    // 注：实际实现需要使用 flutter_local_notifications 包
-    // 这里只提供接口定义
-  }
-
-  void _handleSyncUpdate(matrix.SyncUpdate syncUpdate) {
-    // 处理新消息，如果需要则显示本地通知
-    final joinedRooms = syncUpdate.rooms?.join;
-    if (joinedRooms == null) return;
-
-    for (final entry in joinedRooms.entries) {
-      final roomId = entry.key;
-      final roomUpdate = entry.value;
-      final events = roomUpdate.timeline?.events ?? [];
-
-      for (final event in events) {
-        if (_shouldShowNotification(event)) {
-          _showNotificationForEvent(roomId, event);
-        }
-      }
-    }
-  }
-
-  bool _shouldShowNotification(matrix.MatrixEvent event) {
-    // 只显示消息类型的通知
-    if (event.type != matrix.EventTypes.Message) return false;
-
-    // 不显示自己发送的消息
-    if (event.senderId == _client.userID) return false;
-
-    // 可以添加更多过滤条件
-    return true;
-  }
-
-  void _showNotificationForEvent(String roomId, matrix.MatrixEvent event) {
-    final room = _client.getRoomById(roomId);
-    if (room == null) return;
-
-    // 检查房间是否静音
-    if (room.pushRuleState == matrix.PushRuleState.dontNotify) return;
-
-    final senderName = room
-        .unsafeGetUserFromMemoryOrFallback(event.senderId)
-        .calcDisplayname();
-    final roomName = room.getLocalizedDisplayname();
-    final body = _getNotificationBody(event);
-
-    showLocalNotification(
-      title: room.isDirectChat ? senderName : '$senderName @ $roomName',
-      body: body,
-      roomId: roomId,
-      eventId: event.eventId,
-    );
-  }
-
-  String _getNotificationBody(matrix.MatrixEvent event) {
-    final content = event.content;
-    final msgType = content['msgtype'] as String?;
-
-    switch (msgType) {
-      case 'm.text':
-        return content['body'] as String? ?? '';
-      case 'm.image':
-        return '[Image]';
-      case 'm.video':
-        return '[Video]';
-      case 'm.audio':
-        return '[Voice]';
-      case 'm.file':
-        return '[File]';
-      case 'm.location':
-        return '[Location]';
-      default:
-        return '[Message]';
-    }
-  }
-
-  @override
-  Future<void> registerForPush() async {
-    if (_pushToken == null) {
-      throw PushNotificationException('Push token not available');
-    }
-
-    if (pushGatewayUrl == null) {
-      throw PushNotificationException('Push gateway URL not configured');
-    }
-
-    try {
-      await _client.postPusher(
-        matrix.Pusher(
-          pushkey: _pushToken!,
-          kind: pushkeyType,
-          appId: appId,
-          appDisplayName: 'N42 Chat',
-          deviceDisplayName: _client.deviceName ?? 'Unknown Device',
-          lang: 'zh-TW',
-          data: matrix.PusherData(
-            url: Uri.parse(pushGatewayUrl!),
-            format: 'event_id_only',
-          ),
-        ),
-        append: false,
-      );
-    } catch (e) {
-      throw PushNotificationException('Failed to register push: $e');
-    }
-  }
-
-  @override
-  Future<void> unregisterPush() async {
-    await _syncSubscription?.cancel();
-    _syncSubscription = null;
-
-    if (_pushToken == null) return;
-
-    try {
-      await _client.deletePusher(
-        matrix.Pusher(
-          pushkey: _pushToken!,
-          kind: '',
-          appId: appId,
-          appDisplayName: 'N42 Chat',
-          deviceDisplayName: _client.deviceName ?? 'Unknown Device',
-          lang: 'zh-TW',
-          data: matrix.PusherData(),
-        ),
-      );
-    } catch (e) {
-      throw PushNotificationException('Failed to unregister push: $e');
-    }
-  }
-
-  @override
-  Future<void> handleNotification(Map<String, dynamic> message) async {
-    // 解析推送消息
-    final roomId = message['room_id'] as String?;
-    final eventId = message['event_id'] as String?;
-
-    if (roomId != null) {
-      // 触发回调，让应用导航到对应房间
-      onNotificationTap?.call(roomId, eventId);
-    }
-  }
-
-  @override
-  Future<void> showLocalNotification({
-    required String title,
-    required String body,
-    String? roomId,
-    String? eventId,
-    String? imageUrl,
-  }) async {
-    // 注：实际实现需要使用 flutter_local_notifications 包
-    // 这里只提供接口定义
-
-    debugLog('Showing notification: $title - $body');
-  }
-
-  @override
-  Future<void> clearNotificationsForRoom(String roomId) async {
-    // 清除指定房间的通知
-    // 注：需要使用 flutter_local_notifications 的 cancel 方法
-  }
-
-  @override
-  Future<void> clearAllNotifications() async {
-    // 清除所有通知
-    // 注：需要使用 flutter_local_notifications 的 cancelAll 方法
-  }
-
-  @override
-  Future<NotificationPermissionStatus> getPermissionStatus() async {
-    // 返回通知权限状态
-    // 注：实际实现需要检查系统权限
-    return NotificationPermissionStatus.granted;
-  }
-
-  @override
-  Future<bool> requestPermission() async {
-    // 请求通知权限
-    // 注：实际实现需要使用 permission_handler 包
-    return true;
-  }
-
-  /// 设置推送Token（由Firebase/APNs提供）
-  void setPushToken(String token) {
-    _pushToken = token;
-  }
-}
-
 /// 通知权限状态
 enum NotificationPermissionStatus {
   /// 已授权
@@ -289,16 +54,6 @@ enum NotificationPermissionStatus {
 
   /// 受限
   restricted,
-}
-
-/// 推送通知异常
-class PushNotificationException implements Exception {
-  final String message;
-
-  PushNotificationException(this.message);
-
-  @override
-  String toString() => 'PushNotificationException: $message';
 }
 
 /// 通知设置
@@ -428,11 +183,6 @@ class NotificationConfig {
         return NotificationPresentation(title: genericTitle, body: genericBody);
     }
   }
-
-  bool get allowsNativeForegroundPreview =>
-      enabled &&
-      privacyMode == NotificationPrivacyMode.full &&
-      showPreview;
 
   Map<String, dynamic> toJson() {
     return {

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
@@ -72,7 +73,6 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = S.of(context);
 
     return BlocListener<GroupBloc, GroupState>(
@@ -90,7 +90,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
               content: Text(
                 l10n?.groupContentFilterUpdated ?? 'Content filter updated',
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
             ),
           );
           Navigator.of(context).pop();
@@ -103,7 +103,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
               content: Text(
                 state.errorMessage ?? 'Failed to update content filter',
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -116,21 +116,19 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
               onPressed: _isLoading || _isSaving ? null : _save,
               child: Text(
                 l10n?.commonConfirm ?? 'Save',
-                style: TextStyle(color: AppColors.primary),
+                style: const TextStyle(color: AppColors.primary),
               ),
             ),
           ],
         ),
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : ListView(
                 children: [
                   const SizedBox(height: 10),
                   Container(
-                    color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                    color: context.surfaceColor,
                     child: SwitchListTile(
                       title: Text(
                         l10n?.groupContentFilterEnabled ??
@@ -143,7 +141,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                   if (_enabled) ...[
                     const SizedBox(height: 10),
                     Container(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                      color: context.surfaceColor,
                       child: RadioGroup<FilterAction>(
                         groupValue: _action,
                         onChanged: (value) {
@@ -161,9 +159,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                                 l10n?.groupContentFilterReplace ?? 'Action',
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: isDark
-                                      ? AppColors.textSecondaryDark
-                                      : AppColors.textSecondary,
+                                  color: context.textSecondary,
                                 ),
                               ),
                             ),
@@ -186,7 +182,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                      color: context.surfaceColor,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -196,9 +192,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                               l10n?.groupContentFilterAddWord ?? 'Keywords',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondary,
+                                color: context.textSecondary,
                               ),
                             ),
                           ),
@@ -221,7 +215,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                                 ),
                                 const SizedBox(width: 8),
                                 IconButton(
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.add_circle_outline,
                                     color: AppColors.primary,
                                   ),
@@ -237,9 +231,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                               child: Text(
                                 '—',
                                 style: TextStyle(
-                                  color: isDark
-                                      ? AppColors.textSecondaryDark
-                                      : AppColors.textSecondary,
+                                  color: context.textSecondary,
                                 ),
                               ),
                             )
@@ -264,7 +256,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                      color: context.surfaceColor,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -274,9 +266,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                               'Sensitive Data Detection',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondary,
+                                color: context.textSecondary,
                               ),
                             ),
                           ),

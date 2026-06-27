@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/app_colors.dart';
 
 enum PollComposerAction { sendNow, schedule }
 
@@ -106,7 +107,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[900] : Colors.white,
+        color: AppColors.surfaceOf(isDark),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -117,7 +118,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+                  color: AppColors.dividerOf(isDark),
                 ),
               ),
             ),
@@ -128,7 +129,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                   child: Text(
                     S.of(context)?.commonCancel ?? 'Cancel',
                     style: TextStyle(
-                      color: isDark ? Colors.white70 : Colors.black54,
+                      color: AppColors.textSecondaryOf(isDark),
                     ),
                   ),
                 ),
@@ -151,7 +152,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         child: const Text(
                           'Schedule',
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -161,7 +162,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       child: Text(
                         S.of(context)?.chatSubmitPoll ?? 'Submit',
                         style: const TextStyle(
-                          color: Colors.green,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -187,7 +188,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                   S.of(context)?.chatPollQuestionLabel ?? 'Poll Question',
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDark ? Colors.white70 : Colors.black54,
+                    color: AppColors.textSecondaryOf(isDark),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -201,7 +202,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                    fillColor: AppColors.inputBgOf(isDark),
                   ),
                 ),
 
@@ -215,14 +216,14 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       S.of(context)?.chatPollOptionsLabel ?? 'Poll Options',
                       style: TextStyle(
                         fontSize: 14,
-                        color: isDark ? Colors.white70 : Colors.black54,
+                        color: AppColors.textSecondaryOf(isDark),
                       ),
                     ),
                     Text(
                       '${_optionControllers.length}/10',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? Colors.white38 : Colors.black38,
+                        color: AppColors.textTertiaryOf(isDark),
                       ),
                     ),
                   ],
@@ -239,13 +240,13 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                           height: 24,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha: 0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             '${index + 1}',
                             style: const TextStyle(
-                              color: Colors.green,
+                              color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
                             ),
@@ -263,7 +264,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               filled: true,
-                              fillColor: isDark ? Colors.grey[850] : Colors.grey[100],
+                              fillColor: AppColors.inputBgOf(isDark),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 10,
@@ -275,7 +276,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                           IconButton(
                             onPressed: () => _removeOption(index),
                             icon: const Icon(Icons.remove_circle_outline),
-                            color: Colors.red,
+                            color: AppColors.error,
                             iconSize: 20,
                           ),
                       ],
@@ -289,7 +290,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                     icon: const Icon(Icons.add_circle_outline, size: 20),
                     label: Text(S.of(context)?.chatAddOptionButton ?? 'Add Option'),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.green,
+                      foregroundColor: AppColors.primary,
                     ),
                   ),
 
@@ -299,7 +300,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[850] : Colors.grey[100],
+                    color: AppColors.inputBgOf(isDark),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -310,7 +311,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : Colors.black87,
+                          color: AppColors.textPrimaryOf(isDark),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -361,7 +362,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                                 _isAnonymous = value;
                               });
                             },
-                            activeTrackColor: Colors.green,
+                            activeTrackColor: AppColors.primary,
                           ),
                         ],
                       ),
@@ -375,23 +376,23 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.1),
+                    color: AppColors.info.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.info_outline,
                         size: 18,
-                        color: Colors.blue[700],
+                        color: AppColors.info,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           S.of(context)?.chatPollHint ?? 'Poll will be displayed in chat. Group members can vote.',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.blue[700],
+                            color: AppColors.info,
                           ),
                         ),
                       ),

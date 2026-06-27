@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/self_destruct_service.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 
 /// 阅后即焚倒计时覆盖层
@@ -101,8 +103,8 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: isUrgent
-            ? Colors.red.withValues(alpha: 0.9)
-            : Colors.orange.withValues(alpha: 0.85),
+            ? AppColors.error.withValues(alpha: 0.9)
+            : AppColors.warning.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
@@ -156,7 +158,7 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
           Icon(
             Icons.auto_delete_outlined,
             size: 14,
-            color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+            color: context.textTertiary,
           ),
           const SizedBox(width: 6),
           Text(
@@ -164,7 +166,7 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
             style: TextStyle(
               fontSize: 12,
               fontStyle: FontStyle.italic,
-              color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+              color: context.textTertiary,
             ),
           ),
         ],
@@ -191,7 +193,7 @@ class SelfDestructPendingIcon extends StatelessWidget {
         child: Icon(
           Icons.timer_outlined,
           size: 12,
-          color: Colors.orange.withValues(alpha: 0.7),
+          color: AppColors.warning.withValues(alpha: 0.7),
         ),
       ),
     );

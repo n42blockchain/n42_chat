@@ -71,14 +71,14 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             message = resolveBlocMessage(context, message);
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message), backgroundColor: Colors.red),
+            SnackBar(content: Text(message), backgroundColor: AppColors.error),
           );
         } else if (state.status == GroupStatus.success &&
             state.successMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(resolveBlocMessage(context, state.successMessage!)),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
             ),
           );
         }
@@ -115,7 +115,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final members = state.members;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.groupProfile ?? 'Group Info',
         actions: [
@@ -151,7 +151,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
   Widget _buildGroupHeader(GroupEntity group, bool isDark) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
@@ -171,7 +171,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     bottom: 0,
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
@@ -223,9 +223,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -233,9 +231,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       Icon(
                         group.canEditName ? Icons.edit : Icons.lock_outline,
                         size: 16,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ],
                   ),
@@ -259,9 +255,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         '${group.memberCount} members - Click to copy group ID',
                     style: TextStyle(
                       fontSize: 13,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ),
@@ -282,7 +276,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final showMembers = members.take(maxShow).toList();
 
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,9 +290,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               TextButton(
@@ -346,7 +338,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.orange,
+                      color: AppColors.warning,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -610,7 +602,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     }
 
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(children: widgets),
     );
   }
@@ -619,13 +611,13 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     return Divider(
       height: 1,
       indent: 16,
-      color: isDark ? AppColors.dividerDark : AppColors.divider,
+      color: context.dividerColor,
     );
   }
 
   Widget _buildActionSection(GroupEntity group, bool isDark) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         children: [
           // 清空聊天记录
@@ -640,7 +632,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           Divider(
             height: 1,
             indent: 16,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
 
           // 退出/解散群聊
@@ -649,7 +641,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               group.isOwner
                   ? (S.of(context)?.commonDissolveGroup ?? 'Dissolve Group')
                   : (S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
             onTap: () {
               if (group.isOwner) {
@@ -914,7 +906,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             },
             child: Text(
               S.of(context)?.commonClear ?? 'Clear',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -955,7 +947,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             },
             child: Text(
               S.of(context)?.commonLeave ?? 'Leave',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -985,7 +977,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             },
             child: Text(
               S.of(context)?.commonDissolve ?? 'Dissolve',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],

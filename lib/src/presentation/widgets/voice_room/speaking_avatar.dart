@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/voice_room_entity.dart';
 
 /// 说话脉冲动画头像
@@ -109,7 +110,7 @@ class _SpeakingAvatarState extends State<SpeakingAvatar>
                           child: Container(
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: AppColors.error,
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: theme.colorScheme.surface,
@@ -131,7 +132,7 @@ class _SpeakingAvatarState extends State<SpeakingAvatar>
                           child: Container(
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
-                              color: Colors.orange,
+                              color: AppColors.warning,
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: theme.colorScheme.surface,

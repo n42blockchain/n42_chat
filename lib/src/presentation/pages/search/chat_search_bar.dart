@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../blocs/search/search_event.dart';
 import '../../blocs/search/search_state.dart';
@@ -56,8 +55,6 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return BlocConsumer<SearchBloc, SearchState>(
       listener: (context, state) {
         if (state is ChatSearchState) {
@@ -84,7 +81,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
 
         return Container(
           height: 48,
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
             children: [
@@ -93,7 +90,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                 child: Container(
                   height: 32,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.backgroundDark : AppColors.background,
+                    color: context.pageBackground,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
@@ -103,23 +100,19 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                       hintText: S.of(context)?.searchInChat ?? 'Search in chat',
                       hintStyle: TextStyle(
                         fontSize: 14,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                       prefixIcon: Icon(
                         Icons.search,
                         size: 18,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 6),
                     ),
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                     onChanged: _onSearch,
                   ),
@@ -140,9 +133,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                     '$currentIndex/$totalCount',
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
               ],
@@ -152,26 +143,22 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                 icon: const Icon(Icons.keyboard_arrow_up, size: 24),
                 onPressed: hasPrevious ? _onPrevious : null,
                 color: hasPrevious
-                    ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary)
-                    : (isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary),
+                    ? context.textPrimary
+                    : context.textSecondary,
               ),
               IconButton(
                 icon: const Icon(Icons.keyboard_arrow_down, size: 24),
                 onPressed: hasNext ? _onNext : null,
                 color: hasNext
-                    ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary)
-                    : (isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary),
+                    ? context.textPrimary
+                    : context.textSecondary,
               ),
 
               // 关闭按钮
               IconButton(
                 icon: const Icon(Icons.close, size: 20),
                 onPressed: widget.onClose,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ],
           ),

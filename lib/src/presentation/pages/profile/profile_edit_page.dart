@@ -60,8 +60,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         debugLog(
@@ -83,7 +81,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(successMessage),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
               ),
             );
           }
@@ -109,12 +107,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         final user = state.user;
 
         return Scaffold(
-          backgroundColor: isDark
-              ? AppColors.backgroundDark
-              : AppColors.background,
+          backgroundColor: context.pageBackground,
           appBar: N42AppBar(
             title: S.of(context)?.profilePersonalProfile ?? 'Personal Profile',
-            backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+            backgroundColor: context.surfaceColor,
           ),
           body: ListView(
             children: [
@@ -122,11 +118,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
               // 基本信息区块
               _buildSection(
-                isDark: isDark,
                 children: [
                   // 头像
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileAvatar ?? 'Avatar',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -156,39 +150,35 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     ),
                     onTap: _pickAvatar,
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
 
                   _buildListTile(
-                    isDark: isDark,
                     title: 'Avatar Studio',
                     value: _avatarStudioLabel(user),
                     onTap: _openAvatarStudio,
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
 
                   // 名字
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileName ?? 'Name',
                     value:
                         user?.displayName ??
                         (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: () => _editDisplayName(user?.displayName),
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
 
                   // 性别
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileGender ?? 'Gender',
                     value: _getGenderText(context, user?.gender),
                     onTap: _selectGender,
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
 
                   // 地区
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileRegion ?? 'Region',
                     value:
                         user?.region ??
@@ -202,20 +192,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
               // 账号信息区块
               _buildSection(
-                isDark: isDark,
                 children: [
                   // N42 ID
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileN42IdTitle ?? 'N42 ID',
                     value: user?.userId ?? '',
                     showArrow: false,
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
 
                   // 我的二维码
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.commonMyQrCode ?? 'My QR Code',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -223,9 +210,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         Icon(
                           Icons.qr_code,
                           size: 20,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                         const SizedBox(width: 8),
                         const Icon(
@@ -243,22 +228,19 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
               // 其他信息区块
               _buildSection(
-                isDark: isDark,
                 children: [
                   // 拍一拍
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profilePoke ?? 'Poke',
                     value: user?.pokeText?.isNotEmpty == true
                         ? user!.pokeText!
                         : (S.of(context)?.commonNotSet ?? 'Not Set'),
                     onTap: () => _editPokeText(user?.pokeText),
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
 
                   // 签名
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileSignature ?? 'Signature',
                     value:
                         user?.signature ??
@@ -272,11 +254,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
               // 更多设置区块
               _buildSection(
-                isDark: isDark,
                 children: [
                   // 来电铃声
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileRingtone ?? 'Ringtone',
                     value:
                         user?.ringtone ??
@@ -291,19 +271,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
               // 地址与发票区块
               _buildSection(
-                isDark: isDark,
                 children: [
                   // 我的地址
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileMyAddresses ?? 'My Addresses',
                     onTap: _manageAddresses,
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
 
                   // 我的发票抬头
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileMyInvoices ?? 'My Invoices',
                     onTap: _manageInvoices,
                   ),
@@ -314,10 +291,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
               // N42 Bean区块
               _buildSection(
-                isDark: isDark,
                 children: [
                   _buildListTile(
-                    isDark: isDark,
                     title: S.of(context)?.profileN42Bean ?? 'N42 Bean',
                     onTap: _openN42Bean,
                   ),
@@ -332,17 +307,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-  Widget _buildSection({required bool isDark, required List<Widget> children}) {
+  Widget _buildSection({required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
       ),
       child: Column(children: children),
     );
   }
 
   Widget _buildListTile({
-    required bool isDark,
     required String title,
     String? value,
     Widget? trailing,
@@ -363,9 +337,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               style: TextStyle(
                 fontSize: 16,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(width: 16),
@@ -386,9 +358,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           style: TextStyle(
                             fontSize: 16,
                             height: 1.3,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ),
@@ -396,9 +366,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       const SizedBox(width: 8),
                       Icon(
                         AppIcons.chevron,
-                        color: isDark
-                            ? AppColors.textTertiaryDark
-                            : AppColors.textTertiary,
+                        color: context.textTertiary,
                         size: 20,
                       ),
                     ],
@@ -412,12 +380,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-  Widget _buildDivider(bool isDark) {
+  Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }

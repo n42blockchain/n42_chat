@@ -70,13 +70,11 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
-        child: SafeArea(child: _buildSearchBar(isDark)),
+        child: SafeArea(child: _buildSearchBar()),
       ),
       body: BlocBuilder<SearchBloc, SearchState>(
         builder: (context, state) {
@@ -85,7 +83,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
           }
 
           if (state is SearchLoaded) {
-            return _buildSearchResults(state, isDark);
+            return _buildSearchResults(state);
           }
 
           if (state is SearchError) {
@@ -100,7 +98,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
 
           // SearchInitial
           if (state is SearchInitial) {
-            return _buildSearchHistory(state, isDark);
+            return _buildSearchHistory(state);
           }
 
           return const SizedBox.shrink();
@@ -109,17 +107,17 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     );
   }
 
-  Widget _buildSearchBar(bool isDark) {
+  Widget _buildSearchBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Row(
         children: [
           // 返回按钮
           IconButton(
             icon: Icon(
               AppIcons.back,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -129,7 +127,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             child: Container(
               height: 36,
               decoration: BoxDecoration(
-                color: isDark ? AppColors.backgroundDark : AppColors.background,
+                color: context.pageBackground,
                 borderRadius: BorderRadius.circular(18),
               ),
               child: TextField(
@@ -141,16 +139,12 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                       'Search contacts, groups, messages',
                   hintStyle: TextStyle(
                     fontSize: 14,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                   prefixIcon: Icon(
                     Icons.search,
                     size: 20,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -163,7 +157,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 ),
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
                 onChanged: _onSearch,
               ),
@@ -178,7 +172,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 Icon(
                   Icons.tune,
                   color: _messageFilter == null
-                      ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary)
+                      ? context.textPrimary
                       : AppColors.primary,
                 ),
                 if (_messageFilter != null)
@@ -188,7 +182,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                     child: Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
@@ -203,7 +197,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     );
   }
 
-  Widget _buildSearchHistory(SearchInitial state, bool isDark) {
+  Widget _buildSearchHistory(SearchInitial state) {
     if (state.recentSearches.isEmpty) {
       return Center(
         child: N42EmptyState(
@@ -229,9 +223,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             TextButton(
@@ -260,9 +252,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                     DeleteSearchHistoryItem(query),
                   );
                 },
-                backgroundColor: isDark
-                    ? AppColors.surfaceDark
-                    : AppColors.surface,
+                backgroundColor: context.surfaceColor,
               ),
             );
           }).toList(),
@@ -271,7 +261,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     );
   }
 
-  Widget _buildSearchResults(SearchLoaded state, bool isDark) {
+  Widget _buildSearchResults(SearchLoaded state) {
     if (state.results.isEmpty) {
       return Center(
         child: N42EmptyState.noSearchResult(
@@ -285,7 +275,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     return Column(
       children: [
         // 类型选择器
-        _buildTypeSelector(state, isDark),
+        _buildTypeSelector(state),
         if (state.results.messageFilter != null)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
@@ -295,24 +285,22 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 'Message filters active: ${state.results.messageFilter!.activeCount}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ),
           ),
 
         // 结果列表
-        Expanded(child: _buildResultList(state, isDark)),
+        Expanded(child: _buildResultList(state)),
       ],
     );
   }
 
-  Widget _buildTypeSelector(SearchLoaded state, bool isDark) {
+  Widget _buildTypeSelector(SearchLoaded state) {
     return Container(
       height: 44,
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -322,28 +310,24 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             SearchResultType.all,
             state.selectedType,
             state.results.totalCount,
-            isDark,
           ),
           _buildTypeChip(
             S.of(context)?.commonContacts ?? 'Contacts',
             SearchResultType.contact,
             state.selectedType,
             state.results.contacts.length,
-            isDark,
           ),
           _buildTypeChip(
             S.of(context)?.searchGroups ?? 'Groups',
             SearchResultType.group,
             state.selectedType,
             state.results.groups.length,
-            isDark,
           ),
           _buildTypeChip(
             S.of(context)?.commonMessages ?? 'Messages',
             SearchResultType.message,
             state.selectedType,
             state.results.messages.length,
-            isDark,
           ),
         ],
       ),
@@ -355,7 +339,6 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     SearchResultType type,
     SearchResultType selectedType,
     int count,
-    bool isDark,
   ) {
     final isSelected = type == selectedType;
 
@@ -370,7 +353,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
           decoration: BoxDecoration(
             color: isSelected
                 ? AppColors.primary
-                : (isDark ? AppColors.backgroundDark : AppColors.background),
+                : context.pageBackground,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -383,7 +366,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   color: isSelected
                       ? Colors.white
-                      : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                      : context.textPrimary,
                 ),
               ),
               if (count > 0) ...[
@@ -394,9 +377,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                     fontSize: 12,
                     color: isSelected
                         ? Colors.white.withValues(alpha: 0.8)
-                        : (isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary),
+                        : context.textSecondary,
                   ),
                 ),
               ],
@@ -407,7 +388,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     );
   }
 
-  Widget _buildResultList(SearchLoaded state, bool isDark) {
+  Widget _buildResultList(SearchLoaded state) {
     final results = state.filteredResults;
 
     if (results.isEmpty) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/governance/proposal_entity.dart';
 import '../../blocs/governance/governance_bloc.dart';
@@ -82,10 +83,10 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Governance'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
+        backgroundColor: context.navBarColor,
         elevation: 0.5,
       ),
       body: Column(
@@ -101,11 +102,11 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
 
                 if (state.status == GovernanceStatus.error &&
                     state.proposals.isEmpty) {
-                  return _buildErrorState(state.errorMessage, isDark);
+                  return _buildErrorState(state.errorMessage);
                 }
 
                 if (state.proposals.isEmpty) {
-                  return _buildEmptyState(isDark);
+                  return _buildEmptyState();
                 }
 
                 return RefreshIndicator(
@@ -156,7 +157,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
   Widget _buildFilterChips(bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -194,7 +195,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
+  Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -202,7 +203,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
           Icon(
             Icons.how_to_vote_outlined,
             size: 64,
-            color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+            color: context.textTertiary,
           ),
           const SizedBox(height: 16),
           Text(
@@ -212,8 +213,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
             style: TextStyle(
               fontSize: 16,
               height: 1.3,
-              color:
-                  isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -227,8 +227,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color:
-                  isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ),
         ],
@@ -236,7 +235,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
     );
   }
 
-  Widget _buildErrorState(String? errorMessage, bool isDark) {
+  Widget _buildErrorState(String? errorMessage) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -257,9 +256,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
                 fontSize: 16,
                 height: 1.3,
                 fontWeight: FontWeight.w500,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             if (errorMessage != null) ...[
@@ -272,9 +269,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.4,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -346,7 +341,7 @@ class _FilterChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary
-              : (isDark ? AppColors.dividerThinDark : const Color(0xFFF0F0F0)),
+              : AppColors.dividerThinOf(isDark),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text(
@@ -359,9 +354,7 @@ class _FilterChip extends StatelessWidget {
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             color: isSelected
                 ? Colors.white
-                : (isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary),
+                : context.textSecondary,
           ),
         ),
       ),
@@ -388,7 +381,7 @@ class _ProposalCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           boxShadow: isDark
               ? null
@@ -415,9 +408,7 @@ class _ProposalCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textTertiaryDark
-                        : AppColors.textTertiary,
+                    color: context.textTertiary,
                   ),
                 ),
               ],
@@ -432,8 +423,7 @@ class _ProposalCard extends StatelessWidget {
                 fontSize: 16,
                 height: 1.35,
                 fontWeight: FontWeight.w600,
-                color:
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -443,9 +433,7 @@ class _ProposalCard extends StatelessWidget {
                 Icon(
                   Icons.person_outline,
                   size: 14,
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
                 const SizedBox(width: 4),
                 Flexible(
@@ -456,9 +444,7 @@ class _ProposalCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ),
@@ -466,9 +452,7 @@ class _ProposalCard extends StatelessWidget {
                 Icon(
                   Icons.how_to_vote_outlined,
                   size: 14,
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -478,9 +462,7 @@ class _ProposalCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],

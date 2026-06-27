@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/points/points_transaction.dart';
 import '../../blocs/points/points_bloc.dart';
@@ -51,14 +52,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Points'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
+        backgroundColor: context.navBarColor,
         elevation: 0.5,
         actions: [
           if (widget.isAdmin)
@@ -79,7 +77,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
 
           if (state.balanceStatus == PointsLoadStatus.error &&
               state.balance == null) {
-            return _buildErrorState(state.balanceErrorMessage, isDark);
+            return _buildErrorState(state.balanceErrorMessage);
           }
 
           return RefreshIndicator(
@@ -88,13 +86,13 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildBalanceCard(state, isDark),
+                _buildBalanceCard(state),
                 const SizedBox(height: 16),
-                _buildQuickStats(state, isDark),
+                _buildQuickStats(state),
                 const SizedBox(height: 16),
-                _buildActionSection(state, isDark),
+                _buildActionSection(state),
                 const SizedBox(height: 24),
-                _buildRecentTransactionsHeader(isDark),
+                _buildRecentTransactionsHeader(),
                 const SizedBox(height: 8),
                 if (state.transactionsStatus == PointsLoadStatus.loading &&
                     state.transactions.isEmpty)
@@ -104,17 +102,16 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                   )
                 else if (state.transactionsStatus == PointsLoadStatus.error &&
                     state.transactions.isEmpty)
-                  _buildTransactionsError(state.transactionsErrorMessage, isDark)
+                  _buildTransactionsError(state.transactionsErrorMessage)
                 else ...state.transactions
                     .take(10)
                     .map((tx) => _TransactionTile(
                           transaction: tx,
-                          isDark: isDark,
                         )),
                 if (state.transactionsStatus != PointsLoadStatus.loading &&
                     state.transactionsStatus != PointsLoadStatus.error &&
                     state.transactions.isEmpty)
-                  _buildEmptyTransactions(isDark),
+                  _buildEmptyTransactions(),
               ],
             ),
           );
@@ -127,12 +124,12 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   // Balance card
   // ---------------------------------------------------------------------------
 
-  Widget _buildBalanceCard(PointsState state, bool isDark) {
+  Widget _buildBalanceCard(PointsState state) {
     final balance = state.balance;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -222,7 +219,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   // Quick stats
   // ---------------------------------------------------------------------------
 
-  Widget _buildQuickStats(PointsState state, bool isDark) {
+  Widget _buildQuickStats(PointsState state) {
     final balance = state.balance;
     return Row(
       children: [
@@ -231,7 +228,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             icon: Icons.leaderboard_outlined,
             label: 'Rank',
             value: '#${balance?.rank ?? '--'}',
-            isDark: isDark,
+            isDark: context.isDarkMode,
           ),
         ),
         const SizedBox(width: 12),
@@ -240,7 +237,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             icon: Icons.redeem_outlined,
             label: 'Redeemed',
             value: '${balance?.redeemedPoints ?? 0}',
-            isDark: isDark,
+            isDark: context.isDarkMode,
           ),
         ),
       ],
@@ -251,13 +248,13 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   // Action buttons
   // ---------------------------------------------------------------------------
 
-  Widget _buildActionSection(PointsState state, bool isDark) {
+  Widget _buildActionSection(PointsState state) {
     final config = state.config;
     if (config != null && !config.isEnabled) {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -272,9 +269,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.4,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ),
@@ -289,7 +284,6 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
           child: _ActionButton(
             icon: Icons.emoji_events_outlined,
             label: 'Leaderboard',
-            isDark: isDark,
             onTap: () => _navigateToLeaderboard(),
           ),
         ),
@@ -297,7 +291,6 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
         child: _ActionButton(
           icon: Icons.storefront_outlined,
           label: 'Redeem',
-          isDark: isDark,
           onTap: () => _navigateToRedemption(),
         ),
       ),
@@ -320,7 +313,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   // Transactions section
   // ---------------------------------------------------------------------------
 
-  Widget _buildRecentTransactionsHeader(bool isDark) {
+  Widget _buildRecentTransactionsHeader() {
     return Text(
       'Recent Activity',
       maxLines: 1,
@@ -329,12 +322,12 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
         fontSize: 16,
         height: 1.3,
         fontWeight: FontWeight.w600,
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        color: context.textPrimary,
       ),
     );
   }
 
-  Widget _buildEmptyTransactions(bool isDark) {
+  Widget _buildEmptyTransactions() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Center(
@@ -343,8 +336,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             Icon(
               Icons.history_outlined,
               size: 48,
-              color:
-                  isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
             const SizedBox(height: 8),
             Text(
@@ -354,9 +346,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 4),
@@ -367,9 +357,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textTertiaryDark
-                    : AppColors.textTertiary,
+                color: context.textTertiary,
               ),
             ),
           ],
@@ -378,7 +366,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
     );
   }
 
-  Widget _buildTransactionsError(String? errorMessage, bool isDark) {
+  Widget _buildTransactionsError(String? errorMessage) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Center(
@@ -394,9 +382,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 fontSize: 14,
                 height: 1.3,
                 fontWeight: FontWeight.w500,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             if (errorMessage != null) ...[
@@ -409,9 +395,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.4,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -435,7 +419,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   // Error state
   // ---------------------------------------------------------------------------
 
-  Widget _buildErrorState(String? errorMessage, bool isDark) {
+  Widget _buildErrorState(String? errorMessage) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -452,8 +436,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 fontSize: 16,
                 height: 1.3,
                 fontWeight: FontWeight.w500,
-                color:
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             if (errorMessage != null) ...[
@@ -466,9 +449,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.4,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -583,7 +564,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: isDark
             ? null
@@ -609,9 +590,7 @@ class _StatCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
               Text(
@@ -622,9 +601,7 @@ class _StatCard extends StatelessWidget {
                   fontSize: 18,
                   height: 1.3,
                   fontWeight: FontWeight.w700,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -638,13 +615,11 @@ class _StatCard extends StatelessWidget {
 class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
-  final bool isDark;
   final VoidCallback onTap;
 
   const _ActionButton({
     required this.icon,
     required this.label,
-    required this.isDark,
     required this.onTap,
   });
 
@@ -655,10 +630,10 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
         ),
         child: Row(
@@ -674,8 +649,7 @@ class _ActionButton extends StatelessWidget {
                 fontSize: 14,
                 height: 1.3,
                 fontWeight: FontWeight.w500,
-                color:
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
           ],
@@ -687,11 +661,9 @@ class _ActionButton extends StatelessWidget {
 
 class _TransactionTile extends StatelessWidget {
   final PointsTransaction transaction;
-  final bool isDark;
 
   const _TransactionTile({
     required this.transaction,
-    required this.isDark,
   });
 
   @override
@@ -702,7 +674,7 @@ class _TransactionTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -734,9 +706,7 @@ class _TransactionTile extends StatelessWidget {
                     fontSize: 14,
                     height: 1.3,
                     fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -747,9 +717,7 @@ class _TransactionTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textTertiaryDark
-                        : AppColors.textTertiary,
+                    color: context.textTertiary,
                   ),
                 ),
               ],

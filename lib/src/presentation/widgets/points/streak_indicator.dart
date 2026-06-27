@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// Streak indicator widget showing consecutive active days.
@@ -75,7 +76,7 @@ class _StreakIndicatorState extends State<StreakIndicator>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: isDark
             ? null
@@ -99,9 +100,7 @@ class _StreakIndicatorState extends State<StreakIndicator>
                   size: 28,
                   color: widget.streakDays > 0
                       ? const Color(0xFFFF6B35)
-                      : (isDark
-                          ? AppColors.textTertiaryDark
-                          : AppColors.textTertiary),
+                      : context.textTertiary,
                 ),
               ),
               const SizedBox(width: 8),
@@ -113,9 +112,7 @@ class _StreakIndicatorState extends State<StreakIndicator>
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   Text(
@@ -124,9 +121,7 @@ class _StreakIndicatorState extends State<StreakIndicator>
                         : 'Be active today to continue',
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],
@@ -248,9 +243,7 @@ class _DayDot extends StatelessWidget {
             fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
             color: isToday
                 ? AppColors.primary
-                : (isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary),
+                : context.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -279,9 +272,7 @@ class _DayDot extends StatelessWidget {
                 : Icon(
                     Icons.circle_outlined,
                     size: 14,
-                    color: isDark
-                        ? AppColors.textTertiaryDark
-                        : AppColors.textTertiary,
+                    color: context.textTertiary,
                   ),
           ),
         ),

@@ -28,7 +28,7 @@ class PaymentCommerceSheet extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
@@ -44,7 +44,7 @@ class PaymentCommerceSheet extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: AppColors.textPrimaryOf(isDark),
                 ),
               ),
               const SizedBox(height: 18),
@@ -74,10 +74,10 @@ class PaymentCommerceSheet extends StatelessWidget {
       child: Ink(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.backgroundDark : AppColors.background,
+          color: context.pageBackground,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -102,7 +102,7 @@ class PaymentCommerceSheet extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: AppColors.textPrimaryOf(isDark),
                     ),
                   ),
                   if (action.subtitle != null) ...[
@@ -111,9 +111,7 @@ class PaymentCommerceSheet extends StatelessWidget {
                       action.subtitle!,
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                   ],
@@ -123,9 +121,7 @@ class PaymentCommerceSheet extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios,
               size: 14,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ],
         ),

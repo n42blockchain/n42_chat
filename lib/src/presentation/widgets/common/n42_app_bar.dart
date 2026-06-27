@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/app_colors.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -73,10 +73,8 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = backgroundColor ??
-        (isDark ? AppColors.navBarDark : AppColors.navBar);
-    final fgColor = foregroundColor ??
-        (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+    final bgColor = backgroundColor ?? context.navBarColor;
+    final fgColor = foregroundColor ?? context.textPrimary;
 
     return AppBar(
       backgroundColor: bgColor,
@@ -95,7 +93,7 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
               preferredSize: const Size.fromHeight(0.5),
               child: Container(
                 height: 0.5,
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                color: context.dividerColor,
               ),
             )
           : null,
@@ -159,13 +157,9 @@ class N42SliverAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final fgColor =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final fgColor = context.textPrimary;
     return SliverAppBar(
-      backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
+      backgroundColor: context.navBarColor,
       foregroundColor: fgColor,
       pinned: pinned,
       floating: floating,

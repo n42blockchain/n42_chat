@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/room_metadata_utils.dart';
 import '../../../domain/entities/channel_entity.dart';
@@ -60,7 +61,6 @@ class _GroupTopicsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = S.of(context);
 
     return BlocBuilder<GroupBloc, GroupState>(
@@ -83,9 +83,7 @@ class _GroupTopicsBody extends StatelessWidget {
         }
 
         return Scaffold(
-          backgroundColor: isDark
-              ? AppColors.backgroundDark
-              : AppColors.background,
+          backgroundColor: context.pageBackground,
           appBar: N42AppBar(
             title: l10n?.groupTopics ?? 'Topics',
             actions: [
@@ -98,7 +96,7 @@ class _GroupTopicsBody extends StatelessWidget {
                   ),
                   child: Text(
                     l10n?.commonEdit ?? 'Edit',
-                    style: TextStyle(color: AppColors.primary),
+                    style: const TextStyle(color: AppColors.primary),
                   ),
                 ),
             ],
@@ -124,7 +122,6 @@ class _GroupTopicsBody extends StatelessWidget {
                         if (effectivePinned.isNotEmpty) ...[
                           _buildSectionHeader(
                             context,
-                            isDark,
                             Icons.push_pin_outlined,
                             l10n?.groupChannels ?? 'Pinned',
                           ),
@@ -132,7 +129,6 @@ class _GroupTopicsBody extends StatelessWidget {
                             (c) => _buildTopicTile(
                               context,
                               c,
-                              isDark,
                               isPinned: true,
                             ),
                           ),
@@ -140,14 +136,12 @@ class _GroupTopicsBody extends StatelessWidget {
 
                         _buildSectionHeader(
                           context,
-                          isDark,
                           Icons.forum_outlined,
                           'General',
                         ),
                         _buildTopicTile(
                           context,
                           ChannelEntity.general(roomId),
-                          isDark,
                         ),
                         ...regularByCategory.entries.expand((entry) {
                           final label =
@@ -155,14 +149,13 @@ class _GroupTopicsBody extends StatelessWidget {
                           return <Widget>[
                             _buildSectionHeader(
                               context,
-                              isDark,
                               entry.key == null
                                   ? Icons.tag
                                   : Icons.folder_outlined,
                               label,
                             ),
                             ...entry.value.map(
-                              (c) => _buildTopicTile(context, c, isDark),
+                              (c) => _buildTopicTile(context, c),
                             ),
                           ];
                         }),
@@ -179,7 +172,6 @@ class _GroupTopicsBody extends StatelessWidget {
 
   Widget _buildSectionHeader(
     BuildContext context,
-    bool isDark,
     IconData icon,
     String label,
   ) {
@@ -190,9 +182,7 @@ class _GroupTopicsBody extends StatelessWidget {
           Icon(
             icon,
             size: 14,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
           const SizedBox(width: 6),
           Text(
@@ -201,9 +191,7 @@ class _GroupTopicsBody extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -213,15 +201,14 @@ class _GroupTopicsBody extends StatelessWidget {
 
   Widget _buildTopicTile(
     BuildContext context,
-    ChannelEntity channel,
-    bool isDark, {
+    ChannelEntity channel, {
     bool isPinned = false,
   }) {
     final lastMsg = channel.lastMessage;
     final unread = channel.unreadCount;
 
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         children: [
           ListTile(
@@ -234,13 +221,13 @@ class _GroupTopicsBody extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: isPinned
-                    ? Colors.orange.withValues(alpha: 0.15)
+                    ? AppColors.warning.withValues(alpha: 0.15)
                     : AppColors.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 isPinned ? Icons.campaign_outlined : Icons.tag,
-                color: isPinned ? Colors.orange : AppColors.primary,
+                color: isPinned ? AppColors.warning : AppColors.primary,
                 size: 22,
               ),
             ),
@@ -252,7 +239,7 @@ class _GroupTopicsBody extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                 ),
@@ -268,7 +255,7 @@ class _GroupTopicsBody extends StatelessWidget {
                     ),
                     child: Text(
                       channel.category!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
@@ -284,9 +271,7 @@ class _GroupTopicsBody extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   )
                 : (channel.topic != null
@@ -296,9 +281,7 @@ class _GroupTopicsBody extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         )
                       : null),
@@ -325,7 +308,7 @@ class _GroupTopicsBody extends StatelessWidget {
           Divider(
             height: 1,
             indent: 76,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
         ],
       ),

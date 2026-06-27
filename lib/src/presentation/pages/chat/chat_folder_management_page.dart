@@ -18,11 +18,10 @@ class ChatFolderManagementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.chatFolderManagement ?? 'Manage Folders',
         actions: [
@@ -39,12 +38,11 @@ class ChatFolderManagementPage extends StatelessWidget {
               // 系统文件夹
               _buildSectionHeader(
                 context,
-                isDark,
                 l10n?.chatFolderSystem ?? 'System Folders',
               ),
               ...state.systemFolders.map(
                 (folder) =>
-                    _buildFolderTile(context, isDark, folder, isSystem: true),
+                    _buildFolderTile(context, folder, isSystem: true),
               ),
 
               const SizedBox(height: 16),
@@ -52,7 +50,6 @@ class ChatFolderManagementPage extends StatelessWidget {
               // 自定义文件夹
               _buildSectionHeader(
                 context,
-                isDark,
                 l10n?.chatFolderCustom ?? 'Custom Folders',
               ),
               if (state.customFolders.isEmpty)
@@ -64,13 +61,13 @@ class ChatFolderManagementPage extends StatelessWidget {
                         Icon(
                           Icons.folder_outlined,
                           size: 48,
-                          color: isDark ? AppColors.dividerDark : AppColors.divider,
+                          color: context.dividerColor,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           l10n?.chatFolderEmpty ?? 'No custom folders yet',
                           style: TextStyle(
-                            color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                            color: context.textTertiary,
                           ),
                         ),
                       ],
@@ -81,7 +78,6 @@ class ChatFolderManagementPage extends StatelessWidget {
                 ...state.customFolders.map(
                   (folder) => _buildFolderTile(
                     context,
-                    isDark,
                     folder,
                     isSystem: false,
                   ),
@@ -93,7 +89,7 @@ class ChatFolderManagementPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, bool isDark, String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
@@ -101,7 +97,7 @@ class ChatFolderManagementPage extends StatelessWidget {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -109,14 +105,13 @@ class ChatFolderManagementPage extends StatelessWidget {
 
   Widget _buildFolderTile(
     BuildContext context,
-    bool isDark,
     ChatFolderEntity folder, {
     required bool isSystem,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(10),
       ),
       child: ListTile(
@@ -131,7 +126,7 @@ class ChatFolderManagementPage extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             height: 1.3,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: isSystem
@@ -142,9 +137,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
               )
             : null,
@@ -157,7 +150,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                     icon: Icon(
                       Icons.edit_outlined,
                       size: 18,
-                      color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                      color: context.textTertiary,
                     ),
                     onPressed: () => _showEditDialog(context, folder),
                   ),
@@ -165,7 +158,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                     icon: const Icon(
                       Icons.delete_outline,
                       size: 18,
-                      color: Colors.red,
+                      color: AppColors.error,
                     ),
                     onPressed: () => _confirmDelete(context, folder),
                   ),
@@ -318,7 +311,7 @@ class ChatFolderManagementPage extends StatelessWidget {
             },
             child: Text(
               l10n?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],

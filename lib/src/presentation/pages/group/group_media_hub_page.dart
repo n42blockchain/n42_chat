@@ -54,10 +54,9 @@ class _GroupMediaHubPageState extends State<GroupMediaHubPage>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -79,8 +78,7 @@ class _GroupMediaHubPageState extends State<GroupMediaHubPage>
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
-          unselectedLabelColor:
-              isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          unselectedLabelColor: context.textSecondary,
           indicatorColor: AppColors.primary,
           tabs: [
             Tab(text: S.of(context)?.groupAlbum ?? 'Album'),
@@ -182,8 +180,6 @@ class _LinksTabState extends State<_LinksTab> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -196,13 +192,13 @@ class _LinksTabState extends State<_LinksTab> {
             Icon(
               Icons.link,
               size: 48,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             const SizedBox(height: 16),
             Text(
               S.of(context)?.groupNoLinks ?? 'No links',
               style: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
                 fontSize: 14,
               ),
             ),
@@ -215,13 +211,13 @@ class _LinksTabState extends State<_LinksTab> {
       itemCount: _links.length,
       itemBuilder: (context, index) {
         final link = _links[index];
-        return _buildLinkItem(context, link, isDark);
+        return _buildLinkItem(context, link);
       },
     );
   }
 
-  Widget _buildLinkItem(BuildContext context, _LinkItem link, bool isDark) {
-    final secondaryColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+  Widget _buildLinkItem(BuildContext context, _LinkItem link) {
+    final secondaryColor = context.textSecondary;
 
     return ListTile(
       leading: Container(
@@ -231,12 +227,12 @@ class _LinksTabState extends State<_LinksTab> {
           color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(Icons.link, color: AppColors.primary, size: 20),
+        child: const Icon(Icons.link, color: AppColors.primary, size: 20),
       ),
       title: Text(
         link.title ?? link.url,
         style: TextStyle(
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),

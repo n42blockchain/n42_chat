@@ -57,7 +57,7 @@ class _MediaEditorPageState extends State<MediaEditorPage> {
     final l10n = S.of(context);
 
     final editorTheme = ThemeData.dark().copyWith(
-      colorScheme: ColorScheme.dark(
+      colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.primary,
       ),

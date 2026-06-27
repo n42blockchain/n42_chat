@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/social/social_profile.dart';
@@ -58,12 +59,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Social Graph'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
-        foregroundColor:
-            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        backgroundColor: context.navBarColor,
+        foregroundColor: context.textPrimary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(AppIcons.back, size: 20),
@@ -95,7 +95,6 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
         state.recommendationsErrorMessage ??
             state.profileErrorMessage ??
             'Unknown error',
-        isDark,
       );
     }
 
@@ -110,17 +109,17 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
         // Graph visualization (if there are recommendations)
         if (state.recommendations.isNotEmpty)
           SliverToBoxAdapter(
-            child: _buildGraphSection(state, isDark),
+            child: _buildGraphSection(state),
           ),
 
         // Section header
         SliverToBoxAdapter(
-          child: _buildSectionHeader('Recommended Connections', isDark),
+          child: _buildSectionHeader('Recommended Connections'),
         ),
 
         // Content
         if (state.isRecommendationsLoading && state.recommendations.isEmpty)
-          SliverFillRemaining(
+          const SliverFillRemaining(
             child: Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             ),
@@ -129,12 +128,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
           SliverFillRemaining(
             child: _buildErrorState(
               state.recommendationsErrorMessage ?? 'Unknown error',
-              isDark,
             ),
           )
         else if (state.recommendations.isEmpty)
           SliverFillRemaining(
-            child: _buildEmptyState(isDark),
+            child: _buildEmptyState(),
           )
         else
           SliverList(
@@ -164,7 +162,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(14),
         boxShadow: isDark
             ? null
@@ -177,7 +175,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
               ],
       ),
       child: profile == null
-          ? _buildProfileSkeleton(isDark)
+          ? _buildProfileSkeleton()
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -198,9 +196,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                               fontSize: 17,
                               height: 1.3,
                               fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? AppColors.textPrimaryDark
-                                  : AppColors.textPrimary,
+                              color: context.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -211,9 +207,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                             style: TextStyle(
                               fontSize: 13,
                               height: 1.3,
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
+                              color: context.textSecondary,
                               fontFamily: 'monospace',
                             ),
                           ),
@@ -231,25 +225,21 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                     _buildStat(
                       'Portfolio',
                       '\$${_formatValue(profile.portfolioValueUsd)}',
-                      isDark,
                     ),
-                    _buildStatDivider(isDark),
+                    _buildStatDivider(),
                     _buildStat(
                       'Chains',
                       '${profile.chains.length}',
-                      isDark,
                     ),
-                    _buildStatDivider(isDark),
+                    _buildStatDivider(),
                     _buildStat(
                       'Tokens',
                       '${profile.tokenCount}',
-                      isDark,
                     ),
-                    _buildStatDivider(isDark),
+                    _buildStatDivider(),
                     _buildStat(
                       'NFTs',
                       '${profile.nftCount}',
-                      isDark,
                     ),
                   ],
                 ),
@@ -274,7 +264,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                           chain.toUpperCase(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 11,
                             height: 1.3,
                             fontWeight: FontWeight.w500,
@@ -318,19 +308,19 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     );
   }
 
-  Widget _buildProfileSkeleton(bool isDark) {
+  Widget _buildProfileSkeleton() {
     return SizedBox(
       height: 80,
       child: Center(
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
   }
 
-  Widget _buildStat(String label, String value, bool isDark) {
+  Widget _buildStat(String label, String value) {
     return Expanded(
       child: Column(
         children: [
@@ -342,9 +332,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 2),
@@ -355,9 +343,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             style: TextStyle(
               fontSize: 11,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -365,22 +351,22 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     );
   }
 
-  Widget _buildStatDivider(bool isDark) {
+  Widget _buildStatDivider() {
     return Container(
       width: 1,
       height: 28,
-      color: isDark ? AppColors.dividerDark : AppColors.divider,
+      color: context.dividerColor,
     );
   }
 
-  Widget _buildGraphSection(SocialGraphState state, bool isDark) {
+  Widget _buildGraphSection(SocialGraphState state) {
     final centerLabel = state.profile?.displayName ?? _shortenAddress(widget.address);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       height: 260,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(14),
       ),
       child: ClipRRect(
@@ -397,7 +383,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     );
   }
 
-  Widget _buildSectionHeader(String title, bool isDark) {
+  Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
       child: Text(
@@ -408,13 +394,13 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
           fontSize: 15,
           height: 1.3,
           fontWeight: FontWeight.w600,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
+  Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -422,9 +408,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
           Icon(
             Icons.people_outline,
             size: 56,
-            color: isDark
-                ? AppColors.textTertiaryDark
-                : AppColors.textTertiary,
+            color: context.textTertiary,
           ),
           const SizedBox(height: 12),
           Text(
@@ -434,9 +418,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             style: TextStyle(
               fontSize: 15,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -448,9 +430,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             style: TextStyle(
               fontSize: 13,
               height: 1.4,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ),
         ],
@@ -458,7 +438,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     );
   }
 
-  Widget _buildErrorState(String message, bool isDark) {
+  Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -479,9 +459,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                 fontSize: 16,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -493,9 +471,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 20),

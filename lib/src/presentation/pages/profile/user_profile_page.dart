@@ -96,10 +96,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       body: BlocListener<ContactBloc, ContactState>(
         listener: (context, state) {
           if (state.status == ContactStatus.chatStarted &&
@@ -145,12 +143,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ).showSnackBar(SnackBar(content: Text(state.errorMessage ?? '')));
           }
         },
-        child: _buildBody(isDark),
+        child: _buildBody(),
       ),
     );
   }
 
-  Widget _buildBody(bool isDark) {
+  Widget _buildBody() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -182,25 +180,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return CustomScrollView(
       slivers: [
         // 个人资料头部
-        SliverToBoxAdapter(child: _buildProfileHeader(isDark)),
+        SliverToBoxAdapter(child: _buildProfileHeader()),
 
         // 信息区块
-        SliverToBoxAdapter(child: _buildInfoSection(isDark)),
+        SliverToBoxAdapter(child: _buildInfoSection()),
 
         // 操作按钮
-        SliverToBoxAdapter(child: _buildActionButtons(isDark)),
+        SliverToBoxAdapter(child: _buildActionButtons()),
 
         // 更多选项
-        SliverToBoxAdapter(child: _buildMoreOptions(isDark)),
+        SliverToBoxAdapter(child: _buildMoreOptions()),
       ],
     );
   }
 
-  Widget _buildProfileHeader(bool isDark) {
+  Widget _buildProfileHeader() {
     final contact = _contact!;
 
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         children: [
           // 顶部返回栏
@@ -214,9 +212,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   IconButton(
                     icon: Icon(
                       AppIcons.back,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -224,9 +220,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   IconButton(
                     icon: Icon(
                       Icons.more_horiz,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                     onPressed: _showMoreOptions,
                   ),
@@ -259,9 +253,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             color: AppColors.success,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isDark
-                                  ? AppColors.surfaceDark
-                                  : AppColors.surface,
+                              color: context.surfaceColor,
                               width: 2,
                             ),
                           ),
@@ -285,9 +277,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
                           height: 1.3,
-                          color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimary,
+                          color: context.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -315,9 +305,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   height: 1.3,
-                                  color: isDark
-                                      ? AppColors.textSecondaryDark
-                                      : AppColors.textSecondary,
+                                  color: context.textSecondary,
                                 ),
                               ),
                             ),
@@ -325,9 +313,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             Icon(
                               Icons.copy,
                               size: 14,
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
+                              color: context.textSecondary,
                             ),
                           ],
                         ),
@@ -343,12 +329,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildInfoSection(bool isDark) {
+  Widget _buildInfoSection() {
     final contact = _contact!;
 
     return Container(
       margin: const EdgeInsets.only(top: 10),
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -363,9 +349,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     S.of(context)?.profileBio ?? 'Bio',
                     style: TextStyle(
                       fontSize: 13,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -373,9 +357,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     contact.statusMessage!,
                     style: TextStyle(
                       fontSize: 15,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                 ],
@@ -390,7 +372,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 : (contact.formattedLastActive.isNotEmpty
                       ? contact.formattedLastActive
                       : (S.of(context)?.profileOffline ?? 'Offline')),
-            isDark,
             statusColor: contact.isOnline ? AppColors.success : null,
           ),
 
@@ -398,7 +379,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
           _buildInfoTile(
             S.of(context)?.profileHomeServer ?? 'Server',
             contact.server,
-            isDark,
           ),
         ],
       ),
@@ -407,8 +387,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Widget _buildInfoTile(
     String label,
-    String value,
-    bool isDark, {
+    String value, {
     Color? statusColor,
   }) {
     return Padding(
@@ -419,9 +398,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             label,
             style: TextStyle(
               fontSize: 15,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const Spacer(),
@@ -439,7 +416,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             value,
             style: TextStyle(
               fontSize: 15,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
         ],
@@ -447,11 +424,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildActionButtons(bool isDark) {
+  Widget _buildActionButtons() {
     return Container(
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.all(20),
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Row(
         children: [
           // 发消息按钮
@@ -479,10 +456,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildMoreOptions(bool isDark) {
+  Widget _buildMoreOptions() {
     return Container(
       margin: const EdgeInsets.only(top: 10),
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         children: [
           // 设置备注
@@ -490,9 +467,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
             trailing: Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             onTap: _setRemark,
           ),
@@ -500,7 +475,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           Divider(
             height: 1,
             indent: 16,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
 
           // 加入黑名单
@@ -516,9 +491,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             trailing: Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             onTap: _toggleBlock,
           ),
@@ -526,7 +499,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           Divider(
             height: 1,
             indent: 16,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
 
           // 举报
@@ -534,9 +507,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             title: Text(S.of(context)?.commonReport ?? 'Report'),
             trailing: Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             onTap: _report,
           ),
@@ -639,7 +610,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _report() {
-    final isDark = context.isDarkMode;
     final descController = TextEditingController();
     String? selectedReason;
 
@@ -647,11 +617,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          backgroundColor: context.surfaceColor,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
             style: TextStyle(
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           content: RadioGroup<String>(
@@ -670,9 +640,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     title: Text(
                       reason,
                       style: TextStyle(
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                     value: reason,
@@ -686,18 +654,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   controller: descController,
                   maxLines: 2,
                   style: TextStyle(
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                   decoration: InputDecoration(
                     hintText:
                         S.of(context)?.reportDescription ??
                         'Additional description (optional)',
                     hintStyle: TextStyle(
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                     border: const OutlineInputBorder(),
                   ),

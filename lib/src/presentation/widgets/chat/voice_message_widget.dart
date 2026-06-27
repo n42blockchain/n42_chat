@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
@@ -261,7 +262,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
         : AppColors.primary;
     final textColor = widget.isSelf
         ? AppColors.sentText(isDark)
-        : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary);
+        : context.textPrimary;
     final isConverting = _isConverting || widget.isTranscribing;
     final canConvertToText =
         widget.onRequestTranscription != null || widget.onConvertToText != null;

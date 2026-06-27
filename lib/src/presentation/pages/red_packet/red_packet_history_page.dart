@@ -89,7 +89,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
           ],
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
-          unselectedLabelColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          unselectedLabelColor: context.textSecondary,
         ),
       ),
       body: _isLoading
@@ -119,7 +119,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
             Text(
               'No red packets yet',
               style: TextStyle(
-                color: isDark ? Colors.white38 : Colors.grey.shade500,
+                color: AppColors.textTertiaryOf(isDark),
               ),
             ),
           ],
@@ -148,11 +148,11 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     final statusColor = switch (rp.lifecycle) {
       RedPacketLifecycle.active => AppColors.primary,
       RedPacketLifecycle.completed => AppColors.success,
-      RedPacketLifecycle.expired => Colors.grey,
+      RedPacketLifecycle.expired => context.textTertiary,
     };
 
     return Card(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       elevation: 0.5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
@@ -174,7 +174,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: Text(
@@ -184,7 +184,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
           '${rp.createdAt.minute.toString().padLeft(2, '0')}',
           style: TextStyle(
             fontSize: 12,
-            color: isDark ? Colors.white38 : Colors.grey,
+            color: context.textTertiary,
           ),
         ),
         trailing: Text(

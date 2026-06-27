@@ -130,10 +130,8 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: widget.fileName,
         showBackButton: true,
@@ -146,16 +144,16 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
             ),
         ],
       ),
-      body: _buildBody(isDark),
+      body: _buildBody(),
       bottomNavigationBar: _totalPages > 0
-          ? _buildPageIndicator(isDark)
+          ? _buildPageIndicator()
           : null,
     );
   }
 
-  Widget _buildBody(bool isDark) {
+  Widget _buildBody() {
     if (_isLoading) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),
@@ -170,14 +168,14 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
             Icon(
               Icons.error_outline,
               size: 64,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             const SizedBox(height: 16),
             Text(
               S.of(context)?.pdfLoadFailed ?? 'Failed to load PDF',
               style: TextStyle(
                 fontSize: 16,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -187,7 +185,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                 _error!,
                 style: TextStyle(
                   fontSize: 13,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 3,
@@ -211,16 +209,16 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     );
   }
 
-  Widget _buildPageIndicator(bool isDark) {
+  Widget _buildPageIndicator() {
     return Container(
       height: 44,
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Center(
         child: Text(
           '$_currentPage / $_totalPages',
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       ),

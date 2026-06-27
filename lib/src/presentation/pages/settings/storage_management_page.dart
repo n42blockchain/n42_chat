@@ -84,7 +84,7 @@ class _StorageManagementView extends StatelessWidget {
                   'Freed ${StorageInfo.formatSize(result.bytesFreed)} '
                   '(${result.filesDeleted} files)',
                 ),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
               ),
             );
           }
@@ -92,7 +92,7 @@ class _StorageManagementView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error!),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -208,22 +208,22 @@ class _StorageOverviewSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _LegendItem(
-                color: Colors.blue,
+                color: AppColors.info,
                 label: S.of(context)?.mediaFiles ?? 'Media',
                 size: info.formattedMedia,
               ),
               _LegendItem(
-                color: Colors.orange,
+                color: AppColors.warning,
                 label: S.of(context)?.files ?? 'Files',
                 size: info.formattedFile,
               ),
               _LegendItem(
-                color: Colors.green,
+                color: AppColors.success,
                 label: S.of(context)?.cache ?? 'Cache',
                 size: info.formattedCache,
               ),
               _LegendItem(
-                color: Colors.grey,
+                color: context.textTertiary,
                 label: S.of(context)?.other ?? 'Other',
                 size: info.formattedOther,
               ),
@@ -298,20 +298,20 @@ class _StorageWarningBanner extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isCritical
-            ? Colors.red.withValues(alpha: 0.1)
-            : Colors.orange.withValues(alpha: 0.1),
+            ? AppColors.error.withValues(alpha: 0.1)
+            : AppColors.warning.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isCritical
-              ? Colors.red.withValues(alpha: 0.3)
-              : Colors.orange.withValues(alpha: 0.3),
+              ? AppColors.error.withValues(alpha: 0.3)
+              : AppColors.warning.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
         children: [
           Icon(
             isCritical ? Icons.error : Icons.warning_amber,
-            color: isCritical ? Colors.red : Colors.orange,
+            color: isCritical ? AppColors.error : AppColors.warning,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -325,7 +325,7 @@ class _StorageWarningBanner extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.4,
-                color: isCritical ? Colors.red[800] : Colors.orange[800],
+                color: isCritical ? AppColors.error : AppColors.warning,
               ),
             ),
           ),
@@ -355,7 +355,7 @@ class _SmartCleanupSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.auto_fix_high,
                   color: AppColors.primary,
                   size: 20,
@@ -409,15 +409,15 @@ class _RecommendationTile extends StatelessWidget {
     switch (recommendation.type) {
       case CleanupRecommendationType.oldMedia:
         icon = Icons.history;
-        color = Colors.blue;
+        color = AppColors.info;
         break;
       case CleanupRecommendationType.largeFiles:
         icon = Icons.file_present;
-        color = Colors.orange;
+        color = AppColors.warning;
         break;
       case CleanupRecommendationType.cache:
         icon = Icons.cached;
-        color = Colors.green;
+        color = AppColors.success;
         break;
       case CleanupRecommendationType.roomSpecific:
         icon = Icons.chat;
@@ -558,7 +558,7 @@ class _RoomStorageSection extends StatelessWidget {
             ListTile(
               title: Text(
                 'View all ${state.roomStorageList.length} rooms',
-                style: TextStyle(fontSize: 14, color: AppColors.primary),
+                style: const TextStyle(fontSize: 14, color: AppColors.primary),
                 textAlign: TextAlign.center,
               ),
               onTap: () {
@@ -698,7 +698,7 @@ class _ClearCacheButton extends StatelessWidget {
     return Container(
       color: cardColor,
       child: ListTile(
-        leading: Icon(Icons.cleaning_services, color: AppColors.primary),
+        leading: const Icon(Icons.cleaning_services, color: AppColors.primary),
         title: Text(
           S.of(context)?.clearCache ?? 'Clear Cache',
           maxLines: 1,
@@ -784,7 +784,7 @@ class _StorageRingPainter extends CustomPainter {
 
     // 背景圆环
     final bgPaint = Paint()
-      ..color = isDark ? Colors.grey[800]! : Colors.grey[200]!
+      ..color = AppColors.placeholderOf(isDark)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
     canvas.drawCircle(center, radius - strokeWidth / 2, bgPaint);
@@ -805,10 +805,10 @@ class _StorageRingPainter extends CustomPainter {
       startAngle += sweep;
     }
 
-    drawArc(mediaRatio, Colors.blue);
-    drawArc(fileRatio, Colors.orange);
-    drawArc(cacheRatio, Colors.green);
-    drawArc(otherRatio, Colors.grey);
+    drawArc(mediaRatio, AppColors.info);
+    drawArc(fileRatio, AppColors.warning);
+    drawArc(cacheRatio, AppColors.success);
+    drawArc(otherRatio, AppColors.textTertiary);
   }
 
   @override

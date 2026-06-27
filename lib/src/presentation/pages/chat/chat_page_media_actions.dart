@@ -54,10 +54,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
   }
 
   Future<void> _showPhotoPickerOptions({DateTime? scheduledAt}) async {
-    final isDark = context.isDarkMode;
     final selectedMode = await showModalBottomSheet<_PhotoSendMode>(
       context: context,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: context.surfaceColor,
       builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

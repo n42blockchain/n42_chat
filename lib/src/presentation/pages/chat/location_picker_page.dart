@@ -210,7 +210,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude,
         longitude: position.longitude,
         icon: Icons.location_on,
-        iconColor: Colors.red,
+        iconColor: AppColors.error,
       ),
       NearbyPlace(
         name: l10n?.chatNearbyPlace(1) ?? 'Nearby Place 1',
@@ -218,7 +218,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude + 0.001,
         longitude: position.longitude + 0.001,
         icon: Icons.place,
-        iconColor: Colors.orange,
+        iconColor: AppColors.warning,
       ),
       NearbyPlace(
         name: l10n?.chatNearbyPlace(2) ?? 'Nearby Place 2',
@@ -226,7 +226,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude - 0.001,
         longitude: position.longitude + 0.002,
         icon: Icons.place,
-        iconColor: Colors.orange,
+        iconColor: AppColors.warning,
       ),
       NearbyPlace(
         name: l10n?.chatNearbyPlace(3) ?? 'Nearby Place 3',
@@ -234,7 +234,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude + 0.002,
         longitude: position.longitude - 0.002,
         icon: Icons.place,
-        iconColor: Colors.orange,
+        iconColor: AppColors.warning,
       ),
     ];
   }
@@ -296,7 +296,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
               style: TextStyle(
                 color: _currentPosition != null
                     ? AppColors.primary
-                    : Colors.grey,
+                    : context.textTertiary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -320,15 +320,15 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_off,
                         size: 64,
-                        color: Colors.grey,
+                        color: context.textTertiary,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         _errorMessage!,
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(color: context.textTertiary),
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
@@ -369,7 +369,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               padding: EdgeInsets.only(bottom: 20),
                               child: Icon(
                                 Icons.location_on,
-                                color: Colors.red,
+                                color: AppColors.error,
                                 size: 40,
                               ),
                             ),
@@ -382,7 +382,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               heroTag: 'relocate',
                               onPressed: _moveToCurrentLocation,
                               backgroundColor: Colors.white,
-                              child: Icon(
+                              child: const Icon(
                                 Icons.my_location,
                                 color: AppColors.primary,
                               ),
@@ -400,9 +400,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                           hintText: S.of(context)?.chatSearchLocation ?? 'Search location',
                           prefixIcon: const Icon(Icons.search),
                           filled: true,
-                          fillColor: isDark
-                              ? const Color(0xFF3A3A3C)
-                              : const Color(0xFFF2F2F7),
+                          fillColor: AppColors.inputBgOf(isDark),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide.none,
@@ -456,7 +454,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               ),
                             ),
                             trailing: isSelected
-                                ? Icon(
+                                ? const Icon(
                                     Icons.check_circle,
                                     color: AppColors.primary,
                                   )
@@ -576,7 +574,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                 ),
                               ],
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.location_on,
                               color: AppColors.primary,
                               size: 24,
@@ -635,7 +633,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
             right: 0,
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : Colors.white,
+                color: context.surfaceColor,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
@@ -672,7 +670,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.location_on,
                               color: AppColors.primary,
                               size: 28,
@@ -782,7 +780,7 @@ class _LocationActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5),
+      color: AppColors.bgOf(isDark),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -795,14 +793,14 @@ class _LocationActionButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 22,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],

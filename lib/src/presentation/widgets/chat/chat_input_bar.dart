@@ -570,10 +570,10 @@ class ChatInputBarState extends State<ChatInputBar> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+        color: context.inputBarColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -598,7 +598,7 @@ class ChatInputBarState extends State<ChatInputBar> {
               duration: const Duration(milliseconds: 150),
               curve: Curves.easeInOut,
               child: _showFormattingBar
-                  ? _buildFormattingBar(isDark)
+                  ? _buildFormattingBar()
                   : const SizedBox.shrink(),
             ),
             Padding(
@@ -611,13 +611,12 @@ class ChatInputBarState extends State<ChatInputBar> {
                     _buildIconButton(
                       icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
                       onPressed: _toggleVoiceMode,
-                      isDark: isDark,
                     ),
 
                   // 输入区域
                   Expanded(
                     child: _isVoiceMode
-                        ? _buildVoiceButton(isDark)
+                        ? _buildVoiceButton()
                         : _buildTextField(isDark),
                   ),
 
@@ -626,7 +625,6 @@ class ChatInputBarState extends State<ChatInputBar> {
                     _buildIconButton(
                       icon: Icons.flash_on_outlined,
                       onPressed: widget.onQuickReplyPressed,
-                      isDark: isDark,
                     ),
 
                   // 表情
@@ -634,7 +632,6 @@ class ChatInputBarState extends State<ChatInputBar> {
                     _buildIconButton(
                       icon: Icons.emoji_emotions_outlined,
                       onPressed: widget.onEmojiPressed,
-                      isDark: isDark,
                     ),
 
                   // 附件/更多 或 发送
@@ -644,7 +641,6 @@ class ChatInputBarState extends State<ChatInputBar> {
                           ? _buildIconButton(
                               icon: Icons.attach_file,
                               onPressed: widget.onMorePressed,
-                              isDark: isDark,
                             )
                           : const SizedBox.shrink()),
                 ],
@@ -656,15 +652,15 @@ class ChatInputBarState extends State<ChatInputBar> {
     );
   }
 
-  Widget _buildFormattingBar(bool isDark) {
+  Widget _buildFormattingBar() {
     return Container(
       height: 40,
       padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -745,9 +741,8 @@ class ChatInputBarState extends State<ChatInputBar> {
   Widget _buildIconButton({
     required IconData icon,
     required VoidCallback? onPressed,
-    required bool isDark,
   }) {
-    final color = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final color = context.textSecondary;
     final effectiveCallback = widget.enabled ? onPressed : null;
     return InkWell(
       onTap: effectiveCallback,
@@ -767,7 +762,7 @@ class ChatInputBarState extends State<ChatInputBar> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: isDark
@@ -786,7 +781,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         onSubmitted: (_) => _sendMessage(),
         style: TextStyle(
           fontSize: 16,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
         decoration: InputDecoration(
           hintText:
@@ -808,7 +803,7 @@ class ChatInputBarState extends State<ChatInputBar> {
     );
   }
 
-  Widget _buildVoiceButton(bool isDark) {
+  Widget _buildVoiceButton() {
     // 使用 Listener 直接处理 pointer events，比 GestureDetector 更可靠
     return Listener(
       onPointerDown: (_) => _startRecording(),
@@ -845,7 +840,7 @@ class ChatInputBarState extends State<ChatInputBar> {
               ? (_cancelRecording
                     ? AppColors.error.withValues(alpha: 0.1)
                     : AppColors.primary.withValues(alpha: 0.1))
-              : (isDark ? AppColors.surfaceDark : AppColors.surface),
+              : context.surfaceColor,
           borderRadius: BorderRadius.circular(4),
           border: _isRecording
               ? Border.all(
@@ -868,9 +863,7 @@ class ChatInputBarState extends State<ChatInputBar> {
               fontWeight: FontWeight.w500,
               color: _isRecording
                   ? (_cancelRecording ? AppColors.error : AppColors.primary)
-                  : (isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary),
+                  : context.textPrimary,
             ),
           ),
         ),

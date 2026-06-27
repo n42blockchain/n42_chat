@@ -228,7 +228,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.1),
+                  color: AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -237,7 +237,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, height: 1.4, color: Colors.orange),
+                  style: const TextStyle(fontSize: 13, height: 1.4, color: AppColors.warning),
                 ),
               ),
             ],
@@ -400,7 +400,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              child: Icon(
+              child: const Icon(
                 Icons.person,
                 size: 18,
                 color: AppColors.primary,
@@ -481,7 +481,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
       decoration: BoxDecoration(
         color: context.surfaceColor,
         border: Border(
-          top: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
+          top: BorderSide(color: AppColors.dividerOf(isDark)),
         ),
       ),
       child: Row(
@@ -491,9 +491,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             child: Container(
               constraints: const BoxConstraints(maxHeight: 120),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF2C2C2E)
-                    : const Color(0xFFF5F5F5),
+                color: AppColors.inputBgOf(isDark),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: TextField(
@@ -531,7 +529,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: AppColors.error,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(Icons.stop, color: Colors.white, size: 18),
@@ -603,7 +601,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             },
             child: Text(
               l10n?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -660,7 +658,7 @@ class _TypingDotState extends State<_TypingDot>
           child: Container(
             width: 6,
             height: 6,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),

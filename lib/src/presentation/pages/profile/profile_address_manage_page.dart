@@ -111,13 +111,11 @@ class AddressManagePageState extends State<AddressManagePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: Text(S.of(context)?.profileMyAddresses ?? 'My Addresses'),
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         actions: [
           TextButton(
             onPressed: _addAddress,
@@ -221,7 +219,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                                       'Default',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     height: 1.3,
                                     fontWeight: FontWeight.w500,

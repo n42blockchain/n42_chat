@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/models/social/social_similarity_model.dart';
@@ -72,12 +73,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Similarity'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
-        foregroundColor:
-            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+        backgroundColor: context.navBarColor,
+        foregroundColor: context.textPrimary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(AppIcons.back, size: 20),
@@ -91,7 +91,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           if (state.isSimilarityLoading ||
               (similarity == null &&
                   state.similarityStatus != SocialGraphStatus.error)) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
@@ -99,7 +99,6 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           if (state.hasSimilarityError) {
             return _buildError(
               state.similarityErrorMessage ?? 'Unknown error',
-              isDark,
             );
           }
 
@@ -126,7 +125,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 const SizedBox(height: 24),
 
                 // Common items
-                _buildCommonItemsSection(resolvedSimilarity, isDark),
+                _buildCommonItemsSection(resolvedSimilarity),
 
                 const SizedBox(height: 32),
               ],
@@ -145,7 +144,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Icon(
             Icons.compare_arrows,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
             size: 24,
           ),
         ),
@@ -161,7 +160,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: isDark
             ? null
@@ -207,7 +206,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               fontSize: 13,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 2),
@@ -218,9 +217,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             style: TextStyle(
               fontSize: 11,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
               fontFamily: 'monospace',
             ),
           ),
@@ -266,9 +263,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],
@@ -287,7 +282,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -301,9 +296,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 14),
@@ -373,9 +366,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ),
@@ -387,9 +378,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               style: TextStyle(
                 fontSize: 12,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -417,12 +406,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
 
   Widget _buildCommonItemsSection(
     SocialSimilarityModel similarity,
-    bool isDark,
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -436,9 +424,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark
-                  ? AppColors.textPrimaryDark
-                  : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -449,7 +435,6 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               similarity.commonTokens,
               emptyLabel: 'No shared tokens found',
             ),
-            isDark,
           ),
           const Divider(height: 20),
           _buildCommonItemRow(
@@ -459,7 +444,6 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               similarity.commonNftCollections,
               emptyLabel: 'No shared NFT collections found',
             ),
-            isDark,
           ),
           const Divider(height: 20),
           _buildCommonItemRow(
@@ -469,7 +453,6 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               similarity.commonChains,
               emptyLabel: 'No shared chains found',
             ),
-            isDark,
           ),
         ],
       ),
@@ -480,7 +463,6 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     IconData icon,
     String title,
     String subtitle,
-    bool isDark,
   ) {
     return Row(
       children: [
@@ -506,9 +488,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                   fontSize: 14,
                   height: 1.3,
                   fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               Text(
@@ -518,9 +498,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.4,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ],
@@ -530,7 +508,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     );
   }
 
-  Widget _buildError(String message, bool isDark) {
+  Widget _buildError(String message) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -547,9 +525,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 fontSize: 16,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -561,9 +537,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               style: TextStyle(
                 fontSize: 13,
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 20),

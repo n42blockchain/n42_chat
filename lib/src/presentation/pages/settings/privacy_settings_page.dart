@@ -417,7 +417,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                         }
                       },
                       isDark: isDark,
-                      iconColor: Colors.red,
+                      iconColor: AppColors.error,
                     ),
                   ),
                 ],
@@ -445,7 +445,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
         title,
         style: TextStyle(
           fontSize: 13,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -456,7 +456,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       padding: const EdgeInsets.only(left: 56),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }
@@ -495,9 +495,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 if (subtitle != null)
@@ -508,9 +506,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
               ],
@@ -562,9 +558,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   if (subtitle != null)
@@ -575,9 +569,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       style: TextStyle(
                         fontSize: 13,
                         height: 1.3,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                 ],
@@ -588,9 +580,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 value,
                 textAlign: TextAlign.end,
                 style: TextStyle(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -598,9 +588,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             const SizedBox(width: 8),
             Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ],
         ),
@@ -626,7 +614,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: AppColors.info,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(icon, color: Colors.white, size: 20),
@@ -640,9 +628,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 style: TextStyle(
                   fontSize: 16,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ),
@@ -653,17 +639,13 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(width: 8),
             Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ],
         ),
@@ -714,17 +696,13 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 style: TextStyle(
                   fontSize: 16,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ),
             Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ],
         ),
@@ -777,7 +755,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 (seconds) => ListTile(
                   title: Text(_formatSelfDestructDuration(seconds)),
                   trailing: _settings.defaultSelfDestructSeconds == seconds
-                      ? Icon(Icons.check, color: AppColors.primary)
+                      ? const Icon(Icons.check, color: AppColors.primary)
                       : null,
                   onTap: () => Navigator.pop(ctx, seconds ?? 'off'),
                 ),
@@ -959,7 +937,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
               (level) => ListTile(
                 title: Text(_getLabel(context, level)),
                 trailing: currentValue == level
-                    ? Icon(Icons.check, color: AppColors.primary)
+                    ? const Icon(Icons.check, color: AppColors.primary)
                     : null,
                 onTap: () => Navigator.pop(context, level),
               ),

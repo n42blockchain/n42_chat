@@ -161,10 +161,8 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final bgColor = AppColors.bgOf(isDark);
+    final textColor = context.textPrimary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -219,43 +217,43 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 12),
 
                   // 服务器输入
-                  _buildServerInput(state, isDarkMode),
+                  _buildServerInput(context, state, isDarkMode),
 
                   const SizedBox(height: 10),
 
-                  _buildAnonymousModeToggle(isDarkMode),
+                  _buildAnonymousModeToggle(context, isDarkMode),
 
                   const SizedBox(height: 10),
 
                   if (_anonymousMode) ...[
-                    _buildAnonymousInfoCard(isDarkMode),
+                    _buildAnonymousInfoCard(context, isDarkMode),
                     const SizedBox(height: 10),
                   ] else ...[
                     // 用户名输入
-                    _buildUsernameInput(isDarkMode),
+                    _buildUsernameInput(context, isDarkMode),
                     const SizedBox(height: 10),
                     // 邮箱输入
-                    _buildEmailInput(isDarkMode),
+                    _buildEmailInput(context, isDarkMode),
                     const SizedBox(height: 10),
                   ],
 
                   // 密码输入
-                  _buildPasswordInput(isDarkMode),
+                  _buildPasswordInput(context, isDarkMode),
 
                   const SizedBox(height: 10),
 
                   // 确认密码输入
-                  _buildConfirmPasswordInput(isDarkMode),
+                  _buildConfirmPasswordInput(context, isDarkMode),
 
                   const SizedBox(height: 10),
 
                   // 邀请码输入（可折叠）
-                  _buildInviteCodeInput(isDarkMode),
+                  _buildInviteCodeInput(context, isDarkMode),
 
                   const SizedBox(height: 12),
 
                   // 同意协议
-                  _buildAgreementCheckbox(isDarkMode),
+                  _buildAgreementCheckbox(context),
 
                   const SizedBox(height: 16),
 
@@ -265,7 +263,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 12),
 
                   // 已有账号
-                  _buildLoginLink(isDarkMode),
+                  _buildLoginLink(context),
 
                   const SizedBox(height: 16),
                 ],
@@ -277,19 +275,11 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildServerInput(AuthState state, bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildServerInput(BuildContext context, AuthState state, bool isDark) {
+    final labelColor = context.textSecondary;
+    final inputBgColor = AppColors.inputBgOf(isDark);
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,7 +309,7 @@ class _RegisterPageState extends State<RegisterPage> {
               vertical: 14,
             ),
             suffixIcon: state.isCheckingHomeserver
-                ? Padding(
+                ? const Padding(
                     padding: EdgeInsets.all(12),
                     child: SizedBox(
                       width: 20,
@@ -368,16 +358,10 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildAnonymousModeToggle(bool isDark) {
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final subtitleColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final cardColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
+  Widget _buildAnonymousModeToggle(BuildContext context, bool isDark) {
+    final textColor = context.textPrimary;
+    final subtitleColor = context.textSecondary;
+    final cardColor = AppColors.inputBgOf(isDark);
 
     return Container(
       decoration: BoxDecoration(
@@ -415,16 +399,10 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildAnonymousInfoCard(bool isDark) {
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final subtitleColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final cardColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
+  Widget _buildAnonymousInfoCard(BuildContext context, bool isDark) {
+    final textColor = context.textPrimary;
+    final subtitleColor = context.textSecondary;
+    final cardColor = AppColors.inputBgOf(isDark);
 
     return Container(
       width: double.infinity,
@@ -459,19 +437,11 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildUsernameInput(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildUsernameInput(BuildContext context, bool isDark) {
+    final labelColor = context.textSecondary;
+    final inputBgColor = AppColors.inputBgOf(isDark);
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,19 +501,11 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildEmailInput(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildEmailInput(BuildContext context, bool isDark) {
+    final labelColor = context.textSecondary;
+    final inputBgColor = AppColors.inputBgOf(isDark);
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,19 +570,11 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildPasswordInput(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildPasswordInput(BuildContext context, bool isDark) {
+    final labelColor = context.textSecondary;
+    final inputBgColor = AppColors.inputBgOf(isDark);
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -677,19 +631,11 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildConfirmPasswordInput(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildConfirmPasswordInput(BuildContext context, bool isDark) {
+    final labelColor = context.textSecondary;
+    final inputBgColor = AppColors.inputBgOf(isDark);
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -750,19 +696,11 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildInviteCodeInput(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final inputBgColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildInviteCodeInput(BuildContext context, bool isDark) {
+    final labelColor = context.textSecondary;
+    final inputBgColor = AppColors.inputBgOf(isDark);
+    final textColor = context.textPrimary;
+    final hintColor = context.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -843,10 +781,8 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildAgreementCheckbox(bool isDark) {
-    final textColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildAgreementCheckbox(BuildContext context) {
+    final textColor = context.textSecondary;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -941,10 +877,8 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildLoginLink(bool isDark) {
-    final textColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+  Widget _buildLoginLink(BuildContext context) {
+    final textColor = context.textSecondary;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -478,6 +478,15 @@ extension ChatBlocSendHandlers on ChatBloc {
             'cover': event.metadata?.musicCover ?? '',
           },
         );
+      } else if (event.type == MessageType.codeBlock) {
+        // 发送代码块消息：body 用 markdown 围栏 ```lang\ncode\n``` 编码语言，
+        // N42 客户端按 MessageType.codeBlock 富渲染；其它客户端回退为代码围栏文本。
+        eventId = await _messageRepository.sendCustomMessage(
+          _currentRoomId!,
+          msgType: 'n42.code_block',
+          content: event.content,
+          additionalData: const {},
+        );
       }
 
       if (eventId != null) {

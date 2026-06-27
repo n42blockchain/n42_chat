@@ -96,7 +96,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: isDark ? Colors.white24 : Colors.black12,
+              color: AppColors.dividerOf(isDark),
               borderRadius: BorderRadius.circular(6),
             ),
           ),
@@ -109,7 +109,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                   height: 12,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.white24 : Colors.black12,
+                    color: AppColors.dividerOf(isDark),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -118,7 +118,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                   height: 10,
                   width: 120,
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.white24 : Colors.black12,
+                    color: AppColors.dividerOf(isDark),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -140,7 +140,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
         decoration: BoxDecoration(
           color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
-          border: Border(
+          border: const Border(
             left: BorderSide(
               color: AppColors.primary,
               width: 3,
@@ -163,7 +163,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
                           data.siteName!,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w500,
@@ -179,9 +179,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimary,
+                          color: AppColors.textPrimaryOf(isDark),
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -194,9 +192,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                           data.description!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: AppColors.textSecondaryOf(isDark),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

@@ -444,7 +444,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ),
               trailing:
                   _notificationMode == ConversationNotificationMode.allMessages
-                  ? Icon(Icons.check, color: AppColors.primary)
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () =>
                   Navigator.pop(ctx, ConversationNotificationMode.allMessages),
@@ -457,7 +457,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ),
               trailing:
                   _notificationMode == ConversationNotificationMode.mentionsOnly
-                  ? Icon(Icons.check, color: AppColors.primary)
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () =>
                   Navigator.pop(ctx, ConversationNotificationMode.mentionsOnly),
@@ -472,7 +472,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 style: TextStyle(color: secondaryTextColor),
               ),
               trailing: _notificationMode == ConversationNotificationMode.muted
-                  ? Icon(Icons.check, color: AppColors.primary)
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () =>
                   Navigator.pop(ctx, ConversationNotificationMode.muted),
@@ -996,7 +996,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
-                color: context.isDarkMode ? Colors.white70 : Colors.black54,
+                color: AppColors.textSecondaryOf(context.isDarkMode),
               ),
             ),
           ],
@@ -1166,14 +1166,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               height: 50,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: isDark ? Colors.white30 : Colors.black26,
+                  color: AppColors.textTertiaryOf(isDark),
                   width: 1,
                 ),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
                 icon,
-                color: isDark ? Colors.white30 : Colors.black26,
+                color: AppColors.textTertiaryOf(isDark),
                 size: 24,
               ),
             ),
@@ -1725,7 +1725,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             },
             child: Text(
               S.of(context)?.chatClearAction ?? 'Clear',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -1859,7 +1859,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                 hintStyle: TextStyle(color: secondaryTextColor),
                 prefixIcon: Icon(Icons.search, color: secondaryTextColor),
                 filled: true,
-                fillColor: isDark ? Colors.white10 : Colors.grey[200],
+                fillColor: AppColors.inputBgOf(isDark),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -1923,14 +1923,14 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.orange.withValues(alpha: 0.2),
+                                  color: AppColors.warning.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   S.of(context)?.commonGroupOwner ?? 'Owner',
                                   style: const TextStyle(
                                     fontSize: 10,
-                                    color: Colors.orange,
+                                    color: AppColors.warning,
                                   ),
                                 ),
                               ),
@@ -1942,14 +1942,14 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.withValues(alpha: 0.2),
+                                  color: AppColors.info.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   S.of(context)?.commonGroupAdmin ?? 'Admin',
                                   style: const TextStyle(
                                     fontSize: 10,
-                                    color: Colors.blue,
+                                    color: AppColors.info,
                                   ),
                                 ),
                               ),

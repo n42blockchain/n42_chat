@@ -113,7 +113,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         appBar: AppBar(
           backgroundColor: _mode == StoryMode.text
               ? _currentBackgroundColor
-              : (isDark ? AppColors.surfaceDark : Colors.white),
+              : context.surfaceColor,
           elevation: 0,
           leading: IconButton(
             icon: Icon(
@@ -152,7 +152,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                           ? (_mode == StoryMode.text
                                 ? _currentTextColor
                                 : Theme.of(context).primaryColor)
-                          : Colors.grey,
+                          : context.textTertiary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -332,7 +332,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         Expanded(
           child: _imageBytes != null
               ? _buildImagePreview(isDark)
-              : _buildImagePicker(isDark),
+              : _buildImagePicker(),
         ),
 
         // Music selection (only show when image is selected)
@@ -348,7 +348,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               top: 16,
             ),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : Colors.white,
+              color: context.surfaceColor,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -377,7 +377,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: AppColors.primary,
                     width: 2,
                   ),
@@ -396,7 +396,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     );
   }
 
-  Widget _buildImagePicker(bool isDark) {
+  Widget _buildImagePicker() {
     final s = S.of(context);
 
     return GestureDetector(
@@ -404,7 +404,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
       child: Container(
         margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: context.dividerColor,
@@ -422,7 +422,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.add_photo_alternate_outlined,
                   size: 40,
                   color: AppColors.primary,
@@ -658,7 +658,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                     size: 14,
                     color: _mode == StoryMode.text
                         ? _currentTextColor.withValues(alpha: 0.7)
-                        : Colors.red,
+                        : AppColors.error,
                   ),
                 ),
               ],

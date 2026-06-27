@@ -91,18 +91,17 @@ class _ChatLockPageState extends State<ChatLockPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.close,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           onPressed: () => Navigator.pop(context, false),
         ),
@@ -121,7 +120,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(40),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.lock,
                     size: 40,
                     color: AppColors.primary,
@@ -137,9 +136,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -151,9 +148,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -165,9 +160,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 if (_errorMessage != null) ...[

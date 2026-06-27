@@ -125,10 +125,9 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.commonChangeEmail ?? 'Change Email',
         showBackButton: true,
@@ -234,7 +233,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildCurrentEmailCard(bool isDark, String email) {
-    final cardBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final cardBgColor = context.surfaceColor;
     final textColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
@@ -250,7 +249,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.email_outlined, color: AppColors.primary, size: 24),
+          const Icon(Icons.email_outlined, color: AppColors.primary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -287,7 +286,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = context.surfaceColor;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;
@@ -359,7 +358,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = context.surfaceColor;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;
@@ -414,7 +413,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     final labelColor = isDark
         ? AppColors.textSecondaryDark
         : AppColors.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : Colors.white;
+    final inputBgColor = context.surfaceColor;
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimary;
@@ -588,12 +587,12 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orange.withValues(alpha: 0.1),
+        color: AppColors.warning.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          const Icon(Icons.security, color: Colors.orange, size: 20),
+          const Icon(Icons.security, color: AppColors.warning, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

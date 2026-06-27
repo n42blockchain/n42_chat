@@ -73,8 +73,6 @@ class _SpaceListViewState extends State<_SpaceListView>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return BlocListener<SpaceBloc, SpaceState>(
       listenWhen: (prev, curr) =>
           curr.errorMessage != null && prev.errorMessage != curr.errorMessage ||
@@ -85,7 +83,7 @@ class _SpaceListViewState extends State<_SpaceListView>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
           context.read<SpaceBloc>().add(const ClearSpaceError());
@@ -98,8 +96,7 @@ class _SpaceListViewState extends State<_SpaceListView>
         }
       },
       child: Scaffold(
-        backgroundColor:
-            isDark ? AppColors.backgroundDark : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: N42AppBar(
           title: S.of(context)?.spacesTitle ?? 'Communities',
           showBackButton: true,
@@ -115,13 +112,11 @@ class _SpaceListViewState extends State<_SpaceListView>
         body: Column(
           children: [
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               child: TabBar(
                 controller: _tabController,
                 labelColor: AppColors.primary,
-                unselectedLabelColor: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                unselectedLabelColor: context.textSecondary,
                 indicatorColor: AppColors.primary,
                 tabs: [
                   Tab(text: S.of(context)?.spacesJoined ?? 'Joined'),
@@ -231,8 +226,6 @@ class _DiscoverSpacesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return BlocBuilder<SpaceBloc, SpaceState>(
       buildWhen: (prev, curr) =>
           prev.publicSpaces != curr.publicSpaces ||
@@ -260,7 +253,7 @@ class _DiscoverSpacesTab extends StatelessWidget {
                         )
                       : null,
                   filled: true,
-                  fillColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+                  fillColor: context.surfaceColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -307,7 +300,6 @@ class _SpaceListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final accessToken = MatrixClientManager.instance.client?.accessToken;
     final headers = <String, String>{};
     if (accessToken != null) {
@@ -340,7 +332,7 @@ class _SpaceListItem extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Column(
@@ -353,9 +345,7 @@ class _SpaceListItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           const SizedBox(height: 2),
@@ -363,26 +353,26 @@ class _SpaceListItem extends StatelessWidget {
             children: [
               Icon(Icons.people_outline,
                   size: 14,
-                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary),
+                  color: context.textTertiary),
               const SizedBox(width: 4),
               Text(
                 '${space.memberCount}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
               ),
               const SizedBox(width: 12),
               Icon(Icons.tag,
                   size: 14,
-                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary),
+                  color: context.textTertiary),
               const SizedBox(width: 4),
               Text(
                 S.of(context)?.spacesChannelsCount(space.channelCount) ??
                     '${space.channelCount} channels',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
               ),
             ],
@@ -403,9 +393,7 @@ class _SpaceListItem extends StatelessWidget {
             )
           : Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
       onTap: () {
         final bloc = context.read<SpaceBloc>();
@@ -460,21 +448,18 @@ class _EmptySpaceView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon,
               size: 64,
-              color: isDark ? AppColors.dividerDark : AppColors.divider),
+              color: context.dividerColor),
           const SizedBox(height: 16),
           Text(
             message,
             style: TextStyle(
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           if (actionLabel != null && onAction != null) ...[

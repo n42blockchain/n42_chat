@@ -4,13 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/conversation/conversation_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_colors.dart';
 
 /// 转发朋友圈动态到聊天的底部弹窗
 class MomentForwardSheet extends StatefulWidget {
@@ -211,7 +211,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
+            color: context.surfaceColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: Column(
@@ -235,7 +235,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -249,7 +249,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                     hintText: s?.momentSelectFriends ?? 'Search',
                     prefixIcon: const Icon(Icons.search, size: 20),
                     filled: true,
-                    fillColor: isDark ? Colors.grey[800] : Colors.grey[100],
+                    fillColor: AppColors.inputBgOf(isDark),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
@@ -268,7 +268,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                         child: Text(
                           s?.momentNoConversations ?? 'No conversations',
                           style: TextStyle(
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                         ),
                       )
@@ -286,7 +286,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                             title: Text(
                               conv.name,
                               style: TextStyle(
-                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                                color: context.textPrimary,
                               ),
                             ),
                             subtitle: conv.lastMessage != null
@@ -295,7 +295,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                                      color: context.textSecondary,
                                       fontSize: 13,
                                     ),
                                   )

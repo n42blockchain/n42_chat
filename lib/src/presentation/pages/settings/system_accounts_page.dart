@@ -8,7 +8,6 @@ import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/username_service.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/stored_account_entity.dart';
@@ -246,14 +245,10 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
-    final backgroundColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.background;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: 'System & Accounts',
         showBackButton: true,

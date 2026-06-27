@@ -100,10 +100,10 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final s = S.of(context);
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : Colors.white;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     final contacts = _filteredContacts;
 
@@ -132,7 +132,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                 hintText: s?.momentSelectFriends ?? 'Search',
                 prefixIcon: const Icon(Icons.search, size: 20),
                 filled: true,
-                fillColor: isDark ? Colors.grey[800] : Colors.grey[100],
+                fillColor: AppColors.inputBgOf(isDark),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -177,7 +177,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                         selected: allSelected,
                         onSelected: (_) => _toggleTag(tag),
                         selectedColor: AppColors.primary,
-                        backgroundColor: isDark ? Colors.grey[800] : Colors.grey[100],
+                        backgroundColor: AppColors.inputBgOf(isDark),
                         checkmarkColor: Colors.white,
                       );
                     }).toList(),
@@ -248,7 +248,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
               color: cardColor,
               border: Border(
                 top: BorderSide(
-                  color: isDark ? AppColors.dividerDark : AppColors.divider,
+                  color: context.dividerColor,
                 ),
               ),
             ),
@@ -270,7 +270,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: isDark ? Colors.grey[700] : Colors.grey[300],
+                    disabledBackgroundColor: AppColors.inputBgOf(isDark),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

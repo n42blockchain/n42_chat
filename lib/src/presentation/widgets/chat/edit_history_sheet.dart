@@ -69,7 +69,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: AppColors.surfaceOf(isDark),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: Column(
@@ -92,13 +92,13 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : Colors.black,
+                    color: AppColors.textPrimaryOf(isDark),
                   ),
                 ),
               ),
               Divider(
                 height: 0.5,
-                color: isDark ? Colors.grey[800] : Colors.grey[200],
+                color: context.dividerColor,
               ),
               // 内容
               Expanded(
@@ -152,7 +152,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
         height: 0.5,
         indent: 16,
         endIndent: 16,
-        color: isDark ? Colors.grey[800] : Colors.grey[200],
+        color: context.dividerColor,
       ),
       itemBuilder: (context, index) {
         final entry = reversed[index];
@@ -186,7 +186,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                   ),
                   child: Text(
                     s?.chatOriginalMessage ?? 'Original',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       color: AppColors.primary,
                       fontWeight: FontWeight.w500,
@@ -197,14 +197,14 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                 Icon(
                   Icons.edit,
                   size: 12,
-                  color: isDark ? Colors.grey[500] : Colors.grey,
+                  color: context.textTertiary,
                 ),
               if (!entry.isOriginal) const SizedBox(width: 4),
               Text(
                 timeStr,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.grey[500] : Colors.grey,
+                  color: context.textTertiary,
                 ),
               ),
             ],
@@ -215,7 +215,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
             entry.content,
             style: TextStyle(
               fontSize: 15,
-              color: isDark ? Colors.white : Colors.black87,
+              color: AppColors.textPrimaryOf(isDark),
               height: 1.4,
             ),
           ),

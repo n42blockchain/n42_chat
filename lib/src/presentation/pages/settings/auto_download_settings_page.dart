@@ -133,9 +133,9 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
@@ -143,7 +143,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
             height: 1.3,
@@ -152,7 +152,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
         leading: IconButton(
           icon: Icon(
             AppIcons.back,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             size: 20,
           ),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
@@ -170,7 +170,6 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                   context,
                   title: 'Wi-Fi',
                   icon: Icons.wifi,
-                  isDark: isDark,
                   children: [
                     _buildSwitch(
                       S.of(context)?.images ?? 'Images',
@@ -204,7 +203,6 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                   context,
                   title: S.of(context)?.mobileData ?? 'Mobile Data',
                   icon: Icons.signal_cellular_alt,
-                  isDark: isDark,
                   children: [
                     _buildSwitch(
                       S.of(context)?.images ?? 'Images',
@@ -266,11 +264,10 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
     BuildContext context, {
     required String title,
     required IconData icon,
-    required bool isDark,
     required List<Widget> children,
   }) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -285,9 +282,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ],
@@ -343,9 +338,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -356,9 +349,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],

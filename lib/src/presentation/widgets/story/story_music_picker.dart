@@ -151,7 +151,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: AppColors.surfaceOf(isDark),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Column(
@@ -198,7 +198,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
@@ -220,7 +220,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: isDark ? Colors.white : Colors.black87,
+                            color: AppColors.textPrimaryOf(isDark),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -235,7 +235,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                           backgroundColor: AppColors.primary.withValues(
                             alpha: 0.2,
                           ),
-                          valueColor: AlwaysStoppedAnimation(
+                          valueColor: const AlwaysStoppedAnimation(
                             AppColors.primary,
                           ),
                         ),
@@ -244,7 +244,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                           '${_formatDuration(_position)} / ${_formatDuration(_duration)} ${l10n?.storyMusicPreview ?? "(max 15s)"}',
                           style: TextStyle(
                             fontSize: 11,
-                            color: isDark ? Colors.white38 : Colors.black38,
+                            color: AppColors.textTertiaryOf(isDark),
                           ),
                         ),
                       ],
@@ -253,7 +253,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                   // 删除按钮
                   IconButton(
                     onPressed: _removeMusic,
-                    icon: const Icon(Icons.close, size: 18, color: Colors.red),
+                    icon: const Icon(Icons.close, size: 18, color: AppColors.error),
                   ),
                 ],
               ),

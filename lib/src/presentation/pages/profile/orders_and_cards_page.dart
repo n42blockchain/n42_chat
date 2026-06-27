@@ -11,19 +11,17 @@ class OrdersAndCardsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: AppBar(
-          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          backgroundColor: context.surfaceColor,
           elevation: 0,
           leading: IconButton(
             icon: Icon(
               AppIcons.back,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
               size: 20,
             ),
             onPressed: () => Navigator.of(context).pop(),
@@ -33,14 +31,13 @@ class OrdersAndCardsPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           centerTitle: true,
           bottom: TabBar(
             labelColor: AppColors.primary,
-            unselectedLabelColor:
-                isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            unselectedLabelColor: context.textSecondary,
             indicatorColor: AppColors.primary,
             tabs: [
               Tab(text: S.of(context)?.profileOrders ?? 'Orders'),
@@ -53,7 +50,6 @@ class OrdersAndCardsPage extends StatelessWidget {
             // 订单 Tab
             _buildEmptyTab(
               context,
-              isDark: isDark,
               icon: Icons.receipt_long_outlined,
               title: S.of(context)?.profileNoOrders ?? 'No orders',
               description: S.of(context)?.profileOrdersDesc ??
@@ -62,7 +58,6 @@ class OrdersAndCardsPage extends StatelessWidget {
             // 卡包 Tab
             _buildEmptyTab(
               context,
-              isDark: isDark,
               icon: Icons.credit_card_outlined,
               title: S.of(context)?.profileNoCards ?? 'No cards',
               description: S.of(context)?.profileCardsDesc ??
@@ -76,7 +71,6 @@ class OrdersAndCardsPage extends StatelessWidget {
 
   Widget _buildEmptyTab(
     BuildContext context, {
-    required bool isDark,
     required IconData icon,
     required String title,
     required String description,
@@ -88,14 +82,14 @@ class OrdersAndCardsPage extends StatelessWidget {
           Icon(
             icon,
             size: 64,
-            color: isDark ? Colors.grey[600] : Colors.grey[400],
+            color: context.textTertiary,
           ),
           const SizedBox(height: 16),
           Text(
             title,
             style: TextStyle(
               fontSize: 16,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -103,7 +97,7 @@ class OrdersAndCardsPage extends StatelessWidget {
             description,
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],

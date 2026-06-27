@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/encryption/key_backup_service.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 恢复密钥导入对话框
@@ -43,10 +44,8 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return AlertDialog(
-      title: Row(
+      title: const Row(
         children: [
           Icon(Icons.key, color: AppColors.primary),
           SizedBox(width: 8),
@@ -65,7 +64,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
               'Enter or paste your recovery key to restore encrypted messages from backup.',
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: context.textTertiary,
                 height: 1.4,
               ),
             ),
@@ -84,14 +83,14 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
                 hintText: 'EsTX xxxx xxxx ...',
                 hintStyle: TextStyle(
                   fontFamily: 'monospace',
-                  color: isDark ? Colors.grey[600] : Colors.grey[400],
+                  color: context.textTertiary,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: AppColors.primary),
+                  borderSide: const BorderSide(color: AppColors.primary),
                 ),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste, size: 20),

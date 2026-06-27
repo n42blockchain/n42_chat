@@ -128,7 +128,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : Colors.white;
+    final bgColor = AppColors.bgOf(isDark);
     final textColor = context.textPrimary;
 
     return Scaffold(
@@ -231,7 +231,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   Widget _buildStepIndicator(bool isDark) {
-    final activeColor = AppColors.primary;
+    const activeColor = AppColors.primary;
     final inactiveColor = context.dividerColor;
 
     return Row(
@@ -267,7 +267,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: Text(
           '${step + 1}',
           style: TextStyle(
-            color: isActive ? Colors.white : Colors.grey,
+            color: isActive ? Colors.white : AppColors.textTertiary,
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
@@ -278,7 +278,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Widget _buildEmailStep(bool isDark, bool isLoading) {
     final labelColor = context.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final inputBgColor = AppColors.inputBgOf(isDark);
     final textColor = context.textPrimary;
     final hintColor = context.textSecondary;
 
@@ -374,7 +374,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Widget _buildCodeStep(bool isDark, bool isLoading, AuthState state) {
     final labelColor = context.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final inputBgColor = AppColors.inputBgOf(isDark);
     final textColor = context.textPrimary;
     final hintColor = context.textSecondary;
 
@@ -481,7 +481,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Widget _buildPasswordStep(bool isDark, bool isLoading) {
     final labelColor = context.textSecondary;
-    final inputBgColor = isDark ? AppColors.surfaceDark : AppColors.inputBackground;
+    final inputBgColor = AppColors.inputBgOf(isDark);
     final textColor = context.textPrimary;
     final hintColor = context.textSecondary;
 

@@ -754,7 +754,7 @@ class _ErrorPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () => context.go(Routes.conversationList),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF07C160),
+                backgroundColor: const Color(0xFF5B6CFF),
               ),
               child: Text(l10n?.commonBackToHome ?? 'Back to Home'),
             ),

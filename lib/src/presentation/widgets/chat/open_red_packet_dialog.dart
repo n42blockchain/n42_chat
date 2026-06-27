@@ -423,7 +423,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                   child: Text(
                     S.of(context)?.commonViewRedPacketDetails ??
                         'View Red Packet Details',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w500,
                     ),
