@@ -7,6 +7,7 @@ import '../services/giphy_service.dart';
 import '../services/tenor_service.dart';
 import '../services/gif_service.dart';
 import '../services/reminder_service.dart';
+import '../services/subscription_service.dart';
 import '../services/remark_service.dart';
 import '../services/mymemory_translation_service.dart';
 import '../services/translation_service.dart';
@@ -566,6 +567,11 @@ Future<void> _registerDataSources() async {
     dispose: (svc) => svc.dispose(),
   );
   getIt<ReminderService>().start();
+
+  // 订阅服务（创作者计划 + 用户订阅记录，本地存储）
+  getIt.registerLazySingleton<SubscriptionService>(
+    () => SubscriptionService(getIt<PreferencesDataSource>()),
+  );
 
   // Matrix认证数据源
   getIt.registerLazySingleton<MatrixAuthDataSource>(
