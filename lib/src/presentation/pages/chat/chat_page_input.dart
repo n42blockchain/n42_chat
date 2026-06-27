@@ -14,7 +14,7 @@ extension _ChatPageInputMethods on _ChatPageState {
           color: isDark ? AppColors.surfaceDark : AppColors.background,
           border: Border(
             top: BorderSide(
-              color: isDark ? AppColors.dividerDark : AppColors.divider,
+              color: context.dividerColor,
               width: 0.5,
             ),
           ),
@@ -27,8 +27,7 @@ extension _ChatPageInputMethods on _ChatPageState {
               Icon(
                 Icons.campaign_outlined,
                 size: 16,
-                color:
-                    isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                color: context.textTertiary,
               ),
               const SizedBox(width: 8),
               Flexible(
@@ -41,9 +40,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textTertiaryDark
-                        : AppColors.textTertiary,
+                    color: context.textTertiary,
                   ),
                 ),
               ),
@@ -209,10 +206,10 @@ extension _ChatPageInputMethods on _ChatPageState {
     final label = SelfDestructService.formatDuration(seconds);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.orange.withValues(alpha: 0.1),
+      color: AppColors.warning.withValues(alpha: 0.1),
       child: Row(
         children: [
-          const Icon(Icons.timer_outlined, size: 16, color: Colors.orange),
+          const Icon(Icons.timer_outlined, size: 16, color: AppColors.warning),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -222,7 +219,7 @@ extension _ChatPageInputMethods on _ChatPageState {
               style: const TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: Colors.orange,
+                color: AppColors.warning,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -242,14 +239,13 @@ extension _ChatPageInputMethods on _ChatPageState {
 
   /// 显示阅后即焚定时器选择器
   Future<void> _showSelfDestructTimerPicker() async {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     final result = await showModalBottomSheet<int?>(
       context: context,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -266,7 +262,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                     fontSize: 17,
                     height: 1.3,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -279,7 +275,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                 ),
                 title: Text(l10n?.chatTimerOff ?? 'Off'),
                 trailing: _selfDestructAfter == null
-                    ? Icon(Icons.check, color: AppColors.primary)
+                    ? const Icon(Icons.check, color: AppColors.primary)
                     : null,
                 onTap: () => Navigator.pop(ctx, -1),
               ),
@@ -290,12 +286,12 @@ extension _ChatPageInputMethods on _ChatPageState {
                   leading: Icon(
                     Icons.timer_outlined,
                     color: _selfDestructAfter == preset.seconds
-                        ? Colors.orange
+                        ? AppColors.warning
                         : null,
                   ),
                   title: Text(preset.name),
                   trailing: _selfDestructAfter == preset.seconds
-                      ? const Icon(Icons.check, color: Colors.orange)
+                      ? const Icon(Icons.check, color: AppColors.warning)
                       : null,
                   onTap: () => Navigator.pop(ctx, preset.seconds),
                 ),
@@ -323,14 +319,14 @@ extension _ChatPageInputMethods on _ChatPageState {
       color: AppColors.primary.withValues(alpha: 0.1),
       child: Row(
         children: [
-          Icon(Icons.timer, size: 16, color: AppColors.primary),
+          const Icon(Icons.timer, size: 16, color: AppColors.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               s?.chatViewOnce ?? 'View Once',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 height: 1.3,
                 color: AppColors.primary,
@@ -416,6 +412,10 @@ extension _ChatPageInputMethods on _ChatPageState {
       onMusicPressed: () {
         _hideMorePanel();
         _shareMusic();
+      },
+      onCodePressed: () {
+        _hideMorePanel();
+        _composeCodeBlock();
       },
       onReceivePressed: () {
         _hideMorePanel();
@@ -548,10 +548,12 @@ extension _ChatPageInputMethods on _ChatPageState {
   void _onEmojiPressed() {
     // 隐藏键盘
     _inputFocusNode.unfocus();
-    // 切换表情选择器
+    // 切换统一表情面板（默认 emoji 分页）
     setState(() {
       _showEmojiPicker = !_showEmojiPicker;
+      _expressionInitialTab = ExpressionTab.emoji;
       _showMorePanel = false;
+      _showStickerPicker = false;
     });
   }
 
@@ -565,9 +567,70 @@ extension _ChatPageInputMethods on _ChatPageState {
     });
   }
 
+  /// 代码块输入对话框 → 发送 n42.code_block 消息
+  Future<void> _composeCodeBlock() async {
+    final codeController = TextEditingController();
+    final langController = TextEditingController();
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: context.surfaceColor,
+        title: const Text('Send code'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: langController,
+                decoration: const InputDecoration(
+                  labelText: 'Language',
+                  hintText: 'dart / js / python …',
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: codeController,
+                minLines: 4,
+                maxLines: 12,
+                autofocus: true,
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                decoration: const InputDecoration(
+                  hintText: 'Paste code here',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(S.of(context)?.commonSend ?? 'Send'),
+          ),
+        ],
+      ),
+    );
+    if (send == true && mounted && codeController.text.trim().isNotEmpty) {
+      final lang = langController.text.trim();
+      final fenced = '```$lang\n${codeController.text}\n```';
+      context.read<ChatBloc>().add(
+            SendCustomMessage(content: fenced, type: MessageType.codeBlock),
+          );
+    }
+    codeController.dispose();
+    langController.dispose();
+  }
+
   Widget _buildEmojiPicker() {
-    return EmojiPicker(
-      height: 260,
+    return ExpressionPanel(
+      height: 320,
+      initialTab: _expressionInitialTab,
       onEmojiSelected: (emoji) {
         // 在当前光标位置插入表情
         final text = _inputController.text;
@@ -642,19 +705,20 @@ extension _ChatPageInputMethods on _ChatPageState {
               });
             }
           : null,
+      onStickerSelected: _onStickerSelected,
+      onStickerLongPressed: _onStickerLongPressed,
+      onOpenStickerStore: _openStickerStore,
+      onGifSelected: _onGifSelectedInline,
     );
   }
 
   /// 构建 @ 提醒成员选择器
   Widget _buildMentionPicker() {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final subtextColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final borderColor =
-        isDark ? AppColors.dividerDark : AppColors.divider;
+    final bgColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final subtextColor = context.textSecondary;
+    final borderColor = context.dividerColor;
 
     return Container(
       constraints: const BoxConstraints(maxHeight: 200),
@@ -721,14 +785,12 @@ extension _ChatPageInputMethods on _ChatPageState {
                         radius: 18,
                         backgroundColor: isRoomMention
                             ? AppColors.primary.withValues(alpha: 0.12)
-                            : (isDark
-                                ? AppColors.placeholderDark
-                                : AppColors.placeholder),
+                            : AppColors.placeholderOf(isDark),
                         backgroundImage: !isRoomMention && avatarUrl.isNotEmpty
                             ? NetworkImage(avatarUrl)
                             : null,
                         child: isRoomMention
-                            ? Icon(
+                            ? const Icon(
                                 Icons.alternate_email,
                                 size: 18,
                                 color: AppColors.primary,

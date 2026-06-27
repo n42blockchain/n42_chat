@@ -65,8 +65,6 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return BlocListener<GroupBloc, GroupState>(
       listener: (context, state) {
         if (!_isInviting) {
@@ -93,9 +91,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: N42AppBar(
           title: S.of(context)?.groupInviteMembers ?? 'Invite Members',
           leading: IconButton(
@@ -133,7 +129,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
             if (_selectedUserIds.isNotEmpty)
               Container(
                 height: 80,
-                color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                color: context.surfaceColor,
                 child: BlocBuilder<ContactBloc, ContactState>(
                   builder: (context, state) {
                     if (!state.isLoaded) return const SizedBox.shrink();
@@ -157,7 +153,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
 
             // 搜索栏
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               padding: const EdgeInsets.all(12),
               child: N42SearchBar(
                 controller: _searchController,
@@ -240,7 +236,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                      color: Colors.red,
+                      color: AppColors.error,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

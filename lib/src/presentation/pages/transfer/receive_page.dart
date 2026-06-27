@@ -76,8 +76,6 @@ class _ReceivePageState extends State<ReceivePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return BlocConsumer<TransferBloc, TransferState>(
       listener: (context, state) {
         if (state.status == TransferBlocStatus.paymentCreated) {
@@ -102,7 +100,7 @@ class _ReceivePageState extends State<ReceivePage> {
         }
 
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: context.pageBackground,
           appBar: N42AppBar(
             title: S.of(context)?.transferReceive ?? 'Receive',
             leading: IconButton(
@@ -110,7 +108,7 @@ class _ReceivePageState extends State<ReceivePage> {
               onPressed: () => Navigator.pop(context),
             ),
           ),
-          body: _buildBody(walletAddress, tokens, state, isDark),
+          body: _buildBody(walletAddress, tokens, state),
         );
       },
     );
@@ -120,7 +118,6 @@ class _ReceivePageState extends State<ReceivePage> {
     String? walletAddress,
     List<TokenInfo> tokens,
     TransferState state,
-    bool isDark,
   ) {
     if (state.isProcessing) {
       return const Center(child: CircularProgressIndicator());
@@ -141,12 +138,12 @@ class _ReceivePageState extends State<ReceivePage> {
       child: Column(
         children: [
           // 收款二维码
-          _buildQRCode(walletAddress, isDark),
+          _buildQRCode(walletAddress),
 
           const SizedBox(height: 24),
 
           // 钱包地址
-          _buildAddressSection(walletAddress, isDark),
+          _buildAddressSection(walletAddress),
 
           const SizedBox(height: 32),
 
@@ -163,7 +160,7 @@ class _ReceivePageState extends State<ReceivePage> {
                 },
               ),
             ] else ...[
-              _buildRequestForm(tokens, isDark),
+              _buildRequestForm(tokens),
             ],
           ],
         ],
@@ -171,7 +168,7 @@ class _ReceivePageState extends State<ReceivePage> {
     );
   }
 
-  Widget _buildQRCode(String walletAddress, bool isDark) {
+  Widget _buildQRCode(String walletAddress) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -209,11 +206,11 @@ class _ReceivePageState extends State<ReceivePage> {
     );
   }
 
-  Widget _buildAddressSection(String walletAddress, bool isDark) {
+  Widget _buildAddressSection(String walletAddress) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -223,7 +220,7 @@ class _ReceivePageState extends State<ReceivePage> {
             S.of(context)?.transferMyWalletAddress ?? 'My Wallet Address',
             style: TextStyle(
               fontSize: 13,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -235,7 +232,7 @@ class _ReceivePageState extends State<ReceivePage> {
                   style: TextStyle(
                     fontSize: 13,
                     fontFamily: 'monospace',
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -255,11 +252,11 @@ class _ReceivePageState extends State<ReceivePage> {
     );
   }
 
-  Widget _buildRequestForm(List<TokenInfo> tokens, bool isDark) {
+  Widget _buildRequestForm(List<TokenInfo> tokens) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -270,7 +267,7 @@ class _ReceivePageState extends State<ReceivePage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
 

@@ -68,7 +68,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.auto_awesome,
                     size: 18,
                     color: AppColors.primary,
@@ -79,7 +79,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
                       widget.messageCount > 0
                           ? (l10n?.aiSummarizeUnread(widget.messageCount) ?? 'AI Summary (${widget.messageCount} messages)')
                           : (l10n?.aiSummarize ?? 'AI Summary'),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primary,
@@ -92,14 +92,14 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
                       child: Icon(
                         Icons.close,
                         size: 16,
-                        color: isDark ? Colors.white38 : Colors.black38,
+                        color: AppColors.textTertiaryOf(isDark),
                       ),
                     ),
                   const SizedBox(width: 4),
                   Icon(
                     _isExpanded ? Icons.expand_less : Icons.expand_more,
                     size: 18,
-                    color: isDark ? Colors.white54 : Colors.black54,
+                    color: AppColors.textTertiaryOf(isDark),
                   ),
                 ],
               ),
@@ -116,7 +116,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
                       widget.summary,
                       style: TextStyle(
                         fontSize: 14,
-                        color: isDark ? Colors.white70 : Colors.black87,
+                        color: AppColors.textSecondaryOf(isDark),
                         height: 1.5,
                       ),
                     ),
@@ -130,7 +130,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
     final l10n = S.of(context);
     return Row(
       children: [
-        SizedBox(
+        const SizedBox(
           width: 16,
           height: 16,
           child: CircularProgressIndicator(
@@ -141,7 +141,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
         const SizedBox(width: 8),
         Text(
           l10n?.aiSummarizeLoading ?? 'Generating summary...',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 13,
             color: AppColors.primary,
           ),
@@ -193,7 +193,7 @@ class AiSummarizeButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isLoading)
-              SizedBox(
+              const SizedBox(
                 width: 14,
                 height: 14,
                 child: CircularProgressIndicator(
@@ -202,13 +202,13 @@ class AiSummarizeButton extends StatelessWidget {
                 ),
               )
             else
-              Icon(Icons.auto_awesome, size: 14, color: AppColors.primary),
+              const Icon(Icons.auto_awesome, size: 14, color: AppColors.primary),
             const SizedBox(width: 6),
             Text(
               isLoading
                   ? (l10n?.aiSummarizeLoading ?? 'Summarizing...')
                   : (l10n?.aiSummarizeUnread(unreadCount) ?? 'AI Summarize $unreadCount messages'),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.primary,
                 fontWeight: FontWeight.w500,

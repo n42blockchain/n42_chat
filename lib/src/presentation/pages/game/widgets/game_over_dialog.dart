@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../services/game_score_service.dart';
 
 class GameOverDialog extends StatefulWidget {
@@ -72,7 +73,7 @@ class _GameOverDialogState extends State<GameOverDialog> {
                 const SizedBox(height: 8),
                 Text(
                   '${l10n?.gameHighScore ?? 'Best'}: $highScore',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 16, color: context.textTertiary),
                 ),
               ],
               if (highScore != null && _isNewRecord(highScore)) ...[

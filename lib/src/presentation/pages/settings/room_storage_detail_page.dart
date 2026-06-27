@@ -68,12 +68,10 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
@@ -81,7 +79,7 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
             height: 1.3,
@@ -90,7 +88,7 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
         leading: IconButton(
           icon: Icon(
             AppIcons.back,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             size: 20,
           ),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
@@ -99,9 +97,7 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
-          unselectedLabelColor: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondary,
+          unselectedLabelColor: context.textSecondary,
           indicatorColor: AppColors.primary,
           tabs: _tabs.map((t) => Tab(text: t)).toList(),
         ),
@@ -125,7 +121,7 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
           });
           if (error != null) {
             messenger.showSnackBar(
-              SnackBar(content: Text(error), backgroundColor: Colors.red),
+              SnackBar(content: Text(error), backgroundColor: AppColors.error),
             );
             return;
           }
@@ -136,7 +132,7 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
                   'Freed ${StorageInfo.formatSize(cleanupResult.bytesFreed)} '
                   '(${cleanupResult.filesDeleted} files)',
                 ),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
               ),
             );
           }
@@ -206,7 +202,7 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -223,11 +219,10 @@ class _RoomStorageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final stats = state.roomMediaStats;
     if (stats == null) return const SizedBox.shrink();
 
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+    final cardColor = context.surfaceColor;
 
     return Container(
       color: cardColor,
@@ -265,7 +260,6 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     return Column(
       children: [
         Text(
@@ -273,7 +267,7 @@ class _StatItem extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 2),
@@ -281,9 +275,7 @@ class _StatItem extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       ],
@@ -305,16 +297,12 @@ class _MediaFileList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     if (files.isEmpty) {
       return Center(
         child: Text(
           'No files found',
           style: TextStyle(
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       );
@@ -358,12 +346,8 @@ class _MediaFileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     IconData icon;
     Color color;
@@ -411,7 +395,7 @@ class _MediaFileTile extends StatelessWidget {
               child: Container(
                 width: 18,
                 height: 18,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
@@ -460,10 +444,8 @@ class _SelectionActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: SafeArea(
         child: Row(
@@ -485,7 +467,7 @@ class _SelectionActionBar extends StatelessWidget {
                 icon: const Icon(Icons.delete_outline, size: 18),
                 label: const Text('Delete'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.error,
                   foregroundColor: Colors.white,
                 ),
               ),

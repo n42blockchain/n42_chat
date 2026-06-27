@@ -100,7 +100,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                   'Forward failed: $e',
             ),
             duration: const Duration(seconds: 2),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -449,7 +449,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
               S.of(context)?.chatMessageForwarded ?? 'Message forwarded',
             ),
             duration: const Duration(seconds: 1),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
       }
@@ -762,7 +762,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(message),
           duration: const Duration(seconds: 2),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -827,7 +827,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                 '已撤回 ${myMessages.length} 条消息',
           ),
           duration: const Duration(seconds: 2),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
         ),
       );
     }
@@ -858,7 +858,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
             S.of(context)?.chatRedPacketTransferCannotForward ??
                 'Red envelopes, transfers and payment requests cannot be forwarded',
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;
@@ -909,7 +909,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(resultMsg),
           duration: const Duration(seconds: 2),
-          backgroundColor: failCount == 0 ? Colors.green : Colors.orange,
+          backgroundColor: failCount == 0 ? AppColors.success : AppColors.warning,
         ),
       );
     }
@@ -955,6 +955,47 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
 
     // 显示群成员选择器
     _showMemberPicker(message);
+  }
+
+  /// 将消息设为个人待办提醒（选日期+时间 → 到期弹本地通知）
+  Future<void> _remindMe(MessageEntity message) async {
+    final now = DateTime.now();
+    final date = await showDatePicker(
+      context: context,
+      initialDate: now.add(const Duration(hours: 1)),
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+    );
+    if (date == null || !mounted) return;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(now.add(const Duration(hours: 1))),
+    );
+    if (time == null || !mounted) return;
+    final dueAt =
+        DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    if (!getIt.isRegistered<ReminderService>()) return;
+    final preview = message.content.trim().isEmpty
+        ? '[${message.type.name}]'
+        : message.content;
+    await getIt<ReminderService>().createFromMessage(
+      text: preview,
+      dueAt: dueAt,
+      roomId: message.roomId,
+      roomName: widget.conversation.name,
+      messageId: message.id,
+      senderName: message.senderName,
+    );
+    if (!mounted) return;
+    String two(int n) => n.toString().padLeft(2, '0');
+    final label =
+        '${dueAt.year}-${two(dueAt.month)}-${two(dueAt.day)} ${two(dueAt.hour)}:${two(dueAt.minute)}';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Reminder set · $label'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   /// 显示群成员选择器（@某人）

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import 'services/game_score_service.dart';
 import 'game_2048/game_2048_page.dart';
 import 'minesweeper/minesweeper_page.dart';
@@ -138,7 +139,7 @@ class _GameCenterPageState extends State<GameCenterPage> {
               Text(
                 game.desc,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 11, color: context.textTertiary),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

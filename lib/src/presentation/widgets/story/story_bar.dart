@@ -75,15 +75,13 @@ class StoryBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = context.isDarkMode;
-
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         border: Border(
           bottom: BorderSide(
-            color: isDarkMode ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -108,7 +106,6 @@ class StoryBar extends StatelessWidget {
 
   /// 构建"我的 Story"项
   Widget _buildMyStoryItem(BuildContext context) {
-    final isDarkMode = context.isDarkMode;
     final hasMyStory = myStory != null && myStory!.stories.isNotEmpty;
 
     return Padding(
@@ -155,9 +152,7 @@ class StoryBar extends StatelessWidget {
                           color: AppColors.primary,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isDarkMode
-                                ? AppColors.surfaceDark
-                                : AppColors.surface,
+                            color: context.surfaceColor,
                             width: 2,
                           ),
                         ),
@@ -184,9 +179,7 @@ class StoryBar extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11,
-                color: isDarkMode
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ),
@@ -197,8 +190,6 @@ class StoryBar extends StatelessWidget {
 
   /// 构建用户 Story 项
   Widget _buildUserStoryItem(BuildContext context, UserStories userStory) {
-    final isDarkMode = context.isDarkMode;
-
     return Padding(
       padding: EdgeInsets.only(right: itemSpacing),
       child: Column(
@@ -225,12 +216,8 @@ class StoryBar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 color: userStory.hasUnviewed
-                    ? (isDarkMode
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary)
-                    : (isDarkMode
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary),
+                    ? context.textPrimary
+                    : context.textSecondary,
                 fontWeight:
                     userStory.hasUnviewed ? FontWeight.w500 : FontWeight.normal,
               ),
@@ -269,15 +256,13 @@ class _MyStoryAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = context.isDarkMode;
-
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: isDarkMode ? AppColors.dividerDark : AppColors.divider,
+          color: context.dividerColor,
           width: 2,
         ),
       ),

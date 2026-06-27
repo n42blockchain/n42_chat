@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../data/datasources/bundled_sticker_packs.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
 
@@ -108,10 +111,10 @@ class _StickerPickerState extends State<StickerPicker> {
     return Container(
       height: widget.height + bottomPadding,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+        color: context.inputBarColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -139,10 +142,10 @@ class _StickerPickerState extends State<StickerPicker> {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         border: Border(
           bottom: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -218,9 +221,7 @@ class _StickerPickerState extends State<StickerPicker> {
                   size: 22,
                   color: isSelected
                       ? AppColors.primary
-                      : (isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary),
+                      : context.textSecondary,
                 )
               : Text(
                   emoji ?? label?.substring(0, 1) ?? '?',
@@ -228,9 +229,7 @@ class _StickerPickerState extends State<StickerPicker> {
                     fontSize: emoji != null ? 22 : 14,
                     color: isSelected
                         ? AppColors.primary
-                        : (isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary),
+                        : context.textSecondary,
                   ),
                 ),
         ),
@@ -302,7 +301,7 @@ class _StickerPickerState extends State<StickerPicker> {
           : () => widget.onStickerLongPressed!(sticker, packId),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? Colors.grey[800] : Colors.grey[100],
+          color: AppColors.placeholderOf(isDark),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(child: _buildStickerContent(sticker)),
@@ -315,6 +314,22 @@ class _StickerPickerState extends State<StickerPicker> {
     if (sticker.url.startsWith('emoji:')) {
       final emoji = sticker.url.substring(6);
       return Text(emoji, style: const TextStyle(fontSize: 32));
+    }
+
+    // 内置 asset 贴纸（Lottie 动画 / SVG 静态）
+    if (BundledStickerPacks.isAssetSticker(sticker.url)) {
+      final path = BundledStickerPacks.assetPath(sticker.url);
+      return Padding(
+        padding: const EdgeInsets.all(6),
+        child: BundledStickerPacks.isLottie(sticker.url)
+            ? Lottie.asset(path, fit: BoxFit.contain, repeat: true)
+            : SvgPicture.asset(
+                path,
+                fit: BoxFit.contain,
+                placeholderBuilder: (_) => Text(sticker.emoji ?? '🙂',
+                    style: const TextStyle(fontSize: 32)),
+              ),
+      );
     }
 
     // 图片贴纸
@@ -349,13 +364,13 @@ class _StickerPickerState extends State<StickerPicker> {
           Icon(
             Icons.emoji_emotions_outlined,
             size: 48,
-            color: isDark ? Colors.grey[600] : Colors.grey[400],
+            color: context.textTertiary,
           ),
           const SizedBox(height: 8),
           Text(
             'No stickers yet',
             style: TextStyle(
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
+              color: context.textTertiary,
             ),
           ),
           if (widget.onOpenStore != null) ...[

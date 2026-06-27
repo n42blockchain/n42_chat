@@ -7,26 +7,22 @@ abstract class AppColors {
   AppColors._();
 
   // ============================================
-  // 主色调 - WeChat Green (可被宿主 app setAccentColor 覆盖)
+  // 主色调 - 品牌靛蓝 (AI-native, 与主 App 对齐 #5B6CFF)
+  // 注意: 微信绿仅保留于消息气泡 / success / 在线 / 加密标识等语义场景,
+  //       品牌 CTA / 强调 / 选中 / 焦点 / ripple 统一走品牌靛蓝。
   // ============================================
 
-  /// 默认主色 - 微信绿
-  static const Color _defaultPrimary = Color(0xFF07C160);
-
-  /// 当前主色（可由宿主 app 通过 N42Chat.setAccentColor 动态修改）
-  static Color primary = _defaultPrimary;
-
-  /// 重置为默认主色
-  static void resetPrimary() => primary = _defaultPrimary;
+  /// 主色 - 品牌靛蓝
+  static const Color primary = Color(0xFF5B6CFF);
 
   /// 主色 - 浅色变体
-  static const Color primaryLight = Color(0xFF4CD964);
+  static const Color primaryLight = Color(0xFF8290FF);
 
   /// 主色 - 深色变体
-  static const Color primaryDark = Color(0xFF06AD56);
+  static const Color primaryDark = Color(0xFF4856E6);
 
   /// 主色 - 透明变体
-  static const Color primaryWithOpacity = Color(0x1A07C160);
+  static const Color primaryWithOpacity = Color(0x1A5B6CFF);
 
   // ============================================
   // 背景色
@@ -170,11 +166,11 @@ abstract class AppColors {
   /// 警告背景
   static const Color warningBg = Color(0x14FF9900);
 
-  /// 成功（同 primary 但语义不同）
-  static const Color success = Color(0xFF07C160);
+  /// 成功（对齐设计系统 success 绿 #1FB67A，§1.1；微信绿仅保留给聊天气泡）
+  static const Color success = Color(0xFF1FB67A);
 
   /// 成功背景
-  static const Color successBg = Color(0x1407C160);
+  static const Color successBg = Color(0x141FB67A);
 
   /// 信息
   static const Color info = Color(0xFF10AEFF);
@@ -202,8 +198,8 @@ abstract class AppColors {
   /// 输入框边框
   static const Color inputBorder = Color(0xFFE5E5E5);
 
-  /// 输入框焦点边框
-  static const Color inputFocusBorder = Color(0xFF07C160);
+  /// 输入框焦点边框 (品牌强调)
+  static const Color inputFocusBorder = Color(0xFF5B6CFF);
 
   /// 搜索框背景
   static const Color searchBackground = Color(0xFFEDEDED);
@@ -237,18 +233,18 @@ abstract class AppColors {
   // 特殊用途
   // ============================================
 
-  /// 在线状态
-  static const Color online = Color(0xFF07C160);
+  /// 在线状态（对齐设计系统 success 绿 #1FB67A，§1.1）
+  static const Color online = Color(0xFF1FB67A);
 
   /// 离线状态
   static const Color offline = Color(0xFFCCCCCC);
 
-  /// 选中状态
-  static const Color selected = Color(0x1A07C160);
+  /// 选中状态 (品牌强调)
+  static const Color selected = Color(0x1A5B6CFF);
 
   /// 品牌 ripple/highlight（带主色调的 InkWell 反馈）
-  static const Color brandRipple10 = Color(0x1A07C160);
-  static const Color brandRipple05 = Color(0x0D07C160);
+  static const Color brandRipple10 = Color(0x1A5B6CFF);
+  static const Color brandRipple05 = Color(0x0D5B6CFF);
 
   /// 按压状态 - 浅色
   static const Color pressed = Color(0x0D000000);
@@ -256,14 +252,53 @@ abstract class AppColors {
   /// 按压状态 - 深色
   static const Color pressedDark = Color(0x1FFFFFFF);
 
-  /// 加密标识
-  static const Color encrypted = Color(0xFF07C160);
+  /// 加密标识（对齐设计系统 success 绿 #1FB67A，§1.1）
+  static const Color encrypted = Color(0xFF1FB67A);
 
   /// 红包
   static const Color redPacket = Color(0xFFFD9B2D);
 
   /// 时间分隔器文字（已弃用背景色，改为纯文字）
   static const Color timeSeparator = Color(0xFF808080);
+
+  // ============================================
+  // 主题解析器 (Theme resolvers)
+  // 设计文档 §3：消除散落的 `isDark ? light : dark` 三元，统一走命名令牌解析。
+  // 暗色采用设计系统既定档（如主文字 #E5E5E5 而非纯白、辅助文字 #6B6B6B），
+  // 故个别站点从裸 white/black/grey[N]/inline-hex 归一到这些档会有细微但合规的位移。
+  // 仅用于「成对语义色」；纯 alpha 调节(primary.withValues)/非色值(brightness/elevation) 不在此列。
+  // ============================================
+
+  /// 页面背景：浅 #EDEDED / 深 #111111
+  static Color bgOf(bool isDark) => isDark ? backgroundDark : background;
+
+  /// 卡片 / Sheet / 弹层表面：浅 #FFFFFF / 深 #1E1E1E
+  static Color surfaceOf(bool isDark) => isDark ? surfaceDark : surface;
+
+  /// 主文字：浅 #181818 / 深 #E5E5E5
+  static Color textPrimaryOf(bool isDark) => isDark ? textPrimaryDark : textPrimary;
+
+  /// 次要文字：浅 #888888 / 深 #AAAAAA
+  static Color textSecondaryOf(bool isDark) =>
+      isDark ? textSecondaryDark : textSecondary;
+
+  /// 辅助 / 占位 / hint 文字：浅 #B2B2B2 / 深 #6B6B6B
+  static Color textTertiaryOf(bool isDark) =>
+      isDark ? textTertiaryDark : textTertiary;
+
+  /// 分隔线 / 描边：浅 #E5E5E5 / 深 #3D3D3D
+  static Color dividerOf(bool isDark) => isDark ? dividerDark : divider;
+
+  /// 细分隔线：浅 #F0F0F0 / 深 #2A2A2A
+  static Color dividerThinOf(bool isDark) =>
+      isDark ? dividerThinDark : dividerThin;
+
+  /// 输入 / 填充背景：浅 #F7F7F7 / 深 #2C2C2C
+  static Color inputBgOf(bool isDark) => isDark ? inputBarDark : inputBackground;
+
+  /// 占位 / 图片加载底 / 中性填充：浅 #E5E5E5 / 深 #2A2A2A
+  static Color placeholderOf(bool isDark) =>
+      isDark ? placeholderDark : placeholder;
 }
 
 /// 颜色调色板

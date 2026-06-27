@@ -172,7 +172,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(s?.profilePlayFailed(ringtone.name) ?? 'Failed to play: ${ringtone.name}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             duration: const Duration(seconds: 1),
           ),
         );
@@ -220,7 +220,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(s?.profilePlayFailed(ringtone.name) ?? 'Failed to play: ${ringtone.name}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             duration: const Duration(seconds: 1),
           ),
         );
@@ -288,21 +288,21 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
     final s = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.bgOf(isDark),
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_rounded,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           onPressed: () => Navigator.pop(context), // 取消不保存
         ),
         title: Text(
           s?.profileSelectRingtone ?? 'Select Ringtone',
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -313,7 +313,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
             onPressed: _confirmSave,
             child: Text(
               s?.commonConfirm ?? 'Confirm',
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -332,7 +332,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                   Text(
                     s?.profileLoadingRingtones ?? 'Loading ringtones...',
                     style: TextStyle(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],
@@ -346,13 +346,13 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                       Icon(
                         Icons.music_off,
                         size: 64,
-                        color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                        color: context.textTertiary,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         s?.profileNoRingtonesFound ?? 'No ringtones found',
                         style: TextStyle(
-                          color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                          color: context.textTertiary,
                           fontSize: 16,
                         ),
                       ),
@@ -370,7 +370,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surfaceDark : Colors.white,
+                        color: context.surfaceColor,
                         borderRadius: BorderRadius.circular(8),
                         border: isSelected
                             ? Border.all(color: AppColors.primary, width: 2)
@@ -388,13 +388,13 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                           ),
                           child: Icon(
                             isPlaying ? Icons.pause : ringtone.icon,
-                            color: isPlaying ? AppColors.primary : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+                            color: isPlaying ? AppColors.primary : context.textSecondary,
                           ),
                         ),
                         title: Text(
                           ringtone.name,
                           style: TextStyle(
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                            color: context.textPrimary,
                             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                           ),
                           maxLines: 1,
@@ -420,7 +420,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                               ),
                             // 选中标记
                             if (isSelected)
-                              Icon(
+                              const Icon(
                                 Icons.check_circle,
                                 color: AppColors.primary,
                               ),

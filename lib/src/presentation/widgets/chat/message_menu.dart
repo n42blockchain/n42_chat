@@ -58,7 +58,7 @@ class MessageMenu extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: SafeArea(
@@ -186,7 +186,7 @@ class MessageMenu extends StatelessWidget {
               size: 22,
               color: item.isDestructive
                   ? AppColors.error
-                  : (isDark ? Colors.white : AppColors.textPrimary),
+                  : (AppColors.textPrimaryOf(isDark)),
             ),
             const SizedBox(width: 16),
             Text(
@@ -195,7 +195,7 @@ class MessageMenu extends StatelessWidget {
                 fontSize: 16,
                 color: item.isDestructive
                     ? AppColors.error
-                    : (isDark ? Colors.white : AppColors.textPrimary),
+                    : (AppColors.textPrimaryOf(isDark)),
               ),
             ),
           ],
@@ -230,7 +230,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Column(
@@ -245,7 +245,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: AppColors.textPrimaryOf(isDark),
                   ),
                 ),
                 const Spacer(),

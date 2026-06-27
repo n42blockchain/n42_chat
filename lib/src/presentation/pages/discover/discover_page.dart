@@ -34,7 +34,7 @@ class DiscoverPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
 
     final l10n = S.of(context);
 
@@ -252,7 +252,7 @@ class DiscoverPage extends StatelessWidget {
     required List<Widget> children,
   }) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(mainAxisSize: MainAxisSize.min, children: children),
     );
   }
@@ -265,9 +265,7 @@ class DiscoverPage extends StatelessWidget {
     Widget? trailing,
     VoidCallback? onTap,
   }) {
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final textColor = context.textPrimary;
 
     return Material(
       color: Colors.transparent,
@@ -290,9 +288,7 @@ class DiscoverPage extends StatelessWidget {
               ?trailing,
               Icon(
                 AppIcons.chevron,
-                color: isDark
-                    ? AppColors.textTertiaryDark
-                    : AppColors.textTertiary,
+                color: context.textTertiary,
                 size: 20,
               ),
             ],
@@ -307,7 +303,7 @@ class DiscoverPage extends StatelessWidget {
       padding: const EdgeInsets.only(left: 58),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }
@@ -380,7 +376,7 @@ class DiscoverPage extends StatelessWidget {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: Colors.red,
+                    color: AppColors.error,
                     shape: BoxShape.circle,
                   ),
                 ),

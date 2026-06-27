@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 
 class RedPacketDetailPage extends StatelessWidget {
@@ -235,7 +237,7 @@ class RedPacketDetailPage extends StatelessWidget {
                               width: 32,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: Colors.orange.withValues(alpha: 0.2),
+                                color: AppColors.warning.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Center(
@@ -580,7 +582,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
                   'From $senderName',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14, height: 1.3, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14, height: 1.3, color: context.textTertiary),
             ),
             const SizedBox(height: 24),
 
@@ -617,7 +619,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style:
-                        TextStyle(fontSize: 14, height: 1.4, color: Colors.grey[600])),
+                        TextStyle(fontSize: 14, height: 1.4, color: context.textTertiary)),
               ),
             ],
 

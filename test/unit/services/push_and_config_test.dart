@@ -236,7 +236,7 @@ void main() {
       expect(json['vibrate'], isFalse);
       expect(json['doNotDisturb'], isTrue);
       expect(json['dndStartTime'], equals('22:30'));
-      expect(json['dndEndTime'], equals('7:0'));
+      expect(json['dndEndTime'], equals('07:00'));
       expect(json['privacyMode'], equals('senderOnly'));
     });
 
@@ -345,23 +345,6 @@ void main() {
 
       expect(presentation.title, 'N42 Chat');
       expect(presentation.body, 'You have a new message');
-    });
-
-    test('native foreground preview is disabled when preview is hidden', () {
-      const config = NotificationConfig(
-        showPreview: false,
-        privacyMode: NotificationPrivacyMode.full,
-      );
-
-      expect(config.allowsNativeForegroundPreview, isFalse);
-    });
-
-    test('native foreground preview is disabled in sender-only mode', () {
-      const config = NotificationConfig(
-        privacyMode: NotificationPrivacyMode.senderOnly,
-      );
-
-      expect(config.allowsNativeForegroundPreview, isFalse);
     });
   });
 

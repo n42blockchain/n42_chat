@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../extensions/context_extension.dart';
+
 /// 应用内通知数据
 class InAppNotification {
   final String title;
@@ -163,7 +165,7 @@ class _NotificationBannerState extends State<_NotificationBanner>
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.person, color: Colors.grey),
+                    child: Icon(Icons.person, color: context.textTertiary),
                   ),
                   const SizedBox(width: 12),
                   // 内容
@@ -186,7 +188,7 @@ class _NotificationBannerState extends State<_NotificationBanner>
                           widget.notification.body,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[600],
+                            color: context.textTertiary,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

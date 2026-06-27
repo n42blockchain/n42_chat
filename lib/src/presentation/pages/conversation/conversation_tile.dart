@@ -60,7 +60,7 @@ class ConversationTile extends StatelessWidget {
     } else if (conversation.isPinned) {
       bgColor = isDark ? const Color(0xFF252525) : const Color(0xFFF5F5F5);
     } else {
-      bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
+      bgColor = context.surfaceColor;
     }
 
     return Column(
@@ -93,7 +93,7 @@ class ConversationTile extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(left: 80),
           height: 0.5,
-          color: isDark ? AppColors.dividerDark : AppColors.divider,
+          color: context.dividerColor,
         ),
       ],
     );
@@ -217,7 +217,7 @@ class ConversationTile extends StatelessWidget {
                 children: [
                   // 聊天锁标识
                   if (isLocked)
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.only(right: 4),
                       child: Icon(
                         Icons.lock_outline,
@@ -244,9 +244,7 @@ class ConversationTile extends StatelessWidget {
                         fontSize: 16,
                         height: 1.3,
                         fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                       ),
                     ),
                   ),
@@ -264,7 +262,7 @@ class ConversationTile extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: isDark ? Colors.white38 : AppColors.textTertiary,
+                  color: AppColors.textTertiaryOf(isDark),
                 ),
               ),
           ],
@@ -297,7 +295,7 @@ class ConversationTile extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: isDark ? Colors.white38 : AppColors.textSecondary,
+                  color: AppColors.textSecondaryOf(isDark),
                 ),
               ),
             ),

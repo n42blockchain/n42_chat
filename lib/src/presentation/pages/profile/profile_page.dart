@@ -160,14 +160,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final subtitleColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final subtitleColor = context.textSecondary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -193,11 +189,9 @@ class _ProfilePageState extends State<ProfilePage> {
           // 服务
           _buildGroupCard(
             context,
-            isDark,
             children: [
               _buildMenuItem(
                 context,
-                isDark: isDark,
                 icon: Icons.verified_outlined,
                 iconColor: AppColors.primary,
                 title: S.of(context)?.profileServices ?? 'Services',
@@ -211,38 +205,33 @@ class _ProfilePageState extends State<ProfilePage> {
           // 收藏、朋友圈、订单与卡包、表情
           _buildGroupCard(
             context,
-            isDark,
             children: [
               _buildMenuItem(
                 context,
-                isDark: isDark,
                 icon: Icons.inventory_2_outlined,
                 iconColor: const Color(0xFFFF9F0A),
                 title: S.of(context)?.commonFavorites ?? 'Favorites',
                 onTap: () => _openFavorites(context),
               ),
-              _buildDivider(context, isDark),
+              _buildDivider(context),
               _buildMenuItem(
                 context,
-                isDark: isDark,
                 icon: Icons.photo_library_outlined,
                 iconColor: const Color(0xFF007AFF),
                 title: S.of(context)?.commonMoments ?? 'Moments',
                 onTap: () => _openMoments(context),
               ),
-              _buildDivider(context, isDark),
+              _buildDivider(context),
               _buildMenuItem(
                 context,
-                isDark: isDark,
                 icon: Icons.card_giftcard_outlined,
                 iconColor: const Color(0xFFFF6B6B),
                 title: S.of(context)?.profileOrdersAndCards ?? 'Orders & Cards',
                 onTap: () => _openOrdersAndCards(context),
               ),
-              _buildDivider(context, isDark),
+              _buildDivider(context),
               _buildMenuItem(
                 context,
-                isDark: isDark,
                 icon: Icons.emoji_emotions_outlined,
                 iconColor: const Color(0xFFFFCC00),
                 title: S.of(context)?.profileStickers ?? 'Stickers',
@@ -256,11 +245,9 @@ class _ProfilePageState extends State<ProfilePage> {
           // 设置
           _buildGroupCard(
             context,
-            isDark,
             children: [
               _buildMenuItem(
                 context,
-                isDark: isDark,
                 icon: Icons.settings_outlined,
                 iconColor: const Color(0xFF5E97F6),
                 title: S.of(context)?.commonSettings ?? 'Settings',
@@ -473,28 +460,24 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildGroupCard(
-    BuildContext context,
-    bool isDark, {
+    BuildContext context, {
     required List<Widget> children,
   }) {
     return Container(
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       child: Column(mainAxisSize: MainAxisSize.min, children: children),
     );
   }
 
   Widget _buildMenuItem(
     BuildContext context, {
-    required bool isDark,
     required IconData icon,
     required Color iconColor,
     required String title,
     String? badge,
     VoidCallback? onTap,
   }) {
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final textColor = context.textPrimary;
 
     return Material(
       color: Colors.transparent,
@@ -547,9 +530,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               Icon(
                 AppIcons.chevron,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
                 size: 20,
               ),
             ],
@@ -559,12 +540,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildDivider(BuildContext context, bool isDark) {
+  Widget _buildDivider(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 58),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }
@@ -652,13 +633,12 @@ class _ProfilePageState extends State<ProfilePage> {
   /// 显示头像操作菜单：更换头像 / Avatar Studio
   void _showAvatarOptions(BuildContext context) {
     final l10n = S.of(context);
-    final isDark = context.isDarkMode;
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -672,13 +652,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.dividerDark : AppColors.divider,
+                    color: context.dividerColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.photo_library_outlined,
                   color: AppColors.primary,
                 ),
@@ -691,7 +671,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Divider(
                 height: 1,
                 indent: 56,
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                color: context.dividerColor,
               ),
               ListTile(
                 leading: const Icon(
@@ -706,9 +686,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 onTap: () {

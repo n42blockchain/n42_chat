@@ -223,11 +223,10 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.settingsManageQuickReplies ?? 'Manage Quick Replies',
         showBackButton: true,
@@ -257,12 +256,12 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       body: _isLoading
           ? N42Loading(message: l10n?.commonLoading ?? 'Loading...')
           : _replies.isEmpty
-          ? _buildEmptyState(isDark, l10n)
-          : _buildReplyList(isDark),
+          ? _buildEmptyState(l10n)
+          : _buildReplyList(),
     );
   }
 
-  Widget _buildEmptyState(bool isDark, S? l10n) {
+  Widget _buildEmptyState(S? l10n) {
     return N42EmptyState.noData(
       title: l10n?.settingsNoQuickReplies ?? 'No quick replies',
       description:
@@ -273,7 +272,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
     );
   }
 
-  Widget _buildReplyList(bool isDark) {
+  Widget _buildReplyList() {
     return ReorderableListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: _replies.length,
@@ -293,15 +292,15 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       },
       itemBuilder: (context, index) {
         final reply = _replies[index];
-        return _buildReplyItem(reply, isDark, index);
+        return _buildReplyItem(reply, index);
       },
     );
   }
 
-  Widget _buildReplyItem(QuickReplyEntity reply, bool isDark, int index) {
+  Widget _buildReplyItem(QuickReplyEntity reply, int index) {
     return Container(
       key: ValueKey(reply.id),
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       margin: const EdgeInsets.only(bottom: 1),
       child: ListTile(
         leading: IgnorePointer(
@@ -310,7 +309,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
             index: index,
             child: Icon(
               Icons.drag_handle,
-              color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ),
         ),
@@ -321,9 +320,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
           style: TextStyle(
             fontSize: 16,
             height: 1.3,
-            color: isDark
-                ? AppColors.textPrimaryDark
-                : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         subtitle: reply.isSystem
@@ -334,9 +331,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
               )
             : null,
@@ -347,7 +342,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
               IconButton(
                 icon: Icon(
                   Icons.edit_outlined,
-                  color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
                 onPressed: _isSaving ? null : () => _editReply(reply),
               ),

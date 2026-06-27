@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/bot_webhook_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/external_url_safety.dart';
@@ -99,7 +100,6 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = S.of(context);
 
     return BlocConsumer<GroupBloc, GroupState>(
@@ -118,7 +118,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                   state.successMessage ?? BlocMessageKeys.groupBotConfigUpdated,
                 ),
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
             ),
           );
           Navigator.of(context).pop();
@@ -128,7 +128,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(resolveBlocMessage(context, state.errorMessage!)),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -141,21 +141,19 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
               onPressed: _isSaving ? null : _save,
               child: Text(
                 l10n?.commonConfirm ?? 'Save',
-                style: TextStyle(color: AppColors.primary),
+                style: const TextStyle(color: AppColors.primary),
               ),
             ),
           ],
         ),
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : ListView(
                 children: [
                   const SizedBox(height: 10),
                   Container(
-                    color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                    color: context.surfaceColor,
                     child: SwitchListTile(
                       title: Text(l10n?.groupBotEnabled ?? 'Enable Bot'),
                       value: _enabled,
@@ -165,7 +163,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                   if (_enabled) ...[
                     const SizedBox(height: 10),
                     Container(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                      color: context.surfaceColor,
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,9 +173,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                                 'Welcome Message Template',
                             style: TextStyle(
                               fontSize: 13,
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
+                              color: context.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -196,7 +192,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                      color: context.surfaceColor,
                       child: SwitchListTile(
                         title: const Text('Enable webhook automation'),
                         subtitle: const Text(
@@ -209,9 +205,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                     if (_webhookEnabled) ...[
                       const SizedBox(height: 10),
                       Container(
-                        color: isDark
-                            ? AppColors.surfaceDark
-                            : AppColors.surface,
+                        color: context.surfaceColor,
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,9 +241,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                       ),
                       const SizedBox(height: 10),
                       Container(
-                        color: isDark
-                            ? AppColors.surfaceDark
-                            : AppColors.surface,
+                        color: context.surfaceColor,
                         child: Column(
                           children: [
                             SwitchListTile(
@@ -381,7 +373,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
     final validationError = _validateDraftConfig(config);
     if (validationError != null) {
       messenger.showSnackBar(
-        SnackBar(content: Text(validationError), backgroundColor: Colors.red),
+        SnackBar(content: Text(validationError), backgroundColor: AppColors.error),
       );
       return;
     }
@@ -391,7 +383,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
       messenger.showSnackBar(
         const SnackBar(
           content: Text('Select at least one webhook event'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -414,7 +406,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                 ? 'Test webhook sent successfully'
                 : (result.errorMessage ?? 'Failed to send test webhook'),
           ),
-          backgroundColor: result.success ? Colors.green : Colors.red,
+          backgroundColor: result.success ? AppColors.success : AppColors.error,
         ),
       );
     } catch (e) {
@@ -422,7 +414,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text('Failed to send test webhook: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     } finally {
@@ -439,7 +431,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
     final validationError = _validateDraftConfig(config);
     if (validationError != null) {
       messenger.showSnackBar(
-        SnackBar(content: Text(validationError), backgroundColor: Colors.red),
+        SnackBar(content: Text(validationError), backgroundColor: AppColors.error),
       );
       return;
     }
@@ -456,7 +448,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text('Failed to save bot settings: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }

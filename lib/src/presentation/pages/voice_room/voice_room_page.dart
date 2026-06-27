@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/voice_room_entity.dart';
 import '../../blocs/voice_room/voice_room_bloc.dart';
 import '../../blocs/voice_room/voice_room_event.dart';
@@ -108,7 +109,7 @@ class _VoiceRoomView extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 16),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.green,
+                  color: AppColors.success,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
@@ -192,7 +193,7 @@ class _VoiceRoomView extends StatelessWidget {
               label: state.isHandRaised
                   ? (s?.voiceRoomLowerHand ?? 'Lower Hand')
                   : (s?.voiceRoomRaiseHand ?? 'Raise Hand'),
-              color: state.isHandRaised ? Colors.orange : null,
+              color: state.isHandRaised ? AppColors.warning : null,
               onTap: () {
                 final bloc = context.read<VoiceRoomBloc>();
                 if (state.isHandRaised) {
@@ -211,7 +212,7 @@ class _VoiceRoomView extends StatelessWidget {
               label: state.isMuted
                   ? (s?.voiceRoomUnmute ?? 'Unmute')
                   : (s?.voiceRoomMute ?? 'Mute'),
-              color: state.isMuted ? Colors.red : theme.colorScheme.primary,
+              color: state.isMuted ? AppColors.error : theme.colorScheme.primary,
               onTap: () {
                 context.read<VoiceRoomBloc>().add(const ToggleMute());
               },
@@ -223,7 +224,7 @@ class _VoiceRoomView extends StatelessWidget {
               context,
               icon: Icons.cancel_outlined,
               label: s?.voiceRoomEnd ?? 'End Room',
-              color: Colors.red,
+              color: AppColors.error,
               onTap: () => _confirmEndRoom(context),
             ),
 
@@ -346,7 +347,7 @@ class _VoiceRoomView extends StatelessWidget {
               context.read<VoiceRoomBloc>().add(const EndVoiceRoom());
               Navigator.pop(dialogContext);
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             child: Text(s?.voiceRoomEnd ?? 'End Room'),
           ),
         ],

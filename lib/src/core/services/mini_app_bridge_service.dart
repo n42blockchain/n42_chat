@@ -6,6 +6,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../domain/entities/mini_app_entity.dart';
 import '../../integration/wallet_bridge.dart';
+import '../theme/app_colors.dart';
 import '../utils/debug_log.dart';
 
 /// Mini App <-> Native 通信消息
@@ -479,7 +480,7 @@ class MiniAppBridgeService {
       builder: (ctx) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            Icon(Icons.warning_amber_rounded, color: AppColors.warning),
             SizedBox(width: 8),
             Text('Confirm Transaction'),
           ],
@@ -514,7 +515,7 @@ class MiniAppBridgeService {
             child: const Text('Reject'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.warning),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Confirm'),
           ),

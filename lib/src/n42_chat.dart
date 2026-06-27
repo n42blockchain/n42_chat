@@ -11,7 +11,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
 import 'core/extensions/context_extension.dart';
-import 'core/theme/app_colors.dart';
 import 'core/notifications/firebase_push_service.dart';
 import 'core/notifications/push_notification_service.dart';
 import 'data/datasources/local/preferences_datasource.dart';
@@ -23,6 +22,7 @@ import 'services/voip/call_manager.dart';
 import 'n42_chat_config.dart';
 import 'core/di/injection.dart';
 import 'core/utils/date_utils.dart';
+import 'core/theme/app_colors.dart';
 import 'domain/entities/conversation_entity.dart';
 import 'domain/entities/user_entity.dart';
 import 'domain/entities/user_profile_entity.dart';
@@ -146,6 +146,17 @@ class N42Chat {
   /// 获取当前语言设置
   static Locale get locale => _N42ThemeManager.locale;
 
+  /// 宿主 App 是否接管外观（明暗模式）。
+  ///
+  /// 嵌入主 App 时由宿主在初始化后置为 true：此后 chat 不再用自身存储的
+  /// 外观设置覆盖宿主下发的 [setThemeMode]，明暗模式以宿主为唯一来源，
+  /// 避免每次打开 chat 时被自存值还原。
+  static bool get hostControlsAppearance =>
+      _N42ThemeManager.hostControlsAppearance;
+
+  static set hostControlsAppearance(bool value) =>
+      _N42ThemeManager.hostControlsAppearance = value;
+
   /// 设置主题模式
   ///
   /// 用于与主应用同步主题设置
@@ -159,27 +170,6 @@ class N42Chat {
   /// });
   /// ```
   static void setThemeMode(ThemeMode mode) => _N42ThemeManager.setThemeMode(mode);
-
-  /// 获取当前 accent 主色
-  static Color get accentColor => _N42ThemeManager.accentColor;
-
-  /// 设置 accent 主色（宿主 app 的 accent color 同步入口）
-  ///
-  /// 调用后 n42_chat 所有使用 [AppColors.primary] 的组件均采用新颜色。
-  ///
-  /// ```dart
-  /// // 在主应用 AccentColorNotifier 中同步
-  /// if (N42Chat.isInitialized) N42Chat.setAccentColor(color);
-  /// ```
-  static void setAccentColor(Color color) => _N42ThemeManager.setAccentColor(color);
-
-  /// 添加 accent 主色变化监听器
-  static void addAccentColorListener(void Function(Color) listener) =>
-      _N42ThemeManager.addAccentColorListener(listener);
-
-  /// 移除 accent 主色变化监听器
-  static void removeAccentColorListener(void Function(Color) listener) =>
-      _N42ThemeManager.removeAccentColorListener(listener);
 
   /// 添加主题变化监听器
   static void addThemeListener(void Function(ThemeMode) listener) =>

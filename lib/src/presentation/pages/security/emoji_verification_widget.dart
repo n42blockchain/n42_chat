@@ -3,7 +3,6 @@ import 'package:matrix/encryption/utils/key_verification.dart' as kv;
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 
 /// SAS Emoji 验证展示组件
 ///
@@ -29,7 +28,7 @@ class EmojiVerificationWidget extends StatelessWidget {
           S.of(context)?.securityCompareEmoji ?? 'Compare the emoji on both devices',
           style: TextStyle(
             fontSize: 15,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -40,13 +39,13 @@ class EmojiVerificationWidget extends StatelessWidget {
           alignment: WrapAlignment.center,
           spacing: 8,
           runSpacing: 16,
-          children: emojis.map((emoji) => _buildEmojiItem(emoji, isDark)).toList(),
+          children: emojis.map((emoji) => _buildEmojiItem(context, emoji, isDark)).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildEmojiItem(kv.KeyVerificationEmoji emoji, bool isDark) {
+  Widget _buildEmojiItem(BuildContext context, kv.KeyVerificationEmoji emoji, bool isDark) {
     return SizedBox(
       width: 72,
       child: Column(
@@ -75,7 +74,7 @@ class EmojiVerificationWidget extends StatelessWidget {
             emoji.name,
             style: TextStyle(
               fontSize: 11,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             textAlign: TextAlign.center,
             maxLines: 1,
@@ -110,7 +109,7 @@ class NumberVerificationWidget extends StatelessWidget {
           S.of(context)?.securityCompareNumbers ?? 'Compare the numbers on both devices',
           style: TextStyle(
             fontSize: 15,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -133,7 +132,7 @@ class NumberVerificationWidget extends StatelessWidget {
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'monospace',
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             );

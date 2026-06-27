@@ -17,6 +17,12 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
   Locale _currentLocale = _N42ThemeManager._locale;
   FontSize _fontSize = N42Chat.fontSize;
 
+  // 嵌套 Navigator：承载 chat 内部所有 push 的子页面，使其留在
+  // _wrapChatPresentation 的 Theme + textScaler 缩放层之下（否则会逃到
+  // 宿主根 Navigator 而丢失字体缩放与主题）。
+  final GlobalKey<NavigatorState> _nestedNavKey = GlobalKey<NavigatorState>();
+  final HeroController _heroController = HeroController();
+
   void _onLocaleChanged(Locale locale) {
     if (mounted) setState(() => _currentLocale = locale);
   }
@@ -29,15 +35,15 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     if (mounted) setState(() => _fontSize = fontSize);
   }
 
-  void _onAccentColorChanged(Color _) {
-    if (mounted) setState(() {});
-  }
-
   Future<void> _loadAppearanceSettings() async {
     try {
       final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
       if (!mounted) return;
-      // 主题模式由宿主 app 通过 N42Chat.setThemeMode() 控制，此处只恢复字体大小
+      // 宿主接管明暗模式时不要用自存值覆盖宿主下发的 themeMode，
+      // 否则每次打开 chat 都会把宿主设置还原。字体大小仍由 chat 自身管理。
+      if (!N42Chat.hostControlsAppearance) {
+        N42Chat.setThemeMode(appearanceSettings.themeMode);
+      }
       N42Chat.setFontSize(appearanceSettings.fontSize);
     } catch (e) {
       debugLog('N42Chat: Failed to load appearance settings: $e');
@@ -50,7 +56,6 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     N42Chat.addLocaleListener(_onLocaleChanged);
     N42Chat.addThemeListener(_onThemeChanged);
     N42Chat.addFontSizeListener(_onFontSizeChanged);
-    N42Chat.addAccentColorListener(_onAccentColorChanged);
     unawaited(_loadAppearanceSettings());
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
@@ -61,7 +66,7 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
     N42Chat.removeLocaleListener(_onLocaleChanged);
     N42Chat.removeThemeListener(_onThemeChanged);
     N42Chat.removeFontSizeListener(_onFontSizeChanged);
-    N42Chat.removeAccentColorListener(_onAccentColorChanged);
+    _heroController.dispose();
     super.dispose();
   }
 
@@ -100,39 +105,53 @@ class _N42ChatEntryWidgetState extends State<_N42ChatEntryWidget> {
       context,
       locale: _currentLocale,
       fontSize: _fontSize,
-      child: BlocProvider.value(
-        value: N42Chat.authBloc,
-        child: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            // 检查中或初始状态 - 显示加载
-            if (state.status == AuthStatus.initial ||
-                state.status == AuthStatus.checking) {
-              return const _LoadingPage();
-            }
+      // 嵌套 Navigator：chat 内部所有 push（会话/设置等）都进入本层导航栈，
+      // 从而继承上方 _wrapChatPresentation 的 Theme + textScaler，字体缩放
+      // 与主题在子页面同样生效。NavigatorPopHandler 把系统返回键优先转交
+      // 嵌套栈；当嵌套栈已在根（无可弹）时放行给外层，弹出整个 chat 路由。
+      child: NavigatorPopHandler(
+        onPopWithResult: (_) => _nestedNavKey.currentState?.maybePop(),
+        child: Navigator(
+          key: _nestedNavKey,
+          observers: [_heroController],
+          onGenerateRoute: (settings) => MaterialPageRoute<void>(
+            settings: settings,
+            builder: (context) => BlocProvider.value(
+              value: N42Chat.authBloc,
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  // 检查中或初始状态 - 显示加载
+                  if (state.status == AuthStatus.initial ||
+                      state.status == AuthStatus.checking) {
+                    return const _LoadingPage();
+                  }
 
-            // 已登录 - 显示主框架（微信风格底部Tab）
-            if (state.isAuthenticated) {
-              return ChatMainPage(
-                onBackToMain: () {
-                  // 返回主应用 - 由外部处理
-                  Navigator.of(context).maybePop();
+                  // 已登录 - 显示主框架（微信风格底部Tab）
+                  if (state.isAuthenticated) {
+                    return ChatMainPage(
+                      onBackToMain: () {
+                        // 返回主应用 - 弹出整个 chat 路由（外层宿主导航栈）
+                        Navigator.of(context, rootNavigator: true).maybePop();
+                      },
+                    );
+                  }
+
+                  // 未登录 - 显示欢迎页面
+                  return WelcomePage(
+                    onLogin: () => _navigateToLogin(context),
+                    onRegister: () => _navigateToRegister(context),
+                    onTermsOfService: () => _launchUrl(
+                      N42Chat._config?.termsOfServiceUrl ?? 'https://www.n42.ai/static/terms_of_use.html',
+                    ),
+                    onPrivacyPolicy: () => _launchUrl(
+                      N42Chat._config?.privacyPolicyUrl ??
+                          'https://www.n42.ai/static/terms_of_use.html',
+                    ),
+                  );
                 },
-              );
-            }
-
-            // 未登录 - 显示欢迎页面
-            return WelcomePage(
-              onLogin: () => _navigateToLogin(context),
-              onRegister: () => _navigateToRegister(context),
-              onTermsOfService: () => _launchUrl(
-                N42Chat._config?.termsOfServiceUrl ?? 'https://www.n42.ai/static/terms_of_use.html',
               ),
-              onPrivacyPolicy: () => _launchUrl(
-                N42Chat._config?.privacyPolicyUrl ??
-                    'https://www.n42.ai/static/terms_of_use.html',
-              ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
@@ -148,9 +167,7 @@ class _LoadingPage extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF1E1E1E)
-          : const Color(0xFFEDEDED),
+      backgroundColor: AppColors.bgOf(isDark),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -159,7 +176,7 @@ class _LoadingPage extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xFF07C160),
+                color: const Color(0xFF5B6CFF),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
@@ -174,7 +191,7 @@ class _LoadingPage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: isDark ? Colors.white : const Color(0xFF181818),
+                color: AppColors.textPrimaryOf(isDark),
               ),
             ),
             const SizedBox(height: 16),
@@ -183,7 +200,7 @@ class _LoadingPage extends StatelessWidget {
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF07C160)),
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5B6CFF)),
               ),
             ),
           ],
@@ -316,9 +333,9 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
     }
 
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEDEDED);
-    final textColor = isDark ? Colors.white : const Color(0xFF181818);
-    final subtitleColor = isDark ? Colors.white70 : const Color(0xFF888888);
+    final bgColor = AppColors.bgOf(isDark);
+    final textColor = AppColors.textPrimaryOf(isDark);
+    final subtitleColor = AppColors.textSecondaryOf(isDark);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -369,7 +386,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                 child: ElevatedButton(
                   onPressed: _isRetrying ? null : _retry,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF07C160),
+                    backgroundColor: const Color(0xFF5B6CFF),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -428,7 +445,6 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
     N42Chat.addLocaleListener(_onLocaleChanged);
     N42Chat.addThemeListener(_onThemeChanged);
     N42Chat.addFontSizeListener(_onFontSizeChanged);
-    N42Chat.addAccentColorListener(_onAccentColorChanged);
     unawaited(_loadAppearanceSettings());
     // 检查当前登录状态
     N42Chat.authBloc.add(const AuthCheckRequested());
@@ -446,15 +462,15 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
     if (mounted) setState(() => _fontSize = fontSize);
   }
 
-  void _onAccentColorChanged(Color _) {
-    if (mounted) setState(() {});
-  }
-
   Future<void> _loadAppearanceSettings() async {
     try {
       final appearanceSettings = await N42Chat.getSavedAppearanceSettings();
       if (!mounted) return;
-      // 主题模式由宿主 app 通过 N42Chat.setThemeMode() 控制，此处只恢复字体大小
+      // 宿主接管明暗模式时不要用自存值覆盖宿主下发的 themeMode，
+      // 否则每次打开 chat 都会把宿主设置还原。字体大小仍由 chat 自身管理。
+      if (!N42Chat.hostControlsAppearance) {
+        N42Chat.setThemeMode(appearanceSettings.themeMode);
+      }
       N42Chat.setFontSize(appearanceSettings.fontSize);
     } catch (e) {
       debugLog('N42Chat: Failed to load appearance settings: $e');
@@ -466,7 +482,6 @@ class _N42ProfileEntryWidgetState extends State<_N42ProfileEntryWidget> {
     N42Chat.removeLocaleListener(_onLocaleChanged);
     N42Chat.removeThemeListener(_onThemeChanged);
     N42Chat.removeFontSizeListener(_onFontSizeChanged);
-    N42Chat.removeAccentColorListener(_onAccentColorChanged);
     super.dispose();
   }
 

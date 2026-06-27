@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// 斜杠命令条目
@@ -89,10 +90,10 @@ class SlashCommandPicker extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(maxHeight: 220),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
         ),
         boxShadow: [
@@ -109,7 +110,7 @@ class SlashCommandPicker extends StatelessWidget {
         separatorBuilder: (context, index) => Divider(
           height: 1,
           indent: 56,
-          color: isDark ? AppColors.dividerDark : AppColors.divider,
+          color: context.dividerColor,
         ),
         itemBuilder: (context, index) {
           final item = commands[index];
@@ -124,14 +125,14 @@ class SlashCommandPicker extends StatelessWidget {
               '/${item.command}',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: AppColors.textPrimaryOf(isDark),
               ),
             ),
             subtitle: Text(
               item.description,
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             onTap: () => onSelect(item),

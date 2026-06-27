@@ -216,8 +216,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
     final resolvedCurrentLocale = _resolveLanguageOption(_currentLocale).locale;
 
     return Scaffold(
@@ -244,7 +243,6 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
                 return _LanguageItem(
                   language: language,
                   isSelected: isSelected,
-                  isDark: isDark,
                   onTap: () => _setLanguage(language.locale),
                 );
               },
@@ -280,25 +278,19 @@ class LanguageOption {
 class _LanguageItem extends StatelessWidget {
   final LanguageOption language;
   final bool isSelected;
-  final bool isDark;
   final VoidCallback onTap;
 
   const _LanguageItem({
     required this.language,
     required this.isSelected,
-    required this.isDark,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final subtitleColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final bgColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final subtitleColor = context.textSecondary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -325,9 +317,7 @@ class _LanguageItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary.withValues(alpha: 0.1)
-                        : (isDark
-                              ? AppColors.backgroundDark
-                              : AppColors.background),
+                        : context.pageBackground,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
@@ -375,7 +365,7 @@ class _LanguageItem extends StatelessWidget {
                   ),
                 ),
                 if (isSelected)
-                  Icon(
+                  const Icon(
                     Icons.check_circle_rounded,
                     color: AppColors.primary,
                     size: 24,

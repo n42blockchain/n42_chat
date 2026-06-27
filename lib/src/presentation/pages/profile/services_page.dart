@@ -78,14 +78,11 @@ class ServicesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(title: S.of(context)?.profileServices ?? 'Services'),
       body: Padding(
         padding: const EdgeInsets.all(16),

@@ -54,6 +54,13 @@ extension ContextExtension on BuildContext {
   Color get pageBackground =>
       isDarkMode ? AppColors.backgroundDark : AppColors.background;
 
+  /// 导航栏背景（自动深浅）
+  Color get navBarColor => isDarkMode ? AppColors.navBarDark : AppColors.navBar;
+
+  /// 输入栏背景（自动深浅）
+  Color get inputBarColor =>
+      isDarkMode ? AppColors.inputBarDark : AppColors.inputBar;
+
   // ============================================
   // 屏幕尺寸
   // ============================================
@@ -152,12 +159,12 @@ extension ContextExtension on BuildContext {
 
   /// 显示错误SnackBar
   void showErrorSnackBar(String message, {Duration duration = const Duration(seconds: 3)}) {
-    showSnackBar(message, duration: duration, backgroundColor: Colors.red);
+    showSnackBar(message, duration: duration, backgroundColor: AppColors.error);
   }
 
   /// 显示成功SnackBar
   void showSuccessSnackBar(String message, {Duration duration = const Duration(seconds: 2)}) {
-    showSnackBar(message, duration: duration, backgroundColor: AppColors.primary);
+    showSnackBar(message, duration: duration, backgroundColor: AppColors.success);
   }
 
   /// 清除所有 SnackBar
@@ -215,7 +222,7 @@ extension ContextExtension on BuildContext {
           content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(
+              const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
               if (message != null) ...[

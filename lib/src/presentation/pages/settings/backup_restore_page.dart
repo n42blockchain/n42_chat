@@ -32,10 +32,8 @@ class _BackupRestoreView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: 'Backup & Restore',
         showBackButton: true,
@@ -47,7 +45,7 @@ class _BackupRestoreView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.successMessage!),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
               ),
             );
           }
@@ -55,7 +53,7 @@ class _BackupRestoreView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error!),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -99,11 +97,9 @@ class _BackupSectionState extends State<_BackupSection> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     return Container(
       color: cardColor,
@@ -114,7 +110,7 @@ class _BackupSectionState extends State<_BackupSection> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                Icon(Icons.backup, color: AppColors.primary, size: 20),
+                const Icon(Icons.backup, color: AppColors.primary, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Create Backup',
@@ -140,7 +136,7 @@ class _BackupSectionState extends State<_BackupSection> {
           ),
           const SizedBox(height: 12),
           ListTile(
-            leading: const Icon(Icons.key_outlined, color: Colors.orange),
+            leading: const Icon(Icons.key_outlined, color: AppColors.warning),
             title: Text(
               'Encryption keys are managed separately',
               maxLines: 1,
@@ -230,11 +226,9 @@ class _BackupHistorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     return Container(
       color: cardColor,
@@ -269,11 +263,11 @@ class _BackupHistorySection extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.blue.withValues(alpha: 0.1),
+                      color: AppColors.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.archive,
-                        color: Colors.blue, size: 22),
+                        color: AppColors.info, size: 22),
                   ),
                   title: Text(
                     backup.formattedDate,
@@ -313,10 +307,10 @@ class _BackupHistorySection extends StatelessWidget {
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete, size: 18, color: Colors.red),
+                            Icon(Icons.delete, size: 18, color: AppColors.error),
                             SizedBox(width: 8),
                             Text('Delete',
-                                style: TextStyle(color: Colors.red)),
+                                style: TextStyle(color: AppColors.error)),
                           ],
                         ),
                       ),
@@ -351,7 +345,7 @@ class _BackupHistorySection extends StatelessWidget {
             },
             child: const Text(
               'Delete',
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -368,11 +362,9 @@ class _RestoreSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final secondaryColor = context.textSecondary;
 
     return Container(
       color: cardColor,
@@ -383,7 +375,7 @@ class _RestoreSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                const Icon(Icons.restore, color: Colors.orange, size: 20),
+                const Icon(Icons.restore, color: AppColors.warning, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Restore from File',
@@ -458,7 +450,7 @@ class _RestoreSection extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to pick file: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }

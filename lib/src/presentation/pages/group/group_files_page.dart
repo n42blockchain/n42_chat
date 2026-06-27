@@ -114,13 +114,10 @@ class _GroupFilesPageState extends State<GroupFilesPage>
   }
 
   Widget _buildTabBar(BuildContext context) {
-    final isDark = context.isDarkMode;
     return TabBar(
       controller: _tabController,
       labelColor: AppColors.primary,
-      unselectedLabelColor: isDark
-          ? AppColors.textSecondaryDark
-          : AppColors.textSecondary,
+      unselectedLabelColor: context.textSecondary,
       indicatorColor: AppColors.primary,
       tabs: [
         Tab(text: S.of(context)?.commonAll ?? 'All'),
@@ -133,12 +130,9 @@ class _GroupFilesPageState extends State<GroupFilesPage>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final bgColor = context.pageBackground;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
 
     // 嵌入模式：不显示 Scaffold+AppBar，仅返回 TabBar + body
     if (widget.embedded) {
@@ -225,10 +219,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
     Color cardColor,
     Color textColor,
   ) {
-    final isDark = context.isDarkMode;
-    final secondaryTextColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final secondaryTextColor = context.textSecondary;
 
     return Container(
       color: cardColor,
@@ -265,7 +256,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.download, color: AppColors.primary),
+          icon: const Icon(Icons.download, color: AppColors.primary),
           onPressed: () => _downloadFile(file),
         ),
         onTap: () => _openFile(file),
@@ -275,12 +266,12 @@ class _GroupFilesPageState extends State<GroupFilesPage>
 
   Widget _buildFileIcon(GroupFileEntity file) {
     final (IconData icon, Color color) = switch (file.fileType) {
-      GroupFileType.image => (Icons.image, Colors.blue),
-      GroupFileType.video => (Icons.videocam, Colors.red),
+      GroupFileType.image => (Icons.image, AppColors.info),
+      GroupFileType.video => (Icons.videocam, AppColors.error),
       GroupFileType.audio => (Icons.audiotrack, Colors.purple),
-      GroupFileType.document => (Icons.description, Colors.orange),
+      GroupFileType.document => (Icons.description, AppColors.warning),
       GroupFileType.archive => (Icons.folder_zip, Colors.brown),
-      GroupFileType.other => (Icons.insert_drive_file, Colors.grey),
+      GroupFileType.other => (Icons.insert_drive_file, AppColors.textTertiary),
     };
 
     return Container(
@@ -359,7 +350,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
             content: Text(
               '${S.of(context)?.downloadFailed ?? 'Download failed'}: $e',
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }

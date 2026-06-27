@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/mini_app_entity.dart';
 import '../../helpers/mini_app_launcher_helper.dart';
@@ -63,14 +64,14 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        backgroundColor: context.surfaceColor,
         elevation: 0,
         title: Text(
           l10n?.miniAppMarketTitle ?? 'Mini Apps',
           style: TextStyle(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -80,9 +81,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
           tabAlignment: TabAlignment.start,
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
-          unselectedLabelColor: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondary,
+          unselectedLabelColor: context.textSecondary,
           tabs: [
             Tab(text: l10n?.miniAppCategoryAll ?? 'All'),
             ...MiniAppCategory.values.map((c) => Tab(text: c.label)),
@@ -98,9 +97,9 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: l10n?.miniAppSearch ?? 'Search apps...',
-                prefixIcon: Icon(Icons.search, color: AppColors.primary),
+                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                 filled: true,
-                fillColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+                fillColor: context.surfaceColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -143,9 +142,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
         child: Text(
           l10n?.miniAppNoResults ?? 'No apps found',
           style: TextStyle(
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       );
@@ -163,7 +160,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -189,7 +186,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -240,7 +237,7 @@ class _AppListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+      color: context.surfaceColor,
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
@@ -293,7 +290,7 @@ class _AppListTile extends StatelessWidget {
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: Text(
+                            child: const Text(
                               'Official',
                               style: TextStyle(
                                 fontSize: 10,
@@ -309,9 +306,7 @@ class _AppListTile extends StatelessWidget {
                       app.description,
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -322,9 +317,7 @@ class _AppListTile extends StatelessWidget {
                         '${_formatCount(app.userCount!)} users',
                         style: TextStyle(
                           fontSize: 11,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                     ],
@@ -335,9 +328,7 @@ class _AppListTile extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 14,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ],
           ),
@@ -370,10 +361,10 @@ class _FeaturedCard extends StatelessWidget {
       child: Container(
         width: 120,
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -400,7 +391,7 @@ class _FeaturedCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../blocs/governance/governance_bloc.dart';
@@ -196,10 +197,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: const Text('Create Proposal'),
-        backgroundColor: isDark ? AppColors.navBarDark : AppColors.navBar,
+        backgroundColor: context.navBarColor,
         elevation: 0.5,
       ),
       body: BlocConsumer<GovernanceBloc, GovernanceState>(
@@ -239,13 +240,13 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTitleField(isDark),
+                      _buildTitleField(context),
                       const SizedBox(height: 16),
-                      _buildBodyField(isDark),
+                      _buildBodyField(context),
                       const SizedBox(height: 24),
-                      _buildChoicesSection(isDark),
+                      _buildChoicesSection(context),
                       const SizedBox(height: 24),
-                      _buildDateTimeSection(isDark),
+                      _buildDateTimeSection(context),
                       const SizedBox(height: 32),
                       _buildSubmitButton(isDark, isCreating),
                       const SizedBox(height: 32),
@@ -267,11 +268,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     );
   }
 
-  Widget _buildTitleField(bool isDark) {
+  Widget _buildTitleField(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -285,7 +286,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -294,9 +295,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             decoration: InputDecoration(
               hintText: 'Enter proposal title...',
               hintStyle: TextStyle(
-                color: isDark
-                    ? AppColors.textTertiaryDark
-                    : AppColors.textTertiary,
+                color: context.textTertiary,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -304,7 +303,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppColors.primary),
+                borderSide: const BorderSide(color: AppColors.primary),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -327,11 +326,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     );
   }
 
-  Widget _buildBodyField(bool isDark) {
+  Widget _buildBodyField(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -345,7 +344,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -354,9 +353,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             decoration: InputDecoration(
               hintText: 'Describe your proposal...',
               hintStyle: TextStyle(
-                color: isDark
-                    ? AppColors.textTertiaryDark
-                    : AppColors.textTertiary,
+                color: context.textTertiary,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -364,7 +361,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppColors.primary),
+                borderSide: const BorderSide(color: AppColors.primary),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -386,11 +383,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     );
   }
 
-  Widget _buildChoicesSection(bool isDark) {
+  Widget _buildChoicesSection(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -403,9 +400,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
               const Spacer(),
@@ -416,9 +411,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiary,
+                  color: context.textTertiary,
                 ),
               ),
             ],
@@ -440,9 +433,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                         fontSize: 14,
                         height: 1.3,
                         fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                   ),
@@ -453,9 +444,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                       decoration: InputDecoration(
                         hintText: 'Choice ${index + 1}',
                         hintStyle: TextStyle(
-                          color: isDark
-                              ? AppColors.textTertiaryDark
-                              : AppColors.textTertiary,
+                          color: context.textTertiary,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -465,7 +454,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: AppColors.primary,
                           ),
                         ),
@@ -525,11 +514,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     );
   }
 
-  Widget _buildDateTimeSection(bool isDark) {
+  Widget _buildDateTimeSection(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -543,7 +532,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               fontSize: 15,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color: context.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -551,17 +540,15 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             label: 'Start',
             dateTime: _startTime,
             onTap: _pickStartTime,
-            isDark: isDark,
           ),
           Divider(
             height: 1,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
           _DateTimeTile(
             label: 'End',
             dateTime: _endTime,
             onTap: _pickEndTime,
-            isDark: isDark,
           ),
           const SizedBox(height: 8),
           Text(
@@ -571,9 +558,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             style: TextStyle(
               fontSize: 12,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ),
         ],
@@ -638,13 +623,11 @@ class _DateTimeTile extends StatelessWidget {
   final String label;
   final DateTime dateTime;
   final VoidCallback onTap;
-  final bool isDark;
 
   const _DateTimeTile({
     required this.label,
     required this.dateTime,
     required this.onTap,
-    required this.isDark,
   });
 
   @override
@@ -658,9 +641,7 @@ class _DateTimeTile extends StatelessWidget {
             Icon(
               Icons.calendar_today,
               size: 18,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             const SizedBox(width: 12),
             Text(
@@ -670,9 +651,7 @@ class _DateTimeTile extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.3,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const Spacer(),
@@ -684,18 +663,14 @@ class _DateTimeTile extends StatelessWidget {
                 fontSize: 14,
                 height: 1.3,
                 fontWeight: FontWeight.w500,
-                color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(width: 4),
             Icon(
               AppIcons.chevron,
               size: 20,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
           ],
         ),

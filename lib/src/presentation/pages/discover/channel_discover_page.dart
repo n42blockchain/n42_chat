@@ -132,29 +132,27 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.channelDiscoverTitle ?? 'Discover Channels',
       ),
       body: Column(
         children: [
           // 搜索栏
-          _buildSearchBar(isDark, l10n),
+          _buildSearchBar(context, l10n),
           // 分类标签
-          _buildCategoryTabs(isDark),
+          _buildCategoryTabs(context),
           // 频道列表
-          Expanded(child: _buildChannelList(isDark, l10n)),
+          Expanded(child: _buildChannelList(context, l10n)),
         ],
       ),
     );
   }
 
-  Widget _buildSearchBar(bool isDark, S? l10n) {
+  Widget _buildSearchBar(BuildContext context, S? l10n) {
     return Padding(
       padding: const EdgeInsets.all(12),
       child: TextField(
@@ -163,12 +161,12 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
         decoration: InputDecoration(
           hintText: l10n?.channelDiscoverSearch ?? 'Search channels...',
           hintStyle: TextStyle(
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
             fontSize: 14,
           ),
           prefixIcon: const Icon(AppIcons.search, size: 20),
           filled: true,
-          fillColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+          fillColor: context.surfaceColor,
           contentPadding: const EdgeInsets.symmetric(vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
@@ -179,7 +177,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
     );
   }
 
-  Widget _buildCategoryTabs(bool isDark) {
+  Widget _buildCategoryTabs(BuildContext context) {
     final labels = {
       ChannelCategory.all: 'All',
       ChannelCategory.tech: 'Tech',
@@ -204,13 +202,10 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
                   setState(() => _selectedCategory = entry.key),
               selectedColor: AppColors.primary,
               labelStyle: TextStyle(
-                color: selected
-                    ? Colors.white
-                    : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimary),
+                color: selected ? Colors.white : context.textPrimary,
                 fontSize: 13,
               ),
-              backgroundColor:
-                  isDark ? AppColors.surfaceDark : AppColors.surface,
+              backgroundColor: context.surfaceColor,
               side: BorderSide.none,
               padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
@@ -220,7 +215,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
     );
   }
 
-  Widget _buildChannelList(bool isDark, S? l10n) {
+  Widget _buildChannelList(BuildContext context, S? l10n) {
     final channels = _filteredChannels;
 
     if (channels.isEmpty) {
@@ -228,7 +223,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
         child: Text(
           'No channels found',
           style: TextStyle(
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
         ),
       );
@@ -240,18 +235,18 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
       separatorBuilder: (_, _) => Divider(
         height: 1,
         indent: 76,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
       itemBuilder: (context, index) {
         final channel = channels[index];
-        return _buildChannelTile(channel, isDark, l10n);
+        return _buildChannelTile(context, channel, l10n);
       },
     );
   }
 
   Widget _buildChannelTile(
+    BuildContext context,
     _RecommendedChannel channel,
-    bool isDark,
     S? l10n,
   ) {
     return ListTile(
@@ -262,7 +257,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
           color: AppColors.primary.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(
+        child: const Icon(
           Icons.campaign,
           color: AppColors.primary,
           size: 24,
@@ -276,7 +271,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
           fontSize: 15,
           height: 1.3,
           fontWeight: FontWeight.w600,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Column(
@@ -290,7 +285,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
             style: TextStyle(
               fontSize: 13,
               height: 1.35,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -301,7 +296,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
             style: TextStyle(
               fontSize: 11,
               height: 1.3,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -310,7 +305,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
         onPressed: () => _joinChannel(channel),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary),
+          side: const BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           minimumSize: const Size(0, 32),
         ),

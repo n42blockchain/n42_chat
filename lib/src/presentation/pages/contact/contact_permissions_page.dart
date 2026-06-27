@@ -116,14 +116,13 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
-    final dividerColor = isDark ? AppColors.dividerDark : AppColors.divider;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final subtitleColor = context.textSecondary;
+    final dividerColor = context.dividerColor;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: S.of(context)?.contactFriendPermissions ?? 'Friend Permissions',
       ),

@@ -2,6 +2,7 @@
 // Pure Dart Equatable event classes — no external entity deps.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:n42_chat/src/domain/entities/conversation_entity.dart';
 import 'package:n42_chat/src/presentation/blocs/conversation/conversation_event.dart';
 
 void main() {
@@ -352,10 +353,13 @@ void main() {
       );
     });
 
-    test('stores dynamic items', () {
-      const e = ConversationsUpdated(['conv1', 'conv2']);
+    test('stores conversation entities', () {
+      const e = ConversationsUpdated([
+        ConversationEntity(id: 'conv1', name: 'Alice'),
+        ConversationEntity(id: 'conv2', name: 'Bob'),
+      ]);
       expect(e.conversations.length, 2);
-      expect(e.conversations.first, 'conv1');
+      expect(e.conversations.first.id, 'conv1');
     });
 
     test('is a ConversationEvent', () {

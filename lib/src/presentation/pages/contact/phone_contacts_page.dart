@@ -96,7 +96,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
     final isDark = context.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: const N42AppBar(title: 'From Contacts'),
       body: _buildBody(isDark),
     );
@@ -119,7 +119,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
       return _buildNoMatches(isDark);
     }
 
-    return _buildMatchedList(isDark);
+    return _buildMatchedList();
   }
 
   Widget _buildPermissionRequest(bool isDark) {
@@ -132,7 +132,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             Icon(
               Icons.contacts,
               size: 72,
-              color: isDark ? Colors.grey[600] : Colors.grey[400],
+              color: AppColors.textTertiaryOf(isDark),
             ),
             const SizedBox(height: 24),
             Text(
@@ -144,7 +144,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 fontSize: 18,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -156,9 +156,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 32),
@@ -196,9 +194,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 24),
@@ -219,7 +215,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             Icon(
               Icons.person_search,
               size: 72,
-              color: isDark ? Colors.grey[600] : Colors.grey[400],
+              color: AppColors.textTertiaryOf(isDark),
             ),
             const SizedBox(height: 24),
             Text(
@@ -230,7 +226,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 fontSize: 18,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                color: context.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -242,9 +238,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.4,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 16),
@@ -255,7 +249,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -264,16 +258,16 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
     );
   }
 
-  Widget _buildMatchedList(bool isDark) {
+  Widget _buildMatchedList() {
     return Column(
       children: [
         // 统计信息
         Container(
           padding: const EdgeInsets.all(16),
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.check_circle,
                 color: AppColors.primary,
                 size: 20,
@@ -287,9 +281,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ),
@@ -303,7 +295,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             itemCount: _matchedContacts.length,
             itemBuilder: (context, index) {
               final match = _matchedContacts[index];
-              return _buildMatchTile(match, isDark);
+              return _buildMatchTile(match);
             },
           ),
         ),
@@ -311,7 +303,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
     );
   }
 
-  Widget _buildMatchTile(MatchedContact match, bool isDark) {
+  Widget _buildMatchTile(MatchedContact match) {
     final phoneContact = match.phoneContact;
     final displayName = match.matrixDisplayName ?? phoneContact.displayName;
 
@@ -333,7 +325,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 color: AppColors.primary,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
+                  color: context.surfaceColor,
                   width: 2,
                 ),
               ),
@@ -349,7 +341,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         style: TextStyle(
           fontWeight: FontWeight.w500,
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Column(
@@ -362,9 +354,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             style: TextStyle(
               fontSize: 12,
               height: 1.3,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           if (phoneContact.displayName != displayName)
@@ -375,7 +365,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               style: TextStyle(
                 fontSize: 11,
                 height: 1.3,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
         ],
@@ -385,7 +375,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         onPressed: () => _startDirectChat(match.matrixUserId),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary),
+          side: const BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
         child: const Text('Chat'),

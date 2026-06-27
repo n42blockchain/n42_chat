@@ -80,7 +80,6 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return BlocListener<AuthBloc, AuthState>(
@@ -107,9 +106,7 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: N42AppBar(
           title: 'Accounts',
           showBackButton: true,
@@ -131,21 +128,18 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                     )
                   else
                     Container(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surface,
+                      color: context.surfaceColor,
                       child: Column(
                         children: [
                           for (var i = 0; i < _accounts.length; i++) ...[
                             _AccountTile(
                               account: _accounts[i],
-                              isDark: isDark,
                               isSwitching:
                                   _switchingUserId == _accounts[i].userId,
                               onTap: () => _switchAccount(_accounts[i]),
@@ -155,9 +149,7 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
                                 padding: const EdgeInsets.only(left: 72),
                                 child: Divider(
                                   height: 1,
-                                  color: isDark
-                                      ? AppColors.dividerDark
-                                      : AppColors.divider,
+                                  color: context.dividerColor,
                                 ),
                               ),
                           ],
@@ -184,22 +176,18 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
 
 class _AccountTile extends StatelessWidget {
   final StoredAccountEntity account;
-  final bool isDark;
   final bool isSwitching;
   final VoidCallback onTap;
 
   const _AccountTile({
     required this.account,
-    required this.isDark,
     required this.isSwitching,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final secondaryColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final secondaryColor = context.textSecondary;
 
     return ListTile(
       leading: N42Avatar(
@@ -214,7 +202,7 @@ class _AccountTile extends StatelessWidget {
         style: TextStyle(
           fontSize: 16,
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
           fontWeight: account.isCurrent ? FontWeight.w600 : FontWeight.w500,
         ),
       ),
@@ -235,7 +223,7 @@ class _AccountTile extends StatelessWidget {
               child: CircularProgressIndicator(strokeWidth: 2),
             )
           : account.isCurrent
-          ? Icon(Icons.check_circle, color: AppColors.primary)
+          ? const Icon(Icons.check_circle, color: AppColors.primary)
           : const Icon(AppIcons.chevron),
       onTap: isSwitching ? null : onTap,
     );

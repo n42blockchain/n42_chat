@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
 
-import '../../../core/theme/app_colors.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -84,16 +84,13 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
   Widget build(BuildContext context) {
     if (!_visible) return const SizedBox.shrink();
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = S.of(context);
 
-    final secondary =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final secondary = context.textSecondary;
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Container(
-        color: (isDark ? AppColors.backgroundDark : AppColors.background)
-            .withValues(alpha: 0.92),
+        color: context.pageBackground.withValues(alpha: 0.92),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(AppDimensions.spacingXL),

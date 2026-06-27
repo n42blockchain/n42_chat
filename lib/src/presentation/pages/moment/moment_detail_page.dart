@@ -124,7 +124,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
           backgroundColor: context.pageBackground,
           appBar: AppBar(
             title: Text(s?.momentMoment ?? 'Moment'),
-            backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
+            backgroundColor: context.surfaceColor,
             actions: [
               IconButton(
                 icon: const Icon(Icons.share_outlined),
@@ -142,7 +142,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                       // 动态内容
                       Container(
                         padding: const EdgeInsets.all(16),
-                        color: isDark ? AppColors.surfaceDark : Colors.white,
+                        color: context.surfaceColor,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -161,8 +161,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                     children: [
                                       Text(
                                         moment.userName,
-                                        style: TextStyle(
-                                          color: isDark ? Colors.blue[300] : Colors.blue[700],
+                                        style: const TextStyle(
+                                          color: AppColors.info,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 16,
                                         ),
@@ -235,16 +235,16 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         if (visibleLikes.isEmpty) return const SizedBox.shrink();
                         return Container(
                           padding: const EdgeInsets.all(16),
-                          color: isDark ? AppColors.surfaceDark : Colors.white,
+                          color: context.surfaceColor,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.favorite,
                                     size: 18,
-                                    color: isDark ? Colors.red[300] : Colors.red,
+                                    color: AppColors.error,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -291,7 +291,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         );
                         return Container(
                           padding: const EdgeInsets.all(16),
-                          color: isDark ? AppColors.surfaceDark : Colors.white,
+                          color: context.surfaceColor,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -367,15 +367,15 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         fit: BoxFit.cover,
                         httpHeaders: _getAuthHeaders(),
                         placeholder: (_, _) => Container(
-                          color: isDark ? Colors.grey[850] : Colors.grey[800],
+                          color: AppColors.placeholderOf(isDark),
                         ),
                         errorWidget: (_, _, _) => Container(
-                          color: isDark ? Colors.grey[850] : Colors.grey[800],
+                          color: AppColors.placeholderOf(isDark),
                         ),
                       )
                     else
                       Container(
-                        color: isDark ? Colors.grey[850] : Colors.grey[800],
+                        color: AppColors.placeholderOf(isDark),
                       ),
                     const Center(
                       child: Icon(
@@ -392,13 +392,13 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   fit: BoxFit.cover,
                   httpHeaders: _getAuthHeaders(),
                   errorWidget: (_, _, _) => Container(
-                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                    color: AppColors.placeholderOf(isDark),
                     child: const Icon(Icons.image, size: 48),
                   ),
                 )
               else
                 Container(
-                  color: isDark ? Colors.grey[800] : Colors.grey[200],
+                  color: AppColors.placeholderOf(isDark),
                   child: const Icon(Icons.image, size: 48),
                 ),
             ],
@@ -433,15 +433,15 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         fit: BoxFit.cover,
                         httpHeaders: _getAuthHeaders(),
                         placeholder: (_, _) => Container(
-                          color: isDark ? Colors.grey[850] : Colors.grey[800],
+                          color: AppColors.placeholderOf(isDark),
                         ),
                         errorWidget: (_, _, _) => Container(
-                          color: isDark ? Colors.grey[850] : Colors.grey[800],
+                          color: AppColors.placeholderOf(isDark),
                         ),
                       )
                     else
                       Container(
-                        color: isDark ? Colors.grey[850] : Colors.grey[800],
+                        color: AppColors.placeholderOf(isDark),
                       ),
                     const Center(
                       child: Icon(
@@ -458,13 +458,13 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   fit: BoxFit.cover,
                   httpHeaders: _getAuthHeaders(),
                   errorWidget: (_, _, _) => Container(
-                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                    color: AppColors.placeholderOf(isDark),
                     child: const Icon(Icons.image),
                   ),
                 )
               else
                 Container(
-                  color: isDark ? Colors.grey[800] : Colors.grey[200],
+                  color: AppColors.placeholderOf(isDark),
                   child: const Icon(Icons.image),
                 ),
             ],
@@ -496,8 +496,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                     children: [
                       Text(
                         comment.userName,
-                        style: TextStyle(
-                          color: isDark ? Colors.blue[300] : Colors.blue[700],
+                        style: const TextStyle(
+                          color: AppColors.info,
                           fontWeight: FontWeight.w500,
                           fontSize: 14,
                         ),
@@ -506,8 +506,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         const Text(' ▸ '),
                         Text(
                           comment.replyToUserName ?? '',
-                          style: TextStyle(
-                            color: isDark ? Colors.blue[300] : Colors.blue[700],
+                          style: const TextStyle(
+                            color: AppColors.info,
                             fontWeight: FontWeight.w500,
                             fontSize: 14,
                           ),
@@ -519,7 +519,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   Text(
                     comment.content,
                     style: TextStyle(
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: context.textPrimary,
                       fontSize: 14,
                     ),
                   ),
@@ -527,7 +527,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   Text(
                     _formatCommentTime(comment.timestamp),
                     style: TextStyle(
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      color: context.textSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -549,10 +549,10 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: context.surfaceColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
         ),
       ),
@@ -570,7 +570,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
             },
             icon: Icon(
               moment.isLikedByMe ? Icons.favorite : Icons.favorite_border,
-              color: moment.isLikedByMe ? Colors.red : null,
+              color: moment.isLikedByMe ? AppColors.error : null,
             ),
           ),
 
@@ -578,7 +578,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? Colors.grey[800] : Colors.grey[100],
+                color: AppColors.inputBgOf(isDark),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(

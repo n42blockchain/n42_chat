@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/giphy_service.dart';
+import '../../../core/services/gif_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
 import 'scheduled_send_picker.dart';
@@ -58,7 +59,7 @@ class GifPicker extends StatefulWidget {
 }
 
 class _GifPickerState extends State<GifPicker> {
-  GiphyService? _giphyService;
+  GifService? _gifService;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -78,8 +79,8 @@ class _GifPickerState extends State<GifPicker> {
 
   void _initializeService() {
     try {
-      if (GetIt.instance.isRegistered<GiphyService>()) {
-        _giphyService = GetIt.instance<GiphyService>();
+      if (GetIt.instance.isRegistered<GifService>()) {
+        _gifService = GetIt.instance<GifService>();
         _serviceAvailable = true;
         _loadTrendingGifs();
         _scrollController.addListener(_onScroll);
@@ -95,7 +96,7 @@ class _GifPickerState extends State<GifPicker> {
     _debounceTimer?.cancel();
     _scrollController.dispose();
     _searchController.dispose();
-    // 不要 dispose _giphyService，因为它是单例
+    // 不要 dispose _gifService，因为它是单例
     super.dispose();
   }
 
@@ -132,14 +133,14 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Future<void> _loadTrendingGifs() async {
-    if (_isLoading || _giphyService == null) return;
+    if (_isLoading || _gifService == null) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final result = await _giphyService!.getTrendingGifs(offset: _offset);
+      final result = await _gifService!.getTrendingGifs(offset: _offset);
       if (mounted) {
         setState(() {
           _gifs.addAll(result.gifs);
@@ -158,14 +159,14 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Future<void> _searchGifs() async {
-    if (_isLoading || _currentQuery.isEmpty || _giphyService == null) return;
+    if (_isLoading || _currentQuery.isEmpty || _gifService == null) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final result = await _giphyService!.searchGifs(
+      final result = await _gifService!.searchGifs(
         query: _currentQuery,
         offset: _offset,
       );
@@ -204,10 +205,10 @@ class _GifPickerState extends State<GifPicker> {
     return Container(
       height: widget.height + bottomPadding,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.inputBarDark : AppColors.inputBar,
+        color: context.inputBarColor,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
             width: 0.5,
           ),
         ),
@@ -217,7 +218,7 @@ class _GifPickerState extends State<GifPicker> {
         child: Column(
           children: [
             // 搜索栏
-            _buildSearchBar(isDark),
+            _buildSearchBar(),
 
             // GIF 网格
             Expanded(child: _buildGifGrid(isDark)),
@@ -230,35 +231,31 @@ class _GifPickerState extends State<GifPicker> {
     );
   }
 
-  Widget _buildSearchBar(bool isDark) {
+  Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Container(
         height: 36,
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surface,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextField(
           controller: _searchController,
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: context.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: 'Search GIFs...',
             hintStyle: TextStyle(
               fontSize: 14,
-              color: isDark
-                  ? AppColors.textTertiaryDark
-                  : AppColors.textTertiary,
+              color: context.textTertiary,
             ),
             prefixIcon: Icon(
               Icons.search,
               size: 20,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
@@ -281,28 +278,28 @@ class _GifPickerState extends State<GifPicker> {
   Widget _buildGifGrid(bool isDark) {
     // 服务不可用时显示提示
     if (!_serviceAvailable) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.warning_amber_outlined,
               size: 48,
-              color: isDark ? Colors.grey[600] : Colors.grey[400],
+              color: AppColors.textTertiary,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               'GIF service not configured',
               style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: AppColors.textTertiary,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               'Please configure Giphy API key',
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? Colors.grey[500] : Colors.grey[500],
+                color: AppColors.textTertiary,
               ),
             ),
           ],
@@ -319,16 +316,16 @@ class _GifPickerState extends State<GifPicker> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.gif_box_outlined,
               size: 48,
-              color: isDark ? Colors.grey[600] : Colors.grey[400],
+              color: AppColors.textTertiary,
             ),
             const SizedBox(height: 8),
             Text(
               _currentQuery.isEmpty ? 'No trending GIFs' : 'No GIFs found',
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              style: const TextStyle(
+                color: AppColors.textTertiary,
               ),
             ),
           ],
@@ -370,7 +367,7 @@ class _GifPickerState extends State<GifPicker> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          color: isDark ? Colors.grey[800] : Colors.grey[200],
+          color: AppColors.placeholderOf(isDark),
           child: Image.network(
             gif.previewUrl,
             fit: BoxFit.cover,
@@ -400,22 +397,22 @@ class _GifPickerState extends State<GifPicker> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
+          const Text(
             'Powered by ',
             style: TextStyle(
               fontSize: 10,
-              color: isDark ? Colors.grey[500] : Colors.grey[600],
+              color: AppColors.textTertiary,
             ),
           ),
           Image.network(
             'https://giphy.com/static/img/giphy_logo_small.png',
             height: 12,
-            errorBuilder: (_, _, _) => Text(
+            errorBuilder: (_, _, _) => const Text(
               'GIPHY',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.grey[400] : Colors.grey[700],
+                color: AppColors.textTertiary,
               ),
             ),
           ),
@@ -438,9 +435,7 @@ Future<GifPickerResult?> showGifPicker(BuildContext context) async {
     builder: (context) => Container(
       height: MediaQuery.of(context).size.height * 0.6,
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.inputBarDark
-            : AppColors.inputBar,
+        color: context.inputBarColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Column(
@@ -451,7 +446,7 @@ Future<GifPickerResult?> showGifPicker(BuildContext context) async {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey[400],
+              color: AppColors.textTertiary,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

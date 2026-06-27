@@ -23,7 +23,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
         final assistant = state.assistant ?? AiAssistantEntity.defaultAssistant;
 
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+          backgroundColor: context.pageBackground,
           appBar: N42AppBar(
             title: l10n?.aiAssistantSettings ?? 'AI Settings',
           ),
@@ -96,7 +96,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
                     subtitle: state.isAvailable
                         ? (l10n?.aiAssistantAvailable ?? 'Available')
                         : (l10n?.aiAssistantUnavailable ?? 'Not configured'),
-                    subtitleColor: state.isAvailable ? Colors.green : Colors.orange,
+                    subtitleColor: state.isAvailable ? AppColors.success : AppColors.warning,
                   ),
                 ],
               ),
@@ -124,7 +124,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 13,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+              color: context.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -132,7 +132,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(children: children),
@@ -155,14 +155,14 @@ class AiAssistantSettingsPage extends StatelessWidget {
         title,
         style: TextStyle(
           fontSize: 15,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       trailing: Text(
         subtitle,
         style: TextStyle(
           fontSize: 14,
-          color: subtitleColor ?? (isDark ? AppColors.textSecondaryDark : AppColors.textSecondary),
+          color: subtitleColor ?? context.textSecondary,
         ),
       ),
     );

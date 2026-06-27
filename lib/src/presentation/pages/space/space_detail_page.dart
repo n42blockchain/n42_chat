@@ -64,7 +64,7 @@ class _SpaceDetailPageState extends State<SpaceDetailPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
           context.read<SpaceBloc>().add(const ClearSpaceError());
@@ -278,9 +278,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                       child: Text(
                         S.of(context)?.spacesNoChannels ?? 'No channels yet',
                         style: TextStyle(
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                     ),
@@ -341,7 +339,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 value: 'delete',
                 child: Text(
                   S.of(context)?.spacesDelete ?? 'Delete Community',
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: AppColors.error),
                 ),
               ),
             ],
@@ -450,7 +448,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                     )
                   : const Icon(Icons.exit_to_app),
               label: Text(S.of(context)?.spacesLeave ?? 'Leave Community'),
-              style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+              style: OutlinedButton.styleFrom(foregroundColor: AppColors.error),
             ),
           ),
         ],
@@ -547,7 +545,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: isDark ? Colors.white54 : AppColors.textSecondary,
+              color: AppColors.textSecondaryOf(isDark),
             ),
             const SizedBox(width: 8),
             Text(
@@ -558,7 +556,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 fontSize: 13,
                 height: 1.3,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white54 : AppColors.textSecondary,
+                color: AppColors.textSecondaryOf(isDark),
               ),
             ),
             const SizedBox(width: 4),
@@ -595,7 +593,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(Icons.tag, color: AppColors.primary, size: 20),
+          child: const Icon(Icons.tag, color: AppColors.primary, size: 20),
         ),
         title: Text(
           child.name,
@@ -613,9 +611,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               )
             : null,
@@ -626,7 +622,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
+                  color: AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -637,21 +633,19 @@ class _SpaceDetailScaffold extends StatelessWidget {
                     fontSize: 10,
                     height: 1.3,
                     fontWeight: FontWeight.w500,
-                    color: Colors.green,
+                    color: AppColors.success,
                   ),
                 ),
               ),
             if (_isAdmin)
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 18),
-                color: Colors.red.withValues(alpha: 0.7),
+                color: AppColors.error.withValues(alpha: 0.7),
                 onPressed: () => _confirmDeleteChannel(context, child),
               ),
             Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ],
         ),
@@ -797,7 +791,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () {
               context.read<SpaceBloc>().add(
                 DeleteChannel(space.id, child.roomId),
@@ -826,7 +820,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () {
               Navigator.pop(ctx);
               onLeaveConfirmed();
@@ -914,7 +908,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () {
               Navigator.pop(ctx);
               onDeleteConfirmed();
@@ -1168,10 +1162,10 @@ class _MembersBottomSheet extends StatelessWidget {
     String label;
     switch (role) {
       case GroupRole.owner:
-        color = Colors.amber;
+        color = AppColors.warning;
         label = 'Owner';
       case GroupRole.admin:
-        color = Colors.blue;
+        color = AppColors.info;
         label = 'Admin';
       case GroupRole.member:
         return const SizedBox.shrink();
@@ -1201,7 +1195,7 @@ class _MembersBottomSheet extends StatelessWidget {
             // 设为/撤销管理员
             if (_canPromoteToAdmin(member))
               ListTile(
-                leading: const Icon(Icons.star_outline, color: Colors.blue),
+                leading: const Icon(Icons.star_outline, color: AppColors.info),
                 title: Text(
                   S.of(context)?.spacesPromoteAdmin ?? 'Promote to Admin',
                 ),
@@ -1215,7 +1209,7 @@ class _MembersBottomSheet extends StatelessWidget {
               )
             else if (_canDemoteAdmin(member))
               ListTile(
-                leading: const Icon(Icons.star, color: Colors.orange),
+                leading: const Icon(Icons.star, color: AppColors.warning),
                 title: Text(S.of(context)?.spacesDemoteAdmin ?? 'Remove Admin'),
                 onTap: () {
                   context.read<SpaceBloc>().add(
@@ -1230,7 +1224,7 @@ class _MembersBottomSheet extends StatelessWidget {
               ListTile(
                 leading: const Icon(
                   Icons.person_remove_outlined,
-                  color: Colors.orange,
+                  color: AppColors.warning,
                 ),
                 title: Text(
                   S
@@ -1253,7 +1247,7 @@ class _MembersBottomSheet extends StatelessWidget {
             // 封禁
             if (_canManageMember(member))
               ListTile(
-                leading: const Icon(Icons.block, color: Colors.red),
+                leading: const Icon(Icons.block, color: AppColors.error),
                 title: Text(
                   S
                           .of(context)

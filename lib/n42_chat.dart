@@ -65,6 +65,7 @@ export 'src/core/utils/bridge_detection_utils.dart';
 // ============================================
 // 推送通知导出
 // ============================================
+export 'src/core/notifications/push_dedup_store.dart';
 export 'src/core/notifications/push_notification_service.dart';
 export 'src/core/notifications/firebase_push_service.dart';
 

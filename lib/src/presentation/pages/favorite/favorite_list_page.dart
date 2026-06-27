@@ -33,7 +33,7 @@ class _FavoriteListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.background;
+    final bgColor = context.pageBackground;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -121,10 +121,10 @@ class _FavoriteListView extends StatelessWidget {
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             border: Border(
               bottom: BorderSide(
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                color: context.dividerColor,
                 width: 0.5,
               ),
             ),
@@ -156,9 +156,7 @@ class _FavoriteListView extends StatelessWidget {
                       fontSize: 13,
                       color: isSelected
                           ? AppColors.primary
-                          : (isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary),
+                          : context.textSecondary,
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.normal,
@@ -178,13 +176,9 @@ class _FavoriteListView extends StatelessWidget {
     MessageEntity favorite,
     bool isDark,
   ) {
-    final cardColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final subtitleColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final cardColor = context.surfaceColor;
+    final textColor = context.textPrimary;
+    final subtitleColor = context.textSecondary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -266,18 +260,14 @@ class _FavoriteListView extends StatelessWidget {
           Icon(
             Icons.star_border,
             size: 64,
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondary,
+            color: context.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(
             S.of(context)?.favoriteNoFavorites ?? 'No favorites yet',
             style: TextStyle(
               fontSize: 16,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -542,10 +532,10 @@ class _FavoriteListView extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
+              leading: const Icon(Icons.delete, color: AppColors.error),
               title: Text(
                 S.of(context)?.commonDelete ?? 'Delete',
-                style: const TextStyle(color: Colors.red),
+                style: const TextStyle(color: AppColors.error),
               ),
               onTap: () {
                 Navigator.pop(sheetContext);

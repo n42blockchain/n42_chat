@@ -51,16 +51,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Future<void> _selectPrivacyMode() async {
-    final isDark = context.isDarkMode;
     final selected = await showModalBottomSheet<NotificationPrivacyMode>(
       context: context,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+      backgroundColor: context.surfaceColor,
       builder: (ctx) {
-        final textColor =
-            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
-        final secondary = isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondary;
+        final textColor = context.textPrimary;
+        final secondary = context.textSecondary;
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -79,7 +75,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     'Display a generic private notification',
                 }, style: TextStyle(color: secondary)),
                 trailing: mode == _settings.privacyMode
-                    ? Icon(Icons.check, color: AppColors.primary)
+                    ? const Icon(Icons.check, color: AppColors.primary)
                     : null,
                 onTap: () => Navigator.pop(ctx, mode),
               );
@@ -96,11 +92,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.settingsMessageNotifications ?? 'Message Notifications',
         showBackButton: true,
@@ -112,7 +107,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
           // 通知开关
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: Column(
               children: [
                 _buildSwitchTile(
@@ -126,7 +121,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   value: _settings.enabled,
                   onChanged: (value) =>
                       _updateSettings(_settings.copyWith(enabled: value)),
-                  isDark: isDark,
                 ),
               ],
             ),
@@ -137,7 +131,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           // 通知详情设置
           if (_settings.enabled) ...[
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               child: Column(
                 children: [
                   _buildSwitchTile(
@@ -151,9 +145,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     value: _settings.showPreview,
                     onChanged: (value) =>
                         _updateSettings(_settings.copyWith(showPreview: value)),
-                    isDark: isDark,
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
                   _buildValueTile(
                     title: 'Notification Privacy',
                     subtitle:
@@ -161,9 +154,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     icon: Icons.privacy_tip_outlined,
                     value: _privacyModeLabel(_settings.privacyMode),
                     onTap: _selectPrivacyMode,
-                    isDark: isDark,
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
                   _buildSwitchTile(
                     title:
                         l10n?.settingsNotificationSound ?? 'Notification Sound',
@@ -174,9 +166,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     value: _settings.playSound,
                     onChanged: (value) =>
                         _updateSettings(_settings.copyWith(playSound: value)),
-                    isDark: isDark,
                   ),
-                  _buildDivider(isDark),
+                  _buildDivider(),
                   _buildSwitchTile(
                     title: l10n?.commonVibration ?? 'Vibration',
                     subtitle:
@@ -186,7 +177,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     value: _settings.vibrate,
                     onChanged: (value) =>
                         _updateSettings(_settings.copyWith(vibrate: value)),
-                    isDark: isDark,
                   ),
                 ],
               ),
@@ -196,7 +186,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
             // 免打扰设置
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               child: Column(
                 children: [
                   _buildSwitchTile(
@@ -209,24 +199,21 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     onChanged: (value) => _updateSettings(
                       _settings.copyWith(doNotDisturb: value),
                     ),
-                    isDark: isDark,
                   ),
                   if (_settings.doNotDisturb) ...[
-                    _buildDivider(isDark),
+                    _buildDivider(),
                     _buildTimeTile(
                       title: l10n?.settingsStartTime ?? 'Start Time',
                       value: _settings.doNotDisturbStart ?? '22:00',
                       icon: Icons.access_time,
                       onTap: () => _selectTime(true),
-                      isDark: isDark,
                     ),
-                    _buildDivider(isDark),
+                    _buildDivider(),
                     _buildTimeTile(
                       title: l10n?.settingsEndTime ?? 'End Time',
                       value: _settings.doNotDisturbEnd ?? '07:00',
                       icon: Icons.access_time,
                       onTap: () => _selectTime(false),
-                      isDark: isDark,
                     ),
                   ],
                 ],
@@ -244,7 +231,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     required IconData icon,
     required bool value,
     required ValueChanged<bool> onChanged,
-    required bool isDark,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -268,7 +254,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   title,
                   style: TextStyle(
                     fontSize: 16,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 if (subtitle != null)
@@ -276,9 +262,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     subtitle,
                     style: TextStyle(
                       fontSize: 13,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
               ],
@@ -299,7 +283,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     required String value,
     required IconData icon,
     required VoidCallback onTap,
-    required bool isDark,
   }) {
     return InkWell(
       onTap: onTap,
@@ -311,7 +294,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: AppColors.info,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(icon, color: Colors.white, size: 20),
@@ -322,24 +305,20 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 title,
                 style: TextStyle(
                   fontSize: 16,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                  color: context.textPrimary,
                 ),
               ),
             ),
             Text(
               value,
               style: TextStyle(
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(width: 8),
             Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ],
         ),
@@ -353,7 +332,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     required String value,
     required IconData icon,
     required VoidCallback onTap,
-    required bool isDark,
   }) {
     return InkWell(
       onTap: onTap,
@@ -379,7 +357,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     title,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   if (subtitle != null)
@@ -387,9 +365,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       subtitle,
                       style: TextStyle(
                         fontSize: 13,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                 ],
@@ -402,18 +378,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
               ),
             ),
             const SizedBox(width: 8),
             Icon(
               AppIcons.chevron,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ],
         ),
@@ -421,12 +393,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     );
   }
 
-  Widget _buildDivider(bool isDark) {
+  Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.only(left: 56),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }

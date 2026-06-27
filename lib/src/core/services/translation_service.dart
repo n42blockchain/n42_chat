@@ -312,6 +312,7 @@ const List<TranslationLanguage> _sharedSupportedLanguages = [
   TranslationLanguage(code: 'uk', name: 'Ukrainian', localizedName: 'Українська'),
   TranslationLanguage(code: 'ur', name: 'Urdu', localizedName: 'اردو'),
   TranslationLanguage(code: 'vi', name: 'Vietnamese', localizedName: 'Tiếng Việt'),
+  TranslationLanguage(code: 'zh', name: 'Simplified Chinese', localizedName: '简体中文'),
   TranslationLanguage(code: 'zh_TW', name: 'Traditional Chinese', localizedName: '繁體中文'),
 ];
 

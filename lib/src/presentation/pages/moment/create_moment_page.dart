@@ -105,12 +105,10 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark
-            ? AppColors.backgroundDark
-            : AppColors.background,
+        backgroundColor: context.pageBackground,
         appBar: AppBar(
           title: const Text('Create Moment'),
-          backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
+          backgroundColor: context.surfaceColor,
           actions: [
             BlocBuilder<MomentBloc, MomentState>(
               buildWhen: (prev, curr) => prev.isPosting != curr.isPosting,
@@ -135,7 +133,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     return TextButton(
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.primary,
-                        disabledForegroundColor: Colors.grey,
+                        disabledForegroundColor: AppColors.textTertiary,
                       ),
                       onPressed: canPost ? _postMoment : null,
                       child: Text(
@@ -158,7 +156,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
+                  color: context.surfaceColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: TextField(
@@ -180,14 +178,14 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 
               // 已选择的媒体
               if (_selectedMedia.isNotEmpty) ...[
-                _buildMediaPreview(isDark),
+                _buildMediaPreview(),
                 const SizedBox(height: 16),
               ],
 
               // 操作按钮
               Container(
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
+                  color: context.surfaceColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -244,11 +242,11 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     );
   }
 
-  Widget _buildMediaPreview(bool isDark) {
+  Widget _buildMediaPreview() {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -352,7 +350,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           trailing ??
           Icon(
             AppIcons.chevron,
-            color: isDark ? Colors.grey[600] : Colors.grey[400],
+            color: context.textTertiary,
           ),
       onTap: onTap,
     );
@@ -502,7 +500,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               title: Text(s?.momentVisibilityPublic ?? 'Public'),
               subtitle: const Text('All friends can see'),
               trailing: _visibility == MomentVisibility.public
-                  ? const Icon(Icons.check, color: Colors.green)
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () {
                 setState(() {
@@ -518,7 +516,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               title: Text(s?.momentVisibilityPrivate ?? 'Private'),
               subtitle: const Text('Only you can see'),
               trailing: _visibility == MomentVisibility.private
-                  ? const Icon(Icons.check, color: Colors.green)
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () {
                 setState(() {
@@ -534,7 +532,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               title: Text(s?.momentVisibilityPartial ?? 'Selected Friends'),
               subtitle: const Text('Choose who can see'),
               trailing: _visibility == MomentVisibility.partial
-                  ? const Icon(Icons.check, color: Colors.green)
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () {
                 Navigator.pop(ctx);
@@ -548,7 +546,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               ),
               subtitle: const Text('Hide from specific friends'),
               trailing: _visibility == MomentVisibility.excluded
-                  ? const Icon(Icons.check, color: Colors.green)
+                  ? const Icon(Icons.check, color: AppColors.primary)
                   : null,
               onTap: () {
                 Navigator.pop(ctx);

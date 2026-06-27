@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../n42_chat.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
@@ -39,7 +40,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
@@ -54,19 +54,22 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           const SizedBox(height: 16),
 
           // 深色模式设置
-          _buildSectionHeader(l10n?.settingsDarkMode ?? 'Dark Mode', isDark),
-          _buildThemeModeSection(context, isDark),
-
-          const SizedBox(height: 24),
+          // 宿主 App 接管明暗模式时隐藏此项，避免与宿主设置页双重控制冲突，
+          // 明暗模式统一在宿主 App 的设置页中切换。
+          if (!N42Chat.hostControlsAppearance) ...[
+            _buildSectionHeader(l10n?.settingsDarkMode ?? 'Dark Mode'),
+            _buildThemeModeSection(context),
+            const SizedBox(height: 24),
+          ],
 
           // 字体大小设置
-          _buildSectionHeader(l10n?.settingsFontSize ?? 'Font Size', isDark),
-          _buildFontSizeSection(context, isDark),
+          _buildSectionHeader(l10n?.settingsFontSize ?? 'Font Size'),
+          _buildFontSizeSection(context),
 
           const SizedBox(height: 24),
 
           // 聊天背景
-          _buildSectionHeader(l10n?.chatBackground ?? 'Chat Background', isDark),
+          _buildSectionHeader(l10n?.chatBackground ?? 'Chat Background'),
           Container(
             color: context.surfaceColor,
             child: ListTile(
@@ -95,33 +98,33 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           const SizedBox(height: 24),
 
           // 字体大小滑块
-          _buildSectionHeader(l10n?.settingsFontSizeSlider ?? 'Font Size Adjustment', isDark),
-          _buildFontSizeSliderSection(context, isDark),
+          _buildSectionHeader(l10n?.settingsFontSizeSlider ?? 'Font Size Adjustment'),
+          _buildFontSizeSliderSection(context),
 
           const SizedBox(height: 24),
 
           // 气泡样式设置
-          _buildSectionHeader(l10n?.settingsBubbleStyle ?? 'Bubble Style', isDark),
-          _buildBubbleStyleSection(context, isDark),
+          _buildSectionHeader(l10n?.settingsBubbleStyle ?? 'Bubble Style'),
+          _buildBubbleStyleSection(context),
         ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title, bool isDark) {
+  Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
       child: Text(
         title,
         style: TextStyle(
           fontSize: 13,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
     );
   }
 
-  Widget _buildThemeModeSection(BuildContext context, bool isDark) {
+  Widget _buildThemeModeSection(BuildContext context) {
     final l10n = S.of(context);
     return Container(
       color: context.surfaceColor,
@@ -131,21 +134,18 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             title: l10n?.settingsFollowSystem ?? 'Follow System',
             subtitle: l10n?.settingsAutoSwitchBySystem ?? 'Auto switch by system settings',
             value: ThemeMode.system,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildThemeModeItem(
             title: l10n?.settingsLightMode ?? 'Light Mode',
             subtitle: l10n?.settingsAlwaysUseLightTheme ?? 'Always use light theme',
             value: ThemeMode.light,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildThemeModeItem(
             title: l10n?.settingsDarkModeOption ?? 'Dark Mode',
             subtitle: l10n?.settingsAlwaysUseDarkTheme ?? 'Always use dark theme',
             value: ThemeMode.dark,
-            isDark: isDark,
           ),
         ],
       ),
@@ -156,7 +156,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     required String title,
     required String subtitle,
     required ThemeMode value,
-    required bool isDark,
   }) {
     final isSelected = _settings.themeMode == value;
 
@@ -168,7 +167,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         style: TextStyle(
           fontSize: 16,
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Text(
@@ -178,11 +177,11 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         style: TextStyle(
           fontSize: 13,
           height: 1.3,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
       trailing: isSelected
-          ? Icon(Icons.check_rounded, color: AppColors.primary)
+          ? const Icon(Icons.check_rounded, color: AppColors.primary)
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(themeMode: value));
@@ -190,7 +189,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
-  Widget _buildFontSizeSection(BuildContext context, bool isDark) {
+  Widget _buildFontSizeSection(BuildContext context) {
     final l10n = S.of(context);
     return Container(
       color: context.surfaceColor,
@@ -199,25 +198,21 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           _buildFontSizeItem(
             title: l10n?.settingsFontSizeSmall ?? 'Small',
             value: FontSize.small,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildFontSizeItem(
             title: l10n?.settingsFontSizeStandard ?? 'Standard',
             value: FontSize.medium,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildFontSizeItem(
             title: l10n?.settingsFontSizeLarge ?? 'Large',
             value: FontSize.large,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildFontSizeItem(
             title: l10n?.settingsFontSizeExtraLarge ?? 'Extra Large',
             value: FontSize.extraLarge,
-            isDark: isDark,
           ),
         ],
       ),
@@ -234,7 +229,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Widget _buildFontSizeItem({
     required String title,
     required FontSize value,
-    required bool isDark,
   }) {
     final isSelected = _settings.fontSize == value;
     final previewFontSize = _fontSizeToDouble(value);
@@ -244,11 +238,11 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         title,
         style: TextStyle(
           fontSize: previewFontSize,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       trailing: isSelected
-          ? Icon(
+          ? const Icon(
               Icons.check,
               color: AppColors.primary,
             )
@@ -261,7 +255,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   static const _fontSizeValues = [FontSize.small, FontSize.medium, FontSize.large, FontSize.extraLarge];
 
-  Widget _buildFontSizeSliderSection(BuildContext context, bool isDark) {
+  Widget _buildFontSizeSliderSection(BuildContext context) {
     final sliderValue = _fontSizeValues.indexOf(_settings.fontSize).toDouble();
 
     final l10n = S.of(context);
@@ -323,7 +317,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
-  Widget _buildBubbleStyleSection(BuildContext context, bool isDark) {
+  Widget _buildBubbleStyleSection(BuildContext context) {
     final l10n = S.of(context);
     return Container(
       color: context.surfaceColor,
@@ -333,21 +327,18 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             title: l10n?.settingsBubbleStyleWechat ?? 'WeChat Style',
             subtitle: l10n?.settingsBubbleStyleWechatDesc ?? 'Classic WeChat bubble style',
             value: BubbleStyle.wechat,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildBubbleStyleItem(
             title: l10n?.settingsBubbleStyleModern ?? 'Modern Style',
             subtitle: l10n?.settingsBubbleStyleModernDesc ?? 'Clean modern bubble style',
             value: BubbleStyle.modern,
-            isDark: isDark,
           ),
-          _buildDivider(isDark),
+          _buildDivider(),
           _buildBubbleStyleItem(
             title: l10n?.settingsBubbleStyleClassic ?? 'Classic Style',
             subtitle: l10n?.settingsBubbleStyleClassicDesc ?? 'Traditional bubble style',
             value: BubbleStyle.classic,
-            isDark: isDark,
           ),
         ],
       ),
@@ -358,7 +349,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     required String title,
     required String subtitle,
     required BubbleStyle value,
-    required bool isDark,
   }) {
     final isSelected = _settings.bubbleStyle == value;
 
@@ -370,7 +360,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         style: TextStyle(
           fontSize: 16,
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       subtitle: Text(
@@ -380,11 +370,11 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         style: TextStyle(
           fontSize: 13,
           height: 1.3,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          color: context.textSecondary,
         ),
       ),
       trailing: isSelected
-          ? Icon(Icons.check_rounded, color: AppColors.primary)
+          ? const Icon(Icons.check_rounded, color: AppColors.primary)
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(bubbleStyle: value));
@@ -392,12 +382,12 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
-  Widget _buildDivider(bool isDark) {
+  Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }

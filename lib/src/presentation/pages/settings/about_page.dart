@@ -31,11 +31,10 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.settingsAbout ?? 'About',
         showBackButton: true,
@@ -71,7 +70,7 @@ class AboutPage extends StatelessWidget {
                     fontSize: 24,
                     height: 1.3,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -82,9 +81,7 @@ class AboutPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -96,7 +93,7 @@ class AboutPage extends StatelessWidget {
           // 检查更新
           if (onCheckUpdate != null) ...[
             Container(
-              color: isDark ? AppColors.surfaceDark : AppColors.surface,
+              color: context.surfaceColor,
               child: ListTile(
                 title: Text(
                   l10n?.settingsCheckForUpdates ?? 'Check for Updates',
@@ -104,14 +101,12 @@ class AboutPage extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     height: 1.3,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                    color: context.textPrimary,
                   ),
                 ),
                 trailing: Icon(
                   AppIcons.chevron,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondary,
+                  color: context.textSecondary,
                 ),
                 onTap: onCheckUpdate,
               ),
@@ -121,22 +116,22 @@ class AboutPage extends StatelessWidget {
 
           // 链接列表
           Container(
-            color: isDark ? AppColors.surfaceDark : AppColors.surface,
+            color: context.surfaceColor,
             child: Column(
               children: [
                 if (onPrivacyPolicy != null)
-                  _buildLinkItem(l10n?.authPrivacyPolicy ?? 'Privacy Policy', onPrivacyPolicy!, isDark),
+                  _buildLinkItem(context, l10n?.authPrivacyPolicy ?? 'Privacy Policy', onPrivacyPolicy!),
                 if (onTermsOfService != null) ...[
-                  _buildDivider(isDark),
-                  _buildLinkItem(l10n?.authTermsOfService ?? 'Terms of Service', onTermsOfService!, isDark),
+                  _buildDivider(context),
+                  _buildLinkItem(context, l10n?.authTermsOfService ?? 'Terms of Service', onTermsOfService!),
                 ],
                 if (onOpenSource != null) ...[
-                  _buildDivider(isDark),
-                  _buildLinkItem(l10n?.settingsOpenSourceLicenses ?? 'Open Source Licenses', onOpenSource!, isDark),
+                  _buildDivider(context),
+                  _buildLinkItem(context, l10n?.settingsOpenSourceLicenses ?? 'Open Source Licenses', onOpenSource!),
                 ],
                 if (onFeedback != null) ...[
-                  _buildDivider(isDark),
-                  _buildLinkItem(l10n?.settingsFeedbackAndSuggestions ?? 'Feedback & Suggestions', onFeedback!, isDark),
+                  _buildDivider(context),
+                  _buildLinkItem(context, l10n?.settingsFeedbackAndSuggestions ?? 'Feedback & Suggestions', onFeedback!),
                 ],
               ],
             ),
@@ -155,9 +150,7 @@ class AboutPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -168,9 +161,7 @@ class AboutPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondary,
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -183,7 +174,7 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLinkItem(String title, VoidCallback onTap, bool isDark) {
+  Widget _buildLinkItem(BuildContext context, String title, VoidCallback onTap) {
     return ListTile(
       title: Text(
         title,
@@ -191,23 +182,23 @@ class AboutPage extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           height: 1.3,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          color: context.textPrimary,
         ),
       ),
       trailing: Icon(
         AppIcons.chevron,
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        color: context.textSecondary,
       ),
       onTap: onTap,
     );
   }
 
-  Widget _buildDivider(bool isDark) {
+  Widget _buildDivider(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: Divider(
         height: 1,
-        color: isDark ? AppColors.dividerDark : AppColors.divider,
+        color: context.dividerColor,
       ),
     );
   }

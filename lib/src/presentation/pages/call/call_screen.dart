@@ -63,7 +63,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   static const Color _controlBgColor = AppColors.dividerDark;
   static const Color _controlActiveBgColor = Colors.white;
   static const Color _hangupColor = AppColors.error;
-  static Color _answerColor = AppColors.primary;
+  static const Color _answerColor = AppColors.primary;
 
   @override
   void initState() {

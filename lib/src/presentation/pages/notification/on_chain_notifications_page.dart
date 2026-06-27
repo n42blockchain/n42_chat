@@ -55,7 +55,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
     final l10n = S.of(context);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      backgroundColor: context.pageBackground,
       appBar: N42AppBar(
         title: l10n?.onChainNotificationsTitle ?? 'On-chain Events',
         showBackButton: true,
@@ -71,7 +71,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
                     .add(const MarkAllOnChainNotificationsRead()),
                 child: Text(
                   l10n?.onChainMarkAllRead ?? 'Mark all read',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.primary,
                     fontSize: 13,
                   ),
@@ -109,7 +109,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
               separatorBuilder: (context, index) => Divider(
                 height: 1,
                 indent: 72,
-                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                color: context.dividerColor,
               ),
               itemBuilder: (context, index) {
                 if (index == state.notifications.length) {
@@ -157,15 +157,13 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
           Icon(
             Icons.notifications_none_outlined,
             size: 64,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
           const SizedBox(height: 16),
           Text(
             l10n?.onChainNoNotifications ?? 'No on-chain events yet',
             style: TextStyle(
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -175,9 +173,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
         ],
@@ -194,16 +190,14 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
           Icon(
             Icons.cloud_off_outlined,
             size: 64,
-            color: isDark ? AppColors.dividerDark : AppColors.divider,
+            color: context.dividerColor,
           ),
           const SizedBox(height: 16),
           Text(
             message ?? (l10n?.commonLoadFailed ?? 'Failed to load'),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondary,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: 16),
@@ -268,9 +262,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                             fontWeight: unread
                                 ? FontWeight.w600
                                 : FontWeight.normal,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                            color: context.textSecondary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -280,9 +272,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                         _formatTime(notification.timestamp),
                         style: TextStyle(
                           fontSize: 11,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondary,
+                          color: context.textSecondary,
                         ),
                       ),
                     ],
@@ -295,7 +285,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                       fontSize: 15,
                       fontWeight:
                           unread ? FontWeight.w600 : FontWeight.w500,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -307,9 +297,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                       notification.body,
                       style: TextStyle(
                         fontSize: 13,
-                        color: isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -320,7 +308,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.open_in_new,
                           size: 12,
                           color: AppColors.primary,
@@ -328,7 +316,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           S.of(context)?.onChainViewDetails ?? 'View details',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.primary,
                           ),
@@ -346,7 +334,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                 width: 8,
                 height: 8,
                 margin: const EdgeInsets.only(top: 6),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),

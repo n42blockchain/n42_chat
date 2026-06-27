@@ -12,7 +12,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         backgroundColor: Colors.transparent,
         builder: (context) => Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
+            color: context.surfaceColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
           ),
           child: SafeArea(
@@ -28,7 +28,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.location_on,
                       color: AppColors.primary,
                       size: 24,
@@ -41,9 +41,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   subtitle: Text(
@@ -54,9 +52,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   onTap: () {
@@ -66,7 +62,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                 ),
                 Divider(
                   height: 1,
-                  color: isDark ? AppColors.dividerDark : AppColors.divider,
+                  color: context.dividerColor,
                 ),
                 // 共享实时位置
                 ListTile(
@@ -74,12 +70,12 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
+                      color: AppColors.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.share_location,
-                      color: Colors.green,
+                      color: AppColors.success,
                       size: 24,
                     ),
                   ),
@@ -91,9 +87,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimary,
+                      color: context.textPrimary,
                     ),
                   ),
                   subtitle: Text(
@@ -104,9 +98,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.3,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                   onTap: () {
@@ -138,9 +130,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary,
+                        color: context.textPrimary,
                         fontSize: 16,
                         height: 1.3,
                       ),
@@ -273,7 +263,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
               content: Text(
                 l10n?.redPacketInsufficientBalance ?? 'Insufficient balance',
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -305,7 +295,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to create red packet'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -448,7 +438,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
   Color _commerceMiniAppColor(String appId) {
     switch (appId) {
       case MiniAppLauncherHelper.shopAppId:
-        return Colors.amber.shade700;
+        return AppColors.warning;
       case MiniAppLauncherHelper.creatorPassAppId:
         return Colors.deepPurple;
       default:
@@ -651,7 +641,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                 content: Text(
                   S.of(context)?.chatFileNotExist ?? 'File does not exist',
                 ),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -664,7 +654,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                 S.of(context)?.chatSendFailed(e.toString()) ??
                     'Send failed: $e',
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -816,6 +806,23 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         ),
       );
     }
+  }
+
+  /// 统一表情面板内联发送 GIF（不经模态对话框）
+  void _onGifSelectedInline(GiphyGif gif) {
+    debugLog('ChatPage: Sending GIF (inline) - ${gif.title}');
+    context.read<ChatBloc>().add(
+      SendGifMessage(
+        gifUrl: gif.originalUrl,
+        previewUrl: gif.previewUrl,
+        width: gif.width,
+        height: gif.height,
+        title: gif.title,
+      ),
+    );
+    setState(() {
+      _showEmojiPicker = false;
+    });
   }
 
   /// 显示/隐藏贴纸选择器面板

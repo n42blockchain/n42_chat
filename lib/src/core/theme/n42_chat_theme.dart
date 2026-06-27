@@ -158,7 +158,7 @@ class N42ChatTheme {
   });
 
   /// 微信浅色主题
-  factory N42ChatTheme.wechatLight() => N42ChatTheme(
+  factory N42ChatTheme.wechatLight() => const N42ChatTheme(
         primaryColor: AppColors.primary,
         backgroundColor: AppColors.background,
         surfaceColor: AppColors.surface,
@@ -178,7 +178,7 @@ class N42ChatTheme {
       );
 
   /// 微信深色主题
-  factory N42ChatTheme.wechatDark() => N42ChatTheme(
+  factory N42ChatTheme.wechatDark() => const N42ChatTheme(
         primaryColor: AppColors.primary,
         backgroundColor: AppColors.backgroundDark,
         surfaceColor: AppColors.surfaceDark,
@@ -213,7 +213,9 @@ class N42ChatTheme {
       textSecondaryColor:
           theme.textTheme.bodySmall?.color ?? AppColors.textSecondary,
       textTertiaryColor: AppColors.textTertiary,
-      messageBubbleSentColor: theme.primaryColor.withValues(alpha: 0.3),
+      // 气泡固定走微信绿专用色,不随品牌主色(靛蓝)漂移
+      messageBubbleSentColor:
+          isDark ? AppColors.bubbleSelfDark : AppColors.bubbleSelf,
       messageBubbleReceivedColor: theme.cardColor,
       messageTextSentColor: isDark ? Colors.white : AppColors.messageTextSent,
       messageTextReceivedColor:
@@ -248,7 +250,7 @@ class N42ChatTheme {
           ? AppColors.surfaceDark
           : AppColors.inputBackground,
       outline: dividerColor,
-      outlineVariant: isDark ? AppColors.dividerThinDark : AppColors.dividerThin,
+      outlineVariant: AppColors.dividerThinOf(isDark),
     );
 
     final inputBorder = OutlineInputBorder(
@@ -460,11 +462,11 @@ class N42ChatTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return isDark ? AppColors.dividerDark : AppColors.divider;
+            return AppColors.dividerOf(isDark);
           }
           return states.contains(WidgetState.selected)
               ? primaryColor
-              : (isDark ? AppColors.dividerDark : AppColors.divider);
+              : AppColors.dividerOf(isDark);
         }),
         trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
       ),

@@ -64,10 +64,9 @@ class Web3IdentityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
-    final surfaceColor = isDark ? AppColors.surfaceDark : AppColors.surface;
-    final primaryTextColor = isDark ? Colors.white : AppColors.textPrimary;
-    final secondaryTextColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary;
+    final surfaceColor = AppColors.surfaceOf(isDark);
+    final primaryTextColor = AppColors.textPrimaryOf(isDark);
+    final secondaryTextColor = AppColors.textSecondaryOf(isDark);
 
     final effectiveName = displayName ??
         ensName ??
@@ -79,7 +78,7 @@ class Web3IdentityCard extends StatelessWidget {
         color: surfaceColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.white10 : AppColors.divider,
+          color: AppColors.dividerOf(isDark),
         ),
       ),
       child: Padding(
@@ -141,7 +140,7 @@ class Web3IdentityCard extends StatelessWidget {
             const SizedBox(height: 14),
             Divider(
               height: 1,
-              color: isDark ? Colors.white10 : AppColors.divider,
+              color: AppColors.dividerOf(isDark),
             ),
             const SizedBox(height: 12),
 
@@ -186,12 +185,12 @@ class Web3IdentityCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.copy_rounded,
+                        const Icon(Icons.copy_rounded,
                             size: 14, color: AppColors.primary),
                         const SizedBox(width: 4),
                         Text(
                           l10n?.web3Copy ?? 'Copy',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.primary,
                           ),
@@ -359,7 +358,7 @@ class _N42Badge extends StatelessWidget {
           width: 0.5,
         ),
       ),
-      child: Text(
+      child: const Text(
         'N42',
         style: TextStyle(
           fontSize: 10,
