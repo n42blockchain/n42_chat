@@ -98,6 +98,9 @@ class ChatMorePanel extends StatefulWidget {
   /// 代码块
   final VoidCallback? onCodePressed;
 
+  /// 打赏
+  final VoidCallback? onTipPressed;
+
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
@@ -129,6 +132,7 @@ class ChatMorePanel extends StatefulWidget {
     this.selfDestructAfter,
     this.onMiniAppsPressed,
     this.onCodePressed,
+    this.onTipPressed,
   });
 
   @override
@@ -244,6 +248,12 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       icon: Icons.code,
                       label: 'Code',
                       onTap: widget.onCodePressed,
+                    ),
+                    _MoreItem(
+                      icon: Icons.volunteer_activism_outlined,
+                      label: 'Tip',
+                      onTap: widget.onTipPressed,
+                      iconColor: const Color(0xFFFF6B9D),
                     ),
                   ]),
                   // 第二页

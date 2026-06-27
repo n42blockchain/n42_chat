@@ -157,6 +157,15 @@ class MatrixMetadataExtractor {
       );
     }
 
+    // 打赏信息
+    if (event.content['msgtype'] == 'n42.tip') {
+      return MessageMetadata(
+        amount: event.content['amount'] as String?,
+        token: event.content['token'] as String?,
+        txHash: event.content['tx_hash'] as String?,
+      );
+    }
+
     // 收款请求信息
     if (event.content['msgtype'] == 'n42.payment_request') {
       final expiresAtMillis = event.content['expires_at'] as num?;

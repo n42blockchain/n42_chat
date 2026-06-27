@@ -487,6 +487,19 @@ extension ChatBlocSendHandlers on ChatBloc {
           content: event.content,
           additionalData: const {},
         );
+      } else if (event.type == MessageType.tip) {
+        // 发送打赏消息（金额/代币/链上交易哈希）
+        eventId = await _messageRepository.sendCustomMessage(
+          _currentRoomId!,
+          msgType: 'n42.tip',
+          content: event.content,
+          additionalData: {
+            'amount': event.metadata?.amount ?? '0',
+            'token': event.metadata?.token ?? '',
+            if (event.metadata?.txHash != null)
+              'tx_hash': event.metadata!.txHash,
+          },
+        );
       }
 
       if (eventId != null) {
