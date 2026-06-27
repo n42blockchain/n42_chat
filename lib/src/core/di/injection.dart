@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/giphy_service.dart';
 import '../services/tenor_service.dart';
 import '../services/gif_service.dart';
+import '../services/reminder_service.dart';
 import '../services/remark_service.dart';
 import '../services/mymemory_translation_service.dart';
 import '../services/translation_service.dart';
@@ -558,6 +559,13 @@ Future<void> _registerDataSources() async {
   getIt.registerLazySingleton<PreferencesDataSource>(
     () => PreferencesDataSource(),
   );
+
+  // 待办提醒服务（自带本地通知 + 60s 周期到期检查）
+  getIt.registerLazySingleton<ReminderService>(
+    () => ReminderService(getIt<PreferencesDataSource>()),
+    dispose: (svc) => svc.dispose(),
+  );
+  getIt<ReminderService>().start();
 
   // Matrix认证数据源
   getIt.registerLazySingleton<MatrixAuthDataSource>(

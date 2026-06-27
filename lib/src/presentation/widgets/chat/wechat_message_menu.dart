@@ -47,6 +47,7 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onReplyInThread; // 在线程中回复
   final VoidCallback? onEdit; // 编辑消息
   final VoidCallback? onReport; // 举报消息
+  final VoidCallback? onRemindMe; // 设为待办提醒
 
   /// 表情回应回调
   final void Function(String emoji)? onReaction;
@@ -78,6 +79,7 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onReplyInThread,
     this.onEdit,
     this.onReport,
+    this.onRemindMe,
     this.onReaction,
   });
 
@@ -243,6 +245,12 @@ class WeChatMessageMenu extends StatelessWidget {
                     label: s?.commonQuote ?? 'Quote',
                     onTap: () { onDismiss(); onQuote?.call(); },
                   ),
+                  if (onRemindMe != null)
+                    _buildMenuItem(
+                      icon: Icons.alarm_add_outlined,
+                      label: 'Remind',
+                      onTap: () { onDismiss(); onRemindMe?.call(); },
+                    ),
                   if (message.isFromMe &&
                       message.type == MessageType.text &&
                       onEdit != null)
