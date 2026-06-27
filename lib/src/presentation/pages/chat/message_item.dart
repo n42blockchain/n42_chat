@@ -412,6 +412,9 @@ class MessageItem extends StatelessWidget {
       case MessageType.transfer:
         content = _buildTransferMessage();
         break;
+      case MessageType.tip:
+        content = _buildTipMessage();
+        break;
       case MessageType.paymentRequest:
         content = _buildPaymentRequestMessage(context);
         break;
@@ -1455,6 +1458,64 @@ class MessageItem extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 打赏消息（渐变气泡）
+  Widget _buildTipMessage() {
+    final metadata = message.metadata;
+    final amount = metadata?.amount ?? '0';
+    final token = metadata?.token ?? '';
+    final note = message.content.trim();
+    final confirmed = (metadata?.txHash ?? '').isNotEmpty;
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 260),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFF6B9D), Color(0xFFFF9A56)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Text('💝', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Text(
+                'Tip · $amount $token',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          if (note.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              note,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            ),
+          ],
+          const SizedBox(height: 4),
+          Text(
+            confirmed ? 'On-chain ✓' : 'Sent',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: 11,
             ),
           ),
         ],
