@@ -31,6 +31,9 @@ enum MessageType {
   /// 代码块（带语言标注 + 行号 + 复制）
   codeBlock,
 
+  /// 打赏（渐变气泡，经钱包桥转账）
+  tip,
+
   /// 系统消息
   system,
 

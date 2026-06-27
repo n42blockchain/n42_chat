@@ -414,6 +414,7 @@ class MatrixEventMapper {
     'n42.music': MessageType.music,
     'n42.contact_card': MessageType.contactCard,
     'n42.code_block': MessageType.codeBlock,
+    'n42.tip': MessageType.tip,
   };
 
   /// 检测文件类型（用于 m.file 消息，可能是 bridge 发送的图片/视频/音频）

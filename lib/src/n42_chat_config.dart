@@ -296,6 +296,12 @@ class N42ChatConfig {
   /// 是否将 [tenorBaseUrl] 视为代理端点。
   final bool tenorUseProxyEndpoint;
 
+  /// 法币出入金通道：moonpay | transak
+  final String fiatRampProvider;
+
+  /// 法币出入金可发布 key（无则功能不可用，页面显示未配置提示）
+  final String? fiatRampApiKey;
+
   /// Google Translate API Key
   ///
   /// 用于消息翻译功能。从 Google Cloud Console 获取
@@ -496,6 +502,8 @@ class N42ChatConfig {
     this.tenorApiKey,
     this.tenorBaseUrl = 'https://tenor.googleapis.com/v2',
     this.tenorUseProxyEndpoint = false,
+    this.fiatRampProvider = 'moonpay',
+    this.fiatRampApiKey,
     this.googleTranslateApiKey,
     this.googleSpeechApiKey,
     this.azureSpeechApiKey,
@@ -574,6 +582,8 @@ class N42ChatConfig {
     Object? tenorApiKey = _copyWithUndefined,
     String? tenorBaseUrl,
     bool? tenorUseProxyEndpoint,
+    String? fiatRampProvider,
+    Object? fiatRampApiKey = _copyWithUndefined,
     Object? googleTranslateApiKey = _copyWithUndefined,
     Object? googleSpeechApiKey = _copyWithUndefined,
     Object? azureSpeechApiKey = _copyWithUndefined,
@@ -709,6 +719,11 @@ class N42ChatConfig {
       tenorBaseUrl: tenorBaseUrl ?? this.tenorBaseUrl,
       tenorUseProxyEndpoint:
           tenorUseProxyEndpoint ?? this.tenorUseProxyEndpoint,
+      fiatRampProvider: fiatRampProvider ?? this.fiatRampProvider,
+      fiatRampApiKey: _nullableCopyWithValue<String>(
+        fiatRampApiKey,
+        this.fiatRampApiKey,
+      ),
       googleTranslateApiKey: _nullableCopyWithValue<String>(
         googleTranslateApiKey,
         this.googleTranslateApiKey,
