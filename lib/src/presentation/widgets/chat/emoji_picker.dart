@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 
 /// 表情选择器
 /// 
@@ -248,7 +249,11 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
                   
                   // 删除按钮
                   if (widget.onBackspace != null)
-                    GestureDetector(
+                    Semantics(
+                      button: true,
+                      label: A11yL10n.of(context).backspace,
+                      excludeSemantics: true,
+                      child: GestureDetector(
                       onTap: widget.onBackspace,
                       onLongPress: () {
                         // 长按连续删除
@@ -271,11 +276,16 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
                           color: context.textSecondary,
                         ),
                       ),
+                      ),
                     ),
-                  
+
                   // 发送按钮
                   if (widget.onSend != null)
-                    GestureDetector(
+                    Semantics(
+                      button: true,
+                      label: S.of(context)?.chatSendButton ?? 'Send',
+                      excludeSemantics: true,
+                      child: GestureDetector(
                       onTap: widget.onSend,
                       child: Container(
                         width: 60,
@@ -291,6 +301,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
                             ),
                           ),
                         ),
+                      ),
                       ),
                     ),
                 ],

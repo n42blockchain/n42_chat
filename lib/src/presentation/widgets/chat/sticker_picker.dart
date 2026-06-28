@@ -7,6 +7,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import 'video_sticker_view.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../data/datasources/bundled_sticker_packs.dart';
@@ -211,12 +212,17 @@ class _StickerPickerState extends State<StickerPicker> {
               ),
             ),
             if (_searchQuery.isNotEmpty)
-              GestureDetector(
-                onTap: _clearSearch,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(Icons.close,
-                      size: 18, color: context.textTertiary),
+              Semantics(
+                button: true,
+                label: A11yL10n.of(context).clearSearch,
+                excludeSemantics: true,
+                child: GestureDetector(
+                  onTap: _clearSearch,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Icon(Icons.close,
+                        size: 18, color: context.textTertiary),
+                  ),
                 ),
               ),
           ],
@@ -320,7 +326,14 @@ class _StickerPickerState extends State<StickerPicker> {
     VoidCallback? onTap,
     required bool isDark,
   }) {
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: icon != null
+          ? A11yL10n.of(context).stickerStore
+          : (label ?? A11yL10n.of(context).stickerPack),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -351,6 +364,7 @@ class _StickerPickerState extends State<StickerPicker> {
                   ),
                 ),
         ),
+      ),
       ),
     );
   }

@@ -10,6 +10,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/utils/video_note_utils.dart';
 import '../../../core/utils/event_message_data.dart';
 import '../../../core/utils/quiz_reveal.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
@@ -409,7 +411,7 @@ class MessageItem extends StatelessWidget {
         content = _buildVideoMessage(context);
         break;
       case MessageType.file:
-        content = _buildFileMessage(isDark);
+        content = _buildFileMessage(isDark, context);
         break;
       case MessageType.location:
         content = _buildLocationMessage(isDark, context);
@@ -418,7 +420,7 @@ class MessageItem extends StatelessWidget {
         content = _buildTransferMessage();
         break;
       case MessageType.tip:
-        content = _buildTipMessage();
+        content = _buildTipMessage(context);
         break;
       case MessageType.paymentRequest:
         content = _buildPaymentRequestMessage(context);
@@ -1011,6 +1013,68 @@ class MessageItem extends StatelessWidget {
     );
   }
 
+  /// 圆形视频留言渲染（缩略图圆形裁切 + 播放叠层）。
+  Widget _buildVideoNote(String? thumbnailUrl) {
+    const double size = 160;
+    return Semantics(
+      button: true,
+      label: 'Video note',
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipOval(
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (thumbnailUrl != null && thumbnailUrl.isNotEmpty)
+                  ImageMessageWidget(
+                    imageUrl: thumbnailUrl,
+                    onTap: onTap,
+                    maxWidth: size,
+                    maxHeight: size,
+                    borderRadius: 0,
+                  )
+                else
+                  Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.grey[800]!, Colors.grey[900]!],
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.videocam,
+                      color: Colors.white.withValues(alpha: 0.6),
+                      size: 40,
+                    ),
+                  ),
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildVideoMessage(BuildContext context) {
     final metadata = message.metadata;
     final thumbnailUrl = metadata?.thumbnailUrl;
@@ -1117,6 +1181,11 @@ class MessageItem extends StatelessWidget {
           ),
         ),
       );
+    }
+
+    // 圆形视频留言（Video Note）：据文件名前缀识别，圆形渲染。
+    if (VideoNoteUtils.isVideoNote(metadata?.fileName)) {
+      return _buildVideoNote(thumbnailUrl);
     }
 
     return GestureDetector(
@@ -1281,12 +1350,15 @@ class MessageItem extends StatelessWidget {
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
-  Widget _buildFileMessage(bool isDark) {
+  Widget _buildFileMessage(bool isDark, BuildContext context) {
     final metadata = message.metadata;
     final filename = metadata?.fileName ?? message.content;
     final size = metadata?.size;
 
-    return Container(
+    return Semantics(
+      label: A11yL10n.of(context).file(filename),
+      excludeSemantics: true,
+      child: Container(
       width: 200,
       padding: const EdgeInsets.all(12),
       child: Row(
@@ -1340,6 +1412,7 @@ class MessageItem extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -1356,7 +1429,10 @@ class MessageItem extends StatelessWidget {
       locationName = S.of(context)?.chatMyLocation ?? 'My Location';
     }
 
-    return SizedBox(
+    return Semantics(
+      label: A11yL10n.of(context).location(locationName),
+      excludeSemantics: true,
+      child: SizedBox(
       width: 220,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1477,17 +1553,25 @@ class MessageItem extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
   /// 打赏消息（渐变气泡）
-  Widget _buildTipMessage() {
+  Widget _buildTipMessage(BuildContext context) {
     final metadata = message.metadata;
     final amount = metadata?.amount ?? '0';
     final token = metadata?.token ?? '';
     final note = message.content.trim();
     final confirmed = (metadata?.txHash ?? '').isNotEmpty;
-    return Container(
+    return Semantics(
+      label: [
+        A11yL10n.of(context).tip,
+        '$amount $token'.trim(),
+        if (note.isNotEmpty) note,
+      ].where((e) => e.isNotEmpty).join(', '),
+      excludeSemantics: true,
+      child: Container(
       constraints: const BoxConstraints(maxWidth: 260),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -1534,6 +1618,7 @@ class MessageItem extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -1636,7 +1721,11 @@ class MessageItem extends StatelessWidget {
     final cover = metadata?.musicCover;
     final url = metadata?.musicUrl;
 
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: A11yL10n.of(context).music(title, artist),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: () {
         if (url != null && url.isNotEmpty) {
           onTap?.call();
@@ -1726,6 +1815,7 @@ class MessageItem extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 
@@ -1806,7 +1896,11 @@ class MessageItem extends StatelessWidget {
           if (data.description != null && data.description!.isNotEmpty)
             row(Icons.notes, data.description!, maxLines: 3),
           const SizedBox(height: 10),
-          GestureDetector(
+          Semantics(
+            button: true,
+            label: A11yL10n.of(context).addToCalendar,
+            excludeSemantics: true,
+            child: GestureDetector(
             onTap: () => _shareEventIcs(context, data),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
@@ -1824,6 +1918,7 @@ class MessageItem extends StatelessWidget {
                 ),
               ],
             ),
+          ),
           ),
         ],
       ),
@@ -1987,7 +2082,12 @@ class MessageItem extends StatelessWidget {
                     (maxSelections == 1 && myVotes.isNotEmpty) // 单选可以更改
                     );
 
-            return GestureDetector(
+            return Semantics(
+              button: canChangeVote,
+              selected: isSelected,
+              label: A11yL10n.of(context).pollOption(optionText, voteCount),
+              excludeSemantics: true,
+              child: GestureDetector(
               onTap: canChangeVote
                   ? () => onPollVote?.call(
                       message.id,
@@ -2092,6 +2192,7 @@ class MessageItem extends StatelessWidget {
                   ],
                 ),
               ),
+              ),
             );
           }),
 
@@ -2145,7 +2246,11 @@ class MessageItem extends StatelessWidget {
                 ),
               ),
               if (!pollEnded && message.isFromMe)
-                GestureDetector(
+                Semantics(
+                  button: true,
+                  label: S.of(context)?.chatEndPollButton ?? 'End Poll',
+                  excludeSemantics: true,
+                  child: GestureDetector(
                   onTap: () => onEndPoll?.call(message.id),
                   child: Text(
                     S.of(context)?.chatEndPollButton ?? 'End Poll',
@@ -2157,6 +2262,7 @@ class MessageItem extends StatelessWidget {
                       color: AppColors.error,
                     ),
                   ),
+                ),
                 ),
             ],
           ),
@@ -2263,7 +2369,11 @@ class MessageItem extends StatelessWidget {
           // 未接来电显示回拨按钮
           if (isMissed && !message.isFromMe && onCallBack != null) ...[
             const SizedBox(width: 8),
-            GestureDetector(
+            Semantics(
+              button: true,
+              label: S.of(context)?.chatCallBack ?? '回拨',
+              excludeSemantics: true,
+              child: GestureDetector(
               onTap: () => onCallBack?.call(message),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -2294,6 +2404,7 @@ class MessageItem extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
             ),
           ],
         ],

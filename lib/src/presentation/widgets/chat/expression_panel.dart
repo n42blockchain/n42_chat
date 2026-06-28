@@ -4,6 +4,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/recent_emoji_store.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
 import 'emoji_picker.dart';
@@ -158,21 +159,41 @@ class _ExpressionPanelState extends State<ExpressionPanel> {
   Widget _tabButton(BuildContext context, ExpressionTab tab, IconData icon) {
     final selected = _tab == tab;
     return Expanded(
-      child: InkWell(
-        onTap: () => _switchTab(tab),
-        child: Container(
-          alignment: Alignment.center,
-          color: selected
-              ? AppColors.primary.withValues(alpha: 0.12)
-              : Colors.transparent,
-          child: Icon(
-            icon,
-            size: 24,
-            color: selected ? AppColors.primary : context.textSecondary,
+      child: Semantics(
+        button: true,
+        selected: selected,
+        label: _tabLabel(context, tab),
+        excludeSemantics: true,
+        child: InkWell(
+          onTap: () => _switchTab(tab),
+          child: Container(
+            alignment: Alignment.center,
+            color: selected
+                ? AppColors.primary.withValues(alpha: 0.12)
+                : Colors.transparent,
+            child: Icon(
+              icon,
+              size: 24,
+              color: selected ? AppColors.primary : context.textSecondary,
+            ),
           ),
         ),
       ),
     );
+  }
+
+  String _tabLabel(BuildContext context, ExpressionTab tab) {
+    final a11y = A11yL10n.of(context);
+    switch (tab) {
+      case ExpressionTab.recent:
+        return a11y.tabRecent;
+      case ExpressionTab.emoji:
+        return a11y.emoji;
+      case ExpressionTab.sticker:
+        return a11y.tabSticker;
+      case ExpressionTab.gif:
+        return a11y.tabGif;
+    }
   }
 }
 

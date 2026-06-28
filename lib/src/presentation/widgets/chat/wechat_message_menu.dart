@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'message_reaction_bar.dart';
 
@@ -405,7 +406,11 @@ class WeChatMessageMenu extends StatelessWidget {
     return Builder(
       builder: (context) => Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: Semantics(
+          button: true,
+          label: A11yL10n.of(context).moreReactions,
+          excludeSemantics: true,
+          child: InkWell(
           onTap: () {
             HapticFeedback.lightImpact();
             // 先关闭当前菜单
@@ -438,6 +443,7 @@ class WeChatMessageMenu extends StatelessWidget {
               size: 22,
             ),
           ),
+        ),
         ),
       ),
     );

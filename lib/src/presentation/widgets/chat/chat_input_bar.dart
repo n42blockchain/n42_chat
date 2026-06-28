@@ -8,6 +8,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import 'slash_command_picker.dart';
 import 'scheduled_send_picker.dart';
 import '../../../core/utils/debug_log.dart';
@@ -608,6 +609,9 @@ class ChatInputBarState extends State<ChatInputBar> {
                     _buildIconButton(
                       icon: _isVoiceMode ? Icons.keyboard : Icons.mic,
                       onPressed: _toggleVoiceMode,
+                      semanticLabel: _isVoiceMode
+                          ? A11yL10n.of(context).switchToKeyboard
+                          : A11yL10n.of(context).voice,
                     ),
 
                   // 输入区域
@@ -622,6 +626,7 @@ class ChatInputBarState extends State<ChatInputBar> {
                     _buildIconButton(
                       icon: Icons.flash_on_outlined,
                       onPressed: widget.onQuickReplyPressed,
+                      semanticLabel: A11yL10n.of(context).quickReply,
                     ),
 
                   // 表情
@@ -629,6 +634,7 @@ class ChatInputBarState extends State<ChatInputBar> {
                     _buildIconButton(
                       icon: Icons.emoji_emotions_outlined,
                       onPressed: widget.onEmojiPressed,
+                      semanticLabel: A11yL10n.of(context).emoji,
                     ),
 
                   // 附件/更多 或 发送
@@ -638,6 +644,7 @@ class ChatInputBarState extends State<ChatInputBar> {
                             ? _buildIconButton(
                                 icon: Icons.attach_file,
                                 onPressed: widget.onMorePressed,
+                                semanticLabel: A11yL10n.of(context).attachments,
                               )
                             : const SizedBox.shrink()),
                 ],
@@ -735,20 +742,27 @@ class ChatInputBarState extends State<ChatInputBar> {
   Widget _buildIconButton({
     required IconData icon,
     required VoidCallback? onPressed,
+    String? semanticLabel,
   }) {
     final color = context.textSecondary;
     final effectiveCallback = widget.enabled ? onPressed : null;
-    return InkWell(
-      onTap: effectiveCallback,
-      borderRadius: BorderRadius.circular(6),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
-        child: Icon(
-          icon,
-          size: 22,
-          color: effectiveCallback != null
-              ? color
-              : color.withValues(alpha: 0.4),
+    return Semantics(
+      button: true,
+      enabled: effectiveCallback != null,
+      label: semanticLabel,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: effectiveCallback,
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+          child: Icon(
+            icon,
+            size: 22,
+            color: effectiveCallback != null
+                ? color
+                : color.withValues(alpha: 0.4),
+          ),
         ),
       ),
     );
@@ -798,6 +812,14 @@ class ChatInputBarState extends State<ChatInputBar> {
 
   Widget _buildVoiceButton() {
     // 使用 Listener 直接处理 pointer events，比 GestureDetector 更可靠
+    return Semantics(
+      button: true,
+      label: A11yL10n.of(context).holdToTalk,
+      child: _buildVoiceListener(),
+    );
+  }
+
+  Widget _buildVoiceListener() {
     return Listener(
       onPointerDown: (_) => _startRecording(),
       onPointerUp: (_) => _stopRecording(),
@@ -865,28 +887,34 @@ class ChatInputBarState extends State<ChatInputBar> {
   }
 
   Widget _buildSendButton() {
-    return GestureDetector(
-      onLongPress: widget.enabled && widget.onScheduledSend != null
-          ? () async {
-              if (_controller.text.trim().isEmpty) return;
-              final scheduledAt = await showScheduledSendPicker(context);
-              if (!mounted || scheduledAt == null) return;
-              widget.onScheduledSend?.call(scheduledAt);
-              if (!mounted) return;
-              _controller.clear();
-            }
-          : null,
-      child: InkWell(
-        onTap: widget.enabled ? _sendMessage : null,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-          child: Icon(
-            Icons.send,
-            size: 22,
-            color: widget.enabled
-                ? AppColors.primary
-                : AppColors.primary.withValues(alpha: 0.4),
+    return Semantics(
+      button: true,
+      enabled: widget.enabled,
+      label: A11yL10n.of(context).send,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onLongPress: widget.enabled && widget.onScheduledSend != null
+            ? () async {
+                if (_controller.text.trim().isEmpty) return;
+                final scheduledAt = await showScheduledSendPicker(context);
+                if (!mounted || scheduledAt == null) return;
+                widget.onScheduledSend?.call(scheduledAt);
+                if (!mounted) return;
+                _controller.clear();
+              }
+            : null,
+        child: InkWell(
+          onTap: widget.enabled ? _sendMessage : null,
+          borderRadius: BorderRadius.circular(6),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+            child: Icon(
+              Icons.send,
+              size: 22,
+              color: widget.enabled
+                  ? AppColors.primary
+                  : AppColors.primary.withValues(alpha: 0.4),
+            ),
           ),
         ),
       ),

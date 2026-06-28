@@ -417,6 +417,14 @@ extension _ChatPageInputMethods on _ChatPageState {
         _hideMorePanel();
         _composeCodeBlock();
       },
+      onWhiteboardPressed: () {
+        _hideMorePanel();
+        _openWhiteboard();
+      },
+      onVideoNotePressed: () {
+        _hideMorePanel();
+        _recordVideoNote();
+      },
       onTipPressed: () {
         _hideMorePanel();
         _sendTip();
