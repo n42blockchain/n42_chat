@@ -7,6 +7,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 语音转文字回调
@@ -281,7 +282,19 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
           : CrossAxisAlignment.start,
       children: [
         // 语音消息主体
-        GestureDetector(
+        Semantics(
+          button: true,
+          label: () {
+            final a11y = A11yL10n.of(context);
+            final base = a11y.voiceMessageDuration(widget.duration);
+            if (_isPlaying) return '$base, ${a11y.playing}';
+            if (!widget.isSelf && !widget.isRead) {
+              return '$base, ${a11y.unplayed}';
+            }
+            return base;
+          }(),
+          excludeSemantics: true,
+          child: GestureDetector(
           onTap: _handleTap,
           behavior: HitTestBehavior.opaque,
           onLongPress:
@@ -352,6 +365,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                   ),
                 ),
             ],
+          ),
           ),
         ),
 

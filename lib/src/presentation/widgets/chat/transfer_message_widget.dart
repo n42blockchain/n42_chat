@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/utils/a11y_l10n.dart';
 
 /// 转账消息组件（仿微信）
 class TransferMessageWidget extends StatelessWidget {
@@ -272,7 +273,16 @@ class _PaymentCardFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Semantics(
+      button: onTap != null,
+      label: [
+        footerLabel,
+        title,
+        subtitle,
+        if (note?.isNotEmpty == true) note,
+      ].where((e) => e != null && e.isNotEmpty).join(', '),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         width: 240,
@@ -359,6 +369,7 @@ class _PaymentCardFrame extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 }
@@ -402,7 +413,17 @@ class RedPacketMessageWidget extends StatelessWidget {
         ? const Color(0xFF8B7355) // 已领取：深棕色文字
         : Colors.white; // 未领取：白色文字
 
-    return GestureDetector(
+    return Semantics(
+      button: onTap != null,
+      label: [
+        S.of(context)?.profileRedPacket ?? 'Red Packet',
+        if (note?.isNotEmpty == true) note,
+        isOpened
+            ? A11yL10n.of(context).redPacketOpened
+            : A11yL10n.of(context).redPacketUnopened,
+      ].where((e) => e != null && e.isNotEmpty).join(', '),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         width: 260,
@@ -496,6 +517,7 @@ class RedPacketMessageWidget extends StatelessWidget {
               ),
           ],
         ),
+      ),
       ),
     );
   }

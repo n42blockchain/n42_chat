@@ -104,6 +104,12 @@ class ChatMorePanel extends StatefulWidget {
   /// 打赏
   final VoidCallback? onTipPressed;
 
+  /// 白板 / 涂鸦
+  final VoidCallback? onWhiteboardPressed;
+
+  /// 圆形视频留言（Video Note）
+  final VoidCallback? onVideoNotePressed;
+
   const ChatMorePanel({
     super.key,
     this.onPhotoPressed,
@@ -137,6 +143,8 @@ class ChatMorePanel extends StatefulWidget {
     this.onMiniAppsPressed,
     this.onCodePressed,
     this.onTipPressed,
+    this.onWhiteboardPressed,
+    this.onVideoNotePressed,
   });
 
   @override
@@ -350,6 +358,18 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                       onTap: widget.onScheduledPressed,
                       iconColor: AppColors.primary,
                     ),
+                    _MoreItem(
+                      icon: Icons.draw_outlined,
+                      label: 'Whiteboard',
+                      onTap: widget.onWhiteboardPressed,
+                      iconColor: Colors.brown,
+                    ),
+                    _MoreItem(
+                      icon: Icons.video_camera_front_outlined,
+                      label: 'Video note',
+                      onTap: widget.onVideoNotePressed,
+                      iconColor: Colors.pinkAccent,
+                    ),
                     if (widget.onAiAssistantPressed != null)
                       _MoreItem(
                         icon: Icons.auto_awesome,
@@ -437,7 +457,11 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
     final bgColor = context.surfaceColor;
     final defaultIconColor = context.textSecondary;
 
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: item.label,
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: item.onTap,
       onLongPress: item.onLongPress,
       child: SizedBox(
@@ -470,6 +494,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

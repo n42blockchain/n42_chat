@@ -5,6 +5,7 @@ import 'package:lottie/lottie.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/bundled_sticker_packs.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -34,13 +35,20 @@ class StickerThumb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.placeholderOf(isDark),
-        borderRadius: BorderRadius.circular(8),
+    return Semantics(
+      label: sticker.emoji?.isNotEmpty == true
+          ? A11yL10n.of(context).stickerNamed(sticker.emoji!)
+          : A11yL10n.of(context).tabSticker,
+      image: true,
+      excludeSemantics: true,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.placeholderOf(isDark),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: padding,
+        child: Center(child: _content()),
       ),
-      padding: padding,
-      child: Center(child: _content()),
     );
   }
 
