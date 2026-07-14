@@ -26,6 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final IAuthRepository _authRepository;
   final BiometricService _biometricService;
   final SecureStorageDataSource _secureStorage;
+  final IdHubApi Function(String baseUrl) _idHubApiFactory;
   StreamSubscription<bool>? _loginStateSubscription;
   bool _logoutInProgress = false;
 
@@ -33,9 +34,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required IAuthRepository authRepository,
     BiometricService? biometricService,
     SecureStorageDataSource? secureStorage,
+    IdHubApi Function(String baseUrl)? idHubApiFactory,
   }) : _authRepository = authRepository,
        _biometricService = biometricService ?? BiometricService(),
        _secureStorage = secureStorage ?? SecureStorageDataSource(),
+       _idHubApiFactory =
+           idHubApiFactory ?? ((baseUrl) => IdHubApi(baseUrl: baseUrl)),
        super(const AuthState.initial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
@@ -284,7 +288,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (!getIt.isRegistered<IWalletBridge>()) return false;
 
     try {
-      final api = IdHubApi(baseUrl: hubUrl);
+      final api = _idHubApiFactory(hubUrl);
       final challenge = await api.createWalletChallenge(address: event.address);
       final signature = await getIt<IWalletBridge>().signMessage(
         challenge.message,
