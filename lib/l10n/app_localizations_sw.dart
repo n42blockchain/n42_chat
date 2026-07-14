@@ -1468,16 +1468,6 @@ class SSw extends S {
   String get chatSaveToGallery => 'Hifadhi kwenye Matunzio';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Imeshindwa kupakua: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Imeshindwa kushiriki: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Imeshindwa kupakia picha';
 
   @override
@@ -2641,6 +2631,31 @@ class SSw extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'Hakuna URL ya midia inayopatikana';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Imeshindwa kupakua: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Hitilafu: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Kiungo cha muziki';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Vifurushi vyekundu na uhamishaji hauwezi kusambazwa';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Imeshindwa kushiriki: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Gusa ili kujaribu tena';
 
   @override
@@ -2667,28 +2682,13 @@ class SSw extends S {
   String get groupEnterGroupAnnouncement => 'Weka tangazo la kikundi';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Hitilafu: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return 'Wanachama wa $count, bofya ili kunakili kitambulisho cha kikundi';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Kiungo cha muziki';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'Hakuna URL ya midia inayopatikana';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Huna ruhusa ya kuhariri jina la kikundi';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Vifurushi vyekundu na uhamishaji hauwezi kusambazwa';
 
   @override
   String get authEmailAddress => 'Anwani ya Barua Pepe';
@@ -2885,11 +2885,12 @@ class SSw extends S {
   @override
   String get authAppleLabel => 'Apple';
 
-
-  @override
-  String get authSsoNotConfigured => 'Seva hii haijasanidi watoa huduma wa kuingia SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Seva hii haijasanidi watoa huduma wa kuingia SSO';
 
   @override
   String get transferAmountHintZero => '0.00';

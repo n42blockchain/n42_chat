@@ -1472,16 +1472,6 @@ class SUk extends S {
   String get chatSaveToGallery => 'Зберегти в галерею';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Помилка завантаження: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Не вдалося поділитися: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Не вдалося завантажити зображення';
 
   @override
@@ -2638,6 +2628,31 @@ class SUk extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'Немає доступної URL-адреси медіа';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Помилка завантаження: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Помилка: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Посилання на музику';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Червоні пакети та перекази не пересилаються';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Не вдалося поділитися: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Торкніться, щоб повторити спробу';
 
   @override
@@ -2665,28 +2680,13 @@ class SUk extends S {
   String get groupEnterGroupAnnouncement => 'Введіть групове оголошення';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Помилка: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return 'Учасники $count, натисніть, щоб скопіювати ідентифікатор групи';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Посилання на музику';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'Немає доступної URL-адреси медіа';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Ви не маєте дозволу редагувати назву групи';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Червоні пакети та перекази не пересилаються';
 
   @override
   String get authEmailAddress => 'Адреса електронної пошти';
@@ -2885,11 +2885,12 @@ class SUk extends S {
   @override
   String get authAppleLabel => 'Яблуко';
 
-
-  @override
-  String get authSsoNotConfigured => 'Цей сервер не налаштував провайдерів входу SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Цей сервер не налаштував провайдерів входу SSO';
 
   @override
   String get transferAmountHintZero => '0,00';

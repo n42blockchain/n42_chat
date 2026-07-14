@@ -1465,16 +1465,6 @@ class SId extends S {
   String get chatSaveToGallery => 'Simpan ke Galeri';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Unduhan gagal: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Gagal berbagi: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Gagal memuat gambar';
 
   @override
@@ -2634,6 +2624,31 @@ class SId extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'URL media tidak tersedia';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Unduhan gagal: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Kesalahan: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Link musik';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Angpao dan transfer tidak dapat diteruskan';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Gagal berbagi: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Ketuk untuk mencoba lagi';
 
   @override
@@ -2660,28 +2675,13 @@ class SId extends S {
   String get groupEnterGroupAnnouncement => 'Masukkan pengumuman grup';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Kesalahan: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count anggota, klik untuk menyalin ID grup';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Link musik';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'URL media tidak tersedia';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Anda tidak memiliki izin untuk mengubah nama grup';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Angpao dan transfer tidak dapat diteruskan';
 
   @override
   String get authEmailAddress => 'Alamat email';
@@ -2877,11 +2877,12 @@ class SId extends S {
   @override
   String get authAppleLabel => 'apel';
 
-
-  @override
-  String get authSsoNotConfigured => 'Server ini belum mengkonfigurasi penyedia login SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Server ini belum mengkonfigurasi penyedia login SSO';
 
   @override
   String get transferAmountHintZero => '0,00';

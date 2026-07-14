@@ -1463,16 +1463,6 @@ class STr extends S {
   String get chatSaveToGallery => 'Galeriye Kaydet';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'İndirme başarısız: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Paylaşım başarısız: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Resim yüklenemedi';
 
   @override
@@ -2632,6 +2622,31 @@ class STr extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'Medya URL\'si mevcut değil';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'İndirme başarısız: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Hata: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Müzik bağlantısı';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Kırmızı zarflar ve transferler iletilemez';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Paylaşım başarısız: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Tekrar denemek için dokunun';
 
   @override
@@ -2659,28 +2674,13 @@ class STr extends S {
   String get groupEnterGroupAnnouncement => 'Grup duyurusunu girin';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Hata: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count üye, grup ID\'sini kopyalamak için tıklayın';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Müzik bağlantısı';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'Medya URL\'si mevcut değil';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Grup adını düzenleme izniniz yok';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Kırmızı zarflar ve transferler iletilemez';
 
   @override
   String get authEmailAddress => 'E-posta adresi';
@@ -2875,11 +2875,12 @@ class STr extends S {
   @override
   String get authAppleLabel => 'elma';
 
-
-  @override
-  String get authSsoNotConfigured => 'Bu sunucu SSO oturum açma sağlayıcılarını yapılandırmadı';
   @override
   String get authSsoLabel => 'TOA';
+
+  @override
+  String get authSsoNotConfigured =>
+      'This server has not configured SSO login providers';
 
   @override
   String get transferAmountHintZero => '0,00';

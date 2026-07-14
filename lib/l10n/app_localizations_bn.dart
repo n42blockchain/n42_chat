@@ -1465,16 +1465,6 @@ class SBn extends S {
   String get chatSaveToGallery => 'গ্যালারিতে সংরক্ষণ করুন';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'ডাউনলোড ব্যর্থ হয়েছে: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'শেয়ার করা ব্যর্থ হয়েছে: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'ছবি লোড করতে ব্যর্থ হয়েছে৷';
 
   @override
@@ -2632,6 +2622,31 @@ class SBn extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'কোনো মিডিয়া URL উপলব্ধ নেই৷';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'ডাউনলোড ব্যর্থ হয়েছে: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'ত্রুটি: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'সঙ্গীত লিঙ্ক';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'লাল প্যাকেট এবং স্থানান্তর ফরোয়ার্ড করা যাবে না';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'শেয়ার করা ব্যর্থ হয়েছে: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'আবার চেষ্টা করতে আলতো চাপুন';
 
   @override
@@ -2658,28 +2673,13 @@ class SBn extends S {
   String get groupEnterGroupAnnouncement => 'গ্রুপ ঘোষণা লিখুন';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'ত্রুটি: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count সদস্য, গ্রুপ আইডি কপি করতে ক্লিক করুন';
   }
 
   @override
-  String get chatMusicLinkLabel => 'সঙ্গীত লিঙ্ক';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'কোনো মিডিয়া URL উপলব্ধ নেই৷';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'আপনার গ্রুপের নাম সম্পাদনা করার অনুমতি নেই';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'লাল প্যাকেট এবং স্থানান্তর ফরোয়ার্ড করা যাবে না';
 
   @override
   String get authEmailAddress => 'ইমেইল ঠিকানা';
@@ -2874,11 +2874,12 @@ class SBn extends S {
   @override
   String get authAppleLabel => 'আপেল';
 
-
-  @override
-  String get authSsoNotConfigured => 'এই সার্ভার SSO লগইন প্রদানকারী কনফিগার করেনি';
   @override
   String get authSsoLabel => 'এসএসও';
+
+  @override
+  String get authSsoNotConfigured =>
+      'This server has not configured SSO login providers';
 
   @override
   String get transferAmountHintZero => '0.00';

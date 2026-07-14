@@ -1474,16 +1474,6 @@ class SRu extends S {
   String get chatSaveToGallery => 'Сохранить в галерею';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Ошибка загрузки: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Ошибка при отправке: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Не удалось загрузить изображение';
 
   @override
@@ -2645,6 +2635,31 @@ class SRu extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'URL медиа недоступен';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Ошибка загрузки: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Ошибка: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Ссылка на музыку';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Красные конверты и переводы нельзя пересылать';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Ошибка при отправке: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Нажмите, чтобы повторить';
 
   @override
@@ -2671,28 +2686,13 @@ class SRu extends S {
   String get groupEnterGroupAnnouncement => 'Введите объявление группы';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Ошибка: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count участников, нажмите для копирования ID группы';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Ссылка на музыку';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'URL медиа недоступен';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'У вас нет прав для изменения названия группы';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Красные конверты и переводы нельзя пересылать';
 
   @override
   String get authEmailAddress => 'Адрес электронной почты';
@@ -2888,11 +2888,12 @@ class SRu extends S {
   @override
   String get authAppleLabel => 'Яблоко';
 
-
-  @override
-  String get authSsoNotConfigured => 'Этот сервер не настроил провайдеров входа SSO';
   @override
   String get authSsoLabel => 'система единого входа';
+
+  @override
+  String get authSsoNotConfigured =>
+      'This server has not configured SSO login providers';
 
   @override
   String get transferAmountHintZero => '0,00';

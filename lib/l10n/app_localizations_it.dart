@@ -1468,16 +1468,6 @@ class SIt extends S {
   String get chatSaveToGallery => 'Salva nella galleria';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Download fallito: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Condivisione fallita: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Caricamento immagine fallito';
 
   @override
@@ -2639,6 +2629,31 @@ class SIt extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'URL multimediale non disponibile';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Download fallito: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Errore: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Link musicale';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Le buste rosse e i trasferimenti non possono essere inoltrati';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Condivisione fallita: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Tocca per riprovare';
 
   @override
@@ -2665,28 +2680,13 @@ class SIt extends S {
   String get groupEnterGroupAnnouncement => 'Inserisci l\'annuncio del gruppo';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Errore: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count membri, fai clic per copiare l\'ID del gruppo';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Link musicale';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'URL multimediale non disponibile';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Non hai il permesso di modificare il nome del gruppo';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Le buste rosse e i trasferimenti non possono essere inoltrati';
 
   @override
   String get authEmailAddress => 'Indirizzo email';
@@ -2882,11 +2882,12 @@ class SIt extends S {
   @override
   String get authAppleLabel => 'mela';
 
-
-  @override
-  String get authSsoNotConfigured => 'Questo server non ha configurato provider di accesso SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Questo server non ha configurato provider di accesso SSO';
 
   @override
   String get transferAmountHintZero => '0,00';
