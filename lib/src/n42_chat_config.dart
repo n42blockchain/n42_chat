@@ -175,6 +175,18 @@ class N42ChatConfig {
   /// 需宿主 `IWalletBridge` 已接入且 `signMessage` 返回确定性签名。
   final bool enableWalletLogin;
 
+  /// 统一身份 N42 ID Hub 基址（如 https://id.n42.ai）。
+  ///
+  /// 为空则所有 ID Hub 功能静默禁用，登录回退到现状（降级兜底开关）。
+  final String? idHubUrl;
+
+  /// 是否走 ID Hub 钱包登录路径（默认 false，灰度开）。
+  ///
+  /// 开启且 [idHubUrl] 已配、且 hub 返回 Matrix 凭据时，钱包登录经 ID Hub 供给
+  /// Matrix 账号；任何一步不满足（含 hub 未就绪）都回退到 [WalletLoginCredentials]
+  /// 派生的 legacy 路径，保住聊天历史。
+  final bool enableIdHubLogin;
+
   /// Google Sign-In OAuth Client ID
   ///
   /// 宿主已使用 google-services / 原生配置兜底时可不传；
@@ -480,6 +492,8 @@ class N42ChatConfig {
     this.enableWeChatLogin = false,
     this.enableSsoLogin = false,
     this.enableWalletLogin = true,
+    this.idHubUrl,
+    this.enableIdHubLogin = false,
     this.googleClientId,
     this.googleServerClientId,
     this.twitterApiKey,
@@ -561,6 +575,8 @@ class N42ChatConfig {
     bool? enableWeChatLogin,
     bool? enableSsoLogin,
     bool? enableWalletLogin,
+    Object? idHubUrl = _copyWithUndefined,
+    bool? enableIdHubLogin,
     Object? googleClientId = _copyWithUndefined,
     Object? googleServerClientId = _copyWithUndefined,
     Object? twitterApiKey = _copyWithUndefined,
@@ -653,6 +669,8 @@ class N42ChatConfig {
       enableWeChatLogin: enableWeChatLogin ?? this.enableWeChatLogin,
       enableSsoLogin: enableSsoLogin ?? this.enableSsoLogin,
       enableWalletLogin: enableWalletLogin ?? this.enableWalletLogin,
+      idHubUrl: _nullableCopyWithValue<String>(idHubUrl, this.idHubUrl),
+      enableIdHubLogin: enableIdHubLogin ?? this.enableIdHubLogin,
       googleClientId: _nullableCopyWithValue<String>(
         googleClientId,
         this.googleClientId,

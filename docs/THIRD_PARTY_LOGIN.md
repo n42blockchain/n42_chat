@@ -42,3 +42,19 @@ n42_chat 登录基于 Matrix（用户名/密码 + SSO + 自定义派生）。三
 确定性派生密码要求钱包签名确定性（ECDSA RFC6979 / personal_sign 满足）。若某钱包
 签名非确定性，会导致派生密码变化、账号无法再登录。生产环境更稳的是服务端 SIWE
 （验签发 token）；本方案为纯客户端过渡，已在代码注释中标注。
+
+## 统一身份 N42 ID Hub 钱包登录（降级兜底）
+
+新增 `enableIdHubLogin`（默认 `false`）+ `idHubUrl` 两个 `N42ChatConfig` 开关。开启
+且 `idHubUrl` 已配、且 hub 的 `POST /v1/auth/wallet/verify`（`aud=chat`）返回 Matrix
+凭据时，钱包登录改经 ID Hub 供给 Matrix 账号（`_authRepository.loginWithToken`，与社交
+登录同构）。**任何一步不满足**（未启用 / 未配 / hub 不可达 / hub 未返回 Matrix 凭据，
+如 Synapse bridge 尚未上线）都静默回退到上面的 `WalletLoginCredentials` 派生 legacy
+路径，保住既有聊天历史——这是渐进灰度与回滚的兜底开关。
+
+- 客户端：`data/datasources/remote/id_hub_api.dart`（`IdHubApi` + `IdHubWalletResponse`）。
+- 待签消息由 hub 下发（server nonce），钱包对该原文重新 `signMessage` 签名；启用此路径后
+  UI 侧原有的预签名变为冗余，应移除以避免二次弹窗（后续跟进项）。
+- **双落提醒（D-6）**：`n42appv2` 通过 `pubspec_overrides.yaml` vendored 了本包的一份
+  副本（`packages/n42_chat`，且已与独立仓分叉）。本节改动需在独立仓与 vendored 副本
+  同步落地；长期应把 vendored 副本迁回 git 依赖以消除分叉。
