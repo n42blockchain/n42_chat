@@ -1458,16 +1458,6 @@ class SAr extends S {
   String get chatSaveToGallery => 'حفظ في المعرض';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'فشل التنزيل: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'فشلت المشاركة: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'فشل تحميل الصورة';
 
   @override
@@ -2619,6 +2609,31 @@ class SAr extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'لا يتوفر عنوان URL للوسائط';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'فشل التنزيل: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'خطأ: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'رابط الموسيقى';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'لا يمكن إعادة توجيه الحزم الحمراء وعمليات النقل';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'فشلت المشاركة: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'انقر لإعادة المحاولة';
 
   @override
@@ -2645,28 +2660,13 @@ class SAr extends S {
   String get groupEnterGroupAnnouncement => 'أدخل إعلان المجموعة';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'خطأ: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return 'أعضاء $count، انقر لنسخ معرف المجموعة';
   }
 
   @override
-  String get chatMusicLinkLabel => 'رابط الموسيقى';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'لا يتوفر عنوان URL للوسائط';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'ليس لديك إذن لتعديل اسم المجموعة';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'لا يمكن إعادة توجيه الحزم الحمراء وعمليات النقل';
 
   @override
   String get authEmailAddress => 'عنوان البريد الإلكتروني';
@@ -2863,11 +2863,12 @@ class SAr extends S {
   @override
   String get authAppleLabel => 'أبل';
 
-
-  @override
-  String get authSsoNotConfigured => 'لم يقم هذا الخادم بتكوين موفري تسجيل الدخول SSO';
   @override
   String get authSsoLabel => 'الدخول الموحد';
+
+  @override
+  String get authSsoNotConfigured =>
+      'This server has not configured SSO login providers';
 
   @override
   String get transferAmountHintZero => '0.00';

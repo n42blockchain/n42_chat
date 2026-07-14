@@ -1441,16 +1441,6 @@ class SJa extends S {
   String get chatSaveToGallery => 'ギャラリーに保存';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'ダウンロード失敗: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return '共有に失敗しました: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => '画像の読み込みに失敗しました';
 
   @override
@@ -2578,6 +2568,30 @@ class SJa extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'メディアURLがありません';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'ダウンロード失敗: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'エラー: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => '音楽リンク';
+
+  @override
+  String get chatRedPacketTransferCannotForward => '紅包と送金は転送できません';
+
+  @override
+  String commonShareFailed(String error) {
+    return '共有に失敗しました: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'タップして再試行';
 
   @override
@@ -2602,26 +2616,12 @@ class SJa extends S {
   String get groupEnterGroupAnnouncement => 'グループお知らせを入力';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'エラー: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count人、クリックしてグループIDをコピー';
   }
 
   @override
-  String get chatMusicLinkLabel => '音楽リンク';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'メディアURLがありません';
-
-  @override
   String get groupNoPermissionToEditGroupName => 'グループ名を編集する権限がありません';
-
-  @override
-  String get chatRedPacketTransferCannotForward => '紅包と送金は転送できません';
 
   @override
   String get authEmailAddress => 'メールアドレス';
@@ -2810,11 +2810,11 @@ class SJa extends S {
   @override
   String get authAppleLabel => 'アップル';
 
+  @override
+  String get authSsoLabel => 'SSO';
 
   @override
   String get authSsoNotConfigured => 'このサーバーはSSOログインプロバイダーを設定していません';
-  @override
-  String get authSsoLabel => 'SSO';
 
   @override
   String get transferAmountHintZero => '0.00';

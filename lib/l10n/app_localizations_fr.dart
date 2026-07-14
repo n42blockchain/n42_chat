@@ -1479,16 +1479,6 @@ class SFr extends S {
   String get chatSaveToGallery => 'Enregistrer dans la galerie';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Échec du téléchargement : $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Échec du partage : $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Echec du chargement de l\'image';
 
   @override
@@ -2663,6 +2653,31 @@ class SFr extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'URL média non disponible';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Échec du téléchargement : $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Erreur : $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Lien musical';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Les enveloppes rouges et les transferts ne peuvent pas être transférés';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Échec du partage : $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Appuyez pour réessayer';
 
   @override
@@ -2691,28 +2706,13 @@ class SFr extends S {
       'Veuillez saisir l\'annonce du groupe';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Erreur : $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count membres, cliquez pour copier l\'ID du groupe';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Lien musical';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'URL média non disponible';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Vous n\'avez pas la permission de modifier le nom du groupe';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Les enveloppes rouges et les transferts ne peuvent pas être transférés';
 
   @override
   String get authEmailAddress => 'Adresse e-mail';
@@ -2913,11 +2913,12 @@ class SFr extends S {
   @override
   String get authAppleLabel => 'Pomme';
 
-
-  @override
-  String get authSsoNotConfigured => "Ce serveur n'a pas configuré de fournisseurs de connexion SSO";
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Ce serveur n\'a pas configuré de fournisseurs de connexion SSO';
 
   @override
   String get transferAmountHintZero => '0,00';

@@ -1466,16 +1466,6 @@ class SCs extends S {
   String get chatSaveToGallery => 'Uložit do Galerie';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Stahování se nezdařilo: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Sdílení se nezdařilo: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Načtení obrázku se nezdařilo';
 
   @override
@@ -2635,6 +2625,32 @@ class SCs extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable =>
+      'Není k dispozici žádná adresa URL média';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Stahování se nezdařilo: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Chyba: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Odkaz na hudbu';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Červené pakety a přenosy nelze přeposílat';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Sdílení se nezdařilo: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Klepnutím to zkuste znovu';
 
   @override
@@ -2661,29 +2677,13 @@ class SCs extends S {
   String get groupEnterGroupAnnouncement => 'Zadejte oznámení skupiny';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Chyba: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return 'Členové $count, kliknutím zkopírujte ID skupiny';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Odkaz na hudbu';
-
-  @override
-  String get chatNoMediaUrlAvailable =>
-      'Není k dispozici žádná adresa URL média';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Nemáte oprávnění upravovat název skupiny';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Červené pakety a přenosy nelze přeposílat';
 
   @override
   String get authEmailAddress => 'E-mailová adresa';
@@ -2880,11 +2880,12 @@ class SCs extends S {
   @override
   String get authAppleLabel => 'Jablko';
 
-
-  @override
-  String get authSsoNotConfigured => 'Tento server nenakonfiguroval poskytovatele přihlášení SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Tento server nenakonfiguroval poskytovatele přihlášení SSO';
 
   @override
   String get transferAmountHintZero => '0,00';

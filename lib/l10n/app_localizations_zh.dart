@@ -1440,16 +1440,6 @@ class SZh extends S {
   String get chatSaveToGallery => '保存到相冊';
 
   @override
-  String chatDownloadFailed(String code) {
-    return '下載失敗: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return '分享失敗: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => '圖片加載失敗';
 
   @override
@@ -2570,6 +2560,30 @@ class SZh extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => '沒有可用的媒體鏈接';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return '下載失敗: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return '錯誤: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => '音樂鏈接';
+
+  @override
+  String get chatRedPacketTransferCannotForward => '紅包和轉賬消息無法轉發';
+
+  @override
+  String commonShareFailed(String error) {
+    return '分享失敗: $error';
+  }
+
+  @override
   String get commonTapToRetry => '點擊重試';
 
   @override
@@ -2594,26 +2608,12 @@ class SZh extends S {
   String get groupEnterGroupAnnouncement => '請輸入羣公告';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return '錯誤: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count人，點擊複製羣ID';
   }
 
   @override
-  String get chatMusicLinkLabel => '音樂鏈接';
-
-  @override
-  String get chatNoMediaUrlAvailable => '沒有可用的媒體鏈接';
-
-  @override
   String get groupNoPermissionToEditGroupName => '你沒有權限修改羣名稱';
-
-  @override
-  String get chatRedPacketTransferCannotForward => '紅包和轉賬消息無法轉發';
 
   @override
   String get authEmailAddress => '郵箱地址';
@@ -2796,11 +2796,11 @@ class SZh extends S {
   @override
   String get authAppleLabel => 'Apple';
 
+  @override
+  String get authSsoLabel => 'SSO';
 
   @override
   String get authSsoNotConfigured => '该服务器未配置SSO登录提供商';
-  @override
-  String get authSsoLabel => 'SSO';
 
   @override
   String get transferAmountHintZero => '0.00';
@@ -7076,16 +7076,6 @@ class SZhTw extends SZh {
   String get chatSaveToGallery => '保存到相冊';
 
   @override
-  String chatDownloadFailed(String code) {
-    return '下載失敗: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return '分享失敗: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => '圖片加載失敗';
 
   @override
@@ -8206,6 +8196,30 @@ class SZhTw extends SZh {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => '沒有可用的媒體鏈接';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return '下載失敗: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return '錯誤: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => '音樂鏈接';
+
+  @override
+  String get chatRedPacketTransferCannotForward => '紅包和轉賬消息無法轉發';
+
+  @override
+  String commonShareFailed(String error) {
+    return '分享失敗: $error';
+  }
+
+  @override
   String get commonTapToRetry => '點擊重試';
 
   @override
@@ -8230,26 +8244,12 @@ class SZhTw extends SZh {
   String get groupEnterGroupAnnouncement => '請輸入羣公告';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return '錯誤: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count人，點擊複製羣ID';
   }
 
   @override
-  String get chatMusicLinkLabel => '音樂鏈接';
-
-  @override
-  String get chatNoMediaUrlAvailable => '沒有可用的媒體鏈接';
-
-  @override
   String get groupNoPermissionToEditGroupName => '你沒有權限修改羣名稱';
-
-  @override
-  String get chatRedPacketTransferCannotForward => '紅包和轉賬消息無法轉發';
 
   @override
   String get authEmailAddress => '郵箱地址';
@@ -8432,11 +8432,11 @@ class SZhTw extends SZh {
   @override
   String get authAppleLabel => 'Apple';
 
-
-  @override
-  String get authSsoNotConfigured => '该服务器未配置SSO登录提供商';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured => '該服務器未配置SSO登錄提供商';
 
   @override
   String get transferAmountHintZero => '0.00';

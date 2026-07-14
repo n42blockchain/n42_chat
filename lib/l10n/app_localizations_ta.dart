@@ -1470,16 +1470,6 @@ class STa extends S {
   String get chatSaveToGallery => 'கேலரியில் சேமிக்கவும்';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'பதிவிறக்கம் தோல்வி: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'பகிர்வு தோல்வி: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'படத்தை ஏற்ற முடியவில்லை';
 
   @override
@@ -2657,6 +2647,31 @@ class STa extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'மீடியா URL இல்லை';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'பதிவிறக்கம் தோல்வி: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'பிழை: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'இசை இணைப்பு';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'சிவப்பு பாக்கெட்டுகள் மற்றும் இடமாற்றங்களை அனுப்ப முடியாது';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'பகிர்வு தோல்வி: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'மீண்டும் முயற்சிக்க தட்டவும்';
 
   @override
@@ -2683,28 +2698,13 @@ class STa extends S {
   String get groupEnterGroupAnnouncement => 'குழு அறிவிப்பை உள்ளிடவும்';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'பிழை: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count உறுப்பினர்கள், குழு ஐடியை நகலெடுக்க கிளிக் செய்யவும்';
   }
 
   @override
-  String get chatMusicLinkLabel => 'இசை இணைப்பு';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'மீடியா URL இல்லை';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'குழுவின் பெயரைத் திருத்த உங்களுக்கு அனுமதி இல்லை';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'சிவப்பு பாக்கெட்டுகள் மற்றும் இடமாற்றங்களை அனுப்ப முடியாது';
 
   @override
   String get authEmailAddress => 'மின்னஞ்சல் முகவரி';
@@ -2905,11 +2905,12 @@ class STa extends S {
   @override
   String get authAppleLabel => 'ஆப்பிள்';
 
-
-  @override
-  String get authSsoNotConfigured => 'இந்த சேவையகம் SSO உள்நுழைவு வழங்குநர்களை உள்ளமைக்கவில்லை';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'இந்த சேவையகம் SSO உள்நுழைவு வழங்குநர்களை உள்ளமைக்கவில்லை';
 
   @override
   String get transferAmountHintZero => '0.00';

@@ -612,6 +612,16 @@ class _TestWalletBridge implements IWalletBridge {
   }) async => const TransferResult(success: false);
 
   @override
+  Future<TransferResult> requestNftTransfer({
+    required String contractAddress,
+    required String tokenId,
+    required String toAddress,
+    required int chainId,
+    NftStandard standard = NftStandard.erc721,
+    int amount = 1,
+  }) async => const TransferResult(success: false);
+
+  @override
   Future<void> showReceiveQRCode() async {}
 
   @override

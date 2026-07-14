@@ -1442,16 +1442,6 @@ class SKo extends S {
   String get chatSaveToGallery => '갤러리에 저장';
 
   @override
-  String chatDownloadFailed(String code) {
-    return '다운로드 실패: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return '공유 실패: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => '이미지 로드 실패';
 
   @override
@@ -2580,6 +2570,30 @@ class SKo extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => '미디어 URL을 사용할 수 없습니다';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return '다운로드 실패: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return '오류: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => '음악 링크';
+
+  @override
+  String get chatRedPacketTransferCannotForward => '홍바오와 송금은 전달할 수 없습니다';
+
+  @override
+  String commonShareFailed(String error) {
+    return '공유 실패: $error';
+  }
+
+  @override
   String get commonTapToRetry => '탭하여 다시 시도';
 
   @override
@@ -2604,26 +2618,12 @@ class SKo extends S {
   String get groupEnterGroupAnnouncement => '그룹 공지를 입력하세요';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return '오류: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count명, 클릭하여 그룹 ID 복사';
   }
 
   @override
-  String get chatMusicLinkLabel => '음악 링크';
-
-  @override
-  String get chatNoMediaUrlAvailable => '미디어 URL을 사용할 수 없습니다';
-
-  @override
   String get groupNoPermissionToEditGroupName => '그룹 이름을 수정할 권한이 없습니다';
-
-  @override
-  String get chatRedPacketTransferCannotForward => '홍바오와 송금은 전달할 수 없습니다';
 
   @override
   String get authEmailAddress => '이메일 주소';
@@ -2810,11 +2810,11 @@ class SKo extends S {
   @override
   String get authAppleLabel => '사과';
 
+  @override
+  String get authSsoLabel => 'SSO';
 
   @override
   String get authSsoNotConfigured => '이 서버는 SSO 로그인 공급자를 구성하지 않았습니다';
-  @override
-  String get authSsoLabel => 'SSO';
 
   @override
   String get transferAmountHintZero => '0.00';

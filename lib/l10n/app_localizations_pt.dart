@@ -1475,16 +1475,6 @@ class SPt extends S {
   String get chatSaveToGallery => 'Salvar na Galeria';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Falha no download: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Falha ao compartilhar: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Falha ao carregar imagem';
 
   @override
@@ -2653,6 +2643,31 @@ class SPt extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'URL de mídia não disponível';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Falha no download: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Erro: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Link de música';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Envelopes vermelhos e transferências não podem ser encaminhados';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Falha ao compartilhar: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Toque para tentar novamente';
 
   @override
@@ -2680,28 +2695,13 @@ class SPt extends S {
   String get groupEnterGroupAnnouncement => 'Digite o anúncio do grupo';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Erro: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count membros, clique para copiar ID do grupo';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Link de música';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'URL de mídia não disponível';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Você não tem permissão para editar o nome do grupo';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Envelopes vermelhos e transferências não podem ser encaminhados';
 
   @override
   String get authEmailAddress => 'Endereço de e-mail';
@@ -2896,11 +2896,12 @@ class SPt extends S {
   @override
   String get authAppleLabel => 'maçã';
 
-
-  @override
-  String get authSsoNotConfigured => 'Este servidor não configurou provedores de login SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Este servidor não configurou provedores de login SSO';
 
   @override
   String get transferAmountHintZero => '0,00';
@@ -7281,16 +7282,6 @@ class SPtBr extends SPt {
   String get chatSaveToGallery => 'Salvar na Galeria';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Falha no download: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Falha ao compartilhar: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Falha ao carregar imagem';
 
   @override
@@ -8459,6 +8450,31 @@ class SPtBr extends SPt {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'URL de mídia não disponível';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Falha no download: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Erro: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Link de música';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Envelopes vermelhos e transferências não podem ser encaminhados';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Falha ao compartilhar: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Toque para tentar novamente';
 
   @override
@@ -8486,28 +8502,13 @@ class SPtBr extends SPt {
   String get groupEnterGroupAnnouncement => 'Digite o anúncio do grupo';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Erro: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count membros, clique para copiar ID do grupo';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Link de música';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'URL de mídia não disponível';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Você não tem permissão para editar o nome do grupo';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Envelopes vermelhos e transferências não podem ser encaminhados';
 
   @override
   String get authEmailAddress => 'Endereço de e-mail';
@@ -8702,11 +8703,12 @@ class SPtBr extends SPt {
   @override
   String get authAppleLabel => 'maçã';
 
-
-  @override
-  String get authSsoNotConfigured => 'Este servidor não configurou provedores de login SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Este servidor não configurou provedores de login SSO';
 
   @override
   String get transferAmountHintZero => '0,00';
