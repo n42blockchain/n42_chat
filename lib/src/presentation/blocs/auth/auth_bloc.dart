@@ -226,9 +226,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // legacy derivation below, preserving chat history.
     if (await _tryIdHubWalletLogin(event, emit)) return;
 
+    // Legacy path: sign the canonical message now (only reached when ID Hub is
+    // disabled or fell back). Signing is deferred to here so the wallet prompts
+    // exactly once - the UI no longer pre-signs.
+    final bridge =
+        getIt.isRegistered<IWalletBridge>() ? getIt<IWalletBridge>() : null;
+    final signature = bridge == null
+        ? null
+        : await bridge.signMessage(
+            WalletLoginCredentials.canonicalLoginMessage(event.address),
+          );
+    if (signature == null || signature.isEmpty) {
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Wallet login is not supported by this wallet',
+      ));
+      return;
+    }
+
     final creds = WalletLoginCredentials.derive(
       address: event.address,
-      signature: event.signature,
+      signature: signature,
     );
 
     var result = await _authRepository.login(
@@ -267,10 +285,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   /// Attempt wallet login via the N42 ID Hub. Returns true only when it fully
   /// succeeds (Matrix session established); false means "fall back to legacy".
   ///
-  /// The wallet re-signs the hub-issued challenge (a server nonce), which the
-  /// pre-computed [event.signature] over the local canonical message cannot
-  /// satisfy. When enabling this path, the UI pre-sign becomes redundant and
-  /// should be removed to avoid a double prompt (tracked follow-up).
+  /// The wallet signs the hub-issued challenge (a server nonce) here. Signing is
+  /// deferred to the bloc for both paths (ID Hub challenge here, canonical
+  /// message in the legacy branch), so the wallet prompts exactly once - the UI
+  /// no longer pre-signs.
   Future<bool> _tryIdHubWalletLogin(
     AuthWalletAuthRequested event,
     Emitter<AuthState> emit,
