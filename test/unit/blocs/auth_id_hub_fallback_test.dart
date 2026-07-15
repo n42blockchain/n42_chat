@@ -57,11 +57,15 @@ void main() {
   const event = AuthWalletAuthRequested(
     homeserver: 'https://matrix.example',
     address: '0xAABB',
-    signature: '0xlegacy-signature',
   );
+  // Signing is deferred to the bloc: the legacy path signs the canonical message
+  // via the wallet bridge, so tests stub that message -> legacySignature.
+  const legacySignature = '0xlegacy-signature';
+  final canonicalMessage =
+      WalletLoginCredentials.canonicalLoginMessage(event.address);
   final legacyCredentials = WalletLoginCredentials.derive(
     address: event.address,
-    signature: event.signature,
+    signature: legacySignature,
   );
 
   late _MockAuthRepository repository;
@@ -107,6 +111,11 @@ void main() {
     'feature flag off skips ID Hub and preserves legacy wallet login',
     setUp: () {
       getIt.registerSingleton(const N42ChatConfig(enableIdHubLogin: false));
+      final wallet = _MockWalletBridge();
+      when(
+        () => wallet.signMessage(canonicalMessage),
+      ).thenAnswer((_) async => legacySignature);
+      getIt.registerSingleton<IWalletBridge>(wallet);
     },
     build: () => buildBloc(
       idHubApiFactory: (_) => throw StateError('ID Hub must stay disabled'),
@@ -159,6 +168,9 @@ void main() {
       when(
         () => wallet.signMessage('N42 ID challenge'),
       ).thenAnswer((_) async => '0xhub-signature');
+      when(
+        () => wallet.signMessage(canonicalMessage),
+      ).thenAnswer((_) async => legacySignature);
       getIt.registerSingleton<IWalletBridge>(wallet);
     },
     build: () => buildBloc(
@@ -219,6 +231,9 @@ void main() {
       when(
         () => wallet.signMessage('N42 ID challenge'),
       ).thenAnswer((_) async => '0xhub-signature');
+      when(
+        () => wallet.signMessage(canonicalMessage),
+      ).thenAnswer((_) async => legacySignature);
       getIt.registerSingleton<IWalletBridge>(wallet);
       when(
         () => repository.loginWithToken(
@@ -291,7 +306,11 @@ void main() {
           enableIdHubLogin: true,
         ),
       );
-      getIt.registerSingleton<IWalletBridge>(_MockWalletBridge());
+      final wallet = _MockWalletBridge();
+      when(
+        () => wallet.signMessage(canonicalMessage),
+      ).thenAnswer((_) async => legacySignature);
+      getIt.registerSingleton<IWalletBridge>(wallet);
     },
     build: () => buildBloc(idHubApiFactory: (_) => _ThrowingIdHubApi()),
     act: (bloc) => bloc.add(event),
