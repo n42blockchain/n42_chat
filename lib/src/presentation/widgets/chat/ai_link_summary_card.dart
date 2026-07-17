@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 
 /// AI 链接摘要卡片
 ///
@@ -59,7 +60,13 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 标题
-          InkWell(
+          Semantics(
+            button: true,
+            label: A11yL10n.of(context).aiSummary,
+            hint: _isExpanded
+                ? A11yL10n.of(context).collapse
+                : A11yL10n.of(context).expand,
+            child: InkWell(
             onTap: () => setState(() => _isExpanded = !_isExpanded),
             child: Row(
               children: [
@@ -82,6 +89,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
                 ),
               ],
             ),
+          ),
           ),
 
           if (_isExpanded) ...[
@@ -123,7 +131,11 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
   }
 
   Widget _buildTriggerButton(bool isDark, {S? l10n}) {
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: l10n?.aiLinkSummary ?? 'AI Summary',
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: widget.onGenerate,
       child: Container(
         margin: const EdgeInsets.only(top: 6),
@@ -150,6 +162,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

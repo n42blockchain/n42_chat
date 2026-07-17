@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'message_reaction_bar.dart';
 
@@ -48,6 +49,7 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onEdit; // 编辑消息
   final VoidCallback? onReport; // 举报消息
   final VoidCallback? onRemindMe; // 设为待办提醒
+  final VoidCallback? onReadingMode; // 长文阅读模式
 
   /// 表情回应回调
   final void Function(String emoji)? onReaction;
@@ -80,6 +82,7 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onEdit,
     this.onReport,
     this.onRemindMe,
+    this.onReadingMode,
     this.onReaction,
   });
 
@@ -271,6 +274,12 @@ class WeChatMessageMenu extends StatelessWidget {
                       label: s?.commonTranslate ?? 'Translate',
                       onTap: () { onDismiss(); onTranslate?.call(); },
                     ),
+                  if (onReadingMode != null)
+                    _buildMenuItem(
+                      icon: Icons.menu_book_outlined,
+                      label: 'Reading',
+                      onTap: () { onDismiss(); onReadingMode?.call(); },
+                    ),
                   if (message.isEdited && onViewEditHistory != null)
                     _buildMenuItem(
                       icon: Icons.history,
@@ -397,7 +406,11 @@ class WeChatMessageMenu extends StatelessWidget {
     return Builder(
       builder: (context) => Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: Semantics(
+          button: true,
+          label: A11yL10n.of(context).moreReactions,
+          excludeSemantics: true,
+          child: InkWell(
           onTap: () {
             HapticFeedback.lightImpact();
             // 先关闭当前菜单
@@ -430,6 +443,7 @@ class WeChatMessageMenu extends StatelessWidget {
               size: 22,
             ),
           ),
+        ),
         ),
       ),
     );

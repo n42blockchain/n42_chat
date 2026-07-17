@@ -1471,16 +1471,6 @@ class SEs extends S {
   String get chatSaveToGallery => 'Guardar en galeria';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Descarga fallida: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Error al compartir: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Error al cargar imagen';
 
   @override
@@ -2646,6 +2636,31 @@ class SEs extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'URL de medios no disponible';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Descarga fallida: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Error: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Enlace de musica';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Los sobres rojos y transferencias no se pueden reenviar';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Error al compartir: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Toca para reintentar';
 
   @override
@@ -2672,28 +2687,13 @@ class SEs extends S {
   String get groupEnterGroupAnnouncement => 'Ingresa el anuncio del grupo';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Error: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count miembros, haz clic para copiar el ID del grupo';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Enlace de musica';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'URL de medios no disponible';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'No tienes permiso para editar el nombre del grupo';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Los sobres rojos y transferencias no se pueden reenviar';
 
   @override
   String get authEmailAddress => 'Dirección de correo electrónico';
@@ -2894,11 +2894,12 @@ class SEs extends S {
   @override
   String get authAppleLabel => 'manzana';
 
-
-  @override
-  String get authSsoNotConfigured => 'Este servidor no ha configurado proveedores de inicio de sesión SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Este servidor no ha configurado proveedores de inicio de sesión SSO';
 
   @override
   String get transferAmountHintZero => '0.00';

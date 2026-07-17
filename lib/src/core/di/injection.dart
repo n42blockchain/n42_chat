@@ -13,6 +13,7 @@ import '../services/live_caption_service.dart';
 import '../services/system_integration_service.dart';
 import '../services/local_llm_service.dart';
 import '../services/ai_provider_router.dart';
+import '../services/ai_sticker_service.dart';
 import '../encryption/mls_protocol.dart';
 import '../encryption/mls_manager.dart';
 import '../services/remark_service.dart';
@@ -294,9 +295,9 @@ Future<void> _registerServices(N42ChatConfig config) async {
   );
 
   // MLS 双栈调度（默认 Olm；底层 OpenMLS FFI 未绑定时 mlsAvailable=false）
-  getIt.registerLazySingleton<MlsManager>(
-    () => MlsManager(const UnboundMlsProtocol()),
-  );
+  final mlsProtocol = FfiMlsProtocol();
+  await mlsProtocol.probe();
+  getIt.registerLazySingleton<MlsManager>(() => MlsManager(mlsProtocol));
 
   // Giphy 服务（配置了 API Key 或代理端点时注册）
   if ((config.giphyApiKey != null && config.giphyApiKey!.isNotEmpty) ||
@@ -844,6 +845,15 @@ void _registerRepositories() {
   // 贴纸仓库
   getIt.registerLazySingleton<IStickerRepository>(
     () => StickerRepositoryImpl(getIt<MatrixStickerDataSource>()),
+  );
+
+  // AI 生成贴纸服务（云端文生图 → 贴纸包）。AiProviderRouter 总注册，
+  // 其 supportsImageGeneration 反映云端是否可用（无云端则 UI 隐藏入口）。
+  getIt.registerLazySingleton<AiStickerService>(
+    () => AiStickerService(
+      getIt<AiProviderRouter>(),
+      getIt<IStickerRepository>(),
+    ),
   );
 
   // Story 仓库

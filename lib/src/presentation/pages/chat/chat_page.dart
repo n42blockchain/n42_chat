@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -62,7 +63,18 @@ import '../../blocs/transfer/transfer_bloc.dart';
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/gif_picker.dart';
 import '../../widgets/chat/sticker_picker.dart';
+import '../../widgets/chat/sticker_suggestion_bar.dart';
+import '../../widgets/chat/custom_emoji_suggestion_bar.dart';
+import '../../widgets/chat/event_composer_sheet.dart';
+import '../../widgets/chat/mini_app_agent_sheet.dart';
 import '../../widgets/chat/expression_panel.dart';
+import '../../../domain/repositories/sticker_repository.dart';
+import '../../../domain/entities/custom_emoji.dart';
+import '../../../core/utils/sticker_suggestion_utils.dart';
+import '../../../core/utils/custom_emoji_parser.dart';
+import '../../../core/utils/nft_gift_ref.dart';
+import '../../../core/utils/article_reader_utils.dart';
+import 'article_reader_page.dart';
 import '../../../core/services/giphy_service.dart';
 import '../../../core/services/reminder_service.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
@@ -117,6 +129,9 @@ import '../group/bot_settings_page.dart';
 import '../transfer/receive_page.dart';
 import '../transfer/transfer_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/utils/video_note_utils.dart';
+import 'whiteboard_page.dart';
 
 part 'chat_page_app_bar.dart';
 part 'chat_page_message_list.dart';
@@ -184,6 +199,9 @@ class _ChatPageState extends State<ChatPage> {
   final Set<String> _recalledMessageIds = {};
   String? _lastRecalledContent;
 
+  /// 无障碍 live-region：已播报过的最后一条「对方」消息 id（去重，避免重复播报）。
+  String? _lastAnnouncedIncomingId;
+
   // 多选模式
   bool _isMultiSelectMode = false;
   final Set<String> _selectedMessageIds = {};
@@ -193,6 +211,13 @@ class _ChatPageState extends State<ChatPage> {
 
   // 当前用户ID（用于表情回应高亮）
   String? _currentUserId;
+
+  // 贴纸输入联想（按词推荐贴纸）
+  List<StickerHit> _stickerSuggestions = const [];
+  int _stickerSuggestionToken = 0;
+
+  // 自定义 emoji 输入联想（输入 `:partial` 推荐动画 emoji）
+  List<CustomEmoji> _customEmojiSuggestions = const [];
 
   // @ 提醒相关状态
   bool _showMentionPicker = false;
@@ -696,6 +721,93 @@ class _ChatPageState extends State<ChatPage> {
       }
       _checkMentionTrigger(text);
     }
+
+    // 输入联想：自定义 emoji（`:partial`）优先于贴纸（按词）
+    _updateComposerSuggestions(text);
+  }
+
+  /// 更新输入联想：`:partial` 命中时推荐自定义 emoji，否则按词推荐贴纸
+  void _updateComposerSuggestions(String text) {
+    final cursor = _inputController.selection.baseOffset;
+    final emojiTrigger = CustomEmojiParser.extractTrigger(text, cursor);
+    if (emojiTrigger != null) {
+      // `:` 后至少 1 个字符才推荐，避免单个冒号刷屏
+      final hits = emojiTrigger.isEmpty
+          ? const <CustomEmoji>[]
+          : BuiltinCustomEmojis.search(emojiTrigger, limit: 12);
+      if (!listEquals(hits, _customEmojiSuggestions) ||
+          _stickerSuggestions.isNotEmpty) {
+        setState(() {
+          _customEmojiSuggestions = hits;
+          _stickerSuggestions = const [];
+        });
+      }
+      return;
+    }
+    if (_customEmojiSuggestions.isNotEmpty) {
+      setState(() => _customEmojiSuggestions = const []);
+    }
+    _updateStickerSuggestions(text);
+  }
+
+  /// 选中联想的自定义 emoji：把 `:partial` 替换为完整 `:shortcode:`
+  void _onCustomEmojiSuggestionSelected(CustomEmoji emoji) {
+    final text = _inputController.text;
+    final cursor = _inputController.selection.baseOffset;
+    final offset = (cursor < 0 || cursor > text.length) ? text.length : cursor;
+    final before = text.substring(0, offset);
+    final triggerStart = before.lastIndexOf(':');
+    if (triggerStart < 0) return;
+
+    final insertion = ':${emoji.shortcode}: ';
+    final newText = text.replaceRange(triggerStart, offset, insertion);
+    _inputController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(
+        offset: triggerStart + insertion.length,
+      ),
+    );
+    setState(() => _customEmojiSuggestions = const []);
+    _inputFocusNode.requestFocus();
+  }
+
+  /// 按当前输入词更新贴纸联想候选
+  void _updateStickerSuggestions(String text) {
+    if (!getIt.isRegistered<IStickerRepository>()) return;
+
+    final query = StickerSuggestionUtils.extractQuery(
+      text,
+      _inputController.selection.baseOffset,
+    );
+    if (query == null) {
+      if (_stickerSuggestions.isNotEmpty) {
+        _stickerSuggestionToken++;
+        setState(() => _stickerSuggestions = const []);
+      }
+      return;
+    }
+
+    final token = ++_stickerSuggestionToken;
+    unawaited(() async {
+      try {
+        final hits = await getIt<IStickerRepository>().searchStickers(
+          query,
+          limit: 12,
+        );
+        if (!mounted || token != _stickerSuggestionToken) return;
+        setState(() => _stickerSuggestions = hits);
+      } catch (_) {
+        if (!mounted || token != _stickerSuggestionToken) return;
+        setState(() => _stickerSuggestions = const []);
+      }
+    }());
+  }
+
+  /// 选中联想贴纸：发送并清空候选
+  void _onStickerSuggestionSelected(Sticker sticker, String packId) {
+    _stickerSuggestionToken++;
+    setState(() => _stickerSuggestions = const []);
+    _onStickerSelected(sticker, packId);
   }
 
   /// 检测 @ 触发
@@ -1194,6 +1306,26 @@ class _ChatPageState extends State<ChatPage> {
                   !_showSearchBar)
                 _buildSelfDestructTimerBar(),
 
+              // 自定义 emoji 联想条（输入 `:partial`）
+              if (_customEmojiSuggestions.isNotEmpty &&
+                  !_isMultiSelectMode &&
+                  !_showSearchBar &&
+                  !_showMentionPicker)
+                CustomEmojiSuggestionBar(
+                  suggestions: _customEmojiSuggestions,
+                  onSelected: _onCustomEmojiSuggestionSelected,
+                ),
+
+              // 贴纸输入联想条（按词推荐贴纸）
+              if (_stickerSuggestions.isNotEmpty &&
+                  !_isMultiSelectMode &&
+                  !_showSearchBar &&
+                  !_showMentionPicker)
+                StickerSuggestionBar(
+                  suggestions: _stickerSuggestions,
+                  onSelected: _onStickerSuggestionSelected,
+                ),
+
               // 多选模式下显示操作栏，否则显示输入栏
               if (_isMultiSelectMode)
                 _buildMultiSelectBottomBar()
@@ -1234,7 +1366,13 @@ class _ChatPageState extends State<ChatPage> {
         listenWhen: (prev, curr) => prev.messages != curr.messages,
         listener: (context, state) {
           _handleSmartReplyStateChanged(state);
+          _announceIncomingMessage(context, state);
         },
+      ),
+      // 无障碍：对方「正在输入」状态变化时主动播报（屏幕阅读器否则感知不到）。
+      BlocListener<ChatBloc, ChatState>(
+        listenWhen: (prev, curr) => prev.typingUsers != curr.typingUsers,
+        listener: _announceTyping,
       ),
     ];
 
@@ -1254,6 +1392,46 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     return MultiBlocListener(listeners: listeners, child: content);
+  }
+
+  /// 新「对方」消息到达时,经 [SemanticsService] 主动播报给屏幕阅读器。
+  ///
+  /// 只播报最后一条且为对方发送的新消息(自己发的不报),并用
+  /// [_lastAnnouncedIncomingId] 去重,避免分页/刷新重复触发。
+  void _announceIncomingMessage(BuildContext context, ChatState state) {
+    if (state.messages.isEmpty) return;
+    final last = state.messages.last;
+    if (last.isFromMe) return;
+    if (last.id == _lastAnnouncedIncomingId) return;
+    // 初次进入会话(此前没播报过任何消息)不播报历史最后一条,只记录基线。
+    final isFirstSync = _lastAnnouncedIncomingId == null;
+    _lastAnnouncedIncomingId = last.id;
+    if (isFirstSync) return;
+
+    final a11y = A11yL10n.of(context);
+    final preview = last.type == MessageType.text ? last.content.trim() : '';
+    final text = preview.isEmpty
+        ? a11y.newMessageFrom(last.senderName)
+        : a11y.newMessageFromWithText(last.senderName, preview);
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      text,
+      Directionality.of(context),
+    );
+  }
+
+  /// 对方开始「正在输入」时播报;停止输入(列表清空)不播报。
+  void _announceTyping(BuildContext context, ChatState state) {
+    if (state.typingUsers.isEmpty) return;
+    final a11y = A11yL10n.of(context);
+    final text = state.typingUsers.length == 1
+        ? a11y.userTyping(state.typingUsers.first)
+        : a11y.peopleTyping(state.typingUsers.length);
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      text,
+      Directionality.of(context),
+    );
   }
 }
 

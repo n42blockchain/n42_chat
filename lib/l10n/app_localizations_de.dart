@@ -1466,16 +1466,6 @@ class SDe extends S {
   String get chatSaveToGallery => 'In Galerie speichern';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Download fehlgeschlagen: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Teilen fehlgeschlagen: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Bild laden fehlgeschlagen';
 
   @override
@@ -2644,6 +2634,31 @@ class SDe extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'Keine Medien-URL verfügbar';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Download fehlgeschlagen: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Fehler: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Musik-Link';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Rote Umschläge und Überweisungen können nicht weitergeleitet werden';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Teilen fehlgeschlagen: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Tippen zum Wiederholen';
 
   @override
@@ -2672,28 +2687,13 @@ class SDe extends S {
       'Bitte geben Sie die Gruppenankündigung ein';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Fehler: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count Mitglieder, klicken zum Kopieren der Gruppen-ID';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Musik-Link';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'Keine Medien-URL verfügbar';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Sie haben keine Berechtigung, den Gruppennamen zu ändern';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Rote Umschläge und Überweisungen können nicht weitergeleitet werden';
 
   @override
   String get authEmailAddress => 'E-Mail-Adresse';
@@ -2894,11 +2894,12 @@ class SDe extends S {
   @override
   String get authAppleLabel => 'Apfel';
 
-
-  @override
-  String get authSsoNotConfigured => 'Dieser Server hat keine SSO-Anmeldeanbieter konfiguriert';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Dieser Server hat keine SSO-Anmeldeanbieter konfiguriert';
 
   @override
   String get transferAmountHintZero => '0,00';

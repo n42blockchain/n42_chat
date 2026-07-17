@@ -1476,16 +1476,6 @@ class STe extends S {
   String get chatSaveToGallery => 'గ్యాలరీకి సేవ్ చేయండి';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'డౌన్‌లోడ్ విఫలమైంది: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'భాగస్వామ్యం విఫలమైంది: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'చిత్రాన్ని లోడ్ చేయడంలో విఫలమైంది';
 
   @override
@@ -2652,6 +2642,31 @@ class STe extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'మీడియా URL అందుబాటులో లేదు';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'డౌన్‌లోడ్ విఫలమైంది: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'లోపం: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'సంగీతం లింక్';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'ఎరుపు ప్యాకెట్లు మరియు బదిలీలు ఫార్వార్డ్ చేయబడవు';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'భాగస్వామ్యం విఫలమైంది: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'మళ్లీ ప్రయత్నించడానికి నొక్కండి';
 
   @override
@@ -2679,28 +2694,13 @@ class STe extends S {
   String get groupEnterGroupAnnouncement => 'సమూహ ప్రకటనను నమోదు చేయండి';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'లోపం: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count సభ్యులు, గ్రూప్ IDని కాపీ చేయడానికి క్లిక్ చేయండి';
   }
 
   @override
-  String get chatMusicLinkLabel => 'సంగీతం లింక్';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'మీడియా URL అందుబాటులో లేదు';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'సమూహం పేరును సవరించడానికి మీకు అనుమతి లేదు';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'ఎరుపు ప్యాకెట్లు మరియు బదిలీలు ఫార్వార్డ్ చేయబడవు';
 
   @override
   String get authEmailAddress => 'ఇమెయిల్ చిరునామా';
@@ -2902,11 +2902,12 @@ class STe extends S {
   @override
   String get authAppleLabel => 'ఆపిల్';
 
-
-  @override
-  String get authSsoNotConfigured => 'ఈ సర్వర్ SSO లాగిన్ ప్రొవైడర్‌లను కాన్ఫిగర్ చేయలేదు';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'ఈ సర్వర్ SSO లాగిన్ ప్రొవైడర్‌లను కాన్ఫిగర్ చేయలేదు';
 
   @override
   String get transferAmountHintZero => '0.00';

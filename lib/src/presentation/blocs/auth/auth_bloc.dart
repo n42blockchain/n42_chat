@@ -5,6 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
+import '../../../data/datasources/remote/id_hub_api.dart';
+import '../../../integration/wallet_bridge.dart';
+import '../../../n42_chat_config.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/contact_repository.dart';
@@ -14,6 +17,7 @@ import '../bloc_message_keys.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/utils/wallet_login_credentials.dart';
 
 /// 认证BLoC
 ///
@@ -22,6 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final IAuthRepository _authRepository;
   final BiometricService _biometricService;
   final SecureStorageDataSource _secureStorage;
+  final IdHubApi Function(String baseUrl) _idHubApiFactory;
   StreamSubscription<bool>? _loginStateSubscription;
   bool _logoutInProgress = false;
 
@@ -29,14 +34,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required IAuthRepository authRepository,
     BiometricService? biometricService,
     SecureStorageDataSource? secureStorage,
+    IdHubApi Function(String baseUrl)? idHubApiFactory,
   }) : _authRepository = authRepository,
        _biometricService = biometricService ?? BiometricService(),
        _secureStorage = secureStorage ?? SecureStorageDataSource(),
+       _idHubApiFactory =
+           idHubApiFactory ?? ((baseUrl) => IdHubApi(baseUrl: baseUrl)),
        super(const AuthState.initial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
+    on<AuthWalletAuthRequested>(_onWalletAuthRequested);
     on<AuthAnonymousRegisterRequested>(_onAnonymousRegisterRequested);
     on<AuthHomeserverCheckRequested>(_onHomeserverCheckRequested);
     on<AuthRestoreSessionRequested>(_onRestoreSessionRequested);
@@ -203,6 +212,143 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       );
     }
+  }
+
+  /// 钱包/DID 登录：优先走 ID Hub（统一身份），失败/未启用回退 legacy 派生凭据
+  Future<void> _onWalletAuthRequested(
+    AuthWalletAuthRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
+
+    // ID Hub path (graceful degradation): only when explicitly enabled and the
+    // hub returns Matrix credentials. Any miss falls through to the unchanged
+    // legacy derivation below, preserving chat history.
+    if (await _tryIdHubWalletLogin(event, emit)) return;
+
+    // Legacy path: sign the canonical message now (only reached when ID Hub is
+    // disabled or fell back). Signing is deferred to here so the wallet prompts
+    // exactly once - the UI no longer pre-signs.
+    final bridge =
+        getIt.isRegistered<IWalletBridge>() ? getIt<IWalletBridge>() : null;
+    final signature = bridge == null
+        ? null
+        : await bridge.signMessage(
+            WalletLoginCredentials.canonicalLoginMessage(event.address),
+          );
+    if (signature == null || signature.isEmpty) {
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Wallet login is not supported by this wallet',
+      ));
+      return;
+    }
+
+    final creds = WalletLoginCredentials.derive(
+      address: event.address,
+      signature: signature,
+    );
+
+    var result = await _authRepository.login(
+      homeserver: event.homeserver,
+      username: creds.username,
+      password: creds.password,
+      rememberMe: true,
+    );
+
+    // Matrix password login usually reports both "unknown user" and "wrong
+    // password" as invalid credentials. Only that class of failure should fall
+    // through to first-use auto-registration; network/server/rate-limit errors
+    // must surface directly instead of issuing a second auth request.
+    if (!(result.success && result.user != null) &&
+        _shouldAttemptWalletAutoRegister(result)) {
+      result = await _authRepository.register(
+        homeserver: event.homeserver,
+        username: creds.username,
+        password: creds.password,
+      );
+    }
+
+    if (result.success && result.user != null) {
+      await _completeAuthenticatedFlow(result.user!, emit);
+    } else {
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: _walletAuthErrorMessage(result),
+          errorType: result.errorType,
+        ),
+      );
+    }
+  }
+
+  /// Attempt wallet login via the N42 ID Hub. Returns true only when it fully
+  /// succeeds (Matrix session established); false means "fall back to legacy".
+  ///
+  /// The wallet signs the hub-issued challenge (a server nonce) here. Signing is
+  /// deferred to the bloc for both paths (ID Hub challenge here, canonical
+  /// message in the legacy branch), so the UI never pre-signs. The wallet
+  /// prompts once on hub success and once on the pure-legacy path; the one
+  /// transitional exception is hub-enabled-but-fell-back (e.g. Matrix bridge
+  /// not live yet), where the hub challenge and then the legacy canonical
+  /// message are each signed - two prompts until the bridge ships.
+  Future<bool> _tryIdHubWalletLogin(
+    AuthWalletAuthRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    final config = getIt.isRegistered<N42ChatConfig>()
+        ? getIt<N42ChatConfig>()
+        : null;
+    final hubUrl = config?.idHubUrl;
+    if (config == null ||
+        !config.enableIdHubLogin ||
+        hubUrl == null ||
+        hubUrl.isEmpty) {
+      return false;
+    }
+    if (!getIt.isRegistered<IWalletBridge>()) return false;
+
+    try {
+      final api = _idHubApiFactory(hubUrl);
+      final challenge = await api.createWalletChallenge(address: event.address);
+      final signature = await getIt<IWalletBridge>().signMessage(
+        challenge.message,
+      );
+      if (signature == null || signature.isEmpty) return false;
+
+      final resp = await api.verifyWalletLogin(
+        challengeId: challenge.challengeId,
+        signature: signature,
+      );
+      // Hub reachable but Matrix bridge not live yet -> fall back to legacy.
+      if (!resp.success || !resp.hasMatrixCredentials) return false;
+
+      final result = await _authRepository.loginWithToken(
+        homeserver: resp.matrixHomeserver!,
+        accessToken: resp.matrixAccessToken!,
+        userId: resp.matrixUserId!,
+        deviceId: resp.matrixDeviceId ?? '',
+      );
+      if (result.success && result.user != null) {
+        await _completeAuthenticatedFlow(result.user!, emit);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugLog('AuthBloc: ID Hub wallet login failed, falling back - $e');
+      return false;
+    }
+  }
+
+  bool _shouldAttemptWalletAutoRegister(AuthResult loginResult) {
+    return loginResult.errorType == AuthErrorType.invalidCredentials;
+  }
+
+  String _walletAuthErrorMessage(AuthResult result) {
+    if (result.errorType == AuthErrorType.usernameExists) {
+      return 'Wallet account already exists but could not be unlocked. Reconnect the same wallet and try again.';
+    }
+    return result.errorMessage ?? 'Wallet login failed';
   }
 
   /// 匿名注册

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -5,9 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/utils/video_note_utils.dart';
+import '../../../core/utils/event_message_data.dart';
+import '../../../core/utils/quiz_reveal.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/extensions/context_extension.dart';
@@ -22,6 +28,7 @@ import '../../blocs/chat/chat_event.dart';
 import '../../widgets/chat/message_status_indicator.dart' as indicator;
 import '../../widgets/chat/chat_widgets.dart';
 import '../../widgets/chat/contact_card_message_widget.dart';
+import '../../widgets/chat/video_sticker_view.dart';
 import '../../widgets/chat/url_preview_widget.dart';
 import '../../../core/services/ai_service.dart';
 import '../../widgets/chat/message_reaction_bar.dart';
@@ -404,7 +411,7 @@ class MessageItem extends StatelessWidget {
         content = _buildVideoMessage(context);
         break;
       case MessageType.file:
-        content = _buildFileMessage(isDark);
+        content = _buildFileMessage(isDark, context);
         break;
       case MessageType.location:
         content = _buildLocationMessage(isDark, context);
@@ -413,7 +420,7 @@ class MessageItem extends StatelessWidget {
         content = _buildTransferMessage();
         break;
       case MessageType.tip:
-        content = _buildTipMessage();
+        content = _buildTipMessage(context);
         break;
       case MessageType.paymentRequest:
         content = _buildPaymentRequestMessage(context);
@@ -429,6 +436,9 @@ class MessageItem extends StatelessWidget {
         break;
       case MessageType.contactCard:
         content = _buildContactCardWidget(context);
+        break;
+      case MessageType.event:
+        content = _buildEventMessage(isDark, context);
         break;
       case MessageType.encrypted:
         content = _buildEncryptedMessage(isDark);
@@ -934,30 +944,37 @@ class MessageItem extends StatelessWidget {
         mimeType.contains('json') ||
         lower.endsWith('.json');
     final isSvg = mimeType.contains('svg') || lower.endsWith('.svg');
+    final isVideo = VideoStickerView.isVideoSticker(
+      mimeType: mimeType,
+      url: url,
+    );
     return SizedBox(
       width: size,
       height: size,
-      child: isLottie
-          ? Lottie.network(
-              url,
-              headers: headers,
-              fit: BoxFit.contain,
-              repeat: true,
-              errorBuilder: (_, _, _) => fallback(),
-            )
-          : isSvg
-              ? SvgPicture.network(
+      child: isVideo
+          // 视频贴纸（WebM/MP4，对齐 Telegram；iOS WebM 受限见 VideoStickerView）
+          ? VideoStickerView(url: url, headers: headers)
+          : isLottie
+              ? Lottie.network(
                   url,
                   headers: headers,
                   fit: BoxFit.contain,
-                  placeholderBuilder: (_) => fallback(),
-                )
-              : Image.network(
-                  url,
-                  fit: BoxFit.contain,
-                  headers: headers,
+                  repeat: true,
                   errorBuilder: (_, _, _) => fallback(),
-                ),
+                )
+              : isSvg
+                  ? SvgPicture.network(
+                      url,
+                      headers: headers,
+                      fit: BoxFit.contain,
+                      placeholderBuilder: (_) => fallback(),
+                    )
+                  : Image.network(
+                      url,
+                      fit: BoxFit.contain,
+                      headers: headers,
+                      errorBuilder: (_, _, _) => fallback(),
+                    ),
     );
   }
 
@@ -992,6 +1009,68 @@ class MessageItem extends StatelessWidget {
       TranscribeVoiceMessage(
         messageId: message.id,
         language: locale.toLanguageTag(),
+      ),
+    );
+  }
+
+  /// 圆形视频留言渲染（缩略图圆形裁切 + 播放叠层）。
+  Widget _buildVideoNote(String? thumbnailUrl) {
+    const double size = 160;
+    return Semantics(
+      button: true,
+      label: 'Video note',
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipOval(
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (thumbnailUrl != null && thumbnailUrl.isNotEmpty)
+                  ImageMessageWidget(
+                    imageUrl: thumbnailUrl,
+                    onTap: onTap,
+                    maxWidth: size,
+                    maxHeight: size,
+                    borderRadius: 0,
+                  )
+                else
+                  Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.grey[800]!, Colors.grey[900]!],
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.videocam,
+                      color: Colors.white.withValues(alpha: 0.6),
+                      size: 40,
+                    ),
+                  ),
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1102,6 +1181,11 @@ class MessageItem extends StatelessWidget {
           ),
         ),
       );
+    }
+
+    // 圆形视频留言（Video Note）：据文件名前缀识别，圆形渲染。
+    if (VideoNoteUtils.isVideoNote(metadata?.fileName)) {
+      return _buildVideoNote(thumbnailUrl);
     }
 
     return GestureDetector(
@@ -1266,12 +1350,15 @@ class MessageItem extends StatelessWidget {
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
-  Widget _buildFileMessage(bool isDark) {
+  Widget _buildFileMessage(bool isDark, BuildContext context) {
     final metadata = message.metadata;
     final filename = metadata?.fileName ?? message.content;
     final size = metadata?.size;
 
-    return Container(
+    return Semantics(
+      label: A11yL10n.of(context).file(filename),
+      excludeSemantics: true,
+      child: Container(
       width: 200,
       padding: const EdgeInsets.all(12),
       child: Row(
@@ -1325,6 +1412,7 @@ class MessageItem extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -1341,7 +1429,10 @@ class MessageItem extends StatelessWidget {
       locationName = S.of(context)?.chatMyLocation ?? 'My Location';
     }
 
-    return SizedBox(
+    return Semantics(
+      label: A11yL10n.of(context).location(locationName),
+      excludeSemantics: true,
+      child: SizedBox(
       width: 220,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1462,17 +1553,25 @@ class MessageItem extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
   /// 打赏消息（渐变气泡）
-  Widget _buildTipMessage() {
+  Widget _buildTipMessage(BuildContext context) {
     final metadata = message.metadata;
     final amount = metadata?.amount ?? '0';
     final token = metadata?.token ?? '';
     final note = message.content.trim();
     final confirmed = (metadata?.txHash ?? '').isNotEmpty;
-    return Container(
+    return Semantics(
+      label: [
+        A11yL10n.of(context).tip,
+        '$amount $token'.trim(),
+        if (note.isNotEmpty) note,
+      ].where((e) => e.isNotEmpty).join(', '),
+      excludeSemantics: true,
+      child: Container(
       constraints: const BoxConstraints(maxWidth: 260),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -1519,6 +1618,7 @@ class MessageItem extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -1621,7 +1721,11 @@ class MessageItem extends StatelessWidget {
     final cover = metadata?.musicCover;
     final url = metadata?.musicUrl;
 
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: A11yL10n.of(context).music(title, artist),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: () {
         if (url != null && url.isNotEmpty) {
           onTap?.call();
@@ -1711,7 +1815,135 @@ class MessageItem extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
+  }
+
+  /// 日程 / 事件卡片：标题 + 起止时间 + 地点 + 描述 + 「加入日历」
+  Widget _buildEventMessage(bool isDark, BuildContext context) {
+    final data = message.metadata?.event;
+    if (data == null) return _buildTextMessage(isDark, context);
+
+    final titleColor = message.isFromMe
+        ? AppColors.sentText(isDark)
+        : context.textPrimary;
+    final subColor = message.isFromMe
+        ? AppColors.sentText(isDark).withValues(alpha: 0.75)
+        : context.textSecondary;
+
+    Widget row(IconData icon, String text, {int maxLines = 2}) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 15, color: subColor),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                text,
+                maxLines: maxLines,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 13, height: 1.3, color: subColor),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final when = data.endsAt != null
+        ? EventMessageData.formatRange(data.startsAt, data.endsAt!)
+        : EventMessageData.formatLocal(data.startsAt);
+
+    return Container(
+      width: 250,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: message.isFromMe
+            ? AppColors.messageSent
+            : (isDark
+                  ? AppColors.messageReceivedDark
+                  : AppColors.messageReceived),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.event, size: 18, color: AppColors.primary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  data.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.3,
+                    fontWeight: FontWeight.w600,
+                    color: titleColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          row(Icons.schedule, when),
+          if (data.location != null && data.location!.isNotEmpty)
+            row(Icons.place_outlined, data.location!),
+          if (data.description != null && data.description!.isNotEmpty)
+            row(Icons.notes, data.description!, maxLines: 3),
+          const SizedBox(height: 10),
+          Semantics(
+            button: true,
+            label: A11yL10n.of(context).addToCalendar,
+            excludeSemantics: true,
+            child: GestureDetector(
+            onTap: () => _shareEventIcs(context, data),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.calendar_today,
+                    size: 14, color: AppColors.primary),
+                SizedBox(width: 4),
+                Text(
+                  'Add to calendar',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _shareEventIcs(
+    BuildContext context,
+    EventMessageData data,
+  ) async {
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [
+            XFile.fromData(
+              Uint8List.fromList(utf8.encode(data.toIcs())),
+              mimeType: 'text/calendar',
+              name: 'event.ics',
+            ),
+          ],
+        ),
+      );
+    } catch (_) {
+      // 分享失败静默（用户取消等）
+    }
   }
 
   Widget _buildPollMessage(bool isDark, BuildContext context) {
@@ -1724,6 +1956,14 @@ class MessageItem extends StatelessWidget {
     final totalVoters = metadata?.totalVoters ?? 0;
     final maxSelections = metadata?.maxSelections ?? 1;
     final pollEnded = metadata?.pollEnded ?? false;
+
+    // Quiz：揭晓时机为「已投票或已结束」
+    final quizCorrectIndex = metadata?.quizCorrectIndex;
+    final quizReveal = QuizReveal.shouldReveal(
+      correctIndex: quizCorrectIndex,
+      hasVoted: myVotes.isNotEmpty,
+      pollEnded: pollEnded,
+    );
 
     return Container(
       width: 260,
@@ -1825,14 +2065,29 @@ class MessageItem extends StatelessWidget {
             // 1. 投票已结束，不能投票
             // 2. 单选时，可以点击其他选项更改投票
             // 3. 多选时，可以取消已选项或选择新选项（未达最大值时）
+            // Quiz 揭晓后锁定作答
+            final quizState = QuizReveal.optionState(
+              optionIndex: index,
+              optionId: optionId,
+              correctIndex: quizCorrectIndex,
+              myVoteIds: myVotes,
+              reveal: quizReveal,
+            );
+
             final canChangeVote =
                 !pollEnded &&
+                !quizReveal &&
                 (isSelected || // 可以取消已选的
                     myVotes.length < maxSelections || // 可以添加新选择
                     (maxSelections == 1 && myVotes.isNotEmpty) // 单选可以更改
                     );
 
-            return GestureDetector(
+            return Semantics(
+              button: canChangeVote,
+              selected: isSelected,
+              label: A11yL10n.of(context).pollOption(optionText, voteCount),
+              excludeSemantics: true,
+              child: GestureDetector(
               onTap: canChangeVote
                   ? () => onPollVote?.call(
                       message.id,
@@ -1845,12 +2100,24 @@ class MessageItem extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.inputBgOf(isDark),
+                  color: switch (quizState) {
+                    QuizOptionState.correct =>
+                      AppColors.success.withValues(alpha: 0.12),
+                    QuizOptionState.wrongPicked =>
+                      AppColors.error.withValues(alpha: 0.12),
+                    _ => isSelected
+                        ? AppColors.primary.withValues(alpha: 0.1)
+                        : AppColors.inputBgOf(isDark),
+                  },
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    color: switch (quizState) {
+                      QuizOptionState.correct => AppColors.success,
+                      QuizOptionState.wrongPicked => AppColors.error,
+                      _ => isSelected
+                          ? AppColors.primary
+                          : Colors.transparent,
+                    },
                     width: 1.5,
                   ),
                 ),
@@ -1874,7 +2141,13 @@ class MessageItem extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (isSelected)
+                        if (quizState == QuizOptionState.correct)
+                          const Icon(Icons.check_circle,
+                              size: 18, color: AppColors.success)
+                        else if (quizState == QuizOptionState.wrongPicked)
+                          const Icon(Icons.cancel,
+                              size: 18, color: AppColors.error)
+                        else if (isSelected)
                           const Icon(
                             Icons.check_circle,
                             size: 18,
@@ -1919,8 +2192,42 @@ class MessageItem extends StatelessWidget {
                   ],
                 ),
               ),
+              ),
             );
           }),
+
+          // Quiz 解析（揭晓后显示）
+          if (quizReveal &&
+              metadata?.quizExplanation != null &&
+              metadata!.quizExplanation!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.info.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.lightbulb_outline,
+                      size: 14, color: AppColors.info),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      metadata.quizExplanation!,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        height: 1.35,
+                        color: AppColors.info,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
 
           // 底部统计
           const SizedBox(height: 4),
@@ -1939,7 +2246,11 @@ class MessageItem extends StatelessWidget {
                 ),
               ),
               if (!pollEnded && message.isFromMe)
-                GestureDetector(
+                Semantics(
+                  button: true,
+                  label: S.of(context)?.chatEndPollButton ?? 'End Poll',
+                  excludeSemantics: true,
+                  child: GestureDetector(
                   onTap: () => onEndPoll?.call(message.id),
                   child: Text(
                     S.of(context)?.chatEndPollButton ?? 'End Poll',
@@ -1951,6 +2262,7 @@ class MessageItem extends StatelessWidget {
                       color: AppColors.error,
                     ),
                   ),
+                ),
                 ),
             ],
           ),
@@ -2057,7 +2369,11 @@ class MessageItem extends StatelessWidget {
           // 未接来电显示回拨按钮
           if (isMissed && !message.isFromMe && onCallBack != null) ...[
             const SizedBox(width: 8),
-            GestureDetector(
+            Semantics(
+              button: true,
+              label: S.of(context)?.chatCallBack ?? '回拨',
+              excludeSemantics: true,
+              child: GestureDetector(
               onTap: () => onCallBack?.call(message),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -2088,6 +2404,7 @@ class MessageItem extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
             ),
           ],
         ],

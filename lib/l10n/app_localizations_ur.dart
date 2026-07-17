@@ -1470,16 +1470,6 @@ class SUr extends S {
   String get chatSaveToGallery => 'گیلری میں محفوظ کریں۔';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'ڈاؤن لوڈ ناکام: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'اشتراک ناکام: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'تصویر لوڈ کرنے میں ناکام';
 
   @override
@@ -2636,6 +2626,31 @@ class SUr extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'کوئی میڈیا URL دستیاب نہیں ہے۔';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'ڈاؤن لوڈ ناکام: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'خرابی: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'میوزک لنک';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'ریڈ پیکٹ اور ٹرانسفر فارورڈ نہیں کیے جا سکتے';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'اشتراک ناکام: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'دوبارہ کوشش کرنے کے لیے تھپتھپائیں۔';
 
   @override
@@ -2662,28 +2677,13 @@ class SUr extends S {
   String get groupEnterGroupAnnouncement => 'گروپ کا اعلان درج کریں۔';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'خرابی: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count ممبران، گروپ آئی ڈی کاپی کرنے کے لیے کلک کریں۔';
   }
 
   @override
-  String get chatMusicLinkLabel => 'میوزک لنک';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'کوئی میڈیا URL دستیاب نہیں ہے۔';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'آپ کو گروپ کے نام میں ترمیم کرنے کی اجازت نہیں ہے۔';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'ریڈ پیکٹ اور ٹرانسفر فارورڈ نہیں کیے جا سکتے';
 
   @override
   String get authEmailAddress => 'ای میل ایڈریس';
@@ -2883,11 +2883,12 @@ class SUr extends S {
   @override
   String get authAppleLabel => 'ایپل';
 
-
-  @override
-  String get authSsoNotConfigured => 'اس سرور نے SSO لاگ ان فراہم کنندگان کو ترتیب نہیں دیا ہے';
   @override
   String get authSsoLabel => 'ایس ایس او';
+
+  @override
+  String get authSsoNotConfigured =>
+      'This server has not configured SSO login providers';
 
   @override
   String get transferAmountHintZero => '0.00';

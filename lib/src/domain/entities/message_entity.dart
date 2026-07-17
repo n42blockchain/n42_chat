@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../core/utils/event_message_data.dart';
+
 final _whitespaceRegExp = RegExp(r'\s+');
 
 /// 消息类型
@@ -69,6 +71,9 @@ enum MessageType {
 
   /// 联系人名片
   contactCard,
+
+  /// 日程 / 事件消息（可加入日历）
+  event,
 
   /// 未知类型
   unknown,
@@ -578,6 +583,12 @@ class MessageMetadata extends Equatable {
   /// 是否匿名投票
   final bool? isAnonymousPoll;
 
+  /// Quiz 正确选项序号（null = 普通投票，非 null = Quiz 答题）
+  final int? quizCorrectIndex;
+
+  /// Quiz 答案解析（可空）
+  final String? quizExplanation;
+
   // ============================================
   // E2EE 加密媒体属性（file 字段中的 key 材料）
   // ============================================
@@ -629,6 +640,13 @@ class MessageMetadata extends Equatable {
   /// 通话对方 ID
   final String? callPeerId;
 
+  // ============================================
+  // 日程 / 事件属性
+  // ============================================
+
+  /// 日程/事件载荷（标题、起止时间、地点、描述）
+  final EventMessageData? event;
+
   const MessageMetadata({
     this.mediaUrl,
     this.httpUrl,
@@ -663,6 +681,8 @@ class MessageMetadata extends Equatable {
     this.maxSelections,
     this.pollEnded,
     this.isAnonymousPoll,
+    this.quizCorrectIndex,
+    this.quizExplanation,
     this.encryptKey,
     this.encryptIv,
     this.encryptSha256,
@@ -676,6 +696,7 @@ class MessageMetadata extends Equatable {
     this.callEndReason,
     this.callRoomId,
     this.callPeerId,
+    this.event,
   });
 
   /// 格式化文件大小
@@ -735,6 +756,8 @@ class MessageMetadata extends Equatable {
     maxSelections,
     pollEnded,
     isAnonymousPoll,
+    quizCorrectIndex,
+    quizExplanation,
     encryptKey,
     encryptIv,
     encryptSha256,
@@ -748,6 +771,7 @@ class MessageMetadata extends Equatable {
     callEndReason,
     callRoomId,
     callPeerId,
+    event,
   ];
 
   /// Create a copy with updated poll fields
@@ -767,6 +791,8 @@ class MessageMetadata extends Equatable {
     voteCounts: voteCounts ?? this.voteCounts,
     totalVoters: totalVoters ?? this.totalVoters,
     myVotes: myVotes ?? this.myVotes,
+    quizCorrectIndex: quizCorrectIndex,
+    quizExplanation: quizExplanation,
     mediaUrl: mediaUrl,
     httpUrl: httpUrl,
     thumbnailUrl: thumbnailUrl,

@@ -1459,16 +1459,6 @@ class SVi extends S {
   String get chatSaveToGallery => 'Luu vao Thu vien';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Tai xuong that bai: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Chia se that bai: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Tai hinh anh that bai';
 
   @override
@@ -2612,6 +2602,31 @@ class SVi extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'URL phương tiện không khả dụng';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Tai xuong that bai: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Lỗi: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Liên kết nhạc';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Lì xì và chuyển khoản không thể chuyển tiếp';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Chia se that bai: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Nhấn để thử lại';
 
   @override
@@ -2638,28 +2653,13 @@ class SVi extends S {
   String get groupEnterGroupAnnouncement => 'Nhập thông báo nhóm';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Lỗi: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count thành viên, nhấp để sao chép ID nhóm';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Liên kết nhạc';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'URL phương tiện không khả dụng';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'Bạn không có quyền chỉnh sửa tên nhóm';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Lì xì và chuyển khoản không thể chuyển tiếp';
 
   @override
   String get authEmailAddress => 'Địa chỉ email';
@@ -2853,11 +2853,12 @@ class SVi extends S {
   @override
   String get authAppleLabel => 'táo';
 
-
-  @override
-  String get authSsoNotConfigured => 'Máy chủ này chưa cấu hình nhà cung cấp đăng nhập SSO';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'Máy chủ này chưa cấu hình nhà cung cấp đăng nhập SSO';
 
   @override
   String get transferAmountHintZero => '0,00';
@@ -5482,7 +5483,7 @@ class SVi extends S {
   }
 
   @override
-  String get redPacketStatsTotal => 'Total: null null';
+  String get redPacketStatsTotal => 'tổng';
 
   @override
   String redPacketGrabbedViral(String amount, String token) {

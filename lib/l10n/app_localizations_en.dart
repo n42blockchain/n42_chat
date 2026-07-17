@@ -1457,16 +1457,6 @@ class SEn extends S {
   String get chatSaveToGallery => 'Save to Gallery';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'Download failed: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'Share failed: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'Failed to load image';
 
   @override
@@ -2616,6 +2606,31 @@ class SEn extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'No media URL available';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'Download failed: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'Error: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'Music link';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'Red packets and transfers cannot be forwarded';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'Share failed: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'Tap to retry';
 
   @override
@@ -2642,28 +2657,13 @@ class SEn extends S {
   String get groupEnterGroupAnnouncement => 'Enter group announcement';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'Error: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count members, click to copy group ID';
   }
 
   @override
-  String get chatMusicLinkLabel => 'Music link';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'No media URL available';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'You don\'t have permission to edit group name';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'Red packets and transfers cannot be forwarded';
 
   @override
   String get authEmailAddress => 'Email Address';
@@ -2857,11 +2857,12 @@ class SEn extends S {
   @override
   String get authAppleLabel => 'Apple';
 
-
-  @override
-  String get authSsoNotConfigured => 'This server has not configured SSO login providers';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'This server has not configured SSO login providers';
 
   @override
   String get transferAmountHintZero => '0.00';

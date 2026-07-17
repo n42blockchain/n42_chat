@@ -23,6 +23,31 @@ void main() {
     expect(packs.single.id, 'store_cute_animals');
   });
 
+  test('searchStickers returns empty for blank query', () async {
+    expect(await repository.searchStickers('   '), isEmpty);
+  });
+
+  test('searchStickers matches bundled stickers by name', () async {
+    when(() => mockDataSource.getInstalledPacks())
+        .thenAnswer((_) async => const []);
+
+    final hits = await repository.searchStickers('rocket');
+
+    expect(hits, isNotEmpty);
+    expect(hits.first.sticker.emoji, '🚀');
+    expect(hits.first.packId, isNotEmpty);
+  });
+
+  test('searchStickers matches bundled stickers by emoji', () async {
+    when(() => mockDataSource.getInstalledPacks())
+        .thenAnswer((_) async => const []);
+
+    final hits = await repository.searchStickers('🔥');
+
+    expect(hits, isNotEmpty);
+    expect(hits.every((h) => h.sticker.emoji == '🔥'), isTrue);
+  });
+
   test('searchPacks deduplicates installed and store results by pack id', () async {
     const installedPack = StickerPack(
       id: 'store_cute_animals',

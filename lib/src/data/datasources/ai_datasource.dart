@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 
@@ -15,6 +16,8 @@ class AiDatasource implements AiService {
   final String _baseUrl;
   final String _apiKey;
   final String _defaultModel;
+  final String _imageModel;
+  final String _visionModel;
   final bool _useProxyEndpoint;
 
   static final _newlineRegExp = RegExp(r'[\r\n]+');
@@ -26,6 +29,8 @@ class AiDatasource implements AiService {
     required String baseUrl,
     required String apiKey,
     String defaultModel = 'gpt-4o-mini',
+    String imageModel = 'dall-e-3',
+    String visionModel = 'gpt-4o',
     bool useProxyEndpoint = false,
     Dio? dio,
   }) : _baseUrl = baseUrl.endsWith('/')
@@ -33,6 +38,8 @@ class AiDatasource implements AiService {
            : baseUrl,
        _apiKey = apiKey,
        _defaultModel = defaultModel,
+       _imageModel = imageModel,
+       _visionModel = visionModel,
        _useProxyEndpoint = useProxyEndpoint,
        _dio = dio ?? Dio() {
     _dio.options.baseUrl = _baseUrl;
@@ -453,6 +460,142 @@ class AiDatasource implements AiService {
     return line.replaceFirst(_listPrefixRegExp, '').trim();
   }
 
+  @override
+  bool get supportsImageGeneration => isAvailable;
+
+  @override
+  bool get supportsVision => isAvailable;
+
+  @override
+  Future<String> describeImage(
+    Uint8List imageBytes, {
+    String? prompt,
+    String? model,
+    String mimeType = 'image/png',
+  }) async {
+    if (imageBytes.isEmpty) {
+      throw const AiServiceException('Image is empty');
+    }
+    final instruction = prompt ??
+        'Describe this image concisely. If it contains text, transcribe '
+            'the text (OCR). Reply in the language of the text if any.';
+    final dataUri = 'data:$mimeType;base64,${base64Encode(imageBytes)}';
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        _chatCompletionsUrl,
+        data: {
+          'model': model ?? _visionModel,
+          'messages': [
+            {
+              'role': 'user',
+              'content': [
+                {'type': 'text', 'text': instruction},
+                {
+                  'type': 'image_url',
+                  'image_url': {'url': dataUri},
+                },
+              ],
+            },
+          ],
+          'max_tokens': 1024,
+          'stream': false,
+        },
+      );
+      final data = response.data;
+      final choices = data?['choices'] as List<dynamic>?;
+      if (choices == null || choices.isEmpty) {
+        throw const AiServiceException('No choices in response');
+      }
+      final message = choices[0]['message'] as Map<String, dynamic>?;
+      final content = _extractMessageText(message?['content']) ?? '';
+      return content.trim();
+    } on DioException catch (e) {
+      debugLog('AiDatasource: Vision error: ${e.message}');
+      throw AiServiceException(_parseErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<AiImageResult> generateImage(
+    String prompt, {
+    String? model,
+    String size = '1024x1024',
+  }) async {
+    if (prompt.trim().isEmpty) {
+      throw const AiServiceException('Image prompt is empty');
+    }
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        _imagesUrl,
+        data: {
+          'model': model ?? _imageModel,
+          'prompt': prompt,
+          'n': 1,
+          'size': size,
+          'response_format': 'b64_json',
+        },
+      );
+      final data = response.data?['data'];
+      if (data is! List || data.isEmpty) {
+        throw const AiServiceException('No image in response');
+      }
+      final first = data.first;
+      if (first is Map<String, dynamic>) {
+        // 优先 b64_json，回退 url
+        final b64 = first['b64_json'];
+        if (b64 is String && b64.isNotEmpty) {
+          return AiImageResult(
+            bytes: base64Decode(b64),
+            model: response.data?['model'] as String? ?? model ?? _imageModel,
+          );
+        }
+        final url = first['url'];
+        if (url is String && url.isNotEmpty) {
+          final imgResp = await _dio.get<List<int>>(
+            url,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          final bytes = imgResp.data;
+          if (bytes != null && bytes.isNotEmpty) {
+            return AiImageResult(
+              bytes: Uint8List.fromList(bytes),
+              model: model ?? _imageModel,
+            );
+          }
+        }
+      }
+      throw const AiServiceException('No usable image data in response');
+    } on DioException catch (e) {
+      debugLog('AiDatasource: Image generation error: ${e.message}');
+      throw AiServiceException(_parseErrorMessage(e));
+    }
+  }
+
+  /// OpenAI 兼容图片生成端点（`/v1/images/generations`）。
+  String get _imagesUrl =>
+      _useProxyEndpoint ? _baseUrl : _buildImagesUrl();
+
+  String _buildImagesUrl() {
+    final baseUri = Uri.tryParse(_baseUrl);
+    if (baseUri == null) return '$_baseUrl/v1/images/generations';
+
+    final normalizedPath = baseUri.path.replaceFirst(_trailingSlashRegExp, '');
+    final endpointPath = switch (normalizedPath) {
+      '' => '/v1/images/generations',
+      '/v1' => '/v1/images/generations',
+      // base 指向 chat 端点时，取其 /v1 前缀换成 images
+      final String path when path.endsWith('/v1/chat/completions') =>
+        '${path.substring(0, path.length - '/chat/completions'.length)}/images/generations',
+      final String path when path.endsWith('/images/generations') => path,
+      final String path when path.endsWith('/v1') => '$path/images/generations',
+      final String path => '$path/v1/images/generations',
+    };
+
+    return baseUri
+        .replace(path: endpointPath, queryParameters: null)
+        .toString();
+  }
+
   String _buildChatCompletionsUrl() {
     final baseUri = Uri.tryParse(_baseUrl);
     if (baseUri == null) return '$_baseUrl/v1/chat/completions';
@@ -476,13 +619,4 @@ class AiDatasource implements AiService {
   void dispose() {
     _dio.close();
   }
-}
-
-/// AI 服务异常
-class AiServiceException implements Exception {
-  final String message;
-  const AiServiceException(this.message);
-
-  @override
-  String toString() => 'AiServiceException: $message';
 }
