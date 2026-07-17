@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/services/auto_download_policy_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -267,7 +268,13 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       );
     }
 
-    return imageWidget;
+    return Semantics(
+      image: true,
+      button: widget.onTap != null,
+      label: A11yL10n.of(context).image,
+      excludeSemantics: true,
+      child: imageWidget,
+    );
   }
 
   Widget _buildManualLoadCard(BuildContext context, Size size) {
@@ -532,7 +539,15 @@ class ImageGridWidget extends StatelessWidget {
             client: MatrixClientManager.instance.client,
           );
 
-          return GestureDetector(
+          return Semantics(
+            image: true,
+            button: true,
+            label: isLast
+                ? A11yL10n.of(context)
+                    .imageIndexMore(index + 1, images.length - maxCount)
+                : A11yL10n.of(context).imageIndex(index + 1),
+            excludeSemantics: true,
+            child: GestureDetector(
             onTap: () => onTap?.call(index),
             child: Stack(
               children: [
@@ -582,6 +597,7 @@ class ImageGridWidget extends StatelessWidget {
                   ),
               ],
             ),
+          ),
           );
         }),
       ),

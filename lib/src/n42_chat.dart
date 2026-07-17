@@ -46,6 +46,7 @@ import 'presentation/pages/profile/profile_page.dart';
 import 'presentation/pages/profile/user_profile_page.dart';
 import 'presentation/pages/settings/change_email_page.dart' as chat_settings;
 import 'core/utils/debug_log.dart';
+import 'core/utils/livekit_call_utils.dart';
 
 part 'presentation/widgets/n42_chat_widgets.dart';
 part 'core/services/n42_theme_manager.dart';
@@ -99,6 +100,11 @@ class N42Chat {
   /// 宿主未注册时 ServicesPage 会降级为信息提示。
   static VoidCallback? _onOpenWallet;
   static VoidCallback? _onOpenCardPack;
+
+  /// 宿主"打开视频直播"回调（发现页「直播」触发）。
+  /// 视频直播由宿主实现（复用 chat 的 Matrix 房间 + 自部署 LiveKit）；
+  /// 宿主未注册时发现页「直播」回退到语音房列表。
+  static void Function(BuildContext context)? _onOpenLive;
 
   /// Moment 邀请节流时间戳（10 秒内不重复处理）
   static DateTime? _lastMomentInviteCheck;
@@ -169,7 +175,8 @@ class N42Chat {
   ///   N42Chat.setThemeMode(next);
   /// });
   /// ```
-  static void setThemeMode(ThemeMode mode) => _N42ThemeManager.setThemeMode(mode);
+  static void setThemeMode(ThemeMode mode) =>
+      _N42ThemeManager.setThemeMode(mode);
 
   /// 添加主题变化监听器
   static void addThemeListener(void Function(ThemeMode) listener) =>
@@ -322,6 +329,15 @@ class N42Chat {
     _onOpenCardPack = handler;
   }
 
+  /// 注册宿主侧"打开视频直播"回调。
+  /// 由发现页「直播」入口触发；宿主应 push 自己的视频直播页面。
+  /// 未注册时发现页「直播」回退到语音房列表。
+  static void setLiveEntryHandler(
+    void Function(BuildContext context)? handler,
+  ) {
+    _onOpenLive = handler;
+  }
+
   /// 内部使用：ServicesPage 触发 Wallet，若未注册返回 false。
   static bool invokeOpenWallet() {
     final cb = _onOpenWallet;
@@ -335,6 +351,15 @@ class N42Chat {
     final cb = _onOpenCardPack;
     if (cb == null) return false;
     cb();
+    return true;
+  }
+
+  /// 内部使用：发现页「直播」触发视频直播，若宿主未注册返回 false
+  /// （调用方据此回退到语音房列表）。
+  static bool invokeOpenLive(BuildContext context) {
+    final cb = _onOpenLive;
+    if (cb == null) return false;
+    cb(context);
     return true;
   }
 
@@ -872,8 +897,7 @@ class N42Chat {
   static bool _isLoggedOutState(AuthStatus status) =>
       status == AuthStatus.unauthenticated || status == AuthStatus.initial;
 
-  static bool _defaultIsFailure(AuthState s) =>
-      s.status == AuthStatus.error;
+  static bool _defaultIsFailure(AuthState s) => s.status == AuthStatus.error;
 
   /// 清理本地持久化的 chat 数据。
   ///

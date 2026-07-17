@@ -7,8 +7,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_background/flutter_background.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' show Helper;
 import 'package:livekit_client/livekit_client.dart';
 
+import 'call_e2ee_provider.dart';
+import 'virtual_background_processor.dart';
 import 'voip_config.dart';
 import '../../core/utils/debug_log.dart';
 
@@ -26,12 +30,16 @@ enum MeetingState {
 enum MeetingErrorType {
   /// LiveKit 服务器未配置
   serverNotConfigured,
+
   /// 加入会议失败
   joinFailed,
+
   /// 屏幕共享失败
   screenShareFailed,
+
   /// 连接断开
   connectionLost,
+
   /// 未知错误
   unknown,
 }
@@ -108,11 +116,31 @@ class MeetingInfo {
 
 /// LiveKit 服务
 class LiveKitService extends ChangeNotifier {
+  static const FlutterBackgroundAndroidConfig _screenShareAndroidConfig =
+      FlutterBackgroundAndroidConfig(
+        notificationTitle: 'Screen sharing',
+        notificationText: 'Your screen is being shared.',
+        notificationImportance: AndroidNotificationImportance.normal,
+        notificationIcon: AndroidResource(name: 'push_small_icon'),
+        enableWifiLock: true,
+        showBadge: false,
+        shouldRequestBatteryOptimizationsOff: false,
+      );
+
   final VoIPConfig _config;
 
   Room? _room;
   LocalParticipant? _localParticipant;
   EventsListener<RoomEvent>? _roomListener;
+
+  /// 摄像头帧处理器（虚拟背景 / 背景模糊）
+  late final VoipCameraProcessor _cameraProcessor = VoipCameraProcessor(
+    _config,
+  );
+
+  /// 通话端到端加密提供器（LiveKit 帧加密）
+  final CallE2EEProvider _e2ee = CallE2EEProvider();
+  bool _e2eeEnabled = false;
 
   MeetingState _state = MeetingState.idle;
   MeetingInfo? _currentMeeting;
@@ -129,6 +157,7 @@ class LiveKitService extends ChangeNotifier {
   void Function(MeetingParticipant participant)? onParticipantJoined;
   void Function(MeetingParticipant participant)? onParticipantLeft;
   void Function(MeetingParticipant participant)? onActiveSpeakerChanged;
+
   /// 错误回调，传递错误类型和可选的详细信息
   /// 调用方应根据 [MeetingErrorType] 显示国际化的错误消息
   void Function(MeetingErrorType type, [String? details])? onError;
@@ -155,6 +184,34 @@ class LiveKitService extends ChangeNotifier {
   LocalParticipant? get localParticipant => _localParticipant;
   Duration get duration => _duration;
   Room? get room => _room;
+  bool get _needsAndroidScreenShareForegroundService =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
+  /// 当前通话是否启用了端到端加密
+  bool get isE2EEEnabled => _e2eeEnabled;
+
+  /// 摄像头帧处理器（虚拟背景 / 背景模糊），供本地自视图预览调用 renderFrame
+  VoipCameraProcessor get cameraProcessor => _cameraProcessor;
+
+  // ============================================
+  // 端到端加密（帧加密）
+  // ============================================
+
+  /// 运行时切换帧加密开关（房间已用 e2eeOptions 初始化时有效）
+  Future<void> setE2EEEnabled(bool enabled) async {
+    if (_room == null) return;
+    try {
+      await _room!.setE2EEEnabled(enabled);
+      _e2eeEnabled = enabled;
+      notifyListeners();
+      debugLog('LiveKitService: E2EE ${enabled ? "enabled" : "disabled"}');
+    } catch (e) {
+      debugLog('LiveKitService: setE2EEEnabled failed: $e');
+    }
+  }
+
+  /// 棘轮推进共享密钥（前向保密；各端需同步调用）
+  Future<void> ratchetE2EEKey() => _e2ee.ratchet();
 
   // ============================================
   // 加入/离开会议
@@ -167,6 +224,8 @@ class LiveKitService extends ChangeNotifier {
   /// [participantName] 参与者名称
   /// [enableVideo] 是否开启视频
   /// [enableAudio] 是否开启音频
+  /// [enableE2EE] 是否开启通话端到端加密（LiveKit 帧加密）。开启时必须提供
+  /// [e2eeSharedKey]，且参会各端密钥需一致（详见 [CallE2EEProvider]）。
   Future<bool> joinMeeting({
     required String roomName,
     required String token,
@@ -174,13 +233,17 @@ class LiveKitService extends ChangeNotifier {
     String? participantAvatarUrl,
     bool enableVideo = true,
     bool enableAudio = true,
+    bool enableE2EE = false,
+    String? e2eeSharedKey,
   }) async {
     if (_state != MeetingState.idle) {
       debugLog('LiveKitService: Already in a meeting');
       return false;
     }
 
-    if (_config.liveKitUrl == null) {
+    final liveKitUrl = _config.liveKitUrl?.trim();
+    final liveKitToken = token.trim();
+    if (liveKitUrl == null || liveKitUrl.isEmpty || liveKitToken.isEmpty) {
       onError?.call(MeetingErrorType.serverNotConfigured);
       return false;
     }
@@ -191,11 +254,22 @@ class LiveKitService extends ChangeNotifier {
       // 获取音频处理配置
       final audioConfig = _config.audioProcessing;
 
+      // 构建通话端到端加密选项（如启用）
+      E2EEOptions? e2eeOptions;
+      if (enableE2EE && e2eeSharedKey != null && e2eeSharedKey.isNotEmpty) {
+        e2eeOptions = await _e2ee.buildOptions(e2eeSharedKey);
+        _e2eeEnabled = true;
+        debugLog('LiveKitService: E2EE enabled for this meeting');
+      } else {
+        _e2eeEnabled = false;
+      }
+
       // 创建房间实例
       _room = Room(
         roomOptions: RoomOptions(
           adaptiveStream: true,
           dynacast: true,
+          encryption: e2eeOptions,
           defaultAudioPublishOptions: const AudioPublishOptions(),
           defaultVideoPublishOptions: const VideoPublishOptions(
             simulcast: true,
@@ -212,22 +286,38 @@ class LiveKitService extends ChangeNotifier {
             autoGainControl: audioConfig.autoGainControl,
             highPassFilter: audioConfig.highPassFilter,
           ),
+          // 摄像头采集挂载虚拟背景 / 背景模糊处理器
+          defaultCameraCaptureOptions: CameraCaptureOptions(
+            processor: _cameraProcessor,
+          ),
         ),
       );
-      debugLog('LiveKitService: Room created with audio processing: $audioConfig');
+      debugLog(
+        'LiveKitService: Room created with audio processing: $audioConfig',
+      );
 
       // 设置事件监听
       _setupRoomListeners();
 
       // 连接到房间
       await _room!.connect(
-        _config.liveKitUrl!,
-        token,
+        liveKitUrl,
+        liveKitToken,
         fastConnectOptions: FastConnectOptions(
           microphone: TrackOption(enabled: enableAudio),
           camera: TrackOption(enabled: enableVideo),
         ),
       );
+
+      // 连接成功后启用帧加密
+      if (_e2eeEnabled) {
+        try {
+          await _room!.setE2EEEnabled(true);
+          debugLog('LiveKitService: Frame encryption activated');
+        } catch (e) {
+          debugLog('LiveKitService: Failed to activate E2EE: $e');
+        }
+      }
 
       _localParticipant = _room!.localParticipant;
 
@@ -310,7 +400,9 @@ class LiveKitService extends ChangeNotifier {
     await _localParticipant!.setCameraEnabled(_isVideoEnabled);
 
     _updateLocalParticipant();
-    debugLog('LiveKitService: Camera ${_isVideoEnabled ? "enabled" : "disabled"}');
+    debugLog(
+      'LiveKitService: Camera ${_isVideoEnabled ? "enabled" : "disabled"}',
+    );
   }
 
   /// 切换前后摄像头
@@ -324,7 +416,8 @@ class LiveKitService extends ChangeNotifier {
       // 切换摄像头
       final captureOptions = videoTrack.currentOptions;
       if (captureOptions is CameraCaptureOptions) {
-        final newPosition = captureOptions.cameraPosition == CameraPosition.front
+        final newPosition =
+            captureOptions.cameraPosition == CameraPosition.front
             ? CameraPosition.back
             : CameraPosition.front;
         await videoTrack.setCameraPosition(newPosition);
@@ -334,16 +427,46 @@ class LiveKitService extends ChangeNotifier {
   }
 
   /// 开始屏幕共享
+  ///
+  /// Android 需先获取屏幕捕获许可（[Helper.requestCapturePermission]）并启动
+  /// mediaProjection 前台服务（[FlutterBackground]），否则 Android 14+ 会在
+  /// `setScreenShareEnabled(true)` 运行时失败。
   Future<bool> startScreenShare() async {
     if (_localParticipant == null) return false;
 
+    var foregroundServiceStarted = false;
     try {
+      if (_needsAndroidScreenShareForegroundService) {
+        final hasCapturePermission = await Helper.requestCapturePermission();
+        if (!hasCapturePermission) {
+          debugLog('LiveKitService: Screen share capture permission denied');
+          onError?.call(
+            MeetingErrorType.screenShareFailed,
+            'capture_permission_denied',
+          );
+          return false;
+        }
+
+        foregroundServiceStarted =
+            await _startAndroidScreenShareForegroundService();
+        if (!foregroundServiceStarted) {
+          onError?.call(
+            MeetingErrorType.screenShareFailed,
+            'foreground_service_unavailable',
+          );
+          return false;
+        }
+      }
+
       await _localParticipant!.setScreenShareEnabled(true);
       _isScreenSharing = true;
       _updateLocalParticipant();
       debugLog('LiveKitService: Screen share started');
       return true;
     } catch (e) {
+      if (foregroundServiceStarted) {
+        await _stopAndroidScreenShareForegroundService();
+      }
       debugLog('LiveKitService: Start screen share failed: $e');
       onError?.call(MeetingErrorType.screenShareFailed, e.toString());
       return false;
@@ -352,15 +475,22 @@ class LiveKitService extends ChangeNotifier {
 
   /// 停止屏幕共享
   Future<void> stopScreenShare() async {
-    if (_localParticipant == null) return;
+    if (_localParticipant == null) {
+      _isScreenSharing = false;
+      notifyListeners();
+      await _stopAndroidScreenShareForegroundService();
+      return;
+    }
 
     try {
       await _localParticipant!.setScreenShareEnabled(false);
-      _isScreenSharing = false;
-      _updateLocalParticipant();
       debugLog('LiveKitService: Screen share stopped');
     } catch (e) {
       debugLog('LiveKitService: Stop screen share failed: $e');
+    } finally {
+      _isScreenSharing = false;
+      _updateLocalParticipant();
+      await _stopAndroidScreenShareForegroundService();
     }
   }
 
@@ -430,10 +560,12 @@ class LiveKitService extends ChangeNotifier {
   // ============================================
 
   /// 获取当前背景处理配置
-  BackgroundProcessingConfig get backgroundProcessingConfig => _config.backgroundProcessing;
+  BackgroundProcessingConfig get backgroundProcessingConfig =>
+      _config.backgroundProcessing;
 
   /// 是否启用了背景处理
-  bool get isBackgroundProcessingEnabled => _config.backgroundMode != BackgroundMode.none;
+  bool get isBackgroundProcessingEnabled =>
+      _config.backgroundMode != BackgroundMode.none;
 
   /// 启用背景模糊
   ///
@@ -450,6 +582,14 @@ class LiveKitService extends ChangeNotifier {
   Future<void> setVirtualBackground(String imageUrl) async {
     _config.backgroundMode = BackgroundMode.virtualBackground;
     _config.virtualBackgroundUrl = imageUrl;
+    await _cameraProcessor.loadBackgroundImage(imageUrl);
+    await _updateBackgroundProcessing();
+  }
+
+  /// 设置虚拟背景（直接提供图片字节，适用于网络图 / 内存图）
+  Future<void> setVirtualBackgroundBytes(Uint8List imageBytes) async {
+    _config.backgroundMode = BackgroundMode.virtualBackground;
+    _cameraProcessor.backgroundImageBytes = imageBytes;
     await _updateBackgroundProcessing();
   }
 
@@ -478,16 +618,23 @@ class LiveKitService extends ChangeNotifier {
 
   /// 更新背景处理设置
   ///
-  /// 注意：LiveKit 的背景处理需要使用视频处理器（Video Processor）
-  /// 这里提供了配置更新的框架，实际的视频处理需要配合 UI 层实现
+  /// 配置存于 [VoIPConfig] 单例，已挂载的 [VoipCameraProcessor]（虚拟背景 /
+  /// 背景模糊处理器）会实时读取最新配置：本地自视图通过
+  /// `cameraProcessor.renderFrame` 渲染合成效果（真实可用），发布轨道的逐帧
+  /// 替换待原生 frame processor 接线（见 [VoipCameraProcessor.processedTrack]）。
   Future<void> _updateBackgroundProcessing() async {
     final bgConfig = _config.backgroundProcessing;
     debugLog('LiveKitService: Updating background processing: $bgConfig');
 
+    // 下发最新配置给原生 frame processor（发布轨道替换；未接则优雅 no-op）
+    await _cameraProcessor.pushConfigToNative();
+
     // LiveKit 背景模糊通过 LocalVideoTrack 的处理器实现
     // 需要重新设置视频轨道来应用新设置
     if (_localParticipant == null || !_isVideoEnabled) {
-      debugLog('LiveKitService: No active video to apply background processing');
+      debugLog(
+        'LiveKitService: No active video to apply background processing',
+      );
       notifyListeners();
       return;
     }
@@ -503,12 +650,16 @@ class LiveKitService extends ChangeNotifier {
         // 根据背景模式应用不同的处理
         switch (_config.backgroundMode) {
           case BackgroundMode.blur:
-            debugLog('LiveKitService: Background blur enabled with radius: ${_config.backgroundBlurRadius}');
+            debugLog(
+              'LiveKitService: Background blur enabled with radius: ${_config.backgroundBlurRadius}',
+            );
             // 实际的模糊处理需要通过 VideoProcessor 实现
             // 这里记录配置，由 UI 层应用实际的视觉效果
             break;
           case BackgroundMode.virtualBackground:
-            debugLog('LiveKitService: Virtual background set: ${_config.virtualBackgroundUrl}');
+            debugLog(
+              'LiveKitService: Virtual background set: ${_config.virtualBackgroundUrl}',
+            );
             // 虚拟背景需要使用人像分割和图像合成
             break;
           case BackgroundMode.solidColor:
@@ -540,8 +691,10 @@ class LiveKitService extends ChangeNotifier {
   ///
   /// 此功能尚未实现，调用方应检查返回值并向用户展示"录制功能即将上线"提示。
   Future<bool> startRecording() async {
-    debugLog('LiveKitService: startRecording called — '
-        'server-side Egress API integration not yet implemented; returning false');
+    debugLog(
+      'LiveKitService: startRecording called — '
+      'server-side Egress API integration not yet implemented; returning false',
+    );
     return false;
   }
 
@@ -549,8 +702,10 @@ class LiveKitService extends ChangeNotifier {
   ///
   /// 需配合 startRecording() 返回的 egressId 调用后端停止接口。
   Future<void> stopRecording() async {
-    debugLog('LiveKitService: stopRecording called — '
-        'server-side Egress API integration not yet implemented; no-op');
+    debugLog(
+      'LiveKitService: stopRecording called — '
+      'server-side Egress API integration not yet implemented; no-op',
+    );
   }
 
   // ============================================
@@ -561,7 +716,8 @@ class LiveKitService extends ChangeNotifier {
   final List<InCallChatMessage> _chatMessages = [];
 
   /// 聊天消息通知
-  final _chatMessageController = StreamController<InCallChatMessage>.broadcast();
+  final _chatMessageController =
+      StreamController<InCallChatMessage>.broadcast();
 
   /// 聊天消息流
   Stream<InCallChatMessage> get onChatMessage => _chatMessageController.stream;
@@ -585,13 +741,15 @@ class LiveKitService extends ChangeNotifier {
       );
 
       // 通过 DataChannel 发送
-      final data = utf8.encode(jsonEncode({
-        'type': 'chat',
-        'sender': _localParticipant!.identity,
-        'name': _localParticipant!.name,
-        'content': text.trim(),
-        'ts': DateTime.now().millisecondsSinceEpoch,
-      }));
+      final data = utf8.encode(
+        jsonEncode({
+          'type': 'chat',
+          'sender': _localParticipant!.identity,
+          'name': _localParticipant!.name,
+          'content': text.trim(),
+          'ts': DateTime.now().millisecondsSinceEpoch,
+        }),
+      );
 
       await _localParticipant!.publishData(data, reliable: true);
 
@@ -698,7 +856,9 @@ class LiveKitService extends ChangeNotifier {
       for (final entry in _participants.entries) {
         final isSpeaking = activeSpeakerIds.contains(entry.key);
         if (entry.value.isSpeaking != isSpeaking) {
-          _participants[entry.key] = entry.value.copyWith(isSpeaking: isSpeaking);
+          _participants[entry.key] = entry.value.copyWith(
+            isSpeaking: isSpeaking,
+          );
           if (isSpeaking) {
             onActiveSpeakerChanged?.call(_participants[entry.key]!);
           }
@@ -738,7 +898,9 @@ class LiveKitService extends ChangeNotifier {
   void _addRemoteParticipant(RemoteParticipant participant) {
     final meetingParticipant = MeetingParticipant(
       id: participant.identity,
-      name: participant.name.isNotEmpty ? participant.name : participant.identity,
+      name: participant.name.isNotEmpty
+          ? participant.name
+          : participant.identity,
       avatarUrl: participant.metadata,
       isLocal: false,
       isMuted: !participant.isMicrophoneEnabled(),
@@ -885,7 +1047,62 @@ class LiveKitService extends ChangeNotifier {
     _isScreenSharing = false;
     _chatMessages.clear();
 
+    _e2ee.reset();
+    _e2eeEnabled = false;
+
+    await _stopAndroidScreenShareForegroundService();
+
+    // 释放 ML Kit 人像分割器（虚拟背景），避免原生分割器泄漏到进程生命周期；
+    // 下次需要时 renderComposite 会惰性重建。
+    await VirtualBackgroundEngine.dispose();
+
     debugLog('LiveKitService: Cleaned up');
+  }
+
+  Future<bool> _startAndroidScreenShareForegroundService() async {
+    if (!_needsAndroidScreenShareForegroundService) return true;
+
+    try {
+      final initialized = await FlutterBackground.initialize(
+        androidConfig: _screenShareAndroidConfig,
+      );
+      if (!initialized) {
+        debugLog(
+          'LiveKitService: Android screen share foreground service init failed',
+        );
+        return false;
+      }
+
+      if (FlutterBackground.isBackgroundExecutionEnabled) {
+        return true;
+      }
+
+      final enabled = await FlutterBackground.enableBackgroundExecution();
+      if (!enabled) {
+        debugLog(
+          'LiveKitService: Android screen share foreground service start failed',
+        );
+      }
+      return enabled;
+    } catch (e) {
+      debugLog(
+        'LiveKitService: Android screen share foreground service failed: $e',
+      );
+      return false;
+    }
+  }
+
+  Future<void> _stopAndroidScreenShareForegroundService() async {
+    if (!_needsAndroidScreenShareForegroundService) return;
+    if (!FlutterBackground.isBackgroundExecutionEnabled) return;
+
+    try {
+      await FlutterBackground.disableBackgroundExecution();
+    } catch (e) {
+      debugLog(
+        'LiveKitService: Stop Android screen share foreground service failed: $e',
+      );
+    }
   }
 
   /// 释放资源

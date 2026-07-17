@@ -4,6 +4,7 @@ import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 
 /// 代码块消息（`n42.code_block`）
 ///
@@ -96,7 +97,11 @@ class CodeBlockMessageWidget extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                InkWell(
+                Semantics(
+                  button: true,
+                  label: A11yL10n.of(context).copyCode,
+                  excludeSemantics: true,
+                  child: InkWell(
                   borderRadius: BorderRadius.circular(6),
                   onTap: () => _copy(context, parsed.code),
                   child: Padding(
@@ -118,6 +123,7 @@ class CodeBlockMessageWidget extends StatelessWidget {
                       ],
                     ),
                   ),
+                ),
                 ),
               ],
             ),

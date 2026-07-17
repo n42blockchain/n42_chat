@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
 
 /// 消息反应栏（显示在消息下方）
@@ -55,7 +56,12 @@ class _ReactionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      selected: hasReacted,
+      label: A11yL10n.of(context).reaction(reaction.emoji, reaction.count),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -93,6 +99,7 @@ class _ReactionChip extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 }
@@ -107,7 +114,11 @@ class _AddReactionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: A11yL10n.of(context).addReaction,
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -124,6 +135,7 @@ class _AddReactionButton extends StatelessWidget {
           size: 14,
           color: context.textSecondary,
         ),
+      ),
       ),
     );
   }
@@ -156,13 +168,18 @@ class QuickReactionPicker extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: CommonEmojis.reactions.map((emoji) {
-          return GestureDetector(
-            onTap: () => onReactionSelected?.call(emoji),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Text(
-                emoji,
-                style: const TextStyle(fontSize: 24),
+          return Semantics(
+            button: true,
+            label: emoji,
+            excludeSemantics: true,
+            child: GestureDetector(
+              onTap: () => onReactionSelected?.call(emoji),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text(
+                  emoji,
+                  style: const TextStyle(fontSize: 24),
+                ),
               ),
             ),
           );
@@ -213,6 +230,7 @@ class FullReactionPicker extends StatelessWidget {
                     Icons.close,
                     color: context.textSecondary,
                   ),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -232,7 +250,11 @@ class FullReactionPicker extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: CommonEmojis.extendedReactions.map((emoji) {
-                return GestureDetector(
+                return Semantics(
+                  button: true,
+                  label: emoji,
+                  excludeSemantics: true,
+                  child: GestureDetector(
                   onTap: () {
                     onReactionSelected?.call(emoji);
                     Navigator.of(context).pop();
@@ -249,6 +271,7 @@ class FullReactionPicker extends StatelessWidget {
                       emoji,
                       style: const TextStyle(fontSize: 24),
                     ),
+                  ),
                   ),
                 );
               }).toList(),

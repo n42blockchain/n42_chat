@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 
 /// URL 预览组件
 ///
@@ -133,7 +134,12 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
   Widget _buildPreview(BuildContext context, UrlPreviewData data) {
     final isDark = context.isDarkMode;
 
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: A11yL10n.of(context)
+          .openLink(data.title ?? data.siteName ?? data.url),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: () => _openUrl(data.url),
       child: Container(
         margin: const EdgeInsets.only(top: 8),
@@ -219,6 +225,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
               ),
           ],
         ),
+      ),
       ),
     );
   }

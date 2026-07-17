@@ -858,4 +858,190 @@ void main() {
       expect(exception, isA<Exception>());
     });
   });
+
+  group('AiDatasource.generateImage', () {
+    late MockDio mockDio;
+    late AiDatasource datasource;
+
+    setUp(() {
+      mockDio = MockDio();
+      datasource = AiDatasource(
+        baseUrl: 'https://api.openai.com',
+        apiKey: 'test-api-key',
+        imageModel: 'dall-e-3',
+        dio: mockDio,
+      );
+    });
+
+    test('supportsImageGeneration reflects availability', () {
+      expect(datasource.supportsImageGeneration, isTrue);
+      final unavailable = AiDatasource(baseUrl: '', apiKey: '', dio: mockDio);
+      expect(unavailable.supportsImageGeneration, isFalse);
+    });
+
+    test('empty prompt throws', () {
+      expect(
+        () => datasource.generateImage('  '),
+        throwsA(isA<AiServiceException>()),
+      );
+    });
+
+    test('decodes b64_json into bytes', () async {
+      final bytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+      final b64 = base64Encode(bytes);
+      when(
+        () => mockDio.post<Map<String, dynamic>>(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            'model': 'dall-e-3',
+            'data': [
+              {'b64_json': b64},
+            ],
+          },
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/v1/images/generations'),
+        ),
+      );
+
+      final result = await datasource.generateImage('a happy cat');
+      expect(result.bytes, equals(bytes));
+      expect(result.model, 'dall-e-3');
+    });
+
+    test('falls back to url when no b64_json', () async {
+      final bytes = Uint8List.fromList([9, 8, 7]);
+      when(
+        () => mockDio.post<Map<String, dynamic>>(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            'data': [
+              {'url': 'https://img.example/sticker.png'},
+            ],
+          },
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/v1/images/generations'),
+        ),
+      );
+      when(
+        () => mockDio.get<List<int>>(
+          any(),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
+        (_) async => Response<List<int>>(
+          data: bytes,
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/sticker.png'),
+        ),
+      );
+
+      final result = await datasource.generateImage('a dog');
+      expect(result.bytes, equals(bytes));
+    });
+
+    test('throws when data list is empty', () {
+      when(
+        () => mockDio.post<Map<String, dynamic>>(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {'data': <dynamic>[]},
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/v1/images/generations'),
+        ),
+      );
+      expect(
+        () => datasource.generateImage('x'),
+        throwsA(isA<AiServiceException>()),
+      );
+    });
+  });
+
+  group('AiDatasource.describeImage', () {
+    late MockDio mockDio;
+    late AiDatasource datasource;
+
+    setUp(() {
+      mockDio = MockDio();
+      datasource = AiDatasource(
+        baseUrl: 'https://api.openai.com',
+        apiKey: 'test-api-key',
+        visionModel: 'gpt-4o',
+        dio: mockDio,
+      );
+    });
+
+    test('supportsVision reflects availability', () {
+      expect(datasource.supportsVision, isTrue);
+      final unavailable = AiDatasource(baseUrl: '', apiKey: '', dio: mockDio);
+      expect(unavailable.supportsVision, isFalse);
+    });
+
+    test('empty image throws', () {
+      expect(
+        () => datasource.describeImage(Uint8List(0)),
+        throwsA(isA<AiServiceException>()),
+      );
+    });
+
+    test('returns model text content for the image', () async {
+      when(
+        () => mockDio.post<Map<String, dynamic>>(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            'choices': [
+              {
+                'message': {'content': 'A cat wearing sunglasses.'},
+              },
+            ],
+          },
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/v1/chat/completions'),
+        ),
+      );
+
+      final text = await datasource.describeImage(
+        Uint8List.fromList([1, 2, 3]),
+      );
+      expect(text, 'A cat wearing sunglasses.');
+    });
+
+    test('throws when choices empty', () {
+      when(
+        () => mockDio.post<Map<String, dynamic>>(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+        ),
+      ).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {'choices': <dynamic>[]},
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/v1/chat/completions'),
+        ),
+      );
+      expect(
+        () => datasource.describeImage(Uint8List.fromList([1])),
+        throwsA(isA<AiServiceException>()),
+      );
+    });
+  });
 }

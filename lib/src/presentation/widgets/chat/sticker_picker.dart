@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import 'video_sticker_view.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../data/datasources/bundled_sticker_packs.dart';
@@ -50,11 +53,16 @@ class StickerPicker extends StatefulWidget {
 class _StickerPickerState extends State<StickerPicker> {
   late final IStickerRepository _repository;
   final PageController _pageController = PageController();
+  final TextEditingController _searchController = TextEditingController();
 
   List<StickerPack> _packs = [];
   List<RecentSticker> _recentStickers = [];
   int _selectedPackIndex = 0;
   bool _isLoading = true;
+
+  String _searchQuery = '';
+  List<StickerHit> _searchResults = const [];
+  int _searchToken = 0;
 
   @override
   void initState() {
@@ -66,7 +74,35 @@ class _StickerPickerState extends State<StickerPicker> {
   @override
   void dispose() {
     _pageController.dispose();
+    _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _onSearchChanged(String query) async {
+    final trimmed = query.trim();
+    setState(() => _searchQuery = trimmed);
+    if (trimmed.isEmpty) {
+      setState(() => _searchResults = const []);
+      return;
+    }
+    final token = ++_searchToken;
+    try {
+      final results = await _repository.searchStickers(trimmed, limit: 40);
+      if (!mounted || token != _searchToken) return;
+      setState(() => _searchResults = results);
+    } catch (_) {
+      if (!mounted || token != _searchToken) return;
+      setState(() => _searchResults = const []);
+    }
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    _searchToken++;
+    setState(() {
+      _searchQuery = '';
+      _searchResults = const [];
+    });
   }
 
   Future<void> _loadStickers() async {
@@ -123,18 +159,106 @@ class _StickerPickerState extends State<StickerPicker> {
         top: false,
         child: Column(
           children: [
-            // 贴纸包标签栏
-            _buildPackTabs(isDark),
+            // 搜索框
+            _buildSearchField(isDark),
+
+            // 贴纸包标签栏（搜索时隐藏）
+            if (_searchQuery.isEmpty) _buildPackTabs(isDark),
 
             // 贴纸网格
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : _buildStickerGrid(isDark),
+                  : _searchQuery.isNotEmpty
+                      ? _buildSearchResults(isDark)
+                      : _buildStickerGrid(isDark),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSearchField(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+      child: Container(
+        height: 36,
+        decoration: BoxDecoration(
+          color: context.surfaceColor,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: context.dividerColor, width: 0.5),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 10),
+            Icon(Icons.search, size: 18, color: context.textTertiary),
+            const SizedBox(width: 6),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                style: TextStyle(fontSize: 14, color: context.textPrimary),
+                decoration: InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  hintText: S.of(context)?.commonSearch ?? 'Search stickers',
+                  hintStyle: TextStyle(
+                    fontSize: 14,
+                    color: context.textTertiary,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+              ),
+            ),
+            if (_searchQuery.isNotEmpty)
+              Semantics(
+                button: true,
+                label: A11yL10n.of(context).clearSearch,
+                excludeSemantics: true,
+                child: GestureDetector(
+                  onTap: _clearSearch,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Icon(Icons.close,
+                        size: 18, color: context.textTertiary),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchResults(bool isDark) {
+    if (_searchResults.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search_off, size: 48, color: context.textTertiary),
+            const SizedBox(height: 8),
+            Text(
+              S.of(context)?.searchNoResults ?? 'No stickers found',
+              style: TextStyle(color: context.textTertiary),
+            ),
+          ],
+        ),
+      );
+    }
+    return GridView.builder(
+      padding: const EdgeInsets.all(8),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemCount: _searchResults.length,
+      itemBuilder: (context, index) {
+        final hit = _searchResults[index];
+        return _buildStickerItem(hit.sticker, hit.packId, isDark);
+      },
     );
   }
 
@@ -202,7 +326,14 @@ class _StickerPickerState extends State<StickerPicker> {
     VoidCallback? onTap,
     required bool isDark,
   }) {
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: icon != null
+          ? A11yL10n.of(context).stickerStore
+          : (label ?? A11yL10n.of(context).stickerPack),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -233,6 +364,7 @@ class _StickerPickerState extends State<StickerPicker> {
                   ),
                 ),
         ),
+      ),
       ),
     );
   }
@@ -332,21 +464,33 @@ class _StickerPickerState extends State<StickerPicker> {
       );
     }
 
-    // 图片贴纸
+    // 图片 / 视频贴纸
     final httpUrl = sticker.httpUrl ?? sticker.url;
     if (httpUrl.startsWith('http')) {
       final client = getIt.isRegistered<MatrixClientManager>()
           ? getIt<MatrixClientManager>().client
           : null;
+      final headers = mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
+        httpUrl,
+        client: client,
+      );
+      // 视频贴纸（WebM/MP4，对齐 Telegram）：用 video_player 循环播放。
+      if (VideoStickerView.isVideoSticker(
+        mimeType: sticker.mimeType,
+        url: httpUrl,
+      )) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: VideoStickerView(url: httpUrl, headers: headers),
+        );
+      }
+      // 静态 / 动画 WebP / GIF（Flutter Image 原生支持动画 WebP & GIF）。
       return ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: Image.network(
           httpUrl,
           fit: BoxFit.contain,
-          headers: mx_utils.MatrixUtils.buildAuthenticatedMediaHeaders(
-            httpUrl,
-            client: client,
-          ),
+          headers: headers,
           errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported),
         ),
       );

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'ai_service.dart';
 import 'local_llm_service.dart';
 
@@ -155,6 +157,46 @@ class AiProviderRouter implements AiService {
       return cloud!.suggestReplies(messages, count: count, language: language);
     }
     return const [];
+  }
+
+  @override
+  bool get supportsImageGeneration => cloud?.supportsImageGeneration ?? false;
+
+  @override
+  bool get supportsVision => cloud?.supportsVision ?? false;
+
+  @override
+  Future<String> describeImage(
+    Uint8List imageBytes, {
+    String? prompt,
+    String? model,
+    String mimeType = 'image/png',
+  }) {
+    // 端侧（Gemma 文本）不做视觉，统一走云端。
+    final c = cloud;
+    if (c == null) {
+      throw const AiServiceException('Image understanding unavailable (no cloud AI)');
+    }
+    return c.describeImage(
+      imageBytes,
+      prompt: prompt,
+      model: model,
+      mimeType: mimeType,
+    );
+  }
+
+  @override
+  Future<AiImageResult> generateImage(
+    String prompt, {
+    String? model,
+    String size = '1024x1024',
+  }) {
+    // 端侧（Gemma）不做文生图，统一走云端。
+    final c = cloud;
+    if (c == null) {
+      throw const AiServiceException('Image generation unavailable (no cloud AI)');
+    }
+    return c.generateImage(prompt, model: model, size: size);
   }
 
   @override

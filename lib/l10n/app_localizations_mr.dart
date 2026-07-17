@@ -1468,16 +1468,6 @@ class SMr extends S {
   String get chatSaveToGallery => 'गॅलरीमध्ये जतन करा';
 
   @override
-  String chatDownloadFailed(String code) {
-    return 'डाउनलोड अयशस्वी: $code';
-  }
-
-  @override
-  String commonShareFailed(String error) {
-    return 'शेअर अयशस्वी: $error';
-  }
-
-  @override
   String get chatFailedToLoadImage => 'प्रतिमा लोड करण्यात अयशस्वी';
 
   @override
@@ -2632,6 +2622,31 @@ class SMr extends S {
   }
 
   @override
+  String get chatNoMediaUrlAvailable => 'कोणतीही मीडिया URL उपलब्ध नाही';
+
+  @override
+  String chatDownloadFailed(String code) {
+    return 'डाउनलोड अयशस्वी: $code';
+  }
+
+  @override
+  String chatErrorWithMessage(String message) {
+    return 'त्रुटी: $message';
+  }
+
+  @override
+  String get chatMusicLinkLabel => 'संगीत लिंक';
+
+  @override
+  String get chatRedPacketTransferCannotForward =>
+      'लाल पॅकेट आणि ट्रान्सफर फॉरवर्ड करता येत नाहीत';
+
+  @override
+  String commonShareFailed(String error) {
+    return 'शेअर अयशस्वी: $error';
+  }
+
+  @override
   String get commonTapToRetry => 'पुन्हा प्रयत्न करण्यासाठी टॅप करा';
 
   @override
@@ -2658,28 +2673,13 @@ class SMr extends S {
   String get groupEnterGroupAnnouncement => 'गट घोषणा प्रविष्ट करा';
 
   @override
-  String chatErrorWithMessage(String message) {
-    return 'त्रुटी: $message';
-  }
-
-  @override
   String groupMemberCountClickToCopy(int count) {
     return '$count सदस्य, ग्रुप आयडी कॉपी करण्यासाठी क्लिक करा';
   }
 
   @override
-  String get chatMusicLinkLabel => 'संगीत लिंक';
-
-  @override
-  String get chatNoMediaUrlAvailable => 'कोणतीही मीडिया URL उपलब्ध नाही';
-
-  @override
   String get groupNoPermissionToEditGroupName =>
       'तुम्हाला गटाचे नाव संपादित करण्याची परवानगी नाही';
-
-  @override
-  String get chatRedPacketTransferCannotForward =>
-      'लाल पॅकेट आणि ट्रान्सफर फॉरवर्ड करता येत नाहीत';
 
   @override
   String get authEmailAddress => 'ईमेल पत्ता';
@@ -2874,11 +2874,12 @@ class SMr extends S {
   @override
   String get authAppleLabel => 'सफरचंद';
 
-
-  @override
-  String get authSsoNotConfigured => 'या सर्व्हरने SSO लॉगिन प्रदाते कॉन्फिगर केलेले नाहीत';
   @override
   String get authSsoLabel => 'SSO';
+
+  @override
+  String get authSsoNotConfigured =>
+      'या सर्व्हरने SSO लॉगिन प्रदाते कॉन्फिगर केलेले नाहीत';
 
   @override
   String get transferAmountHintZero => '०.००';

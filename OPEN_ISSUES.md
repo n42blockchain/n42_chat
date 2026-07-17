@@ -203,6 +203,22 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: the latest pass closed room-level notification granularity by wiring `all messages / mentions only / mute` to Matrix push rules, and it added notification privacy levels for sender/body hiding. However there is still no Slack-style keyword alert list that can trigger notifications outside direct mentions.
 - Next step: decide whether keyword rules should live in homeserver push rules or client-side preferences, then add a shared keyword matcher/editor and integrate it into foreground/background notification evaluation.
 
+### IDHUB-001 Positive ID Hub chat login is blocked on Matrix provisioning
+
+- Severity: H
+- Added: 2026-07-14
+- Evidence: `lib/src/presentation/blocs/auth/auth_bloc.dart`, `lib/src/data/datasources/remote/id_hub_api.dart`, unified-identity device QA against the deployed development Hub
+- Current state: the client can create and sign an ID Hub wallet challenge, but the available development Hub does not provision Synapse/Matrix credentials. A successful Hub wallet verification therefore has no Matrix access token, user ID, or homeserver to establish a chat session. The client intentionally falls back to the legacy wallet login path, and that degradation behavior is automated.
+- Next step: deploy/configure the server-side Synapse/Matrix provisioner, return the four Matrix credential fields from wallet verification, then run the positive Hub-to-Matrix login on a real device.
+
+### IDHUB-002 Enabled ID Hub login currently causes two wallet signature prompts
+
+- Severity: M
+- Added: 2026-07-14
+- Evidence: `lib/src/presentation/blocs/auth/auth_bloc.dart`
+- Current state: `AuthWalletAuthRequested` already carries the signature used by legacy deterministic credentials, while the ID Hub path must request a second signature over its server nonce. When ID Hub login is enabled, users therefore see the original wallet-login signature request plus the Hub challenge signature request before success or fallback.
+- Next step: move ID Hub challenge creation/signing ahead of the legacy pre-sign UI when the feature is enabled, and request the legacy canonical-message signature only if Hub login falls back.
+
 ## Verification Gaps
 
 ### QA-003 AI smart replies and webhook automation were not live-tested end to end
