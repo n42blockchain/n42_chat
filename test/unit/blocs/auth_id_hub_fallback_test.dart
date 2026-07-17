@@ -6,6 +6,7 @@ import 'package:n42_chat/src/core/services/biometric_service.dart';
 import 'package:n42_chat/src/core/utils/wallet_login_credentials.dart';
 import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
 import 'package:n42_chat/src/data/datasources/remote/id_hub_api.dart';
+import 'package:n42_chat/src/domain/entities/user_entity.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/integration/wallet_bridge.dart';
 import 'package:n42_chat/src/n42_chat_config.dart';
@@ -337,6 +338,87 @@ void main() {
           rememberMe: true,
         ),
       ).called(1);
+    },
+  );
+
+  blocTest<AuthBloc, AuthState>(
+    'Hub success establishes the Matrix session with exactly one signature '
+    'and never touches the legacy path',
+    setUp: () {
+      getIt.registerSingleton(
+        const N42ChatConfig(
+          idHubUrl: 'https://id-test.n42.ai',
+          enableIdHubLogin: true,
+        ),
+      );
+      final wallet = _MockWalletBridge();
+      when(
+        () => wallet.signMessage('N42 ID challenge'),
+      ).thenAnswer((_) async => '0xhub-signature');
+      getIt.registerSingleton<IWalletBridge>(wallet);
+      when(
+        () => repository.loginWithToken(
+          homeserver: 'https://matrix.hub.example',
+          accessToken: 'matrix-token',
+          userId: '@did_test:matrix.hub.example',
+          deviceId: 'DEVICE1',
+        ),
+      ).thenAnswer(
+        (_) async => AuthResult.success(
+          const UserEntity(
+            userId: '@did_test:matrix.hub.example',
+            displayName: 'did_test',
+          ),
+        ),
+      );
+      // _completeAuthenticatedFlow kicks off a profile refresh; keep it inert.
+      when(
+        () => repository.getCurrentUserProfile(),
+      ).thenAnswer((_) async => null);
+    },
+    build: () => buildBloc(
+      idHubApiFactory: (_) => _FakeIdHubApi(
+        challenge: const IdHubChallenge(
+          challengeId: 'challenge-1',
+          message: 'N42 ID challenge',
+        ),
+        response: IdHubWalletResponse.success(
+          did: 'did:plc:test',
+          matrixUserId: '@did_test:matrix.hub.example',
+          matrixAccessToken: 'matrix-token',
+          matrixDeviceId: 'DEVICE1',
+          matrixHomeserver: 'https://matrix.hub.example',
+        ),
+      ),
+    ),
+    act: (bloc) => bloc.add(event),
+    expect: () => [
+      isA<AuthState>().having(
+        (state) => state.status,
+        'status',
+        AuthStatus.loading,
+      ),
+      isA<AuthState>().having(
+        (state) => state.status,
+        'status',
+        AuthStatus.authenticated,
+      ),
+    ],
+    verify: (_) {
+      // Exactly one signature: the hub challenge; never the legacy canonical.
+      verify(
+        () => getIt<IWalletBridge>().signMessage('N42 ID challenge'),
+      ).called(1);
+      verifyNever(() => getIt<IWalletBridge>().signMessage(canonicalMessage));
+      // Legacy password login is never attempted on hub success.
+      verifyNever(
+        () => repository.login(
+          homeserver: any(named: 'homeserver'),
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+          rememberMe: any(named: 'rememberMe'),
+        ),
+      );
     },
   );
 }
