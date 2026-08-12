@@ -50,6 +50,8 @@ class WeChatMessageMenu extends StatelessWidget {
   final VoidCallback? onReport; // 举报消息
   final VoidCallback? onRemindMe; // 设为待办提醒
   final VoidCallback? onReadingMode; // 长文阅读模式
+  final VoidCallback? onExtractText; // 图片文字提取
+  final VoidCallback? onTranslateImage; // 图片翻译
 
   /// 表情回应回调
   final void Function(String emoji)? onReaction;
@@ -83,6 +85,8 @@ class WeChatMessageMenu extends StatelessWidget {
     this.onReport,
     this.onRemindMe,
     this.onReadingMode,
+    this.onExtractText,
+    this.onTranslateImage,
     this.onReaction,
   });
 
@@ -273,6 +277,26 @@ class WeChatMessageMenu extends StatelessWidget {
                       icon: Icons.translate,
                       label: s?.commonTranslate ?? 'Translate',
                       onTap: () { onDismiss(); onTranslate?.call(); },
+                    ),
+                  if (message.type == MessageType.image &&
+                      onExtractText != null)
+                    _buildMenuItem(
+                      icon: Icons.text_snippet_outlined,
+                      label: A11yL10n.of(context).extractText,
+                      onTap: () {
+                        onDismiss();
+                        onExtractText?.call();
+                      },
+                    ),
+                  if (message.type == MessageType.image &&
+                      onTranslateImage != null)
+                    _buildMenuItem(
+                      icon: Icons.translate,
+                      label: A11yL10n.of(context).translateImage,
+                      onTap: () {
+                        onDismiss();
+                        onTranslateImage?.call();
+                      },
                     ),
                   if (onReadingMode != null)
                     _buildMenuItem(
@@ -744,4 +768,3 @@ class MessageMenuHelper {
     );
   }
 }
-

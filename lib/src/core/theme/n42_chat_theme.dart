@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
@@ -268,7 +269,7 @@ class N42ChatTheme {
       colorScheme: colorScheme,
 
       // iOS-style page transitions for WeChat-like horizontal slide-back
-      pageTransitionsTheme: const PageTransitionsTheme(
+      pageTransitionsTheme: PageTransitionsTheme(
         builders: {
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
@@ -633,4 +634,3 @@ class N42ChatTheme {
     );
   }
 }
-
