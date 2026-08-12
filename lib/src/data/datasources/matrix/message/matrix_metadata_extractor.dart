@@ -23,6 +23,11 @@ class MatrixMetadataExtractor {
     final fileContent = event.content['file'] as Map<String, dynamic>?;
     final mxcUrl = event.content['url'] as String? ?? fileContent?['url'] as String?;
     final thumbnailMxc = info?['thumbnail_url'] as String?;
+    final keyMap = fileContent?['key'] as Map<String, dynamic>?;
+    final hashMap = fileContent?['hashes'] as Map<String, dynamic>?;
+    final encryptKey = keyMap?['k'] as String?;
+    final encryptIv = fileContent?['iv'] as String?;
+    final encryptSha256 = hashMap?['sha256'] as String?;
 
     // 贴纸信息（m.sticker 是独立 event type，无 msgtype；字段结构同图片）
     if (event.type == matrix.EventTypes.Sticker) {
@@ -46,6 +51,9 @@ class MatrixMetadataExtractor {
         size: info?['size'] as int?,
         mimeType: info?['mimetype'] as String?,
         thumbnailUrl: _convertMxcToHttp(thumbnailMxc, width: 400, height: 400),
+        encryptKey: encryptKey,
+        encryptIv: encryptIv,
+        encryptSha256: encryptSha256,
       );
     }
 
@@ -53,11 +61,6 @@ class MatrixMetadataExtractor {
     if (event.messageType == matrix.MessageTypes.Audio) {
       final httpUrl = _convertMxcToHttp(mxcUrl);
       // 提取 E2EE key 材料（加密房间中媒体存于 file 字段）
-      final keyMap = (fileContent?['key'] as Map<String, dynamic>?);
-      final hashMap = (fileContent?['hashes'] as Map<String, dynamic>?);
-      final encryptKey = keyMap?['k'] as String?;
-      final encryptIv = fileContent?['iv'] as String?;
-      final encryptSha256 = hashMap?['sha256'] as String?;
       debugLog(
         'Audio message metadata: mxcUrl=$mxcUrl, httpUrl=$httpUrl, encrypted=${encryptKey != null}, senderId=${event.senderId}, status=${event.status}',
       );
@@ -268,6 +271,9 @@ class MatrixMetadataExtractor {
             width: 400,
             height: 400,
           ),
+          encryptKey: encryptKey,
+          encryptIv: encryptIv,
+          encryptSha256: encryptSha256,
         );
       }
 
