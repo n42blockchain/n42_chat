@@ -33,7 +33,7 @@ class _FakeIdHubApi extends IdHubApi {
   @override
   Future<IdHubChallenge> createWalletChallenge({
     required String address,
-    String chain = 'eip155:1142',
+    String chain = 'eip155:94',
   }) async => challenge;
 
   @override
@@ -50,7 +50,7 @@ class _ThrowingIdHubApi extends IdHubApi {
   @override
   Future<IdHubChallenge> createWalletChallenge({
     required String address,
-    String chain = 'eip155:1142',
+    String chain = 'eip155:94',
   }) => throw IdHubException('hub unavailable', 503);
 }
 
@@ -62,8 +62,9 @@ void main() {
   // Signing is deferred to the bloc: the legacy path signs the canonical message
   // via the wallet bridge, so tests stub that message -> legacySignature.
   const legacySignature = '0xlegacy-signature';
-  final canonicalMessage =
-      WalletLoginCredentials.canonicalLoginMessage(event.address);
+  final canonicalMessage = WalletLoginCredentials.canonicalLoginMessage(
+    event.address,
+  );
   final legacyCredentials = WalletLoginCredentials.derive(
     address: event.address,
     signature: legacySignature,
@@ -157,7 +158,70 @@ void main() {
   );
 
   blocTest<AuthBloc, AuthState>(
-    'Hub response without Matrix credentials falls back to legacy login',
+    'wallet cancellation stops after the Hub challenge without legacy fallback',
+    setUp: () {
+      getIt.registerSingleton(
+        const N42ChatConfig(
+          idHubUrl: 'https://id-test.n42.ai',
+          enableIdHubLogin: true,
+        ),
+      );
+      final wallet = _MockWalletBridge();
+      when(
+        () => wallet.signMessage('N42 ID challenge'),
+      ).thenAnswer((_) async => null);
+      getIt.registerSingleton<IWalletBridge>(wallet);
+    },
+    build: () => buildBloc(
+      idHubApiFactory: (_) => _FakeIdHubApi(
+        challenge: const IdHubChallenge(
+          challengeId: '123e4567-e89b-42d3-a456-426614174000',
+          message: 'N42 ID challenge',
+        ),
+        response: IdHubWalletResponse.success(did: 'did:plc:test'),
+      ),
+    ),
+    act: (bloc) => bloc.add(event),
+    expect: () => [
+      isA<AuthState>().having(
+        (state) => state.status,
+        'status',
+        AuthStatus.loading,
+      ),
+      isA<AuthState>()
+          .having((state) => state.status, 'status', AuthStatus.error)
+          .having(
+            (state) => state.errorMessage,
+            'error message',
+            'Wallet login cancelled',
+          ),
+    ],
+    verify: (_) {
+      verify(
+        () => getIt<IWalletBridge>().signMessage('N42 ID challenge'),
+      ).called(1);
+      verifyNever(() => getIt<IWalletBridge>().signMessage(canonicalMessage));
+      verifyNever(
+        () => repository.loginWithToken(
+          homeserver: any(named: 'homeserver'),
+          accessToken: any(named: 'accessToken'),
+          userId: any(named: 'userId'),
+          deviceId: any(named: 'deviceId'),
+        ),
+      );
+      verifyNever(
+        () => repository.login(
+          homeserver: any(named: 'homeserver'),
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+          rememberMe: any(named: 'rememberMe'),
+        ),
+      );
+    },
+  );
+
+  blocTest<AuthBloc, AuthState>(
+    'Hub response without Matrix credentials fails without a second signature',
     setUp: () {
       getIt.registerSingleton(
         const N42ChatConfig(
@@ -177,7 +241,7 @@ void main() {
     build: () => buildBloc(
       idHubApiFactory: (_) => _FakeIdHubApi(
         challenge: const IdHubChallenge(
-          challengeId: 'challenge-1',
+          challengeId: '123e4567-e89b-42d3-a456-426614174000',
           message: 'N42 ID challenge',
         ),
         response: IdHubWalletResponse.success(did: 'did:plc:test'),
@@ -208,19 +272,20 @@ void main() {
           deviceId: any(named: 'deviceId'),
         ),
       );
-      verify(
+      verifyNever(() => getIt<IWalletBridge>().signMessage(canonicalMessage));
+      verifyNever(
         () => repository.login(
-          homeserver: event.homeserver,
-          username: legacyCredentials.username,
-          password: legacyCredentials.password,
-          rememberMe: true,
+          homeserver: any(named: 'homeserver'),
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+          rememberMe: any(named: 'rememberMe'),
         ),
-      ).called(1);
+      );
     },
   );
 
   blocTest<AuthBloc, AuthState>(
-    'Matrix token rejection still falls back to the legacy account',
+    'Matrix token rejection fails without touching the legacy account',
     setUp: () {
       getIt.registerSingleton(
         const N42ChatConfig(
@@ -253,7 +318,7 @@ void main() {
     build: () => buildBloc(
       idHubApiFactory: (_) => _FakeIdHubApi(
         challenge: const IdHubChallenge(
-          challengeId: 'challenge-1',
+          challengeId: '123e4567-e89b-42d3-a456-426614174000',
           message: 'N42 ID challenge',
         ),
         response: IdHubWalletResponse.success(
@@ -287,14 +352,15 @@ void main() {
           deviceId: 'DEVICE1',
         ),
       ).called(1);
-      verify(
+      verifyNever(() => getIt<IWalletBridge>().signMessage(canonicalMessage));
+      verifyNever(
         () => repository.login(
-          homeserver: event.homeserver,
-          username: legacyCredentials.username,
-          password: legacyCredentials.password,
-          rememberMe: true,
+          homeserver: any(named: 'homeserver'),
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+          rememberMe: any(named: 'rememberMe'),
         ),
-      ).called(1);
+      );
     },
   );
 
@@ -379,7 +445,7 @@ void main() {
     build: () => buildBloc(
       idHubApiFactory: (_) => _FakeIdHubApi(
         challenge: const IdHubChallenge(
-          challengeId: 'challenge-1',
+          challengeId: '123e4567-e89b-42d3-a456-426614174000',
           message: 'N42 ID challenge',
         ),
         response: IdHubWalletResponse.success(
