@@ -30,6 +30,10 @@ void main() {
       expect(config.enableEncryption, isTrue);
     });
 
+    test('ID Hub chain defaults to N42 mainnet', () {
+      expect(config.idHubChainCaip2, 'eip155:94');
+    });
+
     test('enablePushNotifications defaults to true', () {
       expect(config.enablePushNotifications, isTrue);
     });
