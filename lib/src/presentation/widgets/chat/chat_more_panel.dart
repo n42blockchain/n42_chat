@@ -592,43 +592,92 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 6, 8, 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n?.chatRecentPlayed ?? 'Recent',
-                    style: TextStyle(
-                      color: context.textPrimary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final compact = constraints.maxWidth < 360;
+                final photosLabel = l10n?.contactPhotos ?? 'Photos';
+                final manageLabel = l10n?.commonSettings ?? 'Manage';
+                final sendLabel =
+                    l10n?.commonSendCount(_selectedRecentMediaIds.length) ??
+                    'Send (${_selectedRecentMediaIds.length})';
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n?.chatRecentPlayed ?? 'Recent',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: context.textPrimary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                if (snapshot?.access == ChatRecentMediaAccess.limited)
-                  TextButton(
-                    onPressed: _manageRecentMediaAccess,
-                    child: Text(l10n?.commonSettings ?? 'Manage'),
-                  ),
-                TextButton(
-                  onPressed: widget.onPhotoPressed,
-                  child: Text(l10n?.contactPhotos ?? 'Photos'),
-                ),
-                if (_selectedRecentMediaIds.isNotEmpty)
-                  FilledButton(
-                    onPressed: _sendingRecentMedia ? null : _sendRecentMedia,
-                    child: _sendingRecentMedia
-                        ? const SizedBox.square(
-                            dimension: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                    if (snapshot?.access == ChatRecentMediaAccess.limited)
+                      compact
+                          ? IconButton(
+                              visualDensity: VisualDensity.compact,
+                              tooltip: manageLabel,
+                              onPressed: _manageRecentMediaAccess,
+                              icon: const Icon(Icons.tune, size: 20),
+                            )
+                          : TextButton(
+                              onPressed: _manageRecentMediaAccess,
+                              child: Text(manageLabel),
+                            ),
+                    compact
+                        ? IconButton(
+                            visualDensity: VisualDensity.compact,
+                            tooltip: photosLabel,
+                            onPressed: widget.onPhotoPressed,
+                            icon: const Icon(
+                              Icons.photo_library_outlined,
+                              size: 20,
+                            ),
                           )
-                        : Text(
-                            l10n?.commonSendCount(
-                                  _selectedRecentMediaIds.length,
-                                ) ??
-                                'Send (${_selectedRecentMediaIds.length})',
+                        : TextButton(
+                            onPressed: widget.onPhotoPressed,
+                            child: Text(photosLabel),
                           ),
-                  ),
-              ],
+                    if (_selectedRecentMediaIds.isNotEmpty)
+                      compact
+                          ? IconButton.filled(
+                              visualDensity: VisualDensity.compact,
+                              tooltip: sendLabel,
+                              onPressed: _sendingRecentMedia
+                                  ? null
+                                  : _sendRecentMedia,
+                              icon: _sendingRecentMedia
+                                  ? const SizedBox.square(
+                                      dimension: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Badge(
+                                      label: Text(
+                                        '${_selectedRecentMediaIds.length}',
+                                      ),
+                                      child: const Icon(Icons.send, size: 18),
+                                    ),
+                            )
+                          : FilledButton(
+                              onPressed: _sendingRecentMedia
+                                  ? null
+                                  : _sendRecentMedia,
+                              child: _sendingRecentMedia
+                                  ? const SizedBox.square(
+                                      dimension: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(sendLabel),
+                            ),
+                  ],
+                );
+              },
             ),
           ),
           Expanded(child: _buildRecentMediaBody(context)),

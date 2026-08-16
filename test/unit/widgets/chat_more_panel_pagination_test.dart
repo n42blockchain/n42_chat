@@ -207,6 +207,28 @@ void main() {
     expect(find.text('Select up to 1 items'), findsOneWidget);
   });
 
+  testWidgets('窄屏有限授权且已选择媒体时顶栏不溢出', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(320, 568));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final panel = ChatMorePanel(
+      onPhotoPressed: () {},
+      recentMediaLoader: () async => ChatRecentMediaSnapshot(
+        access: ChatRecentMediaAccess.limited,
+        items: [ChatRecentMediaItem(id: 'a', thumbnailBytes: thumbnail)],
+      ),
+      onRecentMediaSend: (_) async {},
+      onManageRecentMediaAccess: () async {},
+    );
+
+    await tester.pumpWidget(wrap(panel));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Recent photo'));
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byTooltip('Send (1)'), findsOneWidget);
+  });
+
   testWidgets('窄屏拒绝相册权限时提供系统相册与设置降级入口', (tester) async {
     await tester.binding.setSurfaceSize(const Size(320, 568));
     addTearDown(() => tester.binding.setSurfaceSize(null));
