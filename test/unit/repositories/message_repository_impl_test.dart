@@ -1,7 +1,12 @@
 // Tests for MessageRepositoryImpl — send, redact, and message retrieval.
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:matrix/encryption/encryption.dart' as matrix_encryption;
+import 'package:matrix/encryption/key_manager.dart' as matrix_encryption;
 import 'package:matrix/matrix.dart' as matrix;
+import 'package:matrix/src/utils/cached_stream_controller.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
@@ -21,6 +26,10 @@ class MockClient extends Mock implements matrix.Client {}
 
 class MockRoom extends Mock implements matrix.Room {}
 
+class MockEncryption extends Mock implements matrix_encryption.Encryption {}
+
+class MockKeyManager extends Mock implements matrix_encryption.KeyManager {}
+
 class MockTimeline extends Mock implements matrix.Timeline {}
 
 class MockEvent extends Mock implements matrix.Event {}
@@ -34,6 +43,7 @@ void main() {
   late MockRoom mockRoom;
   late MockTimeline mockTimeline;
   late MockEvent mockEvent;
+  late CachedStreamController<matrix.SyncUpdate> syncController;
 
   const testRoomId = '!room1:matrix.org';
   const testEventId = '\$event1';
@@ -47,11 +57,18 @@ void main() {
     mockRoom = MockRoom();
     mockTimeline = MockTimeline();
     mockEvent = MockEvent();
+    syncController = CachedStreamController<matrix.SyncUpdate>();
     repository = MessageRepositoryImpl(mockMsgDS, mockClientMgr, mockStorageDS);
 
     when(() => mockClientMgr.client).thenReturn(mockClient);
     when(() => mockClient.getRoomById(any())).thenReturn(mockRoom);
-    when(() => mockRoom.getTimeline()).thenAnswer((_) async => mockTimeline);
+    when(() => mockClient.onSync).thenReturn(syncController);
+    when(() => mockRoom.id).thenReturn(testRoomId);
+    when(() => mockRoom.client).thenReturn(mockClient);
+    when(() => mockClient.encryptionEnabled).thenReturn(false);
+    when(
+      () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
+    ).thenAnswer((_) async => mockTimeline);
     when(() => mockRoom.getEventById(any())).thenAnswer((_) async => null);
     when(() => mockTimeline.events).thenReturn(<matrix.Event>[]);
     when(
@@ -61,6 +78,11 @@ void main() {
     when(
       () => mockStorageDS.getLocallyDeletedMessageIds(any()),
     ).thenAnswer((_) async => {});
+  });
+
+  tearDown(() async {
+    repository.disposeAllTimelines();
+    await syncController.close();
   });
 
   group('sendTextMessage', () {
@@ -262,6 +284,141 @@ void main() {
 
         expect(result, isNotNull);
         expect(result!.metadata?.transferStatus, 'completed');
+      },
+    );
+  });
+
+  group('watchMessages encryption recovery', () {
+    test('requests a missing Megolm session from other devices', () async {
+      final encryption = MockEncryption();
+      final keyManager = MockKeyManager();
+      final encryptedMessage = MessageEntity(
+        id: testEventId,
+        roomId: testRoomId,
+        senderId: '@alice:matrix.org',
+        senderName: 'Alice',
+        content: 'The sender has not sent us the session key.',
+        timestamp: DateTime(2026, 1, 1),
+        type: MessageType.encrypted,
+        status: MessageStatus.sent,
+      );
+
+      when(() => mockClient.encryptionEnabled).thenReturn(true);
+      when(() => mockClient.encryption).thenReturn(encryption);
+      when(() => encryption.keyManager).thenReturn(keyManager);
+      when(() => mockEvent.eventId).thenReturn(testEventId);
+      when(() => mockEvent.type).thenReturn(matrix.EventTypes.Encrypted);
+      when(
+        () => mockEvent.messageType,
+      ).thenReturn(matrix.MessageTypes.BadEncrypted);
+      when(() => mockEvent.content).thenReturn(<String, dynamic>{
+        'can_request_session': true,
+        'session_id': 'session-1',
+        'sender_key': 'sender-key-1',
+      });
+      when(() => mockTimeline.events).thenReturn(<matrix.Event>[mockEvent]);
+      when(
+        () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
+      ).thenReturn(encryptedMessage);
+      when(
+        () => keyManager.request(
+          mockRoom,
+          'session-1',
+          'sender-key-1',
+          tryOnlineBackup: true,
+          onlineKeyBackupOnly: false,
+        ),
+      ).thenAnswer((_) async {});
+
+      await repository.getMessages(testRoomId, limit: 1);
+      await Future<void>.delayed(Duration.zero);
+
+      verify(
+        () => keyManager.request(
+          mockRoom,
+          'session-1',
+          'sender-key-1',
+          tryOnlineBackup: true,
+          onlineKeyBackupOnly: false,
+        ),
+      ).called(1);
+    });
+
+    test(
+      're-emits a decrypted event after the timeline receives its session key',
+      () async {
+        final callbackReady = Completer<void>();
+        late void Function() timelineOnUpdate;
+        var isEncrypted = true;
+        final encryptedMessage = MessageEntity(
+          id: testEventId,
+          roomId: testRoomId,
+          senderId: '@alice:matrix.org',
+          senderName: 'Alice',
+          content: 'The sender has not sent us the session key.',
+          timestamp: DateTime(2026, 1, 1),
+          type: MessageType.encrypted,
+          status: MessageStatus.sent,
+        );
+        final decryptedMessage = MessageEntity(
+          id: testEventId,
+          roomId: testRoomId,
+          senderId: '@alice:matrix.org',
+          senderName: 'Alice',
+          content: 'Recovered message',
+          timestamp: DateTime(2026, 1, 1),
+          type: MessageType.text,
+          status: MessageStatus.sent,
+        );
+
+        when(
+          () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
+        ).thenAnswer((invocation) async {
+          timelineOnUpdate =
+              invocation.namedArguments[#onUpdate] as void Function();
+          if (!callbackReady.isCompleted) callbackReady.complete();
+          return mockTimeline;
+        });
+        when(() => mockEvent.eventId).thenReturn(testEventId);
+        when(() => mockEvent.type).thenAnswer(
+          (_) => isEncrypted
+              ? matrix.EventTypes.Encrypted
+              : matrix.EventTypes.Message,
+        );
+        when(() => mockEvent.messageType).thenAnswer(
+          (_) => isEncrypted
+              ? matrix.MessageTypes.BadEncrypted
+              : matrix.MessageTypes.Text,
+        );
+        when(() => mockEvent.content).thenAnswer(
+          (_) => isEncrypted
+              ? <String, dynamic>{
+                  'can_request_session': true,
+                  'session_id': 'session-1',
+                  'sender_key': 'sender-key-1',
+                }
+              : <String, dynamic>{
+                  'msgtype': matrix.MessageTypes.Text,
+                  'body': 'Recovered message',
+                },
+        );
+        when(() => mockTimeline.events).thenReturn(<matrix.Event>[mockEvent]);
+        when(
+          () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
+        ).thenAnswer((_) => isEncrypted ? encryptedMessage : decryptedMessage);
+
+        final emissions = repository.watchMessages(testRoomId).take(2).toList();
+        await callbackReady.future;
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        isEncrypted = false;
+        timelineOnUpdate();
+
+        final result = await emissions;
+        expect(result.first.single.content, contains('session key'));
+        expect(result.last.single.content, 'Recovered message');
+        verify(
+          () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
+        ).called(2);
       },
     );
   });
