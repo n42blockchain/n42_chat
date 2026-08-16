@@ -228,6 +228,22 @@ void main() {
       );
     });
 
+    test('replaces and clears local LLM configuration', () {
+      final configured = base.copyWith(
+        localLlmModelUrl: 'https://models.example/gemma.task',
+        localLlmHuggingFaceToken: 'hf-token',
+      );
+      expect(configured.localLlmModelUrl, 'https://models.example/gemma.task');
+      expect(configured.localLlmHuggingFaceToken, 'hf-token');
+
+      final cleared = configured.copyWith(
+        localLlmModelUrl: null,
+        localLlmHuggingFaceToken: null,
+      );
+      expect(cleared.localLlmModelUrl, isNull);
+      expect(cleared.localLlmHuggingFaceToken, isNull);
+    });
+
     test('replaces giphyApiKey', () {
       expect(base.copyWith(giphyApiKey: 'my-key').giphyApiKey, 'my-key');
     });
