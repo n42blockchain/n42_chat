@@ -5,6 +5,7 @@ import '../../domain/entities/conversation_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/search_result_entity.dart';
 import '../../domain/repositories/search_repository.dart';
+import '../../core/services/archive_search_service.dart';
 import '../../core/services/ens_cache_service.dart';
 import '../../core/services/username_service.dart';
 import '../datasources/matrix/matrix_search_datasource.dart';
@@ -18,14 +19,17 @@ class SearchRepositoryImpl implements ISearchRepository {
   final MatrixClientManager _clientManager;
   final EnsCacheService? _ensCacheService;
   final UsernameService? _usernameService;
+  final ArchiveSearchService? _archiveSearch;
 
   SearchRepositoryImpl(
     this._searchDataSource,
     this._clientManager, {
     EnsCacheService? ensCacheService,
     UsernameService? usernameService,
+    ArchiveSearchService? archiveSearch,
   }) : _ensCacheService = ensCacheService,
-       _usernameService = usernameService;
+       _usernameService = usernameService,
+       _archiveSearch = archiveSearch;
 
   @override
   Future<SearchResults> searchGlobal(
@@ -239,7 +243,7 @@ class SearchRepositoryImpl implements ISearchRepository {
               limit: limit,
             );
 
-      return results.map((result) {
+      final liveItems = results.map((result) {
         final message = _mapEventToMessage(result.event);
         final roomAvatar = _getRoomAvatarUrl(result.room);
 
@@ -251,6 +255,59 @@ class SearchRepositoryImpl implements ISearchRepository {
           matchedKeyword: query,
         );
       }).toList();
+
+      // 合并 FTS5 归档搜索：内存 timeline 扫描只覆盖已加载消息，归档库
+      // 覆盖完整历史。按消息 id 去重（live 优先），失败静默降级为纯 live。
+      final archiveItems = await _searchArchive(
+        query,
+        excludeIds: liveItems.map((e) => e.id).toSet(),
+        limit: limit,
+      );
+      if (archiveItems.isEmpty) return liveItems;
+      // 合并后按时间倒序重排——否则 live 全部排在 archive 之前,时间顺序错乱
+      // (复审 P2)。无 timestamp 的排最后。
+      final merged = [...liveItems, ...archiveItems]
+        ..sort((a, b) {
+          final ta = a.timestamp;
+          final tb = b.timestamp;
+          if (ta == null && tb == null) return 0;
+          if (ta == null) return 1;
+          if (tb == null) return -1;
+          return tb.compareTo(ta);
+        });
+      return merged.take(limit).toList();
+    }
+  }
+
+  /// FTS5 归档全文搜索，映射为 [SearchResultItem]（房间名从当前客户端解析）。
+  Future<List<SearchResultItem>> _searchArchive(
+    String query, {
+    required Set<String> excludeIds,
+    int limit = 50,
+  }) async {
+    final archive = _archiveSearch;
+    if (archive == null) return const [];
+    try {
+      final hits = await archive.search(query, limit: limit);
+      final items = <SearchResultItem>[];
+      for (final hit in hits) {
+        final msg = hit.message;
+        if (excludeIds.contains(msg.id)) continue;
+        final room = _clientManager.client?.getRoomById(msg.roomId);
+        items.add(
+          SearchResultItem.fromMessage(
+            msg,
+            roomId: msg.roomId,
+            roomName: room?.getLocalizedDisplayname() ?? '归档会话',
+            roomAvatarUrl: _getRoomAvatarUrl(room),
+            matchedKeyword: query,
+          ),
+        );
+      }
+      return items;
+    } catch (e) {
+      debugLog('SearchRepository: archive FTS search failed: $e');
+      return const [];
     }
   }
 

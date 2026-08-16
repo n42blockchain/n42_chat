@@ -21,7 +21,7 @@ class SMr extends S {
   String get chatCallServiceNotInitialized => 'कॉल सेवा सुरू केली नाही';
 
   @override
-  String authLoginFailed(String error) {
+  String authLoginFailed(Object error) {
     return 'लॉगिन अयशस्वी: $error';
   }
 
@@ -149,7 +149,7 @@ class SMr extends S {
       'मायक्रोफोन परवानगी नाकारली गेली आहे. कृपया व्हॉइस संदेश वापरण्यासाठी सिस्टम सेटिंग्जमध्ये ते सक्षम करा.';
 
   @override
-  String commonStartRecordingFailed(String error) {
+  String commonStartRecordingFailed(Object error) {
     return 'रेकॉर्डिंग सुरू करण्यात अयशस्वी: $error';
   }
 
@@ -157,7 +157,7 @@ class SMr extends S {
   String get commonRecordingTooShort => 'रेकॉर्डिंग खूप लहान आहे';
 
   @override
-  String commonStopRecordingFailed(String error) {
+  String commonStopRecordingFailed(Object error) {
     return 'रेकॉर्डिंग थांबवण्यात अयशस्वी: $error';
   }
 
@@ -274,7 +274,7 @@ class SMr extends S {
   }
 
   @override
-  String contactN42Id(String id) {
+  String contactN42Id(Object id) {
     return 'N42 आयडी: $id';
   }
 
@@ -377,7 +377,7 @@ class SMr extends S {
   String get profileChooseFromGallery => 'गॅलरीमधून निवडा';
 
   @override
-  String profileSaveFailed(String error) {
+  String profileSaveFailed(Object error) {
     return 'जतन अयशस्वी: $error';
   }
 
@@ -425,7 +425,7 @@ class SMr extends S {
   String get authEnterServerAddress => 'सर्व्हर पत्ता प्रविष्ट करा';
 
   @override
-  String authConnectedTo(String serverName) {
+  String authConnectedTo(Object serverName) {
     return '$serverName शी कनेक्ट केले';
   }
 
@@ -526,7 +526,7 @@ class SMr extends S {
   String get commonPayment => 'पेमेंट';
 
   @override
-  String commonFeatureComingSoon(String feature) {
+  String commonFeatureComingSoon(Object feature) {
     return '$feature लवकरच येत आहे';
   }
 
@@ -549,7 +549,7 @@ class SMr extends S {
   String get conversationDeleteConversation => 'संभाषण हटवा';
 
   @override
-  String conversationDeleteConversationConfirm(String name) {
+  String conversationDeleteConversationConfirm(Object name) {
     return '\"$name\" सह संभाषण हटवायचे?';
   }
 
@@ -600,7 +600,7 @@ class SMr extends S {
   String get commonLocationLabel => 'स्थान';
 
   @override
-  String contactRecommendFailed(String error) {
+  String contactRecommendFailed(Object error) {
     return 'शिफारस अयशस्वी: $error';
   }
 
@@ -611,7 +611,7 @@ class SMr extends S {
   String get contactOpeningChat => 'गप्पा उघडत आहे...';
 
   @override
-  String contactOpenChatFailed(String error) {
+  String contactOpenChatFailed(Object error) {
     return 'चॅट उघडण्यात अयशस्वी: $error';
   }
 
@@ -679,7 +679,7 @@ class SMr extends S {
   String get searchNoResults => 'कोणतेही परिणाम नाहीत';
 
   @override
-  String commonGroupMembers(int count) {
+  String commonGroupMembers(Object count) {
     return 'सदस्य ($count)';
   }
 
@@ -779,7 +779,7 @@ class SMr extends S {
   String get transferAddressVerified => 'पत्ता सत्यापित केला';
 
   @override
-  String transferAvailableBalance(String balance, String symbol) {
+  String transferAvailableBalance(Object balance, Object symbol) {
     return 'उपलब्ध: $balance $symbol';
   }
 
@@ -840,7 +840,7 @@ class SMr extends S {
   String get profileAvatarUpdated => 'अवतार अपडेट केला';
 
   @override
-  String commonSelectImageFailed(String error) {
+  String commonSelectImageFailed(Object error) {
     return 'प्रतिमा निवडण्यात अयशस्वी: $error';
   }
 
@@ -859,7 +859,7 @@ class SMr extends S {
   }
 
   @override
-  String profileSaveAddressFailed(String error) {
+  String profileSaveAddressFailed(Object error) {
     return 'पत्ता जतन करण्यात अयशस्वी: $error';
   }
 
@@ -882,7 +882,7 @@ class SMr extends S {
   String get profileAddressDeleted => 'पत्ता हटवला';
 
   @override
-  String profileSaveInvoiceFailed(String error) {
+  String profileSaveInvoiceFailed(Object error) {
     return 'बीजक सेव्ह करण्यात अयशस्वी: $error';
   }
 
@@ -938,7 +938,7 @@ class SMr extends S {
   String get commonAddressCopied => 'पत्ता कॉपी केला';
 
   @override
-  String favoriteOpenItem(String content) {
+  String favoriteOpenItem(Object content) {
     return 'उघडा: $content';
   }
 
@@ -1223,7 +1223,7 @@ class SMr extends S {
   String get chatInCall => 'कॉल मध्ये';
 
   @override
-  String commonFeatureInDevelopment(String feature) {
+  String commonFeatureInDevelopment(Object feature) {
     return '$feature वैशिष्ट्य विकसित होत आहे...';
   }
 
@@ -2673,7 +2673,7 @@ class SMr extends S {
   String get groupEnterGroupAnnouncement => 'गट घोषणा प्रविष्ट करा';
 
   @override
-  String groupMemberCountClickToCopy(int count) {
+  String groupMemberCountClickToCopy(Object count) {
     return '$count सदस्य, ग्रुप आयडी कॉपी करण्यासाठी क्लिक करा';
   }
 
@@ -3084,12 +3084,12 @@ class SMr extends S {
   String get contactEnterPhone => 'फोन नंबर प्रविष्ट करा';
 
   @override
-  String commonConversationWithId(String roomId) {
+  String commonConversationWithId(Object roomId) {
     return 'संभाषण: $roomId';
   }
 
   @override
-  String commonContactWithId(String userId) {
+  String commonContactWithId(Object userId) {
     return 'संपर्क: $userId';
   }
 
@@ -3097,7 +3097,7 @@ class SMr extends S {
   String get commonDiscover => 'शोधा';
 
   @override
-  String commonDeveloping(String title) {
+  String commonDeveloping(Object title) {
     return '$title\n(लवकरच येत आहे)';
   }
 
@@ -3422,12 +3422,12 @@ class SMr extends S {
   String get callLivekitNotConfigured => 'LiveKit कॉन्फिगर केलेले नाही';
 
   @override
-  String callJoinMeetingFailed(String error) {
+  String callJoinMeetingFailed(Object error) {
     return 'मीटिंगमध्ये सामील होण्यात अयशस्वी: $error';
   }
 
   @override
-  String callScreenShareFailed(String error) {
+  String callScreenShareFailed(Object error) {
     return 'स्क्रीन शेअर अयशस्वी: $error';
   }
 
@@ -3679,12 +3679,12 @@ class SMr extends S {
   String get profileSilentMode => 'मूक मोड';
 
   @override
-  String profilePlayFailed(String ringtoneName) {
+  String profilePlayFailed(Object ringtoneName) {
     return 'प्ले करण्यात अयशस्वी: $ringtoneName';
   }
 
   @override
-  String profilePlaying(String ringtoneName) {
+  String profilePlaying(Object ringtoneName) {
     return 'खेळत आहे: $ringtoneName';
   }
 
@@ -3738,7 +3738,7 @@ class SMr extends S {
   String get commonAllRead => 'सर्व वाचले';
 
   @override
-  String commonReadCount(int count) {
+  String commonReadCount(Object count) {
     return '$count वाचले';
   }
 

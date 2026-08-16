@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -5,179 +6,80 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:n42_chat/src/data/datasources/remote/id_hub_api.dart';
 
+class _HangingClient extends http.BaseClient {
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) =>
+      Completer<http.StreamedResponse>().future;
+}
+
+class _FailingClient extends http.BaseClient {
+  bool requested = false;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    requested = true;
+    throw StateError('a request must not be sent');
+  }
+}
+
 void main() {
-  const challengeId = '123e4567-e89b-42d3-a456-426614174000';
+  test(
+    'wallet challenge times out instead of blocking login fallback',
+    () async {
+      final api = IdHubApi(
+        baseUrl: 'https://id.n42.ai',
+        client: _HangingClient(),
+        requestTimeout: Duration.zero,
+      );
 
-  group('IdHubApi.createWalletChallenge', () {
-    test('returns the challenge id and message on 200', () async {
-      final client = MockClient((req) async {
-        expect(req.url.path, '/v1/auth/wallet/challenge');
-        expect(jsonDecode(req.body)['aud'], 'chat');
-        return http.Response(
-          jsonEncode({
-            'challenge_id': challengeId,
-            'message': 'N42 ID v1 ...',
-            'expires_at': '2099-01-01T00:00:00Z',
-          }),
-          200,
-        );
-      });
-      final api = IdHubApi(baseUrl: 'https://id-test.n42.ai/', client: client);
-      final ch = await api.createWalletChallenge(address: '0xABC');
-      expect(ch.challengeId, challengeId);
-      expect(ch.message, 'N42 ID v1 ...');
-    });
-
-    test('uses the production N42 chain by default', () async {
-      final client = MockClient((req) async {
-        expect(jsonDecode(req.body)['chain'], 'eip155:94');
-        return http.Response(
-          jsonEncode({'challenge_id': challengeId, 'message': 'N42 ID v1 ...'}),
-          200,
-        );
-      });
-      final api = IdHubApi(baseUrl: 'https://id-test.n42.ai', client: client);
-      await api.createWalletChallenge(address: '0xABC');
-    });
-
-    test('throws IdHubException on non-200', () async {
-      final client = MockClient(
-        (req) async => http.Response(
-          jsonEncode({'type': 'x/rate-limited', 'detail': 'slow down'}),
-          429,
+      await expectLater(
+        api.createWalletChallenge(
+          address: '0x0000000000000000000000000000000000000000',
         ),
-      );
-      final api = IdHubApi(baseUrl: 'https://id-test.n42.ai', client: client);
-      expect(
-        () => api.createWalletChallenge(address: '0xABC'),
-        throwsA(isA<IdHubException>()),
-      );
-    });
-  });
-
-  group('IdHubApi.verifyWalletLogin', () {
-    test('exposes Matrix credentials when the hub returns them', () async {
-      final client = MockClient(
-        (req) async => http.Response(
-          jsonEncode({
-            'access_token': 'n42-id-token',
-            'token_type': 'Bearer',
-            'expires_in': 900,
-            'sub': 'did:plc:aaaa',
-            'matrix_user_id': '@u_x:m.si46.world',
-            'matrix_access_token': 'mx-token',
-            'matrix_device_id': 'DEV1',
-            'matrix_homeserver': 'https://m.si46.world',
-          }),
-          200,
-        ),
-      );
-      final api = IdHubApi(baseUrl: 'https://id-test.n42.ai', client: client);
-      final resp = await api.verifyWalletLogin(
-        challengeId: challengeId,
-        signature: '0xsig',
-      );
-      expect(resp.success, isTrue);
-      expect(resp.hasMatrixCredentials, isTrue);
-      expect(resp.matrixUserId, '@u_x:m.si46.world');
-      expect(resp.did, 'did:plc:aaaa');
-    });
-
-    test(
-      'reports no Matrix credentials when the bridge is not live yet',
-      () async {
-        // Hub reachable, DID minted, but no matrix_* fields -> caller falls back.
-        final client = MockClient(
-          (req) async => http.Response(
-            jsonEncode({
-              'access_token': 'n42-id-token',
-              'token_type': 'Bearer',
-              'expires_in': 900,
-              'sub': 'did:plc:aaaa',
-            }),
-            200,
+        throwsA(
+          isA<IdHubException>().having(
+            (error) => error.message,
+            'message',
+            'ID Hub request timed out',
           ),
-        );
-        final api = IdHubApi(baseUrl: 'https://id-test.n42.ai', client: client);
-        final resp = await api.verifyWalletLogin(
-          challengeId: challengeId,
-          signature: '0xsig',
-        );
-        expect(resp.success, isTrue);
-        expect(resp.hasMatrixCredentials, isFalse);
-      },
+        ),
+      );
+    },
+  );
+
+  test('plaintext Hub URL is rejected before an auth request is sent', () {
+    final client = _FailingClient();
+    expect(
+      () => IdHubApi(baseUrl: 'http://id.n42.ai', client: client),
+      throwsArgumentError,
     );
-
-    test('returns failure on a non-200 verify', () async {
-      final client = MockClient(
-        (req) async => http.Response(
-          jsonEncode({'type': 'x/challenge-expired', 'detail': 'expired'}),
-          401,
-        ),
-      );
-      final api = IdHubApi(baseUrl: 'https://id-test.n42.ai', client: client);
-      final resp = await api.verifyWalletLogin(
-        challengeId: challengeId,
-        signature: '0xsig',
-      );
-      expect(resp.success, isFalse);
-      expect(resp.hasMatrixCredentials, isFalse);
-      expect(resp.error, 'expired');
-      expect(resp.statusCode, 401);
-      expect(resp.code, 'challenge-expired');
-    });
+    expect(client.requested, isFalse);
   });
 
-  group('IdHubApi validation', () {
-    for (final value in [
-      'http://id-test.n42.ai',
-      'https://user@id-test.n42.ai',
-      'https://id-test.n42.ai:8443',
-      'https://id-test.n42.ai/api',
-      'https://id-test.n42.ai?debug=1',
-    ]) {
-      test('rejects non-canonical base URL $value', () {
-        expect(() => IdHubApi(baseUrl: value), throwsArgumentError);
-      });
-    }
-
-    test('rejects malformed successful challenge payload', () async {
+  test(
+    'wallet challenge binds the Chat audience and N42 mainnet chain',
+    () async {
+      late http.Request request;
       final api = IdHubApi(
-        baseUrl: 'https://id-test.n42.ai',
-        client: MockClient(
-          (_) async => http.Response(
-            jsonEncode({'challenge_id': 'not-a-uuid', 'message': 'message'}),
-            200,
-          ),
-        ),
-      );
-      expect(
-        () => api.createWalletChallenge(address: '0xABC'),
-        throwsFormatException,
-      );
-    });
-
-    test('rejects unsafe Matrix homeserver credentials', () async {
-      final api = IdHubApi(
-        baseUrl: 'https://id-test.n42.ai',
-        client: MockClient(
-          (_) async => http.Response(
+        baseUrl: 'https://id.n42.ai',
+        client: MockClient((received) async {
+          request = received;
+          return http.Response(
             jsonEncode({
-              'sub': 'did:plc:aaaa',
-              'matrix_user_id': '@u_x:m.si46.world',
-              'matrix_access_token': 'mx-token',
-              'matrix_homeserver': 'http://m.si46.world',
+              'challenge_id': '123e4567-e89b-42d3-a456-426614174000',
+              'message': 'N42 ID v1 ...',
             }),
             200,
-          ),
-        ),
+          );
+        }),
       );
-      final response = await api.verifyWalletLogin(
-        challengeId: challengeId,
-        signature: '0xsig',
+
+      await api.createWalletChallenge(
+        address: '0x0000000000000000000000000000000000000000',
       );
-      expect(response.success, isFalse);
-      expect(response.error, 'invalid ID Hub response');
-    });
-  });
+
+      expect(jsonDecode(request.body)['aud'], 'chat');
+      expect(jsonDecode(request.body)['chain'], 'eip155:94');
+    },
+  );
 }

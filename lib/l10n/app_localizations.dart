@@ -171,7 +171,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Login failed: {error}'**
-  String authLoginFailed(String error);
+  String authLoginFailed(Object error);
 
   /// No description provided for @chatCallBack.
   ///
@@ -417,7 +417,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Failed to start recording: {error}'**
-  String commonStartRecordingFailed(String error);
+  String commonStartRecordingFailed(Object error);
 
   /// No description provided for @commonRecordingTooShort.
   ///
@@ -429,7 +429,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Failed to stop recording: {error}'**
-  String commonStopRecordingFailed(String error);
+  String commonStopRecordingFailed(Object error);
 
   /// No description provided for @chatReleaseToCancel.
   ///
@@ -633,7 +633,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'N42 ID: {id}'**
-  String contactN42Id(String id);
+  String contactN42Id(Object id);
 
   /// No description provided for @profileN42IdTitle.
   ///
@@ -831,7 +831,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Save failed: {error}'**
-  String profileSaveFailed(String error);
+  String profileSaveFailed(Object error);
 
   /// No description provided for @authSecureDecentralizedChat.
   ///
@@ -921,7 +921,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Connected to {serverName}'**
-  String authConnectedTo(String serverName);
+  String authConnectedTo(Object serverName);
 
   /// No description provided for @authUsername.
   ///
@@ -1107,7 +1107,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'{feature} coming soon'**
-  String commonFeatureComingSoon(String feature);
+  String commonFeatureComingSoon(Object feature);
 
   /// No description provided for @conversationMarkAsRead.
   ///
@@ -1149,7 +1149,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Delete conversation with \"{name}\"?'**
-  String conversationDeleteConversationConfirm(String name);
+  String conversationDeleteConversationConfirm(Object name);
 
   /// No description provided for @commonNoContacts.
   ///
@@ -1245,7 +1245,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Recommend failed: {error}'**
-  String contactRecommendFailed(String error);
+  String contactRecommendFailed(Object error);
 
   /// No description provided for @profileEnterRemark.
   ///
@@ -1263,7 +1263,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Failed to open chat: {error}'**
-  String contactOpenChatFailed(String error);
+  String contactOpenChatFailed(Object error);
 
   /// No description provided for @contactAddContact.
   ///
@@ -1395,7 +1395,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Members ({count})'**
-  String commonGroupMembers(int count);
+  String commonGroupMembers(Object count);
 
   /// No description provided for @groupMembersTitle.
   ///
@@ -1587,7 +1587,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Available: {balance} {symbol}'**
-  String transferAvailableBalance(String balance, String symbol);
+  String transferAvailableBalance(Object balance, Object symbol);
 
   /// No description provided for @commonEnterAmount.
   ///
@@ -1701,7 +1701,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Failed to select image: {error}'**
-  String commonSelectImageFailed(String error);
+  String commonSelectImageFailed(Object error);
 
   /// No description provided for @profileChangeName.
   ///
@@ -1731,7 +1731,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Failed to save address: {error}'**
-  String profileSaveAddressFailed(String error);
+  String profileSaveAddressFailed(Object error);
 
   /// No description provided for @profileAddNew.
   ///
@@ -1773,7 +1773,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Failed to save invoice: {error}'**
-  String profileSaveInvoiceFailed(String error);
+  String profileSaveInvoiceFailed(Object error);
 
   /// No description provided for @profileMyInvoices.
   ///
@@ -1869,7 +1869,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Open: {content}'**
-  String favoriteOpenItem(String content);
+  String favoriteOpenItem(Object content);
 
   /// No description provided for @favoriteDeleted.
   ///
@@ -2361,7 +2361,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'{feature} feature in development...'**
-  String commonFeatureInDevelopment(String feature);
+  String commonFeatureInDevelopment(Object feature);
 
   /// No description provided for @chatCollectMessages.
   ///
@@ -4917,7 +4917,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'{count} members, click to copy group ID'**
-  String groupMemberCountClickToCopy(int count);
+  String groupMemberCountClickToCopy(Object count);
 
   /// No description provided for @groupNoPermissionToEditGroupName.
   ///
@@ -5673,13 +5673,13 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Conversation: {roomId}'**
-  String commonConversationWithId(String roomId);
+  String commonConversationWithId(Object roomId);
 
   /// No description provided for @commonContactWithId.
   ///
   /// In en, this message translates to:
   /// **'Contact: {userId}'**
-  String commonContactWithId(String userId);
+  String commonContactWithId(Object userId);
 
   /// No description provided for @commonDiscover.
   ///
@@ -5691,7 +5691,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'{title}\n(Coming soon)'**
-  String commonDeveloping(String title);
+  String commonDeveloping(Object title);
 
   /// No description provided for @commonPageNotFound.
   ///
@@ -6303,13 +6303,13 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Failed to join meeting: {error}'**
-  String callJoinMeetingFailed(String error);
+  String callJoinMeetingFailed(Object error);
 
   /// No description provided for @callScreenShareFailed.
   ///
   /// In en, this message translates to:
   /// **'Screen share failed: {error}'**
-  String callScreenShareFailed(String error);
+  String callScreenShareFailed(Object error);
 
   /// No description provided for @profileN42BeanTitle.
   ///
@@ -6807,13 +6807,13 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'Failed to play: {ringtoneName}'**
-  String profilePlayFailed(String ringtoneName);
+  String profilePlayFailed(Object ringtoneName);
 
   /// No description provided for @profilePlaying.
   ///
   /// In en, this message translates to:
   /// **'Playing: {ringtoneName}'**
-  String profilePlaying(String ringtoneName);
+  String profilePlaying(Object ringtoneName);
 
   /// No description provided for @profileStop.
   ///
@@ -6909,7 +6909,7 @@ abstract class S {
   ///
   /// In en, this message translates to:
   /// **'{count} read'**
-  String commonReadCount(int count);
+  String commonReadCount(Object count);
 
   /// No description provided for @commonYouRecalledMessage.
   ///

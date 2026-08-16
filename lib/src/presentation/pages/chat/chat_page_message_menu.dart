@@ -14,6 +14,21 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
           Navigator.pop(ctx);
           _copyMessage(message);
         },
+        onSpeak: message.type == MessageType.text
+            ? () {
+                Navigator.pop(ctx);
+                _speakMessage(message);
+              }
+            : null,
+        // 长文阅读模式：条件与微信风格主菜单保持一致，避免 fallback 缺项。
+        onReadingMode:
+            (message.type == MessageType.text &&
+                ArticleReaderUtils.isLongArticle(message.content))
+            ? () {
+                Navigator.pop(ctx);
+                _openReadingMode(message);
+              }
+            : null,
         onReply: () {
           Navigator.pop(ctx);
           context.read<ChatBloc>().add(SetReplyTarget(message));
@@ -206,6 +221,12 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
                 _openReadingMode(message);
               }
             : null,
+        onSpeak: message.type == MessageType.text
+            ? () {
+                debugLog('Read aloud clicked');
+                _speakMessage(message);
+              }
+            : null,
       ),
     );
 
@@ -266,6 +287,13 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
         duration: const Duration(seconds: 1),
       ),
     );
+  }
+
+  /// 朗读文本消息（TTS）。TtsService 为进程级单例，再点同一条即停止。
+  void _speakMessage(MessageEntity message) {
+    final text = message.content.trim();
+    if (text.isEmpty) return;
+    unawaited(TtsService.instance.speak(text, messageId: message.id));
   }
 
   /// 打开长文阅读模式

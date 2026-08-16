@@ -22,15 +22,18 @@ class PushProtocolDatasource {
   PushProtocolDatasource({
     required SharedPreferences prefs,
     String? baseUrl,
-  })  : _prefs = prefs,
-        _dio = Dio(
-          BaseOptions(
-            baseUrl: baseUrl ?? _defaultBaseUrl,
-            connectTimeout: const Duration(seconds: 15),
-            receiveTimeout: const Duration(seconds: 15),
-            headers: const {'Content-Type': 'application/json'},
-          ),
-        );
+    Dio? dio,
+  }) : _prefs = prefs,
+       _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               baseUrl: baseUrl ?? _defaultBaseUrl,
+               connectTimeout: const Duration(seconds: 15),
+               receiveTimeout: const Duration(seconds: 15),
+               headers: const {'Content-Type': 'application/json'},
+             ),
+           );
 
   /// 获取指定钱包地址的通知列表
   ///
@@ -45,15 +48,14 @@ class PushProtocolDatasource {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '/v1/users/$caip10/feeds',
-        queryParameters: {
-          'page': page,
-          'limit': limit,
-          'raw': 'false',
-        },
+        queryParameters: {'page': page, 'limit': limit},
       );
-      final results = response.data?['results'];
+      final results = response.data?['feeds'] ?? response.data?['results'];
       if (results is List) {
-        return results.cast<Map<String, dynamic>>();
+        return results
+            .whereType<Map<Object?, Object?>>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
       }
       return [];
     } on DioException catch (e) {
@@ -61,7 +63,9 @@ class PushProtocolDatasource {
         // 地址在 Push Protocol 上没有历史通知（正常情况）
         return [];
       }
-      debugLog('PushProtocolDatasource: fetchNotifications error: ${e.message}');
+      debugLog(
+        'PushProtocolDatasource: fetchNotifications error: ${e.message}',
+      );
       rethrow;
     }
   }
@@ -78,12 +82,21 @@ class PushProtocolDatasource {
     }
   }
 
+  /// 已读 ID 集合上限——只增不清会无限增长(复审 P2)。
+  static const int _maxReadIds = 500;
+
   /// 将单条通知标记为已读
   Future<void> markAsRead(String notificationId) async {
     final ids = await getReadIds();
     if (ids.add(notificationId)) {
-      await _prefs.setString(_readIdsKey, jsonEncode(ids.toList()));
+      await _prefs.setString(_readIdsKey, jsonEncode(_capped(ids)));
     }
+  }
+
+  /// 截断到最近 [_maxReadIds] 条(LinkedHashSet 保插入序,丢最老)。
+  List<String> _capped(Set<String> ids) {
+    if (ids.length <= _maxReadIds) return ids.toList();
+    return ids.toList().sublist(ids.length - _maxReadIds);
   }
 
   /// 批量标记为已读
@@ -93,7 +106,7 @@ class PushProtocolDatasource {
     final before = ids.length;
     ids.addAll(notificationIds);
     if (ids.length != before) {
-      await _prefs.setString(_readIdsKey, jsonEncode(ids.toList()));
+      await _prefs.setString(_readIdsKey, jsonEncode(_capped(ids)));
     }
   }
 

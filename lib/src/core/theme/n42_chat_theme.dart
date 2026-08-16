@@ -1,3 +1,5 @@
+// CupertinoPageTransitionsBuilder 自 Flutter 3.44 起只由 cupertino 库导出
+// （material 不再转出），pageTransitionsTheme 用到它，故显式引入。
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -269,7 +271,7 @@ class N42ChatTheme {
       colorScheme: colorScheme,
 
       // iOS-style page transitions for WeChat-like horizontal slide-back
-      pageTransitionsTheme: PageTransitionsTheme(
+      pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
@@ -634,3 +636,4 @@ class N42ChatTheme {
     );
   }
 }
+
