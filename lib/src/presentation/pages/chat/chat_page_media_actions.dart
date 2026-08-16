@@ -41,11 +41,12 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
-  /// 打开白板/涂鸦页，绘制结果栅格化为 PNG 后走图片发送链路。
+  /// 打开白板/涂鸦页（传入 roomId 启用实时共绘——会话双方同时打开白板即
+  /// 共同绘制），绘制结果栅格化为 PNG 后走图片发送链路。
   Future<void> _openWhiteboard() async {
     final bytes = await Navigator.of(context).push<Uint8List>(
       MaterialPageRoute<Uint8List>(
-        builder: (_) => const WhiteboardPage(),
+        builder: (_) => WhiteboardPage(roomId: widget.conversation.id),
         fullscreenDialog: true,
       ),
     );
@@ -712,7 +713,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
   Future<void> _pickFile({DateTime? scheduledAt}) async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.any,
         allowMultiple: true,
         withReadStream: true,

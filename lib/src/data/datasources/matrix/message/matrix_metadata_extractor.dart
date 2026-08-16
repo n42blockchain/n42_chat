@@ -21,7 +21,8 @@ class MatrixMetadataExtractor {
     final info = event.content['info'] as Map<String, dynamic>?;
     // 加密房间中媒体 URL 存在 file.url 而非顶层 url 字段
     final fileContent = event.content['file'] as Map<String, dynamic>?;
-    final mxcUrl = event.content['url'] as String? ?? fileContent?['url'] as String?;
+    final mxcUrl =
+        event.content['url'] as String? ?? fileContent?['url'] as String?;
     final thumbnailMxc = info?['thumbnail_url'] as String?;
     final keyMap = fileContent?['key'] as Map<String, dynamic>?;
     final hashMap = fileContent?['hashes'] as Map<String, dynamic>?;

@@ -21,7 +21,7 @@ class SDe extends S {
   String get chatCallServiceNotInitialized => 'Anrufdienst nicht initialisiert';
 
   @override
-  String authLoginFailed(String error) {
+  String authLoginFailed(Object error) {
     return 'Anmeldung fehlgeschlagen: $error';
   }
 
@@ -149,7 +149,7 @@ class SDe extends S {
       'Die Mikrofonberechtigung wurde verweigert. Bitte aktivieren Sie es in den Systemeinstellungen, um Sprachnachrichten zu verwenden.';
 
   @override
-  String commonStartRecordingFailed(String error) {
+  String commonStartRecordingFailed(Object error) {
     return 'Aufnahme starten fehlgeschlagen: $error';
   }
 
@@ -157,7 +157,7 @@ class SDe extends S {
   String get commonRecordingTooShort => 'Aufnahme zu kurz';
 
   @override
-  String commonStopRecordingFailed(String error) {
+  String commonStopRecordingFailed(Object error) {
     return 'Aufnahme stoppen fehlgeschlagen: $error';
   }
 
@@ -274,7 +274,7 @@ class SDe extends S {
   }
 
   @override
-  String contactN42Id(String id) {
+  String contactN42Id(Object id) {
     return 'N42-ID: $id';
   }
 
@@ -376,7 +376,7 @@ class SDe extends S {
   String get profileChooseFromGallery => 'Aus Galerie wählen';
 
   @override
-  String profileSaveFailed(String error) {
+  String profileSaveFailed(Object error) {
     return 'Speichern fehlgeschlagen: $error';
   }
 
@@ -424,7 +424,7 @@ class SDe extends S {
   String get authEnterServerAddress => 'Serveradresse eingeben';
 
   @override
-  String authConnectedTo(String serverName) {
+  String authConnectedTo(Object serverName) {
     return 'Verbunden mit $serverName';
   }
 
@@ -523,7 +523,7 @@ class SDe extends S {
   String get commonPayment => 'Zahlung';
 
   @override
-  String commonFeatureComingSoon(String feature) {
+  String commonFeatureComingSoon(Object feature) {
     return '$feature demnächst verfügbar';
   }
 
@@ -546,7 +546,7 @@ class SDe extends S {
   String get conversationDeleteConversation => 'Unterhaltung löschen';
 
   @override
-  String conversationDeleteConversationConfirm(String name) {
+  String conversationDeleteConversationConfirm(Object name) {
     return 'Unterhaltung mit \"$name\" löschen?';
   }
 
@@ -597,7 +597,7 @@ class SDe extends S {
   String get commonLocationLabel => 'Standort';
 
   @override
-  String contactRecommendFailed(String error) {
+  String contactRecommendFailed(Object error) {
     return 'Empfehlung fehlgeschlagen: $error';
   }
 
@@ -608,7 +608,7 @@ class SDe extends S {
   String get contactOpeningChat => 'Chat wird geöffnet...';
 
   @override
-  String contactOpenChatFailed(String error) {
+  String contactOpenChatFailed(Object error) {
     return 'Chat öffnen fehlgeschlagen: $error';
   }
 
@@ -677,7 +677,7 @@ class SDe extends S {
   String get searchNoResults => 'Keine Ergebnisse';
 
   @override
-  String commonGroupMembers(int count) {
+  String commonGroupMembers(Object count) {
     return 'Mitglieder ($count)';
   }
 
@@ -777,7 +777,7 @@ class SDe extends S {
   String get transferAddressVerified => 'Adresse verifiziert';
 
   @override
-  String transferAvailableBalance(String balance, String symbol) {
+  String transferAvailableBalance(Object balance, Object symbol) {
     return 'Verfügbar: $balance $symbol';
   }
 
@@ -838,7 +838,7 @@ class SDe extends S {
   String get profileAvatarUpdated => 'Avatar aktualisiert';
 
   @override
-  String commonSelectImageFailed(String error) {
+  String commonSelectImageFailed(Object error) {
     return 'Bildauswahl fehlgeschlagen: $error';
   }
 
@@ -857,7 +857,7 @@ class SDe extends S {
   }
 
   @override
-  String profileSaveAddressFailed(String error) {
+  String profileSaveAddressFailed(Object error) {
     return 'Adresse speichern fehlgeschlagen: $error';
   }
 
@@ -880,7 +880,7 @@ class SDe extends S {
   String get profileAddressDeleted => 'Adresse gelöscht';
 
   @override
-  String profileSaveInvoiceFailed(String error) {
+  String profileSaveInvoiceFailed(Object error) {
     return 'Rechnung speichern fehlgeschlagen: $error';
   }
 
@@ -937,7 +937,7 @@ class SDe extends S {
   String get commonAddressCopied => 'Adresse kopiert';
 
   @override
-  String favoriteOpenItem(String content) {
+  String favoriteOpenItem(Object content) {
     return 'Öffnen: $content';
   }
 
@@ -1222,7 +1222,7 @@ class SDe extends S {
   String get chatInCall => 'Im Gespräch';
 
   @override
-  String commonFeatureInDevelopment(String feature) {
+  String commonFeatureInDevelopment(Object feature) {
     return '$feature in Entwicklung...';
   }
 
@@ -2687,7 +2687,7 @@ class SDe extends S {
       'Bitte geben Sie die Gruppenankündigung ein';
 
   @override
-  String groupMemberCountClickToCopy(int count) {
+  String groupMemberCountClickToCopy(Object count) {
     return '$count Mitglieder, klicken zum Kopieren der Gruppen-ID';
   }
 
@@ -3106,12 +3106,12 @@ class SDe extends S {
   String get contactEnterPhone => 'Geben Sie die Telefonnummer ein';
 
   @override
-  String commonConversationWithId(String roomId) {
+  String commonConversationWithId(Object roomId) {
     return 'Unterhaltung: $roomId';
   }
 
   @override
-  String commonContactWithId(String userId) {
+  String commonContactWithId(Object userId) {
     return 'Kontakt: $userId';
   }
 
@@ -3119,7 +3119,7 @@ class SDe extends S {
   String get commonDiscover => 'Entdecken';
 
   @override
-  String commonDeveloping(String title) {
+  String commonDeveloping(Object title) {
     return '$title\n(Demnächst verfügbar)';
   }
 
@@ -3448,12 +3448,12 @@ class SDe extends S {
   String get callLivekitNotConfigured => 'LiveKit nicht konfiguriert';
 
   @override
-  String callJoinMeetingFailed(String error) {
+  String callJoinMeetingFailed(Object error) {
     return 'Meeting beitreten fehlgeschlagen: $error';
   }
 
   @override
-  String callScreenShareFailed(String error) {
+  String callScreenShareFailed(Object error) {
     return 'Bildschirmfreigabe fehlgeschlagen: $error';
   }
 
@@ -3706,12 +3706,12 @@ class SDe extends S {
   String get profileSilentMode => 'Lautlosmodus';
 
   @override
-  String profilePlayFailed(String ringtoneName) {
+  String profilePlayFailed(Object ringtoneName) {
     return 'Abspielen fehlgeschlagen: $ringtoneName';
   }
 
   @override
-  String profilePlaying(String ringtoneName) {
+  String profilePlaying(Object ringtoneName) {
     return 'Spielt ab: $ringtoneName';
   }
 
@@ -3765,7 +3765,7 @@ class SDe extends S {
   String get commonAllRead => 'Alles gelesen';
 
   @override
-  String commonReadCount(int count) {
+  String commonReadCount(Object count) {
     return '$count gelesen';
   }
 

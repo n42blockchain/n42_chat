@@ -77,6 +77,7 @@ import '../../../core/utils/article_reader_utils.dart';
 import 'article_reader_page.dart';
 import '../../../core/services/giphy_service.dart';
 import '../../../core/services/reminder_service.dart';
+import '../../../core/services/tts_service.dart';
 import '../../widgets/chat/red_packet_dialogs.dart';
 import '../sticker/sticker_store_page.dart';
 import '../../widgets/chat/edit_history_sheet.dart';
@@ -273,9 +274,17 @@ class _ChatPageState extends State<ChatPage> {
   int _privacyPreferencesLoadVersion = 0;
   String? _pendingInitialTargetMessageId;
 
+  /// initState 缓存的 ChatBloc，供 dispose 阶段安全使用（那时 context 已
+  /// deactivated，不能再 context.read）。
+  ChatBloc? _chatBloc;
+
   @override
   void initState() {
     super.initState();
+
+    // 缓存 bloc 引用供 dispose 使用：dispose 阶段 widget 已 deactivated，
+    // 再走 context.read 会触发 "deactivated context" 警告（九测真机记录）。
+    _chatBloc = context.read<ChatBloc>();
 
     // 设置当前活跃房间（避免弹出通知）
     N42Chat.pushService?.setActiveRoom(widget.conversation.id);
@@ -379,8 +388,7 @@ class _ChatPageState extends State<ChatPage> {
         break;
       case 'livekit_token_fetch_failed':
         message =
-            l10n?.callJoinMeetingFailed('token') ??
-            'Failed to prepare group call';
+            l10n?.commonConnectionFailed ?? 'Failed to prepare group call';
         break;
       case 'call_rejected':
         message = l10n?.chatCallRejected ?? 'Call rejected';
@@ -538,6 +546,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    // 离开聊天页停止朗读(TtsService 是进程级单例,否则跨页继续播)
+    unawaited(TtsService.instance.stop());
     _privacyPreferencesLoadVersion++;
 
     // 清除当前活跃房间
@@ -554,9 +564,10 @@ class _ChatPageState extends State<ChatPage> {
     // 取消备注更新订阅
     _remarkSubscription?.cancel();
 
-    // 先清理聊天室（在 super.dispose 之前）
+    // 先清理聊天室（在 super.dispose 之前）。用 initState 缓存的引用，
+    // 不能在 dispose 里 context.read（deactivated context 警告）。
     try {
-      context.read<ChatBloc>().add(const DisposeChat());
+      _chatBloc?.add(const DisposeChat());
     } catch (e) {
       debugLog('ChatPage: Error disposing ChatBloc: $e');
     }

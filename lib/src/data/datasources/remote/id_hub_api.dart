@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 
 import '../../../core/utils/debug_log.dart';
 
+const Duration _defaultRequestTimeout = Duration(seconds: 20);
+
 /// Client for the unified-identity N42 ID Hub wallet-login path.
 ///
 /// The hub is a separate RFC 9457 service (not the `{code:200}` gateway), so
@@ -14,12 +16,15 @@ import '../../../core/utils/debug_log.dart';
 class IdHubApi {
   final String baseUrl;
   final http.Client _client;
+  final Duration _requestTimeout;
 
-  IdHubApi({required String baseUrl, http.Client? client})
-    : baseUrl = _canonicalOrigin(baseUrl),
-      _client = client ?? http.Client();
-
-  static const requestTimeout = Duration(seconds: 20);
+  IdHubApi({
+    required String baseUrl,
+    http.Client? client,
+    Duration requestTimeout = _defaultRequestTimeout,
+  }) : baseUrl = _canonicalOrigin(baseUrl),
+       _client = client ?? http.Client(),
+       _requestTimeout = requestTimeout;
 
   static String _canonicalOrigin(String value) {
     final uri = Uri.tryParse(value.trim());
@@ -122,7 +127,10 @@ class IdHubApi {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(body),
         )
-        .timeout(requestTimeout);
+        .timeout(
+          _requestTimeout,
+          onTimeout: () => throw IdHubException('ID Hub request timed out'),
+        );
   }
 
   Map<String, dynamic> _decodeObject(http.Response response) {

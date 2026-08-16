@@ -127,18 +127,19 @@ class VirtualBackgroundEngine {
     String? solidColorHex,
     Uint8List? backgroundImageBytes,
     double beautyStrength = 0.0,
-  }) =>
-      _composeInIsolate(_ComposeParams(
-        frameBytes: frameBytes,
-        maskWidth: maskWidth,
-        maskHeight: maskHeight,
-        confidences: confidences,
-        mode: mode,
-        blurRadius: blurRadius,
-        solidColorHex: solidColorHex,
-        backgroundImageBytes: backgroundImageBytes,
-        beautyStrength: beautyStrength,
-      ));
+  }) => _composeInIsolate(
+    _ComposeParams(
+      frameBytes: frameBytes,
+      maskWidth: maskWidth,
+      maskHeight: maskHeight,
+      confidences: confidences,
+      mode: mode,
+      blurRadius: blurRadius,
+      solidColorHex: solidColorHex,
+      backgroundImageBytes: backgroundImageBytes,
+      beautyStrength: beautyStrength,
+    ),
+  );
 
   /// 前景判定阈值（供单测断言用）
   @visibleForTesting
@@ -165,12 +166,15 @@ class VirtualBackgroundEngine {
           // 模糊半径 0..1 映射到像素半径 1..40，并按帧尺寸夹紧
           // （半径过大会越界，gaussianBlur 在小帧上崩溃）
           final maxR = (minSide ~/ 2 - 1).clamp(1, 40);
-          final radius =
-              (p.blurRadius.clamp(0.0, 1.0) * 39 + 1).round().clamp(1, maxR);
+          final radius = (p.blurRadius.clamp(0.0, 1.0) * 39 + 1).round().clamp(
+            1,
+            maxR,
+          );
           background = img.gaussianBlur(original.clone(), radius: radius);
           break;
         case BackgroundMode.solidColor:
-          final color = _parseHexColor(p.solidColorHex) ??
+          final color =
+              _parseHexColor(p.solidColorHex) ??
               img.ColorRgb8(0x07, 0xC1, 0x60);
           background = img.Image(width: width, height: height)..clear(color);
           break;
@@ -222,11 +226,7 @@ class VirtualBackgroundEngine {
           // 人像像素：向模糊层混合（磨皮）+ 提亮
           final o = original.getPixel(x, y);
           final s = smooth.getPixel(x, y);
-          original.setPixel(
-            x,
-            y,
-            _beautyPixel(o, s, smoothBlend, brighten),
-          );
+          original.setPixel(x, y, _beautyPixel(o, s, smoothBlend, brighten));
         }
       }
     }
@@ -319,6 +319,9 @@ class VoipCameraProcessor implements TrackProcessor<VideoProcessorOptions> {
   final VoIPConfig _config;
   MediaStreamTrack? _sourceTrack;
   Uint8List? _backgroundImageBytes;
+  // 上次下发给原生的图片字节标识(长度+首尾字节),避免每次 pushConfig 都
+  // 把 MB 级图片重过 MethodChannel(复审 P2)。
+  int? _sentImageSignature;
 
   /// 原生 frame processor 配置通道。
   ///
@@ -326,8 +329,9 @@ class VoipCameraProcessor implements TrackProcessor<VideoProcessorOptions> {
   /// `RTCVideoCapturerDelegate`）实现真正的发布轨道逐帧替换时，会监听本通道获取
   /// 当前背景配置。原生未实现时调用经 [MissingPluginException] 优雅 no-op——
   /// 不抛错、不误导。这是发布侧替换的**真实契约**，待原生接入即生效。
-  static const MethodChannel _nativeChannel =
-      MethodChannel('n42.chat/virtual_background');
+  static const MethodChannel _nativeChannel = MethodChannel(
+    'n42.chat/virtual_background',
+  );
 
   @override
   String get name => 'n42-virtual-background';
@@ -352,8 +356,10 @@ class VoipCameraProcessor implements TrackProcessor<VideoProcessorOptions> {
         debugLog('VoipCameraProcessor: background image loaded ($pathOrUrl)');
       } else {
         _backgroundImageBytes = null;
-        debugLog('VoipCameraProcessor: background not a local file, '
-            'caller should inject bytes ($pathOrUrl)');
+        debugLog(
+          'VoipCameraProcessor: background not a local file, '
+          'caller should inject bytes ($pathOrUrl)',
+        );
       }
     } catch (e) {
       _backgroundImageBytes = null;
@@ -396,16 +402,32 @@ class VoipCameraProcessor implements TrackProcessor<VideoProcessorOptions> {
   ///
   /// 配置变更后（[LiveKitService] 调用）应调用本方法，使原生侧拿到最新模式。
   Future<void> pushConfigToNative() async {
+    final bytes = _backgroundImageBytes;
+    // 只在虚拟背景图模式携带图片字节;且仅当字节自上次下发后变化时才带,
+    // 否则切模糊/纯色/摄像头 restart 等无关操作也会把 MB 级图重过通道
+    // (编解码双侧拷贝,复审 P2)。
+    final needImage = _config.backgroundMode == BackgroundMode.virtualBackground &&
+        bytes != null;
+    final sig = bytes == null
+        ? null
+        : bytes.length ^ (bytes.first << 8) ^ bytes.last;
+    final changed = sig != _sentImageSignature;
+
     await _safeNative('setBackgroundConfig', <String, dynamic>{
       'mode': _config.backgroundMode.name,
       'blurRadius': _config.backgroundBlurRadius,
       'solidColor': _config.backgroundProcessing.solidColor,
-      'hasBackgroundImage': _backgroundImageBytes != null,
+      'hasBackgroundImage': bytes != null,
+      // 实际图片字节（原生按 `backgroundImageBytes as? ByteArray` 取，
+      // Flutter 的 Uint8List 经 MethodChannel 自动映射为 Kotlin ByteArray）。
+      // 仅在需要且变化时携带,否则传 null,原生保留上次已缓存的图。
+      if (needImage && changed) 'backgroundImageBytes': bytes,
       'beauty': _config.beautyStrength,
       // 本地相机轨道 id：原生据此定位 libwebrtc VideoSource 挂处理器
       // （见 docs/virtual-background-frame-injection.md §3.4）。
       'trackId': _sourceTrack?.id,
     });
+    if (needImage && changed) _sentImageSignature = sig;
   }
 
   Future<void> _safeNative(String method, [Object? args]) async {

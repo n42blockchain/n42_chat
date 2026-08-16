@@ -95,7 +95,11 @@ class ContactSyncService {
   /// 检查/请求通讯录权限
   Future<bool> requestPermission() async {
     try {
-      return await FlutterContacts.requestPermission(readonly: true);
+      final status = await FlutterContacts.permissions.request(
+        PermissionType.read,
+      );
+      return status == PermissionStatus.granted ||
+          status == PermissionStatus.limited;
     } catch (e) {
       debugLog('ContactSyncService: Permission request error: $e');
       return false;
@@ -113,20 +117,29 @@ class ContactSyncService {
         return [];
       }
 
-      final contacts = await FlutterContacts.getContacts(
-        withProperties: true,
-        withPhoto: withPhoto,
-      );
+      final properties = <ContactProperty>{
+        ContactProperty.name,
+        ContactProperty.phone,
+        ContactProperty.email,
+        if (withPhoto) ContactProperty.photoFullRes,
+      };
+      final contacts = await FlutterContacts.getAll(properties: properties);
 
-      return contacts.map((c) => PhoneContact(
-        id: c.id,
-        displayName: c.displayName,
-        firstName: c.name.first,
-        lastName: c.name.last,
-        phones: c.phones.map((p) => p.number).toList(),
-        emails: c.emails.map((e) => e.address).toList(),
-        photoBytes: withPhoto ? c.photo : null,
-      )).toList();
+      return contacts
+          .map(
+            (c) => PhoneContact(
+              id: c.id ?? '',
+              displayName: c.displayName ?? '',
+              firstName: c.name?.first,
+              lastName: c.name?.last,
+              phones: c.phones.map((p) => p.number).toList(),
+              emails: c.emails.map((e) => e.address).toList(),
+              photoBytes: withPhoto
+                  ? c.photo?.fullSize ?? c.photo?.thumbnail
+                  : null,
+            ),
+          )
+          .toList();
     } catch (e) {
       debugLog('ContactSyncService: Get contacts error: $e');
       return [];

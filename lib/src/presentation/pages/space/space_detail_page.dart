@@ -15,11 +15,13 @@ import '../../../domain/repositories/space_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
+import '../../blocs/governance/governance_bloc.dart';
 import '../../blocs/space/space_bloc.dart';
 import '../../blocs/space/space_event.dart';
 import '../../blocs/space/space_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../chat/chat_page.dart';
+import '../governance/proposals_list_page.dart';
 
 enum _PendingSpaceNavigationAction { leave, delete }
 
@@ -320,6 +322,25 @@ class _SpaceDetailScaffold extends StatelessWidget {
       pinned: true,
       backgroundColor: isDark ? AppColors.surfaceDark : AppColors.primary,
       actions: [
+        // 治理提案入口：GovernanceBloc/三页面/数据层此前全部就位，但全仓
+        // 零导航入口（附录 C 误标 ✅，2026-08-15 复核发现）——在此接线。
+        // 必须与 DI 注册成对判断：GovernanceBloc 仅在宿主开
+        // enableGovernance 时注册，八测真机证实无条件显示图标会在点击时
+        // 抛 GetIt not registered。未启用时隐藏图标而非崩溃。
+        if (getIt.isRegistered<GovernanceBloc>())
+          IconButton(
+            // 与 ProposalsListPage 的 AppBar 同款硬编码（governance 尚无 l10n key）
+            tooltip: 'Governance',
+            icon: const Icon(Icons.how_to_vote_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => BlocProvider(
+                  create: (_) => getIt<GovernanceBloc>(),
+                  child: ProposalsListPage(spaceId: space.id),
+                ),
+              ),
+            ),
+          ),
         if (_isAdmin)
           PopupMenuButton<String>(
             onSelected: (action) => _handleAdminAction(context, action),

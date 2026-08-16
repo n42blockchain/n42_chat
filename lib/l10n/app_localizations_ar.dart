@@ -21,7 +21,7 @@ class SAr extends S {
   String get chatCallServiceNotInitialized => 'لم تتم تهيئة خدمة الاتصال';
 
   @override
-  String authLoginFailed(String error) {
+  String authLoginFailed(Object error) {
     return 'فشل تسجيل الدخول: $error';
   }
 
@@ -148,7 +148,7 @@ class SAr extends S {
       'تم رفض إذن الميكروفون. يرجى تفعيله في إعدادات النظام لاستخدام الرسائل الصوتية.';
 
   @override
-  String commonStartRecordingFailed(String error) {
+  String commonStartRecordingFailed(Object error) {
     return 'فشل بدء التسجيل: $error';
   }
 
@@ -156,7 +156,7 @@ class SAr extends S {
   String get commonRecordingTooShort => 'التسجيل قصير جدًا';
 
   @override
-  String commonStopRecordingFailed(String error) {
+  String commonStopRecordingFailed(Object error) {
     return 'فشل في إيقاف التسجيل: $error';
   }
 
@@ -272,7 +272,7 @@ class SAr extends S {
   }
 
   @override
-  String contactN42Id(String id) {
+  String contactN42Id(Object id) {
     return 'معرف N42: $id';
   }
 
@@ -374,7 +374,7 @@ class SAr extends S {
   String get profileChooseFromGallery => 'اختر من المعرض';
 
   @override
-  String profileSaveFailed(String error) {
+  String profileSaveFailed(Object error) {
     return 'فشل الحفظ: $error';
   }
 
@@ -421,7 +421,7 @@ class SAr extends S {
   String get authEnterServerAddress => 'أدخل عنوان الخادم';
 
   @override
-  String authConnectedTo(String serverName) {
+  String authConnectedTo(Object serverName) {
     return 'متصل بـ $serverName';
   }
 
@@ -522,7 +522,7 @@ class SAr extends S {
   String get commonPayment => 'الدفع';
 
   @override
-  String commonFeatureComingSoon(String feature) {
+  String commonFeatureComingSoon(Object feature) {
     return '$feature قريبا';
   }
 
@@ -545,7 +545,7 @@ class SAr extends S {
   String get conversationDeleteConversation => 'حذف المحادثة';
 
   @override
-  String conversationDeleteConversationConfirm(String name) {
+  String conversationDeleteConversationConfirm(Object name) {
     return 'هل تريد حذف المحادثة مع \"$name\"؟';
   }
 
@@ -595,7 +595,7 @@ class SAr extends S {
   String get commonLocationLabel => 'الموقع';
 
   @override
-  String contactRecommendFailed(String error) {
+  String contactRecommendFailed(Object error) {
     return 'فشل التوصية: $error';
   }
 
@@ -606,7 +606,7 @@ class SAr extends S {
   String get contactOpeningChat => 'جارٍ فتح الدردشة...';
 
   @override
-  String contactOpenChatFailed(String error) {
+  String contactOpenChatFailed(Object error) {
     return 'فشل فتح الدردشة: $error';
   }
 
@@ -675,7 +675,7 @@ class SAr extends S {
   String get searchNoResults => 'لا توجد نتائج';
 
   @override
-  String commonGroupMembers(int count) {
+  String commonGroupMembers(Object count) {
     return 'الأعضاء ($count)';
   }
 
@@ -774,7 +774,7 @@ class SAr extends S {
   String get transferAddressVerified => 'تم التحقق من العنوان';
 
   @override
-  String transferAvailableBalance(String balance, String symbol) {
+  String transferAvailableBalance(Object balance, Object symbol) {
     return 'متاح: $balance $symbol';
   }
 
@@ -835,7 +835,7 @@ class SAr extends S {
   String get profileAvatarUpdated => 'تم تحديث الصورة الرمزية';
 
   @override
-  String commonSelectImageFailed(String error) {
+  String commonSelectImageFailed(Object error) {
     return 'فشل في تحديد الصورة: $error';
   }
 
@@ -854,7 +854,7 @@ class SAr extends S {
   }
 
   @override
-  String profileSaveAddressFailed(String error) {
+  String profileSaveAddressFailed(Object error) {
     return 'فشل حفظ العنوان: $error';
   }
 
@@ -877,7 +877,7 @@ class SAr extends S {
   String get profileAddressDeleted => 'تم حذف العنوان';
 
   @override
-  String profileSaveInvoiceFailed(String error) {
+  String profileSaveInvoiceFailed(Object error) {
     return 'فشل حفظ الفاتورة: $error';
   }
 
@@ -933,7 +933,7 @@ class SAr extends S {
   String get commonAddressCopied => 'تم نسخ العنوان';
 
   @override
-  String favoriteOpenItem(String content) {
+  String favoriteOpenItem(Object content) {
     return 'فتح: $content';
   }
 
@@ -1216,7 +1216,7 @@ class SAr extends S {
   String get chatInCall => 'في المكالمة';
 
   @override
-  String commonFeatureInDevelopment(String feature) {
+  String commonFeatureInDevelopment(Object feature) {
     return 'ميزة $feature قيد التطوير...';
   }
 
@@ -2660,7 +2660,7 @@ class SAr extends S {
   String get groupEnterGroupAnnouncement => 'أدخل إعلان المجموعة';
 
   @override
-  String groupMemberCountClickToCopy(int count) {
+  String groupMemberCountClickToCopy(Object count) {
     return 'أعضاء $count، انقر لنسخ معرف المجموعة';
   }
 
@@ -3071,12 +3071,12 @@ class SAr extends S {
   String get contactEnterPhone => 'أدخل رقم الهاتف';
 
   @override
-  String commonConversationWithId(String roomId) {
+  String commonConversationWithId(Object roomId) {
     return 'المحادثة: $roomId';
   }
 
   @override
-  String commonContactWithId(String userId) {
+  String commonContactWithId(Object userId) {
     return 'جهة الاتصال: $userId';
   }
 
@@ -3084,7 +3084,7 @@ class SAr extends S {
   String get commonDiscover => 'اكتشف';
 
   @override
-  String commonDeveloping(String title) {
+  String commonDeveloping(Object title) {
     return '$title\n(قريبا)';
   }
 
@@ -3408,12 +3408,12 @@ class SAr extends S {
   String get callLivekitNotConfigured => 'لم يتم تكوين LiveKit';
 
   @override
-  String callJoinMeetingFailed(String error) {
+  String callJoinMeetingFailed(Object error) {
     return 'فشل الانضمام إلى الاجتماع: $error';
   }
 
   @override
-  String callScreenShareFailed(String error) {
+  String callScreenShareFailed(Object error) {
     return 'فشلت مشاركة الشاشة: $error';
   }
 
@@ -3665,12 +3665,12 @@ class SAr extends S {
   String get profileSilentMode => 'الوضع الصامت';
 
   @override
-  String profilePlayFailed(String ringtoneName) {
+  String profilePlayFailed(Object ringtoneName) {
     return 'فشل اللعب: $ringtoneName';
   }
 
   @override
-  String profilePlaying(String ringtoneName) {
+  String profilePlaying(Object ringtoneName) {
     return 'التشغيل: $ringtoneName';
   }
 
@@ -3724,7 +3724,7 @@ class SAr extends S {
   String get commonAllRead => 'كل قراءة';
 
   @override
-  String commonReadCount(int count) {
+  String commonReadCount(Object count) {
     return 'قراءة $count';
   }
 

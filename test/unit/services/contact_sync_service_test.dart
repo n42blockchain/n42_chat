@@ -1,205 +1,70 @@
-import 'dart:typed_data';
-
+import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:n42_chat/src/core/services/contact_sync_service.dart';
+import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 
 void main() {
-  group('PhoneContact', () {
-    test('creates with required fields', () {
-      const contact = PhoneContact(
-        id: 'test-id',
-        displayName: 'John Doe',
-      );
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-      expect(contact.id, equals('test-id'));
-      expect(contact.displayName, equals('John Doe'));
-      expect(contact.phones, isEmpty);
-      expect(contact.emails, isEmpty);
-    });
+  const channel = MethodChannel('flutter_contacts');
+  final calls = <MethodCall>[];
+  var permissionStatus = PermissionStatus.granted.name;
 
-    test('creates with all fields', () {
-      final contact = PhoneContact(
-        id: 'test-id',
-        displayName: 'John Doe',
-        firstName: 'John',
-        lastName: 'Doe',
-        phones: ['+1 (234) 567-8900', '555-1234'],
-        emails: ['john@example.com', 'john.doe@work.com'],
-        photoBytes: Uint8List.fromList([1, 2, 3]),
-      );
-
-      expect(contact.firstName, equals('John'));
-      expect(contact.lastName, equals('Doe'));
-      expect(contact.phones.length, equals(2));
-      expect(contact.emails.length, equals(2));
-      expect(contact.photoBytes, isNotNull);
-    });
-
-    test('primaryPhone returns normalized first phone', () {
-      const contact = PhoneContact(
-        id: 'test-id',
-        displayName: 'John Doe',
-        phones: ['+1 (234) 567-8900', '555-1234'],
-      );
-
-      expect(contact.primaryPhone, equals('+12345678900'));
-    });
-
-    test('primaryPhone returns null when no phones', () {
-      const contact = PhoneContact(
-        id: 'test-id',
-        displayName: 'John Doe',
-      );
-
-      expect(contact.primaryPhone, isNull);
-    });
-
-    test('primaryEmail returns lowercase first email', () {
-      const contact = PhoneContact(
-        id: 'test-id',
-        displayName: 'John Doe',
-        emails: ['John@Example.COM', 'john.doe@work.com'],
-      );
-
-      expect(contact.primaryEmail, equals('john@example.com'));
-    });
-
-    test('primaryEmail returns null when no emails', () {
-      const contact = PhoneContact(
-        id: 'test-id',
-        displayName: 'John Doe',
-      );
-
-      expect(contact.primaryEmail, isNull);
-    });
+  setUp(() {
+    calls.clear();
+    permissionStatus = PermissionStatus.granted.name;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+          calls.add(call);
+          if (call.method == 'permissions.request') {
+            return permissionStatus;
+          }
+          if (call.method == 'crud.getAll') {
+            return [
+              Contact(
+                id: 'contact-1',
+                displayName: 'Ada Lovelace',
+                name: const Name(first: 'Ada', last: 'Lovelace'),
+                phones: const [Phone(number: '+1 555 0100')],
+                emails: const [Email(address: 'ada@example.com')],
+                photo: Photo(fullSize: Uint8List.fromList([1, 2, 3])),
+              ).toJson(),
+            ];
+          }
+          return null;
+        });
   });
 
-  group('MatchedContact', () {
-    test('creates with required fields', () {
-      const phoneContact = PhoneContact(
-        id: 'phone-id',
-        displayName: 'John Doe',
-      );
-
-      const match = MatchedContact(
-        phoneContact: phoneContact,
-        matrixUserId: '@john:matrix.org',
-      );
-
-      expect(match.matrixUserId, equals('@john:matrix.org'));
-      expect(match.phoneContact.displayName, equals('John Doe'));
-      expect(match.matrixDisplayName, isNull);
-      expect(match.matrixAvatarUrl, isNull);
-    });
-
-    test('creates with all fields', () {
-      const phoneContact = PhoneContact(
-        id: 'phone-id',
-        displayName: 'John Doe',
-      );
-
-      const match = MatchedContact(
-        phoneContact: phoneContact,
-        matrixUserId: '@john:matrix.org',
-        matrixDisplayName: 'Johnny',
-        matrixAvatarUrl: 'mxc://matrix.org/avatar123',
-      );
-
-      expect(match.matrixDisplayName, equals('Johnny'));
-      expect(match.matrixAvatarUrl, equals('mxc://matrix.org/avatar123'));
-    });
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
   });
 
-  group('ContactSyncResult', () {
-    test('success result with no matches', () {
-      const result = ContactSyncResult(
-        success: true,
-        phoneContacts: [],
-        matchedContacts: [],
-      );
+  test('maps granted device contacts including requested photo', () async {
+    final service = ContactSyncService(MatrixClientManager.instance);
 
-      expect(result.success, isTrue);
-      expect(result.error, isNull);
-      expect(result.hasMatches, isFalse);
-      expect(result.matchCount, equals(0));
-    });
+    final contacts = await service.getPhoneContacts(withPhoto: true);
 
-    test('success result with matches', () {
-      const phoneContact = PhoneContact(
-        id: 'phone-id',
-        displayName: 'John Doe',
-      );
+    expect(contacts, hasLength(1));
+    expect(contacts.single.id, 'contact-1');
+    expect(contacts.single.displayName, 'Ada Lovelace');
+    expect(contacts.single.firstName, 'Ada');
+    expect(contacts.single.lastName, 'Lovelace');
+    expect(contacts.single.phones, ['+1 555 0100']);
+    expect(contacts.single.emails, ['ada@example.com']);
+    expect(contacts.single.photoBytes, [1, 2, 3]);
 
-      const match = MatchedContact(
-        phoneContact: phoneContact,
-        matrixUserId: '@john:matrix.org',
-      );
-
-      const result = ContactSyncResult(
-        success: true,
-        phoneContacts: [phoneContact],
-        matchedContacts: [match],
-      );
-
-      expect(result.success, isTrue);
-      expect(result.hasMatches, isTrue);
-      expect(result.matchCount, equals(1));
-    });
-
-    test('failure result', () {
-      const result = ContactSyncResult(
-        success: false,
-        error: 'Permission denied',
-        phoneContacts: [],
-        matchedContacts: [],
-      );
-
-      expect(result.success, isFalse);
-      expect(result.error, equals('Permission denied'));
-      expect(result.hasMatches, isFalse);
-    });
+    final request = calls.firstWhere((call) => call.method == 'crud.getAll');
+    final properties = (request.arguments as Map)['properties'] as List;
+    expect(properties, containsAll(['name', 'phone', 'email', 'photoFullRes']));
   });
 
-  group('PhoneContact phone normalization', () {
-    test('removes spaces from phone numbers', () {
-      const contact = PhoneContact(
-        id: 'test',
-        displayName: 'Test',
-        phones: ['123 456 7890'],
-      );
+  test('does not read contacts when permission is denied', () async {
+    permissionStatus = PermissionStatus.denied.name;
+    final service = ContactSyncService(MatrixClientManager.instance);
 
-      expect(contact.primaryPhone, equals('1234567890'));
-    });
-
-    test('removes dashes from phone numbers', () {
-      const contact = PhoneContact(
-        id: 'test',
-        displayName: 'Test',
-        phones: ['123-456-7890'],
-      );
-
-      expect(contact.primaryPhone, equals('1234567890'));
-    });
-
-    test('removes parentheses from phone numbers', () {
-      const contact = PhoneContact(
-        id: 'test',
-        displayName: 'Test',
-        phones: ['(123) 456-7890'],
-      );
-
-      expect(contact.primaryPhone, equals('1234567890'));
-    });
-
-    test('preserves plus sign in phone numbers', () {
-      const contact = PhoneContact(
-        id: 'test',
-        displayName: 'Test',
-        phones: ['+1 (234) 567-8900'],
-      );
-
-      expect(contact.primaryPhone, equals('+12345678900'));
-    });
+    expect(await service.getPhoneContacts(), isEmpty);
+    expect(calls.where((call) => call.method == 'crud.getAll'), isEmpty);
   });
 }

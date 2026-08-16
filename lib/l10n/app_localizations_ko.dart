@@ -21,7 +21,7 @@ class SKo extends S {
   String get chatCallServiceNotInitialized => '통화 서비스가 초기화되지 않았습니다';
 
   @override
-  String authLoginFailed(String error) {
+  String authLoginFailed(Object error) {
     return '로그인 실패: $error';
   }
 
@@ -147,7 +147,7 @@ class SKo extends S {
       '마이크 권한이 거부되었습니다. 음성 메시지를 사용하려면 시스템 설정에서 활성화하세요.';
 
   @override
-  String commonStartRecordingFailed(String error) {
+  String commonStartRecordingFailed(Object error) {
     return '녹음 시작 실패: $error';
   }
 
@@ -155,7 +155,7 @@ class SKo extends S {
   String get commonRecordingTooShort => '녹음이 너무 짧습니다';
 
   @override
-  String commonStopRecordingFailed(String error) {
+  String commonStopRecordingFailed(Object error) {
     return '녹음 중지 실패: $error';
   }
 
@@ -270,7 +270,7 @@ class SKo extends S {
   }
 
   @override
-  String contactN42Id(String id) {
+  String contactN42Id(Object id) {
     return 'N42 ID: $id';
   }
 
@@ -372,7 +372,7 @@ class SKo extends S {
   String get profileChooseFromGallery => '갤러리에서 선택';
 
   @override
-  String profileSaveFailed(String error) {
+  String profileSaveFailed(Object error) {
     return '저장 실패: $error';
   }
 
@@ -419,7 +419,7 @@ class SKo extends S {
   String get authEnterServerAddress => '서버 주소 입력';
 
   @override
-  String authConnectedTo(String serverName) {
+  String authConnectedTo(Object serverName) {
     return '$serverName에 연결됨';
   }
 
@@ -514,7 +514,7 @@ class SKo extends S {
   String get commonPayment => '결제';
 
   @override
-  String commonFeatureComingSoon(String feature) {
+  String commonFeatureComingSoon(Object feature) {
     return '$feature 곧 출시 예정';
   }
 
@@ -537,7 +537,7 @@ class SKo extends S {
   String get conversationDeleteConversation => '대화 삭제';
 
   @override
-  String conversationDeleteConversationConfirm(String name) {
+  String conversationDeleteConversationConfirm(Object name) {
     return '\"$name\"님과의 대화를 삭제하시겠습니까?';
   }
 
@@ -587,7 +587,7 @@ class SKo extends S {
   String get commonLocationLabel => '위치';
 
   @override
-  String contactRecommendFailed(String error) {
+  String contactRecommendFailed(Object error) {
     return '추천 실패: $error';
   }
 
@@ -598,7 +598,7 @@ class SKo extends S {
   String get contactOpeningChat => '채팅 열는 중...';
 
   @override
-  String contactOpenChatFailed(String error) {
+  String contactOpenChatFailed(Object error) {
     return '채팅 열기 실패: $error';
   }
 
@@ -666,7 +666,7 @@ class SKo extends S {
   String get searchNoResults => '결과 없음';
 
   @override
-  String commonGroupMembers(int count) {
+  String commonGroupMembers(Object count) {
     return '멤버 ($count명)';
   }
 
@@ -764,7 +764,7 @@ class SKo extends S {
   String get transferAddressVerified => '주소 확인됨';
 
   @override
-  String transferAvailableBalance(String balance, String symbol) {
+  String transferAvailableBalance(Object balance, Object symbol) {
     return '사용 가능: $balance $symbol';
   }
 
@@ -825,7 +825,7 @@ class SKo extends S {
   String get profileAvatarUpdated => '프로필 사진이 업데이트되었습니다';
 
   @override
-  String commonSelectImageFailed(String error) {
+  String commonSelectImageFailed(Object error) {
     return '이미지 선택 실패: $error';
   }
 
@@ -844,7 +844,7 @@ class SKo extends S {
   }
 
   @override
-  String profileSaveAddressFailed(String error) {
+  String profileSaveAddressFailed(Object error) {
     return '주소 저장 실패: $error';
   }
 
@@ -867,7 +867,7 @@ class SKo extends S {
   String get profileAddressDeleted => '주소가 삭제되었습니다';
 
   @override
-  String profileSaveInvoiceFailed(String error) {
+  String profileSaveInvoiceFailed(Object error) {
     return '청구서 저장 실패: $error';
   }
 
@@ -923,7 +923,7 @@ class SKo extends S {
   String get commonAddressCopied => '주소 복사됨';
 
   @override
-  String favoriteOpenItem(String content) {
+  String favoriteOpenItem(Object content) {
     return '열기: $content';
   }
 
@@ -1204,7 +1204,7 @@ class SKo extends S {
   String get chatInCall => '통화 중';
 
   @override
-  String commonFeatureInDevelopment(String feature) {
+  String commonFeatureInDevelopment(Object feature) {
     return '기능 개발 중...';
   }
 
@@ -2618,7 +2618,7 @@ class SKo extends S {
   String get groupEnterGroupAnnouncement => '그룹 공지를 입력하세요';
 
   @override
-  String groupMemberCountClickToCopy(int count) {
+  String groupMemberCountClickToCopy(Object count) {
     return '$count명, 클릭하여 그룹 ID 복사';
   }
 
@@ -3011,12 +3011,12 @@ class SKo extends S {
   String get contactEnterPhone => '전화번호를 입력하세요';
 
   @override
-  String commonConversationWithId(String roomId) {
+  String commonConversationWithId(Object roomId) {
     return '대화: $roomId';
   }
 
   @override
-  String commonContactWithId(String userId) {
+  String commonContactWithId(Object userId) {
     return '연락처: $userId';
   }
 
@@ -3024,7 +3024,7 @@ class SKo extends S {
   String get commonDiscover => '발견';
 
   @override
-  String commonDeveloping(String title) {
+  String commonDeveloping(Object title) {
     return '$title\n(곧 출시 예정)';
   }
 
@@ -3342,12 +3342,12 @@ class SKo extends S {
   String get callLivekitNotConfigured => 'LiveKit이 구성되지 않았습니다';
 
   @override
-  String callJoinMeetingFailed(String error) {
+  String callJoinMeetingFailed(Object error) {
     return '회의 참여 실패: $error';
   }
 
   @override
-  String callScreenShareFailed(String error) {
+  String callScreenShareFailed(Object error) {
     return '화면 공유 실패: $error';
   }
 
@@ -3599,12 +3599,12 @@ class SKo extends S {
   String get profileSilentMode => '무음 모드';
 
   @override
-  String profilePlayFailed(String ringtoneName) {
+  String profilePlayFailed(Object ringtoneName) {
     return '재생 실패: $ringtoneName';
   }
 
   @override
-  String profilePlaying(String ringtoneName) {
+  String profilePlaying(Object ringtoneName) {
     return '재생 중: $ringtoneName';
   }
 
@@ -3658,7 +3658,7 @@ class SKo extends S {
   String get commonAllRead => '모두 읽음';
 
   @override
-  String commonReadCount(int count) {
+  String commonReadCount(Object count) {
     return '$count명 읽음';
   }
 

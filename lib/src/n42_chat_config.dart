@@ -164,6 +164,21 @@ class N42ChatConfig {
   /// 是否显示微信登录入口
   final bool enableWeChatLogin;
 
+  /// 是否显示 Discord 登录入口
+  ///
+  /// 走自建 `backend/social-auth` 的 OAuth2 Authorization Code 流程
+  /// （WebView 授权页 → code → 后端换 token）。需 [socialAuthBaseUrl] 与
+  /// [discordClientId] 均已配置才有意义。
+  final bool enableDiscordLogin;
+
+  /// 是否显示 GitHub 登录入口
+  final bool enableGithubLogin;
+
+  /// 是否显示 Telegram 登录入口
+  ///
+  /// 走 Telegram Login Widget（WebView 拦截 `tgAuthResult`）→ 后端校验 hash。
+  final bool enableTelegramLogin;
+
   /// 是否显示 SSO 登录入口
   ///
   /// 当前仅应在宿主已经打通浏览器回调流程时启用。
@@ -215,6 +230,26 @@ class N42ChatConfig {
 
   /// WeChat Universal Link
   final String? weChatUniversalLink;
+
+  /// Discord OAuth2 Client ID（Discord Developer Portal → App）
+  final String? discordClientId;
+
+  /// GitHub OAuth App Client ID（GitHub → Settings → Developer settings）
+  final String? githubClientId;
+
+  /// Telegram Bot 的数字 ID（`oauth.telegram.org/auth?bot_id=` 需要，公开非敏感）
+  final String? telegramBotId;
+
+  /// OAuth2 授权回调地址（Discord/GitHub 共用）
+  ///
+  /// 默认 `n42app://oauth/callback`，App 侧 `n42app` scheme 已在 Android/iOS 注册。
+  final String oauthRedirectUri;
+
+  /// 自建社交登录后端基址（`backend/social-auth` 部署地址）
+  ///
+  /// Discord/GitHub/Telegram 三家的 `loginSocial` 走此后端；为空则三家登录不可用
+  /// （旧五家仍走默认 `api.n42.network`）。例如 `https://social-auth.n42.ai`。
+  final String? socialAuthBaseUrl;
 
   /// Matrix SSO 浏览器回调地址
   ///
@@ -374,6 +409,16 @@ class N42ChatConfig {
   /// 为 `true` 时，AI 数据源不会再自动拼接 `/v1/chat/completions`。
   final bool aiUseProxyEndpoint;
 
+  /// 端侧 LLM（Gemma via flutter_gemma/MediaPipe）模型源 URL。
+  ///
+  /// 指向 MediaPipe `.task` 模型（Gemma 系列多为 HuggingFace 受限模型，需配
+  /// [localLlmHuggingFaceToken]）。**未配置时端侧推理不可用**，`AiProviderRouter`
+  /// 恒回退云端——这也是 2026-07 复核前"端侧 AI 出厂不可达"的根因（缺此注入通道）。
+  final String? localLlmModelUrl;
+
+  /// 端侧 LLM 模型下载的 HuggingFace 访问 token（受限模型必需）。
+  final String? localLlmHuggingFaceToken;
+
   /// Google Speech 代理端点
   final String? speechGoogleBaseUrl;
 
@@ -493,6 +538,9 @@ class N42ChatConfig {
     this.enableFacebookLogin = false,
     this.enableTwitterLogin = false,
     this.enableWeChatLogin = false,
+    this.enableDiscordLogin = false,
+    this.enableGithubLogin = false,
+    this.enableTelegramLogin = false,
     this.enableSsoLogin = false,
     this.enableWalletLogin = true,
     this.idHubUrl,
@@ -505,6 +553,11 @@ class N42ChatConfig {
     this.twitterRedirectUri,
     this.weChatAppId,
     this.weChatUniversalLink,
+    this.discordClientId,
+    this.githubClientId,
+    this.telegramBotId,
+    this.oauthRedirectUri = 'n42app://oauth/callback',
+    this.socialAuthBaseUrl,
     this.ssoRedirectUrl = 'n42://auth/sso',
     this.onMessageTap,
     this.onAvatarTap,
@@ -538,6 +591,8 @@ class N42ChatConfig {
     this.aiBaseUrl = 'https://api.openai.com',
     this.aiModel = 'gpt-4o-mini',
     this.aiUseProxyEndpoint = false,
+    this.localLlmModelUrl,
+    this.localLlmHuggingFaceToken,
     this.speechGoogleBaseUrl,
     this.speechAzureBaseUrl,
     this.speechUseProxyEndpoint = false,
@@ -577,6 +632,9 @@ class N42ChatConfig {
     bool? enableFacebookLogin,
     bool? enableTwitterLogin,
     bool? enableWeChatLogin,
+    bool? enableDiscordLogin,
+    bool? enableGithubLogin,
+    bool? enableTelegramLogin,
     bool? enableSsoLogin,
     bool? enableWalletLogin,
     Object? idHubUrl = _copyWithUndefined,
@@ -589,6 +647,11 @@ class N42ChatConfig {
     Object? twitterRedirectUri = _copyWithUndefined,
     Object? weChatAppId = _copyWithUndefined,
     Object? weChatUniversalLink = _copyWithUndefined,
+    Object? discordClientId = _copyWithUndefined,
+    Object? githubClientId = _copyWithUndefined,
+    Object? telegramBotId = _copyWithUndefined,
+    String? oauthRedirectUri,
+    Object? socialAuthBaseUrl = _copyWithUndefined,
     String? ssoRedirectUrl,
     Object? onMessageTap = _copyWithUndefined,
     Object? onAvatarTap = _copyWithUndefined,
@@ -622,6 +685,8 @@ class N42ChatConfig {
     String? aiBaseUrl,
     String? aiModel,
     bool? aiUseProxyEndpoint,
+    Object? localLlmModelUrl = _copyWithUndefined,
+    Object? localLlmHuggingFaceToken = _copyWithUndefined,
     Object? speechGoogleBaseUrl = _copyWithUndefined,
     Object? speechAzureBaseUrl = _copyWithUndefined,
     bool? speechUseProxyEndpoint,
@@ -672,6 +737,9 @@ class N42ChatConfig {
       enableFacebookLogin: enableFacebookLogin ?? this.enableFacebookLogin,
       enableTwitterLogin: enableTwitterLogin ?? this.enableTwitterLogin,
       enableWeChatLogin: enableWeChatLogin ?? this.enableWeChatLogin,
+      enableDiscordLogin: enableDiscordLogin ?? this.enableDiscordLogin,
+      enableGithubLogin: enableGithubLogin ?? this.enableGithubLogin,
+      enableTelegramLogin: enableTelegramLogin ?? this.enableTelegramLogin,
       enableSsoLogin: enableSsoLogin ?? this.enableSsoLogin,
       enableWalletLogin: enableWalletLogin ?? this.enableWalletLogin,
       idHubUrl: _nullableCopyWithValue<String>(idHubUrl, this.idHubUrl),
@@ -704,6 +772,23 @@ class N42ChatConfig {
       weChatUniversalLink: _nullableCopyWithValue<String>(
         weChatUniversalLink,
         this.weChatUniversalLink,
+      ),
+      discordClientId: _nullableCopyWithValue<String>(
+        discordClientId,
+        this.discordClientId,
+      ),
+      githubClientId: _nullableCopyWithValue<String>(
+        githubClientId,
+        this.githubClientId,
+      ),
+      telegramBotId: _nullableCopyWithValue<String>(
+        telegramBotId,
+        this.telegramBotId,
+      ),
+      oauthRedirectUri: oauthRedirectUri ?? this.oauthRedirectUri,
+      socialAuthBaseUrl: _nullableCopyWithValue<String>(
+        socialAuthBaseUrl,
+        this.socialAuthBaseUrl,
       ),
       ssoRedirectUrl: ssoRedirectUrl ?? this.ssoRedirectUrl,
       onMessageTap:
@@ -778,6 +863,14 @@ class N42ChatConfig {
       aiBaseUrl: aiBaseUrl ?? this.aiBaseUrl,
       aiModel: aiModel ?? this.aiModel,
       aiUseProxyEndpoint: aiUseProxyEndpoint ?? this.aiUseProxyEndpoint,
+      localLlmModelUrl: _nullableCopyWithValue<String>(
+        localLlmModelUrl,
+        this.localLlmModelUrl,
+      ),
+      localLlmHuggingFaceToken: _nullableCopyWithValue<String>(
+        localLlmHuggingFaceToken,
+        this.localLlmHuggingFaceToken,
+      ),
       speechGoogleBaseUrl: _nullableCopyWithValue<String>(
         speechGoogleBaseUrl,
         this.speechGoogleBaseUrl,

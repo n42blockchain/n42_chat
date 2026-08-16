@@ -2620,7 +2620,7 @@
       }
     }
   },
-  "redPacketStatsTotal": "tổng",
+  "redPacketStatsTotal": "Total: {amount} {token}",
   "redPacketGrabbedViral": "I grabbed a {amount} {token} red packet! 🧧",
   "@redPacketGrabbedViral": {
     "placeholders": {
@@ -2744,5 +2744,15 @@
   "blocAuthChangeEmailFailed": "Không thể thay đổi email",
   "blocAuthVerificationCodeInvalid": "Mã xác minh không chính xác hoặc đã hết hạn",
   "blocAuthSessionExpired": "Phiên đã hết hạn, vui lòng đăng nhập lại",
-  "blocAuthSessionIncomplete": "Dữ liệu phiên không đầy đủ, vui lòng đăng nhập lại"
+  "blocAuthSessionIncomplete": "Dữ liệu phiên không đầy đủ, vui lòng đăng nhập lại",
+  "@redPacketStatsTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "token": {
+        "type": "String"
+      }
+    }
+  }
 }
