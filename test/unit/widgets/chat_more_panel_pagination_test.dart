@@ -80,6 +80,11 @@ void main() {
     await tester.pumpWidget(wrap(fullPanel()));
     await tester.pumpAndSettle();
 
+    expect(
+      find.byKey(const ValueKey<String>('chat_more_panel')),
+      findsOneWidget,
+    );
+
     final labels = await collectAllLabels(tester);
     for (final expected in ['Contact', 'Code', 'Tip', 'View Once']) {
       expect(

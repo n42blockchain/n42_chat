@@ -48,6 +48,10 @@ void main() {
 
     expect(find.byIcon(Icons.keyboard_alt_outlined), findsOneWidget);
     expect(find.byIcon(Icons.attach_file), findsNothing);
+    expect(
+      find.byKey(const ValueKey<String>('chat_input_attachment_toggle')),
+      findsOneWidget,
+    );
     await tester.tap(find.byIcon(Icons.keyboard_alt_outlined));
     expect(pressed, isTrue);
   });
