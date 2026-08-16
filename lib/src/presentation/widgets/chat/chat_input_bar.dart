@@ -143,6 +143,9 @@ class ChatInputBar extends StatefulWidget {
   /// 更多按钮点击回调
   final VoidCallback? onMorePressed;
 
+  /// 输入框为空时显示的相机快捷入口
+  final VoidCallback? onCameraPressed;
+
   /// 快捷回复按钮点击回调
   final VoidCallback? onQuickReplyPressed;
 
@@ -166,6 +169,9 @@ class ChatInputBar extends StatefulWidget {
 
   /// 是否显示更多按钮
   final bool showMoreButton;
+
+  /// 附件扩展面板是否已打开；打开时附件按钮切换为键盘入口。
+  final bool isMorePanelOpen;
 
   /// 是否显示快捷回复按钮
   final bool showQuickReplyButton;
@@ -196,6 +202,7 @@ class ChatInputBar extends StatefulWidget {
     this.onVoicePressed,
     this.onEmojiPressed,
     this.onMorePressed,
+    this.onCameraPressed,
     this.onQuickReplyPressed,
     this.onScheduledSend,
     this.onChanged,
@@ -204,6 +211,7 @@ class ChatInputBar extends StatefulWidget {
     this.showVoiceButton = true,
     this.showEmojiButton = true,
     this.showMoreButton = true,
+    this.isMorePanelOpen = false,
     this.showQuickReplyButton = true,
     this.enabled = true,
     this.maxLines = 5,
@@ -637,14 +645,29 @@ class ChatInputBarState extends State<ChatInputBar> {
                       semanticLabel: A11yL10n.of(context).emoji,
                     ),
 
+                  // 与主流聊天应用一致：无文本时保留相机快捷入口。
+                  if (!_hasText && widget.onCameraPressed != null)
+                    _buildIconButton(
+                      icon: Icons.camera_alt_outlined,
+                      onPressed: widget.onCameraPressed,
+                      semanticLabel: S.of(context)?.commonTakePhoto ?? 'Camera',
+                    ),
+
                   // 附件/更多 或 发送
                   _hasText
                       ? _buildSendButton()
                       : (widget.showMoreButton
                             ? _buildIconButton(
-                                icon: Icons.attach_file,
+                                key: const ValueKey<String>(
+                                  'chat_input_attachment_toggle',
+                                ),
+                                icon: widget.isMorePanelOpen
+                                    ? Icons.keyboard_alt_outlined
+                                    : Icons.attach_file,
                                 onPressed: widget.onMorePressed,
-                                semanticLabel: A11yL10n.of(context).attachments,
+                                semanticLabel: widget.isMorePanelOpen
+                                    ? A11yL10n.of(context).switchToKeyboard
+                                    : A11yL10n.of(context).attachments,
                               )
                             : const SizedBox.shrink()),
                 ],
@@ -740,6 +763,7 @@ class ChatInputBarState extends State<ChatInputBar> {
   }
 
   Widget _buildIconButton({
+    Key? key,
     required IconData icon,
     required VoidCallback? onPressed,
     String? semanticLabel,
@@ -747,6 +771,7 @@ class ChatInputBarState extends State<ChatInputBar> {
     final color = context.textSecondary;
     final effectiveCallback = widget.enabled ? onPressed : null;
     return Semantics(
+      key: key,
       button: true,
       enabled: effectiveCallback != null,
       label: semanticLabel,

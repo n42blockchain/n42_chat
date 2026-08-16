@@ -4,7 +4,7 @@ import 'package:n42_chat/src/core/utils/timed_status_utils.dart';
 void main() {
   group('TimedStatusMetadata', () {
     test('serializes and parses message and expiry', () {
-      final expiresAt = DateTime.utc(2026, 3, 22, 10);
+      final expiresAt = DateTime.now().toUtc().add(const Duration(hours: 1));
       final metadata = TimedStatusMetadata(
         message: 'Gaming',
         expiresAt: expiresAt,

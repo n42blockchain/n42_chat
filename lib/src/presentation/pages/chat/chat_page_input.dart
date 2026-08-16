@@ -13,10 +13,7 @@ extension _ChatPageInputMethods on _ChatPageState {
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : AppColors.background,
           border: Border(
-            top: BorderSide(
-              color: context.dividerColor,
-              width: 0.5,
-            ),
+            top: BorderSide(color: context.dividerColor, width: 0.5),
           ),
         ),
         child: SafeArea(
@@ -61,6 +58,11 @@ extension _ChatPageInputMethods on _ChatPageState {
       onVoicePressed: _onVoicePressed,
       onEmojiPressed: _onEmojiPressed,
       onMorePressed: _onMorePressed,
+      isMorePanelOpen: _showMorePanel,
+      onCameraPressed: () {
+        _hideMorePanel();
+        _takePhoto();
+      },
       onQuickReplyPressed: _onQuickReplyPressed,
       onCommandPoll: _createPoll,
       onScheduledSend: _scheduleComposerText,
@@ -180,7 +182,11 @@ extension _ChatPageInputMethods on _ChatPageState {
                     S.of(context)?.chatTapToCancel ?? 'Tap to cancel',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.3),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                      height: 1.3,
+                    ),
                   ),
                 ),
               ],
@@ -357,6 +363,10 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
 
     return ChatMorePanel(
+      recentMediaLoader: _loadRecentMedia,
+      onRecentMediaSend: _sendRecentMediaSelection,
+      onManageRecentMediaAccess: _manageRecentMediaAccess,
+      maxRecentMediaSelection: _isViewOnce ? 1 : 9,
       onPhotoPressed: () {
         _hideMorePanel();
         _showPhotoPickerOptions();
@@ -574,13 +584,17 @@ extension _ChatPageInputMethods on _ChatPageState {
   }
 
   void _onMorePressed() {
-    // 隐藏键盘
-    _inputFocusNode.unfocus();
-    // 切换更多功能面板
+    final shouldShowPanel = !_showMorePanel;
+    if (shouldShowPanel) _inputFocusNode.unfocus();
     setState(() {
-      _showMorePanel = !_showMorePanel;
+      _showMorePanel = shouldShowPanel;
       _showEmojiPicker = false;
     });
+    if (!shouldShowPanel) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _inputFocusNode.requestFocus();
+      });
+    }
   }
 
   /// 代码块输入对话框 → 发送 n42.code_block 消息
@@ -636,8 +650,8 @@ extension _ChatPageInputMethods on _ChatPageState {
       final lang = langController.text.trim();
       final fenced = '```$lang\n${codeController.text}\n```';
       context.read<ChatBloc>().add(
-            SendCustomMessage(content: fenced, type: MessageType.codeBlock),
-          );
+        SendCustomMessage(content: fenced, type: MessageType.codeBlock),
+      );
     }
     codeController.dispose();
     langController.dispose();

@@ -133,6 +133,29 @@ void main() {
     expect(message.threadRootId, r'$thread-root');
   });
 
+  test('maps a missing Megolm session to an encrypted placeholder', () {
+    when(() => event.type).thenReturn(matrix.EventTypes.Encrypted);
+    when(() => event.messageType).thenReturn(matrix.MessageTypes.BadEncrypted);
+    when(
+      () => event.body,
+    ).thenReturn('The sender has not sent us the session key.');
+    when(
+      () => event.plaintextBody,
+    ).thenReturn('The sender has not sent us the session key.');
+    when(() => event.formattedText).thenReturn('');
+    when(() => event.content).thenReturn({
+      'algorithm': 'm.megolm.v1.aes-sha2',
+      'can_request_session': true,
+      'session_id': 'session-1',
+      'sender_key': 'sender-key-1',
+    });
+
+    final message = mapper.mapEventToMessage(event, room);
+
+    expect(message.type, MessageType.encrypted);
+    expect(message.content, isNot(contains('session key')));
+  });
+
   test(
     'keeps reply preview when an edited reply has clean replacement body',
     () {
