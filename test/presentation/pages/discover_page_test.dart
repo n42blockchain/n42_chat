@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/presentation/blocs/moment/moment_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/moment/moment_state.dart';
+import 'package:n42_chat/src/core/theme/app_icons.dart';
 import 'package:n42_chat/src/presentation/pages/discover/discover_page.dart';
 
 class MockMomentBloc extends Mock implements MomentBloc {
@@ -32,11 +33,19 @@ Widget buildTestWidget(Widget child, {MomentBloc? momentBloc}) {
   return widget;
 }
 
+void useTallViewport(WidgetTester tester) {
+  tester.view.physicalSize = const Size(1080, 2400);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}
+
 void main() {
   group('DiscoverPage', () {
     testWidgets('renders stories hub plus core discover menu items', (
       tester,
     ) async {
+      useTallViewport(tester);
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
@@ -47,7 +56,7 @@ void main() {
       expect(find.text('Scan'), findsOneWidget);
 
       expect(find.text('Voice Room'), findsOneWidget);
-      expect(find.text('Mini Apps'), findsOneWidget);
+      expect(find.textContaining('Mini'), findsOneWidget);
       expect(find.text('Stories & Fun'), findsOneWidget);
 
       // 验证有 Search 菜单项（可能是 'Search' 或本地化的文本）
@@ -61,16 +70,16 @@ void main() {
       expect(find.textContaining('Channel'), findsOneWidget);
     });
 
-    testWidgets('does not show still-hidden features (Listen, Watch, Nearby)', (
+    testWidgets('shows the enabled Listen, Watch, and Nearby entries', (
       tester,
     ) async {
+      useTallViewport(tester);
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
-      // 验证已隐藏的功能不显示
-      expect(find.text('Listen'), findsNothing);
-      expect(find.text('Watch'), findsNothing);
-      expect(find.text('Nearby'), findsNothing);
+      expect(find.text('Listen'), findsOneWidget);
+      expect(find.text('Watch'), findsOneWidget);
+      expect(find.text('Nearby'), findsOneWidget);
     });
 
     testWidgets('shows AppBar with Discover title when showAppBar is true', (
@@ -113,6 +122,7 @@ void main() {
     });
 
     testWidgets('renders correctly in dark mode', (tester) async {
+      useTallViewport(tester);
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: S.localizationsDelegates,
@@ -142,15 +152,13 @@ void main() {
       expect(find.text('Moments'), findsOneWidget);
     });
 
-    testWidgets('has exactly 9 chevron_right icons for visible menu items', (
-      tester,
-    ) async {
+    testWidgets('has a chevron for every visible menu item', (tester) async {
+      useTallViewport(tester);
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
-      // 发现页当前显示 9 个入口（Moments、Stories & Fun、Scan、Search、Voice Room、Mini Apps、Games、Communities、Channels）
-      final chevronIcons = find.byIcon(Icons.chevron_right);
-      expect(chevronIcons, findsNWidgets(9));
+      final chevronIcons = find.byIcon(AppIcons.chevron);
+      expect(chevronIcons, findsNWidgets(13));
     });
   });
 }

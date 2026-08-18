@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/n42_chat.dart';
+import 'package:n42_chat/src/core/theme/app_colors.dart';
 
 void main() {
   group('N42Chat', () {
@@ -8,17 +9,17 @@ void main() {
       expect(N42Chat.isInitialized, isFalse);
     });
 
-    test('should return Widget when accessing chatWidget before initialization', () {
-      // chatWidget returns a fallback widget instead of throwing
-      final widget = N42Chat.chatWidget();
-      expect(widget, isA<Widget>());
-    });
+    test(
+      'should return Widget when accessing chatWidget before initialization',
+      () {
+        // chatWidget returns a fallback widget instead of throwing
+        final widget = N42Chat.chatWidget();
+        expect(widget, isA<Widget>());
+      },
+    );
 
     test('should throw when accessing routes before initialization', () {
-      expect(
-        () => N42Chat.routes(),
-        throwsA(isA<StateError>()),
-      );
+      expect(() => N42Chat.routes(), throwsA(isA<StateError>()));
     });
   });
 
@@ -49,14 +50,14 @@ void main() {
     test('wechatLight should have correct primary color', () {
       final theme = N42ChatTheme.wechatLight();
 
-      expect(theme.primaryColor, equals(const Color(0xFF07C160)));
+      expect(theme.primaryColor, equals(AppColors.primary));
       expect(theme.isDark, isFalse);
     });
 
     test('wechatDark should have correct dark mode', () {
       final theme = N42ChatTheme.wechatDark();
 
-      expect(theme.primaryColor, equals(const Color(0xFF07C160)));
+      expect(theme.primaryColor, equals(AppColors.primary));
       expect(theme.isDark, isTrue);
     });
 
@@ -64,7 +65,7 @@ void main() {
       final theme = N42ChatTheme.wechatLight();
       final themeData = theme.toThemeData();
 
-      expect(themeData.primaryColor, equals(const Color(0xFF07C160)));
+      expect(themeData.primaryColor, equals(AppColors.primary));
       expect(themeData.brightness, equals(Brightness.light));
     });
   });
@@ -114,5 +115,3 @@ void main() {
     });
   });
 }
-
-

@@ -51,7 +51,8 @@ class MessageMenuSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            if (message.type == MessageType.text)
+            // Copying self-destruct/view-once content would defeat its lifetime.
+            if (message.type == MessageType.text && !message.isSelfDestructing)
               _buildMenuItem(
                 context,
                 icon: Icons.copy,
@@ -71,7 +72,7 @@ class MessageMenuSheet extends StatelessWidget {
               title: S.of(context)?.chatReply ?? 'Reply',
               onTap: onReply,
             ),
-            if (onForward != null)
+            if (onForward != null && !message.isSelfDestructing)
               _buildMenuItem(
                 context,
                 icon: Icons.forward,

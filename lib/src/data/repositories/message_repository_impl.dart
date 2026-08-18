@@ -505,11 +505,17 @@ class MessageRepositoryImpl implements IMessageRepository {
     String messageId, {
     String? reason,
   }) async {
-    return await _messageDataSource.redactMessage(
+    final ok = await _messageDataSource.redactMessage(
       roomId,
       messageId,
       reason: reason,
     );
+    // Remove successfully redacted/self-destructed content from the archive
+    // so global search cannot resurrect its plaintext.
+    if (ok) {
+      await _archiveService?.deleteArchivedMessage(messageId);
+    }
+    return ok;
   }
 
   @override

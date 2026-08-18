@@ -570,7 +570,38 @@ class FirebasePushService implements IPushNotificationService {
     return null;
   }
 
-  /// 处理前台消息
+  /// Returns whether notifications for [roomId] must be suppressed.
+  ///
+  /// This reads SharedPreferences directly because a background push isolate
+  /// cannot use the main isolate's DI container. The keys mirror
+  /// PreferencesDataSource and ChatLockService and must stay in sync.
+  /// Storage or decoding errors fail closed to avoid leaking protected room
+  /// names or message previews on the lock screen.
+  static Future<bool> _isPrivacyRestrictedRoom(String? roomId) async {
+    if (roomId == null || roomId.isEmpty) return false;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hiddenRaw = prefs.getString('n42_chat_hidden_chats');
+      if (hiddenRaw != null) {
+        final decoded = json.decode(hiddenRaw);
+        if (decoded is! List) {
+          throw const FormatException('Hidden chat IDs must be a JSON list');
+        }
+        if (decoded.contains(roomId)) return true;
+      }
+      final locked = prefs.getStringList('chat_lock_locked_chats');
+      if (locked != null && locked.contains(roomId)) return true;
+    } catch (e) {
+      debugLog('FirebasePushService: privacy-room check failed: $e');
+      return true;
+    }
+    return false;
+  }
+
+  @visibleForTesting
+  static Future<bool> isPrivacyRestrictedRoomForTest(String? roomId) =>
+      _isPrivacyRestrictedRoom(roomId);
+
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     // 检查通知配置
     if (!_notificationConfig.enabled) return;
@@ -596,11 +627,13 @@ class FirebasePushService implements IPushNotificationService {
         debugLog(
           'FirebasePushService: CallManager not handling call, showing CallKit as fallback',
         );
-        unawaited(_showBackgroundCallKit(message).catchError((Object e) {
-          debugLog(
-            'FirebasePushService: Failed to show foreground CallKit fallback: $e',
-          );
-        }));
+        unawaited(
+          _showBackgroundCallKit(message).catchError((Object e) {
+            debugLog(
+              'FirebasePushService: Failed to show foreground CallKit fallback: $e',
+            );
+          }),
+        );
       }
       return;
     }
@@ -631,6 +664,15 @@ class FirebasePushService implements IPushNotificationService {
       debugLog(
         'FirebasePushService: Ignoring non-chat foreground message '
         '(${message.messageId})',
+      );
+      return;
+    }
+
+    // Suppress hidden/locked rooms before deduplication so they leave no
+    // notification trace and cannot leak a title or preview.
+    if (await _isPrivacyRestrictedRoom(roomId)) {
+      debugLog(
+        'FirebasePushService: Skipping notification for hidden/locked room',
       );
       return;
     }
@@ -795,6 +837,16 @@ class FirebasePushService implements IPushNotificationService {
         debugLog(
           'FirebasePushService: Ignoring non-chat background message '
           '(${message.messageId})',
+        );
+        return;
+      }
+
+      // Apply the same privacy filter in the background isolate before
+      // deduplication so protected rooms leave no notification trace.
+      if (await _isPrivacyRestrictedRoom(roomId)) {
+        debugLog(
+          'FirebasePushService: Skipping background notification for '
+          'hidden/locked room',
         );
         return;
       }
@@ -1085,6 +1137,14 @@ class FirebasePushService implements IPushNotificationService {
     final room = _client.getRoomById(roomId);
     if (room == null) return;
 
+    // Apply the privacy filter on the sync path before deduplication as well.
+    if (await _isPrivacyRestrictedRoom(roomId)) {
+      debugLog(
+        'FirebasePushService: Skipping sync notification for hidden/locked room',
+      );
+      return;
+    }
+
     // 跨通道去重：同一事件可能已由 FCM 前台/后台路径弹过。
     if (!await PushDedupStore.instance.tryMarkNotified(event.eventId)) {
       debugLog(
@@ -1200,7 +1260,7 @@ class FirebasePushService implements IPushNotificationService {
     pushLog(
       'REG',
       'Config: appId=$appId, type=$pushkeyType, '
-      'gateway=$pushGatewayUrl, pushkey=${_truncateToken(pushkey)}',
+          'gateway=$pushGatewayUrl, pushkey=${_truncateToken(pushkey)}',
     );
 
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -1278,7 +1338,7 @@ class FirebasePushService implements IPushNotificationService {
         pushLog(
           'VERIFY_FAIL',
           'Pusher NOT found on server after registration! '
-          'Registered ${pushers.length} pushers, none match appId=$appId',
+              'Registered ${pushers.length} pushers, none match appId=$appId',
         );
       }
     } catch (e) {

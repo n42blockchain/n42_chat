@@ -4,6 +4,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
+import 'package:n42_chat/src/core/theme/app_icons.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/domain/entities/avatar_decoration_preset.dart';
 import 'package:n42_chat/src/domain/entities/user_entity.dart';
@@ -94,7 +95,7 @@ void main() {
       await tester.pumpWidget(buildTestWidget(const MyQRCodePage()));
       await tester.pump();
 
-      expect(find.byIcon(Icons.arrow_back_ios), findsOneWidget);
+      expect(find.byIcon(AppIcons.back), findsOneWidget);
     });
 
     testWidgets('has more options button in AppBar', (tester) async {
@@ -106,7 +107,7 @@ void main() {
       await tester.pumpWidget(buildTestWidget(const MyQRCodePage()));
       await tester.pump();
 
-      expect(find.byIcon(Icons.more_horiz), findsOneWidget);
+      expect(find.byIcon(AppIcons.more), findsOneWidget);
     });
 
     testWidgets('shows scan hint text', (tester) async {
@@ -145,7 +146,7 @@ void main() {
       await tester.pumpWidget(buildTestWidget(const MyQRCodePage()));
       await tester.pump();
 
-      await tester.tap(find.byIcon(Icons.more_horiz));
+      await tester.tap(find.byIcon(AppIcons.more));
       // 使用多次 pump 代替 pumpAndSettle，避免动画超时
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));

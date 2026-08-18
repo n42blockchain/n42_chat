@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
+import 'package:sqlite3/open.dart';
+import 'package:sqlite3/sqlite3.dart' as raw_sqlite;
 import '../../../core/utils/debug_log.dart';
 
 part 'archive_database.g.dart';
@@ -46,8 +51,7 @@ class ArchivedMessages extends Table {
   TextColumn get mediaInfo => text().nullable()();
 
   /// 是否为 E2EE 加密消息
-  BoolColumn get isEncrypted =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get isEncrypted => boolean().withDefault(const Constant(false))();
 
   /// 解密后的明文内容（仅本地存储，不外传）
   TextColumn get decryptedBody => text().nullable()();
@@ -116,47 +120,62 @@ class ArchiveDatabase extends _$ArchiveDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (Migrator m) async {
-          await m.createAll();
-          // 创建复合索引
-          await customStatement(
-            'CREATE INDEX IF NOT EXISTS idx_archived_room_ts '
-            'ON archived_messages (room_id, origin_server_ts DESC)',
-          );
-          await customStatement(
-            'CREATE INDEX IF NOT EXISTS idx_archived_quarter '
-            'ON archived_messages (quarter)',
-          );
-          await customStatement(
-            'CREATE INDEX IF NOT EXISTS idx_archived_room_type '
-            'ON archived_messages (room_id, type)',
-          );
-          // FTS5 全文搜索虚拟表
-          await customStatement(
-            'CREATE VIRTUAL TABLE IF NOT EXISTS archive_fts USING fts5('
-            'body, content=archived_messages, content_rowid=rowid'
-            ')',
-          );
-          // FTS 触发器：插入时自动同步
-          await customStatement(
-            'CREATE TRIGGER IF NOT EXISTS archive_fts_insert '
-            'AFTER INSERT ON archived_messages BEGIN '
-            "INSERT INTO archive_fts(rowid, body) VALUES (new.rowid, COALESCE(new.body, '')); "
-            'END',
-          );
-        },
-        onUpgrade: (Migrator m, int from, int to) async {
-          debugLog('ArchiveDatabase: Migrating from v$from to v$to');
-        },
-        beforeOpen: (details) async {
-          if (details.hadUpgrade) {
-            debugLog(
-              'ArchiveDatabase: Schema upgraded from '
-              'v${details.versionBefore} to v${details.versionNow}',
-            );
-          }
-        },
+    onCreate: (Migrator m) async {
+      await m.createAll();
+      // Create query indexes.
+      await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_archived_room_ts '
+        'ON archived_messages (room_id, origin_server_ts DESC)',
       );
+      await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_archived_quarter '
+        'ON archived_messages (quarter)',
+      );
+      await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_archived_room_type '
+        'ON archived_messages (room_id, type)',
+      );
+      // Create the FTS5 external-content table.
+      await customStatement(
+        'CREATE VIRTUAL TABLE IF NOT EXISTS archive_fts USING fts5('
+        'body, content=archived_messages, content_rowid=rowid'
+        ')',
+      );
+      // Synchronize inserted rows into FTS5.
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS archive_fts_insert '
+        'AFTER INSERT ON archived_messages BEGIN '
+        "INSERT INTO archive_fts(rowid, body) VALUES (new.rowid, COALESCE(new.body, '')); "
+        'END',
+      );
+      await _createFtsDeleteTrigger();
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      debugLog('ArchiveDatabase: Migrating from v$from to v$to');
+    },
+    beforeOpen: (details) async {
+      if (details.hadUpgrade) {
+        debugLog(
+          'ArchiveDatabase: Schema upgraded from '
+          'v${details.versionBefore} to v${details.versionNow}',
+        );
+      }
+      // Older databases had only the insert trigger. Install the delete
+      // trigger idempotently so removed plaintext cannot survive in FTS5.
+      await _createFtsDeleteTrigger();
+    },
+  );
+
+  /// Keeps an external-content FTS5 table synchronized on row deletion.
+  Future<void> _createFtsDeleteTrigger() async {
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS archive_fts_delete '
+      'AFTER DELETE ON archived_messages BEGIN '
+      'INSERT INTO archive_fts(archive_fts, rowid, body) '
+      "VALUES ('delete', old.rowid, COALESCE(old.body, '')); "
+      'END',
+    );
+  }
 
   // ============================================
   // 插入
@@ -170,10 +189,9 @@ class ArchiveDatabase extends _$ArchiveDatabase {
         // insertReturningOrNull:被 insertOrIgnore 忽略(eventId 已存在)时
         // 返回 null,真正插入才返回行——避免用 rowId>0 把被忽略行也计入
         // (last_insert_rowid 对被忽略行仍>0,会高估 totalArchived,复审 P2)。
-        final row = await into(archivedMessages).insertReturningOrNull(
-          entry,
-          mode: InsertMode.insertOrIgnore,
-        );
+        final row = await into(
+          archivedMessages,
+        ).insertReturningOrNull(entry, mode: InsertMode.insertOrIgnore);
         if (row != null) {
           inserted++;
         }
@@ -201,14 +219,13 @@ class ArchiveDatabase extends _$ArchiveDatabase {
       ..where((t) {
         var expr = t.roomId.equals(roomId);
         if (beforeTimestamp != null) {
-          expr = expr &
-              t.originServerTs.isSmallerThanValue(beforeTimestamp);
+          expr = expr & t.originServerTs.isSmallerThanValue(beforeTimestamp);
         }
         return expr;
       })
       ..orderBy([
-        (t) => OrderingTerm(
-            expression: t.originServerTs, mode: OrderingMode.desc),
+        (t) =>
+            OrderingTerm(expression: t.originServerTs, mode: OrderingMode.desc),
       ])
       ..limit(limit);
     return query.get();
@@ -216,19 +233,16 @@ class ArchiveDatabase extends _$ArchiveDatabase {
 
   /// 获取房间归档元数据
   Future<ArchiveMetadataData?> getMetadata(String roomId) async {
-    return (select(archiveMetadata)
-          ..where((t) => t.roomId.equals(roomId)))
-        .getSingleOrNull();
+    return (select(
+      archiveMetadata,
+    )..where((t) => t.roomId.equals(roomId))).getSingleOrNull();
   }
 
   /// 按季度统计消息数
   Future<Map<int, int>> getQuarterlyStats(String roomId) async {
     final query = selectOnly(archivedMessages)
       ..where(archivedMessages.roomId.equals(roomId))
-      ..addColumns([
-        archivedMessages.quarter,
-        archivedMessages.eventId.count(),
-      ])
+      ..addColumns([archivedMessages.quarter, archivedMessages.eventId.count()])
       ..groupBy([archivedMessages.quarter])
       ..orderBy([
         OrderingTerm(
@@ -296,9 +310,16 @@ class ArchiveDatabase extends _$ArchiveDatabase {
 
   /// 删除指定季度的归档
   Future<int> deleteQuarter(int quarter) async {
-    return (delete(archivedMessages)
-          ..where((t) => t.quarter.equals(quarter)))
-        .go();
+    return (delete(
+      archivedMessages,
+    )..where((t) => t.quarter.equals(quarter))).go();
+  }
+
+  /// Deletes one archived event; the FTS trigger removes its indexed text.
+  Future<int> deleteByEventId(String eventId) async {
+    return (delete(
+      archivedMessages,
+    )..where((t) => t.eventId.equals(eventId))).go();
   }
 
   // ============================================
@@ -343,10 +364,12 @@ class ArchiveDatabase extends _$ArchiveDatabase {
       variables.add(Variable.withInt(beforeTimestamp));
     }
 
-    final whereClause =
-        conditions.isNotEmpty ? 'AND ${conditions.join(' AND ')}' : '';
+    final whereClause = conditions.isNotEmpty
+        ? 'AND ${conditions.join(' AND ')}'
+        : '';
 
-    final sql = 'SELECT am.* FROM archived_messages am '
+    final sql =
+        'SELECT am.* FROM archived_messages am '
         'INNER JOIN archive_fts ON archive_fts.rowid = am.rowid '
         'WHERE archive_fts MATCH ? $whereClause '
         'ORDER BY am.origin_server_ts DESC '
@@ -362,29 +385,30 @@ class ArchiveDatabase extends _$ArchiveDatabase {
       ],
     ).get();
 
-    return rows.map((row) => ArchivedMessage(
-          eventId: row.read<String>('event_id'),
-          roomId: row.read<String>('room_id'),
-          senderId: row.read<String>('sender_id'),
-          originServerTs: row.read<int>('origin_server_ts'),
-          type: row.read<String>('type'),
-          body: row.readNullable<String>('body'),
-          formattedBody: row.readNullable<String>('formatted_body'),
-          msgtype: row.readNullable<String>('msgtype'),
-          relatesTo: row.readNullable<String>('relates_to'),
-          mediaInfo: row.readNullable<String>('media_info'),
-          isEncrypted: row.read<bool>('is_encrypted'),
-          decryptedBody: row.readNullable<String>('decrypted_body'),
-          quarter: row.read<int>('quarter'),
-          archivedAt: row.read<DateTime>('archived_at'),
-        )).toList();
+    return rows
+        .map(
+          (row) => ArchivedMessage(
+            eventId: row.read<String>('event_id'),
+            roomId: row.read<String>('room_id'),
+            senderId: row.read<String>('sender_id'),
+            originServerTs: row.read<int>('origin_server_ts'),
+            type: row.read<String>('type'),
+            body: row.readNullable<String>('body'),
+            formattedBody: row.readNullable<String>('formatted_body'),
+            msgtype: row.readNullable<String>('msgtype'),
+            relatesTo: row.readNullable<String>('relates_to'),
+            mediaInfo: row.readNullable<String>('media_info'),
+            isEncrypted: row.read<bool>('is_encrypted'),
+            decryptedBody: row.readNullable<String>('decrypted_body'),
+            quarter: row.read<int>('quarter'),
+            archivedAt: row.read<DateTime>('archived_at'),
+          ),
+        )
+        .toList();
   }
 
   /// FTS5 搜索结果计数
-  Future<int> searchCount(
-    String query, {
-    String? roomId,
-  }) async {
+  Future<int> searchCount(String query, {String? roomId}) async {
     final ftsQuery = _sanitizeFtsQuery(query);
     final conditions = <String>[];
     final variables = <Variable>[];
@@ -394,19 +418,18 @@ class ArchiveDatabase extends _$ArchiveDatabase {
       variables.add(Variable.withString(roomId));
     }
 
-    final whereClause =
-        conditions.isNotEmpty ? 'AND ${conditions.join(' AND ')}' : '';
+    final whereClause = conditions.isNotEmpty
+        ? 'AND ${conditions.join(' AND ')}'
+        : '';
 
-    final sql = 'SELECT COUNT(*) as cnt FROM archived_messages am '
+    final sql =
+        'SELECT COUNT(*) as cnt FROM archived_messages am '
         'INNER JOIN archive_fts ON archive_fts.rowid = am.rowid '
         'WHERE archive_fts MATCH ? $whereClause';
 
     final rows = await customSelect(
       sql,
-      variables: [
-        Variable.withString(ftsQuery),
-        ...variables,
-      ],
+      variables: [Variable.withString(ftsQuery), ...variables],
     ).get();
 
     return rows.firstOrNull?.read<int>('cnt') ?? 0;
@@ -414,7 +437,9 @@ class ArchiveDatabase extends _$ArchiveDatabase {
 
   /// 重建 FTS 索引（在导入数据后调用）
   Future<void> rebuildFtsIndex() async {
-    await customStatement("INSERT INTO archive_fts(archive_fts) VALUES('rebuild')");
+    await customStatement(
+      "INSERT INTO archive_fts(archive_fts) VALUES('rebuild')",
+    );
   }
 
   /// 关闭数据库
@@ -425,7 +450,14 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   }
 }
 
-/// 打开数据库连接
+/// Secure-storage key for the archive SQLCipher passphrase.
+const String _kArchiveDbKeyStorageKey = 'n42_chat_archive_db_key';
+
+/// Opens the full-text archive with SQLCipher because it contains decrypted
+/// E2EE message text.
+///
+/// The 256-bit random key lives in Keychain/Keystore. Existing plaintext
+/// archives are converted in place with sqlcipher_export.
 Future<LazyDatabase> _openConnection() async {
   return LazyDatabase(() async {
     final appDir = await getApplicationDocumentsDirectory();
@@ -434,9 +466,227 @@ Future<LazyDatabase> _openConnection() async {
       dbDir.createSync(recursive: true);
     }
     final file = File(p.join(dbDir.path, 'archive.db'));
-    return NativeDatabase.createInBackground(file);
+
+    // Older Android versions need sqlcipher_flutter_libs' sqlite3 override.
+    // On iOS, the host must force-load SQLCipher so another plugin's system
+    // sqlite3 link cannot shadow PRAGMA key and sqlcipher_export.
+    if (Platform.isAndroid) {
+      await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
+      open.overrideForAll(openCipherOnAndroid);
+    }
+
+    // Fail loudly if the process resolved system SQLite instead of SQLCipher.
+    if (!_isSqlCipherAvailable()) {
+      throw StateError(
+        'SQLCipher unavailable: refusing to open archive.db as plaintext '
+        '(check `-framework SQLCipher` linker flag on iOS).',
+      );
+    }
+
+    _recoverInterruptedArchiveMigration(file);
+    final passphrase = await _resolveArchivePassphrase(file);
+
+    // Convert a legacy plaintext archive without deleting it on failure.
+    await _migratePlaintextArchiveIfNeeded(file, passphrase);
+    _removeMigrationBackupWhenSafe(file, passphrase);
+
+    // Open synchronously because background isolates do not inherit sqlite3
+    // overrides on Android. Archive queries are not latency-critical.
+    return NativeDatabase(
+      file,
+      setup: (db) {
+        // Use the 32-byte raw key form and skip passphrase derivation.
+        db.execute("PRAGMA key = \"x'$passphrase'\";");
+        // Verify again on the actual archive connection.
+        if (db.select('PRAGMA cipher_version;').isEmpty) {
+          throw StateError('SQLCipher not active for archive.db');
+        }
+      },
+    );
   });
 }
+
+/// Probes cipher_version after applying Android's sqlite3 override.
+bool _isSqlCipherAvailable() {
+  raw_sqlite.Database? probe;
+  try {
+    probe = raw_sqlite.sqlite3.openInMemory();
+    final rows = probe.select('PRAGMA cipher_version;');
+    return rows.isNotEmpty;
+  } catch (_) {
+    return false;
+  } finally {
+    probe?.dispose();
+  }
+}
+
+/// Returns the existing archive passphrase or creates one for a new/plaintext
+/// archive. An invalid stored key is never overwritten, and an encrypted file
+/// without its key fails closed instead of being assigned an unrelated key.
+Future<String> _resolveArchivePassphrase(File file) async {
+  const storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(),
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock_this_device,
+    ),
+  );
+  final existing = await storage.read(key: _kArchiveDbKeyStorageKey);
+  if (existing != null) {
+    if (!_isValidArchivePassphrase(existing)) {
+      throw StateError('Stored archive.db passphrase is invalid');
+    }
+    return existing.toLowerCase();
+  }
+
+  if (file.existsSync() && file.lengthSync() > 0) {
+    final plaintext = await _hasPlaintextSqliteHeader(file);
+    if (!plaintext) {
+      throw StateError(
+        'archive.db is encrypted but its secure-storage key is unavailable',
+      );
+    }
+  }
+
+  final rng = Random.secure();
+  final bytes = List<int>.generate(32, (_) => rng.nextInt(256));
+  final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+  await storage.write(key: _kArchiveDbKeyStorageKey, value: hex);
+  debugLog('ArchiveDatabase: generated new SQLCipher passphrase');
+  return hex;
+}
+
+bool _isValidArchivePassphrase(String value) =>
+    RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(value);
+
+Future<bool> _hasPlaintextSqliteHeader(File file) async {
+  try {
+    final head = await file.openRead(0, 16).first;
+    return String.fromCharCodes(head).startsWith('SQLite format 3');
+  } catch (e) {
+    throw StateError('Unable to inspect archive.db header: $e');
+  }
+}
+
+/// Restores the plaintext source if the process stopped after renaming it to
+/// `.plaintext.bak` but before installing the encrypted replacement.
+void _recoverInterruptedArchiveMigration(File file) {
+  final backup = File('${file.path}.plaintext.bak');
+  if (!file.existsSync() && backup.existsSync()) {
+    backup.renameSync(file.path);
+    debugLog('ArchiveDatabase: restored interrupted migration backup');
+  }
+}
+
+/// Deletes a leftover plaintext backup only after proving that the installed
+/// archive can be opened with the retained key.
+void _removeMigrationBackupWhenSafe(File file, String passphrase) {
+  final backup = File('${file.path}.plaintext.bak');
+  if (!backup.existsSync() || !file.existsSync()) return;
+
+  try {
+    _verifyEncryptedArchive(file, passphrase);
+    backup.deleteSync();
+    debugLog('ArchiveDatabase: removed verified plaintext migration backup');
+  } catch (e) {
+    debugLog('ArchiveDatabase: retained migration backup after verify: $e');
+  }
+}
+
+/// Proves that [file] is a readable SQLCipher database with a valid schema.
+///
+/// This check runs both before installation and before deleting the plaintext
+/// backup so a truncated or otherwise corrupt export cannot replace history.
+void _verifyEncryptedArchive(File file, String passphrase) {
+  raw_sqlite.Database? db;
+  try {
+    db = raw_sqlite.sqlite3.open(file.path);
+    db.execute("PRAGMA key = \"x'$passphrase'\";");
+    if (db.select('PRAGMA cipher_version;').isEmpty) {
+      throw StateError('SQLCipher is not active for exported archive.db');
+    }
+    db.select('SELECT count(*) FROM sqlite_master;');
+    final integrity = db.select('PRAGMA integrity_check;');
+    if (integrity.isEmpty || integrity.first.values.first != 'ok') {
+      throw StateError('Encrypted archive.db failed integrity_check');
+    }
+  } finally {
+    db?.dispose();
+  }
+}
+
+void _replacePlaintextArchive(File file, File encryptedFile) {
+  final backup = File('${file.path}.plaintext.bak');
+  if (backup.existsSync()) backup.deleteSync();
+  file.renameSync(backup.path);
+  try {
+    encryptedFile.renameSync(file.path);
+  } catch (_) {
+    if (!file.existsSync() && backup.existsSync()) {
+      backup.renameSync(file.path);
+    }
+    rethrow;
+  }
+}
+
+/// Converts a legacy plaintext archive with SQLCipher's sqlcipher_export.
+Future<void> _migratePlaintextArchiveIfNeeded(
+  File file,
+  String passphrase,
+) async {
+  if (!file.existsSync() || file.lengthSync() == 0) {
+    return; // 新库，直接以密文创建。
+  }
+  // An encrypted database does not contain SQLite's plaintext file header.
+  if (!await _hasPlaintextSqliteHeader(file)) return;
+
+  debugLog('ArchiveDatabase: migrating plaintext archive.db to SQLCipher');
+  final encPath = '${file.path}.enc';
+  final encFile = File(encPath);
+  if (encFile.existsSync()) {
+    encFile.deleteSync();
+  }
+
+  raw_sqlite.Database? db;
+  try {
+    // Open the source unkeyed, attach a keyed destination, and export it.
+    db = raw_sqlite.sqlite3.open(file.path);
+    final escapedPath = encPath.replaceAll("'", "''");
+    db.execute(
+      "ATTACH DATABASE '$escapedPath' AS encrypted KEY \"x'$passphrase'\";",
+    );
+    db.execute("SELECT sqlcipher_export('encrypted');");
+    db.execute('DETACH DATABASE encrypted;');
+    db.dispose();
+    db = null;
+
+    // Verify the export before it can replace the only readable source.
+    _verifyEncryptedArchive(encFile, passphrase);
+
+    // Install the encrypted copy with rollback if the second rename fails.
+    // Keep the plaintext backup until the caller verifies the installed file.
+    _replacePlaintextArchive(file, encFile);
+    debugLog('ArchiveDatabase: migration to SQLCipher completed');
+  } catch (e) {
+    debugLog('ArchiveDatabase: SQLCipher migration failed: $e');
+    db?.dispose();
+    // Delete only the incomplete destination. Preserve the source and retry
+    // on a later launch rather than silently losing history.
+    if (encFile.existsSync()) encFile.deleteSync();
+    rethrow;
+  }
+}
+
+@visibleForTesting
+bool isValidArchivePassphraseForTest(String value) =>
+    _isValidArchivePassphrase(value);
+
+@visibleForTesting
+void recoverInterruptedArchiveMigrationForTest(File file) =>
+    _recoverInterruptedArchiveMigration(file);
+
+@visibleForTesting
+void replacePlaintextArchiveForTest(File file, File encryptedFile) =>
+    _replacePlaintextArchive(file, encryptedFile);
 
 // ============================================
 // 辅助数据类

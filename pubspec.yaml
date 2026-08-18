@@ -51,7 +51,10 @@ dependencies:
   # ============================================
   # MIT License
   drift: ^2.15.0
-  sqlite3_flutter_libs: ^0.5.42
+  # Encrypt archive.db because it indexes decrypted E2EE plaintext. SQLCipher
+  # remains compatible with the Matrix SDK's unkeyed SQLite databases.
+  sqlcipher_flutter_libs: ^0.6.4
+  sqlite3: ^2.4.0  # Native connection for sqlcipher_export migration.
   sqflite: ^2.4.3
   # BSD-3-Clause License
   flutter_secure_storage: ^10.0.0

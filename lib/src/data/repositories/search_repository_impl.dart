@@ -6,8 +6,10 @@ import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/search_result_entity.dart';
 import '../../domain/repositories/search_repository.dart';
 import '../../core/services/archive_search_service.dart';
+import '../../core/services/chat_lock_service.dart';
 import '../../core/services/ens_cache_service.dart';
 import '../../core/services/username_service.dart';
+import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_search_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../../core/utils/debug_log.dart';
@@ -20,6 +22,8 @@ class SearchRepositoryImpl implements ISearchRepository {
   final EnsCacheService? _ensCacheService;
   final UsernameService? _usernameService;
   final ArchiveSearchService? _archiveSearch;
+  final PreferencesDataSource? _preferences;
+  final ChatLockService _chatLockService;
 
   SearchRepositoryImpl(
     this._searchDataSource,
@@ -27,9 +31,36 @@ class SearchRepositoryImpl implements ISearchRepository {
     EnsCacheService? ensCacheService,
     UsernameService? usernameService,
     ArchiveSearchService? archiveSearch,
+    PreferencesDataSource? preferences,
+    ChatLockService? chatLockService,
   }) : _ensCacheService = ensCacheService,
        _usernameService = usernameService,
-       _archiveSearch = archiveSearch;
+       _archiveSearch = archiveSearch,
+       _preferences = preferences,
+       _chatLockService = chatLockService ?? ChatLockService();
+
+  /// Returns hidden and locked room IDs for global-search filtering.
+  ///
+  /// `null` means the privacy state could not be loaded. Global search must
+  /// then fail closed instead of exposing a protected room. Search within an
+  /// explicitly opened room remains unaffected.
+  Future<Set<String>?> _excludedRoomIds() async {
+    final excluded = <String>{};
+    try {
+      final hidden = await _preferences?.getHiddenChatIdsStrict();
+      if (hidden != null) excluded.addAll(hidden);
+    } catch (e) {
+      debugLog('SearchRepository: load hidden chats failed: $e');
+      return null;
+    }
+    try {
+      excluded.addAll(await _chatLockService.getLockedChatIds());
+    } catch (e) {
+      debugLog('SearchRepository: load locked chats failed: $e');
+      return null;
+    }
+    return excluded;
+  }
 
   @override
   Future<SearchResults> searchGlobal(
@@ -170,7 +201,11 @@ class SearchRepositoryImpl implements ISearchRepository {
     String query, {
     int limit = 20,
   }) async {
-    final rooms = _searchDataSource.searchLocalGroups(query);
+    final excluded = await _excludedRoomIds();
+    if (excluded == null) return const [];
+    final rooms = _searchDataSource
+        .searchLocalGroups(query)
+        .where((room) => !excluded.contains(room.id));
 
     return rooms.take(limit).map((room) {
       final conversation = _mapRoomToConversation(room);
@@ -186,7 +221,11 @@ class SearchRepositoryImpl implements ISearchRepository {
     String query, {
     int limit = 20,
   }) async {
-    final rooms = _searchDataSource.searchLocalConversations(query);
+    final excluded = await _excludedRoomIds();
+    if (excluded == null) return const [];
+    final rooms = _searchDataSource
+        .searchLocalConversations(query)
+        .where((room) => !excluded.contains(room.id));
 
     return rooms.take(limit).map((room) {
       final conversation = _mapRoomToConversation(room);
@@ -243,24 +282,31 @@ class SearchRepositoryImpl implements ISearchRepository {
               limit: limit,
             );
 
-      final liveItems = results.map((result) {
-        final message = _mapEventToMessage(result.event);
-        final roomAvatar = _getRoomAvatarUrl(result.room);
+      // Filter both live and archived results for hidden or locked rooms.
+      final excluded = await _excludedRoomIds();
+      if (excluded == null) return const [];
+      final liveItems = results
+          .where((result) => !excluded.contains(result.room.id))
+          .map((result) {
+            final message = _mapEventToMessage(result.event);
+            final roomAvatar = _getRoomAvatarUrl(result.room);
 
-        return SearchResultItem.fromMessage(
-          message,
-          roomId: result.room.id,
-          roomName: result.room.getLocalizedDisplayname(),
-          roomAvatarUrl: roomAvatar,
-          matchedKeyword: query,
-        );
-      }).toList();
+            return SearchResultItem.fromMessage(
+              message,
+              roomId: result.room.id,
+              roomName: result.room.getLocalizedDisplayname(),
+              roomAvatarUrl: roomAvatar,
+              matchedKeyword: query,
+            );
+          })
+          .toList();
 
       // 合并 FTS5 归档搜索：内存 timeline 扫描只覆盖已加载消息，归档库
       // 覆盖完整历史。按消息 id 去重（live 优先），失败静默降级为纯 live。
       final archiveItems = await _searchArchive(
         query,
         excludeIds: liveItems.map((e) => e.id).toSet(),
+        excludeRoomIds: excluded,
         limit: limit,
       );
       if (archiveItems.isEmpty) return liveItems;
@@ -283,6 +329,7 @@ class SearchRepositoryImpl implements ISearchRepository {
   Future<List<SearchResultItem>> _searchArchive(
     String query, {
     required Set<String> excludeIds,
+    Set<String> excludeRoomIds = const {},
     int limit = 50,
   }) async {
     final archive = _archiveSearch;
@@ -293,6 +340,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       for (final hit in hits) {
         final msg = hit.message;
         if (excludeIds.contains(msg.id)) continue;
+        if (excludeRoomIds.contains(msg.roomId)) continue;
         final room = _clientManager.client?.getRoomById(msg.roomId);
         items.add(
           SearchResultItem.fromMessage(

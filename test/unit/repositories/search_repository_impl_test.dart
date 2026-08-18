@@ -8,6 +8,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:n42_chat/src/core/services/chat_lock_service.dart';
+import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_search_datasource.dart';
 import 'package:n42_chat/src/data/repositories/search_repository_impl.dart';
@@ -16,6 +18,10 @@ class MockMatrixSearchDataSource extends Mock
     implements MatrixSearchDataSource {}
 
 class MockMatrixClientManager extends Mock implements MatrixClientManager {}
+
+class MockPreferencesDataSource extends Mock implements PreferencesDataSource {}
+
+class MockChatLockService extends Mock implements ChatLockService {}
 
 void main() {
   late SearchRepositoryImpl repository;
@@ -84,6 +90,47 @@ void main() {
 
       expect(result.isEmpty, isTrue);
       verifyNever(() => mockDataSource.searchLocalContacts(any()));
+    });
+  });
+
+  group('global search privacy filtering', () {
+    late MockPreferencesDataSource preferences;
+    late MockChatLockService chatLockService;
+
+    setUp(() {
+      preferences = MockPreferencesDataSource();
+      chatLockService = MockChatLockService();
+      repository = SearchRepositoryImpl(
+        mockDataSource,
+        mockClientManager,
+        preferences: preferences,
+        chatLockService: chatLockService,
+      );
+    });
+
+    test('fails closed when hidden-room state cannot be read', () async {
+      when(
+        () => preferences.getHiddenChatIdsStrict(),
+      ).thenThrow(const FormatException('invalid privacy state'));
+
+      final result = await repository.searchConversations('secret');
+
+      expect(result, isEmpty);
+      verifyNever(() => mockDataSource.searchLocalConversations(any()));
+    });
+
+    test('fails closed when locked-room state cannot be read', () async {
+      when(
+        () => preferences.getHiddenChatIdsStrict(),
+      ).thenAnswer((_) async => <String>{});
+      when(
+        () => chatLockService.getLockedChatIds(),
+      ).thenThrow(StateError('storage unavailable'));
+
+      final result = await repository.searchGroups('secret');
+
+      expect(result, isEmpty);
+      verifyNever(() => mockDataSource.searchLocalGroups(any()));
     });
   });
 

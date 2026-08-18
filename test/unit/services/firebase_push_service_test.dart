@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:n42_chat/src/core/notifications/firebase_push_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockMatrixClient extends Mock implements matrix.Client {}
 
@@ -31,23 +32,23 @@ void main() {
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('flutter_callkit_incoming'),
-      (MethodCall methodCall) async {
-        callkitCalls.add(methodCall);
-        if (methodCall.method == 'activeCalls') {
-          return <dynamic>[];
-        }
-        return null;
-      },
-    );
+          const MethodChannel('flutter_callkit_incoming'),
+          (MethodCall methodCall) async {
+            callkitCalls.add(methodCall);
+            if (methodCall.method == 'activeCalls') {
+              return <dynamic>[];
+            }
+            return null;
+          },
+        );
   });
 
   tearDown(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('flutter_callkit_incoming'),
-      null,
-    );
+          const MethodChannel('flutter_callkit_incoming'),
+          null,
+        );
   });
 
   group('setInCall and isInCall', () {
@@ -120,14 +121,17 @@ void main() {
       expect(service.isInCall, isFalse);
     });
 
-    test('should cancel previous timer when setInCall(true) is called again', () {
-      service.setInCall(true);
-      service.setInCall(true); // 应取消前一个 timer 并创建新的
-      expect(service.isInCall, isTrue);
+    test(
+      'should cancel previous timer when setInCall(true) is called again',
+      () {
+        service.setInCall(true);
+        service.setInCall(true); // 应取消前一个 timer 并创建新的
+        expect(service.isInCall, isTrue);
 
-      service.setInCall(false);
-      expect(service.isInCall, isFalse);
-    });
+        service.setInCall(false);
+        expect(service.isInCall, isFalse);
+      },
+    );
 
     test('dispose should cancel timer without errors', () async {
       service.setInCall(true);
@@ -199,9 +203,7 @@ void main() {
           'type': 'm.call.invite',
           'room_id': '!room:matrix.org',
         },
-        notification: const RemoteNotification(
-          title: 'Call from Bob',
-        ),
+        notification: RemoteNotification(title: 'Call from Bob'),
       );
 
       await FirebasePushService.showBackgroundCallKitForTest(message);
@@ -210,48 +212,50 @@ void main() {
       expect(args['nameCaller'], equals('Call from Bob'));
     });
 
-    test('should handle m.call.invite with sender_display_name priority', () async {
-      const message = RemoteMessage(
-        data: <String, dynamic>{
-          'type': 'm.call.invite',
-          'sender': '@alice:matrix.org',
-          'sender_display_name': 'Alice Wonderland',
-          'room_id': '!room:matrix.org',
-        },
-        notification: const RemoteNotification(
-          title: 'Different Title',
-        ),
-      );
+    test(
+      'should handle m.call.invite with sender_display_name priority',
+      () async {
+        const message = RemoteMessage(
+          data: <String, dynamic>{
+            'type': 'm.call.invite',
+            'sender': '@alice:matrix.org',
+            'sender_display_name': 'Alice Wonderland',
+            'room_id': '!room:matrix.org',
+          },
+          notification: RemoteNotification(title: 'Different Title'),
+        );
 
-      await FirebasePushService.showBackgroundCallKitForTest(message);
+        await FirebasePushService.showBackgroundCallKitForTest(message);
 
-      final args = callkitCalls.first.arguments as Map<dynamic, dynamic>;
-      // sender_display_name 应该优先于 notification.title
-      expect(args['nameCaller'], equals('Alice Wonderland'));
-    });
+        final args = callkitCalls.first.arguments as Map<dynamic, dynamic>;
+        // sender_display_name takes precedence over notification.title.
+        expect(args['nameCaller'], equals('Alice Wonderland'));
+      },
+    );
 
-    test('should call endAllCalls for both hangup and reject in sequence', () async {
-      const hangup = RemoteMessage(
-        data: <String, dynamic>{
-          'type': 'm.call.hangup',
-          'room_id': '!room:matrix.org',
-        },
-      );
-      const reject = RemoteMessage(
-        data: <String, dynamic>{
-          'type': 'm.call.reject',
-          'room_id': '!room:matrix.org',
-        },
-      );
+    test(
+      'should call endAllCalls for both hangup and reject in sequence',
+      () async {
+        const hangup = RemoteMessage(
+          data: <String, dynamic>{
+            'type': 'm.call.hangup',
+            'room_id': '!room:matrix.org',
+          },
+        );
+        const reject = RemoteMessage(
+          data: <String, dynamic>{
+            'type': 'm.call.reject',
+            'room_id': '!room:matrix.org',
+          },
+        );
 
-      await FirebasePushService.handleBackgroundMessageForTest(hangup);
-      await FirebasePushService.handleBackgroundMessageForTest(reject);
+        await FirebasePushService.handleBackgroundMessageForTest(hangup);
+        await FirebasePushService.handleBackgroundMessageForTest(reject);
 
-      final endCalls = callkitCalls.where(
-        (c) => c.method == 'endAllCalls',
-      );
-      expect(endCalls, hasLength(2));
-    });
+        final endCalls = callkitCalls.where((c) => c.method == 'endAllCalls');
+        expect(endCalls, hasLength(2));
+      },
+    );
   });
 
   // ────────────────────────────────────────────
@@ -420,13 +424,52 @@ void main() {
     test('should build service with minimal parameters', () {
       final client = MockMatrixClient();
       when(() => client.isLogged()).thenReturn(false);
-      final service = FirebasePushServiceBuilder()
-          .withClient(client)
-          .build();
+      final service = FirebasePushServiceBuilder().withClient(client).build();
 
       expect(service, isA<FirebasePushService>());
       final info = service.getDiagnosticInfo();
       expect(info['appId'], equals('com.n42.chat'));
+    });
+  });
+
+  group('privacy-restricted room lookup', () {
+    test('recognizes hidden and locked rooms', () async {
+      SharedPreferences.setMockInitialValues({
+        'n42_chat_hidden_chats': '["!hidden:example.org"]',
+        'chat_lock_locked_chats': <String>['!locked:example.org'],
+      });
+
+      expect(
+        await FirebasePushService.isPrivacyRestrictedRoomForTest(
+          '!hidden:example.org',
+        ),
+        isTrue,
+      );
+      expect(
+        await FirebasePushService.isPrivacyRestrictedRoomForTest(
+          '!locked:example.org',
+        ),
+        isTrue,
+      );
+      expect(
+        await FirebasePushService.isPrivacyRestrictedRoomForTest(
+          '!public:example.org',
+        ),
+        isFalse,
+      );
+    });
+
+    test('fails closed when hidden-room state is malformed', () async {
+      SharedPreferences.setMockInitialValues({
+        'n42_chat_hidden_chats': '{"unexpected":true}',
+      });
+
+      expect(
+        await FirebasePushService.isPrivacyRestrictedRoomForTest(
+          '!room:example.org',
+        ),
+        isTrue,
+      );
     });
   });
 }

@@ -216,6 +216,19 @@ class MessageArchiveService {
     return _db.getQuarterlyStats(roomId);
   }
 
+  /// Removes redacted/self-destructed content from the full-text archive.
+  Future<void> deleteArchivedMessage(String eventId) async {
+    try {
+      await _db.deleteByEventId(eventId);
+    } catch (e) {
+      // Redaction must still complete if the local search cache is damaged,
+      // but keep an observable signal for the residual plaintext risk.
+      debugLog(
+        'MessageArchiveService: failed to remove redacted event $eventId: $e',
+      );
+    }
+  }
+
   /// 获取归档状态
   Future<ArchiveStatus> getArchiveStatus(String roomId) async {
     final metadata = await _db.getMetadata(roomId);
@@ -290,6 +303,12 @@ class MessageArchiveService {
     // 跳过编辑替换事件
     final relatesTo = event.content['m.relates_to'];
     if (relatesTo is Map && relatesTo['rel_type'] == 'm.replace') {
+      return false;
+    }
+
+    // Never archive self-destruct or view-once messages. Both use the same
+    // metadata field, and persisting either would defeat their lifetime.
+    if (event.content['n42.self_destruct'] != null) {
       return false;
     }
 

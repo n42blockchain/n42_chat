@@ -213,7 +213,10 @@ class WeChatMessageMenu extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
                 child: _buildMenuGrid([
-                  if (message.type == MessageType.text)
+                  // Hide every action that can persist or disclose
+                  // self-destruct/view-once content.
+                  if (message.type == MessageType.text &&
+                      !message.isSelfDestructing)
                     _buildMenuItem(
                       icon: Icons.content_copy_outlined,
                       label: s?.chatCopy ?? 'Copy',
@@ -222,8 +225,9 @@ class WeChatMessageMenu extends StatelessWidget {
                         onCopy?.call();
                       },
                     )
-                  else if (message.type == MessageType.image ||
-                      message.type == MessageType.video)
+                  else if ((message.type == MessageType.image ||
+                          message.type == MessageType.video) &&
+                      !message.isSelfDestructing)
                     _buildMenuItem(
                       icon: Icons.download_outlined,
                       label: s?.commonSave ?? 'Save',
@@ -232,7 +236,7 @@ class WeChatMessageMenu extends StatelessWidget {
                         onSave?.call();
                       },
                     ),
-                  if (onForward != null)
+                  if (onForward != null && !message.isSelfDestructing)
                     _buildMenuItem(
                       icon: Icons.shortcut_outlined,
                       label: s?.commonForward ?? 'Forward',
@@ -241,17 +245,20 @@ class WeChatMessageMenu extends StatelessWidget {
                         onForward?.call();
                       },
                     ),
-                  _buildMenuItem(
-                    icon: isFavorited ? Icons.star : Icons.star_border_outlined,
-                    label: isFavorited
-                        ? (s?.commonUnfavorite ?? 'Unfav')
-                        : (s?.commonFavorite ?? 'Fav'),
-                    isHighlighted: isFavorited,
-                    onTap: () {
-                      onDismiss();
-                      onFavorite?.call();
-                    },
-                  ),
+                  if (!message.isSelfDestructing)
+                    _buildMenuItem(
+                      icon: isFavorited
+                          ? Icons.star
+                          : Icons.star_border_outlined,
+                      label: isFavorited
+                          ? (s?.commonUnfavorite ?? 'Unfav')
+                          : (s?.commonFavorite ?? 'Fav'),
+                      isHighlighted: isFavorited,
+                      onTap: () {
+                        onDismiss();
+                        onFavorite?.call();
+                      },
+                    ),
                   if (message.isFromMe &&
                       message.status == MessageStatus.failed)
                     _buildMenuItem(
@@ -301,14 +308,16 @@ class WeChatMessageMenu extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
                 child: _buildMenuGrid([
-                  _buildMenuItem(
-                    icon: Icons.format_quote_outlined,
-                    label: s?.commonQuote ?? 'Quote',
-                    onTap: () {
-                      onDismiss();
-                      onQuote?.call();
-                    },
-                  ),
+                  // Quoting would copy ephemeral plaintext into a new message.
+                  if (!message.isSelfDestructing)
+                    _buildMenuItem(
+                      icon: Icons.format_quote_outlined,
+                      label: s?.commonQuote ?? 'Quote',
+                      onTap: () {
+                        onDismiss();
+                        onQuote?.call();
+                      },
+                    ),
                   if (onRemindMe != null)
                     _buildMenuItem(
                       icon: Icons.alarm_add_outlined,
@@ -348,6 +357,7 @@ class WeChatMessageMenu extends StatelessWidget {
                       },
                     ),
                   if (message.type == MessageType.image &&
+                      !message.isSelfDestructing &&
                       onExtractText != null)
                     _buildMenuItem(
                       icon: Icons.text_snippet_outlined,
@@ -358,6 +368,7 @@ class WeChatMessageMenu extends StatelessWidget {
                       },
                     ),
                   if (message.type == MessageType.image &&
+                      !message.isSelfDestructing &&
                       onTranslateImage != null)
                     _buildMenuItem(
                       icon: Icons.translate,

@@ -448,10 +448,11 @@ class N42ChatConfig {
 
   /// 是否与所有设备（含未验证）共享 E2EE 密钥
   ///
-  /// - `true`（默认）：向所有未被阻止的设备分享 Megolm 会话密钥，
-  ///   避免"The sender has not sent us the session key"错误，兼容性最好。
-  /// - `false`：仅与已完成交叉验证的设备共享密钥，安全性更高，
-  ///   适用于安全敏感部署，但未验证设备无法解密历史消息。
+  /// - `false` (default): share Megolm session keys only with cross-verified
+  ///   devices. New sessions must complete SAS verification before receiving
+  ///   keys, preventing a password-only login from silently gaining access.
+  /// - `true`: share with every unblocked device. This improves compatibility
+  ///   but explicitly trusts unverified devices and must be opt-in.
   final bool shareE2eeKeysWithAllDevices;
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -600,7 +601,7 @@ class N42ChatConfig {
     this.marketUseProxyEndpoint = false,
     this.storageManagement = const StorageManagementConfig(),
     this.pushProtocol,
-    this.shareE2eeKeysWithAllDevices = true,
+    this.shareE2eeKeysWithAllDevices = false,
     this.enableProtocolAbstraction = false,
     this.enableGovernance = false,
     this.snapshotHubUrl,
