@@ -8,6 +8,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../widgets/common/slide_to_pay_button.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class SendTransferPage extends StatefulWidget {
   final String receiverName;
@@ -169,7 +170,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
             // 接收者信息
             Container(
               color: surfaceColor,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Row(
                 children: [
                   CircleAvatar(
@@ -195,7 +196,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                           )
                         : null,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacingM),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,12 +230,12 @@ class _SendTransferPageState extends State<SendTransferPage> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // 金额输入卡片
             Container(
               color: surfaceColor,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -244,7 +245,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 14, height: 1.3, color: secondaryTextColor),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -253,12 +254,12 @@ class _SendTransferPageState extends State<SendTransferPage> {
                         onTap: _showTokenPicker,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                            horizontal: AppDimensions.spacingM,
+                            vertical: AppDimensions.spacingS,
                           ),
                           decoration: BoxDecoration(
                             color: chipBgColor,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -283,7 +284,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppDimensions.spacing),
                       // 金额输入
                       Expanded(
                         child: TextField(
@@ -311,9 +312,9 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Divider(height: 1, color: dividerColor),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 转账说明
                   TextField(
@@ -337,11 +338,11 @@ class _SendTransferPageState extends State<SendTransferPage> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
 
             // 滑动确认转账（微信支付风格 — 防止误触）
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
               child: SlideToPayButton(
                 key: ValueKey('send_transfer_submit_$_submitAttempt'),
                 label:
@@ -375,7 +376,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 S.of(ctx)?.chatSelectCurrency ?? 'Select currency',
                 maxLines: 1,
@@ -404,7 +405,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
           ],
         ),
       ),

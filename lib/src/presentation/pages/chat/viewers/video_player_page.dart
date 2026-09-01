@@ -18,6 +18,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../../core/utils/debug_log.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 /// 视频播放器页面
 class VideoPlayerPage extends StatefulWidget {
@@ -124,7 +125,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.error, color: AppColors.error, size: 48),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               Text(
                 '${S.of(ctx)?.chatVideoPlaybackFailed ?? 'Video playback failed'}\n$errorMessage',
                 textAlign: TextAlign.center,
@@ -180,7 +181,7 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const CircularProgressIndicator(color: Colors.white),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     S.of(context)?.chatLoadingText ?? 'Loading...',
                     style: const TextStyle(color: Colors.white),
@@ -192,13 +193,13 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.error, color: AppColors.error, size: 48),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     '${S.of(context)?.chatVideoLoadFailed ?? 'Video load failed'}\n$_error',
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {

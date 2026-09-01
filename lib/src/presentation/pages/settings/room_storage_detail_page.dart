@@ -10,6 +10,7 @@ import '../../../data/datasources/local/media_metadata_database.dart';
 import '../../blocs/storage/storage_management_bloc.dart';
 import '../../blocs/storage/storage_management_event.dart';
 import '../../blocs/storage/storage_management_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 房间存储详情页
 class RoomStorageDetailPage extends StatefulWidget {
@@ -226,7 +227,7 @@ class _RoomStorageHeader extends StatelessWidget {
 
     return Container(
       color: cardColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -384,7 +385,7 @@ class _MediaFileTile extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Icon(icon, color: color, size: 24),
           ),
@@ -446,7 +447,7 @@ class _SelectionActionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: context.surfaceColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       child: SafeArea(
         child: Row(
           children: [
@@ -457,7 +458,7 @@ class _SelectionActionBar extends StatelessWidget {
             const Spacer(),
             if (isCleaning)
               const SizedBox(
-                width: 24,
+                width: AppDimensions.spacingXL,
                 height: 24,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )

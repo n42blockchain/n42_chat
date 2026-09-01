@@ -5,6 +5,7 @@ import '../../../core/services/mini_app_agent_planner.dart';
 import '../../../core/services/mini_app_agent_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../helpers/mini_app_launcher_helper.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 超级应用 AI 助手面板（#19 Agentic）
 ///
@@ -89,7 +90,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
           Row(
             children: [
               const Icon(Icons.auto_awesome, color: AppColors.primary),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Text(
                 'AI Assistant',
                 style: TextStyle(
@@ -100,12 +101,12 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             'Describe what you want to do — I\'ll open the right mini app.',
             style: TextStyle(fontSize: 13, color: context.textSecondary),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           TextField(
             controller: _controller,
             autofocus: true,
@@ -120,15 +121,15 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           if (_loading)
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
               child: Center(child: CircularProgressIndicator()),
             )
           else if (_ran && _plan == null)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
               child: Text(
                 'No matching mini app found. Try rephrasing.',
                 style: TextStyle(color: context.textTertiary),
@@ -146,7 +147,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: context.pageBackground,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(color: context.dividerColor),
       ),
       child: Column(
@@ -155,7 +156,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
           Row(
             children: [
               const Icon(Icons.apps_rounded, color: AppColors.primary),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: Text(
                   plan.appName,
@@ -178,7 +179,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
                 style: TextStyle(fontSize: 13, color: context.textSecondary)),
           ],
           if (plan.params.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Wrap(
               spacing: 6,
               runSpacing: 6,
@@ -191,7 +192,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
                   .toList(),
             ),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(

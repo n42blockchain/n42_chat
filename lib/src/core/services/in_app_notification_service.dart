@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../extensions/context_extension.dart';
+import '../theme/app_dimensions.dart';
 
 /// 应用内通知数据
 class InAppNotification {
@@ -148,12 +149,12 @@ class _NotificationBannerState extends State<_NotificationBanner>
           },
           child: Material(
             elevation: 8,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Row(
                 children: [
@@ -163,11 +164,11 @@ class _NotificationBannerState extends State<_NotificationBanner>
                     height: 40,
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
                     child: Icon(Icons.person, color: context.textTertiary),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacingM),
                   // 内容
                   Expanded(
                     child: Column(

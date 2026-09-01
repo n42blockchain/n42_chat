@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/services/live_caption_service.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 实时字幕浮层
 ///
@@ -27,8 +28,8 @@ class LiveCaptionOverlay extends StatelessWidget {
         final recent =
             caps.length > maxLines ? caps.sublist(caps.length - maxLines) : caps;
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(10),

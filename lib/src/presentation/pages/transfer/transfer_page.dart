@@ -13,6 +13,7 @@ import '../../blocs/transfer/transfer_state.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../qrcode/scan_qr_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 转账页面
 class TransferPage extends StatefulWidget {
@@ -204,7 +205,7 @@ class _TransferPageState extends State<TransferPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Builder(
               builder: (ctx) => Text(
                 state.processingMessage != null
@@ -238,7 +239,7 @@ class _TransferPageState extends State<TransferPage> {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -247,44 +248,44 @@ class _TransferPageState extends State<TransferPage> {
             S.of(context)?.transferReceiverAddressLabel ?? 'Receiver Address',
             isDark,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           _buildAddressInput(isDark),
 
           // 收款人信息
           if (_recipientInfo != null || widget.recipientName != null)
             _buildRecipientInfo(isDark),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 代币选择
           _buildSectionTitle(
             S.of(context)?.transferSelectTokenLabel ?? 'Select Token',
             isDark,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           _buildTokenSelector(tokens, balances, isDark),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 转账金额
           _buildSectionTitle(
             S.of(context)?.transferAmountLabel ?? 'Transfer Amount',
             isDark,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           _buildAmountInput(balances, isDark),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 备注
           _buildSectionTitle(
             S.of(context)?.transferMemoLabel ?? 'Memo (Optional)',
             isDark,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           _buildMemoInput(isDark),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // 转账按钮
           _buildSubmitButton(isDark),
@@ -311,7 +312,7 @@ class _TransferPageState extends State<TransferPage> {
     return Container(
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
           color: _isAddressValid
               ? AppColors.success
@@ -332,7 +333,7 @@ class _TransferPageState extends State<TransferPage> {
                     'Enter or paste wallet address',
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
+                  horizontal: AppDimensions.spacing,
                   vertical: 14,
                 ),
                 hintStyle: TextStyle(
@@ -381,11 +382,11 @@ class _TransferPageState extends State<TransferPage> {
     final avatar = _recipientInfo?.avatarUrl;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.only(top: AppDimensions.spacingM),
       child: Row(
         children: [
           N42Avatar(imageUrl: avatar, name: name ?? '', size: 36),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -434,7 +435,7 @@ class _TransferPageState extends State<TransferPage> {
     return Container(
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         children: visibleTokens.map((token) {
@@ -450,7 +451,7 @@ class _TransferPageState extends State<TransferPage> {
                     });
                   },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.primary.withValues(alpha: 0.1)
@@ -486,7 +487,7 @@ class _TransferPageState extends State<TransferPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacingM),
                   // 代币信息
                   Expanded(
                     child: Column(
@@ -543,7 +544,7 @@ class _TransferPageState extends State<TransferPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   // 选中标记
                   if (isSelected)
                     const Icon(
@@ -568,9 +569,9 @@ class _TransferPageState extends State<TransferPage> {
     return Container(
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Column(
         children: [
           Row(
@@ -610,7 +611,7 @@ class _TransferPageState extends State<TransferPage> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Row(
             children: [
               Expanded(
@@ -625,7 +626,7 @@ class _TransferPageState extends State<TransferPage> {
                 ),
               ),
               if (!_isPaymentRequestMode) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 TextButton(
                   onPressed: () {
                     _amountController.text = balance;
@@ -644,7 +645,7 @@ class _TransferPageState extends State<TransferPage> {
     return Container(
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: TextField(
         controller: _memoController,
@@ -652,7 +653,7 @@ class _TransferPageState extends State<TransferPage> {
         decoration: InputDecoration(
           hintText: S.of(context)?.transferAddMemoHint ?? 'Add memo',
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(16),
+          contentPadding: const EdgeInsets.all(AppDimensions.spacing),
           hintStyle: TextStyle(
             color: context.textSecondary,
           ),

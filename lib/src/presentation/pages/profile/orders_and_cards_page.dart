@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 订单与卡包页面
 class OrdersAndCardsPage extends StatelessWidget {
@@ -84,7 +85,7 @@ class OrdersAndCardsPage extends StatelessWidget {
             size: 64,
             color: context.textTertiary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             title,
             style: TextStyle(
@@ -92,7 +93,7 @@ class OrdersAndCardsPage extends StatelessWidget {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             description,
             style: TextStyle(

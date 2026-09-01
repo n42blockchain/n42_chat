@@ -23,6 +23,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../security/sas_verification_page.dart';
 import 'totp_2fa_setup_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 安全设置页面
 class SecuritySettingsPage extends StatefulWidget {
@@ -173,39 +174,39 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 加密状态
                 _buildEncryptionStatus(),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 生物识别登录
                 if (_isBiometricAvailable) ...[
                   _buildBiometricSection(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                 ],
 
                 // Passkey 管理
                 if (_isPasskeySupported) ...[
                   _buildPasskeySection(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                 ],
 
                 // 二步验证（TOTP 认证器）
                 _buildTotp2faSection(),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 密钥备份
                 _buildKeyBackupSection(),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 设备管理
                 _buildDevicesSection(),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 高级选项
                 _buildAdvancedSection(),
@@ -241,7 +242,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               height: 40,
               decoration: BoxDecoration(
                 color: AppColors.success.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Icon(biometricIcon, color: AppColors.success),
             ),
@@ -301,7 +302,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 height: 40,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: const Icon(Icons.key, color: AppColors.primary),
               ),
@@ -327,7 +328,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   height: 40,
                   decoration: BoxDecoration(
                     color: AppColors.success.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: const Icon(Icons.key, color: AppColors.success),
                 ),
@@ -367,7 +368,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 44),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
               ),
             ),
@@ -621,11 +622,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     final statusColor = _getStatusColor(status);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Row(
         children: [
@@ -638,7 +639,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             ),
             child: Icon(Icons.lock, color: statusColor, size: 24),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppDimensions.spacing),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -655,7 +656,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                     color: context.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   statusText,
                   maxLines: 1,
@@ -806,7 +807,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           ),
           if (_devices.isEmpty)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 S.of(context)?.settingsNoOtherDevices ?? 'No other devices',
                 style: TextStyle(
@@ -848,7 +849,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               : device.isVerified
               ? AppColors.success.withValues(alpha: 0.1)
               : AppColors.warning.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Icon(
           device.isCurrentDevice ? Icons.smartphone : Icons.phone_android,
@@ -967,7 +968,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               const Text(
                 'This permanently deactivates your Matrix account. If your homeserver requires password verification, you can provide it now or enter it after confirmation.',
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -976,7 +977,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               CheckboxListTile(
                 value: eraseLocalData,
                 onChanged: (value) {
@@ -1109,7 +1110,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               S.of(context)?.settingsEnterPasswordToConfirm ??
                   'Enter your password to confirm this action.',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             TextField(
               controller: passwordController,
               obscureText: true,
@@ -1295,12 +1296,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   'Please save this recovery key in a safe place. You will need it to restore your encrypted messages on a new device.',
               style: const TextStyle(fontSize: 14),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: context.dividerColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 border: Border.all(
                   color: context.dividerColor.withValues(alpha: 0.3),
                 ),
@@ -1346,7 +1347,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                     'Enter your recovery password or recovery key to restore encrypted messages.',
                 style: const TextStyle(fontSize: 14),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Row(
                 children: [
                   ChoiceChip(
@@ -1357,7 +1358,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                     onSelected: (v) =>
                         setDialogState(() => isRecoveryKey = true),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   ChoiceChip(
                     label: Text(S.of(context)?.settingsPassword ?? 'Password'),
                     selected: !isRecoveryKey,
@@ -1366,7 +1367,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               TextField(
                 controller: controller,
                 obscureText: !isRecoveryKey,
@@ -1378,8 +1379,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                             'Enter password'),
                   border: const OutlineInputBorder(),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                    horizontal: AppDimensions.spacingM,
+                    vertical: AppDimensions.spacingS,
                   ),
                 ),
                 maxLines: isRecoveryKey ? 3 : 1,
@@ -1584,11 +1585,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   height: 4,
                   decoration: BoxDecoration(
                     color: context.dividerColor,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               Row(
                 children: [
                   Container(
@@ -1600,7 +1601,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                           : device.isVerified
                           ? AppColors.success.withValues(alpha: 0.1)
                           : AppColors.warning.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     ),
                     child: Icon(
                       device.isCurrentDevice
@@ -1614,7 +1615,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       size: 28,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacingM),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1647,7 +1648,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _buildDeviceDetailRow(
                 S.of(context)?.settingsDeviceId ?? 'Device ID',
                 device.deviceId,
@@ -1668,7 +1669,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                   S.of(context)?.settingsIpAddress ?? 'IP address',
                   device.lastSeenIp!,
                 ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppDimensions.spacingL),
               // Action buttons
               SizedBox(
                 width: double.infinity,
@@ -1682,12 +1683,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                     S.of(context)?.settingsRenameDevice ?? 'Rename device',
                   ),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                   ),
                 ),
               ),
               if (!device.isVerified) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -1701,7 +1702,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                           'Verify this device',
                     ),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                     ),
@@ -1709,7 +1710,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 ),
               ],
               if (!device.isCurrentDevice) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
@@ -1722,7 +1723,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                       S.of(context)?.settingsRemoteLogout ?? 'Remote logout',
                     ),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                       foregroundColor: AppColors.error,
                       side: const BorderSide(color: AppColors.error),
                     ),
@@ -1738,7 +1739,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
   Widget _buildDeviceDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXS),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1915,7 +1916,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
                 S.of(context)?.settingsEnterPasswordToConfirm ??
                     'Enter your password to confirm this action.',
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               TextField(
                 controller: passwordController,
                 obscureText: true,

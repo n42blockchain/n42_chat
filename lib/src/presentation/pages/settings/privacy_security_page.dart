@@ -20,6 +20,7 @@ import '../../widgets/settings/settings_hub_widgets.dart';
 import '../profile/set_username_page.dart';
 import 'privacy_settings_page.dart';
 import 'security_settings_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
   final Future<void> Function()? onOpenPrivacySettings;
@@ -266,7 +267,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             SettingsHubOverviewCard(
               title: overviewTitle,
               subtitle: _hasActiveSession
@@ -278,7 +279,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
               avatarName: overviewTitle,
               chips: _buildOverviewChips(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             SettingsHubSection(
               title: l10n?.settingsPrivacy ?? 'Privacy',
               children: [
@@ -313,7 +314,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             SettingsHubSection(
               title: l10n?.settingsSecurityTitle ?? 'Security',
               children: [
@@ -340,7 +341,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
           ],
         ),
       ),

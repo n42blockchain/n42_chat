@@ -14,6 +14,7 @@ import '../../../domain/entities/mini_app_entity.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Mini App WebView 容器页面
 ///
@@ -271,7 +272,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
               ),
               child: const Icon(Icons.apps, size: 16, color: AppColors.primary),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,7 +341,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   Widget _buildError(S? l10n) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -349,7 +350,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
               size: 64,
               color: context.dividerColor,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               l10n?.commonLoadFailed ?? 'Failed to load',
               style: TextStyle(
@@ -358,7 +359,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               _errorMessage ?? '',
               textAlign: TextAlign.center,
@@ -367,7 +368,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             OutlinedButton.icon(
               onPressed: _retryLoad,
               icon: const Icon(Icons.refresh),

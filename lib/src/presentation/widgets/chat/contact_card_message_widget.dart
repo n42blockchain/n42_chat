@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 联系人名片消息组件
 ///
@@ -36,7 +37,7 @@ class ContactCardMessageWidget extends StatelessWidget {
         width: 240,
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
             color: context.dividerColor,
           ),
@@ -46,7 +47,7 @@ class ContactCardMessageWidget extends StatelessWidget {
           children: [
             // 名片内容
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               child: Row(
                 children: [
                   N42Avatar(
@@ -54,7 +55,7 @@ class ContactCardMessageWidget extends StatelessWidget {
                     name: displayName,
                     size: 44,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacingM),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +89,7 @@ class ContactCardMessageWidget extends StatelessWidget {
             // 底部分隔线 + 标签
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(

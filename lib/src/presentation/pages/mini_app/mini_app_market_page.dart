@@ -7,6 +7,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/mini_app_entity.dart';
 import '../../helpers/mini_app_launcher_helper.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Mini App 市场页面
 ///
@@ -101,7 +102,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
                 filled: true,
                 fillColor: context.surfaceColor,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -149,12 +150,12 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
     }
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       children: [
         // Featured section (only on All tab)
         if (category == null && _searchQuery.isEmpty) ...[
           _buildFeaturedSection(isDark, l10n),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppDimensions.spacingL),
           Text(
             l10n?.miniAppAllApps ?? 'All Apps',
             style: TextStyle(
@@ -163,7 +164,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
         ],
         ...apps.map(
           (app) => _AppListTile(
@@ -189,13 +190,13 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
             color: context.textPrimary,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppDimensions.spacingM),
         SizedBox(
           height: 130,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: featured.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            separatorBuilder: (_, _) => const SizedBox(width: AppDimensions.spacingM),
             itemBuilder: (context, index) => _FeaturedCard(
               app: featured[index],
               isDark: isDark,
@@ -236,15 +237,15 @@ class _AppListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
       color: context.surfaceColor,
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppDimensions.spacingM),
           child: Row(
             children: [
               // App 图标
@@ -253,7 +254,7 @@ class _AppListTile extends StatelessWidget {
                 height: 52,
                 decoration: BoxDecoration(
                   color: _categoryColor(app.category).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 ),
                 child: Icon(
                   _categoryIcon(app.category),
@@ -261,7 +262,7 @@ class _AppListTile extends StatelessWidget {
                   size: 28,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,7 +289,7 @@ class _AppListTile extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                             ),
                             child: const Text(
                               'Official',
@@ -312,7 +313,7 @@ class _AppListTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (app.userCount != null) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXS),
                       Text(
                         '${_formatCount(app.userCount!)} users',
                         style: TextStyle(
@@ -324,7 +325,7 @@ class _AppListTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Icon(
                 Icons.arrow_forward_ios,
                 size: 14,
@@ -384,7 +385,7 @@ class _FeaturedCard extends StatelessWidget {
                 size: 30,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               app.name,
               textAlign: TextAlign.center,

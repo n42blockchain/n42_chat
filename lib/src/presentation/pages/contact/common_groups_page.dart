@@ -8,6 +8,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 共同群组页面
 ///
@@ -221,7 +222,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
   Widget _buildGroupAvatar(GroupEntity group) {
     if (group.avatarUrl != null && group.avatarUrl!.isNotEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         child: Image.network(
           group.avatarUrl!,
           width: 48,
@@ -241,7 +242,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
       height: 48,
       decoration: BoxDecoration(
         color: AppColorPalettes.getAvatarColor(name),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Center(
         child: Text(

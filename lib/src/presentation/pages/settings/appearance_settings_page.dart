@@ -8,6 +8,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'chat_background_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 外观设置页面
 class AppearanceSettingsPage extends StatefulWidget {
@@ -51,7 +52,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 深色模式设置
           // 宿主 App 接管明暗模式时隐藏此项，避免与宿主设置页双重控制冲突，
@@ -59,14 +60,14 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           if (!N42Chat.hostControlsAppearance) ...[
             _buildSectionHeader(l10n?.settingsDarkMode ?? 'Dark Mode'),
             _buildThemeModeSection(context),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
           ],
 
           // 字体大小设置
           _buildSectionHeader(l10n?.settingsFontSize ?? 'Font Size'),
           _buildFontSizeSection(context),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 聊天背景
           _buildSectionHeader(l10n?.chatBackground ?? 'Chat Background'),
@@ -95,13 +96,13 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 字体大小滑块
           _buildSectionHeader(l10n?.settingsFontSizeSlider ?? 'Font Size Adjustment'),
           _buildFontSizeSliderSection(context),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 气泡样式设置
           _buildSectionHeader(l10n?.settingsBubbleStyle ?? 'Bubble Style'),
@@ -113,7 +114,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+      padding: const EdgeInsets.only(left: AppDimensions.spacing, right: AppDimensions.spacing, bottom: AppDimensions.spacingS),
       child: Text(
         title,
         style: TextStyle(
@@ -268,7 +269,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
     return Container(
       color: context.surfaceColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -279,7 +280,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Slider(
             value: sliderValue,
             min: 0,
@@ -384,7 +385,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   Widget _buildDivider() {
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.only(left: AppDimensions.spacing),
       child: Divider(
         height: 1,
         color: context.dividerColor,

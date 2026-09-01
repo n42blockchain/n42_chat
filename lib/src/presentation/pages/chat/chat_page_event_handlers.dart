@@ -1,3 +1,4 @@
+
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
@@ -344,22 +345,22 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               Text(
                 '$amount $token',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 'Status: $status',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               if (txHash?.isNotEmpty == true) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 SelectableText(txHash!),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 TextButton.icon(
                   onPressed: () async {
                     await Clipboard.setData(ClipboardData(text: txHash));
@@ -874,7 +875,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.touch_app, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Flexible(child: Text(displayText)),
           ],
         ),

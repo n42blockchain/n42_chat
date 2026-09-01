@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../domain/entities/voice_room_entity.dart';
 import 'speaking_avatar.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 按角色分区的参与者网格
 class ParticipantGrid extends StatelessWidget {
@@ -25,7 +26,7 @@ class ParticipantGrid extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -42,7 +43,7 @@ class ParticipantGrid extends StatelessWidget {
               crossAxisCount: 3,
               avatarRadius: 32,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
           ],
 
           // 发言者区
@@ -58,7 +59,7 @@ class ParticipantGrid extends StatelessWidget {
               crossAxisCount: 3,
               avatarRadius: 28,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
           ],
 
           // 听众区
@@ -82,7 +83,7 @@ class ParticipantGrid extends StatelessWidget {
 
   Widget _buildSectionHeader(BuildContext context, String title, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacingS),
       child: Text(
         title,
         style: TextStyle(

@@ -318,11 +318,11 @@ class N42Button extends StatelessWidget {
   EdgeInsets _getPadding() {
     switch (size) {
       case N42ButtonSize.small:
-        return const EdgeInsets.symmetric(horizontal: 12);
+        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM);
       case N42ButtonSize.medium:
-        return const EdgeInsets.symmetric(horizontal: 16);
+        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacing);
       case N42ButtonSize.large:
-        return const EdgeInsets.symmetric(horizontal: 20);
+        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacingL);
     }
   }
 }

@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/article_reader_utils.dart';
 import '../../../core/utils/message_markdown_utils.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 长文阅读模式
 ///
@@ -106,12 +107,12 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
                         color: context.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacingS),
                     Row(
                       children: [
                         Icon(Icons.schedule,
                             size: 14, color: context.textTertiary),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppDimensions.spacingXS),
                         Text(
                           '$minutes min read',
                           style: TextStyle(
@@ -121,7 +122,7 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppDimensions.spacingL),
                     MarkdownBody(
                       data: display,
                       selectable: true,

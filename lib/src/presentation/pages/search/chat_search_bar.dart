@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../blocs/search/search_bloc.dart';
 import '../../blocs/search/search_event.dart';
 import '../../blocs/search/search_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 聊天内搜索栏
 class ChatSearchBar extends StatefulWidget {
@@ -82,7 +83,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
         return Container(
           height: 48,
           color: context.surfaceColor,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
           child: Row(
             children: [
               // 搜索输入框
@@ -91,7 +92,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                   height: 32,
                   decoration: BoxDecoration(
                     color: context.pageBackground,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                   ),
                   child: TextField(
                     controller: _controller,
@@ -121,10 +122,10 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
 
               // 结果计数
               if (totalCount > 0 || isSearching) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 if (isSearching)
                   const SizedBox(
-                    width: 16,
+                    width: AppDimensions.spacing,
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )

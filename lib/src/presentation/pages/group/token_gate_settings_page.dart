@@ -9,6 +9,7 @@ import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../helpers/bloc_message_helper.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 代币门控设置页面
 class TokenGateSettingsPage extends StatefulWidget {
@@ -118,7 +119,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
               onPressed: _isSaving ? null : _save,
               child: _isSaving
                   ? const SizedBox(
-                      width: 20,
+                      width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
@@ -127,7 +128,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
           ],
         ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacing),
           children: [
             // 启用开关
             SwitchListTile(
@@ -141,12 +142,12 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
             ),
 
             if (_enabled) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
 
               // 逻辑运算符
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacing),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -157,7 +158,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacingS),
                       SegmentedButton<GateOperator>(
                         segments: [
                           ButtonSegment(
@@ -179,7 +180,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
 
               // 规则列表
               Text(
@@ -189,7 +190,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
 
               ..._rules.asMap().entries.map((entry) {
                 final index = entry.key;
@@ -207,7 +208,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
                 label: Text(s?.tokenGateAddRule ?? 'Add Rule'),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
 
               // 拒绝消息
               TextField(
@@ -271,7 +272,7 @@ class _TokenGateRuleCard extends StatelessWidget {
     final s = S.of(context);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: const Color(0xFF5298FF).withValues(alpha: 0.1),
@@ -367,9 +368,9 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
+        left: AppDimensions.spacing,
+        right: AppDimensions.spacing,
+        top: AppDimensions.spacing,
         bottom: MediaQuery.of(context).viewInsets.bottom + 16,
       ),
       child: SingleChildScrollView(
@@ -381,7 +382,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
               s?.tokenGateAddRule ?? 'Add Rule',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             // Token Standard
             DropdownButtonFormField<TokenStandard>(
@@ -406,7 +407,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
               }).toList(),
               onChanged: (v) => setState(() => _tokenStandard = v!),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // Chain
             DropdownButtonFormField<int>(
@@ -424,7 +425,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
               ],
               onChanged: (v) => setState(() => _chainId = v!),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // Contract Address
             if (_tokenStandard != TokenStandard.native)
@@ -436,7 +437,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
                   border: const OutlineInputBorder(),
                 ),
               ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // Symbol
             TextField(
@@ -447,7 +448,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
                 border: const OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // Min Balance
             TextField(
@@ -458,7 +459,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
               ),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // Token ID (ERC-1155)
             if (_tokenStandard == TokenStandard.erc1155) ...[
@@ -470,7 +471,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
                 ),
                 keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
             ],
 
             // Submit
@@ -478,7 +479,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
               onPressed: _submit,
               child: Text(s?.commonConfirm ?? 'Confirm'),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
           ],
         ),
       ),

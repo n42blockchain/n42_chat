@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class SettingsHubOverviewCard extends StatelessWidget {
   final String? avatarUrl;
@@ -28,11 +29,11 @@ class SettingsHubOverviewCard extends StatelessWidget {
     final subtitleColor = context.textSecondary;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       ),
       child: Row(
         children: [
@@ -50,7 +51,7 @@ class SettingsHubOverviewCard extends StatelessWidget {
                     color: titleColor,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   subtitle,
                   style: TextStyle(fontSize: 13, color: subtitleColor),
@@ -145,7 +146,7 @@ class SettingsHubActionTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
           child: Row(
             children: [
               Container(
@@ -157,7 +158,7 @@ class SettingsHubActionTile extends StatelessWidget {
                 ),
                 child: Icon(icon, color: Colors.white, size: 20),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Expanded(
                 child: Opacity(
                   opacity: onTap == null ? 0.55 : 1,
@@ -208,7 +209,7 @@ class SettingsHubChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
       ),
       child: Text(
         label,

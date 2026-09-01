@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/livekit_service.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 通话中聊天面板
 ///
@@ -78,18 +79,18 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
         children: [
           // 顶部手柄
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
+            margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
             width: 36,
             height: 4,
             decoration: BoxDecoration(
               color: Colors.white24,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
             ),
           ),
 
           // 标题
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
             child: Row(
               children: [
                 const Icon(
@@ -97,7 +98,7 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                   color: Colors.white70,
                   size: 18,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   S.of(context)?.callInCallChat ?? 'In-Call Chat',
                   style: const TextStyle(
@@ -135,8 +136,8 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                 : ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                      horizontal: AppDimensions.spacingM,
+                      vertical: AppDimensions.spacingS,
                     ),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
@@ -148,9 +149,9 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
           // 输入栏
           Container(
             padding: EdgeInsets.only(
-              left: 12,
-              right: 8,
-              top: 8,
+              left: AppDimensions.spacingM,
+              right: AppDimensions.spacingS,
+              top: AppDimensions.spacingS,
               bottom: MediaQuery.of(context).viewInsets.bottom + 8,
             ),
             decoration: const BoxDecoration(
@@ -175,14 +176,14 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                         borderSide: BorderSide.none,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: AppDimensions.spacing,
+                        vertical: AppDimensions.spacingS,
                       ),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 IconButton(
                   onPressed: _sendMessage,
                   icon: const Icon(Icons.send, color: Colors.greenAccent),
@@ -204,7 +205,7 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
     final timeStr = DateFormat('HH:mm').format(message.timestamp);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacingS),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -233,7 +234,7 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

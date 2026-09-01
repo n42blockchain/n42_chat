@@ -13,6 +13,7 @@ import '../../blocs/transfer/transfer_state.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'merchant_qr_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 收款页面
 class ReceivePage extends StatefulWidget {
@@ -135,18 +136,18 @@ class _ReceivePageState extends State<ReceivePage> {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       child: Column(
         children: [
           // 收款二维码
           _buildQRCode(walletAddress),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 钱包地址
           _buildAddressSection(walletAddress),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // 商户收款码（带金额二维码）
           N42Button(
@@ -164,7 +165,7 @@ class _ReceivePageState extends State<ReceivePage> {
 
           // 发送收款请求按钮
           if (widget.roomId != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             if (!_showRequestForm) ...[
               N42Button(
                 text: S.of(context)?.transferSendPaymentRequest ?? 'Send Payment Request',
@@ -186,10 +187,10 @@ class _ReceivePageState extends State<ReceivePage> {
 
   Widget _buildQRCode(String walletAddress) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -209,7 +210,7 @@ class _ReceivePageState extends State<ReceivePage> {
               child: Text(S.of(context)?.transferQrCodeGenerateFailed ?? 'QR code generation failed'),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             S.of(context)?.transferScanQrToPayMe ?? 'Scan QR code to pay me',
             style: const TextStyle(
@@ -224,10 +225,10 @@ class _ReceivePageState extends State<ReceivePage> {
 
   Widget _buildAddressSection(String walletAddress) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +240,7 @@ class _ReceivePageState extends State<ReceivePage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Row(
             children: [
               Expanded(
@@ -270,10 +271,10 @@ class _ReceivePageState extends State<ReceivePage> {
 
   Widget _buildRequestForm(List<TokenInfo> tokens) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,7 +288,7 @@ class _ReceivePageState extends State<ReceivePage> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 代币选择
           DropdownButtonFormField<TokenInfo>(
@@ -309,7 +310,7 @@ class _ReceivePageState extends State<ReceivePage> {
             },
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 金额输入
           TextField(
@@ -322,7 +323,7 @@ class _ReceivePageState extends State<ReceivePage> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 备注输入
           TextField(
@@ -333,7 +334,7 @@ class _ReceivePageState extends State<ReceivePage> {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 按钮
           Row(
@@ -349,7 +350,7 @@ class _ReceivePageState extends State<ReceivePage> {
                   },
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.spacing),
               Expanded(
                 child: N42Button(
                   text: S.of(context)?.transferSendRequest ?? 'Send Request',

@@ -12,6 +12,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 位置选择页面（微信风格）
 class ChatLocationPickerPage extends StatefulWidget {
@@ -310,7 +311,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(S.of(context)?.chatGettingLocation ?? 'Getting location...'),
                 ],
               ),
@@ -325,12 +326,12 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                         size: 64,
                         color: context.textTertiary,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing),
                       Text(
                         _errorMessage!,
                         style: TextStyle(color: context.textTertiary),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacingXL),
                       ElevatedButton(
                         onPressed: _getCurrentLocation,
                         child: Text(S.of(context)?.commonRetry ?? 'Retry'),
@@ -366,7 +367,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                           // 中心固定 pin（地图拖动时 pin 不动）
                           const Center(
                             child: Padding(
-                              padding: EdgeInsets.only(bottom: 20),
+                              padding: EdgeInsets.only(bottom: AppDimensions.spacingL),
                               child: Icon(
                                 Icons.location_on,
                                 color: AppColors.error,
@@ -393,7 +394,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                     ),
                     // 搜索框
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(AppDimensions.spacingM),
                       color: context.surfaceColor,
                       child: TextField(
                         decoration: InputDecoration(
@@ -402,12 +403,12 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                           filled: true,
                           fillColor: AppColors.inputBgOf(isDark),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                             borderSide: BorderSide.none,
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                            horizontal: AppDimensions.spacing,
+                            vertical: AppDimensions.spacingM,
                           ),
                         ),
                         onChanged: (value) {
@@ -429,7 +430,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               height: 40,
                               decoration: BoxDecoration(
                                 color: place.iconColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                               ),
                               child: Icon(
                                 place.icon,
@@ -562,7 +563,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(AppDimensions.spacingS),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
@@ -610,7 +611,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(AppDimensions.spacingS),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.9),
                         shape: BoxShape.circle,
@@ -646,7 +647,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
               child: SafeArea(
                 top: false,
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppDimensions.spacingL),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -654,10 +655,10 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                       Container(
                         width: 36,
                         height: 4,
-                        margin: const EdgeInsets.only(bottom: 16),
+                        margin: const EdgeInsets.only(bottom: AppDimensions.spacing),
                         decoration: BoxDecoration(
                           color: context.dividerColor,
-                          borderRadius: BorderRadius.circular(2),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                         ),
                       ),
                       // 位置信息
@@ -668,7 +669,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                             height: 50,
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                             ),
                             child: const Icon(
                               Icons.location_on,
@@ -689,7 +690,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                     color: context.textPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppDimensions.spacingXS),
                                 Text(
                                   '${widget.latitude.toStringAsFixed(6)}, ${widget.longitude.toStringAsFixed(6)}',
                                   style: TextStyle(
@@ -702,7 +703,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppDimensions.spacingL),
                       // 操作按钮
                       Row(
                         children: [
@@ -724,7 +725,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                               },
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacingM),
                           // 在地图中打开
                           Expanded(
                             flex: 2,
@@ -743,7 +744,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                                 ),
                                 elevation: 0,
                               ),
@@ -781,10 +782,10 @@ class _LocationActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.bgOf(isDark),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 14),
           child: Column(
@@ -795,7 +796,7 @@ class _LocationActionButton extends StatelessWidget {
                 size: 22,
                 color: context.textPrimary,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppDimensions.spacingXS),
               Text(
                 label,
                 style: TextStyle(

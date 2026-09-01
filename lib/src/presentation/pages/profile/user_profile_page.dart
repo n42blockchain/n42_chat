@@ -16,6 +16,7 @@ import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../n42_chat.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 typedef UserProfileChatStartedCallback =
     Future<void> Function(String roomId, BuildContext context);
@@ -159,7 +160,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(_error!, style: const TextStyle(color: AppColors.error)),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             N42Button(
               text: S.of(context)?.commonRetry ?? 'Retry',
               onPressed: _loadUserProfile,
@@ -206,7 +207,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             bottom: false,
             child: Container(
               height: 56,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
               child: Row(
                 children: [
                   IconButton(
@@ -231,7 +232,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           // 头像和基本信息
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppDimensions.spacingL),
             child: Row(
               children: [
                 // 大头像
@@ -262,7 +263,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
 
-                const SizedBox(width: 16),
+                const SizedBox(width: AppDimensions.spacing),
 
                 // 名称和用户名
                 Expanded(
@@ -280,7 +281,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           color: context.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXS),
                       GestureDetector(
                         onTap: () {
                           Clipboard.setData(
@@ -309,7 +310,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppDimensions.spacingXS),
                             Icon(
                               Icons.copy,
                               size: 14,
@@ -341,7 +342,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           // 状态消息
           if (contact.statusMessage?.isNotEmpty == true)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -352,7 +353,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       color: context.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   Text(
                     contact.statusMessage!,
                     style: TextStyle(
@@ -391,7 +392,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     Color? statusColor,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       child: Row(
         children: [
           Text(
@@ -427,7 +428,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildActionButtons() {
     return Container(
       margin: const EdgeInsets.only(top: 10),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.spacingL),
       color: context.surfaceColor,
       child: Row(
         children: [
@@ -440,7 +441,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
 
-          const SizedBox(width: 16),
+          const SizedBox(width: AppDimensions.spacing),
 
           // 语音/视频通话按钮（可选）
           Expanded(
@@ -649,7 +650,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     dense: true,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 TextField(
                   controller: descController,
                   maxLines: 2,
@@ -783,14 +784,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
           content: Row(
             children: [
               const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Text(l10n?.contactSendingCard ?? 'Sending contact card...'),
             ],
           ),

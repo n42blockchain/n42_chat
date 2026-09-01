@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'message_reaction_bar.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 快速表情列表（类似微信/WhatsApp/Element）
 const List<String> _quickReactions = ['😀', '🎁', '❤️', '👍', '😂', '😮'];
@@ -192,7 +193,7 @@ class WeChatMessageMenu extends StatelessWidget {
       children: [
         // 表情胶囊（WhatsApp 风格：独立圆角胶囊，与操作卡分离）
         _buildReactionBar(),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         // 主操作卡片
         Container(
           decoration: BoxDecoration(
@@ -299,7 +300,7 @@ class WeChatMessageMenu extends StatelessWidget {
               ),
 
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
+                margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
                 height: 0.5,
                 color: Colors.white.withValues(alpha: 0.12),
               ),
@@ -488,7 +489,7 @@ class WeChatMessageMenu extends StatelessWidget {
   /// 构建表情快速回应栏（WhatsApp 风格独立胶囊）
   Widget _buildReactionBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
       decoration: BoxDecoration(
         color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(28),
@@ -589,11 +590,11 @@ class WeChatMessageMenu extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         splashColor: Colors.white.withValues(alpha: 0.1),
         highlightColor: Colors.white.withValues(alpha: 0.05),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
+          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM, horizontal: 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -602,7 +603,7 @@ class WeChatMessageMenu extends StatelessWidget {
               // FittedBox: 先尝试最多两行；若仍放不下则等比缩小字号，
               // 避免出现截断省略号，也适配多语言较长译文。
               SizedBox(
-                height: 32,
+                height: AppDimensions.spacingXXL,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.topCenter,
@@ -644,7 +645,7 @@ class _RecallConfirmSheet extends StatelessWidget {
 
     return SafeArea(
       child: Container(
-        margin: const EdgeInsets.all(8),
+        margin: const EdgeInsets.all(AppDimensions.spacingS),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -701,7 +702,7 @@ class _RecallConfirmSheet extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 取消按钮
             Container(
@@ -752,7 +753,7 @@ class RecalledMessageWidget extends StatelessWidget {
 
     return Center(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS, horizontal: AppDimensions.spacing),
         child: Wrap(
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -764,7 +765,7 @@ class RecalledMessageWidget extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: textColor),
             ),
             if (isFromMe && onReEdit != null) ...[
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               GestureDetector(
                 onTap: onReEdit,
                 child: Text(
@@ -865,7 +866,7 @@ class MessageMenuHelper {
         content: Text(message),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.all(AppDimensions.spacing),
       ),
     );
   }

@@ -13,6 +13,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/chat_background_presets.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 聊天背景设置页
 class ChatBackgroundPage extends StatefulWidget {
@@ -121,12 +122,12 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
           AbsorbPointer(
             absorbing: _isSaving,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               children: [
                 // 默认（无背景）
                 _buildDefaultOption(),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 纯色背景
                 Text(
@@ -137,10 +138,10 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                     color: context.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 _buildColorGrid(),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 渐变背景
                 Text(
@@ -151,10 +152,10 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                     color: context.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 _buildGradientGrid(),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 自定义照片背景（对标 iMessage iOS 26）
                 Text(
@@ -165,7 +166,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                     color: context.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 _buildPhotoOption(),
               ],
             ),
@@ -273,7 +274,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
               (decoration ??
                       BoxDecoration(color: context.surfaceColor))
                   .copyWith(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     border: Border.all(
                       color: isImage ? AppColors.primary : context.dividerColor,
                       width: isImage ? 2 : 1,
@@ -282,13 +283,13 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
           child: Center(
             child: Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: 12,
+                horizontal: AppDimensions.spacingM,
                 vertical: 6,
               ),
               decoration: isImage
                   ? BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.45),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     )
                   : null,
               child: Row(
@@ -299,7 +300,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                     size: 18,
                     color: isImage ? Colors.white : context.textPrimary,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   Text(
                     isImage ? 'Change photo' : 'Choose from gallery',
                     style: TextStyle(
@@ -326,7 +327,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
         height: 80,
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
@@ -367,7 +368,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
             height: 64,
             decoration: BoxDecoration(
               color: entry.value,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(
                 color: isSelected ? AppColors.primary : Colors.transparent,
                 width: isSelected ? 2 : 0,
@@ -409,7 +410,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(
                 color: isSelected ? AppColors.primary : Colors.transparent,
                 width: isSelected ? 2 : 0,

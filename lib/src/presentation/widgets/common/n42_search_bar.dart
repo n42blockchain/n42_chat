@@ -238,7 +238,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
       ),
     );
   }

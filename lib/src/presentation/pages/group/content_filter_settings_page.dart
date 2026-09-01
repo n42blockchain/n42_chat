@@ -12,6 +12,7 @@ import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 关键词过滤设置页面
 class ContentFilterSettingsPage extends StatefulWidget {
@@ -197,7 +198,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
                             child: Row(
                               children: [
                                 Expanded(
@@ -213,7 +214,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                                     onSubmitted: (_) => _addWord(),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: AppDimensions.spacingS),
                                 IconButton(
                                   icon: const Icon(
                                     Icons.add_circle_outline,
@@ -224,7 +225,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppDimensions.spacingS),
                           if (_forbiddenWords.isEmpty)
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),

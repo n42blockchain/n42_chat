@@ -37,6 +37,7 @@ import '../settings/chat_background_page.dart';
 import '../settings/room_storage_detail_page.dart';
 import '../settings/security_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 聊天详情页面（仿微信）
 class ChatDetailPage extends StatefulWidget {
@@ -273,7 +274,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                       border: const OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   TextField(
                     controller: confirmController,
                     keyboardType: TextInputType.number,
@@ -692,12 +693,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 成员头像区域
             Container(
               color: cardColor,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -730,7 +731,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     ],
                   ),
                   if (isGroup) ...[
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacing),
                     GestureDetector(
                       onTap: () => _openGroupMemberList(),
                       child: Row(
@@ -756,7 +757,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 设置选项
             _buildMenuSection(
@@ -861,7 +862,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 消息免打扰、置顶等开关
             _buildMenuSection(
@@ -916,7 +917,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 设置背景
             _buildMenuSection(
@@ -942,7 +943,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 清空聊天记录
             _buildMenuSection(
@@ -960,7 +961,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 投诉
             _buildMenuSection(
@@ -976,7 +977,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ],
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
           ],
         ),
       ),
@@ -1015,7 +1016,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               size: 50,
               borderRadius: 6,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(
               name,
               maxLines: 1,
@@ -1203,7 +1204,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 size: 24,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             const Text(''),
           ],
         ),
@@ -1238,7 +1239,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
         child: Row(
           children: [
             Expanded(
@@ -1258,7 +1259,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   textAlign: TextAlign.right,
                 ),
               ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppDimensions.spacingXS),
             Icon(AppIcons.chevron, color: secondaryTextColor, size: 20),
           ],
         ),
@@ -1282,7 +1283,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           onChanged(!value);
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
           child: Row(
             children: [
               Expanded(
@@ -1310,7 +1311,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   Widget _buildDivider(Color color) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.only(left: AppDimensions.spacing),
       child: Divider(height: 0.5, thickness: 0.5, color: color),
     );
   }
@@ -1516,7 +1517,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     dense: true,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 TextField(
                   controller: descController,
                   maxLines: 2,
@@ -1874,7 +1875,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
           // 搜索框
           Container(
             color: cardColor,
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             child: TextField(
               controller: _searchController,
               onChanged: _filterMembers,
@@ -1887,12 +1888,12 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                 filled: true,
                 fillColor: AppColors.inputBgOf(isDark),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  horizontal: AppDimensions.spacing,
+                  vertical: AppDimensions.spacingM,
                 ),
               ),
             ),
@@ -1942,7 +1943,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                               ),
                             ),
                             if (role == 'owner') ...[
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppDimensions.spacingS),
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
@@ -1950,7 +1951,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.warning.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                                 ),
                                 child: Text(
                                   S.of(context)?.commonGroupOwner ?? 'Owner',
@@ -1961,7 +1962,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                 ),
                               ),
                             ] else if (role == 'admin') ...[
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppDimensions.spacingS),
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
@@ -1969,7 +1970,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.info.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                                 ),
                                 child: Text(
                                   S.of(context)?.commonGroupAdmin ?? 'Admin',

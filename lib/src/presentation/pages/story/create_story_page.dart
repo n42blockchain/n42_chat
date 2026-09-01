@@ -13,6 +13,7 @@ import '../../blocs/story/story_event.dart';
 import '../../blocs/story/story_state.dart';
 import '../media/social_image_preparation.dart';
 import '../../widgets/story/story_music_picker.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Story creation mode
 enum StoryMode { text, photo }
@@ -134,9 +135,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               builder: (context, state) {
                 if (state.isPosting) {
                   return const Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(AppDimensions.spacing),
                     child: SizedBox(
-                      width: 20,
+                      width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
@@ -183,7 +184,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           textColor: textColor,
           onTap: () => setState(() => _mode = StoryMode.text),
         ),
-        const SizedBox(width: 24),
+        const SizedBox(width: AppDimensions.spacingXL),
         _buildModeTab(
           label: s?.contactPhotos ?? 'Photo',
           isSelected: _mode == StoryMode.photo,
@@ -216,7 +217,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               height: 1.3,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Container(
             height: 2,
             width: 24,
@@ -239,7 +240,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           Expanded(
             child: Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL),
                 child: TextField(
                   controller: _textController,
                   maxLines: null,
@@ -275,7 +276,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
 
           // Color picker
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingL, horizontal: AppDimensions.spacing),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -299,7 +300,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     return GestureDetector(
       onTap: () => setState(() => _selectedColorIndex = index),
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8),
+        margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
         width: 36,
         height: 36,
         decoration: BoxDecoration(
@@ -342,8 +343,8 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         if (_imageBytes != null)
           Container(
             padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
+              left: AppDimensions.spacing,
+              right: AppDimensions.spacing,
               bottom: MediaQuery.of(context).padding.bottom + 16,
               top: 16,
             ),
@@ -364,19 +365,19 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               decoration: InputDecoration(
                 hintText: s?.storySendMessageHint ?? 'Add a caption...',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   borderSide: BorderSide(
                     color: context.dividerColor,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   borderSide: BorderSide(
                     color: context.dividerColor,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   borderSide: const BorderSide(
                     color: AppColors.primary,
                     width: 2,
@@ -402,10 +403,10 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     return GestureDetector(
       onTap: _pickImage,
       child: Container(
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.all(AppDimensions.spacing),
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: Border.all(
             color: context.dividerColor,
             width: 2,
@@ -428,7 +429,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   color: AppColors.primary,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               Text(
                 s?.contactPhotos ?? 'Add Photo',
                 maxLines: 1,
@@ -440,7 +441,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   color: context.textPrimary,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 'Tap to select an image',
                 maxLines: 1,
@@ -464,9 +465,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
       children: [
         // Image
         Container(
-          margin: const EdgeInsets.all(16),
+          margin: const EdgeInsets.all(AppDimensions.spacing),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.1),
@@ -476,7 +477,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             child: Image.memory(_imageBytes!, fit: BoxFit.contain),
           ),
         ),
@@ -493,7 +494,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               });
             },
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppDimensions.spacingS),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
@@ -513,7 +514,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
               onTap: _pickImage,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
+                  horizontal: AppDimensions.spacingL,
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
@@ -524,7 +525,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.swap_horiz, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
+                    SizedBox(width: AppDimensions.spacingS),
                     Text(
                       'Change',
                       style: TextStyle(
@@ -610,11 +611,11 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         _musicSelection != null && _musicSelection!.isEmpty != true;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
       child: GestureDetector(
         onTap: _showMusicPicker,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
           decoration: BoxDecoration(
             color: _mode == StoryMode.text
                 ? Colors.white.withValues(alpha: 0.15)

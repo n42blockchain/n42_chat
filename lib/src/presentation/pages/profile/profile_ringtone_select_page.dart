@@ -10,6 +10,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../services/voip/incoming_call_ringtone_preference.dart';
 import '../../../services/ringtone/system_ringtone_service.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class RingtoneSelectPage extends StatefulWidget {
   final String currentRingtone;
@@ -190,7 +191,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
             content: Row(
               children: [
                 const Icon(Icons.play_arrow, color: Colors.white, size: 18),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Expanded(
                   child: Text(
                     s?.profilePlaying(ringtone.name) ?? 'Playing: ${ringtone.name}',
@@ -328,7 +329,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     s?.profileLoadingRingtones ?? 'Loading ringtones...',
                     style: TextStyle(
@@ -348,7 +349,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                         size: 64,
                         color: context.textTertiary,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing),
                       Text(
                         s?.profileNoRingtonesFound ?? 'No ringtones found',
                         style: TextStyle(
@@ -360,7 +361,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
                   itemCount: _ringtones.length,
                   itemBuilder: (context, index) {
                     final ringtone = _ringtones[index];
@@ -368,10 +369,10 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                     final isPlaying = ringtone.name == _playingRingtone;
 
                     return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingXS),
                       decoration: BoxDecoration(
                         color: context.surfaceColor,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         border: isSelected
                             ? Border.all(color: AppColors.primary, width: 2)
                             : null,
@@ -384,7 +385,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                             color: isPlaying
                                 ? AppColors.primary.withValues(alpha: 0.2)
                                 : (isDark ? const Color(0xFF3D3D3D) : const Color(0xFFF7F7F7)),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                           ),
                           child: Icon(
                             isPlaying ? Icons.pause : ringtone.icon,

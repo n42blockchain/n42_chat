@@ -19,6 +19,7 @@ import 'contact_permissions_page.dart';
 import 'contact_settings_page.dart';
 import 'tags_management_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 联系人详情页面（仿微信）
 class ContactDetailPage extends StatefulWidget {
@@ -203,11 +204,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.spacingL),
 
             // 用户信息卡片
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -218,7 +219,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                     size: 64,
                     borderRadius: 8,
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppDimensions.spacing),
 
                   // 名称和ID
                   Expanded(
@@ -236,7 +237,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                             color: textColor,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppDimensions.spacingXS),
                         Text(
                           S.of(context)?.contactN42Id(_n42Id) ??
                               'N42 ID: $_n42Id',
@@ -259,7 +260,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
 
             // 朋友资料
             _buildMenuSection(
@@ -278,7 +279,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 朋友圈
             _buildMenuSection(
@@ -304,7 +305,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 视频号
             _buildMenuSection(
@@ -313,7 +314,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               children: [_buildVideoSection(textColor, secondaryTextColor)],
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
 
             // 根据是否是好友显示不同按钮
             if (_isFriend) ...[
@@ -325,7 +326,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                     widget.onSendMessage ?? () => Navigator.of(context).pop(),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
 
               _buildActionButton(
                 icon: Icons.phone_outlined,
@@ -338,7 +339,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               _buildAddFriendButton(),
             ],
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
           ],
         ),
       ),
@@ -395,7 +396,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
         child: Row(
           children: [
             Expanded(
@@ -409,7 +410,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                     style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
                   ),
                   if (subtitle != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppDimensions.spacingXS),
                     Text(
                       subtitle,
                       maxLines: 1,
@@ -433,7 +434,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
   Widget _buildVideoSection(Color textColor, Color secondaryTextColor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -445,7 +446,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: AppDimensions.spacingXL),
               Expanded(
                 child: Text(
                   _effectiveDisplayName,
@@ -456,7 +457,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           // 视频缩略图列表
           SizedBox(
             height: 80,
@@ -466,14 +467,14 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: 5,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
+                    separatorBuilder: (_, _) => const SizedBox(width: AppDimensions.spacingS),
                     itemBuilder: (context, index) {
                       return Container(
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
                           color: Colors.grey.shade800,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                         ),
                         child: const Stack(
                           children: [
@@ -490,7 +491,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                     },
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Icon(
                   AppIcons.chevron,
                   color: secondaryTextColor,
@@ -514,11 +515,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     final textColor = context.textPrimary;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       child: InkWell(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
           decoration: BoxDecoration(
             border: Border(
               top: BorderSide(color: borderColor, width: 0.5),
@@ -529,7 +530,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon, color: iconColor, size: 20),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Text(
                 label,
                 maxLines: 1,
@@ -546,21 +547,21 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   /// 构建添加好友按钮
   Widget _buildAddFriendButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       child: ElevatedButton(
         onPressed: _isAddingFriend ? null : _addFriend,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusM)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (_isAddingFriend)
               const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
@@ -569,7 +570,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               )
             else
               const Icon(Icons.person_add, size: 20),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Text(
               _isAddingFriend
                   ? (S.of(context)?.contactAddingToContacts ?? 'Adding...')
@@ -927,7 +928,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
               ],
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
           ],
         ),
       ),
@@ -996,7 +997,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
         child: Row(
           children: [
             // 左侧标题
@@ -1010,7 +1011,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             Expanded(
               child: value != null
                   ? Padding(
-                      padding: const EdgeInsets.only(left: 16),
+                      padding: const EdgeInsets.only(left: AppDimensions.spacing),
                       child: Text(
                         value,
                         textAlign: TextAlign.right,
@@ -1027,7 +1028,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
             ),
             // 右侧箭头
             if (showArrow) ...[
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Icon(
                 AppIcons.chevron,
                 color: secondaryTextColor,
@@ -1042,7 +1043,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
 
   Widget _buildDivider(Color color) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.only(left: AppDimensions.spacing),
       child: Divider(height: 0.5, thickness: 0.5, color: color),
     );
   }
@@ -1337,7 +1338,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
           child: GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Padding(
-              padding: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.only(left: AppDimensions.spacing),
               child: Text(
                 S.of(context)?.commonCancel ?? 'Cancel',
                 style: TextStyle(fontSize: 16, color: textColor),
@@ -1356,21 +1357,21 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         centerTitle: true,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: AppDimensions.spacingM),
             child: GestureDetector(
               onTap: _isSaving ? null : _save,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
+                  horizontal: AppDimensions.spacingM,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: _isSaving
                     ? const SizedBox(
-                        width: 16,
+                        width: AppDimensions.spacing,
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
@@ -1390,22 +1391,22 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             // 备注名
             Text(
               S.of(context)?.contactRemarkName ?? 'Remark Name',
               style: TextStyle(fontSize: 13, color: labelColor),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Container(
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: TextField(
                 controller: _remarkController,
@@ -1415,32 +1416,32 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                   hintStyle: TextStyle(color: hintColor),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: AppDimensions.spacingM,
                     vertical: 14,
                   ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
 
             // 电话
             Text(
               S.of(context)?.contactPhone ?? 'Phone',
               style: TextStyle(fontSize: 13, color: labelColor),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Container(
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: InkWell(
                 onTap: () => _showAddPhoneDialog(),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: AppDimensions.spacingM,
                     vertical: 14,
                   ),
                   child: Row(
@@ -1450,7 +1451,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                         color: hintColor,
                         size: 20,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingS),
                       Text(
                         S.of(context)?.contactAddPhone ?? 'Add phone',
                         style: TextStyle(fontSize: 16, color: hintColor),
@@ -1461,18 +1462,18 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
 
             // 标签
             Text(
               S.of(context)?.contactTags ?? 'Tags',
               style: TextStyle(fontSize: 13, color: labelColor),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Container(
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: InkWell(
                 onTap: () {
@@ -1483,10 +1484,10 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                     ),
                   );
                 },
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: AppDimensions.spacingM,
                     vertical: 14,
                   ),
                   child: Row(
@@ -1507,18 +1508,18 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
 
             // 备忘
             Text(
               S.of(context)?.contactNotes ?? 'Notes',
               style: TextStyle(fontSize: 13, color: labelColor),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Container(
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: TextField(
                 controller: _memoController,
@@ -1528,27 +1529,27 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                   hintStyle: TextStyle(color: hintColor),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: AppDimensions.spacingM,
                     vertical: 14,
                   ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
 
             // 照片
             Text(
               S.of(context)?.contactPhotos ?? 'Photos',
               style: TextStyle(fontSize: 13, color: labelColor),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Container(
               width: 100,
               height: 100,
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: InkWell(
                 onTap: () {
@@ -1562,12 +1563,12 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                     ),
                   );
                 },
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.add_circle_outline, color: hintColor, size: 24),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppDimensions.spacingXS),
                     Text(
                       S.of(context)?.contactAddPhoto ?? 'Add photo',
                       style: TextStyle(fontSize: 12, color: hintColor),

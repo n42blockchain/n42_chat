@@ -16,6 +16,7 @@ import '../../../domain/entities/message_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../chat/viewers/pdf_viewer_page.dart';
 import 'media_preview_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 媒体画廊页面
 ///
@@ -157,7 +158,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
 
           // 统计
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: Row(
               children: [
                 Text(
@@ -193,7 +194,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
             size: 64,
             color: context.textSecondary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             S.of(context)?.mediaNoMediaFound ?? 'No media found',
             style: TextStyle(
@@ -246,7 +247,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
     final groups = _groupedByDate;
 
     return ListView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       itemCount: groups.length,
       itemBuilder: (context, groupIndex) {
         final group = groups[groupIndex];
@@ -257,7 +258,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
           children: [
             // 日期分隔
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingS),
               child: Text(
                 dateStr,
                 style: TextStyle(
@@ -297,7 +298,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.placeholderOf(isDark),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -329,12 +330,12 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
                 right: 4,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
+                    horizontal: AppDimensions.spacingXS,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.black54,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -409,7 +410,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
           color: isDark
               ? Colors.white.withValues(alpha: 0.08)
               : Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Icon(icon, color: AppColors.primary),
       ),
@@ -431,7 +432,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Text(
             message.senderName,
             style: TextStyle(

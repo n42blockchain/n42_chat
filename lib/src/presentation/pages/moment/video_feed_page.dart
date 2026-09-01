@@ -10,6 +10,7 @@ import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../../domain/repositories/moment_repository.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 短视频沉浸式 Feed（TikTok 风格竖向 PageView）
 ///
@@ -110,7 +111,7 @@ class _VideoFeedPageState extends State<VideoFeedPage> {
                     ),
                     SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(AppDimensions.spacingXS),
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: IconButton(
@@ -135,7 +136,7 @@ class _VideoFeedPageState extends State<VideoFeedPage> {
             children: [
               Icon(Icons.video_collection_outlined,
                   size: 56, color: Colors.white38),
-              SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spacingM),
               Text('No videos yet',
                   style: TextStyle(color: Colors.white54, fontSize: 15)),
             ],
@@ -347,7 +348,7 @@ class _VideoFeedItemState extends State<_VideoFeedItem> {
       child: Column(
         children: [
           Icon(icon, color: color, size: 34),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(label,
               style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
@@ -375,7 +376,7 @@ class _VideoFeedItemState extends State<_VideoFeedItem> {
                           const TextStyle(color: Colors.white, fontSize: 13))
                   : null,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Flexible(
               child: Text(
                 m.userName,
@@ -391,7 +392,7 @@ class _VideoFeedItemState extends State<_VideoFeedItem> {
           ],
         ),
         if (m.hasContent) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             m.content!,
             maxLines: 2,

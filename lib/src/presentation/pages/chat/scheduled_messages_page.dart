@@ -11,6 +11,7 @@ import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class ScheduledMessagesPage extends StatefulWidget {
   final String roomId;
@@ -111,10 +112,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             : (_drafts.isEmpty
                   ? _buildEmptyState()
                   : ListView.separated(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppDimensions.spacing),
                       itemCount: _drafts.length,
                       separatorBuilder: (context, index) =>
-                          const SizedBox(height: 12),
+                          const SizedBox(height: AppDimensions.spacingM),
                       itemBuilder: (context, index) {
                         final draft = _drafts[index];
                         return _buildDraftCard(draft);
@@ -133,7 +134,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           size: 56,
           color: context.textSecondary,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         Center(
           child: Text(
             'No scheduled messages yet',
@@ -147,9 +148,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL),
           child: Text(
             'Long press Send, Photos, Files, a GIF, or a sticker to schedule follow-ups and reminders.',
             textAlign: TextAlign.center,
@@ -171,10 +172,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     final secondaryColor = context.textSecondary;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +183,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           Row(
             children: [
               Icon(_iconForDraft(draft), size: 18, color: AppColors.info),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: Text(
                   _formatScheduledAt(draft.scheduledAt),
@@ -213,7 +214,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
               draft.mentionsRoom ||
               draft.mentionedUserIds.isNotEmpty ||
               draft.selfDestructAfter != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -265,7 +266,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
       ),
       child: Text(
         label,

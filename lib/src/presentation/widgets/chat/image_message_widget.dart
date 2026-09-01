@@ -10,6 +10,7 @@ import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 图片消息组件
 ///
@@ -249,7 +250,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -294,7 +295,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                 color: AppColors.textSecondary,
                 size: 28,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 S.of(context)?.chatDownload ?? 'Download',
                 style: const TextStyle(
@@ -371,14 +372,14 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppDimensions.spacingM),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.lock, color: Colors.white, size: 28),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   s?.chatViewOncePhoto ?? 'View Once Photo',
                   style: const TextStyle(
@@ -387,7 +388,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   s?.chatViewOnceTap ?? 'Tap to view',
                   style: TextStyle(
@@ -446,7 +447,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       color: AppColors.placeholder,
       child: const Center(
         child: SizedBox(
-          width: 24,
+          width: AppDimensions.spacingXL,
           height: 24,
           child: CircularProgressIndicator(
             strokeWidth: 2,
@@ -474,7 +475,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                 size: 32,
               ),
               if (canRetry) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   S.of(context)?.commonTapToRetry ?? 'Tap to retry',
                   style: const TextStyle(
@@ -552,7 +553,7 @@ class ImageGridWidget extends StatelessWidget {
             child: Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   child: CachedNetworkImage(
                     imageUrl: imageUrl,
                     width: itemSize,
@@ -582,7 +583,7 @@ class ImageGridWidget extends StatelessWidget {
                     height: itemSize,
                     decoration: BoxDecoration(
                       color: Colors.black45,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: Center(
                       child: Text(

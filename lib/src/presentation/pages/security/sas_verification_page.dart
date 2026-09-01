@@ -8,6 +8,7 @@ import '../../widgets/common/common_widgets.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'emoji_verification_widget.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// SAS 验证状态
 enum SasVerificationStep {
@@ -260,7 +261,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppDimensions.spacingXL),
           child: _buildContent(isDark),
         ),
       ),
@@ -289,7 +290,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         const CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.securityWaitingForDeviceAccept ??
               'Waiting for the other device to accept...',
@@ -302,7 +303,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             color: context.textPrimary,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         Text(
           widget.deviceName ?? widget.deviceId ?? '',
           maxLines: 1,
@@ -313,7 +314,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             color: context.textSecondary,
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: AppDimensions.spacingXXL),
         OutlinedButton(
           onPressed: _onCancel,
           child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
@@ -329,7 +330,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
 
         // 标题
         const Icon(Icons.security, size: 48, color: AppColors.primary),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         Text(
           S.of(context)?.securityVerifyDevice ?? 'Verify this device',
           maxLines: 1,
@@ -341,7 +342,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             color: context.textPrimary,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         Text(
           S.of(context)?.securityConfirmEmojiMatch ??
               'Confirm the emoji below are displayed on both devices, in the same order',
@@ -354,7 +355,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             color: context.textSecondary,
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: AppDimensions.spacingXXL),
 
         // Emoji 或数字展示
         if (_emojis != null && _emojis!.isNotEmpty)
@@ -376,7 +377,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                   side: const BorderSide(color: AppColors.error),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   ),
                 ),
                 child: Text(
@@ -387,7 +388,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimensions.spacing),
             // 匹配按钮
             Expanded(
               child: ElevatedButton(
@@ -397,7 +398,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   ),
                 ),
                 child: Text(
@@ -410,7 +411,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
       ],
     );
   }
@@ -422,7 +423,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         const CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.success),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.securityWaitingForDeviceConfirm ??
               'Waiting for the other device to confirm...',
@@ -452,7 +453,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
           ),
           child: const Icon(Icons.verified, color: AppColors.success, size: 48),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.securityVerificationSuccess ??
               'Verification successful!',
@@ -465,7 +466,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             color: context.textPrimary,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         Text(
           S.of(context)?.securityDeviceVerifiedTrusted ??
               'This device is now verified and trusted.',
@@ -478,7 +479,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             color: context.textSecondary,
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: AppDimensions.spacingXXL),
         ElevatedButton(
           onPressed: () => Navigator.pop(context, true),
           style: ElevatedButton.styleFrom(
@@ -486,7 +487,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 14),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             ),
           ),
           child: Text(S.of(context)?.commonDone ?? 'Done'),
@@ -512,7 +513,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             size: 48,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.securityVerificationFailed ?? 'Verification failed',
           maxLines: 1,
@@ -524,10 +525,10 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             color: context.textPrimary,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         if (_errorMessage != null)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
             child: Text(
               _errorMessage!,
               textAlign: TextAlign.center,
@@ -540,7 +541,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
               ),
             ),
           ),
-        const SizedBox(height: 32),
+        const SizedBox(height: AppDimensions.spacingXXL),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -548,7 +549,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
               onPressed: () => Navigator.pop(context, false),
               child: Text(S.of(context)?.commonClose ?? 'Close'),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimensions.spacing),
             ElevatedButton(
               onPressed: () {
                 setState(() {

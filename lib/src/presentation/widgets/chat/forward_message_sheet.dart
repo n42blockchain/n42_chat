@@ -7,6 +7,7 @@ import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 转发消息对话框
 class ForwardMessageSheet extends StatefulWidget {
@@ -74,18 +75,18 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
         children: [
           // 拖动条
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 12),
+            margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
             width: 40,
             height: 4,
             decoration: BoxDecoration(
               color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
             ),
           ),
           
           // 标题
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: Row(
               children: [
                 Text(
@@ -107,7 +108,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
 
           // 搜索框
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -119,7 +120,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
               ),
               onChanged: (value) {
                 setState(() {
@@ -131,11 +132,11 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
           
           // 消息预览
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             decoration: BoxDecoration(
               color: AppColors.inputBgOf(widget.isDark),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Row(
               children: [
@@ -144,7 +145,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
                   size: 20,
                   color: AppColors.textSecondaryOf(widget.isDark),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Expanded(
                   child: Text(
                     _getMessagePreview(widget.message),
@@ -195,7 +196,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
     }
     
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
       itemCount: filteredChats.length,
       itemBuilder: (context, index) {
         final chat = filteredChats[index];

@@ -14,6 +14,7 @@ import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/n42_avatar.dart';
 import 'moment_forward_sheet.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 动态详情页面
 class MomentDetailPage extends StatefulWidget {
@@ -141,7 +142,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                     children: [
                       // 动态内容
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(AppDimensions.spacing),
                         color: context.surfaceColor,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +155,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   imageUrl: moment.userAvatarUrl,
                                   size: 48,
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: AppDimensions.spacingM),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +184,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
 
                             // 文字内容
                             if (moment.hasContent) ...[
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppDimensions.spacingM),
                               Text(
                                 moment.content!,
                                 style: TextStyle(
@@ -195,13 +196,13 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
 
                             // 媒体内容
                             if (moment.hasMedia) ...[
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppDimensions.spacingM),
                               _buildMediaSection(isDark),
                             ],
 
                             // 位置信息
                             if (moment.hasLocation) ...[
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppDimensions.spacingM),
                               Row(
                                 children: [
                                   Icon(
@@ -209,7 +210,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                     size: 16,
                                     color: context.textSecondary,
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: AppDimensions.spacingXS),
                                   Text(
                                     moment.location!.displayText,
                                     style: TextStyle(
@@ -224,7 +225,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         ),
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacingS),
 
                       // 点赞区域（可见性过滤）
                       Builder(builder: (context) {
@@ -234,7 +235,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         );
                         if (visibleLikes.isEmpty) return const SizedBox.shrink();
                         return Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(AppDimensions.spacing),
                           color: context.surfaceColor,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +247,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                     size: 18,
                                     color: AppColors.error,
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: AppDimensions.spacingS),
                                   Text(
                                     s?.momentLikesCount(visibleLikes.length) ?? '${visibleLikes.length} likes',
                                     style: TextStyle(
@@ -256,7 +257,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: AppDimensions.spacingS),
                               Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
@@ -281,7 +282,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         );
                       }),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacingS),
 
                       // 评论区域（可见性过滤）
                       Builder(builder: (context) {
@@ -290,7 +291,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                           friendIds: _getFriendIds(),
                         );
                         return Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(AppDimensions.spacing),
                           color: context.surfaceColor,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,7 +303,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                     size: 18,
                                     color: context.textSecondary,
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: AppDimensions.spacingS),
                                   Text(
                                     s?.momentCommentsCount(visibleComments.length) ?? '${visibleComments.length} comments',
                                     style: TextStyle(
@@ -312,11 +313,11 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppDimensions.spacingM),
                               if (visibleComments.isEmpty)
                                 Center(
                                   child: Padding(
-                                    padding: const EdgeInsets.all(24),
+                                    padding: const EdgeInsets.all(AppDimensions.spacingXL),
                                     child: Text(
                                       s?.momentNoComments ?? 'No comments yet',
                                       style: TextStyle(
@@ -351,7 +352,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
     if (mediaCount == 1) {
       final media = widget.moment.media.first;
       return ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         child: AspectRatio(
           aspectRatio: media.aspectRatio ?? 1.0,
           child: Stack(
@@ -419,7 +420,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
       itemBuilder: (context, index) {
         final media = widget.moment.media[index];
         return ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -476,7 +477,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
 
   Widget _buildCommentItem(MomentComment comment, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacingM),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -485,7 +486,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
             imageUrl: comment.userAvatarUrl,
             size: 36,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: GestureDetector(
               onTap: () => _setReplyTarget(comment),
@@ -523,7 +524,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                       fontSize: 14,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacingXS),
                   Text(
                     _formatCommentTime(comment.timestamp),
                     style: TextStyle(
@@ -543,9 +544,9 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
   Widget _buildCommentInput(bool isDark, S? s, MomentEntity moment) {
     return Container(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 8,
+        left: AppDimensions.spacing,
+        right: AppDimensions.spacing,
+        top: AppDimensions.spacingS,
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
       decoration: BoxDecoration(
@@ -592,7 +593,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                             : (s?.momentWriteComment ?? 'Write a comment...'),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                          horizontal: AppDimensions.spacing,
                           vertical: 10,
                         ),
                       ),

@@ -11,6 +11,7 @@ import '../../../data/datasources/bundled_sticker_packs.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import 'video_sticker_view.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 贴纸缩略图（emoji / 内置 asset SVG·Lottie / 网络图片·视频）
 ///
@@ -44,7 +45,7 @@ class StickerThumb extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.placeholderOf(isDark),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         padding: padding,
         child: Center(child: _content()),
@@ -83,7 +84,7 @@ class StickerThumb extends StatelessWidget {
         url: httpUrl,
       )) {
         return ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           child: VideoStickerView(url: httpUrl, headers: headers),
         );
       }

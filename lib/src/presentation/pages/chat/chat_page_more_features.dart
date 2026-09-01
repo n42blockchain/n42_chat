@@ -1,3 +1,4 @@
+
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
@@ -26,7 +27,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     height: 44,
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
                     child: const Icon(
                       Icons.location_on,
@@ -71,7 +72,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     height: 44,
                     decoration: BoxDecoration(
                       color: AppColors.success.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
                     child: const Icon(
                       Icons.share_location,
@@ -106,13 +107,13 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     _shareRealTimeLocation();
                   },
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 // 取消按钮
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                    horizontal: AppDimensions.spacing,
+                    vertical: AppDimensions.spacingS,
                   ),
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -122,7 +123,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                           : AppColors.inputBackground,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       ),
                     ),
                     child: Text(
@@ -137,7 +138,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
               ],
             ),
           ),

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_dimensions.dart';
 
 /// BuildContext 扩展方法
 extension ContextExtension on BuildContext {
@@ -226,7 +227,7 @@ extension ContextExtension on BuildContext {
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
               if (message != null) ...[
-                const SizedBox(width: 16),
+                const SizedBox(width: AppDimensions.spacing),
                 Text(message),
               ],
             ],

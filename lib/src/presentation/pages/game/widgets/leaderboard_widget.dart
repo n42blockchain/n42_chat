@@ -4,6 +4,7 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../models/game_score.dart';
 import '../services/game_score_service.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class LeaderboardWidget extends StatelessWidget {
   final String gameId;
@@ -29,7 +30,7 @@ class LeaderboardWidget extends StatelessWidget {
         if (scores.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppDimensions.spacingXXL),
               child: Text(
                 l10n?.gameNoScores ?? 'No scores yet',
                 style: TextStyle(fontSize: 16, color: context.textTertiary),
@@ -42,7 +43,7 @@ class LeaderboardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 l10n?.gameLeaderboard ?? 'Leaderboard',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -86,7 +87,7 @@ class LeaderboardWidget extends StatelessWidget {
         return const Text('🥉', style: TextStyle(fontSize: 24));
       default:
         return SizedBox(
-          width: 24,
+          width: AppDimensions.spacingXL,
           child: Text(
             '${index + 1}',
             textAlign: TextAlign.center,

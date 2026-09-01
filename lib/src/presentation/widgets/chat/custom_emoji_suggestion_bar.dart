@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../domain/entities/custom_emoji.dart';
 import 'custom_emoji_text.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 自定义 emoji 输入联想条
 ///
@@ -32,16 +33,16 @@ class CustomEmojiSuggestionBar extends StatelessWidget {
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: 6),
         itemCount: suggestions.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 4),
+        separatorBuilder: (_, _) => const SizedBox(width: AppDimensions.spacingXS),
         itemBuilder: (context, index) {
           final emoji = suggestions[index];
           return InkWell(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             onTap: () => onSelected(emoji),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
               child: Row(
                 children: [
                   CustomEmojiInline(emoji: emoji, size: 24),

@@ -24,6 +24,7 @@ import '../moment/moment_list_page.dart';
 import '../profile/avatar_studio_page.dart';
 import '../story/create_story_page.dart';
 import '../story/story_viewer_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class SocialHubPage extends StatelessWidget {
   const SocialHubPage({super.key});
@@ -60,10 +61,10 @@ class _SocialHubView extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(0, 12, 0, 32),
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
                 child: _buildHero(context),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               StoryBar(
                 userStories: state.userStories,
                 myStory: _buildMyStory(authUser, state),
@@ -74,9 +75,9 @@ class _SocialHubView extends StatelessWidget {
                     _openUserStory(context, userStory, state),
                 onAddStory: () => _openCreateStory(context),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
                 child: _ActionGrid(
                   actions: [
                     _QuickAction(
@@ -159,7 +160,7 @@ class _SocialHubView extends StatelessWidget {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             'Reuse the existing social stack instead of scattering entry points across chat, profile and discover.',
             maxLines: 3,
@@ -422,7 +423,7 @@ class _ActionGrid extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             onTap: action.onTap,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               decoration: BoxDecoration(
                 color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(18),
@@ -435,7 +436,7 @@ class _ActionGrid extends StatelessWidget {
                     height: 42,
                     decoration: BoxDecoration(
                       color: action.color.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     ),
                     child: Icon(action.icon, color: action.color),
                   ),

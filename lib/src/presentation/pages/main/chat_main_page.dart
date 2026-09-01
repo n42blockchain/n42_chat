@@ -736,11 +736,11 @@ class _ChatMainPageState extends State<ChatMainPage> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS, vertical: 1),
       constraints: BoxConstraints(minWidth: minWidth, minHeight: 16),
       decoration: BoxDecoration(
         color: AppColors.badge,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Center(
         child: Text(

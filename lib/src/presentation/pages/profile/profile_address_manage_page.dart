@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class AddressManagePage extends StatefulWidget {
   const AddressManagePage({super.key});
@@ -135,7 +136,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                     size: 64,
                     color: AppColors.textTertiary,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     S.of(context)?.profileNoShippingAddress ??
                         'No shipping address',
@@ -147,7 +148,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                       color: context.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
                   ElevatedButton.icon(
                     onPressed: _addAddress,
                     icon: const Icon(Icons.add),
@@ -163,14 +164,14 @@ class AddressManagePageState extends State<AddressManagePage> {
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               itemCount: _addresses.length,
               itemBuilder: (context, index) {
                 final address = _addresses[index];
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppDimensions.spacing),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -189,7 +190,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: AppDimensions.spacingM),
                             Flexible(
                               child: Text(
                                 address.phone,
@@ -205,14 +206,14 @@ class AddressManagePageState extends State<AddressManagePage> {
                             if (address.isDefault)
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                                  horizontal: AppDimensions.spacingS,
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.primary.withValues(
                                     alpha: 0.1,
                                   ),
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                                 ),
                                 child: Text(
                                   S.of(context)?.profileDefaultLabel ??
@@ -229,7 +230,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                               ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacingS),
                         Text(
                           address.fullAddress,
                           maxLines: 3,
@@ -239,7 +240,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                             color: context.textSecondary,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppDimensions.spacingM),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -406,7 +407,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                           'Enter recipient name',
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   TextField(
                     controller: phoneController,
                     keyboardType: TextInputType.phone,
@@ -416,7 +417,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                           s?.profileEnterPhoneNumber ?? 'Enter phone number',
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   TextField(
                     controller: regionController,
                     decoration: InputDecoration(
@@ -425,7 +426,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                           s?.profileRegionHint ?? 'Province/City/District',
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   TextField(
                     controller: detailController,
                     maxLines: 2,
@@ -437,7 +438,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                           'Street, building number, etc.',
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   CheckboxListTile(
                     value: isDefault,
                     onChanged: (value) {

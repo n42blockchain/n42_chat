@@ -7,6 +7,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'notification_filter_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 通知设置页面
 class NotificationSettingsPage extends StatefulWidget {
@@ -104,7 +105,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 通知开关
           Container(
@@ -127,7 +128,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 通知详情设置
           if (_settings.enabled) ...[
@@ -183,7 +184,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             // 免打扰设置
             Container(
@@ -221,7 +222,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             // 智能过滤（优先通知 / 关键词屏蔽）
             Container(
@@ -254,7 +255,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     required ValueChanged<bool> onChanged,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       child: Row(
         children: [
           Container(
@@ -266,7 +267,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
             child: Icon(icon, color: Colors.white, size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,7 +309,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         child: Row(
           children: [
             Container(
@@ -320,7 +321,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ),
               child: Icon(icon, color: Colors.white, size: 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Text(
                 title,
@@ -336,7 +337,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Icon(
               AppIcons.chevron,
               color: context.textSecondary,
@@ -357,7 +358,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         child: Row(
           children: [
             Container(
@@ -369,7 +370,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ),
               child: Icon(icon, color: Colors.white, size: 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,7 +404,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Icon(
               AppIcons.chevron,
               color: context.textSecondary,

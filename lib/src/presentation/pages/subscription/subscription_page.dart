@@ -5,6 +5,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/subscription_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/subscription_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 订阅页：我的订阅 + 可用计划 + 创建计划
 class SubscriptionPage extends StatefulWidget {
@@ -84,7 +85,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                   if (_mySubs.isNotEmpty) ...[
                     _sectionTitle('My subscriptions'),
                     ..._mySubs.map(_buildMySubCard),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppDimensions.spacingL),
                   ],
                   _sectionTitle('Available plans'),
                   if (_plans.isEmpty)
@@ -98,7 +99,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
   }
 
   Widget _sectionTitle(String t) => Padding(
-        padding: const EdgeInsets.only(bottom: 8, top: 4),
+        padding: const EdgeInsets.only(bottom: AppDimensions.spacingS, top: AppDimensions.spacingXS),
         child: Text(
           t,
           style: TextStyle(
@@ -142,7 +143,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: 3),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
@@ -156,7 +157,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text('${sub.plan.creatorName} · ${sub.plan.priceLabel}',
                 style: TextStyle(color: context.textSecondary, fontSize: 12)),
             if (active) ...[
@@ -201,12 +202,12 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     fontWeight: FontWeight.w600,
                     fontSize: 16)),
             if (plan.description != null && plan.description!.isNotEmpty) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: AppDimensions.spacingXS),
               Text(plan.description!,
                   style:
                       TextStyle(color: context.textSecondary, fontSize: 13)),
             ],
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             ...plan.benefits.map((b) => Padding(
                   padding: const EdgeInsets.only(bottom: 2),
                   child: Row(
@@ -288,18 +289,18 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                   decoration: const InputDecoration(
                       labelText: 'Benefits (comma separated)'),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Row(
                   children: [
                     const Text('Period:'),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacingM),
                     ChoiceChip(
                       label: const Text('Monthly'),
                       selected: period == SubscriptionPeriod.monthly,
                       onSelected: (_) => setLocal(
                           () => period = SubscriptionPeriod.monthly),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingS),
                     ChoiceChip(
                       label: const Text('Yearly'),
                       selected: period == SubscriptionPeriod.yearly,

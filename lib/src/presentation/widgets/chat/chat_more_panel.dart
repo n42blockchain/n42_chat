@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 enum ChatRecentMediaAccess { available, limited, denied, unsupported }
 
@@ -373,7 +374,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                   height: 4,
                   decoration: BoxDecoration(
                     color: context.textTertiary.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                   ),
                 ),
               ),
@@ -828,7 +829,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
   }) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -836,7 +837,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon, size: 20, color: context.textTertiary),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Flexible(
                   child: Text(
                     message,
@@ -884,7 +885,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
 
   ButtonStyle get _compactMediaActionStyle => TextButton.styleFrom(
     minimumSize: const Size(0, 34),
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
   );
 
@@ -896,7 +897,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
 
   Widget _buildPage(BuildContext context, bool isDark, List<_MoreItem> items) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -958,7 +959,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                 height: 56,
                 decoration: BoxDecoration(
                   color: bgColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 ),
                 child: Icon(
                   item.icon,
@@ -966,7 +967,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                   color: item.iconColor ?? defaultIconColor,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 item.label,
                 style: TextStyle(fontSize: 11, color: context.textSecondary),

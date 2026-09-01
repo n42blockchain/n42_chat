@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 手机通讯录匹配页面
 ///
@@ -125,7 +126,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
   Widget _buildPermissionRequest(bool isDark) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -134,7 +135,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               size: 72,
               color: AppColors.textTertiaryOf(isDark),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             Text(
               'Contacts Permission Required',
               textAlign: TextAlign.center,
@@ -147,7 +148,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             Text(
               'To find friends from your contacts, please allow access to your contacts.',
               textAlign: TextAlign.center,
@@ -159,15 +160,15 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
             ElevatedButton(
               onPressed: _loadContacts,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 12,
+                  horizontal: AppDimensions.spacingXXL,
+                  vertical: AppDimensions.spacingM,
                 ),
               ),
               child: const Text('Allow Access'),
@@ -181,12 +182,12 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
   Widget _buildError(bool isDark) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error_outline, size: 64, color: AppColors.error),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               _errorMessage ?? 'Unknown error',
               textAlign: TextAlign.center,
@@ -197,7 +198,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             TextButton(onPressed: _loadContacts, child: const Text('Retry')),
           ],
         ),
@@ -208,7 +209,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
   Widget _buildNoMatches(bool isDark) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -217,7 +218,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               size: 72,
               color: AppColors.textTertiaryOf(isDark),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             Text(
               'No Matches Found',
               maxLines: 1,
@@ -229,7 +230,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             Text(
               'None of your contacts are using this app yet. Invite them to join!',
               textAlign: TextAlign.center,
@@ -241,7 +242,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'Scanned ${_allPhoneContacts.length} contacts',
               maxLines: 1,
@@ -263,7 +264,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
       children: [
         // 统计信息
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacing),
           color: context.surfaceColor,
           child: Row(
             children: [
@@ -272,7 +273,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
                 color: AppColors.primary,
                 size: 20,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Flexible(
                 child: Text(
                   'Found ${_matchedContacts.length} matches from your contacts',
@@ -376,7 +377,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
         ),
         child: const Text('Chat'),
       ),

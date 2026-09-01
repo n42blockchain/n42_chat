@@ -8,6 +8,7 @@ import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/thread/thread_bloc.dart';
 import '../../blocs/thread/thread_event.dart';
 import '../../blocs/thread/thread_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 线程详情页
 ///
@@ -93,7 +94,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.error_outline, size: 48),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   Text(state.error!),
                 ],
               ),
@@ -110,10 +111,10 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                     if (state.isLoading && state.replies.isNotEmpty)
                       const SliverToBoxAdapter(
                         child: Padding(
-                          padding: EdgeInsets.all(16),
+                          padding: EdgeInsets.all(AppDimensions.spacing),
                           child: Center(
                             child: SizedBox(
-                              width: 24,
+                              width: AppDimensions.spacingXL,
                               height: 24,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
@@ -131,8 +132,8 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          horizontal: AppDimensions.spacing,
+                          vertical: AppDimensions.spacingS,
                         ),
                         child: Row(
                           children: [
@@ -149,7 +150,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppDimensions.spacingS),
                             Expanded(
                               child: Divider(
                                 color: theme.colorScheme.onSurface.withValues(
@@ -171,7 +172,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                     ),
 
                     // 底部留白
-                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                    const SliverToBoxAdapter(child: SizedBox(height: AppDimensions.spacing)),
                   ],
                 ),
               ),
@@ -188,7 +189,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
   Widget _buildRootMessage(BuildContext context, MessageEntity message) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(
@@ -246,7 +247,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           // 消息内容
           Text(message.content, style: const TextStyle(fontSize: 15, height: 1.4)),
         ],
@@ -257,7 +258,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
   Widget _buildReplyItem(BuildContext context, MessageEntity reply) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -287,7 +288,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                         fontSize: 13,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingS),
                     Text(
                       _formatTime(reply.timestamp),
                       style: TextStyle(
@@ -299,7 +300,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(reply.content, style: const TextStyle(fontSize: 14)),
               ],
             ),
@@ -323,10 +324,10 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
         ),
       ),
       padding: EdgeInsets.only(
-        left: 12,
-        right: 8,
-        top: 8,
-        bottom: 8 + MediaQuery.of(context).padding.bottom,
+        left: AppDimensions.spacingM,
+        right: AppDimensions.spacingS,
+        top: AppDimensions.spacingS,
+        bottom: AppDimensions.spacingS + MediaQuery.of(context).padding.bottom,
       ),
       child: Row(
         children: [
@@ -342,7 +343,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                 filled: true,
                 fillColor: theme.colorScheme.onSurface.withValues(alpha: 0.06),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
+                  horizontal: AppDimensions.spacing,
                   vertical: 10,
                 ),
                 isDense: true,
@@ -353,7 +354,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
               onSubmitted: (_) => _sendMessage(),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           IconButton(
             icon: Icon(
               Icons.send,

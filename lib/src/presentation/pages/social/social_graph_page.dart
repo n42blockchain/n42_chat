@@ -12,6 +12,7 @@ import '../../blocs/social/social_graph_state.dart';
 import '../../widgets/social/similarity_card.dart';
 import '../../widgets/social/social_graph_visualization.dart';
 import 'user_similarity_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Full-screen page showing the on-chain social graph.
 ///
@@ -152,15 +153,15 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
           ),
 
         // Bottom padding
-        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        const SliverToBoxAdapter(child: SizedBox(height: AppDimensions.spacingXL)),
       ],
     );
   }
 
   Widget _buildProfileCard(SocialProfile? profile, bool isDark) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(AppDimensions.spacing),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(14),
@@ -183,7 +184,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                 Row(
                   children: [
                     _buildProfileAvatar(profile.address),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacingM),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,19 +247,19 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
 
                 // Chain badges
                 if (profile.chains.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   Wrap(
                     spacing: 6,
                     runSpacing: 4,
                     children: profile.chains.take(8).map((chain) {
                       return Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
+                          horizontal: AppDimensions.spacingS,
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         ),
                         child: Text(
                           chain.toUpperCase(),
@@ -363,7 +364,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     final centerLabel = state.profile?.displayName ?? _shortenAddress(widget.address);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       height: 260,
       decoration: BoxDecoration(
         color: context.surfaceColor,
@@ -410,7 +411,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             size: 56,
             color: context.textTertiary,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           Text(
             'No connections found',
             maxLines: 1,
@@ -421,7 +422,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             'Connections appear as you build on-chain activity',
             maxLines: 2,
@@ -441,7 +442,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -450,7 +451,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
               size: 48,
               color: AppColors.error,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             Text(
               'Failed to load social graph',
               maxLines: 1,
@@ -462,7 +463,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -474,7 +475,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.spacingL),
             TextButton.icon(
               onPressed: _loadData,
               icon: const Icon(Icons.refresh, size: 18),

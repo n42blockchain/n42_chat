@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 转账消息组件（仿微信）
 class TransferMessageWidget extends StatelessWidget {
@@ -288,13 +289,13 @@ class _PaymentCardFrame extends StatelessWidget {
         width: 240,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               child: Row(
                 children: [
                   Container(
@@ -332,7 +333,7 @@ class _PaymentCardFrame extends StatelessWidget {
                           ),
                         ),
                         if (note?.isNotEmpty == true) ...[
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacingXS),
                           Text(
                             note!,
                             maxLines: 1,
@@ -350,7 +351,7 @@ class _PaymentCardFrame extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.05),
                 borderRadius: const BorderRadius.only(
@@ -446,7 +447,7 @@ class RedPacketMessageWidget extends StatelessWidget {
                     children: [
                       // 红包图标
                       _buildRedPacketIcon(isOpened),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppDimensions.spacingM),
 
                       // 祝福语和状态
                       Expanded(
@@ -486,8 +487,8 @@ class RedPacketMessageWidget extends StatelessWidget {
                 // 底部标签区域
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                    horizontal: AppDimensions.spacingM,
+                    vertical: AppDimensions.spacingS,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.05),
@@ -543,7 +544,7 @@ class RedPacketMessageWidget extends StatelessWidget {
       height: 50,
       decoration: BoxDecoration(
         color: const Color(0xFFD4380D),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
       child: Center(
         child: Container(

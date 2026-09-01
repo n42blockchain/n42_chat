@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Streak indicator widget showing consecutive active days.
 ///
@@ -74,10 +75,10 @@ class _StreakIndicatorState extends State<StreakIndicator>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         boxShadow: isDark
             ? null
             : [
@@ -103,7 +104,7 @@ class _StreakIndicatorState extends State<StreakIndicator>
                       : context.textTertiary,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -130,10 +131,10 @@ class _StreakIndicatorState extends State<StreakIndicator>
               if (_multiplier > 1)
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFF6B35).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: Text(
                     '${_multiplier}x',
@@ -146,7 +147,7 @@ class _StreakIndicatorState extends State<StreakIndicator>
                 ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           // 7-day calendar strip
           _buildCalendarStrip(isDark),
         ],

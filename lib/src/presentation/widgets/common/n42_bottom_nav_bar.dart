@@ -87,7 +87,7 @@ class N42BottomNavBar extends StatelessWidget {
         child: SizedBox(
           height: AppDimensions.bottomNavBarHeight,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS),
             child: Row(
               children: List.generate(navItems.length, (index) {
                 return Expanded(

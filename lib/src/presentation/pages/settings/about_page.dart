@@ -5,6 +5,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 关于页面
 class AboutPage extends StatelessWidget {
@@ -42,7 +43,7 @@ class AboutPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // App图标和名称
           Center(
@@ -61,7 +62,7 @@ class AboutPage extends StatelessWidget {
                     size: 48,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
                 Text(
                   appName,
                   maxLines: 1,
@@ -73,7 +74,7 @@ class AboutPage extends StatelessWidget {
                     color: context.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   l10n?.settingsVersionInfo(version) ?? 'Version $version',
                   maxLines: 1,
@@ -88,7 +89,7 @@ class AboutPage extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // 检查更新
           if (onCheckUpdate != null) ...[
@@ -111,7 +112,7 @@ class AboutPage extends StatelessWidget {
                 onTap: onCheckUpdate,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
           ],
 
           // 链接列表
@@ -137,7 +138,7 @@ class AboutPage extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // 技术说明
           Center(
@@ -153,7 +154,7 @@ class AboutPage extends StatelessWidget {
                     color: context.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   '© 2024 N42. All rights reserved.',
                   maxLines: 1,
@@ -168,7 +169,7 @@ class AboutPage extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
         ],
       ),
     );
@@ -195,7 +196,7 @@ class AboutPage extends StatelessWidget {
 
   Widget _buildDivider(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.only(left: AppDimensions.spacing),
       child: Divider(
         height: 1,
         color: context.dividerColor,

@@ -8,6 +8,7 @@ import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../n42_chat.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 语言设置页面
 class LanguageSettingsPage extends StatefulWidget {
@@ -231,7 +232,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
           AbsorbPointer(
             absorbing: _isSaving,
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing),
               itemCount: _languages.length,
               itemBuilder: (context, index) {
                 final language = _languages[index];
@@ -293,10 +294,10 @@ class _LanguageItem extends StatelessWidget {
     final subtitleColor = context.textSecondary;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: isSelected
             ? Border.all(color: AppColors.primary, width: 2)
             : null,
@@ -305,9 +306,9 @@ class _LanguageItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
             child: Row(
               children: [
                 // 语言图标/标识
@@ -318,7 +319,7 @@ class _LanguageItem extends StatelessWidget {
                     color: isSelected
                         ? AppColors.primary.withValues(alpha: 0.1)
                         : context.pageBackground,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: Center(
                     child: Text(
@@ -331,7 +332,7 @@ class _LanguageItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacingM),
                 // 语言名称
                 Expanded(
                   child: Column(

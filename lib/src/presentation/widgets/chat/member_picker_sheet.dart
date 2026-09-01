@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class MemberPickerSheet extends StatefulWidget {
   final String roomId;
@@ -96,17 +97,17 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
         children: [
           // 拖拽指示器
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 12),
+            margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
             width: 40,
             height: 4,
             decoration: BoxDecoration(
               color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
             ),
           ),
           // 标题
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: Row(
               children: [
                 IconButton(
@@ -131,7 +132,7 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
           ),
           // 搜索框
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: TextField(
               controller: _searchController,
               onChanged: _filterMembers,
@@ -146,12 +147,12 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
                     ? Colors.white.withValues(alpha: 0.1)
                     : Colors.grey[200],
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  horizontal: AppDimensions.spacing,
+                  vertical: AppDimensions.spacingM,
                 ),
               ),
             ),

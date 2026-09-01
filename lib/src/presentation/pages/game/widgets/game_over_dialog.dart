@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../services/game_score_service.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class GameOverDialog extends StatefulWidget {
   final String gameId;
@@ -70,19 +71,19 @@ class _GameOverDialogState extends State<GameOverDialog> {
                 style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               if (highScore != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   '${l10n?.gameHighScore ?? 'Best'}: $highScore',
                   style: TextStyle(fontSize: 16, color: context.textTertiary),
                 ),
               ],
               if (highScore != null && _isNewRecord(highScore)) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingXS),
                   decoration: BoxDecoration(
                     color: Colors.amber.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   ),
                   child: Text(
                     '🏆 ${l10n?.gameNewRecord ?? 'New Record!'}',

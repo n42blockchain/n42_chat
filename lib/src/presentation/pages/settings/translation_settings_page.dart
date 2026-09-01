@@ -9,6 +9,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// WeChat 风格翻译设置页面
 class TranslationSettingsPage extends StatefulWidget {
@@ -196,16 +197,16 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
+                margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
                   color: context.dividerColor,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing),
                 child: Text(
                   S.of(context)?.settingsTranslateTextTo ?? 'Translate text to',
                   maxLines: 1,
@@ -268,7 +269,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
             ],
           ),
         ),
@@ -310,7 +311,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 翻译图标
           Center(
@@ -319,13 +320,13 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
               height: 64,
               decoration: BoxDecoration(
                 color: Colors.teal.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
               ),
               child: const Icon(Icons.translate, size: 36, color: Colors.teal),
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // 卡片1：目标语言选择
           Container(
@@ -336,7 +337,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                 onTap: _showLanguagePicker,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                    horizontal: AppDimensions.spacing,
                     vertical: 14,
                   ),
                   child: Row(
@@ -368,7 +369,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppDimensions.spacingXS),
                       Icon(
                         AppIcons.chevron,
                         color: context.textTertiary,
@@ -382,7 +383,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 说明文字
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: Text(
               l10n?.settingsTranslateDescription ??
                   'Select the language you want messages to be translated into.',
@@ -393,13 +394,13 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 卡片2：自动翻译开关
           Container(
             color: context.surfaceColor,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 6),
               child: Row(
                 children: [
                   Expanded(
@@ -430,7 +431,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 说明文字
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: Text(
               l10n?.settingsAutoTranslateDescription ??
                   'Automatically translate messages received in chat to your selected language.',
@@ -441,13 +442,13 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 卡片3：智能回复翻译开关
           Container(
             color: context.surfaceColor,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 6),
               child: Row(
                 children: [
                   Expanded(
@@ -477,7 +478,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
 
           // 说明文字
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: Text(
               'Automatically translate your messages to match the recipient\'s language before sending.',
               style: TextStyle(

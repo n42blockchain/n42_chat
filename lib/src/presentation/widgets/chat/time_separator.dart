@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 时间分隔器（微信风格：无背景，纯灰色文字居中）
 class TimeSeparator extends StatelessWidget {
@@ -22,7 +23,7 @@ class TimeSeparator extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing),
       child: Center(
         child: Text(
           customText ?? N42DateUtils.formatMessageTime(dateTime),
@@ -55,7 +56,7 @@ class SystemMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM, horizontal: 40),
       child: Center(
         child: _buildText(),
       ),
@@ -155,18 +156,18 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS, horizontal: AppDimensions.spacingXL),
       child: Center(
         child: GestureDetector(
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
             decoration: BoxDecoration(
               border: Border.all(
                 color: const Color(0xFFE64340).withValues(alpha: 0.3),
                 width: 1,
               ),
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusS),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -177,7 +178,7 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
                   height: 16,
                   decoration: BoxDecoration(
                     color: const Color(0xFFE64340),
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                   ),
                   child: Center(
                     child: Container(
@@ -190,7 +191,7 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 // 消息文本
                 Text.rich(
                   TextSpan(
@@ -263,7 +264,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
       child: Row(
         children: [
           AnimatedBuilder(
@@ -291,7 +292,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
               );
             },
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Text(
             widget.userName != null
                 ? (S.of(context)?.commonUserTyping(widget.userName!) ?? '${widget.userName} is typing...')

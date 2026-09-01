@@ -208,13 +208,13 @@ class _RegisterPageState extends State<RegisterPage> {
         builder: (context, state) {
           final isDarkMode = context.isDarkMode;
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXL),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
 
                   // 服务器输入
                   _buildServerInput(context, state, isDarkMode),
@@ -250,22 +250,22 @@ class _RegisterPageState extends State<RegisterPage> {
                   // 邀请码输入（可折叠）
                   _buildInviteCodeInput(context, isDarkMode),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
 
                   // 同意协议
                   _buildAgreementCheckbox(context),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 注册按钮
                   _buildRegisterButton(state),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
 
                   // 已有账号
                   _buildLoginLink(context),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                 ],
               ),
             ),
@@ -288,7 +288,7 @@ class _RegisterPageState extends State<RegisterPage> {
           S.of(context)?.authServerAddress ?? 'Server Address',
           style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _homeserverController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -301,18 +301,18 @@ class _RegisterPageState extends State<RegisterPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             suffixIcon: state.isCheckingHomeserver
                 ? const Padding(
-                    padding: EdgeInsets.all(12),
+                    padding: EdgeInsets.all(AppDimensions.spacingM),
                     child: SizedBox(
-                      width: 20,
+                      width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
@@ -346,7 +346,7 @@ class _RegisterPageState extends State<RegisterPage> {
           },
         ),
         if (state.isHomeserverValid && state.homeserverInfo != null) ...[
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             '✓ ${S.of(context)?.authConnectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
             maxLines: 1,
@@ -370,7 +370,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: SwitchListTile(
         value: _anonymousMode,
@@ -398,7 +398,7 @@ class _RegisterPageState extends State<RegisterPage> {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(color: subtitleColor, fontSize: 12, height: 1.4),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
       ),
     );
   }
@@ -410,10 +410,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,7 +454,7 @@ class _RegisterPageState extends State<RegisterPage> {
           S.of(context)?.authUsername ?? 'Username',
           style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _usernameController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -467,11 +467,11 @@ class _RegisterPageState extends State<RegisterPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.person_outline, color: hintColor),
@@ -520,14 +520,14 @@ class _RegisterPageState extends State<RegisterPage> {
               S.of(context)?.authEmailAddress ?? 'Email Address',
               style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppDimensions.spacingXS),
             Text(
               '(${S.of(context)?.authOptional ?? 'Optional'})',
               style: TextStyle(fontSize: 12, color: hintColor),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -538,11 +538,11 @@ class _RegisterPageState extends State<RegisterPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.email_outlined, color: hintColor),
@@ -563,7 +563,7 @@ class _RegisterPageState extends State<RegisterPage> {
             return null;
           },
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
         Text(
           S.of(context)?.authEmailRecoveryHint ?? 'Used for password recovery',
           maxLines: 1,
@@ -587,7 +587,7 @@ class _RegisterPageState extends State<RegisterPage> {
           S.of(context)?.authPassword ?? 'Password',
           style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -597,11 +597,11 @@ class _RegisterPageState extends State<RegisterPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.lock_outline, color: hintColor),
@@ -648,7 +648,7 @@ class _RegisterPageState extends State<RegisterPage> {
           S.of(context)?.authConfirmPassword ?? 'Confirm Password',
           style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -659,11 +659,11 @@ class _RegisterPageState extends State<RegisterPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.lock_outline, color: hintColor),
@@ -723,7 +723,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 color: labelColor,
                 size: 20,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Flexible(
                 child: Text(
                   S.of(context)?.authInviteCodeBuiltIn ??
@@ -754,7 +754,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         // 邀请码输入框（可折叠）
         if (_showInviteCode) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           TextFormField(
             controller: _inviteCodeController,
             style: TextStyle(color: textColor, fontSize: 14),
@@ -766,17 +766,17 @@ class _RegisterPageState extends State<RegisterPage> {
               filled: true,
               fillColor: inputBgColor,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: BorderSide.none,
               ),
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
+                horizontal: AppDimensions.spacing,
+                vertical: AppDimensions.spacingM,
               ),
               prefixIcon: Icon(Icons.vpn_key_outlined, color: hintColor),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             S.of(context)?.authInviteCodeBuiltInNote ??
                 'Invite code is built-in, usually no need to modify',
@@ -804,7 +804,7 @@ class _RegisterPageState extends State<RegisterPage> {
           },
           child: AbsorbPointer(
             child: SizedBox(
-              width: 24,
+              width: AppDimensions.spacingXL,
               height: 24,
               child: Checkbox(
                 value: _agreeToTerms,
@@ -813,13 +813,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 checkColor: Colors.white,
                 side: BorderSide(color: textColor),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
               ),
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppDimensions.spacingS),
         Expanded(
           child: Text.rich(
             TextSpan(
@@ -857,12 +857,12 @@ class _RegisterPageState extends State<RegisterPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusM)),
           elevation: 0,
         ),
         child: state.isLoading
             ? const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,

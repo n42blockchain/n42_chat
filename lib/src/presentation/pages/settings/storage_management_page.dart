@@ -17,6 +17,7 @@ import '../../blocs/storage/storage_management_event.dart';
 import '../../blocs/storage/storage_management_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'room_storage_detail_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 微信风格存储管理页面
 class StorageManagementPage extends StatelessWidget {
@@ -121,7 +122,7 @@ class _StorageManagementView extends StatelessWidget {
                 _StorageSettingsSection(state: state),
                 const SizedBox(height: 10),
                 _ClearCacheButton(state: state),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimensions.spacingXXL),
               ],
             ),
           );
@@ -149,7 +150,7 @@ class _StorageOverviewSection extends StatelessWidget {
 
     return Container(
       color: cardColor,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       child: Column(
         children: [
           // 环形图
@@ -202,7 +203,7 @@ class _StorageOverviewSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppDimensions.spacingL),
           // 分类图例
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -255,7 +256,7 @@ class _LegendItem extends StatelessWidget {
           height: 10,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
         Text(
           label,
           maxLines: 1,
@@ -295,12 +296,12 @@ class _StorageWarningBanner extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: isCritical
             ? AppColors.error.withValues(alpha: 0.1)
             : AppColors.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         border: Border.all(
           color: isCritical
               ? AppColors.error.withValues(alpha: 0.3)
@@ -314,7 +315,7 @@ class _StorageWarningBanner extends StatelessWidget {
             color: isCritical ? AppColors.error : AppColors.warning,
             size: 24,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Text(
               isCritical
@@ -360,7 +361,7 @@ class _SmartCleanupSection extends StatelessWidget {
                   color: AppColors.primary,
                   size: 20,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'Smart Cleanup',
                   maxLines: 1,
@@ -384,7 +385,7 @@ class _SmartCleanupSection extends StatelessWidget {
                   isCleaning: state.isCleaning,
                 ),
               ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
         ],
       ),
     );
@@ -431,7 +432,7 @@ class _RecommendationTile extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Icon(icon, color: color, size: 20),
       ),
@@ -531,7 +532,7 @@ class _RoomStorageSection extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 14, height: 1.3, color: secondaryColor),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppDimensions.spacingXS),
                       Icon(
                         AppIcons.chevron,
                         size: 20,
@@ -565,7 +566,7 @@ class _RoomStorageSection extends StatelessWidget {
                 // TODO: Navigate to full room list
               },
             ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
         ],
       ),
     );
@@ -678,7 +679,7 @@ class _StorageSettingsSection extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
         ],
       ),
     );
@@ -720,7 +721,7 @@ class _ClearCacheButton extends StatelessWidget {
         ),
         trailing: state.isCleaning
             ? const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )

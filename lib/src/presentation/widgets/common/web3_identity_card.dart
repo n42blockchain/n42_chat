@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import 'ens_badge.dart';
 import 'n42_avatar.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Web3 identity card widget.
 ///
@@ -73,16 +74,16 @@ class Web3IdentityCard extends StatelessWidget {
         _abbreviateAddress(walletAddress);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         border: Border.all(
           color: AppColors.dividerOf(isDark),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -97,7 +98,7 @@ class Web3IdentityCard extends StatelessWidget {
                   isNftAvatar: isNftAvatar,
                   size: 56,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacingM),
 
                 // Name + badges
                 Expanded(
@@ -115,7 +116,7 @@ class Web3IdentityCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXS),
 
                       // Badges row
                       Wrap(
@@ -142,7 +143,7 @@ class Web3IdentityCard extends StatelessWidget {
               height: 1,
               color: AppColors.dividerOf(isDark),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // ── Address row ─────────────────────────────────────────────
             Row(
@@ -178,16 +179,16 @@ class Web3IdentityCard extends StatelessWidget {
                       ),
                     );
                   },
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                        horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.copy_rounded,
                             size: 14, color: AppColors.primary),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppDimensions.spacingXS),
                         Text(
                           l10n?.web3Copy ?? 'Copy',
                           style: const TextStyle(
@@ -222,12 +223,12 @@ class Web3IdentityCard extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                     elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                   ),
                 ),
               ),
               if (!isN42User) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   l10n?.web3WalletOnlyHint ??
                       'This address has no N42 account yet. Message will be delivered when they join.',
@@ -320,7 +321,7 @@ class _NftAvatarBadge extends StatelessWidget {
         gradient: const LinearGradient(
           colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
         ),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -352,7 +353,7 @@ class _N42Badge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         border: Border.all(
           color: AppColors.primary.withValues(alpha: 0.4),
           width: 0.5,

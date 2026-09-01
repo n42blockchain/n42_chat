@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 自动下载设置页
 class AutoDownloadSettingsPage extends StatefulWidget {
@@ -272,7 +273,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
             child: Row(
               children: [
                 Icon(icon, size: 20, color: AppColors.primary),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   title,
                   style: TextStyle(
@@ -308,20 +309,20 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
     required String message,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: isDark
             ? AppColors.surfaceDark.withValues(alpha: 0.85)
             : AppColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 20, color: AppColors.primary),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,7 +338,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                     color: context.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   message,
                   maxLines: 3,

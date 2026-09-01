@@ -10,6 +10,7 @@ import '../../../domain/repositories/contact_repository.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'phone_contacts_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 // ─── Input type detection ─────────────────────────────────────────────────────
 
@@ -379,7 +380,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
           // ── Search bar
           Container(
             color: context.surfaceColor,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -388,7 +389,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                       '@matrix:id  •  0x wallet address  •  name.eth',
                   style: TextStyle(fontSize: 13, color: context.textSecondary),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 Row(
                   children: [
                     Expanded(
@@ -398,7 +399,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                           color: isDark
                               ? AppColors.backgroundDark
                               : AppColors.inputBackground,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         ),
                         child: TextField(
                           controller: _searchController,
@@ -418,8 +419,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
+                              horizontal: AppDimensions.spacing,
+                              vertical: AppDimensions.spacingM,
                             ),
                           ),
                           style: TextStyle(
@@ -432,7 +433,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacingM),
                     ElevatedButton(
                       onPressed: _isLoading ? null : _searchUser,
                       style: ElevatedButton.styleFrom(
@@ -440,12 +441,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
                         foregroundColor: Colors.white,
                         minimumSize: const Size(72, 44),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         ),
                       ),
                       child: _isLoading
                           ? const SizedBox(
-                              width: 20,
+                              width: AppDimensions.spacingL,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
@@ -459,7 +460,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
                 // Input type hint chip
                 if (_searchController.text.isNotEmpty) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   _InputTypeChip(query: _searchController.text, isDark: isDark),
                 ],
               ],
@@ -469,7 +470,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
           // ── Phone contacts entry
           Container(
             color: context.surfaceColor,
-            margin: const EdgeInsets.only(top: 8),
+            margin: const EdgeInsets.only(top: AppDimensions.spacingS),
             child: Material(
               color: Colors.transparent,
               child: ListTile(
@@ -478,7 +479,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   height: 40,
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: const Icon(
                     Icons.contacts,
@@ -507,7 +508,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
           if (_errorMessage != null)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               color: AppColors.error.withValues(alpha: 0.1),
               child: Text(
                 _errorMessage!,
@@ -604,7 +605,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
         ),
         child: Text(S.of(context)?.commonChat ?? 'Chat'),
       ),
@@ -672,17 +673,17 @@ class _InputTypeChip extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppDimensions.spacingXS),
           Text(
             label,
             style: TextStyle(
@@ -729,7 +730,7 @@ class _SearchEmptyState extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.person_search, size: 56, color: color),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
                 Text(
                   l10n?.contactSearchUserToChat ??
                       'Search user to start chatting',
@@ -740,7 +741,7 @@ class _SearchEmptyState extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
                 _SearchMethodRow(isDark: isDark, l10n: l10n),
               ],
             ),
@@ -768,7 +769,7 @@ class _SearchMethodRow extends StatelessWidget {
           desc: '@user:server.com',
           isDark: isDark,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         _MethodCard(
           icon: Icons.account_balance_wallet_outlined,
           color: Colors.orange,
@@ -776,7 +777,7 @@ class _SearchMethodRow extends StatelessWidget {
           desc: '0x71C7...6b6e',
           isDark: isDark,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         _MethodCard(
           icon: Icons.verified_outlined,
           color: const Color(0xFF5298FF),
@@ -820,11 +821,11 @@ class _MethodCard extends StatelessWidget {
             height: 32,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Icon(icon, size: 17, color: color),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

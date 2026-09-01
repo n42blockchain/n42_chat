@@ -12,6 +12,7 @@ import '../../../core/utils/a11y_l10n.dart';
 import 'slash_command_picker.dart';
 import 'scheduled_send_picker.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 语音录音结果回调
 typedef VoiceRecordCallback = void Function(String path, Duration duration);
@@ -608,7 +609,7 @@ class ChatInputBarState extends State<ChatInputBar> {
                   : const SizedBox.shrink(),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS, vertical: 6),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -682,7 +683,7 @@ class ChatInputBarState extends State<ChatInputBar> {
   Widget _buildFormattingBar() {
     return Container(
       height: 40,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         border: Border(
@@ -703,7 +704,7 @@ class ChatInputBarState extends State<ChatInputBar> {
     return Tooltip(
       message: action.tooltip,
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         onTap: () => _applyMarkdownFormat(action.prefix, action.suffix),
         child: Container(
           width: 40,
@@ -795,7 +796,7 @@ class ChatInputBarState extends State<ChatInputBar> {
 
   Widget _buildTextField(bool isDark) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(22),
@@ -826,7 +827,7 @@ class ChatInputBarState extends State<ChatInputBar> {
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
+            horizontal: AppDimensions.spacingM,
             vertical: 10,
           ),
           isDense: true,
@@ -873,7 +874,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         }
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
+        margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS),
         height: 40,
         decoration: BoxDecoration(
           color: _isRecording
@@ -881,7 +882,7 @@ class ChatInputBarState extends State<ChatInputBar> {
                     ? AppColors.error.withValues(alpha: 0.1)
                     : AppColors.primary.withValues(alpha: 0.1))
               : context.surfaceColor,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           border: _isRecording
               ? Border.all(
                   color: _cancelRecording ? AppColors.error : AppColors.primary,

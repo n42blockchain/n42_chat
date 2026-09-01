@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// WeChat-inspired slide-to-confirm payment button.
 ///
@@ -199,14 +200,14 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        width: 16,
+                        width: AppDimensions.spacing,
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: widget.trackColor,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingS),
                       Text(
                         widget.confirmingLabel,
                         style: TextStyle(

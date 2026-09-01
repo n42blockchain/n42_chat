@@ -14,6 +14,7 @@ import '../../blocs/ai_assistant/ai_assistant_event.dart';
 import '../../blocs/ai_assistant/ai_assistant_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'ai_assistant_settings_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// AI 助手聊天页面
 class AiAssistantPage extends StatelessWidget {
@@ -167,7 +168,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
 
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       itemCount: allMessages.length + (state.isGenerating ? 1 : 0),
       itemBuilder: (context, index) {
         if (index < allMessages.length) {
@@ -187,7 +188,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
     final l10n = S.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -195,7 +196,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               state.assistant?.avatar ?? '🤖',
               style: const TextStyle(fontSize: 64),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               state.assistant?.name ?? 'N42 AI',
               maxLines: 1,
@@ -207,7 +208,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               l10n?.aiAssistantWelcome ??
                   'Ask me anything! I can help with questions, writing, analysis, and more.',
@@ -221,15 +222,15 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               ),
             ),
             if (!state.isAvailable) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                  horizontal: AppDimensions.spacing,
+                  vertical: AppDimensions.spacingS,
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.warning.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: Text(
                   l10n?.aiAssistantNotConfigured ??
@@ -243,7 +244,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             ],
             // Web3 快捷建议 chips
             if (state.isAvailable) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXL),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -312,7 +313,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
     final isUser = message.isUser;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXS),
       child: Row(
         mainAxisAlignment: isUser
             ? MainAxisAlignment.end
@@ -325,7 +326,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
               child: const Text('🤖', style: TextStyle(fontSize: 16)),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
           ],
           Flexible(
             child: Container(
@@ -334,7 +335,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 color: isUser
                     ? AppColors.primary
                     : context.surfaceColor,
-                borderRadius: BorderRadius.circular(16).copyWith(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXL).copyWith(
                   topLeft: isUser ? null : const Radius.circular(4),
                   topRight: isUser ? const Radius.circular(4) : null,
                 ),
@@ -380,7 +381,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                             color: isDark
                                 ? Colors.black26
                                 : Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                           ),
                           listBullet: TextStyle(
                             fontSize: 15,
@@ -396,7 +397,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             ),
           ),
           if (isUser) ...[
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
@@ -414,7 +415,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
 
   Widget _buildStreamingBubble(String text, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXS),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,7 +425,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             child: const Text('🤖', style: TextStyle(fontSize: 16)),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -473,9 +474,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
 
     return Container(
       padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 8,
+        left: AppDimensions.spacingM,
+        right: AppDimensions.spacingM,
+        top: AppDimensions.spacingS,
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
       decoration: BoxDecoration(
@@ -507,7 +508,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                    horizontal: AppDimensions.spacing,
                     vertical: 10,
                   ),
                 ),
@@ -520,7 +521,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           if (state.isGenerating)
             IconButton(
               onPressed: () =>
@@ -530,7 +531,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 height: 32,
                 decoration: BoxDecoration(
                   color: AppColors.error,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                 ),
                 child: const Icon(Icons.stop, color: Colors.white, size: 18),
               ),
@@ -543,7 +544,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 height: 32,
                 decoration: BoxDecoration(
                   color: canSend ? AppColors.primary : Colors.grey,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                 ),
                 child: const Icon(
                   Icons.arrow_upward,

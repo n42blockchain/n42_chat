@@ -137,6 +137,7 @@ import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/image_text_l10n.dart';
 import '../../../core/utils/video_note_utils.dart';
 import 'whiteboard_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 part 'chat_page_app_bar.dart';
 part 'chat_page_message_list.dart';
@@ -1475,7 +1476,7 @@ class _BotResultSheet extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -1483,12 +1484,12 @@ class _BotResultSheet extends StatelessWidget {
           // 拖拽条
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(top: AppDimensions.spacingS),
               width: 36,
               height: 4,
               decoration: BoxDecoration(
                 color: context.dividerColor,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
               ),
             ),
           ),
@@ -1520,7 +1521,7 @@ class _BotResultSheet extends StatelessWidget {
           const Divider(height: 1),
           Flexible(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppDimensions.spacingL),
               child: Text(
                 content,
                 style: TextStyle(
@@ -1531,7 +1532,7 @@ class _BotResultSheet extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
         ],
       ),
     );

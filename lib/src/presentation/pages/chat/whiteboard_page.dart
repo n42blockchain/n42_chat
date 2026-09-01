@@ -10,6 +10,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/chat/whiteboard/whiteboard_controller.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 白板 / 涂鸦页（仿微信「涂鸦」、对标 iMessage Digital Touch / Apple Freeform）。
 ///
@@ -249,7 +250,7 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
   Widget _buildToolbar() {
     return Container(
       color: Colors.black,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: 10),
       child: SafeArea(
         top: false,
         child: Row(
@@ -270,7 +271,7 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
                 onPressed: _clearBoard,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppDimensions.spacingXS),
             Expanded(
               child: AnimatedBuilder(
                 animation: _controller,

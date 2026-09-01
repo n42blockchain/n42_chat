@@ -23,6 +23,7 @@ import 'social_hub_page.dart';
 import '../space/space_list_page.dart';
 import '../voice_room/voice_room_list_page.dart';
 import 'channel_discover_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 发现页面（仿微信）
 class DiscoverPage extends StatelessWidget {
@@ -48,7 +49,7 @@ class DiscoverPage extends StatelessWidget {
           : null,
       body: ListView(
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 朋友圈
           _buildGroupCard(
@@ -71,7 +72,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 扫一扫、搜一搜
           _buildGroupCard(
@@ -96,7 +97,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 直播、听一听、看一看
           _buildGroupCard(
@@ -131,7 +132,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 游戏
           _buildGroupCard(
@@ -175,7 +176,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 社区/Communities
           _buildGroupCard(
@@ -196,7 +197,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 附近的人
           _buildGroupCard(
@@ -216,7 +217,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 频道发现
           _buildGroupCard(
@@ -240,7 +241,7 @@ class DiscoverPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
         ],
       ),
     );
@@ -272,11 +273,11 @@ class DiscoverPage extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
           child: Row(
             children: [
               SizedBox(width: 26, height: 26, child: iconWidget),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.spacing),
               Expanded(
                 child: Text(
                   title,
@@ -371,7 +372,7 @@ class DiscoverPage extends StatelessWidget {
                   size: 32,
                 ),
               if (unread > 0) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Container(
                   width: 8,
                   height: 8,

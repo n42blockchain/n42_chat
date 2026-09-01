@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 标签管理页面
 class TagsManagementPage extends StatefulWidget {
@@ -249,7 +250,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                         size: 64,
                         color: AppColors.textTertiaryOf(isDark),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing),
                       Text(
                         S.of(context)?.contactNoTags ?? 'No tags yet',
                         style: TextStyle(
@@ -257,7 +258,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                           color: context.textSecondary,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacingXL),
                       ElevatedButton.icon(
                         onPressed: _createTag,
                         icon: const Icon(Icons.add),

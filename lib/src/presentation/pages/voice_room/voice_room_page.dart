@@ -8,6 +8,7 @@ import '../../blocs/voice_room/voice_room_bloc.dart';
 import '../../blocs/voice_room/voice_room_event.dart';
 import '../../blocs/voice_room/voice_room_state.dart';
 import '../../widgets/voice_room/participant_grid.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 语音房间内页面
 ///
@@ -75,7 +76,7 @@ class _VoiceRoomView extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const CircularProgressIndicator(),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.spacing),
                         Text(s?.voiceRoomConnecting ?? 'Connecting...'),
                       ],
                     )
@@ -106,11 +107,11 @@ class _VoiceRoomView extends StatelessWidget {
             actions: [
               // 直播标识
               Container(
-                margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                margin: const EdgeInsets.only(right: AppDimensions.spacing),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
                 decoration: BoxDecoration(
                   color: AppColors.success,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -123,7 +124,7 @@ class _VoiceRoomView extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacingXS),
                     Text(
                       s?.voiceRoomLive ?? 'LIVE',
                       style: const TextStyle(
@@ -167,10 +168,10 @@ class _VoiceRoomView extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 16,
-        bottom: 16 + MediaQuery.of(context).padding.bottom,
+        left: AppDimensions.spacingXL,
+        right: AppDimensions.spacingXL,
+        top: AppDimensions.spacing,
+        bottom: AppDimensions.spacing + MediaQuery.of(context).padding.bottom,
       ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
@@ -267,7 +268,7 @@ class _VoiceRoomView extends StatelessWidget {
             ),
             child: Icon(icon, color: effectiveColor, size: 24),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             label,
             style: TextStyle(

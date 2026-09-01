@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import 'sticker_thumb.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 贴纸输入联想条
 ///
@@ -32,9 +33,9 @@ class StickerSuggestionBar extends StatelessWidget {
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingS),
         itemCount: suggestions.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: AppDimensions.spacingS),
         itemBuilder: (context, index) {
           final hit = suggestions[index];
           return GestureDetector(
@@ -44,7 +45,7 @@ class StickerSuggestionBar extends StatelessWidget {
               child: StickerThumb(
                 sticker: hit.sticker,
                 emojiFontSize: 30,
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(AppDimensions.spacingXS),
               ),
             ),
           );

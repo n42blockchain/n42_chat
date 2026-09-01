@@ -12,6 +12,7 @@ import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'nft_avatar_picker_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 enum _AvatarStudioOperation { decoration, bindNft, clearNft }
 
@@ -76,9 +77,9 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
             children: [
               _buildHeroCard(context, isDark, user),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _buildDecorationSection(context, user),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _buildNftSection(context, user),
             ],
           ),
@@ -93,7 +94,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
     final subtitleColor = context.textSecondary;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.spacingL),
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(18),
@@ -118,7 +119,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
               color: textColor,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Wrap(
             alignment: WrapAlignment.center,
             spacing: 8,
@@ -154,12 +155,12 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
     return labels
         .map(
           (label) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: 6),
             decoration: BoxDecoration(
               color: isDark
                   ? Colors.white.withValues(alpha: 0.06)
                   : Colors.black.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
             ),
             child: Text(
               label,
@@ -178,7 +179,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
     final textColor = context.textPrimary;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(18),
@@ -202,7 +203,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -383,7 +384,7 @@ class _DecorationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppDimensions.spacingM),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             border: Border.all(

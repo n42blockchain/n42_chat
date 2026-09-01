@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// N42豆页面（类似微信豆）
 class N42BeanPage extends StatefulWidget {
@@ -86,7 +87,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // N42豆文字
                   Text(
@@ -100,7 +101,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 豆数量
                   Text(
@@ -126,7 +127,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
     final s = S.of(context);
     return Container(
       height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
       child: Row(
         children: [
           IconButton(
@@ -168,7 +169,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
         ),
       ),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppDimensions.spacingXL),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -184,7 +185,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.spacingL),
 
             // 功能列表
             _buildFeatureItem('· ${s?.profileN42BeanFeature1 ?? 'Exclusive member stickers and themes'}'),
@@ -213,7 +214,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
                   ),
                   child: Text(
@@ -230,7 +231,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.spacingL),
           ],
         ),
       ),
@@ -280,18 +281,18 @@ class _BeanDetailSheet extends StatelessWidget {
         children: [
           // 拖拽指示器
           Container(
-            margin: const EdgeInsets.only(top: 12),
+            margin: const EdgeInsets.only(top: AppDimensions.spacingM),
             width: 40,
             height: 4,
             decoration: BoxDecoration(
               color: AppColors.divider,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
             ),
           ),
 
           // 标题
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Row(
               children: [
                 const Spacer(),
@@ -336,7 +337,7 @@ class _BeanDetailSheet extends StatelessWidget {
                     size: 64,
                     color: AppColors.textTertiary,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     s?.profileNoN42BeanRecords ?? 'No N42 Bean records',
                     maxLines: 1,

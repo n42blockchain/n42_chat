@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../services/voip/livekit_service.dart';
 import '../../../services/voip/voip_config.dart';
 import '../../../services/voip/webrtc_service.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 abstract class CallEnhancementController {
   AudioProcessingConfig get audioProcessingConfig;
@@ -253,9 +254,9 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
         ),
         child: ListView(
           padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 12,
+            left: AppDimensions.spacingL,
+            right: AppDimensions.spacingL,
+            top: AppDimensions.spacingM,
             bottom: MediaQuery.of(context).padding.bottom + 24,
           ),
           children: [
@@ -265,25 +266,25 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
                 height: 4,
                 decoration: BoxDecoration(
                   color: dividerColor,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               widget.title ?? 'Call tools',
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(
               'Tune audio and video quality without leaving the call.',
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: subtitleColor),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             const _SectionTitle(title: 'Audio enhancement'),
             _SwitchTile(
               icon: Icons.graphic_eq,
@@ -319,7 +320,7 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
                 onChanged: (_) => _runAction(_controller.toggleEnhancedAudio),
               ),
             if (_controller.supportsBackgroundBlur) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: AppDimensions.spacingL),
               const _SectionTitle(title: 'Video'),
               _SwitchTile(
                 icon: Icons.blur_on,
@@ -335,7 +336,7 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
               ),
             ],
             if (_controller.supportsRecording) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: AppDimensions.spacingL),
               const _SectionTitle(title: 'Recording'),
               _ActionTile(
                 icon: Icons.fiber_manual_record,
@@ -407,7 +408,7 @@ class _SwitchTile extends StatelessWidget {
       child: SwitchListTile.adaptive(
         value: value,
         onChanged: enabled ? onChanged : null,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
         secondary: Icon(
           icon,
           color: enabled ? AppColors.primary : subtitleColor,
@@ -456,7 +457,7 @@ class _ActionTile extends StatelessWidget {
       ),
       child: ListTile(
         enabled: enabled,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
         leading: Icon(icon, color: iconColor ?? AppColors.primary),
         title: Text(title),
         subtitle: Text(

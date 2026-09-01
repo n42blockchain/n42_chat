@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class ChannelEditorDraft {
   final String name;
@@ -91,7 +92,7 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
         child: SafeArea(
           top: false,
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppDimensions.spacingL),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +117,7 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
                 TextField(
                   controller: _nameController,
                   autofocus: true,
@@ -126,7 +127,7 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
                     prefixIcon: Icon(Icons.tag),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 TextField(
                   controller: _categoryController,
                   decoration: const InputDecoration(
@@ -136,7 +137,7 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
                     prefixIcon: Icon(Icons.folder_outlined),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 TextField(
                   controller: _topicController,
                   decoration: const InputDecoration(
@@ -144,7 +145,7 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppDimensions.spacingL),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

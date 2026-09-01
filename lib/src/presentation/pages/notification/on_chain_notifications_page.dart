@@ -10,6 +10,7 @@ import '../../blocs/on_chain_notification/on_chain_notification_bloc.dart';
 import '../../blocs/on_chain_notification/on_chain_notification_event.dart';
 import '../../blocs/on_chain_notification/on_chain_notification_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 链上事件通知列表页面
 ///
@@ -114,7 +115,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
               itemBuilder: (context, index) {
                 if (index == state.notifications.length) {
                   return const Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(AppDimensions.spacing),
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
@@ -159,14 +160,14 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
             size: 64,
             color: context.dividerColor,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             l10n?.onChainNoNotifications ?? 'No on-chain events yet',
             style: TextStyle(
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             l10n?.onChainNoNotificationsDesc ??
                 'Events from subscribed channels will appear here',
@@ -192,7 +193,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
             size: 64,
             color: context.dividerColor,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             message ?? (l10n?.commonLoadFailed ?? 'Failed to load'),
             textAlign: TextAlign.center,
@@ -200,7 +201,7 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           OutlinedButton(
             onPressed: () => context
                 .read<OnChainNotificationBloc>()
@@ -240,13 +241,13 @@ class _OnChainNotificationItem extends StatelessWidget {
                 ? AppColors.primary.withValues(alpha: 0.08)
                 : AppColors.primary.withValues(alpha: 0.04))
             : null,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 频道图标 / 类型图标
             _buildTypeIcon(),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,7 +278,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacingXS),
                   // 标题
                   Text(
                     notification.title,
@@ -305,7 +306,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                   ],
                   // CTA 链接标识
                   if (notification.ctaUrl != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppDimensions.spacingXS),
                     Row(
                       children: [
                         const Icon(
@@ -313,7 +314,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                           size: 12,
                           color: AppColors.primary,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppDimensions.spacingXS),
                         Text(
                           S.of(context)?.onChainViewDetails ?? 'View details',
                           style: const TextStyle(
@@ -329,7 +330,7 @@ class _OnChainNotificationItem extends StatelessWidget {
             ),
             // 未读小圆点
             if (unread) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Container(
                 width: 8,
                 height: 8,

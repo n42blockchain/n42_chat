@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// AI 摘要气泡组件
 ///
@@ -42,7 +43,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
     final l10n = S.of(context);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -52,7 +53,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
           color: AppColors.primary.withValues(alpha: 0.2),
         ),
@@ -65,7 +66,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
             onTap: () => setState(() => _isExpanded = !_isExpanded),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: 10),
               child: Row(
                 children: [
                   const Icon(
@@ -73,7 +74,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
                     size: 18,
                     color: AppColors.primary,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   Expanded(
                     child: Text(
                       widget.messageCount > 0
@@ -95,7 +96,7 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
                         color: AppColors.textTertiaryOf(isDark),
                       ),
                     ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppDimensions.spacingXS),
                   Icon(
                     _isExpanded ? Icons.expand_less : Icons.expand_more,
                     size: 18,
@@ -131,14 +132,14 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
     return Row(
       children: [
         const SizedBox(
-          width: 16,
+          width: AppDimensions.spacing,
           height: 16,
           child: CircularProgressIndicator(
             strokeWidth: 2,
             color: AppColors.primary,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppDimensions.spacingS),
         Text(
           l10n?.aiSummarizeLoading ?? 'Generating summary...',
           style: const TextStyle(
@@ -180,7 +181,7 @@ class AiSummarizeButton extends StatelessWidget {
       onTap: isLoading ? null : onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08),
           borderRadius: BorderRadius.circular(20),

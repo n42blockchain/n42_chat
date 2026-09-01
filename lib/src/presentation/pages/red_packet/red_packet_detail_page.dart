@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class RedPacketDetailPage extends StatelessWidget {
   /// 发送者名称
@@ -82,7 +83,7 @@ class RedPacketDetailPage extends StatelessWidget {
                   children: [
                     // AppBar row
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
                       child: Row(
                         children: [
                           IconButton(
@@ -96,7 +97,7 @@ class RedPacketDetailPage extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppDimensions.spacingXL),
 
                     // Sender info
                     Row(
@@ -118,7 +119,7 @@ class RedPacketDetailPage extends StatelessWidget {
                                 )
                               : null,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppDimensions.spacingS),
                         Flexible(
                           child: Text(
                             S.of(context)?.commonSenderSentRedPacket(senderName) ??
@@ -136,11 +137,11 @@ class RedPacketDetailPage extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
 
                     // Greeting
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL),
                       child: Text(
                         greeting ??
                             S.of(context)?.commonRedPacketDefaultGreeting ??
@@ -156,12 +157,12 @@ class RedPacketDetailPage extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppDimensions.spacingXXL),
 
                     // Claimed amount for current user
                     if (isClaimed && claimedAmount != null) ...[
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXL),
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Row(
@@ -191,7 +192,7 @@ class RedPacketDetailPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing),
 
                       GestureDetector(
                         onTap: () {},
@@ -220,12 +221,12 @@ class RedPacketDetailPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacingXL),
 
                       // Emoji reply button
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
+                            horizontal: AppDimensions.spacingL, vertical: 10),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
@@ -238,13 +239,13 @@ class RedPacketDetailPage extends StatelessWidget {
                               height: 32,
                               decoration: BoxDecoration(
                                 color: AppColors.warning.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                               ),
                               child: const Center(
                                   child: Text('🐕',
                                       style: TextStyle(fontSize: 20))),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: AppDimensions.spacingM),
                             Text(
                               S.of(context)?.commonReplyWithEmoji ??
                                   'Reply with this emoji',
@@ -261,7 +262,7 @@ class RedPacketDetailPage extends StatelessWidget {
                       ),
                     ] else ...[
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL),
                         child: Text(
                           S.of(context)?.commonRedPacketExpiredOrEmpty ??
                               'Red packet expired/all claimed',
@@ -309,7 +310,7 @@ class RedPacketDetailPage extends StatelessWidget {
             ),
 
           // Bottom padding
-          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          const SliverToBoxAdapter(child: SizedBox(height: AppDimensions.spacingXXL)),
         ],
       ),
     );
@@ -348,7 +349,7 @@ class _StatsBar extends StatelessWidget {
         children: [
           const Divider(height: 1, color: Colors.white10),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
             child: Row(
               children: [
                 Expanded(
@@ -388,7 +389,7 @@ class _ClaimerRow extends StatelessWidget {
     return Container(
       color: Colors.black,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         child: Row(
           children: [
             // Avatar
@@ -405,7 +406,7 @@ class _ClaimerRow extends StatelessWidget {
                     )
                   : null,
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
 
             // Name + time
             Expanded(
@@ -545,10 +546,10 @@ class ConfirmReceiveDialog extends StatelessWidget {
       backgroundColor: Colors.transparent,
       child: Container(
         width: 300,
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppDimensions.spacingXL),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -563,7 +564,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
               child: const Icon(Icons.account_balance_wallet,
                   size: 32, color: Color(0xFFF9A825)),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             Text(
               S.of(context)?.commonReceivedTransfer ?? 'Received Transfer',
@@ -575,7 +576,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             Text(
               S.of(context)?.commonFromSender(senderName, senderName) ??
@@ -584,7 +585,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 14, height: 1.3, color: context.textTertiary),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -607,13 +608,13 @@ class ConfirmReceiveDialog extends StatelessWidget {
             ),
 
             if (memo != null && memo!.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
                 decoration: BoxDecoration(
                   color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: Text(memo!,
                     maxLines: 2,
@@ -623,7 +624,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
               ),
             ],
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
 
             SizedBox(
               width: double.infinity,
@@ -637,7 +638,7 @@ class ConfirmReceiveDialog extends StatelessWidget {
                   backgroundColor: const Color(0xFFF9A825),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM)),
                   elevation: 0,
                 ),
                 child: Text(

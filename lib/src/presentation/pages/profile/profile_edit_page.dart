@@ -22,6 +22,7 @@ import 'profile_ringtone_select_page.dart';
 
 import 'n42_bean_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 个人资料编辑页面
 ///
@@ -127,7 +128,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       children: [
                         if (_isUploading)
                           const SizedBox(
-                            width: 20,
+                            width: AppDimensions.spacingL,
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
@@ -141,7 +142,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                 user?.avatarDecorationPreset ??
                                 AvatarDecorationPreset.none,
                           ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppDimensions.spacingS),
                         const Icon(
                           AppIcons.chevron,
                           color: AppColors.textTertiary,
@@ -212,7 +213,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           size: 20,
                           color: context.textSecondary,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppDimensions.spacingS),
                         const Icon(
                           AppIcons.chevron,
                           color: AppColors.textTertiary,
@@ -327,7 +328,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       onTap: onTap,
       child: Container(
         constraints: const BoxConstraints(minHeight: 52),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
         child: Row(
           children: [
             Text(
@@ -340,7 +341,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimensions.spacing),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -363,7 +364,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         ),
                       ),
                     if (showArrow) ...[
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingS),
                       Icon(
                         AppIcons.chevron,
                         color: context.textTertiary,
@@ -382,7 +383,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   Widget _buildDivider() {
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.only(left: AppDimensions.spacing),
       child: Divider(
         height: 1,
         color: context.dividerColor,
@@ -447,7 +448,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             ListTile(
               leading: const Icon(Icons.close),
               title: Text(S.of(context)?.commonCancel ?? 'Cancel'),
@@ -644,7 +645,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         builder: (context, scrollController) => Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               decoration: const BoxDecoration(
                 border: Border(bottom: BorderSide(color: AppColors.divider)),
               ),
@@ -703,7 +704,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppDimensions.spacing),
                     child: Text(
                       S.of(context)?.profileSelectCity ?? 'Select City',
                       maxLines: 1,
@@ -830,7 +831,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               TextField(
                 controller: controller,
                 autofocus: true,
@@ -841,12 +842,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       'Enter poke suffix, e.g.: on the shoulder',
                   border: const OutlineInputBorder(),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: AppDimensions.spacingM,
                     vertical: 10,
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 '${S.of(context)?.profileExample ?? 'Example'}: ${S.of(context)?.profileFriendPokedMe ?? 'Friend poked me'}${controller.text.isNotEmpty ? controller.text : (S.of(context)?.profileOnTheShoulder ?? " on the shoulder")}',
                 style: const TextStyle(
@@ -937,7 +938,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       context: context,
       builder: (context) => Dialog(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppDimensions.spacingXL),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -951,13 +952,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   height: 1.3,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppDimensions.spacingL),
               // QR code 内层始终白底——保证扫码识别（深色模式同样）。
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: QrImageView(
                   data: 'n42chat://user/$userId',
@@ -965,7 +966,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   size: 200,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               Text(
                 userId,
                 maxLines: 1,
@@ -977,7 +978,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   color: AppColors.textSecondary,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 S.of(context)?.profileScanToAddFriend ??
                     'Scan the QR code above to add me as a friend',

@@ -9,6 +9,7 @@ import '../../blocs/governance/governance_bloc.dart';
 import '../../blocs/governance/governance_event.dart';
 import '../../blocs/governance/governance_state.dart';
 import '../../widgets/governance/vote_progress_bar.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Page displaying detailed information about a single governance proposal.
 ///
@@ -126,22 +127,22 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(proposal),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
                 _buildBody(proposal),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
                 _buildVoteResults(proposal),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
                 if (proposal.isActive) ...[
                   _buildVotingSection(proposal, state),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
                 ],
                 _buildRecentVotes(state.votes, proposal),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimensions.spacingXXL),
               ],
             ),
           );
@@ -154,10 +155,10 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
 
   Widget _buildHeader(ProposalEntity proposal) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +171,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               _buildTimeIndicator(proposal),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           // Title
           Text(
             proposal.title,
@@ -211,7 +212,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                 size: 16,
                 color: context.textTertiary,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 '${proposal.votesCount} votes',
                 maxLines: 1,
@@ -252,7 +253,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: badgeColor.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
       child: Text(
         label,
@@ -280,7 +281,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.schedule, size: 14, color: color),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppDimensions.spacingXS),
         Text(
           text,
           maxLines: 1,
@@ -298,10 +299,10 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,10 +338,10 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
     final winningChoice = proposal.winningChoice;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,7 +372,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           ...proposal.choices.map((choice) {
             final score = proposal.scores[choice] ?? 0;
             return VoteProgressBar(
@@ -398,10 +399,10 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
     final isVoting = _voteInFlight && state.status == GovernanceStatus.voting;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,7 +418,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           // Radio buttons for each choice
           IgnorePointer(
             ignoring: isVoting,
@@ -453,7 +454,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           // Cast Vote button
           SizedBox(
             width: double.infinity,
@@ -469,12 +470,12 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                     : const Color(0xFFE0E0E0),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
               ),
               child: isVoting
                   ? const SizedBox(
-                      width: 24,
+                      width: AppDimensions.spacingXL,
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
@@ -545,10 +546,10 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
     if (votes.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -564,7 +565,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           ...votes.take(20).map((vote) {
             final choiceName = _resolveChoiceName(vote.choice, proposal);
             return Padding(

@@ -9,6 +9,7 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../widgets/common/common_widgets.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 /// PDF 文件查看器
 ///
@@ -170,7 +171,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               size: 64,
               color: context.textSecondary,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               S.of(context)?.pdfLoadFailed ?? 'Failed to load PDF',
               style: TextStyle(
@@ -178,9 +179,9 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL),
               child: Text(
                 _error!,
                 style: TextStyle(

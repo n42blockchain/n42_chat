@@ -7,6 +7,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/services/username_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/username_validator.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 设置用户名页面
 class SetUsernamePage extends StatefulWidget {
@@ -147,7 +148,7 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
             onPressed: (_isAvailable && !_isSaving) ? _saveUsername : null,
             child: _isSaving
                 ? const SizedBox(
-                    width: 20,
+                    width: AppDimensions.spacingL,
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
@@ -156,7 +157,7 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -170,7 +171,7 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
                 height: 1.3,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             TextField(
               controller: _controller,
               decoration: InputDecoration(
@@ -179,9 +180,9 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
                 border: const OutlineInputBorder(),
                 suffixIcon: _isChecking
                     ? const Padding(
-                        padding: EdgeInsets.all(12),
+                        padding: EdgeInsets.all(AppDimensions.spacingM),
                         child: SizedBox(
-                          width: 20,
+                          width: AppDimensions.spacingL,
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
@@ -203,7 +204,7 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
                 if (_isAvailable) _saveUsername();
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               s?.usernameInvalid ??
                   '3-30 characters, lowercase letters, numbers, underscore. Must start with a letter.',
@@ -214,7 +215,7 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
               ),
             ),
             if (_isAvailable && _controller.text.trim().isNotEmpty) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 s?.usernameAvailable ?? 'Username available',
                 maxLines: 1,

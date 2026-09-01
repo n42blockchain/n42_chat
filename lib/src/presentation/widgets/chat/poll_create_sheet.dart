@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 enum PollComposerAction { sendNow, schedule }
 
@@ -152,7 +153,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
         children: [
           // 顶部栏
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -215,9 +216,9 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
           Expanded(
             child: ListView(
               padding: EdgeInsets.only(
-                left: 16,
-                right: 16,
-                top: 16,
+                left: AppDimensions.spacing,
+                right: AppDimensions.spacing,
+                top: AppDimensions.spacing,
                 bottom: bottomPadding + 16,
               ),
               children: [
@@ -229,7 +230,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                     color: AppColors.textSecondaryOf(isDark),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 TextField(
                   controller: _questionController,
                   maxLines: 2,
@@ -237,14 +238,14 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                   decoration: InputDecoration(
                     hintText: S.of(context)?.chatEnterPollQuestionHint ?? 'Please enter poll question',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     ),
                     filled: true,
                     fillColor: AppColors.inputBgOf(isDark),
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 选项输入
                 Row(
@@ -266,11 +267,11 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
 
                 ...List.generate(_optionControllers.length, (index) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.only(bottom: AppDimensions.spacingS),
                     child: Row(
                       children: [
                         if (_isQuiz)
@@ -296,7 +297,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                           ),
                           child: Text(
                             '${index + 1}',
@@ -307,7 +308,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppDimensions.spacingS),
                         Expanded(
                           child: TextField(
                             controller: _optionControllers[index],
@@ -321,7 +322,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                               filled: true,
                               fillColor: AppColors.inputBgOf(isDark),
                               contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
+                                horizontal: AppDimensions.spacingM,
                                 vertical: 10,
                               ),
                             ),
@@ -349,14 +350,14 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                     ),
                   ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 投票类型
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacing),
                   decoration: BoxDecoration(
                     color: AppColors.inputBgOf(isDark),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +370,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                           color: AppColors.textPrimaryOf(isDark),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacingM),
 
                       // 单选/多选
                       Row(
@@ -380,7 +381,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacingS),
                           Flexible(
                             child: SegmentedButton<int>(
                               segments: [
@@ -401,9 +402,9 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         ],
                       ),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacingM),
                       const Divider(height: 1),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacingM),
 
                       // 匿名投票
                       Row(
@@ -422,9 +423,9 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         ],
                       ),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacingM),
                       const Divider(height: 1),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.spacingM),
 
                       // Quiz 模式：标记正确答案，投票后揭晓
                       Row(
@@ -444,7 +445,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         ],
                       ),
                       if (_isQuiz) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacingS),
                         TextField(
                           controller: _explanationController,
                           maxLength: 200,
@@ -464,14 +465,14 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 提示信息
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppDimensions.spacingM),
                   decoration: BoxDecoration(
                     color: AppColors.info.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: Row(
                     children: [
@@ -480,7 +481,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         size: 18,
                         color: AppColors.info,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingS),
                       Expanded(
                         child: Text(
                           S.of(context)?.chatPollHint ?? 'Poll will be displayed in chat. Group members can vote.',

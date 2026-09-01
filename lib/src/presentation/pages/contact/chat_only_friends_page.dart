@@ -11,6 +11,7 @@ import '../../../domain/repositories/contact_repository.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'contact_tile.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 仅聊天的朋友列表页面
 class ChatOnlyFriendsPage extends StatefulWidget {
@@ -87,7 +88,7 @@ class _ChatOnlyFriendsPageState extends State<ChatOnlyFriendsPage> {
                         size: 64,
                         color: context.textTertiary,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing),
                       Text(
                         S.of(context)?.contactNoChatOnlyFriends ?? 'No chat-only friends',
                         style: TextStyle(

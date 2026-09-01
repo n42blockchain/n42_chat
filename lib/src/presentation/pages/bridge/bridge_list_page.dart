@@ -9,6 +9,7 @@ import '../../../integration/bridge/bridge_manager.dart';
 import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/bridge/bridge_state.dart';
 import 'bridge_detail_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Page displaying all available bridge platforms and their connection status.
 ///
@@ -176,7 +177,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
             color: state.isAvailable
                 ? info.brandColor.withValues(alpha: 0.12)
                 : Colors.grey.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           ),
           child: Icon(
             info.icon,
@@ -242,7 +243,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
   Widget? _buildTrailingWidget(BridgeState state) {
     if (state.isLoading) {
       return const SizedBox(
-        width: 20,
+        width: AppDimensions.spacingL,
         height: 20,
         child: CircularProgressIndicator(strokeWidth: 2),
       );
@@ -261,7 +262,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
 
   Widget _buildFooterNote(bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXL),
       child: Text(
         'Bridge availability depends on server configuration. '
         'Contact your server admin to enable additional bridges.',

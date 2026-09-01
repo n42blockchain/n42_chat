@@ -22,6 +22,7 @@ import 'register_page.dart';
 import 'reset_password_page.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../helpers/bloc_message_helper.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 登录页面
 ///
@@ -223,53 +224,53 @@ class _LoginPageState extends State<LoginPage> {
         builder: (context, state) {
           final isDarkMode = context.isDarkMode;
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXL),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppDimensions.spacingL),
 
                   // Logo（紧凑版）
                   _buildCompactLogo(context),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
 
                   // 服务器输入
                   _buildServerInput(context, state, isDarkMode),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
 
                   // 用户名输入
                   _buildUsernameInput(context, isDarkMode),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
 
                   // 密码输入
                   _buildPasswordInput(context, isDarkMode),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppDimensions.spacingL),
 
                   // 生物识别快捷登录（如果已启用且有凭据）- 显示在登录按钮上方
                   if (_isBiometricAvailable &&
                       _isBiometricEnabled &&
                       _hasCredentials) ...[
                     _buildBiometricQuickLogin(),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     _buildOrDivider(),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                   ],
 
                   // 登录按钮
                   _buildLoginButton(state),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 注册和忘记密码链接
                   _buildQuickLinks(),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 第三方登录
                   SocialLoginButtons(
@@ -277,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
                     homeserverBuilder: () => _homeserverController.text.trim(),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 底部协议
                   _buildAgreement(isDarkMode),
@@ -300,7 +301,7 @@ class _LoginPageState extends State<LoginPage> {
           height: 48,
           decoration: BoxDecoration(
             color: AppColors.primary,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           ),
           child: const Icon(
             Icons.chat_bubble_rounded,
@@ -308,7 +309,7 @@ class _LoginPageState extends State<LoginPage> {
             size: 24,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppDimensions.spacingM),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -398,7 +399,7 @@ class _LoginPageState extends State<LoginPage> {
           S.of(context)?.authServerAddress ?? 'Server Address',
           style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           key: const ValueKey<String>('chat_login_server'),
           controller: _homeserverController,
@@ -412,18 +413,18 @@ class _LoginPageState extends State<LoginPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             suffixIcon: state.isCheckingHomeserver
                 ? const Padding(
-                    padding: EdgeInsets.all(12),
+                    padding: EdgeInsets.all(AppDimensions.spacingM),
                     child: SizedBox(
-                      width: 20,
+                      width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
@@ -457,7 +458,7 @@ class _LoginPageState extends State<LoginPage> {
           },
         ),
         if (state.isHomeserverValid && state.homeserverInfo != null) ...[
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             '✓ ${S.of(context)?.authConnectedTo(state.homeserverInfo!.serverName) ?? 'Connected to ${state.homeserverInfo!.serverName}'}',
             maxLines: 1,
@@ -488,7 +489,7 @@ class _LoginPageState extends State<LoginPage> {
           S.of(context)?.authUsernameOrEmail ?? 'Username or Email',
           style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           key: const ValueKey<String>('chat_login_username'),
           controller: _usernameController,
@@ -501,11 +502,11 @@ class _LoginPageState extends State<LoginPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(
@@ -541,7 +542,7 @@ class _LoginPageState extends State<LoginPage> {
           S.of(context)?.authPassword ?? 'Password',
           style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           key: const ValueKey<String>('chat_login_password'),
           controller: _passwordController,
@@ -552,11 +553,11 @@ class _LoginPageState extends State<LoginPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.lock_outline, color: hintColor),
@@ -600,12 +601,12 @@ class _LoginPageState extends State<LoginPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusM)),
           elevation: 0,
         ),
         child: state.isLoading
             ? const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
@@ -658,7 +659,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         minimumSize: const Size(double.infinity, 52),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
       ),
     );
   }
@@ -671,7 +672,7 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Expanded(child: Divider(color: dividerColor)),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
           child: Text(
             S.of(context)?.authOr ?? 'OR',
             style: TextStyle(color: textColor, fontSize: 12, height: 1.3),
@@ -693,7 +694,7 @@ class _LoginPageState extends State<LoginPage> {
         : AppColors.textTertiary;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       child: Text.rich(
         TextSpan(
           text:

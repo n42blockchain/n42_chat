@@ -5,6 +5,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 频道分类
 enum ChannelCategory {
@@ -154,7 +155,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
 
   Widget _buildSearchBar(BuildContext context, S? l10n) {
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       child: TextField(
         controller: _searchController,
         onChanged: (v) => setState(() => _searchQuery = v),
@@ -167,7 +168,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
           prefixIcon: const Icon(AppIcons.search, size: 20),
           filled: true,
           fillColor: context.surfaceColor,
-          contentPadding: const EdgeInsets.symmetric(vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
@@ -190,11 +191,11 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
       height: 40,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
         children: labels.entries.map((entry) {
           final selected = _selectedCategory == entry.key;
           return Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: AppDimensions.spacingS),
             child: ChoiceChip(
               label: Text(entry.value),
               selected: selected,
@@ -207,7 +208,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
               ),
               backgroundColor: context.surfaceColor,
               side: BorderSide.none,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
             ),
           );
         }).toList(),
@@ -230,7 +231,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
       itemCount: channels.length,
       separatorBuilder: (_, _) => Divider(
         height: 1,
@@ -255,7 +256,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
         height: 48,
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
         child: const Icon(
           Icons.campaign,
@@ -288,7 +289,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             '${_formatCount(channel.subscriberCount)} ${l10n?.channelSubscribers ?? 'subscribers'}',
             maxLines: 1,
@@ -306,7 +307,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
           minimumSize: const Size(0, 32),
         ),
         child: Text(
@@ -314,7 +315,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
           style: const TextStyle(fontSize: 13),
         ),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
     );
   }
 

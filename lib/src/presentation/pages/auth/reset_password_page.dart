@@ -202,13 +202,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               state.passwordResetStatus == PasswordResetStatus.resetting;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXL),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXXL),
 
                   // 步骤指示器
                   _buildStepIndicator(isDark),
@@ -220,7 +220,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   if (_currentStep == 1) _buildCodeStep(isDark, isLoading, state),
                   if (_currentStep == 2) _buildPasswordStep(isDark, isLoading),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXXL),
                 ],
               ),
             ),
@@ -296,7 +296,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             color: textColor,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.authEmailAddress ?? 'Email Address',
           maxLines: 1,
@@ -307,7 +307,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -317,11 +317,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(
@@ -333,7 +333,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _sendVerificationCode(),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         SizedBox(
           height: 48,
           child: ElevatedButton(
@@ -342,13 +342,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               backgroundColor: AppColors.primary,
               disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               elevation: 0,
             ),
             child: isLoading
                 ? const SizedBox(
-                    width: 20,
+                    width: AppDimensions.spacingL,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
@@ -393,7 +393,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             color: textColor,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.authEnterResetCode ?? 'Enter reset code',
           maxLines: 1,
@@ -404,7 +404,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _codeController,
           style: TextStyle(color: textColor, fontSize: 24, letterSpacing: 8),
@@ -415,11 +415,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
           ),
@@ -428,7 +428,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _verifyCode(),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         // 重新发送按钮
         Center(
           child: TextButton(
@@ -450,7 +450,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         SizedBox(
           height: 48,
           child: ElevatedButton(
@@ -458,7 +458,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               elevation: 0,
             ),
@@ -499,7 +499,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             color: textColor,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.commonNewPassword ?? 'New Password',
           maxLines: 1,
@@ -510,7 +510,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -520,11 +520,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(
@@ -555,7 +555,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             return null;
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         Text(
           S.of(context)?.commonConfirmNewPassword ?? 'Confirm New Password',
           maxLines: 1,
@@ -566,7 +566,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -576,11 +576,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(
@@ -612,7 +612,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             return null;
           },
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         SizedBox(
           height: 48,
           child: ElevatedButton(
@@ -621,13 +621,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               backgroundColor: AppColors.primary,
               disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               elevation: 0,
             ),
             child: isLoading
                 ? const SizedBox(
-                    width: 20,
+                    width: AppDimensions.spacingL,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,

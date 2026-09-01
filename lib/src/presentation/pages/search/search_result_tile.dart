@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart' as chat_date;
 import '../../../domain/entities/search_result_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 搜索结果列表项
 class SearchResultTile extends StatelessWidget {
@@ -25,13 +26,13 @@ class SearchResultTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
           child: Row(
             children: [
               // 头像
               _buildAvatar(),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
 
               // 内容
               Expanded(
@@ -72,7 +73,7 @@ class SearchResultTile extends StatelessWidget {
         height: 48,
         decoration: BoxDecoration(
           color: iconBgColor,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Icon(icon, color: Colors.white, size: 24),
       );
@@ -100,7 +101,7 @@ class SearchResultTile extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
 
         // 内容（消息搜索）或副标题
         if (item.type == SearchResultType.message && item.matchedContent != null)
@@ -196,14 +197,14 @@ class SearchResultTile extends StatelessWidget {
             ),
           ),
 
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
 
         // 类型标签
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: _getTypeColor().withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           ),
           child: Text(
             _getTypeLabel(context),

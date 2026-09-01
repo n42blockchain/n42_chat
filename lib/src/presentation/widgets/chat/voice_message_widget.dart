@@ -9,6 +9,7 @@ import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 语音转文字回调
 typedef VoiceToTextCallback = Future<String?> Function();
@@ -308,7 +309,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
               // 未读红点（对方消息，在左侧显示）
               if (!widget.isSelf && !widget.isRead)
                 Container(
-                  margin: const EdgeInsets.only(right: 4),
+                  margin: const EdgeInsets.only(right: AppDimensions.spacingXS),
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
@@ -335,7 +336,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
 
                     // 时长
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
                       child: Text(
                         '${widget.duration}"',
                         style: TextStyle(fontSize: 16, color: textColor),
@@ -356,7 +357,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
               // 未读红点（自己的消息，在右侧显示）
               if (widget.isSelf && !widget.isRead)
                 Container(
-                  margin: const EdgeInsets.only(left: 4),
+                  margin: const EdgeInsets.only(left: AppDimensions.spacingXS),
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
@@ -372,12 +373,12 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
         // 转换的文字
         if (_convertedText != null && _convertedText!.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(top: AppDimensions.spacingS),
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppDimensions.spacingS),
               decoration: BoxDecoration(
                 color: AppColors.placeholder.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
               ),
               child: Text(
                 _convertedText!,
@@ -397,7 +398,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
         // 转文字按钮（仅在没有转换文字时显示）
         if (_convertedText == null && canConvertToText)
           Padding(
-            padding: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.only(top: AppDimensions.spacingXS),
             child: GestureDetector(
               onTap: isConverting ? null : _convertToText,
               child: Row(
@@ -405,7 +406,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                 children: [
                   if (isConverting)
                     const SizedBox(
-                      width: 12,
+                      width: AppDimensions.spacingM,
                       height: 12,
                       child: CircularProgressIndicator(
                         strokeWidth: 1.5,
@@ -422,7 +423,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                       size: 14,
                       color: convertColor,
                     ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppDimensions.spacingXS),
                   Text(
                     convertLabel,
                     style: TextStyle(fontSize: 12, color: convertColor),
@@ -458,12 +459,12 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
+                margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
               if (_convertedText == null && canConvertToText)
@@ -484,7 +485,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                 title: Text(S.of(context)?.commonCancel ?? 'Cancel'),
                 onTap: () => Navigator.pop(ctx),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
             ],
           ),
         ),
@@ -509,7 +510,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
     return Transform.flip(
       flipX: isReversed,
       child: SizedBox(
-        width: 20,
+        width: AppDimensions.spacingL,
         height: 20,
         child: CustomPaint(
           painter: _VoiceWavePainter(

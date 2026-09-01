@@ -1,3 +1,4 @@
+
 part of '../../n42_chat.dart';
 
 /// N42 Chat 入口Widget
@@ -178,7 +179,7 @@ class _LoadingPage extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 color: const Color(0xFF5B6CFF),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
               ),
               child: const Icon(
                 Icons.chat_bubble_rounded,
@@ -186,7 +187,7 @@ class _LoadingPage extends StatelessWidget {
                 size: 40,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             Text(
               'N42 Chat',
               style: TextStyle(
@@ -195,9 +196,9 @@ class _LoadingPage extends StatelessWidget {
                 color: AppColors.textPrimaryOf(isDark),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             const SizedBox(
-              width: 24,
+              width: AppDimensions.spacingXL,
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
@@ -342,7 +343,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
       backgroundColor: bgColor,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(AppDimensions.spacingXXL),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -351,7 +352,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                 height: 80,
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                 ),
                 child: const Icon(
                   Icons.chat_bubble_outline_rounded,
@@ -359,7 +360,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                   size: 40,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXL),
               Text(
                 'N42 Chat',
                 style: TextStyle(
@@ -368,19 +369,19 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                   color: textColor,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Text(
                 'Chat initialization failed',
                 style: TextStyle(fontSize: 16, color: subtitleColor),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 'Please check your network and try again',
                 style: TextStyle(fontSize: 14, color: subtitleColor),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppDimensions.spacingXXL),
               SizedBox(
                 width: 160,
                 height: 44,
@@ -390,13 +391,13 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                     backgroundColor: const Color(0xFF5B6CFF),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
                     elevation: 0,
                   ),
                   child: _isRetrying
                       ? const SizedBox(
-                          width: 20,
+                          width: AppDimensions.spacingL,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
@@ -637,15 +638,15 @@ ThemeData _buildChatScopedTheme(ThemeData baseTheme) {
       fillColor: isDark ? const Color(0xFF1A252F) : const Color(0xFFF7F7F7),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         borderSide: BorderSide(
           color: baseTheme.colorScheme.primary.withValues(alpha: 0.35),
         ),
@@ -653,7 +654,7 @@ ThemeData _buildChatScopedTheme(ThemeData baseTheme) {
     ),
     listTileTheme: baseTheme.listTileTheme.copyWith(
       tileColor: cardColor,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 2),
       minVerticalPadding: 8,
     ),
     dividerTheme: baseTheme.dividerTheme.copyWith(

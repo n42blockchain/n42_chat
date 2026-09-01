@@ -12,6 +12,7 @@ import '../../blocs/live_location/live_location_bloc.dart';
 import '../../blocs/live_location/live_location_event.dart';
 import '../../blocs/live_location/live_location_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 实时位置共享页面
 class LiveLocationPage extends StatelessWidget {
@@ -215,7 +216,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
 
             // 开始/停止共享按钮
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: widget.state.isSharing
                   ? SizedBox(
                       width: double.infinity,
@@ -228,9 +229,9 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.error,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                           ),
                         ),
                         child: Text(
@@ -246,9 +247,9 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                           ),
                         ),
                         child: Text(
@@ -325,7 +326,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 S.of(context)?.selectDuration ?? 'Select Duration',
                 style: const TextStyle(

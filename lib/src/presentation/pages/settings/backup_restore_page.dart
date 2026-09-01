@@ -11,6 +11,7 @@ import '../../blocs/backup/backup_bloc.dart';
 import '../../blocs/backup/backup_event.dart';
 import '../../blocs/backup/backup_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 备份与恢复页面
 class BackupRestorePage extends StatelessWidget {
@@ -62,11 +63,11 @@ class _BackupRestoreView extends StatelessWidget {
           return ListView(
             children: [
               _BackupSection(state: state),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _BackupHistorySection(state: state),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _RestoreSection(state: state),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppDimensions.spacingXXL),
             ],
           );
         },
@@ -111,7 +112,7 @@ class _BackupSectionState extends State<_BackupSection> {
             child: Row(
               children: [
                 const Icon(Icons.backup, color: AppColors.primary, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'Create Backup',
                   maxLines: 1,
@@ -127,14 +128,14 @@ class _BackupSectionState extends State<_BackupSection> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
             child: Text(
               'Backup your local chat settings. '
               'Messages will be restored from server after re-login.',
               style: TextStyle(fontSize: 13, height: 1.4, color: secondaryColor),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           ListTile(
             leading: const Icon(Icons.key_outlined, color: AppColors.warning),
             title: Text(
@@ -163,22 +164,22 @@ class _BackupSectionState extends State<_BackupSection> {
           ),
           if (_usePassword)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
               child: TextField(
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: 'Enter backup password',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                      horizontal: AppDimensions.spacingM, vertical: 10),
                 ),
               ),
             ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -194,14 +195,14 @@ class _BackupSectionState extends State<_BackupSection> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                 ),
                 child: widget.state.isCreating
                     ? const SizedBox(
-                        width: 20,
+                        width: AppDimensions.spacingL,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
@@ -251,7 +252,7 @@ class _BackupHistorySection extends StatelessWidget {
           ),
           if (state.backups.isEmpty)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 'No backups yet',
                 style: TextStyle(fontSize: 14, height: 1.3, color: secondaryColor),
@@ -264,7 +265,7 @@ class _BackupHistorySection extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                       color: AppColors.info.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
                     child: const Icon(Icons.archive,
                         color: AppColors.info, size: 22),
@@ -298,7 +299,7 @@ class _BackupHistorySection extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(Icons.restore, size: 18),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppDimensions.spacingS),
                             Text('Restore'),
                           ],
                         ),
@@ -308,7 +309,7 @@ class _BackupHistorySection extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(Icons.delete, size: 18, color: AppColors.error),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppDimensions.spacingS),
                             Text('Delete',
                                 style: TextStyle(color: AppColors.error)),
                           ],
@@ -317,7 +318,7 @@ class _BackupHistorySection extends StatelessWidget {
                     ],
                   ),
                 )),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
         ],
       ),
     );
@@ -376,7 +377,7 @@ class _RestoreSection extends StatelessWidget {
             child: Row(
               children: [
                 const Icon(Icons.restore, color: AppColors.warning, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'Restore from File',
                   maxLines: 1,
@@ -392,7 +393,7 @@ class _RestoreSection extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
             child: Text(
               'Import a .n42backup file from another device or previous backup. '
               'Encryption keys are restored separately with your Recovery Key.',
@@ -400,7 +401,7 @@ class _RestoreSection extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -417,9 +418,9 @@ class _RestoreSection extends StatelessWidget {
                 label: Text(
                     state.isRestoring ? 'Restoring...' : 'Choose Backup File'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                 ),
               ),

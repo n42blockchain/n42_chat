@@ -6,6 +6,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../../widgets/common/n42_empty_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Story viewers page
 ///
@@ -92,7 +93,7 @@ class _ViewerListTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
           child: Row(
             children: [
               // Avatar
@@ -102,7 +103,7 @@ class _ViewerListTile extends StatelessWidget {
                 size: 48,
                 borderRadius: 24,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               // User info
               Expanded(
                 child: Column(
@@ -119,7 +120,7 @@ class _ViewerListTile extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppDimensions.spacingXS),
                     Text(
                       _formatTimeAgo(viewer.viewedAt),
                       style: TextStyle(

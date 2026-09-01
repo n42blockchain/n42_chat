@@ -15,6 +15,7 @@ import '../../blocs/space/space_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'space_create_page.dart';
 import 'space_detail_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 社区/Space 列表页面
 ///
@@ -235,7 +236,7 @@ class _DiscoverSpacesTab extends StatelessWidget {
           children: [
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
               child: TextField(
                 controller: searchController,
                 onSubmitted: onSearch,
@@ -255,7 +256,7 @@ class _DiscoverSpacesTab extends StatelessWidget {
                   filled: true,
                   fillColor: context.surfaceColor,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     borderSide: BorderSide.none,
                   ),
                 ),
@@ -308,13 +309,13 @@ class _SpaceListItem extends StatelessWidget {
 
     return ListTile(
       contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
       leading: Container(
         width: 48,
         height: 48,
         decoration: BoxDecoration(
           color: AppColorPalettes.getAvatarColor(space.name),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
         clipBehavior: Clip.antiAlias,
         child: space.avatarUrl != null
@@ -354,7 +355,7 @@ class _SpaceListItem extends StatelessWidget {
               Icon(Icons.people_outline,
                   size: 14,
                   color: context.textTertiary),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 '${space.memberCount}',
                 style: TextStyle(
@@ -362,11 +363,11 @@ class _SpaceListItem extends StatelessWidget {
                   color: context.textTertiary,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Icon(Icons.tag,
                   size: 14,
                   color: context.textTertiary),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 S.of(context)?.spacesChannelsCount(space.channelCount) ??
                     '${space.channelCount} channels',
@@ -455,7 +456,7 @@ class _EmptySpaceView extends StatelessWidget {
           Icon(icon,
               size: 64,
               color: context.dividerColor),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             message,
             style: TextStyle(
@@ -463,7 +464,7 @@ class _EmptySpaceView extends StatelessWidget {
             ),
           ),
           if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             OutlinedButton.icon(
               onPressed: onAction,
               icon: const Icon(Icons.explore),

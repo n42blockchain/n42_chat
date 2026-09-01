@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../integration/bridge/bridge_manager.dart';
 import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/bridge/bridge_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Detail page for a single bridge platform.
 ///
@@ -184,19 +185,19 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
       body: ListView(
         children: [
           _buildHeader(isDark),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           _buildStatusSection(isDark),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           _buildActionsSection(isDark),
           if (_lastResponse != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             _buildResponseSection(isDark),
           ],
           if (_qrCodeUrl != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             _buildQRSection(isDark),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           _buildInfoSection(isDark),
           const SizedBox(height: 40),
         ],
@@ -207,7 +208,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   Widget _buildHeader(bool isDark) {
     return Container(
       color: context.surfaceColor,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       child: Column(
         children: [
           Container(
@@ -215,7 +216,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             height: 64,
             decoration: BoxDecoration(
               color: _info.brandColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             ),
             child: Icon(
               _info.icon,
@@ -223,7 +224,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               size: 32,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           Text(
             _info.displayName,
             maxLines: 1,
@@ -235,7 +236,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             _info.description,
             textAlign: TextAlign.center,
@@ -258,7 +259,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
     return Container(
       color: bgColor,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -274,11 +275,11 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           Row(
             children: [
               _buildStatusIndicator(),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +397,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
           ],
           if (_state.isLoading)
             const Padding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppDimensions.spacing),
               child: Center(child: CircularProgressIndicator()),
             ),
           if (_state.hasError)
@@ -433,7 +434,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
       ),
       trailing: _isActionInProgress
           ? const SizedBox(
-              width: 20,
+              width: AppDimensions.spacingL,
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
@@ -447,7 +448,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
     return Container(
       color: bgColor,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -463,7 +464,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           SelectableText(
             _lastResponse!,
             style: TextStyle(
@@ -482,7 +483,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
     return Container(
       color: bgColor,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       child: Column(
         children: [
           Text(
@@ -496,7 +497,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             'Open ${_info.displayName} on your phone and scan this QR code to link your account.',
             textAlign: TextAlign.center,
@@ -508,14 +509,14 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               color: context.textTertiary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           // QR code would be displayed here using the mxc:// URL
           Container(
             width: 200,
             height: 200,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               border: Border.all(color: AppColors.divider),
             ),
             child: const Center(
@@ -537,7 +538,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
     return Container(
       color: bgColor,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -550,7 +551,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           _buildInfoRow('Platform', _info.displayName, textColor),
           _buildInfoRow('Status', _info.isActive ? 'Active' : 'Low maintenance', textColor),
           _buildInfoRow('Language', _info.language, textColor),
@@ -569,7 +570,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
   Widget _buildInfoRow(String label, String value, Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXS),
       child: Row(
         children: [
           SizedBox(

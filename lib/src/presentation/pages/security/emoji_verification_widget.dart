@@ -3,6 +3,7 @@ import 'package:matrix/encryption/utils/key_verification.dart' as kv;
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// SAS Emoji 验证展示组件
 ///
@@ -32,7 +33,7 @@ class EmojiVerificationWidget extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
 
         // Emoji 网格展示
         Wrap(
@@ -59,7 +60,7 @@ class EmojiVerificationWidget extends StatelessWidget {
               color: isDark
                   ? Colors.white.withValues(alpha: 0.08)
                   : Colors.grey.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             ),
             child: Center(
               child: Text(
@@ -68,7 +69,7 @@ class EmojiVerificationWidget extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           // Emoji 名称
           Text(
             emoji.name,
@@ -113,18 +114,18 @@ class NumberVerificationWidget extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: numbers.map((number) {
             return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingL, vertical: AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.08)
                     : Colors.grey.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Text(
                 number.toString().padLeft(4, '0'),

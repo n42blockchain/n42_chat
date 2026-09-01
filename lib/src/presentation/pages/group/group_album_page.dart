@@ -13,6 +13,7 @@ import '../../blocs/group_album/group_album_event.dart';
 import '../../blocs/group_album/group_album_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../media/media_preview_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群相册页面
 class GroupAlbumPage extends StatelessWidget {
@@ -198,7 +199,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
     final textColor = context.textSecondary;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -247,7 +248,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
             color: AppColors.primary,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
         Text(
           label,
           style: TextStyle(
@@ -280,7 +281,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
           ),
           // 媒体网格
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
             child: GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -315,7 +316,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
               color: Colors.grey[300],
               child: const Center(
                 child: SizedBox(
-                  width: 20,
+                  width: AppDimensions.spacingL,
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
@@ -332,10 +333,10 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
               right: 4,
               bottom: 4,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS, vertical: 2),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

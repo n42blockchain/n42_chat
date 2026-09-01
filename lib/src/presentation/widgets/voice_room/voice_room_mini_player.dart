@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../domain/entities/voice_room_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 语音房间悬浮小窗
 ///
@@ -28,11 +29,11 @@ class VoiceRoomMiniPlayer extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
         decoration: BoxDecoration(
           color: theme.colorScheme.primary,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           boxShadow: [
             BoxShadow(
               color: theme.colorScheme.primary.withValues(alpha: 0.3),
@@ -52,7 +53,7 @@ class VoiceRoomMiniPlayer extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             // 房间名称
             Expanded(
               child: Column(

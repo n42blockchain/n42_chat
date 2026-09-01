@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// URL 预览组件
 ///
@@ -85,11 +86,11 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
     final isDark = context.isDarkMode;
 
     return Container(
-      margin: const EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(top: AppDimensions.spacingS),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Row(
         children: [
@@ -111,7 +112,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: AppColors.dividerOf(isDark),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -120,7 +121,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                   width: 120,
                   decoration: BoxDecoration(
                     color: AppColors.dividerOf(isDark),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                 ),
               ],
@@ -142,10 +143,10 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
       child: GestureDetector(
       onTap: () => _openUrl(data.url),
       child: Container(
-        margin: const EdgeInsets.only(top: 8),
+        margin: const EdgeInsets.only(top: AppDimensions.spacingS),
         decoration: BoxDecoration(
           color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           border: const Border(
             left: BorderSide(
               color: AppColors.primary,
@@ -166,7 +167,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                     // 网站名
                     if (data.siteName != null)
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
+                        padding: const EdgeInsets.only(bottom: AppDimensions.spacingXS),
                         child: Text(
                           data.siteName!,
                           style: const TextStyle(
@@ -193,7 +194,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                     // 描述
                     if (data.description != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.only(top: AppDimensions.spacingXS),
                         child: Text(
                           data.description!,
                           style: TextStyle(

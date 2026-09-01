@@ -11,6 +11,7 @@ import '../../blocs/favorite/favorite_bloc.dart';
 import '../../blocs/favorite/favorite_event.dart';
 import '../../blocs/favorite/favorite_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 收藏列表页面
 class FavoriteListPage extends StatelessWidget {
@@ -119,7 +120,7 @@ class _FavoriteListView extends StatelessWidget {
       builder: (context, state) {
         return Container(
           height: 44,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
           decoration: BoxDecoration(
             color: context.surfaceColor,
             border: Border(
@@ -132,7 +133,7 @@ class _FavoriteListView extends StatelessWidget {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: filters.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: AppDimensions.spacingS),
             itemBuilder: (context, index) {
               final (type, label) = filters[index];
               final isSelected = state.filterType == type;
@@ -142,7 +143,7 @@ class _FavoriteListView extends StatelessWidget {
                   context.read<FavoriteBloc>().add(ChangeFavoriteFilter(type));
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isSelected
@@ -181,18 +182,18 @@ class _FavoriteListView extends StatelessWidget {
     final subtitleColor = context.textSecondary;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: 6),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onLongPress: () => _showFavoriteOptions(context, favorite),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -204,7 +205,7 @@ class _FavoriteListView extends StatelessWidget {
                   style: TextStyle(color: textColor, height: 1.4),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
 
                 // 来源和时间
                 Row(
@@ -214,7 +215,7 @@ class _FavoriteListView extends StatelessWidget {
                       size: 14,
                       color: subtitleColor,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacingXS),
                     Text(
                       favorite.senderName,
                       style: TextStyle(fontSize: 12, color: subtitleColor),
@@ -262,7 +263,7 @@ class _FavoriteListView extends StatelessWidget {
             size: 64,
             color: context.textSecondary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             S.of(context)?.favoriteNoFavorites ?? 'No favorites yet',
             style: TextStyle(
@@ -270,7 +271,7 @@ class _FavoriteListView extends StatelessWidget {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             S.of(context)?.favoriteLongPressToFavorite ??
                 'Long press message to favorite',
@@ -412,7 +413,7 @@ class _FavoriteListView extends StatelessWidget {
                 border: const OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             TextField(
               controller: urlController,
               keyboardType: TextInputType.url,

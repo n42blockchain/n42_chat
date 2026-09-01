@@ -27,6 +27,7 @@ import 'invite_members_page.dart';
 import 'token_gate_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../n42_chat.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群设置页面
 class GroupSettingsPage extends StatefulWidget {
@@ -152,7 +153,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   Widget _buildGroupHeader(GroupEntity group, bool isDark) {
     return Container(
       color: context.surfaceColor,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Row(
         children: [
           // 群头像
@@ -170,7 +171,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     right: 0,
                     bottom: 0,
                     child: Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(AppDimensions.spacingXS),
                       decoration: const BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
@@ -186,7 +187,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             ),
           ),
 
-          const SizedBox(width: 16),
+          const SizedBox(width: AppDimensions.spacing),
 
           // 群名称和信息
           Expanded(
@@ -227,7 +228,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppDimensions.spacingXS),
                       Icon(
                         group.canEditName ? Icons.edit : Icons.lock_outline,
                         size: 16,
@@ -236,7 +237,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 GestureDetector(
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: group.roomId));
@@ -277,7 +278,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
     return Container(
       color: context.surfaceColor,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -300,7 +301,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
 
           // 成员头像列表
           Wrap(
@@ -334,12 +335,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   bottom: -2,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
+                      horizontal: AppDimensions.spacingXS,
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.warning,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: Text(
                       S.of(context)?.commonGroupOwner ?? 'Owner',
@@ -360,12 +361,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   bottom: -2,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
+                      horizontal: AppDimensions.spacingXS,
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: Text(
                       S.of(context)?.commonGroupAdmin ?? 'Admin',
@@ -382,7 +383,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           SizedBox(
             width: 50,
             child: Text(
@@ -408,11 +409,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             height: 44,
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.divider),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: const Icon(Icons.add, color: AppColors.textSecondary),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           SizedBox(
             width: 50,
             child: Text(

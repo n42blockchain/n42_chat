@@ -10,6 +10,7 @@ import '../../blocs/space/space_bloc.dart';
 import '../../blocs/space/space_event.dart';
 import '../../blocs/space/space_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 创建 Space 页面
 class SpaceCreatePage extends StatefulWidget {
@@ -57,7 +58,7 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
         body: Form(
           key: _formKey,
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             children: [
               // 社区名称
               TextFormField(
@@ -77,7 +78,7 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
                 },
                 textInputAction: TextInputAction.next,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
 
               // 描述
               TextFormField(
@@ -91,7 +92,7 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
                   border: const OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
 
               TextFormField(
                 controller: _tagsCtrl,
@@ -101,7 +102,7 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXL),
 
               // 类型选择
               Text(
@@ -111,13 +112,13 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
                   color: AppColors.textSecondaryOf(isDark),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               _TypeSelector(
                 value: _type,
                 onChanged: (t) => setState(() => _type = t),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppDimensions.spacingXXL),
 
               // 提交按钮
               BlocBuilder<SpaceBloc, SpaceState>(
@@ -126,7 +127,7 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
                   onPressed: state.isOperating ? null : _submit,
                   child: state.isOperating
                       ? const SizedBox(
-                          width: 20,
+                          width: AppDimensions.spacingL,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
@@ -179,7 +180,7 @@ class _TypeSelector extends StatelessWidget {
             onTap: () => onChanged(SpaceType.public),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppDimensions.spacingM),
         Expanded(
           child: _TypeCard(
             selected: value == SpaceType.private,
@@ -217,7 +218,7 @@ class _TypeCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.1)
@@ -226,7 +227,7 @@ class _TypeCard extends StatelessWidget {
             color: selected ? AppColors.primary : Colors.transparent,
             width: 2,
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,7 +238,7 @@ class _TypeCard extends StatelessWidget {
                   ? AppColors.primary
                   : context.textSecondary,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               title,
               style: TextStyle(
@@ -247,7 +248,7 @@ class _TypeCard extends StatelessWidget {
                     : context.textPrimary,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(
               subtitle,
               style: TextStyle(

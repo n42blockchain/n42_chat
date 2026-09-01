@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/chat_folder_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 聊天文件夹标签栏
 ///
@@ -48,7 +49,7 @@ class ChatFolderTabBar extends StatelessWidget {
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
         itemCount: folders.length + 1, // +1 for add button
         itemBuilder: (context, index) {
           if (index == folders.length) {
@@ -73,7 +74,7 @@ class ChatFolderTabBar extends StatelessWidget {
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.1)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -83,7 +84,7 @@ class ChatFolderTabBar extends StatelessWidget {
                 folder.icon!,
                 style: const TextStyle(fontSize: 13),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
             ],
             Text(
               folder.name,
@@ -96,12 +97,12 @@ class ChatFolderTabBar extends StatelessWidget {
               ),
             ),
             if (folder.showUnreadBadge && folder.unreadChatsCount > 0) ...[
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
                   color: AppColors.error,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: Text(
                   folder.unreadChatsCount > 99
@@ -125,7 +126,7 @@ class ChatFolderTabBar extends StatelessWidget {
     return GestureDetector(
       onTap: onAddFolder,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
         margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
         child: Icon(
           Icons.add,

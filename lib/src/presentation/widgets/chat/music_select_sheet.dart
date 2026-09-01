@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class MusicSelectSheet extends StatefulWidget {
   final bool isDark;
@@ -140,7 +141,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
         children: [
           // 顶部标题栏
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -195,7 +196,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
     return GestureDetector(
       onTap: () => setState(() => _selectedTab = index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
@@ -249,7 +250,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
       children: [
         // 搜索框
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppDimensions.spacingM),
           child: TextField(
             decoration: InputDecoration(
               hintText: S.of(context)?.chatSearchSongOrArtist ?? 'Search song or artist',
@@ -257,7 +258,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               filled: true,
               fillColor: AppColors.inputBgOf(widget.isDark),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: BorderSide.none,
               ),
             ),
@@ -289,7 +290,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                         height: 48,
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         ),
                         child: const Icon(
                           Icons.music_note,
@@ -328,21 +329,21 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
     final fillColor = AppColors.inputBgOf(widget.isDark);
     
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 提示
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Row(
               children: [
                 const Icon(Icons.info_outline, color: AppColors.primary, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Expanded(
                   child: Text(
                     '支持网易云、QQ音乐、酷狗、酷我等平台的歌曲链接',
@@ -352,10 +353,10 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppDimensions.spacingL),
           // 音乐链接
           Text('${S.of(context)?.chatMusicLinkLabel ?? 'Music Link'} *', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           TextField(
             controller: _linkController,
             style: TextStyle(color: textColor),
@@ -366,15 +367,15 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               filled: true,
               fillColor: fillColor,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: BorderSide.none,
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           // 歌曲名称
           Text(S.of(context)?.chatSongNameOptional ?? 'Song Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           TextField(
             controller: _titleController,
             style: TextStyle(color: textColor),
@@ -385,15 +386,15 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               filled: true,
               fillColor: fillColor,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: BorderSide.none,
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           // 歌手名称
           Text(S.of(context)?.chatArtistNameOptional ?? 'Artist Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           TextField(
             controller: _artistController,
             style: TextStyle(color: textColor),
@@ -404,12 +405,12 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               filled: true,
               fillColor: fillColor,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: BorderSide.none,
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
           // 分享按钮
           SizedBox(
             width: double.infinity,
@@ -420,7 +421,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
               ),
               child: Text(S.of(context)?.chatShareMusicButton ?? 'Share Music', style: const TextStyle(fontSize: 16)),
@@ -437,7 +438,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
     
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -454,7 +455,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                 color: AppColors.primary,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             Text(
               S.of(context)?.chatSelectLocalAudio ?? 'Select Local Audio File',
               style: TextStyle(
@@ -463,7 +464,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                 color: textColor,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               S.of(context)?.chatSupportedAudioFormats ?? 'Supports MP3, M4A, WAV, FLAC, etc.',
               style: TextStyle(
@@ -471,7 +472,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                 color: subtextColor,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
             ElevatedButton.icon(
               onPressed: _pickLocalAudio,
               icon: const Icon(Icons.folder_open),
@@ -479,9 +480,9 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL, vertical: 14),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
               ),
             ),

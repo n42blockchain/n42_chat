@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Status setting page (WeChat-style)
 class StatusPage extends StatefulWidget {
@@ -215,7 +216,7 @@ class _StatusPageState extends State<StatusPage> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       child: Row(
         children: [
           IconButton(
@@ -265,11 +266,11 @@ class _StatusPageState extends State<StatusPage> {
 
   Widget _buildCustomInput() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      margin: const EdgeInsets.all(AppDimensions.spacing),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingL, vertical: AppDimensions.spacingXL),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: GestureDetector(
         onTap: () => _showCustomStatusDialog(),
@@ -287,7 +288,7 @@ class _StatusPageState extends State<StatusPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Text(
               S.of(context)?.profileWriteStatus ?? 'Write Status',
               style: TextStyle(
@@ -306,7 +307,7 @@ class _StatusPageState extends State<StatusPage> {
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,7 +346,7 @@ class _StatusPageState extends State<StatusPage> {
       },
       child: Container(
         width: (MediaQuery.of(context).size.width - 32 - 16) / 5,
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -355,7 +356,7 @@ class _StatusPageState extends State<StatusPage> {
               decoration: isSelected
                   ? BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     )
                   : null,
               child: Icon(item.icon, color: Colors.white, size: 28),

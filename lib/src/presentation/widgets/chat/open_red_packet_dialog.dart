@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../pages/red_packet/send_red_packet_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class SendRedPacketDialog extends StatefulWidget {
   final String receiverName;
@@ -191,7 +192,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
           end: Alignment.bottomCenter,
           colors: [Color(0xFFE64340), Color(0xFFD63030)],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -199,7 +200,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
           Align(
             alignment: Alignment.topRight,
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(),
                 child: const Icon(Icons.close, color: Colors.white70, size: 24),
@@ -224,7 +225,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                   )
                 : null,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
 
           Text(
             S.of(context)?.commonSenderRedPacket(widget.senderName) ??
@@ -235,7 +236,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           Text(
             widget.greeting ??
@@ -243,7 +244,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                 'Best wishes',
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           if (widget.status == OpenRedPacketStatus.canOpen)
             AnimatedBuilder(
@@ -285,11 +286,11 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
           else
             _buildStatusMessage(context),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // Bottom branding
           Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: AppDimensions.spacing),
             child: Text(
               'N42 Red Packet',
               style: TextStyle(
@@ -318,7 +319,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
         message = '';
     }
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingL),
       child: Text(
         message,
         style: const TextStyle(color: Colors.white70, fontSize: 16),
@@ -333,7 +334,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
       width: 280,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -370,11 +371,11 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // Amount
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Row(
@@ -390,7 +391,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(bottom: AppDimensions.spacingS),
                           child: Text(
                             ' ${widget.token}',
                             style: const TextStyle(
@@ -406,7 +407,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
 
                 // Best luck badge — shown when user snagged the highest amount
                 if (widget.isBestLuck) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   _BestLuckBanner(shimmerAnimation: _shimmerAnimation),
                 ],
               ],
@@ -415,7 +416,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
 
           // Bottom actions
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppDimensions.spacingL),
             child: Column(
               children: [
                 TextButton(
@@ -471,7 +472,7 @@ class _BestLuckBanner extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 6),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(20),

@@ -9,6 +9,7 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../domain/entities/message_entity.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 /// 消息操作菜单
 class MessageMenuSheet extends StatelessWidget {
@@ -43,12 +44,12 @@ class MessageMenuSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
+              margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
               ),
             ),
             // Copying self-destruct/view-once content would defeat its lifetime.
@@ -87,7 +88,7 @@ class MessageMenuSheet extends StatelessWidget {
                 color: AppColors.error,
                 onTap: onDelete,
               ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
           ],
         ),
       ),

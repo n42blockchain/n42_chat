@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// A reusable progress bar widget for displaying vote results.
 ///
@@ -89,7 +90,7 @@ class VoteProgressBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Text(
                 '$_voteCountText votes',
                 style: TextStyle(
@@ -97,7 +98,7 @@ class VoteProgressBar extends StatelessWidget {
                   color: secondaryTextColor,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               SizedBox(
                 width: 48,
                 child: Text(
@@ -115,9 +116,9 @@ class VoteProgressBar extends StatelessWidget {
           const SizedBox(height: 6),
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
             child: SizedBox(
-              height: 8,
+              height: AppDimensions.spacingS,
               child: Stack(
                 children: [
                   // Track
@@ -125,7 +126,7 @@ class VoteProgressBar extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: trackColor,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                   ),
                   // Progress fill
@@ -137,7 +138,7 @@ class VoteProgressBar extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         color: barColor,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                       ),
                     ),
                   ),

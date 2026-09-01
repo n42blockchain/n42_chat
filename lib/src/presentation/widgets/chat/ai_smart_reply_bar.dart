@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class AiSmartReplyBar extends StatelessWidget {
   const AiSmartReplyBar({
@@ -54,7 +55,7 @@ class AiSmartReplyBar extends StatelessWidget {
                   color: titleColor,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: Text(
                   'Suggested replies',
@@ -64,7 +65,7 @@ class AiSmartReplyBar extends StatelessWidget {
               ),
               if (isLoading)
                 const SizedBox(
-                  width: 16,
+                  width: AppDimensions.spacing,
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
@@ -84,7 +85,7 @@ class AiSmartReplyBar extends StatelessWidget {
               ],
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           if (isLoading && suggestions.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
@@ -100,7 +101,7 @@ class AiSmartReplyBar extends StatelessWidget {
                 children: suggestions
                     .map(
                       (suggestion) => Padding(
-                        padding: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.only(right: AppDimensions.spacingS),
                         child: ActionChip(
                           label: Text(suggestion),
                           onPressed: onSelect == null

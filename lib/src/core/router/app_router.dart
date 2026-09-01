@@ -63,6 +63,7 @@ import '../../presentation/blocs/voice_room/voice_room_event.dart';
 import '../../domain/repositories/voice_room_repository.dart';
 import '../../services/voip/voice_room_service.dart';
 import 'routes.dart';
+import '../theme/app_dimensions.dart';
 
 /// N42 Chat 路由配置
 ///
@@ -740,7 +741,7 @@ class _ErrorPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.error_outline, size: 64, color: Color(0xFFFA5151)),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               l10n?.commonPageNotFound ?? 'Page not found',
               style: const TextStyle(
@@ -750,13 +751,13 @@ class _ErrorPage extends StatelessWidget {
               ),
             ),
             if (error != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 error.toString(),
                 style: const TextStyle(fontSize: 14, color: Color(0xFF888888)),
               ),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             ElevatedButton(
               onPressed: () => context.go(Routes.conversationList),
               style: ElevatedButton.styleFrom(

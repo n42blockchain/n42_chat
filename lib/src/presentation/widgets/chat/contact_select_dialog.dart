@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class ContactSelectDialog extends StatefulWidget {
   final List<ContactEntity> contacts;
@@ -53,11 +54,11 @@ class _ContactSelectDialogState extends State<ContactSelectDialog> {
                 hintText: S.of(context)?.chatSearchContactHint ?? 'Search contacts',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             // 联系人列表
             Expanded(
               child: ListView.builder(

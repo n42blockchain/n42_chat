@@ -7,6 +7,7 @@ import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 自定义贴纸包管理页
 ///
@@ -226,14 +227,14 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.add_photo_alternate_outlined, size: 56),
-            SizedBox(height: 12),
+            SizedBox(height: AppDimensions.spacingM),
             Text('Tap "Add stickers" to upload images'),
           ],
         ),
       );
     }
     return GridView.builder(
-      padding: const EdgeInsets.all(12).copyWith(bottom: 88),
+      padding: const EdgeInsets.all(AppDimensions.spacingM).copyWith(bottom: 88),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 8,
@@ -284,7 +285,7 @@ class _StickerThumb extends StatelessWidget {
     Widget container(Widget child) => Container(
           decoration: BoxDecoration(
             color: AppColors.placeholderOf(isDark),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           ),
           child: Center(child: child),
         );

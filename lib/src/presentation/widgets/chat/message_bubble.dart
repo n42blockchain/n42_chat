@@ -7,6 +7,7 @@ import '../../../core/utils/a11y_l10n.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'message_status_indicator.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 消息气泡组件
 ///
@@ -100,7 +101,7 @@ class MessageBubble extends StatelessWidget {
         maxWidth = calculated > 400 ? 400 : calculated;
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingXS),
           child: Row(
             mainAxisAlignment: isSelf
                 ? MainAxisAlignment.end
@@ -109,7 +110,7 @@ class MessageBubble extends StatelessWidget {
             children: [
               // 左侧头像（对方消息）
               if (!isSelf && showAvatar) _buildAvatar(isDark),
-              if (!isSelf && showAvatar) const SizedBox(width: 8),
+              if (!isSelf && showAvatar) const SizedBox(width: AppDimensions.spacingS),
 
               // 消息内容
               Flexible(
@@ -121,7 +122,7 @@ class MessageBubble extends StatelessWidget {
                     // 时间戳
                     if (showTimestamp && timestamp != null)
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
+                        padding: const EdgeInsets.only(bottom: AppDimensions.spacingXS),
                         child: Text(
                           _formatTime(timestamp!),
                           style: const TextStyle(
@@ -139,7 +140,7 @@ class MessageBubble extends StatelessWidget {
                         // 发送失败图标（自己的消息，在气泡左侧）
                         if (isSelf && status == MessageStatus.failed) ...[
                           _buildFailedIndicator(context),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppDimensions.spacingXS),
                         ],
 
                         // 气泡或无气泡内容 - 使用 Flexible 防止溢出
@@ -154,7 +155,7 @@ class MessageBubble extends StatelessWidget {
 
                         // 发送中指示器（自己的消息，在气泡右侧）
                         if (isSelf && status == MessageStatus.sending) ...[
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppDimensions.spacingXS),
                           _buildSendingIndicator(context),
                         ],
                       ],
@@ -164,7 +165,7 @@ class MessageBubble extends StatelessWidget {
               ),
 
               // 右侧头像（自己的消息）
-              if (isSelf && showAvatar) const SizedBox(width: 8),
+              if (isSelf && showAvatar) const SizedBox(width: AppDimensions.spacingS),
               if (isSelf && showAvatar) _buildAvatar(isDark),
             ],
           ),
@@ -194,7 +195,7 @@ class MessageBubble extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: AppColors.placeholder,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),

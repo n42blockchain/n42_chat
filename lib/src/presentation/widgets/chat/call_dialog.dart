@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 通话对话框
 /// 
@@ -153,7 +154,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
               child: _buildAvatarPlaceholder(),
             ),
             
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             
             // 联系人名字
             Text(
@@ -165,7 +166,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
               ),
             ),
             
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             
             // 通话状态
             Text(
@@ -237,7 +238,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             Text(
               S.of(context)?.chatHangUp ?? 'Hang Up',
@@ -288,7 +289,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
               size: 28,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,
             style: TextStyle(

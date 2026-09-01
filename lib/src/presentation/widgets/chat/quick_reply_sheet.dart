@@ -5,6 +5,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/quick_reply_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 快捷回复选择弹窗
 class QuickReplySheet extends StatefulWidget {
@@ -127,18 +128,18 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
         children: [
           // 拖动指示器
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 12),
+            margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
             width: 40,
             height: 4,
             decoration: BoxDecoration(
               color: AppColors.dividerOf(isDark),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
             ),
           ),
 
           // 标题栏
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -175,7 +176,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
             child: _isLoading
                 ? const Center(
                     child: Padding(
-                      padding: EdgeInsets.all(32),
+                      padding: EdgeInsets.all(AppDimensions.spacingXXL),
                       child: CircularProgressIndicator(),
                     ),
                   )
@@ -193,7 +194,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
 
   Widget _buildEmptyState(bool isDark, S? l10n) {
     return Padding(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(AppDimensions.spacingXXL),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -202,7 +203,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
             size: 48,
             color: AppColors.textTertiaryOf(isDark),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             l10n?.settingsNoQuickReplies ?? 'No quick replies',
             style: TextStyle(
@@ -218,14 +219,14 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
   Widget _buildReplyList(bool isDark, S? l10n) {
     return ListView(
       shrinkWrap: true,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
       children: [
         if (_isLoadingSmartReplies)
           _buildSectionHeader(
             isDark,
             title: 'AI Suggestions',
             trailing: const SizedBox(
-              width: 16,
+              width: AppDimensions.spacing,
               height: 16,
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
@@ -285,7 +286,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
     return InkWell(
       onTap: () => _onSelectReply(reply),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         child: Row(
           children: [
             Expanded(
@@ -304,7 +305,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
                   color: isDark
                       ? Colors.white12
                       : Colors.black.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(
                   'Default',
@@ -324,7 +325,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
     return InkWell(
       onTap: () => _onSelectSmartReply(reply),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         child: Row(
           children: [
             const Icon(Icons.auto_awesome, size: 18, color: AppColors.primary),

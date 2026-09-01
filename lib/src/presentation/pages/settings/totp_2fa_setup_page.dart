@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/totp.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// App 级 TOTP 二步验证设置页
 ///
@@ -112,13 +113,13 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
   Widget _buildEnabled() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppDimensions.spacingXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.verified_user,
                 size: 64, color: AppColors.success),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'Two-factor authentication is on',
               style: TextStyle(
@@ -127,13 +128,13 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               'A code from your authenticator app is required.',
               textAlign: TextAlign.center,
               style: TextStyle(color: context.textSecondary),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.spacingXXL),
             N42Button(
               text: 'Turn off',
               type: N42ButtonType.secondary,
@@ -152,20 +153,20 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
       issuer: 'N42 Chat',
     );
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       children: [
         Text(
           '1. Scan this QR with an authenticator app (Google Authenticator, '
           'Authy, 1Password…), or enter the key manually.',
           style: TextStyle(color: context.textSecondary, height: 1.4),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         Center(
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             ),
             child: QrImageView(
               data: uri,
@@ -175,7 +176,7 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         InkWell(
           onTap: () {
             Clipboard.setData(ClipboardData(text: _secret));
@@ -184,10 +185,10 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
             );
           },
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             decoration: BoxDecoration(
               color: context.surfaceColor,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Row(
               children: [
@@ -205,12 +206,12 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           '2. Enter the 6-digit code to confirm.',
           style: TextStyle(color: context.textSecondary),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppDimensions.spacingM),
         TextField(
           controller: _codeController,
           keyboardType: TextInputType.number,
@@ -227,7 +228,7 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
             if (_error != null) setState(() => _error = null);
           },
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         N42Button(text: 'Enable', onPressed: _enable),
       ],
     );

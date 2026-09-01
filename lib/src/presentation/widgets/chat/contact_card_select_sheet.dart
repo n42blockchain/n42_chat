@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class ContactCardSelectSheet extends StatefulWidget {
   final bool isDark;
@@ -85,7 +86,7 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
         children: [
           // 顶部标题栏
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -116,7 +117,7 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
           ),
           // 搜索框
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             child: TextField(
               decoration: InputDecoration(
                 hintText: widget.searchContactHintText,
@@ -124,7 +125,7 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
                 filled: true,
                 fillColor: AppColors.inputBgOf(widget.isDark),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   borderSide: BorderSide.none,
                 ),
               ),

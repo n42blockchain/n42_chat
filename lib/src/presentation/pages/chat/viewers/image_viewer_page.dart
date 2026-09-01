@@ -24,6 +24,7 @@ import '../../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../../core/utils/debug_log.dart';
 import '../../../../domain/entities/message_entity.dart';
 import 'image_text_page.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 /// 图片查看器页面
 class ImageViewerPage extends StatefulWidget {
@@ -202,7 +203,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
             IconButton(
               icon: _isSaving
                   ? const SizedBox(
-                      width: 20,
+                      width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(
                         color: Colors.white,
@@ -255,7 +256,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                           color: Colors.white,
                           size: 20,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacingM),
                         Text(
                           imageText.extractText,
                           style: const TextStyle(color: Colors.white),
@@ -273,7 +274,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                           color: Colors.white,
                           size: 20,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacingM),
                         Text(
                           imageText.translateImage,
                           style: const TextStyle(color: Colors.white),
@@ -287,7 +288,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                     child: Row(
                       children: [
                         Icon(Icons.auto_awesome, color: Colors.white, size: 20),
-                        SizedBox(width: 12),
+                        SizedBox(width: AppDimensions.spacingM),
                         Text(
                           'AI describe / OCR',
                           style: TextStyle(color: Colors.white),
@@ -305,7 +306,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                           color: Colors.white,
                           size: 20,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacingM),
                         Text(
                           S.of(context)?.chatSaveToGallery ?? 'Save to Gallery',
                           style: const TextStyle(color: Colors.white),
@@ -319,7 +320,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                     child: Row(
                       children: [
                         const Icon(Icons.share, color: Colors.white, size: 20),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacingM),
                         Text(
                           S.of(context)?.commonShare ?? 'Share',
                           style: const TextStyle(color: Colors.white),
@@ -376,7 +377,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       const Icon(Icons.error, color: AppColors.error, size: 48),
-      const SizedBox(height: 16),
+      const SizedBox(height: AppDimensions.spacing),
       Text(
         S.of(context)?.chatFailedToLoadImage ?? 'Failed to load image',
         style: const TextStyle(color: Colors.white),
@@ -438,10 +439,10 @@ class _AiDescribeSheetState extends State<_AiDescribeSheet> {
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 16,
-          bottom: 16 + MediaQuery.of(context).viewInsets.bottom,
+          left: AppDimensions.spacing,
+          right: AppDimensions.spacing,
+          top: AppDimensions.spacing,
+          bottom: AppDimensions.spacing + MediaQuery.of(context).viewInsets.bottom,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -450,7 +451,7 @@ class _AiDescribeSheetState extends State<_AiDescribeSheet> {
             const Row(
               children: [
                 Icon(Icons.auto_awesome, color: Colors.white, size: 20),
-                SizedBox(width: 8),
+                SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'AI describe / OCR',
                   style: TextStyle(
@@ -461,10 +462,10 @@ class _AiDescribeSheetState extends State<_AiDescribeSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             if (_loading)
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
+                padding: EdgeInsets.symmetric(vertical: AppDimensions.spacingXL),
                 child: Center(
                   child: CircularProgressIndicator(color: Colors.white),
                 ),
@@ -484,7 +485,7 @@ class _AiDescribeSheetState extends State<_AiDescribeSheet> {
                 ),
               ),
             if (!_loading && _result != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton.icon(

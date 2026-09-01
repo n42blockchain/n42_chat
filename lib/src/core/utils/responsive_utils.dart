@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_dimensions.dart';
 
 /// 响应式布局工具类
 ///
@@ -262,7 +263,7 @@ class _EmptyRightPanel extends StatelessWidget {
             size: 64,
             color: Color(0xFFBDBDBD),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing),
           Text(
             'Select a conversation',
             style: TextStyle(

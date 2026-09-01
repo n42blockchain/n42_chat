@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// AI 链接摘要卡片
 ///
@@ -51,7 +52,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.04),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         border: Border.all(
           color: AppColors.primary.withValues(alpha: 0.15),
         ),
@@ -98,14 +99,14 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
               Row(
                 children: [
                   const SizedBox(
-                    width: 12,
+                    width: AppDimensions.spacingM,
                     height: 12,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       color: AppColors.primary,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   Text(
                     l10n?.aiLinkSummaryAnalyzing ?? 'Analyzing...',
                     style: const TextStyle(
@@ -142,7 +143,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.04),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: Border.all(
             color: AppColors.primary.withValues(alpha: 0.2),
           ),
@@ -151,7 +152,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.auto_awesome, size: 12, color: AppColors.primary),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppDimensions.spacingXS),
             Text(
               l10n?.aiLinkSummary ?? 'AI Summary',
               style: const TextStyle(

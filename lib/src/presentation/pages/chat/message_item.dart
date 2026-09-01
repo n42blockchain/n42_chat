@@ -38,6 +38,7 @@ import '../../widgets/chat/custom_emoji_text.dart';
 import '../../../core/utils/custom_emoji_parser.dart';
 import 'message_item_helpers.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 消息列表项
 class MessageItem extends StatelessWidget {
@@ -244,15 +245,15 @@ class MessageItem extends StatelessWidget {
                   ),
                 ),
                 if (message.isBotMessage) ...[
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppDimensions.spacingXS),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
+                      horizontal: AppDimensions.spacingXS,
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: const Text(
                       'BOT',
@@ -281,7 +282,7 @@ class MessageItem extends StatelessWidget {
       bubble = Container(
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: bubble,
       );
@@ -326,13 +327,13 @@ class MessageItem extends StatelessWidget {
             padding: EdgeInsets.only(
               left: message.isFromMe ? 0 : 56,
               right: message.isFromMe ? 56 : 0,
-              top: 4,
+              top: AppDimensions.spacingXS,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.schedule, size: 12, color: AppColors.primary),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacingXS),
                 Flexible(
                   child: Text(
                     '${S.of(context)?.scheduledMessageLabel ?? 'Scheduled'} ${_formatScheduledTime(message.scheduledAt!)}',
@@ -380,7 +381,7 @@ class MessageItem extends StatelessWidget {
       padding: EdgeInsets.only(
         left: message.isFromMe ? 0 : 56, // 头像宽度 + 间距
         right: message.isFromMe ? 56 : 0,
-        top: 4,
+        top: AppDimensions.spacingXS,
       ),
       child: MessageReactionBar(
         reactions: reactionEntities,
@@ -458,7 +459,7 @@ class MessageItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildReplyQuote(isDark, context),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           content,
         ],
       );
@@ -502,10 +503,10 @@ class MessageItem extends StatelessWidget {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: 6),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           border: const Border(
             left: BorderSide(color: AppColors.primary, width: 2),
           ),
@@ -756,7 +757,7 @@ class MessageItem extends StatelessWidget {
           color: message.isFromMe
               ? AppColors.selfBubble(isDark)
               : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -764,7 +765,7 @@ class MessageItem extends StatelessWidget {
           children: [
             // 名片内容
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               child: Row(
                 children: [
                   // 头像 - 如果有头像URL则显示网络图片，否则显示首字母
@@ -814,7 +815,7 @@ class MessageItem extends StatelessWidget {
             // 底部分隔线和标签
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: 6),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
@@ -858,7 +859,7 @@ class MessageItem extends StatelessWidget {
     if (avatarUrl != null && avatarUrl.isNotEmpty) {
       // 有头像URL，显示网络图片
       return ClipRRect(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         child: Image.network(
           avatarUrl,
           width: 44,
@@ -886,7 +887,7 @@ class MessageItem extends StatelessWidget {
       height: 44,
       decoration: BoxDecoration(
         color: _getColorFromName(name),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
       child: Center(
         child: Text(
@@ -1091,7 +1092,7 @@ class MessageItem extends StatelessWidget {
       if (message.isExpired || message.isDestructionStarted) {
         // 已过期或已查看
         return ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           child: Container(
             width: 200,
             height: 120,
@@ -1129,7 +1130,7 @@ class MessageItem extends StatelessWidget {
       return GestureDetector(
         onTap: onTap,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           child: Container(
             width: 200,
             height: 120,
@@ -1145,7 +1146,7 @@ class MessageItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppDimensions.spacingM),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
@@ -1156,7 +1157,7 @@ class MessageItem extends StatelessWidget {
                       size: 28,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   Text(
                     s?.chatViewOnceVideo ?? 'View Once Video',
                     maxLines: 1,
@@ -1168,7 +1169,7 @@ class MessageItem extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacingXS),
                   Text(
                     s?.chatViewOnceTap ?? 'Tap to view',
                     maxLines: 1,
@@ -1195,7 +1196,7 @@ class MessageItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -1222,7 +1223,7 @@ class MessageItem extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.6),
                       size: 48,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacingS),
                     Text(
                       S.of(context)?.chatVideoTitle ?? 'Video',
                       maxLines: 1,
@@ -1274,7 +1275,7 @@ class MessageItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Text(
                     _formatDuration((durationMs / 1000).round()),
@@ -1294,10 +1295,10 @@ class MessageItem extends StatelessWidget {
               left: 8,
               top: 8,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(AppDimensions.spacingXS),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: const Icon(
                   Icons.videocam,
@@ -1318,7 +1319,7 @@ class MessageItem extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -1364,7 +1365,7 @@ class MessageItem extends StatelessWidget {
       excludeSemantics: true,
       child: Container(
       width: 200,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       child: Row(
         children: [
           Container(
@@ -1372,14 +1373,14 @@ class MessageItem extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusS),
             ),
             child: const Icon(
               Icons.insert_drive_file,
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1505,7 +1506,7 @@ class MessageItem extends StatelessWidget {
                   height: 36,
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: const Icon(
                     Icons.location_on,
@@ -1593,7 +1594,7 @@ class MessageItem extends StatelessWidget {
           Row(
             children: [
               const Text('💝', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Text(
                 'Tip · $amount $token',
                 style: const TextStyle(
@@ -1613,7 +1614,7 @@ class MessageItem extends StatelessWidget {
               style: const TextStyle(color: Colors.white, fontSize: 13),
             ),
           ],
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             confirmed ? 'On-chain ✓' : 'Sent',
             style: TextStyle(
@@ -1737,14 +1738,14 @@ class MessageItem extends StatelessWidget {
       },
       child: Container(
         width: 240,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppDimensions.spacingM),
         decoration: BoxDecoration(
           color: message.isFromMe
               ? AppColors.messageSent
               : (isDark
                     ? AppColors.messageReceivedDark
                     : AppColors.messageReceived),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
         child: Row(
           children: [
@@ -1754,11 +1755,11 @@ class MessageItem extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: cover != null && cover.isNotEmpty
                   ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       child: Image.network(
                         cover,
                         fit: BoxFit.cover,
@@ -1775,7 +1776,7 @@ class MessageItem extends StatelessWidget {
                       color: AppColors.primary,
                     ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             // 歌曲信息
             Expanded(
               child: Column(
@@ -1862,14 +1863,14 @@ class MessageItem extends StatelessWidget {
 
     return Container(
       width: 250,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: message.isFromMe
             ? AppColors.messageSent
             : (isDark
                   ? AppColors.messageReceivedDark
                   : AppColors.messageReceived),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1911,7 +1912,7 @@ class MessageItem extends StatelessWidget {
               children: [
                 Icon(Icons.calendar_today,
                     size: 14, color: AppColors.primary),
-                SizedBox(width: 4),
+                SizedBox(width: AppDimensions.spacingXS),
                 Text(
                   'Add to calendar',
                   style: TextStyle(
@@ -1971,14 +1972,14 @@ class MessageItem extends StatelessWidget {
 
     return Container(
       width: 260,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: message.isFromMe
             ? AppColors.messageSent
             : (isDark
                   ? AppColors.messageReceivedDark
                   : AppColors.messageReceived),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1990,13 +1991,13 @@ class MessageItem extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.poll, size: 12, color: AppColors.primary),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacingXS),
                     Text(
                       maxSelections == 1
                           ? (S.of(context)?.chatSingleChoice ?? 'Single')
@@ -2015,14 +2016,14 @@ class MessageItem extends StatelessWidget {
               ),
               if (pollEnded)
                 Container(
-                  margin: const EdgeInsets.only(left: 8),
+                  margin: const EdgeInsets.only(left: AppDimensions.spacingS),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 6,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.grey.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Text(
                     S.of(context)?.chatEnded ?? 'Ended',
@@ -2033,7 +2034,7 @@ class MessageItem extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 问题
           Text(
@@ -2051,7 +2052,7 @@ class MessageItem extends StatelessWidget {
                         : AppColors.messageTextReceived),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
 
           // 选项
           ...List.generate(options.length, (index) {
@@ -2101,7 +2102,7 @@ class MessageItem extends StatelessWidget {
                     )
                   : null,
               child: Container(
-                margin: const EdgeInsets.only(bottom: 8),
+                margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: switch (quizState) {
@@ -2113,7 +2114,7 @@ class MessageItem extends StatelessWidget {
                         ? AppColors.primary.withValues(alpha: 0.1)
                         : AppColors.inputBgOf(isDark),
                   },
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   border: Border.all(
                     color: switch (quizState) {
                       QuizOptionState.correct => AppColors.success,
@@ -2163,7 +2164,7 @@ class MessageItem extends StatelessWidget {
                       const SizedBox(height: 6),
                       // 投票进度条
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                         child: LinearProgressIndicator(
                           value: percentage / 100,
                           backgroundColor: isDark
@@ -2175,7 +2176,7 @@ class MessageItem extends StatelessWidget {
                           minHeight: 4,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXS),
                       Text(
                         S
                                 .of(context)
@@ -2204,12 +2205,12 @@ class MessageItem extends StatelessWidget {
           if (quizReveal &&
               metadata?.quizExplanation != null &&
               metadata!.quizExplanation!.isNotEmpty) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppDimensions.spacingS),
               decoration: BoxDecoration(
                 color: AppColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2230,11 +2231,11 @@ class MessageItem extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
           ],
 
           // 底部统计
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -2281,7 +2282,7 @@ class MessageItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Icon(Icons.lock, size: 16, color: AppColors.textSecondary),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppDimensions.spacingXS),
         Text(
           A11yL10n.of(context).encrypted,
           maxLines: 1,
@@ -2373,7 +2374,7 @@ class MessageItem extends StatelessWidget {
           ),
           // 未接来电显示回拨按钮
           if (isMissed && !message.isFromMe && onCallBack != null) ...[
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Semantics(
               button: true,
               label: S.of(context)?.chatCallBack ?? '回拨',
@@ -2381,10 +2382,10 @@ class MessageItem extends StatelessWidget {
               child: GestureDetector(
               onTap: () => onCallBack?.call(message),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -2394,7 +2395,7 @@ class MessageItem extends StatelessWidget {
                       size: 14,
                       color: AppColors.primary,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacingXS),
                     Text(
                       S.of(context)?.chatCallBack ?? '回拨',
                       maxLines: 1,
@@ -2559,18 +2560,18 @@ class MessageItem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Container(
               width: 36,
               height: 4,
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
               child: Text(
                 address.length > 20
                     ? '${address.substring(0, 10)}...${address.substring(address.length - 8)}'
@@ -2584,7 +2585,7 @@ class MessageItem extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             ListTile(
               leading: const Icon(Icons.copy),
               title: Text(l10n?.addressCopyAction ?? 'Copy Address'),
@@ -2603,7 +2604,7 @@ class MessageItem extends StatelessWidget {
                 // 跳转到通过钱包地址添加好友页
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
           ],
         ),
       ),

@@ -10,6 +10,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/debug_log.dart';
 import 'scheduled_send_picker.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// GIF 选择回调
 typedef GifSelectedCallback = void Function(GiphyGif gif);
@@ -234,12 +235,12 @@ class _GifPickerState extends State<GifPicker> {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       child: Container(
         height: 36,
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: TextField(
           controller: _searchController,
@@ -270,7 +271,7 @@ class _GifPickerState extends State<GifPicker> {
                   )
                 : null,
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
           ),
         ),
       ),
@@ -289,14 +290,14 @@ class _GifPickerState extends State<GifPicker> {
               size: 48,
               color: AppColors.textTertiary,
             ),
-            SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacingS),
             Text(
               'GIF service not configured',
               style: TextStyle(
                 color: AppColors.textTertiary,
               ),
             ),
-            SizedBox(height: 4),
+            SizedBox(height: AppDimensions.spacingXS),
             // Giphy 与 Tenor 任一 key 即可启用，文案不要只提 Giphy 误导配置。
             Text(
               'Set GIPHY_API_KEY or TENOR_API_KEY at build time',
@@ -324,7 +325,7 @@ class _GifPickerState extends State<GifPicker> {
               size: 48,
               color: AppColors.textTertiary,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               _currentQuery.isEmpty ? 'No trending GIFs' : 'No GIFs found',
               style: const TextStyle(
@@ -338,7 +339,7 @@ class _GifPickerState extends State<GifPicker> {
 
     return GridView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 4,
@@ -349,7 +350,7 @@ class _GifPickerState extends State<GifPicker> {
         if (index >= _gifs.length) {
           return const Center(
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppDimensions.spacing),
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
           );
@@ -368,7 +369,7 @@ class _GifPickerState extends State<GifPicker> {
           ? null
           : () => widget.onGifLongPressed!(gif),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         child: Container(
           color: AppColors.placeholderOf(isDark),
           child: Image.network(
@@ -396,7 +397,7 @@ class _GifPickerState extends State<GifPicker> {
 
   Widget _buildGiphyAttribution(bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -445,17 +446,17 @@ Future<GifPickerResult?> showGifPicker(BuildContext context) async {
         children: [
           // 拖动条
           Container(
-            margin: const EdgeInsets.only(top: 8),
+            margin: const EdgeInsets.only(top: AppDimensions.spacingS),
             width: 40,
             height: 4,
             decoration: BoxDecoration(
               color: AppColors.textTertiary,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
             ),
           ),
           // 标题栏
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             child: Row(
               children: [
                 const Text(

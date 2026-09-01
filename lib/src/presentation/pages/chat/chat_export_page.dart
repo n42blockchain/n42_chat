@@ -9,6 +9,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 聊天记录导出页面
 class ChatExportPage extends StatefulWidget {
@@ -201,24 +202,24 @@ class _ChatExportPageState extends State<ChatExportPage> {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           if (_isLoadingMessages)
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: AppColors.info.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Row(
                 children: [
                   const SizedBox(
-                    width: 16,
+                    width: AppDimensions.spacing,
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacingM),
                   Expanded(
                     child: Text(
                       'Loading more chat history for export...',
@@ -229,7 +230,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
               ),
             ),
 
-          if (_isLoadingMessages) const SizedBox(height: 16),
+          if (_isLoadingMessages) const SizedBox(height: AppDimensions.spacing),
 
           // 导出格式
           _buildSection(
@@ -278,7 +279,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 日期范围
           _buildSection(
@@ -337,7 +338,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                     isDark: isDark,
                     onTap: () => _pickCustomDate(isStart: true),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   _buildDateTile(
                     label: 'End',
                     value: _customEnd,
@@ -348,20 +349,20 @@ class _ChatExportPageState extends State<ChatExportPage> {
               ),
             ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 统计信息
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             decoration: BoxDecoration(
               color: AppColors.info.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             ),
             child: Row(
               children: [
                 Icon(Icons.info_outline, size: 20, color: Colors.blue[700]),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacingM),
                 Expanded(
                   child: Text(
                     '${S.of(context)?.chatExportMessageCount ?? "Messages to export"}: $_filteredCount / ${_messages.length}',
@@ -372,11 +373,11 @@ class _ChatExportPageState extends State<ChatExportPage> {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // 导出按钮
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
             child: ElevatedButton(
               onPressed:
                   _isExporting || _isLoadingMessages || _filteredCount == 0
@@ -387,12 +388,12 @@ class _ChatExportPageState extends State<ChatExportPage> {
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 ),
               ),
               child: _isExporting
                   ? const SizedBox(
-                      width: 20,
+                      width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
@@ -409,7 +410,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
         ],
       ),
     );
@@ -474,11 +475,11 @@ class _ChatExportPageState extends State<ChatExportPage> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: 14),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
             color: context.dividerColor,
           ),
@@ -490,7 +491,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
               size: 18,
               color: AppColors.primary,
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Text(
                 '$label: ${value != null ? _formatDate(value) : "Select date"}',

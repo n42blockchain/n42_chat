@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/image_text_l10n.dart';
 import '../../../../domain/entities/message_entity.dart';
 import '../../../../domain/entities/ocr_document.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 enum ImageTextMode { extract, translate }
 
@@ -247,7 +248,7 @@ class _ImageTextPageState extends State<ImageTextPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(color: Colors.white),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               strings.recognizing,
               style: const TextStyle(color: Colors.white70),
@@ -268,7 +269,7 @@ class _ImageTextPageState extends State<ImageTextPage> {
         Expanded(
           flex: 3,
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             child: LayoutBuilder(
               builder: (context, constraints) => _ImageOverlay(
                 bytes: _bytes!,
@@ -311,7 +312,7 @@ class _ImageTextPageState extends State<ImageTextPage> {
                         setState(() => _mode = selection.first),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Tooltip(
                   message: _translation!.isOnDevice
                       ? strings.onDevice
@@ -328,7 +329,7 @@ class _ImageTextPageState extends State<ImageTextPage> {
           ),
         if (_translating)
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -343,7 +344,7 @@ class _ImageTextPageState extends State<ImageTextPage> {
           ),
         if (_error != null)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
             child: Text(
               _error!,
               style: const TextStyle(color: AppColors.error),
@@ -388,7 +389,7 @@ class _ImageTextPageState extends State<ImageTextPage> {
     child: Material(
       color: const Color(0xFF181818),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: 6),
         child: Row(
           children: [
             TextButton(
@@ -445,7 +446,7 @@ class _ImageTextPageState extends State<ImageTextPage> {
                     PopupMenuItem(value: 'search', child: Text(strings.search)),
                 ],
               ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppDimensions.spacingXS),
             FilledButton.icon(
               onPressed: _translating ? null : _translate,
               icon: const Icon(Icons.translate, size: 18),
@@ -540,7 +541,7 @@ class _ErrorState extends StatelessWidget {
     final strings = ImageTextL10n.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppDimensions.spacingXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

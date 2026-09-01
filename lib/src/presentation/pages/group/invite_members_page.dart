@@ -15,6 +15,7 @@ import '../../blocs/group/group_state.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../contact/contact_tile.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 邀请成员页面
 class InviteMembersPage extends StatefulWidget {
@@ -140,7 +141,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
 
                     return ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
                       itemCount: selectedContacts.length,
                       itemBuilder: (context, index) {
                         final contact = selectedContacts[index];
@@ -154,7 +155,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
             // 搜索栏
             Container(
               color: context.surfaceColor,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               child: N42SearchBar(
                 controller: _searchController,
                 hintText:
@@ -217,7 +218,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
 
   Widget _buildSelectedMember(ContactEntity contact) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS, vertical: AppDimensions.spacingS),
       child: GestureDetector(
         onTap: () => _toggleSelection(contact.userId),
         child: Column(
@@ -248,7 +249,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             SizedBox(
               width: 50,
               child: Text(

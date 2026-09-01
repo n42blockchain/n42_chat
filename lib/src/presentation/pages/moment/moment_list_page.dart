@@ -18,6 +18,7 @@ import 'create_moment_page.dart';
 import 'moment_forward_sheet.dart';
 import 'video_feed_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 朋友圈列表页面
 class MomentListPage extends StatelessWidget {
@@ -213,7 +214,7 @@ class _MomentListViewState extends State<_MomentListView> {
                           size: 64,
                           color: context.textTertiary,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.spacing),
                         Text(
                           s?.momentNoMomentsYet ?? 'No moments yet',
                           style: TextStyle(
@@ -231,7 +232,7 @@ class _MomentListViewState extends State<_MomentListView> {
                   if (index >= state.moments.length) {
                     if (state.isLoadingMore) {
                       return const Padding(
-                        padding: EdgeInsets.all(16),
+                        padding: EdgeInsets.all(AppDimensions.spacing),
                         child: Center(child: CircularProgressIndicator()),
                       );
                     }
@@ -316,11 +317,11 @@ class _MomentListViewState extends State<_MomentListView> {
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white, width: 2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: N42Avatar(
                   name: _isUserMode
@@ -369,7 +370,7 @@ class _MomentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         border: Border(
@@ -389,7 +390,7 @@ class _MomentTile extends StatelessWidget {
             size: 44,
           ),
 
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
 
           // 内容区域
           Expanded(
@@ -408,7 +409,7 @@ class _MomentTile extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
 
                 // 文字内容
                 if (moment.hasContent) ...[
@@ -420,13 +421,13 @@ class _MomentTile extends StatelessWidget {
                       height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                 ],
 
                 // 媒体内容
                 if (moment.hasMedia) ...[
                   _buildMediaGrid(context),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                 ],
 
                 // 位置信息
@@ -438,7 +439,7 @@ class _MomentTile extends StatelessWidget {
                         size: 14,
                         color: context.textSecondary,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppDimensions.spacingXS),
                       Flexible(
                         child: Text(
                           moment.location!.displayText,
@@ -453,7 +454,7 @@ class _MomentTile extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                 ],
 
                 // 时间、可见性图标和操作
@@ -472,7 +473,7 @@ class _MomentTile extends StatelessWidget {
                     // 自己的动态显示可见性状态（非公开时显示图标，微信风格）
                     if (moment.isFromMe &&
                         moment.visibility != MomentVisibility.public) ...[
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppDimensions.spacingXS),
                       _buildVisibilityBadge(context),
                     ],
                     const Spacer(),
@@ -482,7 +483,7 @@ class _MomentTile extends StatelessWidget {
 
                 // 点赞和评论（已在方法内部做可见性过滤）
                 if (moment.likeCount > 0 || moment.commentCount > 0) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   _buildLikesAndComments(context),
                 ],
               ],
@@ -524,7 +525,7 @@ class _MomentTile extends StatelessWidget {
           return GestureDetector(
             onTap: () => _openMediaViewer(context, index),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusS),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -587,7 +588,7 @@ class _MomentTile extends StatelessWidget {
     return GestureDetector(
       onTap: () => _openMediaViewer(context, index),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         child: SizedBox(
           width: width,
           height: height,
@@ -683,10 +684,10 @@ class _MomentTile extends StatelessWidget {
       builder: (buttonContext) => GestureDetector(
         onTap: () => _showActionPopup(context, buttonContext),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
           decoration: BoxDecoration(
             color: AppColors.inputBgOf(isDark),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           ),
           child: Icon(
             Icons.more_horiz,
@@ -834,14 +835,14 @@ class _MomentTile extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 16, color: Colors.white),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppDimensions.spacingXS),
             Text(
               label,
               maxLines: 1,
@@ -869,10 +870,10 @@ class _MomentTile extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       decoration: BoxDecoration(
         color: AppColors.inputBgOf(isDark),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -886,7 +887,7 @@ class _MomentTile extends StatelessWidget {
                   size: 14,
                   color: AppColors.error,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacingXS),
                 Expanded(
                   child: Text(
                     visibleLikes.map((l) => l.userName).join(', '),
@@ -911,7 +912,7 @@ class _MomentTile extends StatelessWidget {
           // 评论列表
           ...visibleComments.map(
             (comment) => Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: AppDimensions.spacingXS),
               child: RichText(
                 text: TextSpan(
                   style: TextStyle(
@@ -1119,7 +1120,7 @@ class _MomentCommentDialogState extends State<_MomentCommentDialog> {
             onPressed: _isSubmitting ? null : _submit,
             child: _isSubmitting
                 ? const SizedBox(
-                    width: 16,
+                    width: AppDimensions.spacing,
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
@@ -1198,7 +1199,7 @@ class _MomentDeleteDialogState extends State<_MomentDeleteDialog> {
             onPressed: _isDeleting ? null : _delete,
             child: _isDeleting
                 ? const SizedBox(
-                    width: 16,
+                    width: AppDimensions.spacing,
                     height: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
@@ -1300,7 +1301,7 @@ class _MomentImageGalleryPageState extends State<_MomentImageGalleryPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.error, color: AppColors.error, size: 48),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.spacing),
                         Text(
                           S.of(context)?.momentFailedToLoad ??
                               'Failed to load image',

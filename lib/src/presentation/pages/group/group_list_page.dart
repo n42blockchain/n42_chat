@@ -16,6 +16,7 @@ import '../../widgets/common/common_widgets.dart';
 import '../../../n42_chat.dart';
 import 'create_group_page.dart';
 import 'group_settings_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群聊列表页面
 class GroupListPage extends StatefulWidget {
@@ -141,7 +142,7 @@ class _GroupListPageState extends State<GroupListPage> {
 
   Widget _buildSectionHeader(String title, bool isDark) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       color: context.pageBackground,
       child: Text(
         title,

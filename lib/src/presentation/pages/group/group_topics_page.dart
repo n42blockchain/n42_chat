@@ -14,6 +14,7 @@ import '../../widgets/common/common_widgets.dart';
 import 'group_channels_page.dart';
 import 'channel_editor_sheet.dart';
 import '../../../n42_chat.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群话题列表页面（用户视角，Telegram Topics 风格）
 ///
@@ -213,8 +214,8 @@ class _GroupTopicsBody extends StatelessWidget {
         children: [
           ListTile(
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 4,
+              horizontal: AppDimensions.spacing,
+              vertical: AppDimensions.spacingXS,
             ),
             leading: Container(
               width: 44,
@@ -246,7 +247,7 @@ class _GroupTopicsBody extends StatelessWidget {
                 if (channel.category != null && channel.roomId != roomId)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: AppDimensions.spacingS,
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
@@ -293,7 +294,7 @@ class _GroupTopicsBody extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     ),
                     child: Text(
                       unread > 99 ? '99+' : '$unread',

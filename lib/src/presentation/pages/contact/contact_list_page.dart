@@ -31,6 +31,7 @@ import '../group/create_group_page.dart';
 import '../../../n42_chat.dart';
 import 'contact_tile.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 通讯录页面（仿微信）
 class ContactListPage extends StatefulWidget {
@@ -170,12 +171,12 @@ class _ContactListPageState extends State<ContactListPage> {
   Widget _buildSearchBar(bool isDark) {
     return Container(
       color: context.surfaceColor,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
       child: Container(
         height: 36,
         decoration: BoxDecoration(
           color: AppColors.inputBgOf(isDark),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: TextField(
           controller: _searchController,
@@ -199,7 +200,7 @@ class _ContactListPageState extends State<ContactListPage> {
               color: context.textTertiary,
             ),
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
           ),
         ),
       ),
@@ -338,7 +339,7 @@ class _ContactListPageState extends State<ContactListPage> {
         // 正在搜索指示器
         if (state.isSearching || state.isGlobalSearching)
           const Padding(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(AppDimensions.spacing),
             child: Center(child: CircularProgressIndicator()),
           ),
 
@@ -385,7 +386,7 @@ class _ContactListPageState extends State<ContactListPage> {
             onTap: _openChatOnlyFriendsPage,
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Container(
             color: surfaceColor,
             child: Column(
@@ -453,7 +454,7 @@ class _ContactListPageState extends State<ContactListPage> {
             ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
         ],
       ),
     );
@@ -474,11 +475,11 @@ class _ContactListPageState extends State<ContactListPage> {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
           child: Row(
             children: [
               SizedBox(width: 44, height: 44, child: icon),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Expanded(
                 child: Text(
                   title,
@@ -490,7 +491,7 @@ class _ContactListPageState extends State<ContactListPage> {
               if (badgeCount > 0)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                    horizontal: AppDimensions.spacingS,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
@@ -533,7 +534,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
   Widget _buildLetterHeader(String letter, bool isDark) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 6),
       color: context.pageBackground,
       child: Text(
         letter,
@@ -551,7 +552,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
   Widget _buildSectionHeader(String title, bool isDark) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       color: context.pageBackground,
       child: Text(
         title,
@@ -568,7 +569,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
   Widget _buildFooter(int count, bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.spacingL),
       alignment: Alignment.center,
       child: Text(
         S.of(context)?.contactCount(count) ?? '$count contacts',
@@ -645,7 +646,7 @@ class _ContactListPageState extends State<ContactListPage> {
             children: [
               // 联系人信息头部
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing),
                 child: Row(
                   children: [
                     N42Avatar(
@@ -653,7 +654,7 @@ class _ContactListPageState extends State<ContactListPage> {
                       name: contact.effectiveDisplayName,
                       size: 48,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.spacingM),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -729,14 +730,14 @@ class _ContactListPageState extends State<ContactListPage> {
                   _setContactRemark(contact);
                 },
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               // 取消按钮
               ListTile(
                 leading: const Icon(Icons.close),
                 title: Text(S.of(context)?.commonCancel ?? 'Cancel'),
                 onTap: () => Navigator.pop(context),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
             ],
           ),
         ),
@@ -764,14 +765,14 @@ class _ContactListPageState extends State<ContactListPage> {
           content: Row(
             children: [
               const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Text(S.of(context)?.contactSendingCard ?? 'Sending card...'),
             ],
           ),
@@ -880,14 +881,14 @@ class _ContactListPageState extends State<ContactListPage> {
           content: Row(
             children: [
               const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Text(S.of(context)?.contactOpeningChat ?? 'Opening chat...'),
             ],
           ),
@@ -1021,7 +1022,7 @@ class _NewFriendIcon extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFFA9D3B),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: CustomPaint(
         size: const Size(44, 44),
@@ -1068,7 +1069,7 @@ class _ChatOnlyFriendIcon extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFFA9D3B),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: const Center(
         child: Icon(Icons.person, color: Colors.white, size: 26),
@@ -1084,7 +1085,7 @@ class _GroupChatIcon extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF57BE6A),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: const Center(
         child: Icon(Icons.group, color: Colors.white, size: 26),
@@ -1100,7 +1101,7 @@ class _TagIcon extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF3E7FE1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: CustomPaint(size: const Size(44, 44), painter: _TagPainter()),
     );
@@ -1143,7 +1144,7 @@ class _OfficialAccountIcon extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF576B95),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: CustomPaint(
         size: const Size(44, 44),
@@ -1189,7 +1190,7 @@ class _ServiceAccountIcon extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFE64340),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: CustomPaint(
         size: const Size(44, 44),
@@ -1238,7 +1239,7 @@ class _EnterpriseContactIcon extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF3E7FE1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: CustomPaint(
         size: const Size(44, 44),
@@ -1361,7 +1362,7 @@ class _WeChatIndexBarState extends State<_WeChatIndexBar> {
                 height: 60,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -1383,7 +1384,7 @@ class _WeChatIndexBarState extends State<_WeChatIndexBar> {
           onVerticalDragEnd: _onVerticalDragEnd,
           child: Container(
             width: 20,
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXS),
             decoration: BoxDecoration(
               color: _isDragging
                   ? (isDark
@@ -1471,7 +1472,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
                     size: 64,
                     color: context.textTertiary,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     S.of(context)?.contactNoFriendRequests ??
                         'No friend requests',
@@ -1489,7 +1490,7 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
             itemCount: requests.length,
             separatorBuilder: (_, _) => Divider(
               height: 1,
@@ -1563,22 +1564,22 @@ class _FriendRequestsPageState extends State<_FriendRequestsPage> {
             style: TextButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
               ),
             ),
             child: Text(S.of(context)?.commonAccept ?? 'Accept'),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           TextButton(
             onPressed: () => _rejectRequest(request),
             style: TextButton.styleFrom(
               backgroundColor: AppColors.inputBgOf(isDark),
               foregroundColor: context.textPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
               ),
             ),
             child: Text(S.of(context)?.commonReject ?? 'Reject'),
@@ -1748,7 +1749,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             size: 64,
             color: context.textTertiary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             S.of(context)?.commonNoGroups ?? 'No groups',
             maxLines: 1,
@@ -1759,7 +1760,7 @@ class _GroupListPageState extends State<_GroupListPage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
           ElevatedButton.icon(
             onPressed: _navigateToCreateGroup,
             icon: const Icon(Icons.add),
@@ -1809,7 +1810,7 @@ class _GroupListPageState extends State<_GroupListPage> {
 
   Widget _buildSectionHeader(String title, bool isDark) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       color: context.pageBackground,
       child: Text(
         title,
@@ -2091,7 +2092,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
         children: [
           // 顶部标题栏
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -2129,7 +2130,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
           ),
           // 搜索框
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingM),
             child: TextField(
               cursorColor: AppColors.primary,
               decoration: InputDecoration(
@@ -2139,7 +2140,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                 filled: true,
                 fillColor: AppColors.inputBgOf(widget.isDark),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   borderSide: BorderSide.none,
                 ),
               ),

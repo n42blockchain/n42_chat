@@ -14,6 +14,7 @@ import '../../../core/utils/debug_log.dart';
 import '../../../core/utils/payment_request_uri.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 商户收款二维码页
 ///
@@ -131,13 +132,13 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
                   ),
                 )
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(AppDimensions.spacingXL),
                   child: Column(
                     children: [
                       _buildQrCard(l10n),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacingXL),
                       _buildForm(l10n),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacingXL),
                       N42Button(
                         text: l10n?.commonShare ?? 'Share',
                         onPressed: _shareQr,
@@ -155,10 +156,10 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
     return RepaintBoundary(
       key: _qrKey,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppDimensions.spacingXL),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -190,7 +191,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
                 height: 220,
                 child: Center(child: CircularProgressIndicator()),
               ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               amount.isNotEmpty
                   ? '$amount $symbol'
@@ -202,7 +203,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
                 color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(
               _shortAddress(_walletAddress!),
               style: const TextStyle(
@@ -219,10 +220,10 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
 
   Widget _buildForm(S? l10n) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +242,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
                 .toList(),
             onChanged: (value) => setState(() => _selectedToken = value),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           TextField(
             controller: _amountController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -252,7 +253,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
               suffixText: _selectedToken?.symbol,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           TextField(
             controller: _memoController,
             decoration: InputDecoration(
@@ -260,7 +261,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
               border: const OutlineInputBorder(),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           Row(
             children: [
               Expanded(

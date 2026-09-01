@@ -6,6 +6,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/services/ai_sticker_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// AI 生成贴纸页
 ///
@@ -89,7 +90,7 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('AI Sticker')),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -105,7 +106,7 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
               ),
               onSubmitted: (_) => _generate(),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             FilledButton.icon(
               onPressed: _generating ? null : _generate,
               icon: _generating
@@ -117,10 +118,10 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
                   : const Icon(Icons.auto_awesome),
               label: Text(_generating ? 'Generating…' : 'Generate'),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.spacingL),
             Expanded(child: Center(child: _buildPreview())),
             if (_preview != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               FilledButton.icon(
                 onPressed: _adding ? null : _addToPack,
                 icon: _adding
@@ -153,7 +154,7 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
     final preview = _preview;
     if (preview != null) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         child: Image.memory(
           preview,
           width: 220,
@@ -168,7 +169,7 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.auto_awesome, size: 48),
-          SizedBox(height: 8),
+          SizedBox(height: AppDimensions.spacingS),
           Text('Describe a sticker and tap Generate'),
         ],
       ),

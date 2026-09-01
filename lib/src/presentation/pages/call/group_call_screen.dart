@@ -18,6 +18,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../widgets/chat/in_call_chat_panel.dart';
 import '../../widgets/call/call_enhancement_sheet.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 多人会议页面
 class GroupCallScreen extends StatefulWidget {
@@ -412,10 +413,10 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     // 静音图标
                     if (participant.isMuted)
                       Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(AppDimensions.spacingXS),
                         decoration: BoxDecoration(
                           color: AppColors.error.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                         ),
                         child: const Icon(
                           Icons.mic_off,
@@ -424,18 +425,18 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         ),
                       ),
 
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacingXS),
 
                     // 名称
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: AppDimensions.spacingS,
+                          vertical: AppDimensions.spacingXS,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.black54,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                         ),
                         child: Text(
                           participant.isLocal
@@ -466,12 +467,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 right: 8,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                    horizontal: AppDimensions.spacingS,
+                    vertical: AppDimensions.spacingXS,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -481,7 +482,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         color: Colors.white,
                         size: 14,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppDimensions.spacingXS),
                       Text(
                         S.of(context)?.callSharingLabel ?? 'Sharing',
                         maxLines: 1,
@@ -529,12 +530,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               left: 16,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: AppDimensions.spacingM,
+                  vertical: AppDimensions.spacingS,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.black54,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: Row(
                   children: [
@@ -543,7 +544,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       color: AppColors.primary,
                       size: 18,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingS),
                     Flexible(
                       child: Text(
                         S.of(context)?.callScreenSharingBy(sharer.name) ??
@@ -653,7 +654,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacingS),
                           Container(
                             width: 6,
                             height: 6,
@@ -662,7 +663,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppDimensions.spacingXS),
                           Text(
                             _formatDuration(_duration),
                             maxLines: 1,
@@ -926,15 +927,15 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: AppDimensions.spacingS,
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     ),
                     child: Text(
                       '${_participants.length}',
@@ -971,7 +972,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             // 参与者列表
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
                 itemCount: _participants.length,
                 itemBuilder: (context, index) {
                   final participant = _participants[index];
@@ -1009,12 +1010,12 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             const Icon(Icons.mic_off, color: AppColors.error, size: 18),
           if (!participant.isVideoEnabled)
             const Padding(
-              padding: EdgeInsets.only(left: 8),
+              padding: EdgeInsets.only(left: AppDimensions.spacingS),
               child: Icon(Icons.videocam_off, color: AppColors.error, size: 18),
             ),
           if (participant.isScreenSharing)
             const Padding(
-              padding: EdgeInsets.only(left: 8),
+              padding: EdgeInsets.only(left: AppDimensions.spacingS),
               child: Icon(
                 Icons.screen_share,
                 color: AppColors.primary,
@@ -1041,7 +1042,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const CircularProgressIndicator(color: AppColors.primary),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXL),
               Text(
                 S.of(context)?.callJoiningMeeting ?? 'Joining meeting...',
                 maxLines: 1,

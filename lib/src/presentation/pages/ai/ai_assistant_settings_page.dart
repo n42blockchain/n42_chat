@@ -8,6 +8,7 @@ import '../../../domain/entities/ai_assistant_entity.dart';
 import '../../blocs/ai_assistant/ai_assistant_bloc.dart';
 import '../../blocs/ai_assistant/ai_assistant_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// AI 助手设置页面
 class AiAssistantSettingsPage extends StatelessWidget {
@@ -29,7 +30,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
           ),
           body: ListView(
             children: [
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
 
               // 助手信息
               _buildSection(
@@ -52,7 +53,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
 
               // 参数设置
               _buildSection(
@@ -81,7 +82,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
 
               // 服务状态
               _buildSection(
@@ -101,7 +102,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXL),
             ],
           ),
         );
@@ -119,7 +120,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
           child: Text(
             title,
             style: TextStyle(
@@ -130,7 +131,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
           ),
         ),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
+          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
           decoration: BoxDecoration(
             color: context.surfaceColor,
             borderRadius: BorderRadius.circular(10),

@@ -16,6 +16,7 @@ import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Bot 设置页面
 class BotSettingsPage extends StatefulWidget {
@@ -164,7 +165,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                     const SizedBox(height: 10),
                     Container(
                       color: context.surfaceColor,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppDimensions.spacing),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -176,7 +177,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                               color: context.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppDimensions.spacingS),
                           TextField(
                             controller: _welcomeController,
                             maxLines: 3,
@@ -206,7 +207,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                       const SizedBox(height: 10),
                       Container(
                         color: context.surfaceColor,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(AppDimensions.spacing),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -214,7 +215,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                               'Webhook URL',
                               style: TextStyle(fontSize: 13),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppDimensions.spacingS),
                             TextField(
                               controller: _webhookUrlController,
                               keyboardType: TextInputType.url,
@@ -223,12 +224,12 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                                 border: OutlineInputBorder(),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppDimensions.spacingM),
                             const Text(
                               'Signing Secret (optional)',
                               style: TextStyle(fontSize: 13),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppDimensions.spacingS),
                             TextField(
                               controller: _webhookSecretController,
                               decoration: const InputDecoration(
@@ -270,7 +271,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                             : _sendTestWebhook,
                         icon: _isTestingWebhook
                             ? const SizedBox(
-                                width: 16,
+                                width: AppDimensions.spacing,
                                 height: 16,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,

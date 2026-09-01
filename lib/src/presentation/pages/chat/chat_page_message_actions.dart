@@ -1,3 +1,4 @@
+
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
@@ -536,7 +537,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(emoji, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Text(feedbackText),
           ],
         ),
@@ -673,7 +674,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                   'Are you sure you want to delete ${selectedMessages.length} messages?',
             ),
             if (otherMessages.isNotEmpty) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 S.of(context)?.chatNoteOtherMessages(otherMessages.length) ??
                     'Note: ${otherMessages.length} messages are from others, can only delete locally.',
@@ -687,7 +688,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
               ),
             ],
             if (myMessages.isNotEmpty) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 S
                         .of(context)

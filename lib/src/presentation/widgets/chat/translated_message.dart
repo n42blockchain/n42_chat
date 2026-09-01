@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 翻译结果显示组件（微信风格）
 ///
@@ -48,12 +49,12 @@ class TranslatedMessageWidget extends StatelessWidget {
         left: isFromMe ? _outerPadding : _avatarOffset,
         right: isFromMe ? _avatarOffset : _outerPadding,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
       decoration: BoxDecoration(
         color: isDark
             ? Colors.white.withValues(alpha: 0.08)
             : Colors.black.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Column(
         crossAxisAlignment: isFromMe
@@ -85,7 +86,7 @@ class TranslatedMessageWidget extends StatelessWidget {
                           ? const Color(0xFF66BB6A)
                           : const Color(0xFF43A047)),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 isOriginalDisplay
                     ? 'Original text'
@@ -105,7 +106,7 @@ class TranslatedMessageWidget extends StatelessWidget {
   Widget _buildTranslatingIndicator(bool isDark, S? l10n) {
     return Padding(
       padding: EdgeInsets.only(
-        top: 4,
+        top: AppDimensions.spacingXS,
         left: isFromMe ? _outerPadding : _avatarOffset,
         right: isFromMe ? _avatarOffset : _outerPadding,
       ),
@@ -113,7 +114,7 @@ class TranslatedMessageWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: 12,
+            width: AppDimensions.spacingM,
             height: 12,
             child: CircularProgressIndicator(
               strokeWidth: 1.5,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'game_2048_logic.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class Game2048Board extends StatelessWidget {
   final Game2048Logic logic;
@@ -46,7 +47,7 @@ class Game2048Board extends StatelessWidget {
               padding: const EdgeInsets.all(spacing),
               decoration: BoxDecoration(
                 color: const Color(0xFFBBADA0),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -60,7 +61,7 @@ class Game2048Board extends StatelessWidget {
                             margin: const EdgeInsets.all(spacing / 2),
                             decoration: BoxDecoration(
                               color: _tileColor(value),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                             ),
                             child: Center(
                               child: Text(

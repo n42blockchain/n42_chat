@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 线程指示器
 ///
@@ -35,11 +36,11 @@ class ThreadIndicator extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(top: 4),
+        margin: const EdgeInsets.only(top: AppDimensions.spacingXS),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: theme.colorScheme.primary.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -60,7 +61,7 @@ class ThreadIndicator extends StatelessWidget {
             ),
             // 线程未读红点
             if (hasUnread) ...[
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Container(
                 width: 8,
                 height: 8,
@@ -71,7 +72,7 @@ class ThreadIndicator extends StatelessWidget {
               ),
             ],
             if (message.threadLatestReply != null) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Flexible(
                 child: Text(
                   message.threadLatestReply!,
@@ -84,7 +85,7 @@ class ThreadIndicator extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(width: 4),
+            const SizedBox(width: AppDimensions.spacingXS),
             Icon(
               Icons.chevron_right,
               size: 14,

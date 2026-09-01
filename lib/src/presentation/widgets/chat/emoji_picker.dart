@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 表情选择器
 /// 
@@ -315,7 +316,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
 
   Widget _buildEmojiGrid(List<String> emojis, bool isDark) {
     return GridView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 8,
         mainAxisSpacing: 4,
@@ -328,7 +329,7 @@ class _EmojiPickerState extends State<EmojiPicker> with SingleTickerProviderStat
           onTap: () => widget.onEmojiSelected(emoji),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Center(
               child: Text(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class GameScaffold extends StatelessWidget {
   final String title;
@@ -36,12 +37,12 @@ class GameScaffold extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(title),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.orange.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Text(
                 '$score',
@@ -86,13 +87,13 @@ class GameScaffold extends StatelessWidget {
                     children: [
                       const Icon(Icons.pause_circle_outline,
                           size: 64, color: Colors.white),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing),
                       Text(
                         l10n?.gamePause ?? 'Paused',
                         style: const TextStyle(
                             fontSize: 24, color: Colors.white),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacingS),
                       Text(
                         l10n?.gameResume ?? 'Tap to resume',
                         style: const TextStyle(

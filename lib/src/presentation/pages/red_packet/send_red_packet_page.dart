@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class SendRedPacketPage extends StatefulWidget {
   /// 接收者名称
@@ -260,17 +261,17 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
           child: IntrinsicHeight(
             child: Column(
               children: [
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 免责横幅:红包为聊天内记账,不涉及真实链上资产转移
                 // (接线复审第二轮 P1:此前做真实余额校验+真币种却从不上链,
                 //  误导用户以为发了真币)。
                 Container(
                   margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppDimensions.spacingM),
                   decoration: BoxDecoration(
                     color: AppColors.warning.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: const Row(
                     children: [
@@ -279,7 +280,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         size: 18,
                         color: AppColors.warning,
                       ),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppDimensions.spacingS),
                       Expanded(
                         child: Text(
                           // 硬编码英文:l10n 未含此 key;红包上链落地时再补 l10n。
@@ -306,10 +307,10 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                       GestureDetector(
                         onTap: _showTokenPicker,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
                           decoration: BoxDecoration(
                             color: isDark ? AppColors.dividerThinDark : AppColors.dividerThin.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -325,7 +326,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingS),
                       SizedBox(
                         width: 140,
                         child: TextField(
@@ -391,7 +392,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppDimensions.spacingXS),
                             Text(
                               _covers[_selectedCoverIndex].name,
                               maxLines: 1,
@@ -411,13 +412,13 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             end: Alignment.bottomCenter,
                             colors: _covers[_selectedCoverIndex].colors,
                           ),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                         ),
                         child: Center(
                           child: _buildRedPacketIcon(28, Colors.white70),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingS),
                       Icon(AppIcons.chevron, color: secondaryTextColor),
                     ],
                   ),
@@ -425,7 +426,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 
                 // 群聊选项
                 if (widget.isGroup) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   _buildMenuItem(
                     context: context,
                     label: S.of(context)?.commonRedPacketType ?? 'Red Packet Type',
@@ -435,7 +436,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         _buildTypeChip(context, S.of(context)?.commonNormalRedPacket ?? 'Normal', !_isLucky, () {
                           setState(() => _isLucky = false);
                         }),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppDimensions.spacingS),
                         _buildTypeChip(context, S.of(context)?.commonLuckyRedPacket ?? 'Lucky', _isLucky, () {
                           setState(() => _isLucky = true);
                         }),
@@ -468,7 +469,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 
                 const Spacer(),
                 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 金额显示
                 Text(
@@ -480,7 +481,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 发送按钮
                 Padding(
@@ -500,13 +501,13 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         foregroundColor: Colors.white,
                         disabledForegroundColor: isDark ? Colors.white38 : Colors.white60,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         ),
                         elevation: 0,
                       ),
                       child: _isSending
                           ? const SizedBox(
-                              width: 20,
+                              width: AppDimensions.spacingL,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
@@ -524,11 +525,11 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 底部提示
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL),
                   child: Text(
                     S.of(context)?.commonRedPacketRefundNotice ?? 'Unclaimed red packets will be refunded after 24 hours',
                     textAlign: TextAlign.center,
@@ -542,7 +543,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   ),
                 ),
                 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
               ],
             ),
           ),
@@ -595,8 +596,8 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
         decoration: BoxDecoration(
           color: surfaceColor,
           borderRadius: BorderRadius.circular(10),
@@ -612,7 +613,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
                 ),
               ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             ?trailing,
           ],
         ),
@@ -627,12 +628,12 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: 6),
         decoration: BoxDecoration(
           color: selected
               ? const Color(0xFFE85D04)
               : (isDark ? AppColors.dividerThinDark : AppColors.dividerThin.withValues(alpha: 0.05)),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         ),
         child: Text(
           label,
@@ -663,7 +664,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 S.of(ctx)?.chatSelectCurrency ?? 'Select currency',
                 style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
@@ -683,7 +684,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 Navigator.pop(ctx);
               },
             )),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
           ],
         ),
       ),
@@ -707,7 +708,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Row(
                 children: [
                   Expanded(
@@ -721,7 +722,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -751,7 +752,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: isDark ? AppColors.dividerThinDark : AppColors.dividerThin.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       ),
                       child: Center(
                         child: Text(
@@ -764,7 +765,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
           ],
         ),
       ),
@@ -787,7 +788,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
       builder: (ctx) => SafeArea(
         child: Container(
           height: MediaQuery.of(ctx).size.height * 0.6,
-          padding: const EdgeInsets.only(top: 16),
+          padding: const EdgeInsets.only(top: AppDimensions.spacing),
           child: Column(
             children: [
               // 标题
@@ -795,11 +796,11 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                 S.of(ctx)?.chatSelectRedPacketCover ?? 'Select Cover',
                 style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               // 封面网格
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
                   child: GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
@@ -828,7 +829,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                                     end: Alignment.bottomCenter,
                                     colors: cover.colors,
                                   ),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                                   border: isSelected
                                       ? Border.all(color: const Color(0xFFE85D04), width: 3)
                                       : null,
@@ -869,7 +870,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppDimensions.spacingS),
                             Text(
                               cover.name,
                               style: TextStyle(
@@ -887,7 +888,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
             ],
           ),
         ),

@@ -20,6 +20,7 @@ import '../../blocs/moment/moment_state.dart';
 import '../media/social_image_preparation.dart';
 import 'visibility_selection_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 const _kLastVisibilityKey = 'moment_last_visibility';
 
@@ -115,9 +116,9 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               builder: (context, state) {
                 if (state.isPosting) {
                   return const Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(AppDimensions.spacing),
                     child: SizedBox(
-                      width: 20,
+                      width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
@@ -148,16 +149,16 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           ],
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacing),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 文字输入
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppDimensions.spacingM),
                 decoration: BoxDecoration(
                   color: context.surfaceColor,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: TextField(
                   controller: _contentController,
@@ -174,19 +175,19 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
 
               // 已选择的媒体
               if (_selectedMedia.isNotEmpty) ...[
                 _buildMediaPreview(),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
               ],
 
               // 操作按钮
               Container(
                 decoration: BoxDecoration(
                   color: context.surfaceColor,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: Column(
                   children: [
@@ -244,10 +245,10 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
 
   Widget _buildMediaPreview() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,7 +269,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -284,7 +285,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                 fit: StackFit.expand,
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     child: media.isVideo
                         ? (media.thumbnailBytes != null
                               ? Image.memory(
@@ -311,7 +312,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                       onTap: () =>
                           setState(() => _selectedMedia.removeAt(index)),
                       child: Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(AppDimensions.spacingXS),
                         decoration: const BoxDecoration(
                           color: Colors.black54,
                           shape: BoxShape.circle,

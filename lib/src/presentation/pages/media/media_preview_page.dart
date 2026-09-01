@@ -12,6 +12,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 媒体项数据
 class MediaItem {
@@ -261,7 +262,7 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
                 opacity: _videoController!.value.isPlaying ? 0.0 : 1.0,
                 duration: const Duration(milliseconds: 200),
                 child: Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppDimensions.spacingM),
                   decoration: const BoxDecoration(
                     color: Colors.black45,
                     shape: BoxShape.circle,

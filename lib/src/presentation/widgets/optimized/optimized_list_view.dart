@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 // ScrollCacheExtent（scrollCacheExtent 的参数类型，Flutter 3.44 起取代
 // 裸 double 的 cacheExtent）由 rendering 库导出，material 未转出。
 import 'package:flutter/rendering.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 优化的消息列表视图
 ///
@@ -108,10 +109,10 @@ class _OptimizedMessageListViewState extends State<OptimizedMessageListView> {
                 if (widget.hasMore && index == widget.itemCount) {
                   return widget.loadingIndicator ??
                       const Padding(
-                        padding: EdgeInsets.all(16),
+                        padding: EdgeInsets.all(AppDimensions.spacing),
                         child: Center(
                           child: SizedBox(
-                            width: 20,
+                            width: AppDimensions.spacingL,
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           ),

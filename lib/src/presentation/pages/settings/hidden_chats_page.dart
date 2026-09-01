@@ -9,6 +9,7 @@ import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/conversation/conversation_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 隐藏聊天列表页面
 class HiddenChatsPage extends StatefulWidget {
@@ -150,12 +151,12 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
             children: [
               // 拖动指示器
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
+                margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
                   color: context.dividerColor,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
 
@@ -195,7 +196,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 },
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
             ],
           ),
         ),

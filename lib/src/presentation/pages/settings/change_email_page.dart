@@ -11,6 +11,7 @@ import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 修改邮箱页面
 class ChangeEmailPage extends StatefulWidget {
@@ -192,37 +193,37 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
           final isLoading = _pendingAction != null;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 当前绑定邮箱
                   if (state.boundEmail != null)
                     _buildCurrentEmailCard(isDark, state.boundEmail!),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
 
                   if (_currentStep == 0) ...[
                     // 步骤 1: 输入密码和新邮箱
                     _buildPasswordField(isDark),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacing),
                     _buildNewEmailField(isDark),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppDimensions.spacingXXL),
                     _buildSendCodeButton(isDark, isLoading),
                   ] else ...[
                     // 步骤 2: 输入验证码
                     _buildCodeField(isDark),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacing),
                     _buildResendButton(isDark, isLoading),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppDimensions.spacingXXL),
                     _buildConfirmButton(isDark, isLoading),
                   ],
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   _buildSecurityNote(isDark),
                 ],
               ),
@@ -243,15 +244,15 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         : AppColors.textPrimary;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: cardBgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Row(
         children: [
           const Icon(Icons.email_outlined, color: AppColors.primary, size: 24),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,7 +264,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 12, height: 1.3, color: textColor),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   email,
                   maxLines: 1,
@@ -309,7 +310,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -321,11 +322,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.lock_outline, color: hintColor),
@@ -384,7 +385,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -396,11 +397,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.email_outlined, color: hintColor),
@@ -439,14 +440,14 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         Text(
           '${S.of(context)?.settingsCodeSentTo ?? 'Verification code sent to'} ${_emailController.text}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 12, height: 1.3, color: hintColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _codeController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -458,11 +459,11 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.verified_outlined, color: hintColor),
@@ -483,12 +484,12 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusM)),
           elevation: 0,
         ),
         child: isLoading
             ? const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
@@ -556,12 +557,12 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusM)),
           elevation: 0,
         ),
         child: isLoading
             ? const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
@@ -589,15 +590,15 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         : AppColors.textTertiary;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: AppColors.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Row(
         children: [
           const Icon(Icons.security, color: AppColors.warning, size: 20),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text(
               S.of(context)?.settingsEmailSecurityNote ??

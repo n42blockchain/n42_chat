@@ -8,6 +8,7 @@ import '../../../core/services/nft_metadata_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../integration/wallet_bridge.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// NFT avatar picker page — Status.im inspired.
 ///
@@ -213,10 +214,10 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
 
   Widget _buildPopularTab(bool isDark, S? l10n) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       children: [
         _InfoBanner(l10n: l10n),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         Text(
           l10n?.nftPickerPopularCollections ?? 'Popular Collections',
           maxLines: 1,
@@ -228,7 +229,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             color: context.textPrimary,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppDimensions.spacingM),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -248,7 +249,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             },
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         _WalletConnectHint(isDark: isDark, l10n: l10n),
       ],
     );
@@ -262,7 +263,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
     final secondaryColor = context.textSecondary;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -278,14 +279,14 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               color: secondaryColor,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           _ChainSelector(
             selectedChainId: _selectedChainId,
             isDark: isDark,
             onChanged: (id) => setState(() => _selectedChainId = id),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // Contract address
           Text(
@@ -299,7 +300,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               color: secondaryColor,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Container(
             decoration: BoxDecoration(
               color: surfaceColor,
@@ -315,7 +316,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                 hintText: '0x...',
                 hintStyle: TextStyle(color: secondaryColor),
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(12),
+                contentPadding: const EdgeInsets.all(AppDimensions.spacingM),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste_rounded, size: 18),
                   color: AppColors.primary,
@@ -331,7 +332,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // Token ID
           Text(
@@ -345,7 +346,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               color: secondaryColor,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Container(
             decoration: BoxDecoration(
               color: surfaceColor,
@@ -363,20 +364,20 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                 hintText: '1234',
                 hintStyle: TextStyle(color: secondaryColor),
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(12),
+                contentPadding: const EdgeInsets.all(AppDimensions.spacingM),
               ),
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // Error
           if (_errorText != null)
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: AppColors.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Text(
                 _errorText!,
@@ -390,7 +391,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               ),
             ),
 
-          if (_errorText != null) const SizedBox(height: 16),
+          if (_errorText != null) const SizedBox(height: AppDimensions.spacing),
 
           // Preview
           if (_resolvedImageUrl != null) ...[
@@ -407,7 +408,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                 );
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
           ],
 
           // Resolve button
@@ -426,7 +427,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
               ),
               child: _isResolving
                   ? const SizedBox(
-                      width: 20,
+                      width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
@@ -480,7 +481,7 @@ class _NftPreview extends StatelessWidget {
             color: context.textSecondary,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppDimensions.spacingM),
 
         // NFT avatar with gold ring preview
         Container(
@@ -526,20 +527,20 @@ class _NftPreview extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text('🖼', style: TextStyle(fontSize: 11)),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 l10n?.web3NftAvatar ?? 'NFT Avatar',
                 maxLines: 1,
@@ -555,7 +556,7 @@ class _NftPreview extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         OutlinedButton.icon(
           onPressed: onConfirm,
           icon: const Icon(Icons.check_circle_outline, size: 18),
@@ -566,7 +567,7 @@ class _NftPreview extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingL, vertical: AppDimensions.spacingM),
           ),
         ),
       ],
@@ -587,13 +588,13 @@ class _InfoBanner extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
           const Text('🖼', style: TextStyle(fontSize: 24)),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -609,7 +610,7 @@ class _InfoBanner extends StatelessWidget {
                     color: AppColors.primary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   l10n?.nftPickerInfoDesc ??
                       'Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.',
@@ -659,7 +660,7 @@ class _ChainSelector extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _chains.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: AppDimensions.spacingS),
         itemBuilder: (context, i) {
           final chain = _chains[i];
           final selected = chain.id == selectedChainId;
@@ -667,14 +668,14 @@ class _ChainSelector extends StatelessWidget {
             onTap: () => onChanged(chain.id),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
               decoration: BoxDecoration(
                 color: selected
                     ? AppColors.primary
                     : (isDark
                           ? Colors.white10
                           : AppColors.primary.withValues(alpha: 0.08)),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 border: Border.all(
                   color: selected ? AppColors.primary : Colors.transparent,
                 ),
@@ -728,7 +729,7 @@ class _CollectionCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
             color: AppColors.dividerOf(isDark),
           ),
@@ -781,7 +782,7 @@ class _WalletConnectHint extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Row(
         children: [
@@ -790,7 +791,7 @@ class _WalletConnectHint extends StatelessWidget {
             size: 16,
             color: context.textSecondary,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text(
               l10n?.nftPickerWalletHint ??

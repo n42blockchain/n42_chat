@@ -10,6 +10,7 @@ import '../../../data/models/social/social_similarity_model.dart';
 import '../../blocs/social/social_graph_bloc.dart';
 import '../../blocs/social/social_graph_event.dart';
 import '../../blocs/social/social_graph_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Detail page showing the similarity breakdown between two on-chain addresses.
 ///
@@ -106,13 +107,13 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           final score = resolvedSimilarity.totalScore;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Column(
               children: [
                 // Two address cards
                 _buildAddressRow(isDark),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // Circular similarity score
                 _buildScoreIndicator(score, isDark),
@@ -122,12 +123,12 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 // Dimension breakdown
                 _buildBreakdownSection(resolvedSimilarity, isDark),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // Common items
                 _buildCommonItemsSection(resolvedSimilarity),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimensions.spacingXXL),
               ],
             ),
           );
@@ -141,7 +142,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
       children: [
         Expanded(child: _buildAddressCard(widget.addressA, widget.displayNameA, isDark)),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM),
           child: Icon(
             Icons.compare_arrows,
             color: context.textSecondary,
@@ -161,7 +162,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         boxShadow: isDark
             ? null
             : [
@@ -196,7 +197,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,
             maxLines: 1,
@@ -280,7 +281,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     bool isDark,
   ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(14),
@@ -370,7 +371,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Text(
               '$percent% (weight: $weight)',
               maxLines: 1,
@@ -383,7 +384,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
         AnimatedBuilder(
           animation: _animController,
           builder: (context, child) {
@@ -408,7 +409,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     SocialSimilarityModel similarity,
   ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(14),
@@ -427,7 +428,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           _buildCommonItemRow(
             Icons.token_outlined,
             'Shared Tokens',
@@ -471,11 +472,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           height: 36,
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           ),
           child: Icon(icon, size: 18, color: AppColors.primary),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppDimensions.spacingM),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -511,12 +512,12 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
   Widget _buildError(String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             Text(
               'Failed to calculate similarity',
               maxLines: 1,
@@ -528,7 +529,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -540,7 +541,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.spacingL),
             TextButton.icon(
               onPressed: () {
                 context.read<SocialGraphBloc>().add(

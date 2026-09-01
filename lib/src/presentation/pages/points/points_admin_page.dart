@@ -9,6 +9,7 @@ import '../../../domain/entities/points/reward_rule.dart';
 import '../../blocs/points/points_bloc.dart';
 import '../../blocs/points/points_event.dart';
 import '../../blocs/points/points_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Admin configuration page for the points system.
 ///
@@ -156,7 +157,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           }
 
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             children: [
               _buildSection(
                 title: 'General',
@@ -176,7 +177,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                     controller: _nameController,
                     hint: 'e.g. Points, Tokens, Stars',
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   _buildTextField(
                     label: 'Points Symbol',
                     controller: _symbolController,
@@ -185,7 +186,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _buildSection(
                 title: 'Features',
                 children: [
@@ -216,7 +217,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _buildSection(
                 title: 'Reward Rules',
                 trailing: IconButton(
@@ -229,7 +230,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                 children: [
                   if (_rules.isEmpty)
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing),
                       child: Center(
                         child: Text(
                           'No rules configured',
@@ -286,10 +287,10 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
     Widget? trailing,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,7 +314,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
               ?trailing,
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           ...children,
         ],
       ),
@@ -331,7 +332,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
     required ValueChanged<bool> onChanged,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacingM),
       child: Row(
         children: [
           Expanded(
@@ -418,11 +419,11 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                 ? AppColors.dividerThinDark
                 : const Color(0xFFF7F7F7),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
+              horizontal: AppDimensions.spacingM,
               vertical: 10,
             ),
             counterText: '',
@@ -495,7 +496,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     TextField(
                       controller: pointsController,
                       keyboardType: TextInputType.number,
@@ -505,7 +506,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                         border: OutlineInputBorder(),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     TextField(
                       controller: dailyLimitController,
                       keyboardType: TextInputType.number,
@@ -515,7 +516,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                         border: OutlineInputBorder(),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     TextField(
                       controller: cooldownController,
                       keyboardType: TextInputType.number,
@@ -592,11 +593,11 @@ class _RuleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: AppColors.dividerThinOf(isDark),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Row(
         children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/voice_room_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 说话脉冲动画头像
 class SpeakingAvatar extends StatefulWidget {
@@ -151,7 +152,7 @@ class _SpeakingAvatarState extends State<SpeakingAvatar>
               );
             },
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           SizedBox(
             width: widget.radius * 2.5,
             child: Text(

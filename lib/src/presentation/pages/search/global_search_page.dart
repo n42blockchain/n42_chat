@@ -13,6 +13,7 @@ import '../../widgets/common/common_widgets.dart';
 import 'search_result_tile.dart';
 import 'search_message_filter_sheet.dart';
 import '../../../n42_chat.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 全局搜索页面
 class GlobalSearchPage extends StatefulWidget {
@@ -110,7 +111,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
 
   Widget _buildSearchBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingS),
       color: context.surfaceColor,
       child: Row(
         children: [
@@ -152,7 +153,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                         )
                       : null,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
                 ),
                 style: TextStyle(fontSize: 14, color: context.textPrimary),
                 onChanged: _onSearch,
@@ -160,7 +161,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             ),
           ),
 
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           IconButton(
             icon: Stack(
               clipBehavior: Clip.none,
@@ -209,7 +210,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     }
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -230,7 +231,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -296,7 +297,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
       color: context.surfaceColor,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
         children: [
           _buildTypeChip(
             S.of(context)?.searchAllResults ?? 'All',
@@ -336,16 +337,16 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
     final isSelected = type == selectedType;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS, vertical: 6),
       child: GestureDetector(
         onTap: () {
           context.read<SearchBloc>().add(ChangeSearchType(type));
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 6),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.primary : context.pageBackground,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -359,7 +360,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                 ),
               ),
               if (count > 0) ...[
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacingXS),
                 Text(
                   '($count)',
                   style: TextStyle(

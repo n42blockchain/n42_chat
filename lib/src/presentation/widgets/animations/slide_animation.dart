@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 滑动删除组件
 class SlideToDeleteWidget extends StatefulWidget {
@@ -143,7 +144,7 @@ class _SlideToDeleteWidgetState extends State<SlideToDeleteWidget>
                 size: 22,
               ),
             if (action.label != null) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: AppDimensions.spacingXS),
               Text(
                 action.label!,
                 style: TextStyle(
@@ -225,7 +226,7 @@ class PullToRefreshIndicator extends StatelessWidget {
         );
       case RefreshIndicatorState.refreshing:
         return const SizedBox(
-          width: 24,
+          width: AppDimensions.spacingXL,
           height: 24,
           child: CircularProgressIndicator(
             strokeWidth: 2,

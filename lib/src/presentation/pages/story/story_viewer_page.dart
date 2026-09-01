@@ -18,6 +18,7 @@ import '../../widgets/common/n42_avatar.dart';
 import '../../widgets/story/story_progress_bar.dart';
 import 'story_viewers_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Story 查看器页面
 ///
@@ -705,7 +706,7 @@ class _StoryContentState extends State<_StoryContent> {
   /// 构建顶部区域（进度条 + 用户信息）
   Widget _buildTopSection(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -721,7 +722,7 @@ class _StoryContentState extends State<_StoryContent> {
             segmentGap: 4,
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
 
           // 用户信息行
           _buildUserInfoRow(context),
@@ -786,10 +787,10 @@ class _StoryContentState extends State<_StoryContent> {
               }
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -799,7 +800,7 @@ class _StoryContentState extends State<_StoryContent> {
                     color: Colors.white,
                     size: 14,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppDimensions.spacingXS),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 80),
                     child: Text(
@@ -813,7 +814,7 @@ class _StoryContentState extends State<_StoryContent> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
         ],
 
         // 关闭按钮
@@ -834,7 +835,7 @@ class _StoryContentState extends State<_StoryContent> {
         : Colors.white;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL),
       child: Text(
         story.content ?? '',
         textAlign: TextAlign.center,
@@ -859,7 +860,7 @@ class _StoryContentState extends State<_StoryContent> {
     if (widget.isMyStory) {
       final viewCount = story.viewCount;
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         child: Row(
           children: [
             Expanded(
@@ -872,7 +873,7 @@ class _StoryContentState extends State<_StoryContent> {
                       color: Colors.white.withValues(alpha: 0.8),
                       size: 20,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingS),
                     Text(
                       viewCount > 0
                           ? '$viewCount ${l10n?.storyViewers ?? "viewers"}'
@@ -882,7 +883,7 @@ class _StoryContentState extends State<_StoryContent> {
                         fontSize: 14,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppDimensions.spacingXS),
                     Icon(
                       AppIcons.chevron,
                       color: Colors.white.withValues(alpha: 0.6),
@@ -893,7 +894,7 @@ class _StoryContentState extends State<_StoryContent> {
               ),
             ),
             if (widget.onDeleteStory != null) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               IconButton(
                 key: const Key('story_delete_button'),
                 onPressed: _isDeletingStory ? null : _confirmDeleteStory,
@@ -922,7 +923,7 @@ class _StoryContentState extends State<_StoryContent> {
     // 别人的 Story：显示回复输入框
     if (widget.onReply != null) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
         child: Row(
           children: [
             Expanded(
@@ -949,7 +950,7 @@ class _StoryContentState extends State<_StoryContent> {
                     ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                      horizontal: AppDimensions.spacing,
                       vertical: 10,
                     ),
                     isDense: true,
@@ -959,7 +960,7 @@ class _StoryContentState extends State<_StoryContent> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             IconButton(
               onPressed: _isSendingReply
                   ? null
@@ -973,7 +974,7 @@ class _StoryContentState extends State<_StoryContent> {
       );
     }
 
-    return const SizedBox(height: 16);
+    return const SizedBox(height: AppDimensions.spacing);
   }
 
   Future<void> _handleReplySubmit(String text) async {

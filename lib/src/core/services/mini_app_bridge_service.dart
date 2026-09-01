@@ -8,6 +8,7 @@ import '../../domain/entities/mini_app_entity.dart';
 import '../../integration/wallet_bridge.dart';
 import '../theme/app_colors.dart';
 import '../utils/debug_log.dart';
+import '../theme/app_dimensions.dart';
 
 /// Mini App <-> Native 通信消息
 class _BridgeMessage {
@@ -481,7 +482,7 @@ class MiniAppBridgeService {
         title: const Row(
           children: [
             Icon(Icons.warning_amber_rounded, color: AppColors.warning),
-            SizedBox(width: 8),
+            SizedBox(width: AppDimensions.spacingS),
             Text('Confirm Transaction'),
           ],
         ),
@@ -494,12 +495,12 @@ class MiniAppBridgeService {
               style: TextStyle(fontSize: 14),
             ),
             if (params != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppDimensions.spacingM),
                 decoration: BoxDecoration(
                   color: Colors.grey.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: Text(
                   params.entries.map((e) => '${e.key}: ${e.value}').join('\n'),

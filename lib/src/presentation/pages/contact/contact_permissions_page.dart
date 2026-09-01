@@ -8,6 +8,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 联系人权限设置页面
 class ContactPermissionsPage extends StatefulWidget {
@@ -128,7 +129,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Container(
             color: cardColor,
             child: Column(
@@ -142,7 +143,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   subtitleColor: subtitleColor,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 16),
+                  padding: const EdgeInsets.only(left: AppDimensions.spacing),
                   child: Divider(height: 1, color: dividerColor),
                 ),
                 _buildToggleItem(
@@ -155,7 +156,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   subtitleColor: subtitleColor,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 16),
+                  padding: const EdgeInsets.only(left: AppDimensions.spacing),
                   child: Divider(height: 1, color: dividerColor),
                 ),
                 _buildToggleItem(
@@ -168,7 +169,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   subtitleColor: subtitleColor,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 16),
+                  padding: const EdgeInsets.only(left: AppDimensions.spacing),
                   child: Divider(height: 1, color: dividerColor),
                 ),
                 _buildToggleItem(
@@ -197,7 +198,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
     required Color subtitleColor,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       child: Row(
         children: [
           Expanded(
@@ -208,7 +209,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
                   title,
                   style: TextStyle(fontSize: 16, color: textColor),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   subtitle,
                   style: TextStyle(fontSize: 13, color: subtitleColor),

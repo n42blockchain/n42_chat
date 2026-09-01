@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 消息操作菜单项
 class MessageMenuItem {
@@ -56,7 +57,7 @@ class MessageMenu extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
@@ -80,7 +81,7 @@ class MessageMenu extends StatelessWidget {
 
   Widget _buildQuickReactions(bool isDark) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: CommonEmojis.reactions.take(6).map((emoji) {
@@ -178,7 +179,7 @@ class MessageMenu extends StatelessWidget {
     return InkWell(
       onTap: item.onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         child: Row(
           children: [
             Icon(
@@ -188,7 +189,7 @@ class MessageMenu extends StatelessWidget {
                   ? AppColors.error
                   : (AppColors.textPrimaryOf(isDark)),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimensions.spacing),
             Text(
               item.label,
               style: TextStyle(
@@ -237,7 +238,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
         children: [
           // 标题栏
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Row(
               children: [
                 Text(

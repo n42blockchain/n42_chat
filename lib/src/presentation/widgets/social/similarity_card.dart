@@ -4,6 +4,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/social/social_connection.dart';
 import '../../../domain/entities/social/social_recommendation.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Card widget for displaying a social graph recommendation.
 ///
@@ -38,11 +39,11 @@ class SimilarityCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           boxShadow: isDark
               ? null
               : [
@@ -57,7 +58,7 @@ class SimilarityCard extends StatelessWidget {
           children: [
             // Avatar
             _buildAvatar(profile.address),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
 
             // Name + reason
             Expanded(
@@ -78,11 +79,11 @@ class SimilarityCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingS),
                       _buildSimilarityBadge(),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacingXS),
                   Text(
                     recommendation.reason,
                     style: TextStyle(
@@ -92,7 +93,7 @@ class SimilarityCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   Row(
                     children: [
                       // Connection type icons
@@ -152,7 +153,7 @@ class SimilarityCard extends StatelessWidget {
             : AppColors.textSecondary;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: 2),
       decoration: BoxDecoration(
         color: badgeColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(10),

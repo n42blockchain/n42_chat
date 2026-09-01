@@ -4,6 +4,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/search_result_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 Future<MessageSearchFilter?> showMessageSearchFilterSheet(
   BuildContext context, {
@@ -93,7 +94,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 TextField(
                   controller: _senderController,
                   decoration: const InputDecoration(
@@ -111,7 +112,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                     color: context.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -133,7 +134,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                     color: context.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -146,7 +147,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Only my messages'),
@@ -159,7 +160,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                   value: _hasMediaOnly,
                   onChanged: (value) => setState(() => _hasMediaOnly = value),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

@@ -9,6 +9,7 @@ import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 修改密码页面
 class ChangePasswordPage extends StatefulWidget {
@@ -102,38 +103,38 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           final isLoading = _isSubmitting;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 说明文字
                   _buildInfoCard(),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
 
                   // 当前密码
                   _buildCurrentPasswordField(),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 新密码
                   _buildNewPasswordField(),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 确认新密码
                   _buildConfirmPasswordField(),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
 
                   // 密码要求提示
                   _buildPasswordRequirements(),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXXL),
 
                   // 确认按钮
                   SizedBox(
@@ -146,13 +147,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           alpha: 0.5,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                         ),
                         elevation: 0,
                       ),
                       child: isLoading
                           ? const SizedBox(
-                              width: 20,
+                              width: AppDimensions.spacingL,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
@@ -175,7 +176,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
 
                   // 安全提示
                   _buildSecurityNote(),
@@ -193,15 +194,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     final textColor = context.textSecondary;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: cardBgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Row(
         children: [
           const Icon(Icons.info_outline, color: AppColors.primary, size: 24),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Text(
               S.of(context)?.settingsChangePasswordInfo ??
@@ -236,7 +237,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _currentPasswordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -248,11 +249,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.lock_outline, color: hintColor),
@@ -307,7 +308,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _newPasswordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -318,11 +319,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.lock_outline, color: hintColor),
@@ -383,7 +384,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             color: labelColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -394,11 +395,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
             prefixIcon: Icon(Icons.lock_outline, color: hintColor),
@@ -451,7 +452,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 12, height: 1.3, color: textColor),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
         Text(
           '• ${S.of(context)?.commonPasswordMinLength ?? 'At least 8 characters'}',
           maxLines: 1,
@@ -466,15 +467,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     final textColor = context.textTertiary;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: AppColors.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Row(
         children: [
           const Icon(Icons.security, color: AppColors.warning, size: 20),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text(
               S.of(context)?.settingsSecurityNote ??

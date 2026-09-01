@@ -16,6 +16,7 @@ import 'storage_management_page.dart';
 import 'auto_download_settings_page.dart';
 import 'privacy_security_page.dart';
 import 'system_accounts_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 设置页面
 class SettingsPage extends StatelessWidget {
@@ -76,7 +77,7 @@ class SettingsPage extends StatelessWidget {
           // 个人资料卡片
           if (profile != null) _buildProfileCard(context, isDark),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 设置组1：通知与隐私安全
           _SettingsGroup(
@@ -100,7 +101,7 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 设置组2：外观、聊天与语言
           _SettingsGroup(
@@ -138,7 +139,7 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 设置组2.5：存储与下载
           _SettingsGroup(
@@ -182,7 +183,7 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 设置组2.8：System & Accounts
           _SettingsGroup(
@@ -198,7 +199,7 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 设置组3：账号安全
           _SettingsGroup(
@@ -238,7 +239,7 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 设置组4：关于
           _SettingsGroup(
@@ -252,19 +253,19 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
 
           // 退出登录按钮
           if (onLogout != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
               child: N42Button.danger(
                 text: S.of(context)?.commonLogout ?? 'Log Out',
                 onPressed: () => _showLogoutConfirmDialog(context),
               ),
             ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
         ],
       ),
     );
@@ -274,18 +275,18 @@ class SettingsPage extends StatelessWidget {
     final secondaryColor = context.textSecondary;
 
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onEditProfile,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Row(
               children: [
                 N42Avatar(
@@ -294,7 +295,7 @@ class SettingsPage extends StatelessWidget {
                   size: 64,
                   decorationPreset: profile!.avatarDecorationPreset,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppDimensions.spacing),
                 Expanded(
                   child: FutureBuilder<PrivacySettings>(
                     future: getIt<PreferencesDataSource>()
@@ -321,7 +322,7 @@ class SettingsPage extends StatelessWidget {
                               color: context.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacingXS),
                           Text(
                             profile!.userId,
                             maxLines: 1,
@@ -334,7 +335,7 @@ class SettingsPage extends StatelessWidget {
                           ),
                           if (phoneNumber != null &&
                               phoneNumber.isNotEmpty) ...[
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppDimensions.spacingXS),
                             Text(
                               phoneNumber,
                               maxLines: 1,
@@ -347,7 +348,7 @@ class SettingsPage extends StatelessWidget {
                             ),
                           ],
                           if (email != null && email.isNotEmpty) ...[
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppDimensions.spacingXS),
                             Text(
                               email,
                               maxLines: 1,
@@ -361,7 +362,7 @@ class SettingsPage extends StatelessWidget {
                           ],
                           if (profile!.statusMessage != null &&
                               profile!.statusMessage!.isNotEmpty) ...[
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppDimensions.spacingXS),
                             Text(
                               profile!.statusMessage!,
                               maxLines: 1,
@@ -526,7 +527,7 @@ class _SettingsItem extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
           child: Row(
             children: [
               Container(
@@ -538,7 +539,7 @@ class _SettingsItem extends StatelessWidget {
                 ),
                 child: Icon(icon, color: Colors.white, size: 20),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

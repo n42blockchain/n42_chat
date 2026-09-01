@@ -1,3 +1,4 @@
+
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
@@ -26,7 +27,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                 size: 16,
                 color: context.textTertiary,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Flexible(
                 child: Text(
                   S.of(context)?.channelReadOnly ??
@@ -125,7 +126,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                         size: 56,
                         color: Colors.white,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacingS),
                       Text(
                         _formatDuration(_recordingDuration),
                         maxLines: 1,
@@ -144,7 +145,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                 // 提示文字
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
+                    horizontal: AppDimensions.spacingL,
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
@@ -171,7 +172,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppDimensions.spacingL),
                 // 取消按钮（紧急退出）
                 TextButton.icon(
                   onPressed: () {
@@ -211,12 +212,12 @@ extension _ChatPageInputMethods on _ChatPageState {
     final seconds = _selfDestructAfter!;
     final label = SelfDestructService.formatDuration(seconds);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       color: AppColors.warning.withValues(alpha: 0.1),
       child: Row(
         children: [
           const Icon(Icons.timer_outlined, size: 16, color: AppColors.warning),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text(
               '${S.of(context)?.chatSelfDestructTimer ?? 'Self-destruct'}: $label',
@@ -259,7 +260,7 @@ extension _ChatPageInputMethods on _ChatPageState {
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing),
                 child: Text(
                   l10n?.chatTimerPickerTitle ?? 'Self-destruct Timer',
                   maxLines: 1,
@@ -321,12 +322,12 @@ extension _ChatPageInputMethods on _ChatPageState {
   Widget _buildViewOnceIndicator() {
     final s = S.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       color: AppColors.primary.withValues(alpha: 0.1),
       child: Row(
         children: [
           const Icon(Icons.timer, size: 16, color: AppColors.primary),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text(
               s?.chatViewOnce ?? 'View Once',
@@ -762,7 +763,7 @@ extension _ChatPageInputMethods on _ChatPageState {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(AppDimensions.spacing),
                 child: CircularProgressIndicator(),
               ),
             );
@@ -777,7 +778,7 @@ extension _ChatPageInputMethods on _ChatPageState {
 
           if (suggestions.isEmpty) {
             return Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 _mentionSearchQuery.isEmpty
                     ? (S.of(context)?.chatNoMembers ?? 'No members')
@@ -801,7 +802,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                 onTap: () => _onMentionSuggestionSelected(suggestion),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                    horizontal: AppDimensions.spacing,
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
@@ -838,7 +839,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                                     )
                                   : null),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppDimensions.spacingM),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

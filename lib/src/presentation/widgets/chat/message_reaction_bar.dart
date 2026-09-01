@@ -4,6 +4,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 消息反应栏（显示在消息下方）
 class MessageReactionBar extends StatelessWidget {
@@ -64,12 +65,12 @@ class _ReactionChip extends StatelessWidget {
       child: GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
         decoration: BoxDecoration(
           color: hasReacted
               ? AppColors.primary.withValues(alpha: 0.2)
               : context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
             color: hasReacted
                 ? AppColors.primary
@@ -85,7 +86,7 @@ class _ReactionChip extends StatelessWidget {
               style: const TextStyle(fontSize: 14),
             ),
             if (reaction.count > 1) ...[
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 '${reaction.count}',
                 style: TextStyle(
@@ -121,10 +122,10 @@ class _AddReactionButton extends StatelessWidget {
       child: GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS, vertical: AppDimensions.spacingXS),
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
             color: context.dividerColor,
             width: 1,
@@ -153,7 +154,7 @@ class QuickReactionPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: AppDimensions.spacingS),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(24),
@@ -204,7 +205,7 @@ class FullReactionPicker extends StatelessWidget {
 
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         decoration: BoxDecoration(
           color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
@@ -235,7 +236,7 @@ class FullReactionPicker extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 常用表情
             Text(
@@ -245,7 +246,7 @@ class FullReactionPicker extends StatelessWidget {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -265,7 +266,7 @@ class FullReactionPicker extends StatelessWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: context.pageBackground,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
                     child: Text(
                       emoji,

@@ -7,6 +7,7 @@ import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../pages/settings/security_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 恢复密钥提醒 Banner
 ///
@@ -114,15 +115,15 @@ class _RecoveryKeyReminderBannerState
       elevation: 4,
       color: Colors.transparent,
       child: Container(
-        margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.all(AppDimensions.spacingM),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF6C63FF), Color(0xFF9B59B6)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF6C63FF).withValues(alpha: 0.3),
@@ -134,7 +135,7 @@ class _RecoveryKeyReminderBannerState
         child: Row(
           children: [
             const Icon(Icons.shield_outlined, color: Colors.white, size: 28),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +163,7 @@ class _RecoveryKeyReminderBannerState
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -174,7 +175,7 @@ class _RecoveryKeyReminderBannerState
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusM)),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
@@ -186,7 +187,7 @@ class _RecoveryKeyReminderBannerState
                         fontWeight: FontWeight.w600),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 GestureDetector(
                   onTap: _dismissFor7Days,
                   child: Text(

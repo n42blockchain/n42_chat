@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/notification_filter_rules.dart';
 import '../../../n42_chat.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 智能通知过滤设置页
 ///
@@ -102,13 +103,13 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 _buildHeaderNote(
                   'Priority rules always notify (bypassing mute, '
                   'mentions-only and Do Not Disturb). Muted keywords '
                   'suppress notifications.',
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 _buildKeywordSection(
                   title: 'Priority keywords',
                   icon: Icons.priority_high,
@@ -150,7 +151,7 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                           .where((e) => e != v)
                           .toList())),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
                 Container(
                   color: context.surfaceColor,
                   child: SwitchListTile(
@@ -171,7 +172,7 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
 
   Widget _buildHeaderNote(String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingXS),
       child: Text(
         text,
         style: TextStyle(fontSize: 13, color: context.textSecondary),
@@ -189,7 +190,7 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
     required void Function(String) onRemove,
   }) {
     return Container(
-      margin: const EdgeInsets.only(top: 16),
+      margin: const EdgeInsets.only(top: AppDimensions.spacing),
       color: context.surfaceColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,7 +208,7 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                   ),
                   child: Icon(icon, color: Colors.white, size: 20),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacingM),
                 Expanded(
                   child: Text(
                     title,

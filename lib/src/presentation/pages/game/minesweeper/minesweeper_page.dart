@@ -10,6 +10,7 @@ import '../widgets/game_scaffold.dart';
 import '../widgets/leaderboard_widget.dart';
 import 'minesweeper_board.dart';
 import 'minesweeper_logic.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class MinesweeperPage extends StatefulWidget {
   const MinesweeperPage({super.key});
@@ -58,7 +59,7 @@ class _MinesweeperPageState extends State<MinesweeperPage> {
 
   Widget _buildTopBar(S? l10n) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -66,7 +67,7 @@ class _MinesweeperPageState extends State<MinesweeperPage> {
           Row(
             children: [
               const Text('💣', style: TextStyle(fontSize: 18)),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 '${_logic.remainingMines}',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -102,7 +103,7 @@ class _MinesweeperPageState extends State<MinesweeperPage> {
           Row(
             children: [
               const Icon(Icons.timer, size: 18),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 '${_logic.elapsedSeconds}s',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

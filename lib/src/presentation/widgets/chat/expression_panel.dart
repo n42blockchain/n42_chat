@@ -11,6 +11,7 @@ import 'emoji_picker.dart';
 import 'sticker_picker.dart';
 import 'sticker_thumb.dart';
 import 'gif_picker.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 统一表情面板分页
 enum ExpressionTab { recent, emoji, sticker, gif }
@@ -268,7 +269,7 @@ class _RecentTabState extends State<_RecentTab> {
       return _buildEmpty(context);
     }
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM, vertical: 10),
       children: [
         if (_emojis.isNotEmpty) ...[
           _sectionIcon(context, Icons.emoji_emotions_outlined),
@@ -289,7 +290,7 @@ class _RecentTabState extends State<_RecentTab> {
           ),
         ],
         if (_stickers.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           _sectionIcon(context, Icons.auto_awesome_outlined),
           GridView.count(
             crossAxisCount: 4,

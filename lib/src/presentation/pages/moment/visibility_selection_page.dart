@@ -12,6 +12,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../contact/tags_management_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 可见性好友选择页面
 ///
@@ -134,10 +135,10 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                 filled: true,
                 fillColor: AppColors.inputBgOf(isDark),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
               ),
             ),
           ),
@@ -159,7 +160,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -185,7 +186,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
           ],
 
           // 联系人列表
@@ -239,9 +240,9 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
           // 底部确认栏
           Container(
             padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 12,
+              left: AppDimensions.spacing,
+              right: AppDimensions.spacing,
+              top: AppDimensions.spacingM,
               bottom: MediaQuery.of(context).padding.bottom + 12,
             ),
             decoration: BoxDecoration(
@@ -272,9 +273,9 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.inputBgOf(isDark),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL, vertical: AppDimensions.spacingM),
                   ),
                   child: Text(s?.contactDoneButton ?? 'Done'),
                 ),

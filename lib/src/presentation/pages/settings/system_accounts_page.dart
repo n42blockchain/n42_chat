@@ -23,6 +23,7 @@ import '../profile/set_username_page.dart';
 import 'account_switch_page.dart';
 import 'notification_settings_page.dart';
 import 'security_settings_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class SystemAccountsPage extends StatefulWidget {
   final Future<void> Function()? onOpenAccounts;
@@ -266,9 +267,9 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             _buildOverviewCard(),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             SettingsHubSection(
               title: 'Account & Identity',
               children: [
@@ -302,7 +303,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             SettingsHubSection(
               title: l10n?.settingsNotificationSettings ?? 'Notifications',
               children: [
@@ -319,7 +320,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             SettingsHubSection(
               title: 'Integrations',
               children: [
@@ -333,7 +334,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
           ],
         ),
       ),

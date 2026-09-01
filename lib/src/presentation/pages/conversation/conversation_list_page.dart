@@ -661,7 +661,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 height: 4,
                 decoration: BoxDecoration(
                   color: context.textTertiary,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
               _buildAddMenuItem(
@@ -837,7 +837,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 height: 4,
                 decoration: BoxDecoration(
                   color: context.textTertiary,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
               // 标记已读
@@ -925,7 +925,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 },
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
             ],
           ),
         ),

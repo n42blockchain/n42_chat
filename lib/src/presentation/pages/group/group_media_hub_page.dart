@@ -12,6 +12,7 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'group_album_page.dart';
 import 'group_files_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群媒体中心页面
 ///
@@ -194,7 +195,7 @@ class _LinksTabState extends State<_LinksTab> {
               size: 48,
               color: context.textSecondary,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               S.of(context)?.groupNoLinks ?? 'No links',
               style: TextStyle(
@@ -225,7 +226,7 @@ class _LinksTabState extends State<_LinksTab> {
         height: 40,
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: const Icon(Icons.link, color: AppColors.primary, size: 20),
       ),

@@ -43,6 +43,7 @@ import 'status_page.dart';
 import '../moment/moment_list_page.dart';
 import '../sticker/sticker_store_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 我的页面
 class ProfilePage extends StatefulWidget {
@@ -187,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
             subtitleColor,
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 服务
           _buildGroupCard(
@@ -203,7 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 收藏、朋友圈、订单与卡包、表情
           _buildGroupCard(
@@ -279,7 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
 
           // 设置
           _buildGroupCard(
@@ -295,7 +296,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXXL),
         ],
       ),
     );
@@ -333,7 +334,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     decorationPreset: _avatarDecorationPreset,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppDimensions.spacing),
                 // 用户信息
                 Expanded(
                   child: Column(
@@ -523,7 +524,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
           child: Row(
             children: [
               // 透明背景的图标
@@ -548,7 +549,7 @@ class _ProfilePageState extends State<ProfilePage> {
               if (badge != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                    horizontal: AppDimensions.spacingS,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
@@ -687,12 +688,12 @@ class _ProfilePageState extends State<ProfilePage> {
               // 拖拽条
               Center(
                 child: Container(
-                  margin: const EdgeInsets.only(top: 8, bottom: 4),
+                  margin: const EdgeInsets.only(top: AppDimensions.spacingS, bottom: AppDimensions.spacingXS),
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
                     color: context.dividerColor,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                   ),
                 ),
               ),
@@ -733,7 +734,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   _openAvatarStudio(context);
                 },
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
             ],
           ),
         ),

@@ -13,6 +13,7 @@ import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../auth/login_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class AccountSwitchPage extends StatefulWidget {
   const AccountSwitchPage({super.key});
@@ -116,11 +117,11 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
             ? const Center(child: CircularProgressIndicator())
             : ListView(
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   if (_accounts.isEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
+                        horizontal: AppDimensions.spacingXL,
                         vertical: 48,
                       ),
                       child: Text(
@@ -156,9 +157,9 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
                         ],
                       ),
                     ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
                     child: N42Button.primary(
                       text: l10n?.commonAdd ?? 'Add Account',
                       onPressed: _switchingUserId == null
@@ -166,7 +167,7 @@ class _AccountSwitchPageState extends State<AccountSwitchPage> {
                           : null,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
                 ],
               ),
       ),
@@ -218,7 +219,7 @@ class _AccountTile extends StatelessWidget {
       ),
       trailing: isSwitching
           ? const SizedBox(
-              width: 20,
+              width: AppDimensions.spacingL,
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             )

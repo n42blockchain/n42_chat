@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class ShareableLinkPresentation {
   final String entityName;
@@ -258,7 +259,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppDimensions.spacingXL),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -267,7 +268,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                   child: Container(
                     width: double.infinity,
                     constraints: const BoxConstraints(maxWidth: 360),
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(AppDimensions.spacingXL),
                     decoration: BoxDecoration(
                       color: cardColor,
                       borderRadius: BorderRadius.circular(24),
@@ -294,7 +295,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                             color: AppColors.primary,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.spacing),
                         Text(
                           widget.presentation.entityName,
                           textAlign: TextAlign.center,
@@ -305,7 +306,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                           ),
                         ),
                         if (widget.presentation.qrCodeSubtitle != null) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppDimensions.spacingS),
                           Text(
                             widget.presentation.qrCodeSubtitle!,
                             textAlign: TextAlign.center,
@@ -316,9 +317,9 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                             ),
                           ),
                         ],
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppDimensions.spacingXL),
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(AppDimensions.spacing),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -330,7 +331,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                             backgroundColor: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppDimensions.spacingL),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(
@@ -358,7 +359,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppDimensions.spacingL),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
@@ -367,7 +368,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                     label: Text(S.of(context)?.commonShare ?? 'Share'),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.spacingM),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(

@@ -7,6 +7,7 @@ import '../../../core/services/red_packet_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/red_packet_entity.dart';
 import 'red_packet_detail_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 红包历史记录页
 ///
@@ -115,7 +116,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
               size: 48,
               color: isDark ? Colors.white24 : Colors.grey.shade300,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             Text(
               'No red packets yet',
               style: TextStyle(
@@ -128,9 +129,9 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       itemCount: packets.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: AppDimensions.spacingS),
       itemBuilder: (context, index) {
         final rp = packets[index];
         return _buildRedPacketCard(rp, isDark, isSent: isSent);
@@ -154,9 +155,9 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     return Card(
       color: context.surfaceColor,
       elevation: 0.5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
         leading: Container(
           width: 44,
           height: 44,

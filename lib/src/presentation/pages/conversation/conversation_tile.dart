@@ -9,6 +9,7 @@ import '../../../core/utils/date_utils.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../integration/bridge/bridge_platform.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 会话列表项（仿微信）
 class ConversationTile extends StatelessWidget {
@@ -106,7 +107,7 @@ class ConversationTile extends StatelessWidget {
                 child: ExcludeSemantics(
                   child: Container(
                     height: 76,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
                     child: Row(
                       children: [
                         // 头像（带未读红点）
@@ -210,10 +211,10 @@ class ConversationTile extends StatelessWidget {
 
     return Container(
       constraints: BoxConstraints(minWidth: minWidth, minHeight: 18),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXS, vertical: 1),
       decoration: BoxDecoration(
         color: AppColors.badge,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         border: Border.all(color: Colors.white, width: 1.5),
       ),
       child: Center(
@@ -246,7 +247,7 @@ class ConversationTile extends StatelessWidget {
                   // 聊天锁标识
                   if (isLocked)
                     const Padding(
-                      padding: EdgeInsets.only(right: 4),
+                      padding: EdgeInsets.only(right: AppDimensions.spacingXS),
                       child: Icon(
                         Icons.lock_outline,
                         size: 14,
@@ -256,7 +257,7 @@ class ConversationTile extends StatelessWidget {
                   // 加密标识
                   if (conversation.isEncrypted)
                     const Padding(
-                      padding: EdgeInsets.only(right: 4),
+                      padding: EdgeInsets.only(right: AppDimensions.spacingXS),
                       child: Icon(
                         Icons.lock,
                         size: 14,
@@ -297,7 +298,7 @@ class ConversationTile extends StatelessWidget {
           ],
         ),
 
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
 
         // 副标题行：消息内容 + 免打扰图标
         Row(
@@ -332,7 +333,7 @@ class ConversationTile extends StatelessWidget {
             // 免打扰图标（在右侧）
             if (conversation.isMuted)
               Padding(
-                padding: const EdgeInsets.only(left: 4),
+                padding: const EdgeInsets.only(left: AppDimensions.spacingXS),
                 child: Icon(
                   Icons.notifications_off,
                   size: 16,

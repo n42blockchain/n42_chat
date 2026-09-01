@@ -12,6 +12,7 @@ import '../../../services/voip/voice_room_service.dart';
 import '../../blocs/voice_room/voice_room_bloc.dart';
 import '../../blocs/voice_room/voice_room_event.dart';
 import '../../blocs/voice_room/voice_room_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 活跃语音房间列表页
 class VoiceRoomListPage extends StatelessWidget {
@@ -59,7 +60,7 @@ class _VoiceRoomListView extends StatelessWidget {
                     size: 64,
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     s?.voiceRoomNoActive ?? 'No active voice rooms',
                     style: TextStyle(
@@ -72,7 +73,7 @@ class _VoiceRoomListView extends StatelessWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             itemCount: state.activeRooms.length,
             itemBuilder: (context, index) {
               final room = state.activeRooms[index];
@@ -166,7 +167,7 @@ class _CreateVoiceRoomDialogState extends State<_CreateVoiceRoomDialog> {
                 border: const OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             TextField(
               controller: _topicController,
               decoration: InputDecoration(
@@ -175,7 +176,7 @@ class _CreateVoiceRoomDialogState extends State<_CreateVoiceRoomDialog> {
               ),
             ),
             if (_inlineError != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -224,7 +225,7 @@ class _CreateVoiceRoomDialogState extends State<_CreateVoiceRoomDialog> {
                       },
                 child: isSubmitting
                     ? const SizedBox(
-                        width: 16,
+                        width: AppDimensions.spacing,
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
@@ -249,14 +250,14 @@ class _VoiceRoomCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         onTap: () {
           context.push(Routes.voiceRoomPath(room.roomId));
         },
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacing),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -265,12 +266,12 @@ class _VoiceRoomCard extends StatelessWidget {
                   // 直播标识
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: AppDimensions.spacingS,
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.success,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     ),
                     child: Text(
                       s?.voiceRoomLive ?? 'LIVE',
@@ -281,7 +282,7 @@ class _VoiceRoomCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   Expanded(
                     child: Text(
                       room.name,
@@ -305,7 +306,7 @@ class _VoiceRoomCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Row(
                 children: [
                   Icon(
@@ -313,7 +314,7 @@ class _VoiceRoomCard extends StatelessWidget {
                     size: 16,
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppDimensions.spacingXS),
                   Text(
                     '${room.participantCount}',
                     style: TextStyle(
@@ -321,13 +322,13 @@ class _VoiceRoomCard extends StatelessWidget {
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppDimensions.spacing),
                   Icon(
                     Icons.mic,
                     size: 16,
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppDimensions.spacingXS),
                   Text(
                     '${room.speakers.length + room.hosts.length}',
                     style: TextStyle(

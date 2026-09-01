@@ -39,14 +39,14 @@ class WelcomePage extends StatelessWidget {
             _buildBackButton(context),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL),
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppDimensions.spacingL),
                     _buildHeader(context),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppDimensions.spacingXXL),
                     _buildFeatures(context),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacingS),
                   ],
                 ),
               ),
@@ -93,7 +93,7 @@ class WelcomePage extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [AppColors.primary, AppColors.primaryLight],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary.withValues(alpha: 0.3),
@@ -146,7 +146,7 @@ class WelcomePage extends StatelessWidget {
               S.of(context)?.authMessagesOnlyYouCanSee ??
               'Messages visible only to you and the recipient',
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: AppDimensions.spacingL),
         _FeatureItem(
           icon: Icons.public,
           title: S.of(context)?.authDecentralized ?? 'Decentralized',
@@ -154,7 +154,7 @@ class WelcomePage extends StatelessWidget {
               S.of(context)?.authBasedOnMatrix ??
               'Built on the Matrix open protocol',
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: AppDimensions.spacingL),
         _FeatureItem(
           icon: Icons.account_balance_wallet,
           title: S.of(context)?.authWalletIntegration ?? 'Wallet Integration',
@@ -281,7 +281,7 @@ class WelcomePage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildButtons(context, isDark),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           _buildAgreement(context),
         ],
       ),

@@ -15,6 +15,7 @@ import '../../widgets/chat/contact_card_select_sheet.dart';
 import 'contact_detail_page.dart';
 import 'contact_permissions_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 联系人设置页面（仿微信 - 图二）
 class ContactSettingsPage extends StatefulWidget {
@@ -126,7 +127,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
 
                   // 编辑备注
                   _buildMenuSection(
@@ -143,7 +144,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
 
                   // 设置权限
                   _buildMenuSection(
@@ -161,7 +162,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
 
                   // 把他(她)推荐给朋友
                   _buildMenuSection(
@@ -179,7 +180,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
 
                   // 设为星标朋友 & 加入黑名单
                   _buildMenuSection(
@@ -230,7 +231,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
 
                   // 投诉
                   _buildMenuSection(
@@ -246,7 +247,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
 
                   // 删除联系人
                   _buildMenuSection(
@@ -271,7 +272,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXXL),
                 ],
               ),
             ),
@@ -313,7 +314,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 14),
         child: Row(
           children: [
             Text(title, style: TextStyle(fontSize: 16, color: textColor)),
@@ -336,7 +337,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
     required ValueChanged<bool> onChanged,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       child: Row(
         children: [
           Text(title, style: TextStyle(fontSize: 16, color: textColor)),
@@ -353,7 +354,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
 
   Widget _buildDivider(Color color) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.only(left: AppDimensions.spacing),
       child: Divider(height: 0.5, thickness: 0.5, color: color),
     );
   }
@@ -409,14 +410,14 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           content: Row(
             children: [
               const SizedBox(
-                width: 20,
+                width: AppDimensions.spacingL,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Text(l10n?.contactSendingCard ?? 'Sending contact card...'),
             ],
           ),
@@ -506,7 +507,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                     dense: true,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 TextField(
                   controller: descController,
                   maxLines: 2,

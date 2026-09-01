@@ -11,6 +11,7 @@ import '../widgets/game_scaffold.dart';
 import '../widgets/leaderboard_widget.dart';
 import 'block_drop_board.dart';
 import 'block_drop_logic.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class BlockDropPage extends StatefulWidget {
   const BlockDropPage({super.key});
@@ -119,7 +120,7 @@ class _BlockDropPageState extends State<BlockDropPage> {
 
   Widget _buildInfoBar(S? l10n) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingS),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -135,7 +136,7 @@ class _BlockDropPageState extends State<BlockDropPage> {
             children: [
               Text(l10n?.gameNext ?? 'Next',
                   style: TextStyle(fontSize: 12, color: context.textTertiary)),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppDimensions.spacingXS),
               NextPieceWidget(piece: _logic.nextPiece),
             ],
           ),

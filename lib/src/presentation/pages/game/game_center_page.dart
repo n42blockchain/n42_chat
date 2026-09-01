@@ -8,6 +8,7 @@ import 'game_2048/game_2048_page.dart';
 import 'minesweeper/minesweeper_page.dart';
 import 'block_drop/block_drop_page.dart';
 import 'match3/match3_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class GameCenterPage extends StatefulWidget {
   const GameCenterPage({super.key});
@@ -81,7 +82,7 @@ class _GameCenterPageState extends State<GameCenterPage> {
         title: Text(l10n?.gameCenter ?? 'Games'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
@@ -105,9 +106,9 @@ class _GameCenterPageState extends State<GameCenterPage> {
       BuildContext context, _GameInfo game, int? highScore, S? l10n) {
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXL)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         onTap: () async {
           await Navigator.push(
             context,
@@ -116,7 +117,7 @@ class _GameCenterPageState extends State<GameCenterPage> {
           await _loadHighScores();
         },
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacing),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -125,17 +126,17 @@ class _GameCenterPageState extends State<GameCenterPage> {
                 height: 56,
                 decoration: BoxDecoration(
                   color: game.color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                 ),
                 child: Icon(game.icon, size: 32, color: game.color),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Text(
                 game.name,
                 style:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppDimensions.spacingXS),
               Text(
                 game.desc,
                 textAlign: TextAlign.center,

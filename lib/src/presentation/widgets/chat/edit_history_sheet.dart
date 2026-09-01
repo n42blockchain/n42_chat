@@ -5,6 +5,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../data/datasources/matrix/matrix_reaction_datasource.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 编辑历史 BottomSheet
 ///
@@ -76,17 +77,17 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
             children: [
               // 拖拽手柄
               Container(
-                margin: const EdgeInsets.only(top: 8),
+                margin: const EdgeInsets.only(top: AppDimensions.spacingS),
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
                   color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
               // 标题
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing),
                 child: Text(
                   s?.chatEditHistory ?? 'Edit History',
                   style: TextStyle(
@@ -146,7 +147,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
 
     return ListView.separated(
       controller: scrollController,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
       itemCount: reversed.length,
       separatorBuilder: (_, _) => Divider(
         height: 0.5,
@@ -169,7 +170,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
     final timeStr = _formatTime(entry.editedAt);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -179,10 +180,10 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
               if (entry.isOriginal)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  margin: const EdgeInsets.only(right: 8),
+                  margin: const EdgeInsets.only(right: AppDimensions.spacingS),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Text(
                     s?.chatOriginalMessage ?? 'Original',
@@ -199,7 +200,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                   size: 12,
                   color: context.textTertiary,
                 ),
-              if (!entry.isOriginal) const SizedBox(width: 4),
+              if (!entry.isOriginal) const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 timeStr,
                 style: TextStyle(

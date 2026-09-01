@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class InvoiceManagePage extends StatefulWidget {
   const InvoiceManagePage({super.key});
@@ -141,7 +142,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                     size: 64,
                     color: AppColors.textTertiary,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     S.of(context)?.profileNoInvoice ?? 'No invoice',
                     maxLines: 1,
@@ -152,7 +153,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                       color: context.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
                   ElevatedButton.icon(
                     onPressed: _addInvoice,
                     icon: const Icon(Icons.add),
@@ -168,14 +169,14 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               itemCount: _invoices.length,
               itemBuilder: (context, index) {
                 final invoice = _invoices[index];
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppDimensions.spacing),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -183,14 +184,14 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
+                                horizontal: AppDimensions.spacingS,
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
                                 color: invoice.type == 'company'
                                     ? AppColors.primary.withValues(alpha: 0.1)
                                     : AppColors.warning.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                               ),
                               child: Text(
                                 invoice.type == 'company'
@@ -210,7 +211,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppDimensions.spacingS),
                             Expanded(
                               child: Text(
                                 invoice.title,
@@ -227,14 +228,14 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                             if (invoice.isDefault)
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                                  horizontal: AppDimensions.spacingS,
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.primary.withValues(
                                     alpha: 0.1,
                                   ),
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                                 ),
                                 child: Text(
                                   S.of(context)?.profileDefaultLabel ??
@@ -253,7 +254,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                         ),
                         if (invoice.taxNumber != null &&
                             invoice.taxNumber!.isNotEmpty) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppDimensions.spacingS),
                           Text(
                             '${S.of(context)?.profileTaxNumber ?? 'Tax Number'}: ${invoice.taxNumber}',
                             maxLines: 1,
@@ -265,7 +266,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                             ),
                           ),
                         ],
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppDimensions.spacingM),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -463,7 +464,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   TextField(
                     controller: titleController,
                     decoration: InputDecoration(
@@ -476,7 +477,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                     ),
                   ),
                   if (type == 'company') ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     TextField(
                       controller: taxNumberController,
                       decoration: InputDecoration(
@@ -485,7 +486,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                             s?.profileEnterTaxIdNumber ?? 'Enter tax ID number',
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     TextField(
                       controller: bankNameController,
                       decoration: InputDecoration(
@@ -495,7 +496,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                         hintText: s?.profileEnterBankName ?? 'Enter bank name',
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     TextField(
                       controller: bankAccountController,
                       decoration: InputDecoration(
@@ -506,7 +507,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                             s?.profileEnterBankAccount ?? 'Enter bank account',
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     TextField(
                       controller: companyAddressController,
                       decoration: InputDecoration(
@@ -518,7 +519,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                             'Enter company address',
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppDimensions.spacingM),
                     TextField(
                       controller: companyPhoneController,
                       decoration: InputDecoration(
@@ -531,7 +532,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                       ),
                     ),
                   ],
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   CheckboxListTile(
                     value: isDefault,
                     onChanged: (value) {

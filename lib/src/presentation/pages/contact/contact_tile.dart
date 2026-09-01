@@ -4,6 +4,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 联系人列表项
 class ContactTile extends StatelessWidget {
@@ -30,7 +31,7 @@ class ContactTile extends StatelessWidget {
         onTap: onTap,
         onLongPress: onLongPress,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: AppDimensions.spacingM),
           child: Row(
             children: [
               // 头像
@@ -62,7 +63,7 @@ class ContactTile extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
 
               // 名称和状态
               Expanded(
@@ -84,7 +85,7 @@ class ContactTile extends StatelessWidget {
                     // 状态消息或最后活跃时间
                     if (contact.statusMessage?.isNotEmpty == true ||
                         (!contact.isOnline && contact.formattedLastActive.isNotEmpty))
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXS),
 
                     if (contact.statusMessage?.isNotEmpty == true)
                       Text(
@@ -145,7 +146,7 @@ class SimpleContactTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing, vertical: 10),
           child: Row(
             children: [
               N42Avatar(
@@ -153,7 +154,7 @@ class SimpleContactTile extends StatelessWidget {
                 name: contact.effectiveDisplayName,
                 size: 40,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
               Expanded(
                 child: Text(
                   contact.effectiveDisplayName,

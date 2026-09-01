@@ -1,3 +1,4 @@
+
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
@@ -24,7 +25,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                 children: [
                   if (chatState.isChannel)
                     Padding(
-                      padding: const EdgeInsets.only(right: 4),
+                      padding: const EdgeInsets.only(right: AppDimensions.spacingXS),
                       child: Icon(
                         Icons.campaign,
                         size: 18,
@@ -34,7 +35,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                   // 桥接平台小图标
                   if (bridgePlatform != null)
                     Padding(
-                      padding: const EdgeInsets.only(right: 4),
+                      padding: const EdgeInsets.only(right: AppDimensions.spacingXS),
                       child: Icon(
                         BridgePlatformRegistry.getInfo(bridgePlatform).icon,
                         size: 16,

@@ -14,6 +14,7 @@ import '../../../integration/wallet_bridge.dart';
 import '../../helpers/mini_app_launcher_helper.dart';
 import 'my_qrcode_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Scan QR page
 class ScanQRPage extends StatefulWidget {
@@ -245,10 +246,10 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
               return SafeArea(
                 child: Padding(
                   padding: EdgeInsets.only(
-                    left: 20,
-                    top: 20,
-                    right: 20,
-                    bottom: 20 + MediaQuery.viewInsetsOf(ctx).bottom,
+                    left: AppDimensions.spacingL,
+                    top: AppDimensions.spacingL,
+                    right: AppDimensions.spacingL,
+                    bottom: AppDimensions.spacingL + MediaQuery.viewInsetsOf(ctx).bottom,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -261,7 +262,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.spacingS),
                       Text(
                         payment.receiverAddress,
                         style: const TextStyle(
@@ -271,11 +272,11 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                         ),
                       ),
                       if (payment.memo != null && payment.memo!.isNotEmpty) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacingS),
                         Text(payment.memo!),
                       ],
                       if (!payment.hasAmount) ...[
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.spacing),
                         TextField(
                           controller: amountController,
                           keyboardType: const TextInputType.numberWithOptions(
@@ -290,7 +291,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppDimensions.spacingL),
                       Row(
                         children: [
                           Expanded(
@@ -299,7 +300,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                               child: Text(S.of(ctx)?.commonCancel ?? 'Cancel'),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppDimensions.spacingM),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
@@ -463,7 +464,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               S.of(context)?.qrcodeCheckingCameraPermission ??
                   'Checking camera permission...',
@@ -477,7 +478,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     if (!_hasPermission) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(AppDimensions.spacingXXL),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -494,7 +495,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   size: 40,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXL),
               Text(
                 S.of(context)?.qrcodeNeedCameraPermission ??
                     'Camera Permission Required',
@@ -504,7 +505,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               Text(
                 _permissionError ??
                     (S.of(context)?.qrcodeCameraPermissionRequired ??
@@ -512,7 +513,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 style: const TextStyle(color: Colors.white54, fontSize: 14),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppDimensions.spacingXXL),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -522,29 +523,29 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                        horizontal: AppDimensions.spacingXL,
+                        vertical: AppDimensions.spacingM,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       ),
                     ),
                     child: Text(
                       S.of(context)?.qrcodeRetryPermission ?? 'Retry',
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppDimensions.spacing),
                   OutlinedButton(
                     onPressed: _openSettings,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Colors.white54),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                        horizontal: AppDimensions.spacingXL,
+                        vertical: AppDimensions.spacingM,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                       ),
                     ),
                     child: Text(
@@ -553,7 +554,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXL),
               TextButton(
                 onPressed: _toggleManualInput,
                 child: Text(
@@ -590,13 +591,13 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                     color: AppColors.error,
                     size: 48,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
                     S.of(context)?.qrcodeCameraStartFailed ??
                         'Camera failed to start',
                     style: const TextStyle(color: Colors.white),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   Text(
                     error.errorDetails?.message ??
                         (S.of(context)?.qrcodeUnknownError ?? 'Unknown error'),
@@ -626,7 +627,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 TextButton(
                   onPressed: _toggleManualInput,
                   child: Text(
@@ -642,7 +643,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   ),
                 ),
                 if (_showManualInput) _buildManualInputSection(scanSize),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -733,7 +734,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
   Widget _buildManualInputSection(double scanSize) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingXXL, vertical: AppDimensions.spacing),
       child: Row(
         children: [
           Expanded(
@@ -747,29 +748,29 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.1),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  horizontal: AppDimensions.spacing,
+                  vertical: AppDimensions.spacingM,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           ElevatedButton(
             onPressed: _isProcessing ? null : _submitManualInput,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingL, vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
             ),
             child: _isProcessing
                 ? const SizedBox(
-                    width: 20,
+                    width: AppDimensions.spacingL,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
@@ -802,7 +803,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             ),
             child: Icon(icon, color: Colors.white, size: 28),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,
             style: const TextStyle(color: Colors.white, fontSize: 12),
