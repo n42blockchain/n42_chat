@@ -1,4 +1,12 @@
 {
+  "ignore": [
+    "build/**",
+    "coverage/**",
+    "example/**",
+    "**/*.g.dart",
+    "**/*.freezed.dart",
+    "**/generated/**"
+  ],
   "overrides": [
     {
       "files": [

@@ -1,7 +1,7 @@
 # HIG audit: what is configured, and what is left
 
 ```bash
-npx hig-doctor . --exclude "build/**,coverage/**,example/**,**/*.g.dart,**/*.freezed.dart,**/generated/**"
+npx hig-doctor .
 ```
 
 audits this package against Apple's Human Interface Guidelines. It found
@@ -47,16 +47,24 @@ One file at a time: run that screen in light and dark, move its literals onto
 `AppColors` and the type scale, then re-run with `--write-baseline` so the
 snapshot shrinks with the debt.
 
-## In CI
-
-```bash
-npx hig-doctor . --exclude "<the list above>" --fail-on moderate
-```
-
-Passes today; fails the moment new hardcoded colour or type appears.
 
 ## Note
 
 This package is also vendored into `n42appv2` under `packages/n42_chat`, which
 carries its own baseline covering that copy. Fixes made here should be carried
 across, or the two snapshots will drift.
+
+## In CI
+
+```bash
+npx hig-doctor@2.0.1 . --fail-on serious
+```
+
+The ignore list and the rule exemptions live in `hig-doctor.config.json`, so
+this is the same command locally and in CI - nothing to keep in sync by hand.
+
+`--fail-on serious` means the build goes red on anything critical or serious
+that is newly introduced. It passes today, and the moderate backlog held in `.hig-baseline.json`
+does not gate it.
+
+Pipeline: `.github/workflows/hig-audit.yml`.
