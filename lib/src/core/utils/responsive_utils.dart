@@ -267,7 +267,7 @@ class _EmptyRightPanel extends StatelessWidget {
             'Select a conversation',
             style: TextStyle(
               fontSize: 16,
-              color: Color(0xFF9E9E9E),
+              color: Color(0xFF999999),
             ),
           ),
         ],

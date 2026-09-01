@@ -416,7 +416,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
             filled: true,
             fillColor: isDark
                 ? AppColors.dividerThinDark
-                : const Color(0xFFF5F5F5),
+                : const Color(0xFFF7F7F7),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,

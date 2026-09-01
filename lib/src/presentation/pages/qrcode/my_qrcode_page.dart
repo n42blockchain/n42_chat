@@ -428,22 +428,22 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   Color _qrCardColor(bool isDark) {
     switch (_qrStyle) {
       case _QRCodeStyle.n42:
-        return isDark ? const Color(0xFF2C2C2C) : Colors.white;
+        return isDark ? const Color(0xFF2A2A2A) : Colors.white;
       case _QRCodeStyle.classic:
-        return isDark ? const Color(0xFF1E1E1E) : Colors.white;
+        return isDark ? const Color(0xFF181818) : Colors.white;
       case _QRCodeStyle.ocean:
-        return isDark ? const Color(0xFF112A3A) : const Color(0xFFEAF8FF);
+        return isDark ? const Color(0xFF1A252F) : const Color(0xFFE3EFFD);
       case _QRCodeStyle.berry:
-        return isDark ? const Color(0xFF2A1727) : const Color(0xFFFFF1F7);
+        return isDark ? const Color(0xFF2A1727) : const Color(0xFFF7F7F7);
     }
   }
 
   Color get _qrBackgroundColor {
     switch (_qrStyle) {
       case _QRCodeStyle.ocean:
-        return const Color(0xFFF4FCFF);
+        return const Color(0xFFF7F7F7);
       case _QRCodeStyle.berry:
-        return const Color(0xFFFFF8FB);
+        return const Color(0xFFF7F7F7);
       case _QRCodeStyle.n42:
       case _QRCodeStyle.classic:
         return Colors.white;

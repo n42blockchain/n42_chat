@@ -208,7 +208,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark
                         ? AppColors.surfaceDark.withValues(alpha: 0.5)
-                        : const Color(0xFFF5F5F5),
+                        : const Color(0xFFF7F7F7),
                     foregroundColor: context.textPrimary,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),

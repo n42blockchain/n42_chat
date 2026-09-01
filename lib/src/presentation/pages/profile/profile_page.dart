@@ -212,7 +212,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildMenuItem(
                 context,
                 icon: Icons.inventory_2_outlined,
-                iconColor: const Color(0xFFFF9F0A),
+                iconColor: const Color(0xFFFF9900),
                 title: S.of(context)?.commonFavorites ?? 'Favorites',
                 onTap: () => _openFavorites(context),
               ),
@@ -236,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildMenuItem(
                 context,
                 icon: Icons.emoji_emotions_outlined,
-                iconColor: const Color(0xFFFFCC00),
+                iconColor: const Color(0xFFFFD700),
                 title: S.of(context)?.profileStickers ?? 'Stickers',
                 onTap: () => _openStickers(context),
               ),
@@ -256,7 +256,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildMenuItem(
                 context,
                 icon: Icons.account_balance_outlined,
-                iconColor: const Color(0xFF2ECC71),
+                iconColor: const Color(0xFF25D366),
                 title: 'Buy / Sell crypto',
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -288,7 +288,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildMenuItem(
                 context,
                 icon: Icons.settings_outlined,
-                iconColor: const Color(0xFF5E97F6),
+                iconColor: const Color(0xFF5298FF),
                 title: S.of(context)?.commonSettings ?? 'Settings',
                 onTap: () => _openSettings(context),
               ),

@@ -496,9 +496,9 @@ class _MomentsIconPainter extends CustomPainter {
     // 四个椭圆花瓣，交织在一起
     final colors = [
       const Color(0xFF56CCF2), // 上 - 蓝
-      const Color(0xFFFF9F43), // 右 - 橙
+      const Color(0xFFFA9D3B), // 右 - 橙
       const Color(0xFF26DE81), // 下 - 绿
-      const Color(0xFFFC5C65), // 左 - 粉红
+      const Color(0xFFF5576C), // 左 - 粉红
     ];
 
     // 绘制四个交织的椭圆
@@ -537,7 +537,7 @@ class _LiveIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    const color = Color(0xFFFF4757);
+    const color = Color(0xFFFA5151);
 
     final outerPaint = Paint()
       ..color = color
@@ -688,7 +688,7 @@ class _GameIconPainter extends CustomPainter {
     final h = size.height;
 
     final bodyPaint = Paint()
-      ..color = const Color(0xFF4FC3F7)
+      ..color = const Color(0xFF56CCF2)
       ..style = PaintingStyle.fill;
 
     // Controller body
@@ -801,7 +801,7 @@ class _SearchIcon extends StatelessWidget {
 class _SearchIconPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    const color = Color(0xFFFF4757);
+    const color = Color(0xFFFA5151);
     final w = size.width;
     final h = size.height;
 

@@ -383,7 +383,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                           decoration: BoxDecoration(
                             color: isPlaying
                                 ? AppColors.primary.withValues(alpha: 0.2)
-                                : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7)),
+                                : (isDark ? const Color(0xFF3D3D3D) : const Color(0xFFF7F7F7)),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(

@@ -58,7 +58,7 @@ class VoteProgressBar extends StatelessWidget {
     final textColor = context.textPrimary;
     final secondaryTextColor = context.textSecondary;
     final trackColor =
-        isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5);
+        isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F7F7);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),

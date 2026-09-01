@@ -222,7 +222,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           icon: Icons.facebook,
           isLoading: _isFacebookLoading,
           tooltip: 'Facebook',
-          backgroundColor: const Color(0xFF1877F2),
+          backgroundColor: const Color(0xFF1A73E8),
           iconColor: Colors.white,
         ),
       if ((config?.enableTwitterLogin ?? false) &&
@@ -250,7 +250,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           icon: Icons.code,
           isLoading: _isGithubLoading,
           tooltip: 'GitHub',
-          backgroundColor: const Color(0xFF24292F),
+          backgroundColor: const Color(0xFF2A2A2A),
           iconColor: Colors.white,
         ),
       if (_isTelegramConfigured(config))
@@ -259,7 +259,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           icon: Icons.send,
           isLoading: _isTelegramLoading,
           tooltip: 'Telegram',
-          backgroundColor: const Color(0xFF26A5E4),
+          backgroundColor: const Color(0xFF2AABEE),
           iconColor: Colors.white,
         ),
       if ((config?.enableWeChatLogin ?? false) && _isWeChatAvailable)
@@ -907,7 +907,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       case SsoBrand.gitlab:
         return (Icons.merge_type, const Color(0xFFFC6D26));
       case SsoBrand.facebook:
-        return (Icons.facebook, const Color(0xFF1877F2));
+        return (Icons.facebook, const Color(0xFF1A73E8));
       case SsoBrand.twitter:
         return (Icons.alternate_email, context.textPrimary);
       case SsoBrand.discord:

@@ -589,12 +589,12 @@ ThemeData _buildChatScopedTheme(ThemeData baseTheme) {
   final isDark = baseTheme.brightness == Brightness.dark;
   final textTheme = baseTheme.textTheme;
   final chromeColor = isDark
-      ? const Color(0xFF161A22)
-      : const Color(0xFFF6F8FB);
-  final cardColor = isDark ? const Color(0xFF1C212B) : Colors.white;
+      ? const Color(0xFF181818)
+      : const Color(0xFFF7F7F7);
+  final cardColor = isDark ? const Color(0xFF1A252F) : Colors.white;
   final dividerColor = isDark
       ? const Color(0xFF2B3140)
-      : const Color(0xFFE6EBF2);
+      : const Color(0xFFE8EEF0);
   final appBarTitleStyle =
       (baseTheme.appBarTheme.titleTextStyle ?? textTheme.titleLarge)?.copyWith(
         fontWeight: FontWeight.w600,
@@ -608,7 +608,7 @@ ThemeData _buildChatScopedTheme(ThemeData baseTheme) {
     appBarTheme: baseTheme.appBarTheme.copyWith(
       centerTitle: true,
       backgroundColor: chromeColor,
-      foregroundColor: isDark ? Colors.white : const Color(0xFF141B24),
+      foregroundColor: isDark ? Colors.white : const Color(0xFF181818),
       surfaceTintColor: Colors.transparent,
       titleTextStyle: appBarTitleStyle,
     ),
@@ -634,7 +634,7 @@ ThemeData _buildChatScopedTheme(ThemeData baseTheme) {
     ),
     inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
       filled: true,
-      fillColor: isDark ? const Color(0xFF232938) : const Color(0xFFF3F6FA),
+      fillColor: isDark ? const Color(0xFF1A252F) : const Color(0xFFF7F7F7),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

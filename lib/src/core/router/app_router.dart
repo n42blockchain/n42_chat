@@ -734,7 +734,7 @@ class _ErrorPage extends StatelessWidget {
         backgroundColor: const Color(0xFFF7F7F7),
         foregroundColor: const Color(0xFF181818),
       ),
-      backgroundColor: const Color(0xFFEDEDED),
+      backgroundColor: const Color(0xFFF7F7F7),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

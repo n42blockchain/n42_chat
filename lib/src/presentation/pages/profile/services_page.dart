@@ -95,7 +95,7 @@ class ServicesPage extends StatelessWidget {
             _buildServiceItem(
               context,
               icon: Icons.monetization_on_outlined,
-              color: const Color(0xFFFF9500),
+              color: const Color(0xFFFF8C00),
               label: S.of(context)?.profileN42Bean ?? 'N42 Bean',
               cardColor: cardColor,
               textColor: textColor,

@@ -82,7 +82,7 @@ class ConversationTile extends StatelessWidget {
     if (isSelected) {
       bgColor = isDark ? const Color(0xFF2A3A50) : const Color(0xFFE3EFFD);
     } else if (conversation.isPinned) {
-      bgColor = isDark ? const Color(0xFF252525) : const Color(0xFFF5F5F5);
+      bgColor = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F7F7);
     } else {
       bgColor = context.surfaceColor;
     }

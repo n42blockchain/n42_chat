@@ -105,7 +105,7 @@ class Game2048Board extends StatelessWidget {
       case 8:
         return const Color(0xFFF2B179);
       case 16:
-        return const Color(0xFFF59563);
+        return const Color(0xFFFF8A65);
       case 32:
         return const Color(0xFFF67C5F);
       case 64:
@@ -121,7 +121,7 @@ class Game2048Board extends StatelessWidget {
       case 2048:
         return const Color(0xFFEDC22E);
       default:
-        return const Color(0xFF3C3A32);
+        return const Color(0xFF3D3D3D);
     }
   }
 }

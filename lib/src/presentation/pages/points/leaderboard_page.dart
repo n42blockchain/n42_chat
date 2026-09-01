@@ -130,7 +130,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 balance: top3[1],
                 rank: 2,
                 height: 130,
-                medalColor: const Color(0xFFC0C0C0),
+                medalColor: const Color(0xFFCCCCCC),
                 isCurrentUser: top3[1].userId == widget.currentUserId,
               ),
             ),

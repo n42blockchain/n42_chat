@@ -257,7 +257,7 @@ class _DayDot extends StatelessWidget {
                 ? const Color(0xFFFF6B35)
                 : (isDark
                     ? const Color(0xFF2A2A2A)
-                    : const Color(0xFFF0F0F0)),
+                    : const Color(0xFFF7F7F7)),
             border: isToday
                 ? Border.all(color: AppColors.primary, width: 2)
                 : null,

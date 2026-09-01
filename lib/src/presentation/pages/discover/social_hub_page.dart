@@ -83,7 +83,7 @@ class _SocialHubView extends StatelessWidget {
                       title: 'Create Story',
                       subtitle: 'Post a text or photo status.',
                       icon: Icons.add_circle_outline,
-                      color: const Color(0xFF3B82F6),
+                      color: const Color(0xFF3A76F0),
                       onTap: () => _openCreateStory(context),
                     ),
                     _QuickAction(
@@ -97,21 +97,21 @@ class _SocialHubView extends StatelessWidget {
                       title: S.of(context)?.commonMoments ?? 'Moments',
                       subtitle: 'Open the full feed and comments.',
                       icon: Icons.photo_library_outlined,
-                      color: const Color(0xFF6366F1),
+                      color: const Color(0xFF5865F2),
                       onTap: () => _openMoments(context),
                     ),
                     _QuickAction(
                       title: 'Moment Camera',
                       subtitle: 'Create a post and pick media immediately.',
                       icon: Icons.camera_alt_outlined,
-                      color: const Color(0xFFF59E0B),
+                      color: const Color(0xFFFF9900),
                       onTap: () => _openCreateMoment(context),
                     ),
                     _QuickAction(
                       title: S.of(context)?.discoverGames ?? 'Games',
                       subtitle: 'Launch the built-in casual game center.',
                       icon: Icons.sports_esports_outlined,
-                      color: const Color(0xFFEF4444),
+                      color: const Color(0xFFE64340),
                       onTap: () => _openGames(context),
                     ),
                     _QuickAction(

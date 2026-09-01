@@ -56,7 +56,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     ),
     _RedPacketCover(
       id: 'gold',
-      colors: [Color(0xFFFFB800), Color(0xFFFF8C00)],
+      colors: [Color(0xFFFFB300), Color(0xFFFF8C00)],
       name: 'Golden',
     ),
     _RedPacketCover(

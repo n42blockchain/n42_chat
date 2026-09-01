@@ -196,7 +196,7 @@ class WeChatMessageMenu extends StatelessWidget {
         // 主操作卡片
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF2C2C2E),
+            color: const Color(0xFF2A2A2A),
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
@@ -490,7 +490,7 @@ class WeChatMessageMenu extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2E),
+        color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
@@ -772,7 +772,7 @@ class RecalledMessageWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark
-                        ? const Color(0xFF57A5FF)
+                        ? const Color(0xFF4FACFE)
                         : const Color(0xFF576B95),
                   ),
                 ),

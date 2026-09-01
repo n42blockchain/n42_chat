@@ -28,7 +28,7 @@ class TimeSeparator extends StatelessWidget {
           customText ?? N42DateUtils.formatMessageTime(dateTime),
           style: TextStyle(
             fontSize: 12,
-            color: isDark ? const Color(0xFF808080) : const Color(0xFF999999),
+            color: isDark ? const Color(0xFF888888) : const Color(0xFF999999),
           ),
         ),
       ),

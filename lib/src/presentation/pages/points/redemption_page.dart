@@ -503,7 +503,7 @@ class _RedemptionCard extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isDisabled
                             ? (isDark
-                                ? const Color(0xFF333333)
+                                ? const Color(0xFF2A2A2A)
                                 : const Color(0xFFE0E0E0))
                             : AppColors.primary,
                         foregroundColor: isDisabled

@@ -200,9 +200,9 @@ class _ImageTextPageState extends State<ImageTextPage> {
   Widget build(BuildContext context) {
     final strings = ImageTextL10n.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: const Color(0xFF181818),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF111111),
+        backgroundColor: const Color(0xFF181818),
         foregroundColor: Colors.white,
         title: Text(
           _mode == ImageTextMode.extract
@@ -386,7 +386,7 @@ class _ImageTextPageState extends State<ImageTextPage> {
 
   Widget _buildActions(ImageTextL10n strings) => SafeArea(
     child: Material(
-      color: const Color(0xFF1C1C1E),
+      color: const Color(0xFF181818),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Row(

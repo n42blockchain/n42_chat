@@ -280,8 +280,8 @@ class _MomentListViewState extends State<_MomentListView> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: isDark
-                  ? [const Color(0xFF2C3E50), const Color(0xFF1A252F)]
-                  : [const Color(0xFF667eea), const Color(0xFF764ba2)],
+                  ? [const Color(0xFF2A3A50), const Color(0xFF1A252F)]
+                  : [const Color(0xFF667EEA), const Color(0xFF764BA2)],
             ),
           ),
         ),
@@ -793,8 +793,8 @@ class _MomentTile extends StatelessWidget {
                 child: Material(
                   borderRadius: BorderRadius.circular(6),
                   color: isDark
-                      ? const Color(0xFF4A4A4A)
-                      : const Color(0xFF4C4C4C),
+                      ? const Color(0xFF555555)
+                      : const Color(0xFF555555),
                   elevation: 4,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

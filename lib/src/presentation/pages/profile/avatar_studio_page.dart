@@ -248,7 +248,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
                 ? 'Replace NFT Avatar'
                 : (S.of(context)?.profileBindNftAvatar ?? 'Bind NFT Avatar'),
             subtitle: 'Use an on-chain collectible as your avatar.',
-            iconColor: const Color(0xFFFFB020),
+            iconColor: const Color(0xFFF9A825),
             onTap: _openNftPicker,
           ),
           if (user?.hasNftAvatar ?? false) ...[

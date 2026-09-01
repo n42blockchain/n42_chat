@@ -191,7 +191,7 @@ class PaymentRequestMessageWidget extends StatelessWidget {
   Color _getBackgroundColor() {
     switch (status) {
       case PaymentRequestMessageStatus.pending:
-        return const Color(0xFF2D9CDB);
+        return const Color(0xFF3498DB);
       case PaymentRequestMessageStatus.paid:
         return const Color(0xFFF9A825);
       case PaymentRequestMessageStatus.expired:

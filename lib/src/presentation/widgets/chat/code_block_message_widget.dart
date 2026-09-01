@@ -72,7 +72,7 @@ class CodeBlockMessageWidget extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(maxWidth: 320),
       decoration: BoxDecoration(
-        color: const Color(0xFF282C34), // atom-one-dark 背景
+        color: const Color(0xFF2A2A2A), // atom-one-dark 背景
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),

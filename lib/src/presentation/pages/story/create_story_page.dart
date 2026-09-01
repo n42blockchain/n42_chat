@@ -47,10 +47,10 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
   static const List<_ColorOption> _colorOptions = [
     _ColorOption(background: Color(0xFF1A73E8), text: Colors.white),
     _ColorOption(background: Color(0xFF34A853), text: Colors.white),
-    _ColorOption(background: Color(0xFFEA4335), text: Colors.white),
-    _ColorOption(background: Color(0xFFFBBC04), text: Colors.black),
+    _ColorOption(background: Color(0xFFE64340), text: Colors.white),
+    _ColorOption(background: Color(0xFFFFB300), text: Colors.black),
     _ColorOption(background: Color(0xFF9C27B0), text: Colors.white),
-    _ColorOption(background: Color(0xFF212121), text: Colors.white),
+    _ColorOption(background: Color(0xFF181818), text: Colors.white),
   ];
 
   int _selectedColorIndex = 0;

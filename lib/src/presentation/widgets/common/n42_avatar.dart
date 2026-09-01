@@ -156,7 +156,7 @@ class N42Avatar extends StatelessWidget {
       height: size + borderWidth * 2,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFFD700), Color(0xFFFFA500), Color(0xFFFFD700)],
+          colors: [Color(0xFFFFD700), Color(0xFFFF9900), Color(0xFFFFD700)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -178,7 +178,7 @@ class N42Avatar extends StatelessWidget {
         height: badgeSize * 0.7,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+            colors: [Color(0xFFFFD700), Color(0xFFFF9900)],
           ),
           borderRadius: BorderRadius.circular(3),
           border: Border.all(color: Colors.white, width: 1),

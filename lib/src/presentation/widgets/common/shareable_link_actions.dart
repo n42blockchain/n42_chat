@@ -340,7 +340,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                           decoration: BoxDecoration(
                             color: isDark
                                 ? Colors.white.withValues(alpha: 0.06)
-                                : const Color(0xFFF5F7FA),
+                                : const Color(0xFFF7F7F7),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Text(
