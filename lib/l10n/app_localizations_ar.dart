@@ -794,7 +794,7 @@ class SAr extends S {
   String get commonTransferTo => 'نقل إلى';
 
   @override
-  String commonFromSender(String name, Object senderName) {
+  String commonFromSender(String name) {
     return 'من $name';
   }
 

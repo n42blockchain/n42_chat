@@ -800,7 +800,7 @@ class SBn extends S {
   String get commonTransferTo => 'ট্রান্সফার করুন';
 
   @override
-  String commonFromSender(String name, Object senderName) {
+  String commonFromSender(String name) {
     return '$name থেকে';
   }
 
