@@ -2898,7 +2898,7 @@ class SPl extends S {
 
   @override
   String get authSsoNotConfigured =>
-      'This server has not configured SSO login providers';
+      'Na tym serwerze nie skonfigurowano dostawców logowania SSO';
 
   @override
   String get transferAmountHintZero => '0,00';

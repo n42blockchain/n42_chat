@@ -2743,5 +2743,6 @@
   "blocAuthChangeEmailFailed": "Не удалось изменить адрес электронной почты",
   "blocAuthVerificationCodeInvalid": "Код подтверждения неверен или срок его действия истек.",
   "blocAuthSessionExpired": "Срок сеанса истек, пожалуйста, войдите снова",
-  "blocAuthSessionIncomplete": "Данные сеанса неполные, пожалуйста, войдите снова"
+  "blocAuthSessionIncomplete": "Данные сеанса неполные, пожалуйста, войдите снова",
+  "authSsoNotConfigured": "На этом сервере не настроены провайдеры входа через SSO"
 }

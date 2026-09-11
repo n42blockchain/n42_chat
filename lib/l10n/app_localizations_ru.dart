@@ -2893,7 +2893,7 @@ class SRu extends S {
 
   @override
   String get authSsoNotConfigured =>
-      'This server has not configured SSO login providers';
+      'На этом сервере не настроены провайдеры входа через SSO';
 
   @override
   String get transferAmountHintZero => '0,00';

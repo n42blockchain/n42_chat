@@ -2880,7 +2880,7 @@ class STr extends S {
 
   @override
   String get authSsoNotConfigured =>
-      'This server has not configured SSO login providers';
+      'Bu sunucuda SSO oturum açma sağlayıcıları yapılandırılmamış';
 
   @override
   String get transferAmountHintZero => '0,00';

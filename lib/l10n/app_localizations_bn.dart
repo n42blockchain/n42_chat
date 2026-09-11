@@ -2879,7 +2879,7 @@ class SBn extends S {
 
   @override
   String get authSsoNotConfigured =>
-      'This server has not configured SSO login providers';
+      'এই সার্ভারে SSO লগইন প্রদানকারী কনফিগার করা নেই';
 
   @override
   String get transferAmountHintZero => '0.00';

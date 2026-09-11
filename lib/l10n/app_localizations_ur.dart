@@ -2888,7 +2888,7 @@ class SUr extends S {
 
   @override
   String get authSsoNotConfigured =>
-      'This server has not configured SSO login providers';
+      'اس سرور پر SSO لاگ اِن فراہم کنندگان ترتیب نہیں دیے گئے';
 
   @override
   String get transferAmountHintZero => '0.00';
