@@ -5814,4 +5814,7 @@ class SPl extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'Dane sesji są niekompletne. Proszę zalogować się ponownie';
+
+  @override
+  String get chatReadingMode => 'Tryb czytania';
 }

@@ -5765,4 +5765,7 @@ class SVi extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'Dữ liệu phiên không đầy đủ, vui lòng đăng nhập lại';
+
+  @override
+  String get chatReadingMode => 'Chế độ đọc';
 }

@@ -216,9 +216,7 @@ class _MomentListViewState extends State<_MomentListView> {
                         const SizedBox(height: 16),
                         Text(
                           s?.momentNoMomentsYet ?? 'No moments yet',
-                          style: TextStyle(
-                            color: context.textSecondary,
-                          ),
+                          style: TextStyle(color: context.textSecondary),
                         ),
                       ],
                     ),
@@ -368,15 +366,23 @@ class _MomentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return GestureDetector(
+      onSecondaryTapDown: (details) => _showActionPopup(
+        context,
+        context,
+        pointerPosition: details.globalPosition,
+      ),
+      child: _buildContent(context),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         border: Border(
-          bottom: BorderSide(
-            color: context.dividerColor,
-            width: 0.5,
-          ),
+          bottom: BorderSide(color: context.dividerColor, width: 0.5),
         ),
       ),
       child: Row(
@@ -682,26 +688,24 @@ class _MomentTile extends StatelessWidget {
     return Builder(
       builder: (buttonContext) => GestureDetector(
         onTap: () => _showActionPopup(context, buttonContext),
+        onSecondaryTapDown: (details) => _showActionPopup(
+          context,
+          buttonContext,
+          pointerPosition: details.globalPosition,
+        ),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: AppColors.inputBgOf(isDark),
             borderRadius: BorderRadius.circular(4),
           ),
-          child: Icon(
-            Icons.more_horiz,
-            size: 18,
-            color: context.textSecondary,
-          ),
+          child: Icon(Icons.more_horiz, size: 18, color: context.textSecondary),
         ),
       ),
     );
   }
 
-  List<_MomentActionItem> _buildActionItems(
-    BuildContext context,
-    BuildContext dialogContext,
-  ) {
+  List<_MomentActionItem> _buildActionItems(BuildContext context) {
     final items = <_MomentActionItem>[
       _MomentActionItem(
         icon: moment.isLikedByMe ? Icons.thumb_up : Icons.thumb_up_outlined,
@@ -709,7 +713,6 @@ class _MomentTile extends StatelessWidget {
             ? (S.of(context)?.momentUnlike ?? 'Unlike')
             : (S.of(context)?.momentLike ?? 'Like'),
         onTap: () {
-          Navigator.pop(dialogContext);
           if (moment.isLikedByMe) {
             context.read<MomentBloc>().add(UnlikeMoment(moment.id));
           } else {
@@ -721,7 +724,6 @@ class _MomentTile extends StatelessWidget {
         icon: Icons.chat_bubble_outline,
         label: S.of(context)?.momentComment ?? 'Comment',
         onTap: () {
-          Navigator.pop(dialogContext);
           _showCommentDialog(context);
         },
       ),
@@ -729,7 +731,6 @@ class _MomentTile extends StatelessWidget {
         icon: Icons.share_outlined,
         label: S.of(context)?.momentForward ?? 'Forward',
         onTap: () {
-          Navigator.pop(dialogContext);
           MomentForwardSheet.show(context, moment);
         },
       ),
@@ -741,7 +742,6 @@ class _MomentTile extends StatelessWidget {
           icon: Icons.delete_outline,
           label: S.of(context)?.momentDelete ?? 'Delete',
           onTap: () {
-            Navigator.pop(dialogContext);
             _showDeleteConfirmation(context);
           },
         ),
@@ -751,107 +751,43 @@ class _MomentTile extends StatelessWidget {
     return items;
   }
 
-  /// 微信风格的操作弹出栏
-  void _showActionPopup(BuildContext context, BuildContext anchorContext) {
-    final renderObject = anchorContext.findRenderObject();
-    if (renderObject is! RenderBox || !renderObject.hasSize) return;
-    final position = renderObject.localToGlobal(Offset.zero);
-    final size = renderObject.size;
-    final screenSize = MediaQuery.of(context).size;
-    final topInset = MediaQuery.of(context).padding.top;
-    final top = (position.dy + (size.height / 2) - 22.0)
-        .clamp(topInset + 8.0, screenSize.height - 56.0)
-        .toDouble();
-    final right = (screenSize.width - position.dx - size.width)
-        .clamp(12.0, screenSize.width - 12.0)
-        .toDouble();
-    final maxPopupWidth = (position.dx + size.width - 12.0)
-        .clamp(180.0, screenSize.width - 24.0)
-        .toDouble();
-
+  Future<void> _showActionPopup(
+    BuildContext context,
+    BuildContext anchorContext, {
+    Offset? pointerPosition,
+  }) async {
+    final overlay = Navigator.of(context).overlay?.context.findRenderObject();
+    final anchor = anchorContext.findRenderObject();
+    if (overlay is! RenderBox || anchor is! RenderBox || !anchor.hasSize)
+      return;
+    final origin = pointerPosition != null
+        ? overlay.globalToLocal(pointerPosition)
+        : anchor.localToGlobal(Offset.zero, ancestor: overlay);
+    final rect = origin & (pointerPosition == null ? anchor.size : Size.zero);
+    final actions = _buildActionItems(context);
     onActionMenuVisibilityChanged?.call(true);
-    showDialog<void>(
-      context: context,
-      barrierColor: Colors.transparent,
-      builder: (ctx) {
-        final actions = _buildActionItems(context, ctx);
-        return Stack(
-          children: [
-            // 点击空白区域关闭
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(ctx),
-                child: Container(color: Colors.transparent),
+    try {
+      final selected = await showMenu<int>(
+        context: context,
+        position: RelativeRect.fromRect(rect, Offset.zero & overlay.size),
+        items: [
+          for (var i = 0; i < actions.length; i++)
+            PopupMenuItem<int>(
+              value: i,
+              child: Row(
+                children: [
+                  Icon(actions[i].icon, size: 20),
+                  const SizedBox(width: 12),
+                  Flexible(child: Text(actions[i].label)),
+                ],
               ),
             ),
-            // 操作面板定位在 "..." 按钮左侧
-            Positioned(
-              right: right,
-              top: top,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: maxPopupWidth),
-                child: Material(
-                  borderRadius: BorderRadius.circular(6),
-                  color: isDark
-                      ? const Color(0xFF4A4A4A)
-                      : const Color(0xFF4C4C4C),
-                  elevation: 4,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (var i = 0; i < actions.length; i++) ...[
-                        _buildPopupAction(
-                          ctx,
-                          icon: actions[i].icon,
-                          label: actions[i].label,
-                          onTap: actions[i].onTap,
-                        ),
-                        if (i != actions.length - 1)
-                          Container(
-                            width: 1,
-                            height: 24,
-                            color: Colors.white24,
-                          ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    ).whenComplete(() {
+        ],
+      );
+      if (context.mounted && selected != null) actions[selected].onTap();
+    } finally {
       onActionMenuVisibilityChanged?.call(false);
-    });
-  }
-
-  Widget _buildPopupAction(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: Colors.white),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.3),
-            ),
-          ],
-        ),
-      ),
-    );
+    }
   }
 
   Widget _buildLikesAndComments(BuildContext context) {
@@ -881,11 +817,7 @@ class _MomentTile extends StatelessWidget {
           if (visibleLikes.isNotEmpty) ...[
             Row(
               children: [
-                const Icon(
-                  Icons.favorite,
-                  size: 14,
-                  color: AppColors.error,
-                ),
+                const Icon(Icons.favorite, size: 14, color: AppColors.error),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
@@ -902,10 +834,7 @@ class _MomentTile extends StatelessWidget {
               ],
             ),
             if (visibleComments.isNotEmpty)
-              Divider(
-                color: context.dividerColor,
-                height: 16,
-              ),
+              Divider(color: context.dividerColor, height: 16),
           ],
 
           // 评论列表
@@ -914,10 +843,7 @@ class _MomentTile extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 4),
               child: RichText(
                 text: TextSpan(
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: context.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 13, color: context.textPrimary),
                   children: [
                     TextSpan(
                       text: comment.userName,
@@ -1269,7 +1195,11 @@ class _MomentImageGalleryPageState extends State<_MomentImageGalleryPage> {
                 '${_currentIndex + 1}/${widget.imageUrls.length}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white, fontSize: 16, height: 1.3),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  height: 1.3,
+                ),
               )
             : null,
         centerTitle: true,
@@ -1299,7 +1229,11 @@ class _MomentImageGalleryPageState extends State<_MomentImageGalleryPage> {
                     errorWidget: (_, _, _) => Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error, color: AppColors.error, size: 48),
+                        const Icon(
+                          Icons.error,
+                          color: AppColors.error,
+                          size: 48,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           S.of(context)?.momentFailedToLoad ??

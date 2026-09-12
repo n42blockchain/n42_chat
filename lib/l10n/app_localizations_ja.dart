@@ -5660,4 +5660,7 @@ class SJa extends S {
 
   @override
   String get blocAuthSessionIncomplete => 'セッションデータが不完全です。再度ログインしてください。';
+
+  @override
+  String get chatReadingMode => '閲覧モード';
 }

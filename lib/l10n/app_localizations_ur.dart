@@ -5789,4 +5789,7 @@ class SUr extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'سیشن کا ڈیٹا نامکمل ہے، براہ کرم دوبارہ لاگ ان کریں۔';
+
+  @override
+  String get chatReadingMode => 'مطالعہ موڈ';
 }

@@ -5841,4 +5841,7 @@ class SFr extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'Données de session incomplètes, veuillez vous reconnecter';
+
+  @override
+  String get chatReadingMode => 'Mode lecture';
 }

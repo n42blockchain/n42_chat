@@ -5800,4 +5800,7 @@ class SIt extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'Dati della sessione incompleti, effettua nuovamente l\'accesso';
+
+  @override
+  String get chatReadingMode => 'Modalità lettura';
 }

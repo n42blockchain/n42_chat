@@ -5824,4 +5824,7 @@ class SDe extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'Sitzungsdaten unvollständig, bitte melden Sie sich erneut an';
+
+  @override
+  String get chatReadingMode => 'Lesemodus';
 }

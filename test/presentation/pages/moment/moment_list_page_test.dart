@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -103,7 +104,12 @@ void main() {
       final commentRect = tester.getRect(find.text('Comment'));
       expect(commentRect.left, lessThan(moreButtonRect.right));
       expect(commentRect.top, greaterThanOrEqualTo(moreButtonRect.top - 24));
-      expect(commentRect.top, lessThanOrEqualTo(moreButtonRect.bottom + 24));
+      final popupRect = tester.getRect(find.byType(PopupMenuItem<int>).first);
+      expect(popupRect.top, lessThanOrEqualTo(moreButtonRect.bottom + 8));
+      expect(
+        tester.getRect(find.byType(PopupMenuItem<int>).last).bottom,
+        lessThanOrEqualTo(tester.view.physicalSize.height),
+      );
 
       await tester.tapAt(const Offset(8, 8));
       await tester.pumpAndSettle();
@@ -126,6 +132,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Delete Moment'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('right click on a post opens actions and Like dispatches once', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildTestWidget(contactBloc: mockContactBloc));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('hello'), buttons: kSecondaryMouseButton);
+    await tester.pumpAndSettle();
+    expect(find.text('Like'), findsOneWidget);
+    await tester.tap(find.text('Like'));
+    await tester.pumpAndSettle();
+    verify(() => mockMomentBloc.add(const LikeMoment('moment-1'))).called(1);
+    expect(find.byType(PopupMenuItem<int>), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

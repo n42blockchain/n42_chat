@@ -5777,4 +5777,7 @@ class SBn extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'সেশন ডেটা অসম্পূর্ণ, অনুগ্রহ করে আবার লগইন করুন';
+
+  @override
+  String get chatReadingMode => 'পড়ার মোড';
 }

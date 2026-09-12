@@ -10690,6 +10690,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Session data incomplete, please login again'**
   String get blocAuthSessionIncomplete;
+
+  /// No description provided for @chatReadingMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading mode'**
+  String get chatReadingMode;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

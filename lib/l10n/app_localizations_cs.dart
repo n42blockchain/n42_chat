@@ -5789,4 +5789,7 @@ class SCs extends S {
   @override
   String get blocAuthSessionIncomplete =>
       'Údaje o relaci nejsou úplné, přihlaste se prosím znovu';
+
+  @override
+  String get chatReadingMode => 'Režim čtení';
 }

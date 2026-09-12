@@ -78,3 +78,25 @@ Neither implements a responding AI Matrix member. No bot account, inference
 worker or group-AI configuration exists in the audited source. Restoring a label
 would not restore that service. AUTO-002 records the required backend/member
 work and a real-room acceptance test; no test messages were sent to real chats.
+
+## M3: compact message and post actions
+
+Message actions now prioritize quote/copy/forward/thread/edit, with at most eight
+initial tiles and an explicit More control for the remaining actions. Null
+callbacks no longer create dead tiles. Expanded actions scroll above the
+keyboard; reaction buttons fit 320-pixel screens. Ephemeral content defensively
+hides persistence, translation, speech, thread and extraction actions. The quote
+preview uses one content line and a direction-aware leading border; tapping
+still navigates to the original message. Reading mode has ARB translations in
+all 26 shipped locale catalogs (generated with flutter gen-l10n).
+
+Desktop secondary click now opens the same message actions. Moment actions use
+a compact standard popup list instead of an overflowing horizontal bar; right
+click on a post also opens it. Like/comment/forward/delete callbacks are retained,
+and the compose FAB returns when the popup closes.
+
+Validation: 12 passing message-menu, image protection, bubble accessibility and
+Moment tests. New tests exercise More expansion and a final delete callback on
+320x640 with a 280-pixel keyboard and 1.5 text scale in en/ar, plus one-shot
+secondary-click callbacks on messages and posts. Static analysis of the changed
+UI files has no issues. Physical-device visual acceptance remains pending.
