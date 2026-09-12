@@ -286,7 +286,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Added: 2026-09-12
 - Evidence: host `docs/chat-audit-2026-09-12/DEVICE_RETRY_2026-09-12.md`; successful Flutter drive verbose log explicitly records app uninstall.
 - Current state: iPhone fixture UI tests passed, but Flutter drive's default cleanup removed the host app. The normal app was reinstalled; the missing initialization preference was restored and read back to avoid additional first-install keychain cleanup. This does not recover removed app-container files or prove wallet/Chat data continuity. The agent did not read or export private keys or mnemonics. Host automation now uses `--keep-app-running`, with regression coverage for both drive paths. The user's subsequently established Android Chat session was preserved during the retry.
-- Next step: verify wallet and Chat state in the normal iPhone app with the user; any recovery must use user-controlled backups. Do not mark this resolved based only on install success or fixture test results.
+- User update: Chat login on iPhone is now confirmed, as on Android. Current login availability does not establish preservation of previous chat history or wallet data.
+- Next step: verify wallet and historical Chat data in the normal iPhone app with the user; any recovery must use user-controlled backups. Do not mark this resolved based only on renewed login, install success or fixture test results.
 
 ## Resolved in the 2026-09-12 audit
 
