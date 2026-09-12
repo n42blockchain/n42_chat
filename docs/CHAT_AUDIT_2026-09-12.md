@@ -183,3 +183,9 @@ access before that device run can complete.
 The final review found that the relocate button moved the map without resetting the selected search result. Relocate now cancels/invalidate pending searches, clears the query, selects the real GPS result and updates the map center. The route-result regression verifies GPS latitude/longitude after relocation even when an older search completes.
 
 Host full suite: 4,163 passed; raw coverage 59,112/130,694 (45.23%). Host analyze: zero errors/warnings, 286 informational diagnostics. The host handoff removes the tracked Chat path override, pins the published audit commit and verifies resolved library/assets bytes against the cache. These host integration changes must be committed separately in n42appv2.
+
+## Device retry follow-up
+
+The same iPhone 13 UI fixture subsequently passed from GUI Terminal with `--disable-dds` (eight screenshots). The signing failure was caused by the agent's Background security context; the user's GUI keychain was already usable. See the host report `docs/chat-audit-2026-09-12/DEVICE_RETRY_2026-09-12.md` for evidence and limitations.
+
+The invocation exposed a serious test-runner default: Flutter drive stopped and uninstalled the host app after tests. The incident was disclosed; host runners now explicitly preserve the app. App-container data continuity is not certified by reinstalling the normal app or by the passing UI fixture. QA-007 tracks the remaining verification.

@@ -280,6 +280,14 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: all 26 ARB catalogs have matching English keys and no blank values. This does not cover direct UI literals: the conservative scanner found 539 candidates in 33 presentation directories, including on-device AI, points and system settings. Brands/examples are not necessarily defects. M1/M3/M4 localized the changed expression/actions labels, but the complete backlog is not fixed.
 - Next step: review and translate candidates by module, regenerate catalogs, then verify RTL and expanded text with real UI tests. Do not treat key parity as full translation coverage.
 
+### QA-007 iPhone data continuity after test-runner cleanup is unverified
+
+- Severity: H
+- Added: 2026-09-12
+- Evidence: host `docs/chat-audit-2026-09-12/DEVICE_RETRY_2026-09-12.md`; successful Flutter drive verbose log explicitly records app uninstall.
+- Current state: iPhone fixture UI tests passed, but Flutter drive's default cleanup removed the host app. The normal app was reinstalled; the missing initialization preference was restored and read back to avoid additional first-install keychain cleanup. This does not recover removed app-container files or prove wallet/Chat data continuity. The agent did not read or export private keys or mnemonics. Host automation now uses `--keep-app-running`, with regression coverage for both drive paths. The user's subsequently established Android Chat session was preserved during the retry.
+- Next step: verify wallet and Chat state in the normal iPhone app with the user; any recovery must use user-controlled backups. Do not mark this resolved based only on install success or fixture test results.
+
 ## Resolved in the 2026-09-12 audit
 
 ### INTEGRATION-001 Wallet build source differed from its declared Chat pin — Resolved
