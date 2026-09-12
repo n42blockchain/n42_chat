@@ -253,8 +253,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Severity: H
 - Added: 2026-09-12
 - Evidence: `docs/HOST_BASELINE_SYNC_2026-09-12.json`, host `pubspec.yaml` and local override.
-- Current state: 38 changed and 3 new shipped library files were absent from the declared `fa08010e` dependency. They are reconciled in this isolated audit branch, preserving canonical tests. The host still uses the old pin until the audit commits are published.
-- Next step: publish the audited plugin commits, update the host pin and cache, and verify builds resolve identical library sources.
+- Current state: 38 changed and 3 new shipped library files were absent from the declared `fa08010e` dependency. They are reconciled in this isolated audit branch, preserving canonical tests. The audited commits are published on `fix/chat-entry-audit-20260912`. The host handoff removes the tracked path override and checks the pinned Git package against the cache.
+- Closure evidence: require the host integration commit with its new pin, Git lock entry and `CHAT_SOURCE_MANIFEST_2026-09-12.json`; retain this issue until that host commit is published.
 
 ### AUTO-002 AI group membership and responding bot are absent
 

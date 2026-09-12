@@ -22,6 +22,7 @@ class ChatLocationPickerPage extends StatefulWidget {
 }
 
 class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
+  final _searchController = TextEditingController();
   Position? _currentPosition;
   String _currentAddress = 'Getting location...';
   bool _isLoading = true;
@@ -49,6 +50,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
     _searchGeneration++;
     _searchDebounce?.cancel();
     _mapController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -227,12 +229,16 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
   }
 
   void _moveToCurrentLocation() {
-    if (_currentPosition != null) {
-      _mapController.move(
-        LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-        15.0,
-      );
-    }
+    final position = _currentPosition;
+    if (position == null) return;
+    _searchDebounce?.cancel();
+    _searchGeneration++;
+    _searchController.clear();
+    setState(() {
+      _mapCenter = LatLng(position.latitude, position.longitude);
+      _generateNearbyPlaces(position);
+    });
+    _mapController.move(_mapCenter!, 15.0);
   }
 
   @override
@@ -371,6 +377,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                       padding: const EdgeInsets.all(12),
                       color: context.surfaceColor,
                       child: TextField(
+                        controller: _searchController,
                         decoration: InputDecoration(
                           hintText: S.of(context)?.chatSearchLocation ?? 'Search location',
                           prefixIcon: const Icon(Icons.search),

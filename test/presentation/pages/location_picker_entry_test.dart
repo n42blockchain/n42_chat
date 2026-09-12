@@ -94,4 +94,58 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     },
   );
+  testWidgets('relocate sends GPS coordinates and invalidates pending search', (
+    tester,
+  ) async {
+    Map<String, dynamic>? selected;
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () async {
+              selected = await Navigator.of(context).push<Map<String, dynamic>>(
+                MaterialPageRoute(
+                  builder: (_) => const ChatLocationPickerPage(),
+                ),
+              );
+            },
+            child: const Text('Open'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.enterText(find.byType(TextField), 'destination');
+    await tester.pump(const Duration(milliseconds: 550));
+    places.queries['destination']!.complete([
+      Location(latitude: 30, longitude: 40, timestamp: DateTime(2026)),
+    ]);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('Place 30.0'), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'pending');
+    await tester.pump(const Duration(milliseconds: 550));
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pump();
+    places.queries['pending']!.complete([
+      Location(latitude: 50, longitude: 60, timestamp: DateTime(2026)),
+    ]);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('My location'), findsOneWidget);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      isEmpty,
+    );
+    await tester.tap(find.text('Send'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(selected?['latitude'], 10);
+    expect(selected?['longitude'], 20);
+    expect(selected?['address'], '10.000000, 20.000000');
+  });
 }

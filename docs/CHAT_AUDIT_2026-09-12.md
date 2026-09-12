@@ -177,3 +177,9 @@ and unavailable AI. These use local fixtures, not real message delivery. iPhone
 compilation reached signing but both available development identities fail with
 errSecInternalComponent. The Mac login keychain must grant current private-key
 access before that device run can complete.
+
+## Final location regression and host handoff
+
+The final review found that the relocate button moved the map without resetting the selected search result. Relocate now cancels/invalidate pending searches, clears the query, selects the real GPS result and updates the map center. The route-result regression verifies GPS latitude/longitude after relocation even when an older search completes.
+
+Host full suite: 4,163 passed; raw coverage 59,112/130,694 (45.23%). Host analyze: zero errors/warnings, 286 informational diagnostics. The host handoff removes the tracked Chat path override, pins the published audit commit and verifies resolved library/assets bytes against the cache. These host integration changes must be committed separately in n42appv2.
