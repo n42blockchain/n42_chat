@@ -130,7 +130,28 @@ including generated localizations: 22,939 / 130,693 lines (17.55%); it is not a
 | PointsDashboardPage | Actual orphan; configuration-aware group entry wired and tested in M4. |
 | RedPacketHistoryPage | Alternate ledger UI; OrdersAndCardsPage already consumes the ledger. Do not add duplicate top-level navigation without consolidating filters and real settlement semantics. |
 | GroupListPage | Alternate implementation; contact list uses its own _GroupListPage. |
-| AboutPage | Alternate implementation; active Settings/Profile about flow and host callbacks exist. |
+| AboutPage | Recheck found that the optional Settings callback was never supplied by Profile. A default route to AboutPage is added in M5, without showing the old fabricated 1.0.0 version. |
 | CallDialog, MessageMenuSheet, ContactIndexBar | Legacy/alternate widgets; current calls use VoIP screens, chat uses ChatMessageMenuSheet/WeChatMessageMenu, contacts render their own index. No reason to restore duplicate UI. |
 
 The generated inventory remains a reference index, not a complete runtime proof.
+
+## M5: media/location and platform capability review
+
+The location picker no longer invents three nearby places by adding offsets to
+GPS coordinates. Search generations prevent obsolete geocoder responses from
+replacing newer results. Clearing results resets selection safely; confirmation
+uses the selected place's address, and map dragging selects the displayed center.
+The location widget regression passes with fake platform sources (map HTTP is
+blocked by Flutter test infrastructure, so this does not verify live map tiles).
+
+Settings About now has a default route and license entry; its fabricated default
+1.0.0 version is omitted. A widget test covers entry without host callbacks.
+LiveKit's recording controller no longer advertises a capability while its
+startRecording implementation always returns false without an egress backend.
+Remaining platform/automation limitations stay in the ledger. Personal reminder
+and whiteboard entries were found; stale "not implemented" ledger text has been
+corrected without treating unverified cross-device behavior as complete.
+
+Both USB devices were discovered on 2026-09-12: Android 16 and iPhone iOS 26.6.2.
+Discovery alone is not UI or messaging acceptance. Tests never send messages or
+transactions into real user conversations.

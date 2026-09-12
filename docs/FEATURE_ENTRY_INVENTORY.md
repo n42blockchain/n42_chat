@@ -4,7 +4,7 @@
 
 本表是静态构造引用索引，不代表按钮可点击、平台可见、消息正确收发或服务端验收通过。零外部引用是复核候选；同文件调用、构造函数 tear-off 和备用实现可能导致误报。外部引用也可能来自未启用代码。运行时结论见配套审计报告。
 
-纳入 656 个 Dart 源文件、329 个测试文件、173 个公开页面或页面组件类。
+纳入 656 个 Dart 源文件、331 个测试文件、173 个公开页面或页面组件类。
 
 ## 模块覆盖清单
 
@@ -52,7 +52,7 @@
 | transfer | 3 |
 | voice_room | 2 |
 
-测试目录分布：core/utils: 1、integration/auth_flow_test.dart: 1、integration/bridge: 2、integration/wallet_bridge_test.dart: 1、live/live_media_smoke_test.dart: 1、localization/sso_localization_test.dart: 1、n42_chat_test.dart: 1、presentation/pages: 33、presentation/widgets: 7、unit/blocs: 74、unit/config: 2、unit/core: 8、unit/datasources: 20、unit/domain: 1、unit/encryption: 1、unit/entities: 54、unit/game: 6、unit/helpers: 5、unit/image_upload_test.dart: 1、unit/integration: 3、unit/repositories: 16、unit/services: 48、unit/theme: 1、unit/utils: 27、unit/widgets: 14。
+测试目录分布：core/utils: 1、integration/auth_flow_test.dart: 1、integration/bridge: 2、integration/wallet_bridge_test.dart: 1、live/live_media_smoke_test.dart: 1、localization/sso_localization_test.dart: 1、n42_chat_test.dart: 1、presentation/pages: 35、presentation/widgets: 7、unit/blocs: 74、unit/config: 2、unit/core: 8、unit/datasources: 20、unit/domain: 1、unit/encryption: 1、unit/entities: 54、unit/game: 6、unit/helpers: 5、unit/image_upload_test.dart: 1、unit/integration: 3、unit/repositories: 16、unit/services: 48、unit/theme: 1、unit/utils: 27、unit/widgets: 14。
 
 测试计数按目录归属，不把文件数当作行为覆盖率。
 
@@ -77,7 +77,7 @@
 | chat | `ChatDetailPage` | [chat_detail_page.dart:43](../lib/src/presentation/pages/chat/chat_detail_page.dart) | [chat_page_event_handlers.dart](../lib/src/presentation/pages/chat/chat_page_event_handlers.dart) |
 | chat | `ChatExportPage` | [chat_export_page.dart:14](../lib/src/presentation/pages/chat/chat_export_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[chat_detail_page.dart](../lib/src/presentation/pages/chat/chat_detail_page.dart) |
 | chat | `ChatFolderManagementPage` | [chat_folder_management_page.dart:16](../lib/src/presentation/pages/chat/chat_folder_management_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart) |
-| chat | `ChatLocationDetailPage` | [location_picker_page.dart:502](../lib/src/presentation/pages/chat/location_picker_page.dart) | [chat_page_event_handlers.dart](../lib/src/presentation/pages/chat/chat_page_event_handlers.dart) |
+| chat | `ChatLocationDetailPage` | [location_picker_page.dart:477](../lib/src/presentation/pages/chat/location_picker_page.dart) | [chat_page_event_handlers.dart](../lib/src/presentation/pages/chat/chat_page_event_handlers.dart) |
 | chat | `ChatLocationPickerPage` | [location_picker_page.dart:17](../lib/src/presentation/pages/chat/location_picker_page.dart) | [chat_page_more_features.dart](../lib/src/presentation/pages/chat/chat_page_more_features.dart) |
 | chat | `ChatLockPage` | [chat_lock_page.dart:14](../lib/src/presentation/pages/chat/chat_lock_page.dart) | [n42_chat.dart](../lib/src/n42_chat.dart)<br>[chat_main_page.dart](../lib/src/presentation/pages/main/chat_main_page.dart) |
 | chat | `ChatPage` | [chat_page.dart:152](../lib/src/presentation/pages/chat/chat_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[n42_chat.dart](../lib/src/n42_chat.dart)<br>[contact_list_page.dart](../lib/src/presentation/pages/contact/contact_list_page.dart)<br>[chat_main_page.dart](../lib/src/presentation/pages/main/chat_main_page.dart)<br>[space_detail_page.dart](../lib/src/presentation/pages/space/space_detail_page.dart) |
@@ -193,7 +193,7 @@
 | security | `EmojiVerificationWidget` | [emoji_verification_widget.dart:10](../lib/src/presentation/pages/security/emoji_verification_widget.dart) | [sas_verification_page.dart](../lib/src/presentation/pages/security/sas_verification_page.dart) |
 | security | `NumberVerificationWidget` | [emoji_verification_widget.dart:92](../lib/src/presentation/pages/security/emoji_verification_widget.dart) | [sas_verification_page.dart](../lib/src/presentation/pages/security/sas_verification_page.dart) |
 | security | `SasVerificationPage` | [sas_verification_page.dart:35](../lib/src/presentation/pages/security/sas_verification_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[security_settings_page.dart](../lib/src/presentation/pages/settings/security_settings_page.dart) |
-| settings | `AboutPage` | [about_page.dart:10](../lib/src/presentation/pages/settings/about_page.dart) | 需人工复核：无外部构造调用 |
+| settings | `AboutPage` | [about_page.dart:10](../lib/src/presentation/pages/settings/about_page.dart) | [settings_page.dart](../lib/src/presentation/pages/settings/settings_page.dart) |
 | settings | `AccountSwitchPage` | [account_switch_page.dart:17](../lib/src/presentation/pages/settings/account_switch_page.dart) | [profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart)<br>[system_accounts_page.dart](../lib/src/presentation/pages/settings/system_accounts_page.dart) |
 | settings | `AppearanceSettingsPage` | [appearance_settings_page.dart:13](../lib/src/presentation/pages/settings/appearance_settings_page.dart) | [profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart) |
 | settings | `AutoDownloadSettingsPage` | [auto_download_settings_page.dart:12](../lib/src/presentation/pages/settings/auto_download_settings_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[chat_detail_page.dart](../lib/src/presentation/pages/chat/chat_detail_page.dart)<br>[settings_page.dart](../lib/src/presentation/pages/settings/settings_page.dart) |
@@ -211,7 +211,7 @@
 | settings | `QuickRepliesPage` | [quick_replies_page.dart:12](../lib/src/presentation/pages/settings/quick_replies_page.dart) | [chat_page_input.dart](../lib/src/presentation/pages/chat/chat_page_input.dart)<br>[settings_page.dart](../lib/src/presentation/pages/settings/settings_page.dart) |
 | settings | `RoomStorageDetailPage` | [room_storage_detail_page.dart:15](../lib/src/presentation/pages/settings/room_storage_detail_page.dart) | [chat_detail_page.dart](../lib/src/presentation/pages/chat/chat_detail_page.dart)<br>[storage_management_page.dart](../lib/src/presentation/pages/settings/storage_management_page.dart) |
 | settings | `SecuritySettingsPage` | [security_settings_page.dart:28](../lib/src/presentation/pages/settings/security_settings_page.dart) | [chat_detail_page.dart](../lib/src/presentation/pages/chat/chat_detail_page.dart)<br>[profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart)<br>[privacy_security_page.dart](../lib/src/presentation/pages/settings/privacy_security_page.dart)<br>[system_accounts_page.dart](../lib/src/presentation/pages/settings/system_accounts_page.dart)<br>[recovery_key_reminder_dialog.dart](../lib/src/presentation/widgets/settings/recovery_key_reminder_dialog.dart) |
-| settings | `SettingsPage` | [settings_page.dart:21](../lib/src/presentation/pages/settings/settings_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart) |
+| settings | `SettingsPage` | [settings_page.dart:22](../lib/src/presentation/pages/settings/settings_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart) |
 | settings | `StorageManagementPage` | [storage_management_page.dart:22](../lib/src/presentation/pages/settings/storage_management_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[settings_page.dart](../lib/src/presentation/pages/settings/settings_page.dart) |
 | settings | `SystemAccountsPage` | [system_accounts_page.dart:27](../lib/src/presentation/pages/settings/system_accounts_page.dart) | [settings_page.dart](../lib/src/presentation/pages/settings/settings_page.dart) |
 | settings | `Totp2faSetupPage` | [totp_2fa_setup_page.dart:17](../lib/src/presentation/pages/settings/totp_2fa_setup_page.dart) | [security_settings_page.dart](../lib/src/presentation/pages/settings/security_settings_page.dart) |

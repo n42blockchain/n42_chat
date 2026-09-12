@@ -36,6 +36,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
   // 附近地点列表
   List<NearbyPlace> _nearbyPlaces = [];
   int _selectedPlaceIndex = 0;
+  int _searchGeneration = 0;
 
   @override
   void initState() {
@@ -45,6 +46,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
 
   @override
   void dispose() {
+    _searchGeneration++;
     _searchDebounce?.cancel();
     _mapController.dispose();
     super.dispose();
@@ -139,6 +141,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
 
   void _searchPlaces(String query) {
     _searchDebounce?.cancel();
+    final generation = ++_searchGeneration;
     if (query.trim().isEmpty) {
       // 清空搜索时恢复附近地点
       if (_currentPosition != null) {
@@ -150,7 +153,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
     _searchDebounce = Timer(const Duration(milliseconds: 500), () async {
       try {
         final locations = await geocoding.locationFromAddress(query);
-        if (!mounted) return;
+        if (!mounted || generation != _searchGeneration) return;
 
         final results = <NearbyPlace>[];
         for (final loc in locations.take(5)) {
@@ -171,7 +174,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
           ));
         }
 
-        if (mounted) {
+        if (mounted && generation == _searchGeneration) {
           setState(() {
             _nearbyPlaces = results;
             _selectedPlaceIndex = 0;
@@ -193,7 +196,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
   void _generateNearbyPlaces(Position position) {
     final l10n = S.of(context);
     final myLocation = l10n?.chatMyLocation ?? 'My Location';
-    final currentLocation = l10n?.chatCurrentLocation ?? 'Current Location';
+    _selectedPlaceIndex = 0;
 
     _nearbyPlaces = [
       NearbyPlace(
@@ -204,52 +207,21 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         icon: Icons.my_location,
         iconColor: AppColors.primary,
       ),
-      NearbyPlace(
-        name: currentLocation,
-        address: '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}',
-        latitude: position.latitude,
-        longitude: position.longitude,
-        icon: Icons.location_on,
-        iconColor: AppColors.error,
-      ),
-      NearbyPlace(
-        name: l10n?.chatNearbyPlace(1) ?? 'Nearby Place 1',
-        address: l10n?.chatApproximateDistance('100m') ?? 'About 100m',
-        latitude: position.latitude + 0.001,
-        longitude: position.longitude + 0.001,
-        icon: Icons.place,
-        iconColor: AppColors.warning,
-      ),
-      NearbyPlace(
-        name: l10n?.chatNearbyPlace(2) ?? 'Nearby Place 2',
-        address: l10n?.chatApproximateDistance('200m') ?? 'About 200m',
-        latitude: position.latitude - 0.001,
-        longitude: position.longitude + 0.002,
-        icon: Icons.place,
-        iconColor: AppColors.warning,
-      ),
-      NearbyPlace(
-        name: l10n?.chatNearbyPlace(3) ?? 'Nearby Place 3',
-        address: l10n?.chatApproximateDistance('500m') ?? 'About 500m',
-        latitude: position.latitude + 0.002,
-        longitude: position.longitude - 0.002,
-        icon: Icons.place,
-        iconColor: AppColors.warning,
-      ),
+
     ];
   }
 
   void _confirmLocation() {
     if (_currentPosition == null) return;
 
-    final selectedPlace = _nearbyPlaces.isNotEmpty
+    final selectedPlace = _selectedPlaceIndex >= 0 && _selectedPlaceIndex < _nearbyPlaces.length
         ? _nearbyPlaces[_selectedPlaceIndex]
         : null;
 
     Navigator.pop(context, {
-      'latitude': selectedPlace?.latitude ?? _currentPosition!.latitude,
-      'longitude': selectedPlace?.longitude ?? _currentPosition!.longitude,
-      'address': _currentAddress,
+      'latitude': selectedPlace?.latitude ?? _mapCenter?.latitude ?? _currentPosition!.latitude,
+      'longitude': selectedPlace?.longitude ?? _mapCenter?.longitude ?? _currentPosition!.longitude,
+      'address': selectedPlace?.address ?? '${_mapCenter?.latitude ?? _currentPosition!.latitude}, ${_mapCenter?.longitude ?? _currentPosition!.longitude}',
       'name': selectedPlace?.name ?? (S.of(context)?.chatMyLocation ?? 'My Location'),
     });
   }
@@ -352,7 +324,10 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                               initialZoom: 15.0,
                               onPositionChanged: (pos, hasGesture) {
                                 if (hasGesture) {
-                                  _mapCenter = pos.center;
+                                  setState(() {
+                                    _mapCenter = pos.center;
+                                    _selectedPlaceIndex = -1;
+                                  });
                                 }
                               },
                             ),

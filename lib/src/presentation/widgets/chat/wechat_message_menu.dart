@@ -323,14 +323,22 @@ class WeChatMessageMenu extends StatelessWidget {
       Icons.alarm_add_outlined,
       s?.commonRemind ?? 'Remind',
       onRemindMe,
+      allowed: persistent,
     );
     add(
       'remind',
       Icons.notifications_outlined,
       s?.commonRemind ?? 'Remind',
       onRemind,
+      allowed: persistent,
     );
-    add('search', Icons.search, s?.commonSearch ?? 'Search', onSearch);
+    add(
+      'search',
+      Icons.search,
+      s?.commonSearch ?? 'Search',
+      onSearch,
+      allowed: persistent,
+    );
     add(
       'recall',
       Icons.undo_outlined,
@@ -506,7 +514,7 @@ class _CompactActionCardState extends State<_CompactActionCard> {
                     'more',
                     _expanded ? Icons.expand_less : Icons.more_horiz,
                     _expanded
-                        ? (S.of(context)?.commonClose ?? 'Close')
+                        ? MaterialLocalizations.of(context).expandedIconTapHint
                         : (S.of(context)?.commonMore ?? 'More'),
                     () => setState(() => _expanded = !_expanded),
                     width,

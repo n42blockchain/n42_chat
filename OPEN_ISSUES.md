@@ -11,13 +11,13 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
-### SOCIAL-001 Nearby people is still not implemented as a real discovery feature
+### SOCIAL-001 Nearby discovery is limited to location-bearing Moments
 
 - Severity: M
-- Added: 2026-03-21
-- Evidence: `lib/src/presentation/pages/discover/discover_page.dart`, `lib/src/presentation/pages/chat/location_picker_page.dart`
-- Current state: entertainment/social review confirmed that Moments, Stories, Games, QR scan, Voice Rooms, and Mini Apps already exist, and Discover now exposes the reusable Live/Mini App entries. However there is still no dedicated nearby-people repository, proximity protocol, privacy consent flow, or real "people around me" page. The only nearby-related UI in the repo today is place selection for location sharing, which is not user discovery.
-- Next step: define the proximity model first, for example explicit ephemeral location sharing, server-side geo buckets, or a privacy-preserving nearby service, then add the opt-in UI and ranking/filtering rules on top of that data source.
+- Updated: 2026-09-12
+- Evidence: `lib/src/presentation/pages/discover/nearby_page.dart`, `discover_page.dart`
+- Current state: a real NearbyPage now exists and derives candidates from visible Moments with coordinates, after location permission. The previous claim that no discovery page exists was stale. This is not a dedicated proximity-presence protocol or complete people-discovery service.
+- Next step: verify consent/visibility/expiry in a controlled multi-user scenario and define any broader discovery backend separately.
 
 ### SOCIAL-002 AR effects are still missing beyond reusable image filters/editor tools
 
@@ -43,21 +43,21 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: status posts now store expiry metadata and the client clears expired statuses on session restore/profile reads instead of treating "visible for 24 hours" as a pure label. However the expiry is still enforced by the owner's client path. Other users still only see Matrix presence text, so there is no canonical shared expiry event that remote clients can independently honor.
 - Next step: define a shared status-expiry model, for example room/state/account-data that contacts can read or a server-shaped ephemeral-status API, then migrate contact rendering off plain presence text for this feature.
 
-### OFFICE-001 Task / todo and calendar collaboration are still not implemented
+### OFFICE-001 Collaborative tasks and calendar synchronization remain incomplete
 
 - Severity: M
-- Added: 2026-03-21
-- Evidence: no task entity, assignee/state model, calendar sync datasource, or task/calendar UI flow was added in the recent office-collaboration review of `lib/` and `test/`.
-- Current state: chat search, rich text, mentions, export/backup, and basic collaboration primitives exist, but there is still no real task/todo domain model or calendar integration path.
-- Next step: define a task entity + storage/sync model first, then decide whether calendar support should be Matrix state/account data, an external CalDAV/ICS bridge, or both.
+- Updated: 2026-09-12
+- Evidence: `lib/src/core/services/reminder_service.dart`, `chat_page_message_actions.dart`, `favorite_list_page.dart`
+- Current state: personal reminders exist, persist as FavoriteEntity values, and are reached from the message menu/favorites. The previous "no todo model" claim was stale. The periodic notifier only runs while the app process is alive; there is no assignee workflow or shared calendar sync.
+- Next step: verify notifications after process termination and define collaborative assignment/calendar semantics before claiming full task collaboration.
 
-### OFFICE-002 Whiteboard and spreadsheet collaboration are still absent
+### OFFICE-002 Whiteboard collaboration needs multi-client acceptance; spreadsheets are absent
 
 - Severity: M
-- Added: 2026-03-21
-- Evidence: no canvas/whiteboard renderer, drawing sync protocol, spreadsheet grid/editor, or collaborative state engine was found in the current codebase.
-- Current state: rich-text messages and document preview exist, but there is still no shared whiteboard/canvas or worksheet-style collaboration surface.
-- Next step: choose a collaboration engine (CRDT/OT or server-owned state) and a rendering/editor stack before wiring room permissions and persistence.
+- Updated: 2026-09-12
+- Evidence: `lib/src/presentation/pages/chat/whiteboard_page.dart`, `lib/src/presentation/widgets/chat/whiteboard/whiteboard_controller.dart`
+- Current state: drawing/export and Matrix stroke/clear exchange exist with a chat entry. The previous "no renderer" claim was stale. Concurrent drawing, offline recovery and room permissions have not been accepted on multiple real clients; there is no spreadsheet editor.
+- Next step: validate multi-client convergence and persistence, then scope spreadsheet collaboration independently.
 
 ### OFFICE-003 Audit logging is still missing
 
@@ -263,3 +263,19 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Evidence: `lib/src/presentation/pages/group/bot_settings_page.dart`, `lib/src/core/services/bot_command_processor.dart`, `lib/src/n42_chat_config.dart`
 - Current state: private AI routes exist and are repaired in M2. Group bot settings only configure welcome/webhook automation. There is no AI Matrix bot identity, invitation-specific configuration, response worker or group-context policy in this checkout. The local device build also lacks an AI provider key/model configuration.
 - Next step: provide/deploy a responding bot service, specify bot identity and group disclosure/context rules, then wire invitation/member state and verify mention/response/removal in an isolated test room. Ordinary member invitation is not evidence of AI responses.
+
+### MEDIA-005 Sticker pack sharing and importing are still stubs
+
+- Severity: M
+- Added: 2026-09-12
+- Evidence: `lib/src/data/repositories/sticker_repository_impl.dart` importPack/getPackShareUrl
+- Current state: installed/custom packs, upload, search and sending exist; these two cross-user sharing methods still return null. There is no verified share-manifest or import preview path. Do not claim a full sticker sharing ecosystem.
+- Next step: define persistent pack distribution, resource validation and receiver preview/install, then wire and test both sender and receiver.
+
+### INTEGRATION-002 Standalone Settings still relies on host callbacks for account actions
+
+- Severity: M
+- Added: 2026-09-12
+- Evidence: `lib/src/presentation/pages/settings/settings_page.dart`, `profile_page.dart`, `core/router/app_router.dart`
+- Current state: Profile supplies notification/privacy/appearance/security/account/password/email/language/logout actions, but the direct Settings route supplies none. About now has a tested default. The generic Chat slot has no consumer; related download/background/translation/quick-reply entries exist separately. These optional slots must not be reported as standalone end-to-end settings support.
+- Next step: centralize settings composition and persistence for direct routes and Profile, preserving host overrides and account permissions.
