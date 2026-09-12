@@ -36,10 +36,12 @@ void main() {
     getIt.registerSingleton<IAiRepository>(mockRepo);
 
     when(() => mockRepo.aiService).thenReturn(mockService);
-    when(() => mockRepo.getDefaultAssistant())
-        .thenAnswer((_) async => defaultAssistant);
-    when(() => mockRepo.getChatHistory(defaultAssistant.id))
-        .thenAnswer((_) async => const []);
+    when(
+      () => mockRepo.getDefaultAssistant(),
+    ).thenAnswer((_) async => defaultAssistant);
+    when(
+      () => mockRepo.getChatHistory(defaultAssistant.id),
+    ).thenAnswer((_) async => const []);
   });
 
   tearDown(() async {
@@ -62,8 +64,9 @@ void main() {
     );
   }
 
-  testWidgets('send button enables only when draft text exists',
-      (tester) async {
+  testWidgets('send button enables only when draft text exists', (
+    tester,
+  ) async {
     when(() => mockRepo.isAvailable).thenReturn(true);
 
     await tester.pumpWidget(buildApp());
@@ -77,8 +80,9 @@ void main() {
     expect(tester.widget<IconButton>(sendButtonFinder()).onPressed, isNotNull);
   });
 
-  testWidgets('send button stays disabled when AI service is unavailable',
-      (tester) async {
+  testWidgets('send button stays disabled when AI service is unavailable', (
+    tester,
+  ) async {
     when(() => mockRepo.isAvailable).thenReturn(false);
 
     await tester.pumpWidget(buildApp());
@@ -86,5 +90,33 @@ void main() {
 
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
     expect(tester.widget<IconButton>(sendButtonFinder()).onPressed, isNull);
+  });
+  testWidgets(
+    'unconfigured direct entry renders status instead of a DI exception',
+    (tester) async {
+      await getIt.reset();
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      expect(find.text('AI service not configured'), findsOneWidget);
+      expect(find.byType(TextField), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('direct settings entry owns an initialized AI bloc', (
+    tester,
+  ) async {
+    when(() => mockRepo.isAvailable).thenReturn(true);
+    await tester.pumpWidget(
+      const MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: AiAssistantPage(showSettings: true),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Test AI'), findsOneWidget);
+    expect(find.text('gpt-4o-mini'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

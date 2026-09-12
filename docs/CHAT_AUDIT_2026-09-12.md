@@ -54,3 +54,27 @@ sticker selection/usage callbacks, lazy GIF loading, en/zh/ar at 1.5 text scale,
 and the bottom safe area. These are automated widget checks, not physical-device
 or authenticated provider acceptance. No credentials were added to the plugin;
 a build without GIF provider configuration still reports unavailable.
+
+## M2: AI assistant entries and routing
+
+The conversation add panel now always offers AI Assistant, and Profile has a
+persistent assistant entry. Missing provider configuration opens a localized
+status page instead of hiding the capability or throwing a GetIt exception.
+The direct AI settings route creates its own initialized bloc; navigation from
+an active assistant continues to share that assistant's bloc. The page reuses
+the registered bloc factory so its wallet bridge is preserved. The repository
+uses the existing local/cloud router, respecting the local-model preference.
+Raw user prompts were removed from assistant diagnostic logging.
+
+Validation: 34 passing AI page/bloc tests, including missing DI, unavailable
+composer, and direct settings navigation. The current local device build-defines
+file has no GIPHY_API_KEY, TENOR_API_KEY, AI_API_KEY or LOCAL_LLM_MODEL_URL;
+only presence was inspected. The host intentionally disables GIF/AI proxy mode.
+These code fixes cannot supply missing external service credentials.
+
+Group AI remains an explicit gap: BotSettingsPage configures welcome messages
+and client-session webhooks; BotCommandProcessor implements utility commands.
+Neither implements a responding AI Matrix member. No bot account, inference
+worker or group-AI configuration exists in the audited source. Restoring a label
+would not restore that service. AUTO-002 records the required backend/member
+work and a real-room acceptance test; no test messages were sent to real chats.

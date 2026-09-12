@@ -255,3 +255,11 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Evidence: `docs/HOST_BASELINE_SYNC_2026-09-12.json`, host `pubspec.yaml` and local override.
 - Current state: 38 changed and 3 new shipped library files were absent from the declared `fa08010e` dependency. They are reconciled in this isolated audit branch, preserving canonical tests. The host still uses the old pin until the audit commits are published.
 - Next step: publish the audited plugin commits, update the host pin and cache, and verify builds resolve identical library sources.
+
+### AUTO-002 AI group membership and responding bot are absent
+
+- Severity: H
+- Added: 2026-09-12
+- Evidence: `lib/src/presentation/pages/group/bot_settings_page.dart`, `lib/src/core/services/bot_command_processor.dart`, `lib/src/n42_chat_config.dart`
+- Current state: private AI routes exist and are repaired in M2. Group bot settings only configure welcome/webhook automation. There is no AI Matrix bot identity, invitation-specific configuration, response worker or group-context policy in this checkout. The local device build also lacks an AI provider key/model configuration.
+- Next step: provide/deploy a responding bot service, specify bot identity and group disclosure/context rules, then wire invitation/member state and verify mention/response/removal in an isolated test room. Ordinary member invitation is not evidence of AI responses.
