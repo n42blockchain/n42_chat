@@ -554,6 +554,22 @@ void main() {
       );
     });
 
+    test(
+      'rapid password requests keep identity without exposing passwords',
+      () {
+        final events = List.generate(
+          1000,
+          (_) => AuthChangePasswordRequested(
+            oldPassword: 'old-test-password',
+            newPassword: 'new-test-password',
+          ),
+        );
+        expect(events.toSet(), hasLength(events.length));
+        expect(events.first, equals(events.first));
+        expect(events.first.toString(), isNot(contains('test-password')));
+      },
+    );
+
     test('is an AuthEvent', () {
       expect(
         AuthChangePasswordRequested(oldPassword: 'o', newPassword: 'n'),

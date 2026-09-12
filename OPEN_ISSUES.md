@@ -247,3 +247,11 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Added: 2026-03-21
 - Current state: the recent system/account-management pass wired saved-account switching, appearance persistence, and notification settings into the real runtime and covered them with analyze plus unit tests. However the new flows were not exercised against two real Matrix accounts/devices, so there is still no live confirmation that account switching, pusher re-registration, and restored appearance/notification preferences behave correctly across a real homeserver session change.
 - Next step: run a smoke with at least two real accounts on the shared homeserver, switch between them on one device, and verify push registration, active room behavior, font/theme persistence, and DND/sound settings after restart.
+
+### INTEGRATION-001 Wallet build source differs from its declared Chat pin
+
+- Severity: H
+- Added: 2026-09-12
+- Evidence: `docs/HOST_BASELINE_SYNC_2026-09-12.json`, host `pubspec.yaml` and local override.
+- Current state: 38 changed and 3 new shipped library files were absent from the declared `fa08010e` dependency. They are reconciled in this isolated audit branch, preserving canonical tests. The host still uses the old pin until the audit commits are published.
+- Next step: publish the audited plugin commits, update the host pin and cache, and verify builds resolve identical library sources.
