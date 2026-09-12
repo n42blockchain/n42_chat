@@ -1,7 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:n42_chat/src/core/services/remark_service.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/domain/entities/contact_entity.dart';

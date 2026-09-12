@@ -67,7 +67,7 @@ void main() {
       'does nothing when roomId is null (initial state)',
       build: buildBloc,
       act: (bloc) => bloc.add(const LoadMoreThreadMessages()),
-      expect: () => [],
+      expect: () => <Never>[],
     );
 
     blocTest<ThreadBloc, ThreadState>(
@@ -75,7 +75,7 @@ void main() {
       build: buildBloc,
       seed: () => _seedWithThread(hasMore: false),
       act: (bloc) => bloc.add(const LoadMoreThreadMessages()),
-      expect: () => [],
+      expect: () => <Never>[],
     );
 
     blocTest<ThreadBloc, ThreadState>(
@@ -161,7 +161,7 @@ void main() {
         imageBytes: [1, 2, 3],
         filename: 'img.jpg',
       )),
-      expect: () => [],
+      expect: () => <Never>[],
     );
 
     blocTest<ThreadBloc, ThreadState>(
@@ -235,7 +235,7 @@ void main() {
         fileBytes: [4, 5, 6],
         filename: 'doc.pdf',
       )),
-      expect: () => [],
+      expect: () => <Never>[],
     );
 
     blocTest<ThreadBloc, ThreadState>(

@@ -136,7 +136,7 @@ void main() {
       build: buildBloc,
       // initial state has no roomId
       act: (bloc) => bloc.add(const LoadThreadMessages()),
-      expect: () => [],
+      expect: () => <Never>[],
     );
   });
 
@@ -186,7 +186,7 @@ void main() {
       build: buildBloc,
       // initial state — roomId is null
       act: (bloc) => bloc.add(const SendThreadTextMessage('Should be skipped')),
-      expect: () => [],
+      expect: () => <Never>[],
     );
   });
 
@@ -247,7 +247,7 @@ void main() {
       build: buildBloc,
       act: (bloc) => bloc.add(const DisposeThread()),
       // DisposeThread just cancels subscription, no state change
-      expect: () => [],
+      expect: () => <Never>[],
     );
   });
 

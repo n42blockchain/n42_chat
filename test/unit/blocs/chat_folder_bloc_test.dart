@@ -215,7 +215,7 @@ void main() {
       act: (bloc) => bloc.add(
         UpdateChatFolder(ChatFolderEntity.all.copyWith(name: 'Hacked')),
       ),
-      expect: () => [],
+      expect: () => <Never>[],
     );
 
     blocTest<ChatFolderBloc, ChatFolderState>(
@@ -268,7 +268,7 @@ void main() {
         isLoading: false,
       ),
       act: (bloc) => bloc.add(const DeleteChatFolder('all')),
-      expect: () => [],
+      expect: () => <Never>[],
     );
 
     blocTest<ChatFolderBloc, ChatFolderState>(

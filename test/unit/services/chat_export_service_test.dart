@@ -246,7 +246,7 @@ void main() {
 
       expect(parsed['roomName'], 'Test Room');
       expect(parsed['messageCount'], 1);
-      expect(parsed['messages'], isA<List>());
+      expect(parsed['messages'], isA<List<dynamic>>());
     });
 
     test('should include correct message fields', () {

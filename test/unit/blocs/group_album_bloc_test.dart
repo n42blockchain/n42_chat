@@ -159,7 +159,7 @@ void main() {
       build: buildBloc,
       // initial state has roomId=null
       act: (bloc) => bloc.add(const LoadMoreAlbum()),
-      expect: () => [],
+      expect: () => <Never>[],
     );
 
     blocTest<GroupAlbumBloc, GroupAlbumState>(
@@ -170,7 +170,7 @@ void main() {
         hasMore: false,
       ),
       act: (bloc) => bloc.add(const LoadMoreAlbum()),
-      expect: () => [],
+      expect: () => <Never>[],
     );
 
     blocTest<GroupAlbumBloc, GroupAlbumState>(

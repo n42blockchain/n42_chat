@@ -263,7 +263,7 @@ void main() {
       },
       act: (bloc) => bloc.add(const EstimateBackupSize()),
       // Error is caught and logged; no state change
-      expect: () => [],
+      expect: () => <Never>[],
     );
   });
 }

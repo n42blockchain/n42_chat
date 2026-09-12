@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:n42_chat/src/domain/entities/user_entity.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/auth/auth_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/auth/auth_state.dart';
@@ -12,11 +11,6 @@ class MockAuthRepository extends Mock implements IAuthRepository {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
-
-  const testUser = UserEntity(
-    userId: '@user:server.com',
-    displayName: 'Test User',
-  );
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();

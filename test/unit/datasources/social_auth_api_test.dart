@@ -561,7 +561,7 @@ void main() {
         // Arrange
         final responseData = {
           'code': 200,
-          'data': [],
+          'data': <Object?>[],
         };
 
         when(() => mockClient.get(

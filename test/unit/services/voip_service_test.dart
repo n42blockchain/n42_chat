@@ -123,8 +123,8 @@ void main() {
     test('toConstraints should return valid map', () {
       final constraints = VideoResolution.hd720.toConstraints();
 
-      expect(constraints['width'], isA<Map>());
-      expect(constraints['height'], isA<Map>());
+      expect(constraints['width'], isA<Map<String, dynamic>>());
+      expect(constraints['height'], isA<Map<String, dynamic>>());
       expect(constraints['width']['ideal'], equals(1280));
       expect(constraints['height']['ideal'], equals(720));
     });

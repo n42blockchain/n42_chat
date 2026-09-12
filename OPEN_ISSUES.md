@@ -279,3 +279,11 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Evidence: `lib/src/presentation/pages/settings/settings_page.dart`, `profile_page.dart`, `core/router/app_router.dart`
 - Current state: Profile supplies notification/privacy/appearance/security/account/password/email/language/logout actions, but the direct Settings route supplies none. About now has a tested default. The generic Chat slot has no consumer; related download/background/translation/quick-reply entries exist separately. These optional slots must not be reported as standalone end-to-end settings support.
 - Next step: centralize settings composition and persistence for direct routes and Profile, preserving host overrides and account permissions.
+
+### QA-006 Direct UI literals still need module-by-module translation review
+
+- Severity: M
+- Added: 2026-09-12
+- Evidence: `docs/UI_LOCALIZATION_REVIEW_2026-09-12.md`, `tool/audit_ui_localization.py`
+- Current state: all 26 ARB catalogs have matching English keys and no blank values. This does not cover direct UI literals: the conservative scanner found 539 candidates in 33 presentation directories, including on-device AI, points and system settings. Brands/examples are not necessarily defects. M1/M3/M4 localized the changed expression/actions labels, but the complete backlog is not fixed.
+- Next step: review and translate candidates by module, regenerate catalogs, then verify RTL and expanded text with real UI tests. Do not treat key parity as full translation coverage.

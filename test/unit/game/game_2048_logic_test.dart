@@ -37,7 +37,6 @@ void main() {
       // Make some moves
       logic.swipe(Direction.left);
       logic.swipe(Direction.down);
-      final oldScore = logic.score;
 
       logic.reset();
 

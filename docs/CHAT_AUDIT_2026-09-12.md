@@ -155,3 +155,25 @@ corrected without treating unverified cross-device behavior as complete.
 Both USB devices were discovered on 2026-09-12: Android 16 and iPhone iOS 26.6.2.
 Discovery alone is not UI or messaging acceptance. Tests never send messages or
 transactions into real user conversations.
+
+## M6: global regression and remaining review scope
+
+Full suite: 5,826 passes, one live-credentials skip. Raw coverage is 17.97%; the
+separate view excluding generated code is 29.04%. See the module breakdown in
+[COVERAGE_AUDIT_2026-09-12.md](COVERAGE_AUDIT_2026-09-12.md). Twenty-two historical
+test warnings were removed using explicit types and removing unused fixtures;
+333 affected tests pass. `flutter analyze --no-pub --no-fatal-infos` now exits
+successfully with zero errors/warnings and 173 informational lints.
+
+The localization inventory finds no missing/blank ARB keys but 539 direct UI
+literal candidates across 33 presentation directories. This remains QA-006;
+this audit does not claim to have translated every old page. Native encrypted
+calls, AI group service and cross-user sticker sharing remain separate acceptance
+or implementation gaps as recorded in the single issues ledger.
+
+Android UI integration passed with eight captured screens: expressions,
+installed sticker selection, unavailable GIF, compact/expanded menus in en/ar,
+and unavailable AI. These use local fixtures, not real message delivery. iPhone
+compilation reached signing but both available development identities fail with
+errSecInternalComponent. The Mac login keychain must grant current private-key
+access before that device run can complete.

@@ -184,7 +184,7 @@ void main() {
         service.startTracking(message);
 
         // Wait a bit for async processing
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
 
         expect(destroyedMessageId, message.id);
         expect(destroyedRoomId, message.roomId);

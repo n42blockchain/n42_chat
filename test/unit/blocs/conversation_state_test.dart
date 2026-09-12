@@ -251,7 +251,7 @@ void main() {
 
     test('clearFilteredConversations=false preserves filtered list', () {
       final copy = withData.copyWith(clearFilteredConversations: false);
-      expect(copy.filteredConversations, []);
+      expect(copy.filteredConversations, isEmpty);
     });
   });
 
