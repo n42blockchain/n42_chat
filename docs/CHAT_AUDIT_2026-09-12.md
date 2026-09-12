@@ -31,3 +31,26 @@ The execution plan is maintained in the host repository at
 `docs/CHAT_PLUGIN_AUDIT_PLAN_2026-09-12.md`. UI reference candidates are tracked
 in `docs/FEATURE_ENTRY_INVENTORY.md`; references do not establish runtime reachability.
 Further module results and remaining issues are recorded as work progresses.
+
+## M1: expression entries and GIF retrieval
+
+Emoji, installed sticker packs and GIF callbacks were present, but icon-only
+bottom tabs made the combined panel hard to discover. Tabs now show localized
+labels, respect the bottom safe area and enlarged text, and initialize a source
+only on its first visit. The recent-panel empty actions are localized as well.
+
+Two failing widget regressions demonstrated that typing during a pending
+trending/search request discarded the newer query. Request generations now
+invalidate obsolete responses before debounce. First-page errors and later-page
+errors expose retry, and a failed page preserves its existing results/cursor.
+Tenor now forwards the opaque `next` cursor as `pos` per its
+[official contract](https://developers.google.com/tenor/guides/endpoints).
+Composite fallback chooses a source on page one and pins later pages/retries to
+that source. Attribution follows the actual provider instead of always GIPHY.
+
+Validation: 30 passing tests across Giphy, Tenor/composite pagination, picker
+lifecycle and expression-panel entry suites. Widget checks cover installed
+sticker selection/usage callbacks, lazy GIF loading, en/zh/ar at 1.5 text scale,
+and the bottom safe area. These are automated widget checks, not physical-device
+or authenticated provider acceptance. No credentials were added to the plugin;
+a build without GIF provider configuration still reports unavailable.
