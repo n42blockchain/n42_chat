@@ -5777,4 +5777,7 @@ class SMr extends S {
 
   @override
   String get chatReadingMode => 'वाचन मोड';
+
+  @override
+  String get groupPoints => 'गुण';
 }

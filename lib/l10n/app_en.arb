@@ -2745,5 +2745,6 @@
   "blocAuthVerificationCodeInvalid": "Verification code is incorrect or expired",
   "blocAuthSessionExpired": "Session expired, please login again",
   "blocAuthSessionIncomplete": "Session data incomplete, please login again",
-  "chatReadingMode": "Reading mode"
+  "chatReadingMode": "Reading mode",
+  "groupPoints": "Points"
 }

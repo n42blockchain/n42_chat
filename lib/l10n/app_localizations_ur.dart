@@ -5792,4 +5792,7 @@ class SUr extends S {
 
   @override
   String get chatReadingMode => 'مطالعہ موڈ';
+
+  @override
+  String get groupPoints => 'پوائنٹس';
 }

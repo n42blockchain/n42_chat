@@ -5779,4 +5779,7 @@ class SHi extends S {
 
   @override
   String get chatReadingMode => 'पठन मोड';
+
+  @override
+  String get groupPoints => 'अंक';
 }

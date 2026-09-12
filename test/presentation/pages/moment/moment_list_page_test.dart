@@ -14,6 +14,7 @@ import 'package:n42_chat/src/presentation/blocs/moment/moment_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/moment/moment_event.dart';
 import 'package:n42_chat/src/presentation/blocs/moment/moment_state.dart';
 import 'package:n42_chat/src/presentation/pages/moment/moment_list_page.dart';
+import 'package:n42_chat/src/presentation/pages/moment/moment_detail_page.dart';
 
 class MockMomentBloc extends Mock implements MomentBloc {}
 
@@ -146,6 +147,19 @@ void main() {
     await tester.pumpAndSettle();
     verify(() => mockMomentBloc.add(const LikeMoment('moment-1'))).called(1);
     expect(find.byType(PopupMenuItem<int>), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('post details entry retains the live moment bloc', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildTestWidget(contactBloc: mockContactBloc));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.more_horiz).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('View details'));
+    await tester.pumpAndSettle();
+    expect(find.byType(MomentDetailPage), findsOneWidget);
+    expect(find.text('hello'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

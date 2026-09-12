@@ -5807,4 +5807,7 @@ class SRu extends S {
 
   @override
   String get chatReadingMode => 'Режим чтения';
+
+  @override
+  String get groupPoints => 'Баллы';
 }

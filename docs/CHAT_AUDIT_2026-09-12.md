@@ -98,5 +98,39 @@ and the compose FAB returns when the popup closes.
 Validation: 12 passing message-menu, image protection, bubble accessibility and
 Moment tests. New tests exercise More expansion and a final delete callback on
 320x640 with a 280-pixel keyboard and 1.5 text scale in en/ar, plus one-shot
-secondary-click callbacks on messages and posts. Static analysis of the changed
-UI files has no issues. Physical-device visual acceptance remains pending.
+secondary-click callbacks on messages and posts. Static analysis had no errors or warnings; one braces lint was corrected during M4. Physical-device visual acceptance remains pending.
+
+## M4: orphan candidates and dead controls
+
+MomentDetailPage is now reached from the post action menu with the current
+MomentBloc/ContactBloc, retaining live updates. Group settings now exposes
+PointsDashboardPage when the host has registered PointsBloc and a signed-in
+user exists; the dashboard receives room/user and admin state. The host still
+must enable/configure the points API. Storage's previously empty View all rooms
+callback now expands the ranking; Material surfaces restore visible ink feedback.
+
+Validation: ten passing Moment, points and storage page tests, including real
+navigation with scoped blocs, absent points configuration, and expanding seven
+rooms beyond the previous five-entry cap. Full plugin suite at M0–M3 commit
+8e5388e: 5,820 passed, one credential-dependent live test skipped. Raw coverage
+including generated localizations: 22,939 / 130,693 lines (17.55%); it is not a
+70% coverage claim. Final module totals follow the complete verification pass.
+
+### Manual classification of initial zero-external-constructor candidates
+
+| Candidate | Result |
+|---|---|
+| OAuthWebViewPage | SocialLoginButtons uses static open(); inventory now recognizes open/show wrappers. |
+| EditRemarkPage | Constructed inside ContactDetailPage in the same file. |
+| MediaEditorPage | Static open/show flow used by media/social creation; not an orphan. |
+| MomentForwardSheet | Static show() used by both list and detail actions. |
+| ConfirmReceiveDialog | Same-file helper of red-packet details. |
+| SendTransferDialog, SendTransferPage | Alternate legacy transfer UI with no external call found; active chat/Services use the wallet transfer flow. |
+| MomentDetailPage | Actual orphan; wired and widget-tested in M4. |
+| PointsDashboardPage | Actual orphan; configuration-aware group entry wired and tested in M4. |
+| RedPacketHistoryPage | Alternate ledger UI; OrdersAndCardsPage already consumes the ledger. Do not add duplicate top-level navigation without consolidating filters and real settlement semantics. |
+| GroupListPage | Alternate implementation; contact list uses its own _GroupListPage. |
+| AboutPage | Alternate implementation; active Settings/Profile about flow and host callbacks exist. |
+| CallDialog, MessageMenuSheet, ContactIndexBar | Legacy/alternate widgets; current calls use VoIP screens, chat uses ChatMessageMenuSheet/WeChatMessageMenu, contacts render their own index. No reason to restore duplicate UI. |
+
+The generated inventory remains a reference index, not a complete runtime proof.

@@ -5821,4 +5821,7 @@ class SEs extends S {
 
   @override
   String get chatReadingMode => 'Modo de lectura';
+
+  @override
+  String get groupPoints => 'Puntos';
 }

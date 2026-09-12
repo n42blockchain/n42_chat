@@ -2745,5 +2745,6 @@
   "blocAuthVerificationCodeInvalid": "Kode verifikasi salah atau kedaluwarsa",
   "blocAuthSessionExpired": "Sesi telah habis, silakan login kembali",
   "blocAuthSessionIncomplete": "Data sesi tidak lengkap, silakan login kembali",
-  "chatReadingMode": "Mode baca"
+  "chatReadingMode": "Mode baca",
+  "groupPoints": "Poin"
 }

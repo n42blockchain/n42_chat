@@ -2745,5 +2745,6 @@
   "blocAuthVerificationCodeInvalid": "Il codice di verifica non è corretto o è scaduto",
   "blocAuthSessionExpired": "Sessione scaduta, effettua nuovamente l'accesso",
   "blocAuthSessionIncomplete": "Dati della sessione incompleti, effettua nuovamente l'accesso",
-  "chatReadingMode": "Modalità lettura"
+  "chatReadingMode": "Modalità lettura",
+  "groupPoints": "Punti"
 }

@@ -5817,4 +5817,7 @@ class SPl extends S {
 
   @override
   String get chatReadingMode => 'Tryb czytania';
+
+  @override
+  String get groupPoints => 'Punkty';
 }

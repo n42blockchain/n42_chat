@@ -5824,4 +5824,7 @@ class STe extends S {
 
   @override
   String get chatReadingMode => 'పఠన మోడ్';
+
+  @override
+  String get groupPoints => 'పాయింట్లు';
 }

@@ -10696,6 +10696,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Reading mode'**
   String get chatReadingMode;
+
+  /// No description provided for @groupPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Points'**
+  String get groupPoints;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

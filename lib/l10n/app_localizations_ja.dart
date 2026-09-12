@@ -5663,4 +5663,7 @@ class SJa extends S {
 
   @override
   String get chatReadingMode => '閲覧モード';
+
+  @override
+  String get groupPoints => 'ポイント';
 }

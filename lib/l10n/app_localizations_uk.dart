@@ -5809,4 +5809,7 @@ class SUk extends S {
 
   @override
   String get chatReadingMode => 'Режим читання';
+
+  @override
+  String get groupPoints => 'Бали';
 }

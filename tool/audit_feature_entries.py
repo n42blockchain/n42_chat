@@ -13,7 +13,7 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 GENERATED = ('.g.dart', '.freezed.dart', '.pb.dart', '.pbenum.dart', '.pbjson.dart')
 WIDGET = re.compile(r'\bclass\s+(\w+)\s+extends\s+(ConsumerStatefulWidget|ConsumerWidget|StatefulWidget|StatelessWidget)\b')
-CALL = re.compile(r'\b([A-Z]\w*)\s*\(')
+CALL = re.compile(r'\b([A-Z]\w*)\s*(?:\.\s*(?:open|show)\s*)?\(')
 
 
 def inventory():
@@ -49,7 +49,7 @@ def render():
     files, modules, tests, widgets, calls = inventory()
     out = ['# 功能与 UI 入口源码清单', '',
            '由 `python3 tool/audit_feature_entries.py` 生成。统计排除自动生成的 Dart 文件。', '',
-           '本表是静态构造引用索引，不代表按钮可点击、平台可见、签名正确或链上流程通过。'
+           '本表是静态构造引用索引，不代表按钮可点击、平台可见、消息正确收发或服务端验收通过。'
            '零外部引用是复核候选；同文件调用、构造函数 tear-off 和备用实现可能导致误报。'
            '外部引用也可能来自未启用代码。运行时结论见配套审计报告。', '',
            f'纳入 {len(files)} 个 Dart 源文件、{sum(tests.values())} 个测试文件、{len(widgets)} 个公开页面或页面组件类。', '',
@@ -74,7 +74,7 @@ def main():
     result = render()
     if args.check:
         if not destination.exists() or destination.read_text() != result:
-            raise SystemExit('UI inventory is stale; run scripts/audit_feature_wiring.py')
+            raise SystemExit('UI inventory is stale; run tool/audit_feature_entries.py')
     else:
         destination.write_text(result)
     print(destination.relative_to(ROOT))

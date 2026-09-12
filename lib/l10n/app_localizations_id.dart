@@ -5791,4 +5791,7 @@ class SId extends S {
 
   @override
   String get chatReadingMode => 'Mode baca';
+
+  @override
+  String get groupPoints => 'Poin';
 }

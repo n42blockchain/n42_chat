@@ -5756,4 +5756,7 @@ class SAr extends S {
 
   @override
   String get chatReadingMode => 'وضع القراءة';
+
+  @override
+  String get groupPoints => 'النقاط';
 }

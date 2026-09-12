@@ -2745,5 +2745,6 @@
   "blocAuthVerificationCodeInvalid": "Ověřovací kód je nesprávný nebo jeho platnost vypršela",
   "blocAuthSessionExpired": "Platnost relace vypršela, přihlaste se prosím znovu",
   "blocAuthSessionIncomplete": "Údaje o relaci nejsou úplné, přihlaste se prosím znovu",
-  "chatReadingMode": "Režim čtení"
+  "chatReadingMode": "Režim čtení",
+  "groupPoints": "Body"
 }

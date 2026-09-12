@@ -2745,5 +2745,6 @@
   "blocAuthSessionExpired": "Срок сеанса истек, пожалуйста, войдите снова",
   "blocAuthSessionIncomplete": "Данные сеанса неполные, пожалуйста, войдите снова",
   "authSsoNotConfigured": "На этом сервере не настроены провайдеры входа через SSO",
-  "chatReadingMode": "Режим чтения"
+  "chatReadingMode": "Режим чтения",
+  "groupPoints": "Баллы"
 }

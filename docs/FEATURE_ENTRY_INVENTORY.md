@@ -2,9 +2,9 @@
 
 由 `python3 tool/audit_feature_entries.py` 生成。统计排除自动生成的 Dart 文件。
 
-本表是静态构造引用索引，不代表按钮可点击、平台可见、签名正确或链上流程通过。零外部引用是复核候选；同文件调用、构造函数 tear-off 和备用实现可能导致误报。外部引用也可能来自未启用代码。运行时结论见配套审计报告。
+本表是静态构造引用索引，不代表按钮可点击、平台可见、消息正确收发或服务端验收通过。零外部引用是复核候选；同文件调用、构造函数 tear-off 和备用实现可能导致误报。外部引用也可能来自未启用代码。运行时结论见配套审计报告。
 
-纳入 655 个 Dart 源文件、328 个测试文件、173 个公开页面或页面组件类。
+纳入 656 个 Dart 源文件、329 个测试文件、173 个公开页面或页面组件类。
 
 ## 模块覆盖清单
 
@@ -44,7 +44,7 @@
 | src/integration | 7 |
 | src/n42_chat.dart | 1 |
 | src/n42_chat_config.dart | 1 |
-| src/presentation | 180 |
+| src/presentation | 181 |
 | src/services | 13 |
 | sticker | 3 |
 | story | 3 |
@@ -52,7 +52,7 @@
 | transfer | 3 |
 | voice_room | 2 |
 
-测试目录分布：core/utils: 1、integration/auth_flow_test.dart: 1、integration/bridge: 2、integration/wallet_bridge_test.dart: 1、live/live_media_smoke_test.dart: 1、localization/sso_localization_test.dart: 1、n42_chat_test.dart: 1、presentation/pages: 32、presentation/widgets: 7、unit/blocs: 74、unit/config: 2、unit/core: 8、unit/datasources: 20、unit/domain: 1、unit/encryption: 1、unit/entities: 54、unit/game: 6、unit/helpers: 5、unit/image_upload_test.dart: 1、unit/integration: 3、unit/repositories: 16、unit/services: 48、unit/theme: 1、unit/utils: 27、unit/widgets: 14。
+测试目录分布：core/utils: 1、integration/auth_flow_test.dart: 1、integration/bridge: 2、integration/wallet_bridge_test.dart: 1、live/live_media_smoke_test.dart: 1、localization/sso_localization_test.dart: 1、n42_chat_test.dart: 1、presentation/pages: 33、presentation/widgets: 7、unit/blocs: 74、unit/config: 2、unit/core: 8、unit/datasources: 20、unit/domain: 1、unit/encryption: 1、unit/entities: 54、unit/game: 6、unit/helpers: 5、unit/image_upload_test.dart: 1、unit/integration: 3、unit/repositories: 16、unit/services: 48、unit/theme: 1、unit/utils: 27、unit/widgets: 14。
 
 测试计数按目录归属，不把文件数当作行为覆盖率。
 
@@ -63,7 +63,7 @@
 | ai | `AiAssistantPage` | [ai_assistant_page.dart:19](../lib/src/presentation/pages/ai/ai_assistant_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[chat_page_ai_features.dart](../lib/src/presentation/pages/chat/chat_page_ai_features.dart)<br>[profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart) |
 | ai | `AiAssistantSettingsPage` | [ai_assistant_settings_page.dart:13](../lib/src/presentation/pages/ai/ai_assistant_settings_page.dart) | [ai_assistant_page.dart](../lib/src/presentation/pages/ai/ai_assistant_page.dart) |
 | auth | `LoginPage` | [login_page.dart:29](../lib/src/presentation/pages/auth/login_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[account_switch_page.dart](../lib/src/presentation/pages/settings/account_switch_page.dart)<br>[n42_chat_widgets.dart](../lib/src/presentation/widgets/n42_chat_widgets.dart) |
-| auth | `OAuthWebViewPage` | [oauth_webview_page.dart:17](../lib/src/presentation/pages/auth/oauth_webview_page.dart) | 需人工复核：无外部构造调用 |
+| auth | `OAuthWebViewPage` | [oauth_webview_page.dart:17](../lib/src/presentation/pages/auth/oauth_webview_page.dart) | [social_login_buttons.dart](../lib/src/presentation/widgets/auth/social_login_buttons.dart) |
 | auth | `RegisterPage` | [register_page.dart:25](../lib/src/presentation/pages/auth/register_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[login_page.dart](../lib/src/presentation/pages/auth/login_page.dart)<br>[n42_chat_widgets.dart](../lib/src/presentation/widgets/n42_chat_widgets.dart) |
 | auth | `ResetPasswordPage` | [reset_password_page.dart:23](../lib/src/presentation/pages/auth/reset_password_page.dart) | [login_page.dart](../lib/src/presentation/pages/auth/login_page.dart) |
 | auth | `WelcomePage` | [welcome_page.dart:13](../lib/src/presentation/pages/auth/welcome_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[n42_chat_widgets.dart](../lib/src/presentation/widgets/n42_chat_widgets.dart) |
@@ -143,27 +143,27 @@
 | group | `GroupListPage` | [group_list_page.dart:21](../lib/src/presentation/pages/group/group_list_page.dart) | 需人工复核：无外部构造调用 |
 | group | `GroupMediaHubPage` | [group_media_hub_page.dart:19](../lib/src/presentation/pages/group/group_media_hub_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[chat_detail_page.dart](../lib/src/presentation/pages/chat/chat_detail_page.dart)<br>[group_settings_page.dart](../lib/src/presentation/pages/group/group_settings_page.dart) |
 | group | `GroupMembersPage` | [group_members_page.dart:17](../lib/src/presentation/pages/group/group_members_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[group_settings_page.dart](../lib/src/presentation/pages/group/group_settings_page.dart) |
-| group | `GroupSettingsPage` | [group_settings_page.dart:32](../lib/src/presentation/pages/group/group_settings_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[chat_detail_page.dart](../lib/src/presentation/pages/chat/chat_detail_page.dart)<br>[group_list_page.dart](../lib/src/presentation/pages/group/group_list_page.dart) |
+| group | `GroupSettingsPage` | [group_settings_page.dart:33](../lib/src/presentation/pages/group/group_settings_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[chat_detail_page.dart](../lib/src/presentation/pages/chat/chat_detail_page.dart)<br>[group_list_page.dart](../lib/src/presentation/pages/group/group_list_page.dart) |
 | group | `GroupTopicsPage` | [group_topics_page.dart:22](../lib/src/presentation/pages/group/group_topics_page.dart) | [chat_page_app_bar.dart](../lib/src/presentation/pages/chat/chat_page_app_bar.dart)<br>[group_settings_page.dart](../lib/src/presentation/pages/group/group_settings_page.dart) |
 | group | `InviteMembersPage` | [invite_members_page.dart:20](../lib/src/presentation/pages/group/invite_members_page.dart) | [group_settings_page.dart](../lib/src/presentation/pages/group/group_settings_page.dart) |
 | group | `TokenGateSettingsPage` | [token_gate_settings_page.dart:14](../lib/src/presentation/pages/group/token_gate_settings_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[group_settings_page.dart](../lib/src/presentation/pages/group/group_settings_page.dart) |
 | group | `TokenGateVerifyPage` | [token_gate_verify_page.dart:15](../lib/src/presentation/pages/group/token_gate_verify_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart) |
 | main | `ChatMainPage` | [chat_main_page.dart:48](../lib/src/presentation/pages/main/chat_main_page.dart) | [login_page.dart](../lib/src/presentation/pages/auth/login_page.dart)<br>[register_page.dart](../lib/src/presentation/pages/auth/register_page.dart)<br>[n42_chat_widgets.dart](../lib/src/presentation/widgets/n42_chat_widgets.dart) |
-| media | `MediaEditorPage` | [media_editor_page.dart:15](../lib/src/presentation/pages/media/media_editor_page.dart) | 需人工复核：无外部构造调用 |
+| media | `MediaEditorPage` | [media_editor_page.dart:15](../lib/src/presentation/pages/media/media_editor_page.dart) | [chat_page_media_actions.dart](../lib/src/presentation/pages/chat/chat_page_media_actions.dart) |
 | media | `MediaGalleryPage` | [media_gallery_page.dart:25](../lib/src/presentation/pages/media/media_gallery_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart) |
 | media | `MediaPreviewPage` | [media_preview_page.dart:41](../lib/src/presentation/pages/media/media_preview_page.dart) | [app_router.dart](../lib/src/core/router/app_router.dart)<br>[group_album_page.dart](../lib/src/presentation/pages/group/group_album_page.dart)<br>[media_gallery_page.dart](../lib/src/presentation/pages/media/media_gallery_page.dart) |
 | mini_app | `MiniAppMarketPage` | [mini_app_market_page.dart:15](../lib/src/presentation/pages/mini_app/mini_app_market_page.dart) | [chat_page_input.dart](../lib/src/presentation/pages/chat/chat_page_input.dart)<br>[discover_page.dart](../lib/src/presentation/pages/discover/discover_page.dart) |
 | mini_app | `MiniAppPage` | [mini_app_page.dart:22](../lib/src/presentation/pages/mini_app/mini_app_page.dart) | [mini_app_launcher_helper.dart](../lib/src/presentation/helpers/mini_app_launcher_helper.dart) |
 | moment | `CreateMomentPage` | [create_moment_page.dart:27](../lib/src/presentation/pages/moment/create_moment_page.dart) | [social_hub_page.dart](../lib/src/presentation/pages/discover/social_hub_page.dart)<br>[moment_list_page.dart](../lib/src/presentation/pages/moment/moment_list_page.dart) |
-| moment | `MomentDetailPage` | [moment_detail_page.dart:19](../lib/src/presentation/pages/moment/moment_detail_page.dart) | 需人工复核：无外部构造调用 |
-| moment | `MomentForwardSheet` | [moment_forward_sheet.dart:16](../lib/src/presentation/pages/moment/moment_forward_sheet.dart) | 需人工复核：无外部构造调用 |
-| moment | `MomentListPage` | [moment_list_page.dart:23](../lib/src/presentation/pages/moment/moment_list_page.dart) | [contact_detail_page.dart](../lib/src/presentation/pages/contact/contact_detail_page.dart)<br>[discover_page.dart](../lib/src/presentation/pages/discover/discover_page.dart)<br>[social_hub_page.dart](../lib/src/presentation/pages/discover/social_hub_page.dart)<br>[profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart) |
+| moment | `MomentDetailPage` | [moment_detail_page.dart:19](../lib/src/presentation/pages/moment/moment_detail_page.dart) | [moment_list_page.dart](../lib/src/presentation/pages/moment/moment_list_page.dart) |
+| moment | `MomentForwardSheet` | [moment_forward_sheet.dart:16](../lib/src/presentation/pages/moment/moment_forward_sheet.dart) | [moment_detail_page.dart](../lib/src/presentation/pages/moment/moment_detail_page.dart)<br>[moment_list_page.dart](../lib/src/presentation/pages/moment/moment_list_page.dart) |
+| moment | `MomentListPage` | [moment_list_page.dart:24](../lib/src/presentation/pages/moment/moment_list_page.dart) | [contact_detail_page.dart](../lib/src/presentation/pages/contact/contact_detail_page.dart)<br>[discover_page.dart](../lib/src/presentation/pages/discover/discover_page.dart)<br>[social_hub_page.dart](../lib/src/presentation/pages/discover/social_hub_page.dart)<br>[profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart) |
 | moment | `VideoFeedPage` | [video_feed_page.dart:18](../lib/src/presentation/pages/moment/video_feed_page.dart) | [discover_page.dart](../lib/src/presentation/pages/discover/discover_page.dart)<br>[moment_list_page.dart](../lib/src/presentation/pages/moment/moment_list_page.dart) |
 | moment | `VisibilitySelectionPage` | [visibility_selection_page.dart:19](../lib/src/presentation/pages/moment/visibility_selection_page.dart) | [create_moment_page.dart](../lib/src/presentation/pages/moment/create_moment_page.dart) |
 | notification | `OnChainNotificationsPage` | [on_chain_notifications_page.dart:18](../lib/src/presentation/pages/notification/on_chain_notifications_page.dart) | [conversation_list_page.dart](../lib/src/presentation/pages/conversation/conversation_list_page.dart) |
 | points | `LeaderboardPage` | [leaderboard_page.dart:18](../lib/src/presentation/pages/points/leaderboard_page.dart) | [points_dashboard_page.dart](../lib/src/presentation/pages/points/points_dashboard_page.dart) |
 | points | `PointsAdminPage` | [points_admin_page.dart:21](../lib/src/presentation/pages/points/points_admin_page.dart) | [points_dashboard_page.dart](../lib/src/presentation/pages/points/points_dashboard_page.dart) |
-| points | `PointsDashboardPage` | [points_dashboard_page.dart:21](../lib/src/presentation/pages/points/points_dashboard_page.dart) | 需人工复核：无外部构造调用 |
+| points | `PointsDashboardPage` | [points_dashboard_page.dart:22](../lib/src/presentation/pages/points/points_dashboard_page.dart) | [group_points_entry.dart](../lib/src/presentation/widgets/chat/group_points_entry.dart) |
 | points | `RedemptionPage` | [redemption_page.dart:18](../lib/src/presentation/pages/points/redemption_page.dart) | [points_dashboard_page.dart](../lib/src/presentation/pages/points/points_dashboard_page.dart) |
 | profile | `AddressManagePage` | [profile_address_manage_page.dart:10](../lib/src/presentation/pages/profile/profile_address_manage_page.dart) | [profile_edit_page.dart](../lib/src/presentation/pages/profile/profile_edit_page.dart) |
 | profile | `AvatarStudioPage` | [avatar_studio_page.dart:18](../lib/src/presentation/pages/profile/avatar_studio_page.dart) | [social_hub_page.dart](../lib/src/presentation/pages/discover/social_hub_page.dart)<br>[profile_edit_page.dart](../lib/src/presentation/pages/profile/profile_edit_page.dart)<br>[profile_page.dart](../lib/src/presentation/pages/profile/profile_page.dart) |

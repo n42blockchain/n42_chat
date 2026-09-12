@@ -5844,4 +5844,7 @@ class SFr extends S {
 
   @override
   String get chatReadingMode => 'Mode lecture';
+
+  @override
+  String get groupPoints => 'Points';
 }

@@ -5663,4 +5663,7 @@ class SKo extends S {
 
   @override
   String get chatReadingMode => '읽기 모드';
+
+  @override
+  String get groupPoints => '포인트';
 }

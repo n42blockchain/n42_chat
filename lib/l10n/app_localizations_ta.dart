@@ -5842,4 +5842,7 @@ class STa extends S {
 
   @override
   String get chatReadingMode => 'வாசிப்பு முறை';
+
+  @override
+  String get groupPoints => 'புள்ளிகள்';
 }

@@ -5785,4 +5785,7 @@ class STr extends S {
 
   @override
   String get chatReadingMode => 'Okuma modu';
+
+  @override
+  String get groupPoints => 'Puanlar';
 }

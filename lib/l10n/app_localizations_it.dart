@@ -5803,4 +5803,7 @@ class SIt extends S {
 
   @override
   String get chatReadingMode => 'Modalità lettura';
+
+  @override
+  String get groupPoints => 'Punti';
 }

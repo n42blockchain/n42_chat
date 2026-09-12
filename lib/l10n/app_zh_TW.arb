@@ -2133,5 +2133,6 @@
   "blocAuthVerificationCodeInvalid": "驗證碼錯誤或已過期",
   "blocAuthSessionExpired": "會話已失效，請重新登錄",
   "blocAuthSessionIncomplete": "會話數據不完整，請重新登錄",
-  "chatReadingMode": "閱讀模式"
+  "chatReadingMode": "閱讀模式",
+  "groupPoints": "積分"
 }

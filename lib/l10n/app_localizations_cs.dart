@@ -5792,4 +5792,7 @@ class SCs extends S {
 
   @override
   String get chatReadingMode => 'Režim čtení';
+
+  @override
+  String get groupPoints => 'Body';
 }

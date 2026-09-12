@@ -16,6 +16,7 @@ import '../../widgets/common/n42_avatar.dart';
 import '../chat/viewers/video_player_page.dart';
 import 'create_moment_page.dart';
 import 'moment_forward_sheet.dart';
+import 'moment_detail_page.dart';
 import 'video_feed_page.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -734,6 +735,28 @@ class _MomentTile extends StatelessWidget {
           MomentForwardSheet.show(context, moment);
         },
       ),
+      _MomentActionItem(
+        icon: Icons.article_outlined,
+        label: S.of(context)?.onChainViewDetails ?? 'View details',
+        onTap: () {
+          final momentBloc = context.read<MomentBloc>();
+          final contactBloc = context.read<ContactBloc?>();
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) {
+                Widget page = BlocProvider.value(
+                  value: momentBloc,
+                  child: MomentDetailPage(moment: moment),
+                );
+                if (contactBloc != null) {
+                  page = BlocProvider.value(value: contactBloc, child: page);
+                }
+                return page;
+              },
+            ),
+          );
+        },
+      ),
     ];
 
     if (moment.isFromMe) {
@@ -758,8 +781,9 @@ class _MomentTile extends StatelessWidget {
   }) async {
     final overlay = Navigator.of(context).overlay?.context.findRenderObject();
     final anchor = anchorContext.findRenderObject();
-    if (overlay is! RenderBox || anchor is! RenderBox || !anchor.hasSize)
+    if (overlay is! RenderBox || anchor is! RenderBox || !anchor.hasSize) {
       return;
+    }
     final origin = pointerPosition != null
         ? overlay.globalToLocal(pointerPosition)
         : anchor.localToGlobal(Offset.zero, ancestor: overlay);

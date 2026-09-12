@@ -5753,4 +5753,7 @@ class SEn extends S {
 
   @override
   String get chatReadingMode => 'Reading mode';
+
+  @override
+  String get groupPoints => 'Points';
 }

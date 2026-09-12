@@ -5780,4 +5780,7 @@ class SBn extends S {
 
   @override
   String get chatReadingMode => 'পড়ার মোড';
+
+  @override
+  String get groupPoints => 'পয়েন্ট';
 }

@@ -5827,4 +5827,7 @@ class SDe extends S {
 
   @override
   String get chatReadingMode => 'Lesemodus';
+
+  @override
+  String get groupPoints => 'Punkte';
 }

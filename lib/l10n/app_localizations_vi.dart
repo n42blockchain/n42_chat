@@ -5768,4 +5768,7 @@ class SVi extends S {
 
   @override
   String get chatReadingMode => 'Chế độ đọc';
+
+  @override
+  String get groupPoints => 'Điểm';
 }
