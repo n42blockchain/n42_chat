@@ -264,20 +264,20 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: installed/custom packs, upload, search and sending exist; these two cross-user sharing methods still return null. There is no verified share-manifest or import preview path. Do not claim a full sticker sharing ecosystem.
 - Next step: define persistent pack distribution, resource validation and receiver preview/install, then wire and test both sender and receiver.
 
-### INTEGRATION-002 Standalone Settings still relies on host callbacks for account actions
+### INTEGRATION-002 Standalone Settings composition — Resolved
 
 - Severity: M
-- Added: 2026-09-12
-- Evidence: `lib/src/presentation/pages/settings/settings_page.dart`, `profile_page.dart`, `core/router/app_router.dart`
-- Current state: Profile supplies notification/privacy/appearance/security/account/password/email/language/logout actions, but the direct Settings route supplies none. About now has a tested default. The generic Chat slot has no consumer; related download/background/translation/quick-reply entries exist separately. These optional slots must not be reported as standalone end-to-end settings support.
-- Next step: centralize settings composition and persistence for direct routes and Profile, preserving host overrides and account permissions.
+- Added / resolved: 2026-09-12
+- Evidence: `docs/SETTINGS_AUDIT_2026-09-12.md`, `settings_navigation_test.dart`, `settings_persistence_test.dart`
+- Resolution: direct routes and Profile now share default notification/appearance/chat/language/password/email/logout composition. Existing host overrides retain precedence; account hub navigation preserves the active AuthBloc. Notification and appearance saves are awaited, persisted by default, and rolled back on rejection. The Chat category exposes background, quick replies, translation and auto-download.
+- Verification: real widget routes cover direct settings, privacy/account hubs, multi-hop auth propagation, save/reopen, failures, slider commits, logout confirmation, and Arabic narrow-screen layout. Live account mutation is still outside this verification (QA-005).
 
 ### QA-006 Direct UI literals still need module-by-module translation review
 
 - Severity: M
 - Added: 2026-09-12
 - Evidence: `docs/UI_LOCALIZATION_REVIEW_2026-09-12.md`, `tool/audit_ui_localization.py`
-- Current state: all 26 ARB catalogs have matching English keys and no blank values. This does not cover direct UI literals: the conservative scanner found 539 candidates in 33 presentation directories, including on-device AI, points and system settings. Brands/examples are not necessarily defects. M1/M3/M4 localized the changed expression/actions labels, but the complete backlog is not fixed.
+- Current state: all 26 ARB catalogs have matching English keys and no blank values. This does not cover direct UI literals: the conservative scanner initially found 539 candidates in 33 presentation directories, including on-device AI, points and system settings. Brands/examples are not necessarily defects. M1/M3/M4 localized the changed expression/actions labels. The settings follow-up localized six messages in all catalogs and reused the backup label; 533 direct literal candidates remain. Nested account/privacy hubs and notification-filter content still require translation; the complete backlog is not fixed.
 - Next step: review and translate candidates by module, regenerate catalogs, then verify RTL and expanded text with real UI tests. Do not treat key parity as full translation coverage.
 
 ### QA-007 iPhone data continuity after test-runner cleanup is unverified
@@ -294,3 +294,11 @@ This file tracks unresolved issues intentionally left open during recent agent w
 ### INTEGRATION-001 Wallet build source differed from its declared Chat pin — Resolved
 
 Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d841ff667708e513fc1ca0b708f9e`, removes the tracked Chat path override, and records Git source in pubspec.lock. The resolved Git package and host cache match across all 764 lib/assets files (SHA-256 manifest in host docs/chat-audit-2026-09-12/CHAT_SOURCE_MANIFEST_2026-09-12.json). Host full suite: 4,163 passed; after Git resolution, 18 additional targeted tests passed and analyze reports zero errors/warnings with 155 infos. The original divergence evidence remains in docs/HOST_BASELINE_SYNC_2026-09-12.json.
+
+### INTEGRATION-003 Nested settings failure handling — Resolved
+
+- Severity: M
+- Added / resolved: 2026-09-12
+- Evidence: `nested_settings_failure_test.dart`, `settings_write_failure_test.dart`
+- Resolution: account-list and notification-filter reads show a retry state on failure. Filter saves serialize input, restore confirmed rules on failure, and update the running push filter only after storage succeeds. Appearance, notification and filter writes reject platform `false` results and reload SharedPreferences' optimistic cache from durable storage.
+- Verification: fault injection covers both `false` and thrown platform failures, cached-value restoration, successful retry, filter read/write failures and late completion after disposal. If the platform also refuses cache reload, the original write failure is still surfaced; recovery from a persistently unavailable OS store is not claimed.
