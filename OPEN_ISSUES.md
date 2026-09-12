@@ -248,14 +248,6 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: the recent system/account-management pass wired saved-account switching, appearance persistence, and notification settings into the real runtime and covered them with analyze plus unit tests. However the new flows were not exercised against two real Matrix accounts/devices, so there is still no live confirmation that account switching, pusher re-registration, and restored appearance/notification preferences behave correctly across a real homeserver session change.
 - Next step: run a smoke with at least two real accounts on the shared homeserver, switch between them on one device, and verify push registration, active room behavior, font/theme persistence, and DND/sound settings after restart.
 
-### INTEGRATION-001 Wallet build source differs from its declared Chat pin
-
-- Severity: H
-- Added: 2026-09-12
-- Evidence: `docs/HOST_BASELINE_SYNC_2026-09-12.json`, host `pubspec.yaml` and local override.
-- Current state: 38 changed and 3 new shipped library files were absent from the declared `fa08010e` dependency. They are reconciled in this isolated audit branch, preserving canonical tests. The audited commits are published on `fix/chat-entry-audit-20260912`. The host handoff removes the tracked path override and checks the pinned Git package against the cache.
-- Closure evidence: require the host integration commit with its new pin, Git lock entry and `CHAT_SOURCE_MANIFEST_2026-09-12.json`; retain this issue until that host commit is published.
-
 ### AUTO-002 AI group membership and responding bot are absent
 
 - Severity: H
@@ -287,3 +279,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Evidence: `docs/UI_LOCALIZATION_REVIEW_2026-09-12.md`, `tool/audit_ui_localization.py`
 - Current state: all 26 ARB catalogs have matching English keys and no blank values. This does not cover direct UI literals: the conservative scanner found 539 candidates in 33 presentation directories, including on-device AI, points and system settings. Brands/examples are not necessarily defects. M1/M3/M4 localized the changed expression/actions labels, but the complete backlog is not fixed.
 - Next step: review and translate candidates by module, regenerate catalogs, then verify RTL and expanded text with real UI tests. Do not treat key parity as full translation coverage.
+
+## Resolved in the 2026-09-12 audit
+
+### INTEGRATION-001 Wallet build source differed from its declared Chat pin — Resolved
+
+Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d841ff667708e513fc1ca0b708f9e`, removes the tracked Chat path override, and records Git source in pubspec.lock. The resolved Git package and host cache match across all 764 lib/assets files (SHA-256 manifest in host docs/chat-audit-2026-09-12/CHAT_SOURCE_MANIFEST_2026-09-12.json). Host full suite: 4,163 passed; after Git resolution, 18 additional targeted tests passed and analyze reports zero errors/warnings with 155 infos. The original divergence evidence remains in docs/HOST_BASELINE_SYNC_2026-09-12.json.
