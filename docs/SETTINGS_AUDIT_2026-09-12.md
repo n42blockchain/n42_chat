@@ -21,7 +21,7 @@ The direct Settings route previously supplied none of the optional navigation ca
 
 `nested_settings_failure_test.dart` and `settings_write_failure_test.dart` cover retryable account/filter reads, serialized filter saves, keyword persistence, disposal, and both `false` and thrown platform-write failures with cache restoration. The targeted settings run passed **41 tests** (40 new tests plus the existing About regression).
 
-Full-suite and coverage totals are recorded in `COVERAGE_AUDIT_2026-09-12.md`. Flutter analysis reports **0 errors, 0 warnings, 173 existing informational diagnostics**. The first full coverage run exhausted the shell’s 256-file limit and was stopped; the retry uses `ulimit -n 4096` and `--concurrency=4`.
+Full-suite and coverage totals are recorded in `COVERAGE_AUDIT_2026-09-12.md`. Flutter analysis reports **0 errors, 0 warnings, 173 existing informational diagnostics**. The first full coverage run exhausted the shell’s 256-file limit and was stopped; the retry uses `ulimit -n 4096`; the final committed-source run uses `--concurrency=6` and passed 5,867 tests with one live-credentials skip. Settings-page coverage increased from 13.93% to 42.05%; raw plugin coverage increased from 17.97% to 19.23%.
 
 ## Boundaries
 
