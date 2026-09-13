@@ -313,12 +313,19 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: the confirmation method accepts `newEmail` and `code` but does not use them; it calls Matrix add3PID with the stored client secret/session ID. This still relies on server-side 3PID verification and is not evidence of an authentication bypass, but the entered code is not submitted by this method and the requested address is not matched. Local form/navigation tests do not validate email delivery or the server verification contract.
 - Next step: align the page with the homeserver's supported verification link/token flow, validate the address/session association, and verify expiry, wrong code/session and success against an isolated account.
 
-### QA-008 Xiaomi overwrite installation is blocked by the device
+### QA-008 Xiaomi overwrite installation — Resolved
 
 - Severity: M
 - Added: 2026-09-13
-- Current state: USB/ADB connectivity works, but both explicit `adb install -r -t` attempts were rejected with INSTALL_FAILED_USER_RESTRICTED. The user was asked to allow USB installation. The existing Android application was not uninstalled or cleared. Updated fixture acceptance on Android and final dual-device release tagging remain pending.
-- Next step: allow the installation on the phone, rerun the device suite through the existing-app VM connection, and restore/verify the normal app. The host runner now avoids Flutter's uninstall-on-install-failure fallback.
+- Resolution: after the user enabled USB installation, explicit overwrite installation succeeded on 2026-09-13. No uninstall or data clearing was used. This resolves installation permission only; acceptance exposed the SQLite loader issue below.
+
+### STORAGE-002 Android media database background isolate lacks SQLCipher loader
+
+- Severity: H
+- Added: 2026-09-13
+- Evidence: physical Xiaomi fixture failed resolving `libsqlite3.so`; the APK ships `libsqlcipher.so`. `MediaMetadataDatabase._openConnection` used `NativeDatabase.createInBackground` without configuring its isolate's library loader; the archive main-isolate override cannot propagate to it.
+- Current state: added Android library preparation and a per-isolate SQLCipher override. A production-path regression writes, closes, reopens and cleans media metadata under an isolated temporary documents directory. All 15 local storage contracts pass; updated physical-device verification is pending.
+- Next step: run the expanded device suite, restore the normal Android app and verify Chat entry, then record acceptance before release tagging.
 
 ## Resolved in the 2026-09-12 audit
 

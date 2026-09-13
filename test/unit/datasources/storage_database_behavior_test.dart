@@ -1,13 +1,27 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:n42_chat/src/data/datasources/local/archive_database.dart';
 import 'package:n42_chat/src/data/datasources/local/media_metadata_database.dart';
 
 typedef StorageBehaviorTestRegistrar =
     void Function(String description, Future<void> Function() body);
 
-void main() => registerStorageDatabaseBehaviorTests();
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  registerStorageDatabaseBehaviorTests();
+}
+
+class _TemporaryDocuments extends PathProviderPlatform {
+  _TemporaryDocuments(this.path);
+  final String path;
+
+  @override
+  Future<String?> getApplicationDocumentsPath() async => path;
+}
 
 /// Device callers register each contract through testWidgets so integration_test
 /// records SQL failures in its driver result as well as in the console.
@@ -18,6 +32,42 @@ void registerStorageDatabaseBehaviorTests({
       registerCase ??
       (String description, Future<void> Function() body) =>
           test(description, body);
+  runCase(
+    'production media connection persists through background reopen',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'n42-media-contract-',
+      );
+      final originalPaths = PathProviderPlatform.instance;
+      PathProviderPlatform.instance = _TemporaryDocuments(directory.path);
+      try {
+        final db = await MediaMetadataDatabase.getInstance();
+        final now = DateTime.utc(2026, 9, 13);
+        await db.registerFile(
+          MediaFilesCompanion.insert(
+            filePath: 'fixture-image',
+            roomId: 'fixture-room',
+            fileCategory: 'image',
+            fileSize: const Value(123),
+            downloadedAt: now,
+            lastAccessedAt: now,
+          ),
+        );
+        expect((await db.getTotalStats()).totalSize, 123);
+        await MediaMetadataDatabase.closeInstance();
+        final reopened = await MediaMetadataDatabase.getInstance();
+        final files = await reopened.getRoomMediaFiles(roomId: 'fixture-room');
+        expect(files.single.filePath, 'fixture-image');
+        expect(files.single.fileSize, 123);
+        await reopened.markCleaned(['fixture-image']);
+        expect((await reopened.getTotalStats()).totalSize, 0);
+      } finally {
+        await MediaMetadataDatabase.closeInstance();
+        PathProviderPlatform.instance = originalPaths;
+        await directory.delete(recursive: true);
+      }
+    },
+  );
   group('archive database on real in-memory SQLite', () {
     late ArchiveDatabase db;
     final now = DateTime.utc(2026, 9, 13);
