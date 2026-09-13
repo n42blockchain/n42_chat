@@ -289,6 +289,30 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - User update: Chat login on iPhone is now confirmed, as on Android. Current login availability does not establish preservation of previous chat history or wallet data.
 - Next step: verify wallet and historical Chat data in the normal iPhone app with the user; any recovery must use user-controlled backups. Do not mark this resolved based only on renewed login, install success or fixture test results.
 
+### STORAGE-001 Favorite deletion spans two preference keys
+
+- Severity: M
+- Added: 2026-09-13
+- Evidence: `MessageActionRepositoryImpl.unsaveMessage`, `message_action_persistence_test.dart`
+- Current state: message and metadata writes now propagate rejection and publish caches only after successful persistence; mutations on one repository instance are serialized. Deletion still writes the message list before cleaning the separate metadata key. Failure of the second write can leave durable message deletion plus stale metadata and a surfaced error. There is no cross-key transaction or cross-isolate locking; the tests do not claim either.
+- Next step: migrate favorites and metadata to one versioned transactional record with crash-recovery tests and update the caller's partial-failure behavior.
+
+### UI-001 Legacy favorite tag and remark methods have no visible read/edit path
+
+- Severity: M
+- Added: 2026-09-13
+- Evidence: `MessageActionRepositoryImpl.editFavoriteTags/editFavoriteRemark`, `FavoriteBloc`, `FavoriteListPage`
+- Current state: tag/remark edits persist and their failure/retry behavior is covered, but `getSavedMessages` returns MessageEntity without this metadata and FavoriteListPage has no tag/remark editor. These backend methods are not evidence of a usable tagged-favorites feature. The newer FavoriteEntity/reminder storage is a separate path and must not be confused with this repository.
+- Next step: consolidate the two favorites models, expose persisted metadata through the domain contract, and cover create/edit/search/reopen from the actual profile entry.
+
+### AUTH-001 Email confirmation UI and Matrix verification contract differ
+
+- Severity: H
+- Added: 2026-09-13
+- Evidence: `AuthRepositoryImpl.confirmChangeEmail`, `ChangeEmailPage`
+- Current state: the confirmation method accepts `newEmail` and `code` but does not use them; it calls Matrix add3PID with the stored client secret/session ID. This still relies on server-side 3PID verification and is not evidence of an authentication bypass, but the entered code is not submitted by this method and the requested address is not matched. Local form/navigation tests do not validate email delivery or the server verification contract.
+- Next step: align the page with the homeserver's supported verification link/token flow, validate the address/session association, and verify expiry, wrong code/session and success against an isolated account.
+
 ## Resolved in the 2026-09-12 audit
 
 ### INTEGRATION-001 Wallet build source differed from its declared Chat pin — Resolved
