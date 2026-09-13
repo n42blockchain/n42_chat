@@ -4,7 +4,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/data/datasources/local/archive_database.dart';
 import 'package:n42_chat/src/data/datasources/local/media_metadata_database.dart';
 
-void main() {
+typedef StorageBehaviorTestRegistrar =
+    void Function(String description, Future<void> Function() body);
+
+void main() => registerStorageDatabaseBehaviorTests();
+
+/// Device callers register each contract through testWidgets so integration_test
+/// records SQL failures in its driver result as well as in the console.
+void registerStorageDatabaseBehaviorTests({
+  StorageBehaviorTestRegistrar? registerCase,
+}) {
+  final runCase =
+      registerCase ??
+      (String description, Future<void> Function() body) =>
+          test(description, body);
   group('archive database on real in-memory SQLite', () {
     late ArchiveDatabase db;
     final now = DateTime.utc(2026, 9, 13);
@@ -33,7 +46,7 @@ void main() {
     setUp(() => db = ArchiveDatabase.forTesting(NativeDatabase.memory()));
     tearDown(() => db.close());
 
-    test(
+    runCase(
       'duplicate imports are idempotent and preserve the original body',
       () async {
         expect(
@@ -62,7 +75,7 @@ void main() {
       },
     );
 
-    test(
+    runCase(
       'pagination excludes the boundary and never leaks another room',
       () async {
         await db.insertMessages([
@@ -82,7 +95,7 @@ void main() {
       },
     );
 
-    test(
+    runCase(
       'metadata upserts retain absent fields and update archive checkpoint',
       () async {
         expect(await db.getMetadata('room-a'), isNull);
@@ -110,7 +123,7 @@ void main() {
       },
     );
 
-    test(
+    runCase(
       'quarter statistics and deletion update counts and full-text index',
       () async {
         await db.insertMessages([
@@ -132,7 +145,7 @@ void main() {
       },
     );
 
-    test('search filters hidden rooms before applying pagination', () async {
+    runCase('search filters hidden rooms before applying pagination', () async {
       await db.insertMessages([
         message('hidden', room: 'private', ts: 500),
         message('a', ts: 400),
@@ -157,7 +170,7 @@ void main() {
       );
     });
 
-    test(
+    runCase(
       'FTS operators are treated as user text rather than query syntax',
       () async {
         await db.insertMessages([
@@ -174,7 +187,7 @@ void main() {
       },
     );
 
-    test('empty and whitespace-only searches return no matches', () async {
+    runCase('empty and whitespace-only searches return no matches', () async {
       await db.insertMessages([message('one')]);
       for (final query in ['', '   ', '\n\t']) {
         expect(await db.searchMessages(query), isEmpty);
@@ -182,7 +195,7 @@ void main() {
       }
     });
 
-    test('empty database statistics and empty import are safe', () async {
+    runCase('empty database statistics and empty import are safe', () async {
       expect(await db.insertMessages([]), 0);
       expect(await db.getMessageCount('missing'), 0);
       expect(await db.getQuarterlyStats('missing'), isEmpty);
@@ -223,7 +236,7 @@ void main() {
     setUp(() => db = MediaMetadataDatabase.forTesting(NativeDatabase.memory()));
     tearDown(() => db.close());
 
-    test(
+    runCase(
       'default cleanup protects pinned files, thumbnails and cleaned records',
       () async {
         await file('normal');
@@ -250,7 +263,7 @@ void main() {
       },
     );
 
-    test(
+    runCase(
       'cleanup combines age, room, category and minimum size filters',
       () async {
         await file('target', size: 500);
@@ -280,7 +293,7 @@ void main() {
       },
     );
 
-    test(
+    runCase(
       'cleaned records retain download metadata but disappear from usage',
       () async {
         await file('one');
@@ -304,7 +317,7 @@ void main() {
       },
     );
 
-    test('room/category summaries and ranking match stored bytes', () async {
+    runCase('room/category summaries and ranking match stored bytes', () async {
       await file('image', size: 100);
       await file('video', category: 'video', size: 200);
       await file('audio', category: 'audio', size: 50);
@@ -328,7 +341,7 @@ void main() {
       expect((await db.getRoomMediaStats('absent')).imageSize, 0);
     });
 
-    test(
+    runCase(
       'upsert updates existing media and pin changes alter cleanup eligibility',
       () async {
         await file('one', size: 20);
@@ -344,7 +357,7 @@ void main() {
       },
     );
 
-    test(
+    runCase(
       'cleanup selects oldest access first and empty summaries remain zero',
       () async {
         final empty = await db.getTotalStats();
