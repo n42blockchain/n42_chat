@@ -319,13 +319,12 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Added: 2026-09-13
 - Resolution: after the user enabled USB installation, explicit overwrite installation succeeded on 2026-09-13. No uninstall or data clearing was used. This resolves installation permission only; acceptance exposed the SQLite loader issue below.
 
-### STORAGE-002 Android media database background isolate lacks SQLCipher loader
+### STORAGE-002 Android media database background isolate lacks SQLCipher loader — Resolved
 
 - Severity: H
 - Added: 2026-09-13
 - Evidence: physical Xiaomi fixture failed resolving `libsqlite3.so`; the APK ships `libsqlcipher.so`. `MediaMetadataDatabase._openConnection` used `NativeDatabase.createInBackground` without configuring its isolate's library loader; the archive main-isolate override cannot propagate to it.
-- Current state: added Android library preparation and a per-isolate SQLCipher override. A production-path regression writes, closes, reopens and cleans media metadata under an isolated temporary documents directory. All 15 local storage contracts pass; updated physical-device verification is pending.
-- Next step: run the expanded device suite, restore the normal Android app and verify Chat entry, then record acceptance before release tagging.
+- Resolution: `657a66b` adds Android library preparation and a per-isolate SQLCipher override. A production-path regression writes, closes, reopens and cleans media metadata under an isolated temporary documents directory. All 15 local storage contracts and 49 related service/bloc cases pass. The expanded 19-case suite passed on both physical Xiaomi and iPhone devices. Both normal apps were overwrite-restored; Android Chat opens into the existing logged-in conversation list. No uninstall, account creation or real message/payment was performed. Evidence: host `docs/chat-audit-2026-09-12/DEVICE_ACCEPTANCE_2026-09-13.md` and its two result manifests.
 
 ## Resolved in the 2026-09-12 audit
 
