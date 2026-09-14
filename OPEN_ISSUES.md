@@ -328,6 +328,19 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Resolved in the 2026-09-12 audit
 
+### SEARCH-001 Archived results ignore active message filters — Resolved 2026-09-14
+
+- Severity: M
+- Evidence: 21 of 22 initial SQLite-backed regressions returned messages with the wrong sender/type/date, including results outside the active only-from-me filter. SearchRepositoryImpl did not pass MessageSearchFilter to the archive service.
+- Resolution: forward the filter through the repository and archive service into parameterized SQL before LIMIT/OFFSET. Apply sender, authenticated only-from-me, inclusive date boundaries, resolved message type and media-only conditions together with hidden/locked room exclusions. Missing authenticated identity returns no only-from-me matches. Preserve the archive mapper's existing type precedence and audio/voice representation.
+- Verification: 31 real SQLite repository/service cases cover filter combinations, page limits/offsets, room visibility, SQL binding, snippets, counts and unavailable FTS; 43 repository cases cover discovery, mappings, merging and navigation. These are local synthetic tests, not new live-homeserver/device acceptance.
+
+### SEARCH-002 Loading more results loses the selected message — Resolved 2026-09-14
+
+- Severity: M
+- Evidence: all three navigation regressions fail on the previous repository implementation: a newly inserted result shifts selection, deleting the selected result leaves an invalid index, and removing all results leaves index zero.
+- Resolution: preserve the selected message by ID after refresh; if it disappeared, clamp to the nearest valid index, or use -1 for an empty list. Regressions also verify filter propagation, expanded page size and unchanged original results.
+
 ### BACKUP-001 Password-protected v3 backups can fail authentication — Resolved 2026-09-13
 
 - Severity: H
