@@ -19,14 +19,17 @@ void main() {
     });
 
     test('contains all expected values', () {
-      expect(AuthStatus.values, containsAll([
-        AuthStatus.initial,
-        AuthStatus.checking,
-        AuthStatus.loading,
-        AuthStatus.authenticated,
-        AuthStatus.unauthenticated,
-        AuthStatus.error,
-      ]));
+      expect(
+        AuthStatus.values,
+        containsAll([
+          AuthStatus.initial,
+          AuthStatus.checking,
+          AuthStatus.loading,
+          AuthStatus.authenticated,
+          AuthStatus.unauthenticated,
+          AuthStatus.error,
+        ]),
+      );
     });
   });
 
@@ -40,12 +43,15 @@ void main() {
     });
 
     test('contains all expected values', () {
-      expect(HomeserverStatus.values, containsAll([
-        HomeserverStatus.unknown,
-        HomeserverStatus.checking,
-        HomeserverStatus.valid,
-        HomeserverStatus.invalid,
-      ]));
+      expect(
+        HomeserverStatus.values,
+        containsAll([
+          HomeserverStatus.unknown,
+          HomeserverStatus.checking,
+          HomeserverStatus.valid,
+          HomeserverStatus.invalid,
+        ]),
+      );
     });
   });
 
@@ -59,14 +65,17 @@ void main() {
     });
 
     test('contains all expected values', () {
-      expect(PasswordResetStatus.values, containsAll([
-        PasswordResetStatus.initial,
-        PasswordResetStatus.sendingCode,
-        PasswordResetStatus.codeSent,
-        PasswordResetStatus.resetting,
-        PasswordResetStatus.success,
-        PasswordResetStatus.failed,
-      ]));
+      expect(
+        PasswordResetStatus.values,
+        containsAll([
+          PasswordResetStatus.initial,
+          PasswordResetStatus.sendingCode,
+          PasswordResetStatus.codeSent,
+          PasswordResetStatus.resetting,
+          PasswordResetStatus.success,
+          PasswordResetStatus.failed,
+        ]),
+      );
     });
   });
 
@@ -80,12 +89,15 @@ void main() {
     });
 
     test('contains all expected values', () {
-      expect(ChangePasswordStatus.values, containsAll([
-        ChangePasswordStatus.initial,
-        ChangePasswordStatus.changing,
-        ChangePasswordStatus.success,
-        ChangePasswordStatus.failed,
-      ]));
+      expect(
+        ChangePasswordStatus.values,
+        containsAll([
+          ChangePasswordStatus.initial,
+          ChangePasswordStatus.changing,
+          ChangePasswordStatus.success,
+          ChangePasswordStatus.failed,
+        ]),
+      );
     });
   });
 
@@ -95,18 +107,22 @@ void main() {
 
   group('ChangeEmailStatus enum', () {
     test('has 6 values', () {
-      expect(ChangeEmailStatus.values.length, 6);
+      expect(ChangeEmailStatus.values.length, 7);
     });
 
     test('contains all expected values', () {
-      expect(ChangeEmailStatus.values, containsAll([
-        ChangeEmailStatus.initial,
-        ChangeEmailStatus.sendingCode,
-        ChangeEmailStatus.codeSent,
-        ChangeEmailStatus.confirming,
-        ChangeEmailStatus.success,
-        ChangeEmailStatus.failed,
-      ]));
+      expect(
+        ChangeEmailStatus.values,
+        containsAll([
+          ChangeEmailStatus.initial,
+          ChangeEmailStatus.sendingCode,
+          ChangeEmailStatus.codeSent,
+          ChangeEmailStatus.linkSent,
+          ChangeEmailStatus.confirming,
+          ChangeEmailStatus.success,
+          ChangeEmailStatus.failed,
+        ]),
+      );
     });
   });
 
@@ -257,12 +273,18 @@ void main() {
     });
 
     test('status authenticated with errorMessage → false', () {
-      const s = AuthState(status: AuthStatus.authenticated, errorMessage: 'stale');
+      const s = AuthState(
+        status: AuthStatus.authenticated,
+        errorMessage: 'stale',
+      );
       expect(s.hasError, isFalse);
     });
 
     test('status unauthenticated with errorMessage → false', () {
-      const s = AuthState(status: AuthStatus.unauthenticated, errorMessage: 'msg');
+      const s = AuthState(
+        status: AuthStatus.unauthenticated,
+        errorMessage: 'msg',
+      );
       expect(s.hasError, isFalse);
     });
   });
@@ -361,17 +383,23 @@ void main() {
     });
 
     test('overrides passwordResetStatus', () {
-      final copy = base.copyWith(passwordResetStatus: PasswordResetStatus.codeSent);
+      final copy = base.copyWith(
+        passwordResetStatus: PasswordResetStatus.codeSent,
+      );
       expect(copy.passwordResetStatus, PasswordResetStatus.codeSent);
     });
 
     test('overrides changePasswordStatus', () {
-      final copy = base.copyWith(changePasswordStatus: ChangePasswordStatus.success);
+      final copy = base.copyWith(
+        changePasswordStatus: ChangePasswordStatus.success,
+      );
       expect(copy.changePasswordStatus, ChangePasswordStatus.success);
     });
 
     test('overrides changeEmailStatus', () {
-      final copy = base.copyWith(changeEmailStatus: ChangeEmailStatus.confirming);
+      final copy = base.copyWith(
+        changeEmailStatus: ChangeEmailStatus.confirming,
+      );
       expect(copy.changeEmailStatus, ChangeEmailStatus.confirming);
     });
   });

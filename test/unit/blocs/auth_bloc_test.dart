@@ -212,10 +212,8 @@ void main() {
         when(
           () => mockAuthRepository.switchStoredAccount('@other:server.com'),
         ).thenAnswer(
-          (_) async => AuthResult.failure(
-            '账号数据不完整',
-            type: AuthErrorType.tokenExpired,
-          ),
+          (_) async =>
+              AuthResult.failure('账号数据不完整', type: AuthErrorType.tokenExpired),
         );
         return AuthBloc(authRepository: mockAuthRepository);
       },
@@ -231,7 +229,11 @@ void main() {
         isA<AuthState>()
             .having((s) => s.status, 'status', AuthStatus.error)
             .having((s) => s.user, 'user', testUser)
-            .having((s) => s.errorType, 'errorType', AuthErrorType.tokenExpired),
+            .having(
+              (s) => s.errorType,
+              'errorType',
+              AuthErrorType.tokenExpired,
+            ),
       ],
     );
 
@@ -467,6 +469,40 @@ void main() {
   });
 
   group('Email Change', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits linkSent when the repository returns email link verification',
+      build: () {
+        when(
+          () => mockAuthRepository.requestChangeEmail(
+            password: any(named: 'password'),
+            newEmail: any(named: 'newEmail'),
+          ),
+        ).thenAnswer((_) async => true);
+        when(
+          () => mockAuthRepository.emailChangeRequiresCode,
+        ).thenReturn(false);
+        return AuthBloc(authRepository: mockAuthRepository);
+      },
+      act: (bloc) => bloc.add(
+        const AuthRequestChangeEmailRequested(
+          password: 'test-password',
+          newEmail: 'alice@example.org',
+        ),
+      ),
+      expect: () => [
+        isA<AuthState>().having(
+          (s) => s.changeEmailStatus,
+          'status',
+          ChangeEmailStatus.sendingCode,
+        ),
+        isA<AuthState>().having(
+          (s) => s.changeEmailStatus,
+          'status',
+          ChangeEmailStatus.linkSent,
+        ),
+      ],
+    );
+
     blocTest<AuthBloc, AuthState>(
       'emits [sendingCode, codeSent] when request email change succeeds',
       build: () {
