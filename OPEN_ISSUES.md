@@ -11,6 +11,14 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
+### GROUP-001 Token gates are not authoritative admission control across join paths
+
+- Severity: H
+- Added: 2026-09-14
+- Evidence: GroupBloc checks the gate in AcceptGroupInvite; GroupRepositoryImpl.joinGroup/joinGroupByAlias and MatrixGroupDataSource join methods directly invoke the SDK join operation without token verification.
+- Current state: this round fixes failure handling and precision in the existing client verification path. Alias/direct joins still lack the same check, and no homeserver-side token admission contract has been verified. A local balance check or a saved n42.token_gate state event is not proof of server-enforced private access.
+- Next step: define an authoritative join/admission service and cover invitation, alias, direct SDK and alternate-client joins with controlled accounts before claiming complete token-gated access. No real funds or live joins were used in this coverage round.
+
 ### SOCIAL-001 Nearby discovery is limited to location-bearing Moments
 
 - Severity: M
@@ -327,6 +335,20 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Resolution: `657a66b` adds Android library preparation and a per-isolate SQLCipher override. A production-path regression writes, closes, reopens and cleans media metadata under an isolated temporary documents directory. All 15 local storage contracts and 49 related service/bloc cases pass. The expanded 19-case suite passed on both physical Xiaomi and iPhone devices. Both normal apps were overwrite-restored; Android Chat opens into the existing logged-in conversation list. No uninstall, account creation or real message/payment was performed. Evidence: host `docs/chat-audit-2026-09-12/DEVICE_ACCEPTANCE_2026-09-13.md` and its two result manifests.
 
 ## Resolved in the 2026-09-12 audit
+
+### CONTACT-001 Search misses visible remarks and first blacklist read omits remarks — Resolved 2026-09-14
+
+- Severity: M
+- Evidence: three contact regressions fail on the previous implementation: remark lookup, whitespace around a name, and remarks on the first ignored-contact read. Two conversation queries also fail with surrounding/only whitespace.
+- Resolution: search both the original and effective display name plus Matrix ID; trim contact/conversation search text and treat whitespace-only input as an empty query. Load current remarks before mapping ignored profiles. Existing ContactBloc and conversation consumers use the repaired repository methods.
+- Verification: 32 contact cases cover lookup, identity mapping, remark persistence failures, invitations and presence; 24 conversation cases cover mapping, search, creation failures, unread deduplication and typing subscription/timer cleanup.
+
+### GROUP-002 Failed gate reads and imprecise balances can approve verification — Resolved 2026-09-14
+
+- Severity: H
+- Evidence: 21 of 42 initial gate regressions fail, including malformed/failed configuration reads being treated as absent gates, an amount one wei below the threshold passing through double rounding, and unsupported native chains reading Ethereum funds.
+- Resolution: a strict datasource read distinguishes a missing gate from an unavailable room/state; enabled rule validation rejects malformed operators, standards, chains, contracts, minimums and ERC-1155 IDs. Invalid saves fail before state writes. Verification returns failure on read/parse errors and converts the wallet's decimal native balance directly to BigInt units. Native chains are restricted to the five supported by the current settings UI; unsupported chains no longer fall back to ETH.
+- Verification: 49 gate cases exercise the real datasource and repository with mocked Matrix/wallet boundaries, including the actual AcceptGroupInvite and SetTokenGate Bloc paths, state-write permissions, ERC-20/721/1155, AND/OR, exact unit boundaries, invalid balances and RPC failures. No real blockchain query, transaction or external message occurred. GROUP-001 remains open for broader admission control.
 
 ### SEARCH-001 Archived results ignore active message filters — Resolved 2026-09-14
 
