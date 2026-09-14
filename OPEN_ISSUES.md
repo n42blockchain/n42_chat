@@ -15,9 +15,11 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 - Severity: H
 - Added: 2026-09-14
-- Evidence: GroupBloc checks the gate in AcceptGroupInvite; GroupRepositoryImpl.joinGroup/joinGroupByAlias and MatrixGroupDataSource join methods directly invoke the SDK join operation without token verification.
-- Current state: this round fixes failure handling and precision in the existing client verification path. Alias/direct joins still lack the same check, and no homeserver-side token admission contract has been verified. A local balance check or a saved n42.token_gate state event is not proof of server-enforced private access.
-- Next step: define an authoritative join/admission service and cover invitation, alias, direct SDK and alternate-client joins with controlled accounts before claiming complete token-gated access. No real funds or live joins were used in this coverage round.
+- Updated: 2026-09-14
+- Evidence: `RoomJoinService` now checks locally known gates for GroupRepositoryImpl ID/alias/invite joins and shared MatrixGroupDataSource/MatrixRoomDataSource joins. Channel discovery calls the guarded group repository. GroupBloc renders typed admission failures without a duplicate balance request.
+- Current state (partial): alias resolution pins the verified room ID, duplicate pending joins share one check, session changes and changed/replaced gate state reject stale results. Known enabled gates without a verifier fail. Unknown rooms still use normal homeserver join policy; Matrix invite/preview state can be incomplete, so absence of a local gate is not evidence of unrestricted access. A local balance check or saved n42.token_gate event does not enforce private access on the server.
+- Remaining observed paths: contact-invite, Moments invitation, voice-room, Space and username-registry helpers still contain their own SDK joins; these need separate protocol-specific review. Alternate clients and direct SDK use can bypass local checks. No homeserver admission contract, live balance query, external room join or fresh device acceptance was verified in this round.
+- Next step: define and test authoritative homeserver admission, including pre-join state visibility and restricted private-room rules; migrate the remaining helpers with appropriate integration coverage before claiming complete token-gated access.
 
 ### SOCIAL-001 Nearby discovery is limited to location-bearing Moments
 

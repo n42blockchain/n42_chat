@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:n42_chat/src/core/services/room_join_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/bot_webhook_service.dart';
@@ -1405,9 +1406,6 @@ void main() {
       'emits [success] with "Joined the group" when no token gate',
       build: () {
         when(
-          () => mockRepository.getTokenGate(_roomId1),
-        ).thenAnswer((_) async => null);
-        when(
           () => mockRepository.acceptGroupInvite(_roomId1),
         ).thenAnswer((_) async {});
         // RefreshGroups side-effect
@@ -1436,28 +1434,13 @@ void main() {
     blocTest<GroupBloc, GroupState>(
       'emits [tokenGateVerified] when token gate check fails',
       build: () {
-        final tokenGateConfig = TokenGateConfig(
-          enabled: true,
-          rules: [
-            TokenGateRule(
-              id: 'rule1',
-              tokenStandard: TokenStandard.erc20,
-              chainId: 1,
-              contractAddress: '0x123',
-              minBalance: BigInt.from(100),
-            ),
-          ],
-        );
         const verificationResult = TokenGateVerificationResult(
           passed: false,
           errorMessage: 'Insufficient balance',
         );
         when(
-          () => mockRepository.getTokenGate(_roomId1),
-        ).thenAnswer((_) async => tokenGateConfig);
-        when(
-          () => mockRepository.verifyTokenGate(_roomId1),
-        ).thenAnswer((_) async => verificationResult);
+          () => mockRepository.acceptGroupInvite(_roomId1),
+        ).thenThrow(const RoomAdmissionException(_roomId1, verificationResult));
         return GroupBloc(mockRepository);
       },
       act: (bloc) => bloc.add(const AcceptGroupInvite(_roomId1)),
@@ -1472,32 +1455,14 @@ void main() {
             ),
       ],
       verify: (_) {
-        verifyNever(() => mockRepository.acceptGroupInvite(any()));
+        verify(() => mockRepository.acceptGroupInvite(_roomId1)).called(1);
+        verifyNever(() => mockRepository.verifyTokenGate(any()));
       },
     );
 
     blocTest<GroupBloc, GroupState>(
       'accepts invite when token gate passes',
       build: () {
-        final tokenGateConfig = TokenGateConfig(
-          enabled: true,
-          rules: [
-            TokenGateRule(
-              id: 'rule1',
-              tokenStandard: TokenStandard.erc20,
-              chainId: 1,
-              contractAddress: '0x123',
-              minBalance: BigInt.from(100),
-            ),
-          ],
-        );
-        const verificationResult = TokenGateVerificationResult(passed: true);
-        when(
-          () => mockRepository.getTokenGate(_roomId1),
-        ).thenAnswer((_) async => tokenGateConfig);
-        when(
-          () => mockRepository.verifyTokenGate(_roomId1),
-        ).thenAnswer((_) async => verificationResult);
         when(
           () => mockRepository.acceptGroupInvite(_roomId1),
         ).thenAnswer((_) async {});
@@ -1526,12 +1491,8 @@ void main() {
     );
 
     blocTest<GroupBloc, GroupState>(
-      'skips token gate verification when config is disabled',
+      'delegates verification to admission without duplicate balance requests',
       build: () {
-        const tokenGateConfig = TokenGateConfig(enabled: false, rules: []);
-        when(
-          () => mockRepository.getTokenGate(_roomId1),
-        ).thenAnswer((_) async => tokenGateConfig);
         when(
           () => mockRepository.acceptGroupInvite(_roomId1),
         ).thenAnswer((_) async {});
@@ -1561,9 +1522,6 @@ void main() {
     blocTest<GroupBloc, GroupState>(
       'emits [error] when acceptGroupInvite throws',
       build: () {
-        when(
-          () => mockRepository.getTokenGate(_roomId1),
-        ).thenAnswer((_) async => null);
         when(
           () => mockRepository.acceptGroupInvite(_roomId1),
         ).thenThrow(Exception('accept failed'));
