@@ -328,6 +328,18 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Resolved in the 2026-09-12 audit
 
+### BACKUP-001 Password-protected v3 backups can fail authentication — Resolved 2026-09-13
+
+- Severity: H
+- Evidence: new file-level tests reproduced correct-password failures for full and incremental backups. The writer serialized the block-rounded GCM output buffer, so the last 16 bytes were not always the actual authentication tag.
+- Resolution: serialize the actual bytes returned by the cipher. The reader authenticates normal v3 data first; it also recovers the historical zero-padded layout using a bounded 1–15 byte retry, with successful GCM authentication required for every accepted candidate. Wrong passwords, altered salt/nonce/tag/ciphertext and malformed files remain rejected. Independent Python cryptography fixtures verify both standard and historical layouts. Tests use public synthetic data only.
+
+### BACKUP-002 Repeated backups and exports overwrite earlier files — Resolved 2026-09-13
+
+- Severity: H
+- Evidence: consecutive full/incremental backup tests produced identical minute-based paths. HTML/JSON/TXT exports of the same room also reused the same second-based path, replacing files that could still be referenced by a share sheet.
+- Resolution: backup filenames include their unique backup ID; each chat export uses its own temporary directory. Regression tests verify distinct paths and byte-for-byte preservation of the earlier file. Existing backup discovery/deletion and export sharing continue to use the returned paths.
+
 ### INTEGRATION-001 Wallet build source differed from its declared Chat pin — Resolved
 
 Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d841ff667708e513fc1ca0b708f9e`, removes the tracked Chat path override, and records Git source in pubspec.lock. The resolved Git package and host cache match across all 764 lib/assets files (SHA-256 manifest in host docs/chat-audit-2026-09-12/CHAT_SOURCE_MANIFEST_2026-09-12.json). Host full suite: 4,163 passed; after Git resolution, 18 additional targeted tests passed and analyze reports zero errors/warnings with 155 infos. The original divergence evidence remains in docs/HOST_BASELINE_SYNC_2026-09-12.json.
