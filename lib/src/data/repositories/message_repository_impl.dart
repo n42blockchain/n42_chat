@@ -1197,6 +1197,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     } finally {
       if (identical(_timelineCreations[roomId], creation)) {
         _timelineCreations.remove(roomId);
+        _timelineGenerations.remove(roomId);
       }
     }
   }
