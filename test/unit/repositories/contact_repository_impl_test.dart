@@ -93,9 +93,27 @@ void main() {
   });
 
   group('startDirectChat', () {
-    test('creates chat and invites to moment room', () async {
+    test('pending request does not share Moments before acceptance', () async {
+      when(
+        () => mockStorageDS.shouldDefaultEncryptNewChats(),
+      ).thenAnswer((_) async => true);
+      when(
+        () =>
+            mockContactDS.startDirectChat('@alice:matrix.org', encrypted: true),
+      ).thenAnswer((_) async => '!dm1:matrix.org');
+      when(() => mockContactDS.getDirectChatRoomIdMap()).thenReturn({});
+      expect(
+        await repository.startDirectChat('@alice:matrix.org'),
+        '!dm1:matrix.org',
+      );
+      verifyNever(() => mockMomentDS.inviteFriendToMomentRoom(any()));
+    });
+    test('accepted friend can also be invited to moment room', () async {
       const userId = '@alice:matrix.org';
       const roomId = '!dm1:matrix.org';
+      when(
+        () => mockContactDS.getDirectChatRoomIdMap(),
+      ).thenReturn({userId: roomId});
 
       when(
         () => mockStorageDS.shouldDefaultEncryptNewChats(),
@@ -120,6 +138,9 @@ void main() {
     test('still returns roomId even if moment invite fails', () async {
       const userId = '@alice:matrix.org';
       const roomId = '!dm1:matrix.org';
+      when(
+        () => mockContactDS.getDirectChatRoomIdMap(),
+      ).thenReturn({userId: roomId});
 
       when(
         () => mockStorageDS.shouldDefaultEncryptNewChats(),

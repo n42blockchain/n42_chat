@@ -288,6 +288,56 @@ void main() {
     );
   });
 
+  group('timeline login lifetime', () {
+    test('same account on a new device creates a fresh timeline', () async {
+      when(() => mockClient.userID).thenReturn('@alice:matrix.org');
+      when(() => mockClient.deviceID).thenReturn('old-device');
+      await repository.getMessages(testRoomId, limit: 0);
+      when(() => mockClient.deviceID).thenReturn('new-device');
+      await repository.getMessages(testRoomId, limit: 0);
+      verify(
+        () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
+      ).called(2);
+      verify(() => mockTimeline.cancelSubscriptions()).called(1);
+    });
+    test('disposed creation cannot overwrite a replacement timeline', () async {
+      final pending = Completer<matrix.Timeline>();
+      var calls = 0;
+      when(
+        () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
+      ).thenAnswer((_) {
+        calls++;
+        return calls == 1 ? pending.future : Future.value(mockTimeline);
+      });
+      final oldRequest = repository.getMessages(testRoomId, limit: 0);
+      await Future<void>.delayed(Duration.zero);
+      repository.disposeTimeline(testRoomId);
+      await repository.getMessages(testRoomId, limit: 0);
+      final stale = MockTimeline();
+      pending.complete(stale);
+      expect(await oldRequest, isEmpty);
+      await repository.getMessages(testRoomId, limit: 0);
+      expect(calls, 2);
+      verify(() => stale.cancelSubscriptions()).called(1);
+    });
+    test(
+      'account switch discards an in-flight timeline before caching it',
+      () async {
+        when(() => mockClient.userID).thenReturn('@alice:matrix.org');
+        final pending = Completer<matrix.Timeline>();
+        when(
+          () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
+        ).thenAnswer((_) => pending.future);
+        final request = repository.getMessages(testRoomId, limit: 0);
+        await Future<void>.delayed(Duration.zero);
+        when(() => mockClient.userID).thenReturn('@bob:matrix.org');
+        pending.complete(mockTimeline);
+        expect(await request, isEmpty);
+        verify(() => mockTimeline.cancelSubscriptions()).called(1);
+      },
+    );
+  });
+
   group('watchMessages encryption recovery', () {
     test('requests a missing Megolm session from other devices', () async {
       final encryption = MockEncryption();
