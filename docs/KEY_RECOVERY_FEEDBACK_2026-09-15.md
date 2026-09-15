@@ -33,10 +33,12 @@ The complete Chat suite passes 6,462 tests with one credential-dependent test
 skipped and no failures. Static analysis reports zero errors/warnings and 173
 existing informational diagnostics.
 
-The separate permissions question concerns a different settings scope. The current
-entry is Contacts → select a friend → top-right “…” → Set Permissions. Global Chat
-settings contain background, quick replies, translation and downloads. No friend
-permission entry was added to global settings in this patch.
+The user's subsequent clarification concerns **own-account** friendship policy,
+not per-contact restrictions. The previous direction to Contacts → select a friend
+→ Set Permissions did not answer that requirement. The requested global controls
+are verification/open/closed friend requests, discoverability and a blocklist.
+They are not implemented by this recovery patch; see
+`ACCOUNT_FRIEND_PERMISSIONS_2026-09-15.md` for the confirmed scope and deployment gap.
 
 Unresolved real-account acceptance is tracked only in `OPEN_ISSUES.md`, `QA-009`.
 Historical messages whose keys exist neither in a valid backup nor on another

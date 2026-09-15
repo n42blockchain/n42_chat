@@ -16,6 +16,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/biometric_service.dart';
+import 'package:n42_chat/src/presentation/blocs/bloc_message_keys.dart';
 import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
 import 'package:n42_chat/src/domain/entities/user_entity.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
@@ -851,6 +852,49 @@ void main() {
 
   group('AuthBiometricLoginRequested', () {
     blocTest<AuthBloc, AuthState>(
+      'does not prompt or restore after logout has removed the session',
+      build: () {
+        when(
+          () => mockBiometricService.isAvailable(),
+        ).thenAnswer((_) async => true);
+        when(
+          () => mockSecureStorage.isBiometricEnabled(),
+        ).thenAnswer((_) async => true);
+        when(() => mockSecureStorage.getCredentials()).thenAnswer(
+          (_) async => {'homeserver': 'https://server.com', 'username': 'user'},
+        );
+        when(
+          () => mockSecureStorage.getSession(),
+        ).thenAnswer((_) async => null);
+        return buildBloc();
+      },
+      act: (bloc) => bloc.add(const AuthBiometricLoginRequested()),
+      expect: () => [
+        isA<AuthState>().having((s) => s.status, 'status', AuthStatus.loading),
+        isA<AuthState>()
+            .having((s) => s.status, 'status', AuthStatus.unauthenticated)
+            .having(
+              (s) => s.errorMessage,
+              'error',
+              BlocMessageKeys.authSessionExpired,
+            ),
+      ],
+      verify: (_) {
+        verifyNever(
+          () => mockBiometricService.authenticate(reason: any(named: 'reason')),
+        );
+        verifyNever(
+          () => mockAuthRepository.loginWithToken(
+            homeserver: any(named: 'homeserver'),
+            accessToken: any(named: 'accessToken'),
+            userId: any(named: 'userId'),
+            deviceId: any(named: 'deviceId'),
+          ),
+        );
+      },
+    );
+
+    blocTest<AuthBloc, AuthState>(
       'emits [loading, error] when device biometrics unavailable',
       build: () {
         when(
@@ -936,6 +980,14 @@ void main() {
             'homeserver': 'https://server.com',
             'username': 'user',
             'password': 'pass',
+          },
+        );
+        when(() => mockSecureStorage.getSession()).thenAnswer(
+          (_) async => {
+            'homeserver': 'https://server.com',
+            'userId': '@user:server.com',
+            'accessToken': 'test-token',
+            'deviceId': 'test-device',
           },
         );
         when(
