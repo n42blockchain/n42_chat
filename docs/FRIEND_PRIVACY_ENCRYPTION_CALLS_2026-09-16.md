@@ -74,3 +74,24 @@ and registration policy have not been checked on the deployment. No production
 configuration was changed. User-account cross-platform calls, background ringing,
 network handover and new-message delivery must be accepted on both updated apps.
 TestFlight build 2026072667 predates these fixes.
+
+## Contact and tag follow-up
+
+Video 9 exposed a stricter friendship check running before lazy-loaded member
+state was present after login. Resolve the actual room member (without global
+profile fallback) before contact enumeration and sends. Unknown membership
+fails explicitly rather than publishing a false empty contact snapshot. Reuse
+accepted/pending direct rooms; create a fresh invitation for an abandoned room.
+Outgoing requests appear as awaiting acceptance; they do not offer Accept/Reject.
+Profile Add and request acceptance now wait for their actual asynchronous result.
+No existing rooms or historical messages are removed.
+
+The populated friend-tag picker now includes a create button alongside Confirm.
+Creating selects the new tag; confirming saves the friend's selection. Matching
+trimmed, case-insensitive names reuse the existing tag. Dialog-owned controllers
+survive exit animations and storage failures roll back mutations.
+
+Both attached phones passed the native smoke scenarios after Android USB install
+was allowed. These are not the reported phones, and fixture signaling does not
+verify dxx/dxx01 contacts or successful live calls. The original affected accounts
+must still perform QR acceptance and exchange fresh encrypted messages.

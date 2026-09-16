@@ -241,6 +241,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Next step: TestFlight `2.4.8+2026072656` was uploaded from the preceding client repairs. Obtain the Matrix deployment target, inspect its effective registration policy and restore the intended registration flow before repeating the above device acceptance. The new explanatory message does not change server policy and is not yet in that uploaded build.
 
 
+- September 16 follow-up (video 9 and tag picker): joined direct rooms now resolve authoritative peer membership with profile fallback disabled before building contacts or sending. An abandoned direct room no longer absorbs a new QR invitation; outgoing invitations are visible as awaiting acceptance. Friend-request actions await the repository result, and failed loading can retry. No rooms, contact account data or history are deleted. The tag picker exposes creation in selection mode, selects the new tag, persists on confirmation and reuses an existing normalized name. Tag catalog contact counts remain legacy catalog data; this change does not reconstruct those counts.
+- Verification update: focused contact/profile/tag regression passed 137 cases; both attached Android and iPhone passed native Megolm and WebRTC cancellation smoke scenarios with fixture signaling. The user confirmed the reported phones are different devices. Live dxx/dxx01 contact restoration, bilateral QR acceptance and cross-platform calling remain unverified; retain this issue pending acceptance on those updated clients.
+
 ### QA-003 AI smart replies and webhook automation were not live-tested end to end
 
 - Severity: M
