@@ -58,7 +58,7 @@ packages:
     source: hosted
     version: "2.7.0"
   async:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: async
       sha256: "758e6d74e971c3e5aceb4110bfd6698efc7f501675bcfe0c775459a8140750eb"
@@ -2627,7 +2627,7 @@ packages:
     source: hosted
     version: "15.0.2"
   vodozemac:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: vodozemac
       sha256: bbe7dd31d7f623e2aeedb92e4b71a8b519e6109ce1e2911b5a220f6752b65cda

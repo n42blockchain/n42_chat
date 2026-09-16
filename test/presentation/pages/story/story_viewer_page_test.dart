@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'package:mocktail/mocktail.dart';
+import 'package:n42_chat/src/core/di/injection.dart';
+import 'package:n42_chat/src/domain/repositories/story_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
@@ -19,7 +23,41 @@ StoryEntity makeStory(String id) {
   );
 }
 
+class _StoryRepository extends Mock implements IStoryRepository {}
+
 void main() {
+  testWidgets('revoked status disappears from an already-open viewer', (
+    tester,
+  ) async {
+    final changes = StreamController<List<UserStories>>.broadcast();
+    final repository = _StoryRepository();
+    when(() => repository.watchStories()).thenAnswer((_) => changes.stream);
+    getIt.registerSingleton<IStoryRepository>(repository);
+    addTearDown(() async {
+      await changes.close();
+      await getIt.unregister<IStoryRepository>();
+    });
+    final group = UserStories(
+      userId: '@alice:server',
+      userName: 'Alice',
+      stories: [makeStory('private')],
+      lastUpdated: DateTime.now(),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: StoryViewerPage(allUserStories: [group]),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Story private'), findsOneWidget);
+    changes.add([]);
+    await tester.pump();
+    expect(find.text('Story private'), findsNothing);
+    expect(find.text('Failed to load'), findsOneWidget);
+  });
+
   testWidgets('onStoryViewed receives the actual currently visible story', (
     tester,
   ) async {
@@ -124,8 +162,9 @@ void main() {
     expect(textField.controller?.text, isEmpty);
   });
 
-  testWidgets('my story delete action calls callback and closes viewer',
-      (tester) async {
+  testWidgets('my story delete action calls callback and closes viewer', (
+    tester,
+  ) async {
     final deleteCalls = <String>[];
     final userStories = UserStories(
       userId: '@alice:server',

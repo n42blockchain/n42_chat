@@ -66,8 +66,9 @@ void main() {
     currentState = MomentState(moments: [moment]);
 
     when(() => mockMomentBloc.state).thenAnswer((_) => currentState);
-    when(() => mockMomentBloc.stream)
-        .thenAnswer((_) => momentStateController.stream);
+    when(
+      () => mockMomentBloc.stream,
+    ).thenAnswer((_) => momentStateController.stream);
     when(() => mockMomentBloc.add(any())).thenReturn(null);
     when(() => mockMomentBloc.close()).thenAnswer((_) async {});
   });
@@ -76,8 +77,25 @@ void main() {
     await momentStateController.close();
   });
 
-  testWidgets('failed comment submission keeps draft text and reply target',
-      (tester) async {
+  testWidgets(
+    'revoked moments do not fall back to the stale navigation snapshot',
+    (tester) async {
+      await tester.pumpWidget(
+        _buildTestWidget(momentBloc: mockMomentBloc, moment: moment),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Test moment'), findsOneWidget);
+      currentState = const MomentState();
+      momentStateController.add(currentState);
+      await tester.pumpAndSettle();
+      expect(find.text('Test moment'), findsNothing);
+      expect(find.text('Failed to load'), findsOneWidget);
+    },
+  );
+
+  testWidgets('failed comment submission keeps draft text and reply target', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _buildTestWidget(momentBloc: mockMomentBloc, moment: moment),
     );
@@ -118,8 +136,9 @@ void main() {
     expect(find.text('comment failed'), findsOneWidget);
   });
 
-  testWidgets('successful comment submission clears draft and reply target',
-      (tester) async {
+  testWidgets('successful comment submission clears draft and reply target', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _buildTestWidget(momentBloc: mockMomentBloc, moment: moment),
     );

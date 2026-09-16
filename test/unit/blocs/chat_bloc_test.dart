@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:n42_chat/src/data/datasources/matrix/message/encrypted_send_guard.dart';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -404,6 +405,29 @@ void main() {
           ),
         ).called(1);
 
+        await bloc.close();
+      },
+    );
+
+    test(
+      'encryption gate failure stays a failure without advancing sent timestamp',
+      () async {
+        when(
+          () => mockRepository.sendTextMessage(
+            any(),
+            any(),
+            selfDestructAfter: any(named: 'selfDestructAfter'),
+            mentionedUserIds: any(named: 'mentionedUserIds'),
+            mentionsRoom: any(named: 'mentionsRoom'),
+          ),
+        ).thenThrow(const EncryptedSendNotReady());
+        final bloc = await buildInitializedBloc();
+        final sentAt = bloc.state.lastMessageSentAt;
+        bloc.add(const SendTextMessage('Keep this draft'));
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+        expect(bloc.state.isSending, isFalse);
+        expect(bloc.state.error, EncryptedSendNotReady.code);
+        expect(bloc.state.lastMessageSentAt, sentAt);
         await bloc.close();
       },
     );
