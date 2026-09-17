@@ -1,11 +1,16 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
+import 'package:n42_chat/src/core/di/injection.dart';
+import 'package:n42_chat/src/domain/repositories/contact_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/contact/contact_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/contact/contact_state.dart';
 import 'package:n42_chat/src/presentation/pages/contact/contact_settings_page.dart';
+
+class _ContactRepository extends Mock implements IContactRepository {}
 
 class MockContactBloc extends Mock implements ContactBloc {
   @override
@@ -27,10 +32,7 @@ Widget buildTestWidget(Widget child, {ContactBloc? contactBloc}) {
   );
 
   if (contactBloc != null) {
-    return BlocProvider<ContactBloc>.value(
-      value: contactBloc,
-      child: widget,
-    );
+    return BlocProvider<ContactBloc>.value(value: contactBloc, child: widget);
   }
   return widget;
 }
@@ -41,6 +43,52 @@ void main() {
   setUp(() {
     mockContactBloc = MockContactBloc();
   });
+
+  for (final fail in [false, true]) {
+    testWidgets(
+      'blocked user absent from contacts has truthful switch; save failure=$fail',
+      (tester) async {
+        final repository = _ContactRepository();
+        final saved = Completer<void>();
+        getIt.pushNewScope();
+        getIt.registerSingleton<IContactRepository>(repository);
+        addTearDown(getIt.popScope);
+        when(
+          () => repository.isUserIgnored('@test:server.com'),
+        ).thenReturn(true);
+        when(
+          () => repository.unignoreUser('@test:server.com'),
+        ).thenAnswer((_) => saved.future);
+        await tester.pumpWidget(
+          buildTestWidget(
+            const ContactSettingsPage(
+              userId: '@test:server.com',
+              displayName: 'Test User',
+            ),
+            contactBloc: mockContactBloc,
+          ),
+        );
+        await tester.pumpAndSettle();
+        final toggle = find.byType(Switch).last;
+        expect(tester.widget<Switch>(toggle).value, isTrue);
+        await tester.ensureVisible(toggle);
+        await tester.tap(toggle);
+        await tester.pump();
+        expect(tester.widget<Switch>(toggle).value, isTrue);
+        expect(tester.widget<Switch>(toggle).onChanged, isNull);
+        if (fail) {
+          saved.completeError(StateError('Offline'));
+        } else {
+          saved.complete();
+        }
+        await tester.pumpAndSettle();
+        expect(tester.widget<Switch>(toggle).value, fail);
+        expect(tester.widget<Switch>(toggle).onChanged, isNotNull);
+        if (fail) expect(find.text('Save failed'), findsOneWidget);
+        verify(() => repository.unignoreUser('@test:server.com')).called(1);
+      },
+    );
+  }
 
   group('ContactSettingsPage', () {
     testWidgets('renders basic menu items', (tester) async {
@@ -83,33 +131,36 @@ void main() {
       expect(find.text('Other'), findsOneWidget);
     });
 
-    testWidgets('report dialog shows validation error when no reason selected',
-        (tester) async {
-      await tester.pumpWidget(
-        buildTestWidget(
-          const ContactSettingsPage(
-            userId: '@test:server.com',
-            displayName: 'Test User',
+    testWidgets(
+      'report dialog shows validation error when no reason selected',
+      (tester) async {
+        await tester.pumpWidget(
+          buildTestWidget(
+            const ContactSettingsPage(
+              userId: '@test:server.com',
+              displayName: 'Test User',
+            ),
+            contactBloc: mockContactBloc,
           ),
-          contactBloc: mockContactBloc,
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // 打开投诉对话框
-      await tester.tap(find.text('Report'));
-      await tester.pumpAndSettle();
+        // 打开投诉对话框
+        await tester.tap(find.text('Report'));
+        await tester.pumpAndSettle();
 
-      // 不选择任何原因，直接点击提交
-      await tester.tap(find.text('Confirm'));
-      await tester.pumpAndSettle();
+        // 不选择任何原因，直接点击提交
+        await tester.tap(find.text('Confirm'));
+        await tester.pumpAndSettle();
 
-      // 验证显示了验证错误提示
-      expect(find.text('Please select a reason'), findsOneWidget);
-    });
+        // 验证显示了验证错误提示
+        expect(find.text('Please select a reason'), findsOneWidget);
+      },
+    );
 
-    testWidgets('report dialog submits successfully when reason is selected',
-        (tester) async {
+    testWidgets('report dialog submits successfully when reason is selected', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         buildTestWidget(
           const ContactSettingsPage(
@@ -137,8 +188,7 @@ void main() {
       expect(find.text('Report submitted'), findsOneWidget);
     });
 
-    testWidgets('report dialog has optional description field',
-        (tester) async {
+    testWidgets('report dialog has optional description field', (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
           const ContactSettingsPage(
