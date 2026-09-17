@@ -449,15 +449,39 @@ class MatrixContactDataSource {
 
   /// 接受邀请
   Future<void> acceptInvite(String roomId) async {
-    final room = _client?.getRoomById(roomId);
-    if (room == null) return;
+    final client = _client;
+    final account = client?.userID;
+    final room = client?.getRoomById(roomId);
+    if (client == null || account == null || room == null) {
+      throw StateError('Friend request is no longer available');
+    }
+    void checkSession() {
+      if (!identical(client, _client) || account != client.userID) {
+        throw StateError('Account changed');
+      }
+    }
+
     final peer = room.directChatMatrixID;
     await room.join();
-    if (peer != null) await room.addToDirectChat(peer);
+    checkSession();
+    if (peer != null) {
+      await room.addToDirectChat(peer);
+      checkSession();
+      // Once joined, the SDK can no longer infer the peer from the invitation.
+      // Preserve the acknowledged mapping until account data arrives in /sync.
+      client.accountData['m.direct'] = matrix.BasicEvent(
+        type: 'm.direct',
+        content: {
+          ...client.directChats,
+          peer: {...?client.directChats[peer], roomId}.toList(),
+        },
+      );
+    }
     if (room.membership != matrix.Membership.join) {
-      await _client!
+      await client
           .waitForRoomInSync(roomId, join: true)
           .timeout(const Duration(seconds: 20));
+      checkSession();
     }
     await refreshDirectChatMembers();
   }

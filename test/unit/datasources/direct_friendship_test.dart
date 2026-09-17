@@ -276,6 +276,50 @@ void main() {
     },
   );
 
+  test(
+    'real SDK invitation remains discoverable after accepting before account sync',
+    () async {
+      final updates = Client('invite-test', database: _Database()).onRoomState;
+      when(() => client.onRoomState).thenReturn(updates);
+      addTearDown(updates.close);
+      final invited = Room(
+        id: '!dm:test',
+        client: client,
+        membership: Membership.invite,
+      );
+      invited.setState(
+        User.fromState(
+          stateKey: '@alice:test',
+          senderId: '@bob:test',
+          typeKey: EventTypes.RoomMember,
+          room: invited,
+          content: {'membership': 'invite', 'is_direct': true},
+        ),
+      );
+      invited.setState(User('@bob:test', membership: 'join', room: invited));
+      when(() => client.rooms).thenReturn([invited]);
+      when(() => client.getRoomById('!dm:test')).thenReturn(invited);
+      when(
+        () => client.setAccountData('@alice:test', 'm.direct', any()),
+      ).thenAnswer((_) async {});
+      when(() => client.joinRoomById('!dm:test')).thenAnswer((_) async {
+        invited.membership = Membership.join;
+        return invited.id;
+      });
+      expect(contacts.getPendingInvites(), [invited]);
+      expect(contacts.getDirectChatContacts(), isEmpty);
+      await contacts.acceptInvite('!dm:test');
+      expect(contacts.getPendingInvites(), isEmpty);
+      expect(contacts.getDirectChatContacts().map((u) => u.id), ['@bob:test']);
+      expect(contacts.getDirectChatRoomIdMap(), {'@bob:test': '!dm:test'});
+    },
+  );
+
+  test('accepting a missing invitation cannot report success', () async {
+    when(() => client.getRoomById('!gone:test')).thenReturn(null);
+    await expectLater(contacts.acceptInvite('!gone:test'), throwsStateError);
+  });
+
   test('scan creates a fresh invitation when the old peer has left', () async {
     when(() => partner.content).thenReturn({'membership': 'leave'});
     when(

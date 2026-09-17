@@ -84,6 +84,27 @@ void main() {
     home: BlocProvider<ContactBloc>.value(value: contacts, child: page),
   );
 
+  testWidgets('incoming request stays accessible when contacts fail to load', (
+    tester,
+  ) async {
+    when(() => contacts.state).thenReturn(
+      ContactState(
+        status: ContactStatus.error,
+        errorMessage: 'Membership unavailable',
+        friendRequests: [
+          FriendRequest(id: '!request:hs', userId: '@bob:hs', userName: 'Bob'),
+        ],
+      ),
+    );
+    await tester.pumpWidget(app(const ContactListPage()));
+    await tester.pumpAndSettle();
+    expect(find.text('New Friends'), findsOneWidget);
+    await tester.tap(find.text('New Friends'));
+    await tester.pumpAndSettle();
+    expect(find.text('Bob'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final status in [
     ContactStatus.loading,
     ContactStatus.error,
