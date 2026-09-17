@@ -84,6 +84,41 @@ void main() {
     home: BlocProvider<ContactBloc>.value(value: contacts, child: page),
   );
 
+  for (final status in [
+    ContactStatus.loading,
+    ContactStatus.error,
+    ContactStatus.chatStarted,
+  ]) {
+    testWidgets('cached contacts remain visible during $status', (
+      tester,
+    ) async {
+      when(() => contacts.state).thenReturn(
+        ContactState(
+          status: status,
+          contacts: const [friend],
+          groupedContacts: const {
+            'A': [friend],
+          },
+          indexLetters: const ['A'],
+        ),
+      );
+      await tester.pumpWidget(app(const ContactListPage()));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Alice'),
+        250,
+        scrollable: find
+            .descendant(
+              of: find.byType(CustomScrollView),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      expect(find.text('Alice'), findsOneWidget);
+      expect(find.text('No contacts'), findsNothing);
+    });
+  }
+
   testWidgets('tapping a contact opens their profile without creating a chat', (
     tester,
   ) async {

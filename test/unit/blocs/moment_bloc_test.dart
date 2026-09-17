@@ -34,6 +34,23 @@ void main() {
 
   MomentBloc buildBloc() => MomentBloc(mockRepo);
 
+  test('late refresh cannot restore a successfully deleted moment', () async {
+    final item = _makeMoment(isFromMe: true);
+    when(() => mockRepo.deleteMoment(item.id)).thenAnswer((_) async {});
+    final bloc = buildBloc();
+    bloc.add(MomentsUpdated([item]));
+    await bloc.stream.firstWhere((s) => s.moments.isNotEmpty);
+    final deleted = bloc.stream.firstWhere(
+      (s) => s.deleteActionStatus == MomentDeleteActionStatus.success,
+    );
+    bloc.add(DeleteMoment(item.id));
+    await deleted;
+    bloc.add(MomentsUpdated([item]));
+    await Future<void>.delayed(Duration.zero);
+    expect(bloc.state.moments, isEmpty);
+    await bloc.close();
+  });
+
   group('initial state', () {
     test('is MomentState.initial()', () {
       final bloc = buildBloc();
@@ -185,11 +202,7 @@ void main() {
               'moment removed',
               isFalse,
             )
-            .having(
-              (s) => s.deleteActionVersion,
-              'deleteActionVersion',
-              1,
-            )
+            .having((s) => s.deleteActionVersion, 'deleteActionVersion', 1)
             .having(
               (s) => s.deleteActionMomentId,
               'deleteActionMomentId',
@@ -216,11 +229,7 @@ void main() {
       expect: () => [
         isA<MomentState>()
             .having((s) => s.hasError, 'hasError', isTrue)
-            .having(
-              (s) => s.deleteActionVersion,
-              'deleteActionVersion',
-              1,
-            )
+            .having((s) => s.deleteActionVersion, 'deleteActionVersion', 1)
             .having(
               (s) => s.deleteActionMomentId,
               'deleteActionMomentId',

@@ -133,11 +133,12 @@ class _ContactListPageState extends State<ContactListPage> {
                 }
               },
               builder: (context, state) {
-                if (state.isLoading) {
+                if (state.isLoading && state.contacts.isEmpty) {
                   return const N42Loading();
                 }
 
-                if (state.status == ContactStatus.error) {
+                if (state.status == ContactStatus.error &&
+                    state.contacts.isEmpty) {
                   return N42EmptyState(
                     icon: Icons.error_outline,
                     title: S.of(context)?.commonLoadFailed ?? 'Load failed',
@@ -149,7 +150,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   );
                 }
 
-                if (state.isLoaded) {
+                if (state.isLoaded || state.contacts.isNotEmpty) {
                   return _buildContactList(state, isDark);
                 }
 
