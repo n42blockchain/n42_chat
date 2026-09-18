@@ -193,21 +193,6 @@ class ContactRepositoryImpl implements IContactRepository {
       // Use display name if available, otherwise extract username from userId
       String displayName = user?.calcDisplayname() ?? '';
 
-      if ((displayName.isEmpty || displayName == inviter) && inviter != null) {
-        try {
-          final profile = await _contactDataSource.getUserProfile(inviter);
-          final profileName = profile?.displayName?.trim() ?? '';
-          if (profileName.isNotEmpty) {
-            displayName = profileName;
-          }
-          if (avatarUrl == null && profile != null) {
-            avatarUrl = _contactDataSource.getProfileAvatarUrl(profile);
-          }
-        } catch (_) {
-          // The invitation remains usable when profile lookup is unavailable.
-        }
-      }
-
       // Fallback: extract username from Matrix ID format (@username:server)
       if ((displayName.isEmpty || displayName == inviter) && inviter != null) {
         displayName = inviter.split(':').first.replaceFirst('@', '');
