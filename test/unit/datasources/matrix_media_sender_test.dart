@@ -33,7 +33,7 @@ void main() {
   });
 
   test(
-    'rejects streaming file uploads in encrypted rooms to preserve attachment encryption',
+    'rejects oversized encrypted attachments before reading or uploading',
     () async {
       when(() => room.encrypted).thenReturn(true);
       when(() => client.fileEncryptionEnabled).thenReturn(true);
@@ -43,9 +43,9 @@ void main() {
           '!room:test',
           filename: 'secret.bin',
           filePath: '/tmp/secret.bin',
-          fileSize: 16,
+          fileSize: 51 * 1024 * 1024,
         ),
-        throwsA(isA<UnsupportedError>()),
+        throwsStateError,
       );
 
       verifyNever(

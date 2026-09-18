@@ -93,12 +93,12 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: member-join welcome messages and webhook callbacks now share the same room bot config, but they still execute from the client-side `GroupBloc`. If no logged-in client is online and subscribed, those automations do not fire.
 - Next step: move room automation triggers to a durable server-side worker/bot account, or introduce a background sync service with explicit delivery guarantees.
 
-### MEDIA-002 Encrypted-room large file uploads still cap at 64MB
+### MEDIA-002 Encrypted-room file uploads require bounded in-memory encryption
 
 - Severity: H
 - Added: 2026-03-20
 - Evidence: `lib/src/presentation/pages/chat/chat_page_media_actions.dart`, `lib/src/data/datasources/matrix/message/matrix_media_sender.dart`
-- Current state: the secure fallback for encrypted rooms intentionally fail-closes above 64MB to avoid sending unencrypted attachments. Large-file support therefore does not meet the `>2GB` requirement for encrypted rooms.
+- Current state: the September 18 repair converts picker paths/streams to SDK-encrypted attachments with a 50 MB bound (AppConstants.maxFileSize), including a streaming byte count that does not trust declared size. Larger attachments fail closed rather than uploading plaintext. Large-file support therefore does not meet the `>2GB` requirement for encrypted rooms.
 - Next step: implement a streaming encrypted upload path that preserves Matrix attachment encryption semantics instead of falling back to whole-file bytes or unencrypted upload.
 
 ### MEDIA-003 Built-in document preview is still incomplete for office formats
@@ -441,3 +441,14 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Evidence: `nested_settings_failure_test.dart`, `settings_write_failure_test.dart`
 - Resolution: account-list and notification-filter reads show a retry state on failure. Filter saves serialize input, restore confirmed rules on failure, and update the running push filter only after storage succeeds. Appearance, notification and filter writes reject platform `false` results and reload SharedPreferences' optimistic cache from durable storage.
 - Verification: fault injection covers both `false` and thrown platform failures, cached-value restoration, successful retry, filter read/write failures and late completion after disposal. If the platform also refuses cache reload, the original write failure is still surfaced; recovery from a persistently unavailable OS store is not claimed.
+
+### QA-008 September 18 call, logout history, file and location repairs await device acceptance
+
+- Severity: H
+- Evidence: user confirmed build 2026072683 loses readable messages after logout/login without a recovery key; Downloads/1.mov shows this on both accounts. Caller posted duplicate call summaries, receiver posted another. Picker file paths were explicitly rejected in encrypted rooms. Current-location lookup only formatted coordinates, and send composition discarded the address.
+- Client repair: preserve account/homeserver-scoped inbound history sessions in device secure storage before normal logout/logoutAll; restore missing sessions after authenticated login. Retain replay indexes and stop logout if snapshot verification fails. No passwords, access tokens, outbound ratchets or Olm identity are retained. Account deactivation deletes its snapshot. Earlier lost keys and device replacement still require a user-held backup; forced session invalidation is outside this explicit-logout hook.
+- Call repair: caller-only shared summary with a stable per-call transaction ID, frozen duration, local deduplication, and no local pending signaling bubble. Remote hangup/reject invalidates pending startup. Both peers need the repair; older clients can still publish their own record.
+- Media/location repair: encrypted picker paths and streams feed the SDK attachment encryption path, with no plaintext retry on failure. GPS and map-center selection resolve an address; message composition retains it and location cards allow two text lines. Offline/unavailable geocoding falls back to coordinates. Chat-only contact rows open the friend's profile and refresh permissions on return.
+- Verification: native Megolm ciphertext survives mocked logout database clearing and authenticated login restoration; secure-storage platform is mocked. Tests cover failed snapshot storage preserving login, voice/video duplicate termination, late TURN completion, profile navigation/refresh, encrypted file path/stream routing, upload failure without plaintext fallback, and geocoder address/fallback. Physical keychain persistence, live bilateral file download/decryption, GPS address availability and two-device call acceptance remain unverified.
+- User confirmation: the okle contact-refresh failure was from build 2026072679; the user now confirms contacts display normally. No further reproduction is claimed for that old build.
+- Next step: upgrade both test phones and verify new-message logout/login without manual recovery, file transfer/opening, GPS/map address, one caller summary for either initiator, and chat-only profile navigation. Do not infer native acceptance from automated tests or release upload.
