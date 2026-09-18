@@ -49,7 +49,11 @@ void main() {
   );
   setUp(() {
     SharedPreferences.setMockInitialValues({
-      'tags_data': jsonEncode([
+      FriendDetailsStore(
+        'https://hs.test',
+        '@me:hs.test',
+        '__tag_catalog__',
+      ).key: jsonEncode([
         {'name': 'Family', 'contactIds': <String>[]},
       ]),
     });
@@ -109,7 +113,11 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({
-      'tags_data': jsonEncode([
+      FriendDetailsStore(
+        'https://hs.test',
+        '@me:hs.test',
+        '__tag_catalog__',
+      ).key: jsonEncode([
         {'name': 'Family', 'contactIds': <String>[]},
         {'name': 'Work', 'contactIds': <String>[]},
       ]),
@@ -217,7 +225,19 @@ void main() {
       await tester.pumpAndSettle();
       expect((await store.load())['tags'], ['Family']);
       final prefs = await SharedPreferences.getInstance();
-      expect(jsonDecode(prefs.getString('tags_data')!) as List, hasLength(1));
+      expect(
+        jsonDecode(
+              prefs.getString(
+                FriendDetailsStore(
+                  'https://hs.test',
+                  '@me:hs.test',
+                  '__tag_catalog__',
+                ).key,
+              )!,
+            )
+            as List,
+        hasLength(1),
+      );
     },
   );
 
