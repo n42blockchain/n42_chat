@@ -338,7 +338,13 @@ void main() {
       await tester.pumpAndSettle();
       await tester.runAsync(() async {
         await tester.tap(find.text('Add'));
-        await Future<void>.delayed(const Duration(milliseconds: 200));
+        final deadline = DateTime.now().add(const Duration(seconds: 5));
+        while (((await store.load())['photos'] as List?)?.length != 2) {
+          if (DateTime.now().isAfter(deadline)) {
+            fail('Photo imports did not finish before the deadline');
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        }
       });
       await tester.pumpAndSettle();
       expect(picker.source, ImageSource.gallery);
