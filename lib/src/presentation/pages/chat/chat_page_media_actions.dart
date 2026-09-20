@@ -107,8 +107,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         if (asset.type == AssetType.video) {
           await _sendVideo(
             media,
-            suppliedThumbnail: await asset.thumbnailDataWithSize(
-              const ThumbnailSize(400, 400),
+            suppliedThumbnail: await loadOptionalVideoThumbnail(
+              () => asset.thumbnailDataWithSize(const ThumbnailSize(400, 400)),
             ),
           );
         } else {

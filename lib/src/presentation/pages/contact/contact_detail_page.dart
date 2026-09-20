@@ -213,13 +213,20 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       final requests = contact?.isFriend == true
           ? <FriendRequest>[]
           : await repository.getPendingFriendRequests();
-      if (!mounted || _maybeContactBloc()?.state.deletedUserId == widget.userId)
-        return;
+      if (!mounted) return;
+      final latestState = _maybeContactBloc()?.state;
+      if (latestState?.deletedUserId == widget.userId) return;
+      // A sync update may have resolved the relationship while this lookup
+      // was in flight. Prefer that current contact over the older response.
+      final latestContact = latestState?.contacts
+          .where((c) => c.userId == widget.userId)
+          .firstOrNull;
+      final resolvedContact = latestContact ?? contact;
       setState(() {
-        _contact = _mergeRemarkIntoContact(contact);
-        _isFriend = contact?.isFriend == true;
-        _isStarred = contact?.isStarred ?? false;
-        _standaloneRequest = requests
+        _contact = _mergeRemarkIntoContact(resolvedContact);
+        _isFriend = resolvedContact?.isFriend == true;
+        _isStarred = resolvedContact?.isStarred ?? false;
+        _standaloneRequest = (_isFriend ? <FriendRequest>[] : requests)
             .where((r) => r.userId == widget.userId)
             .firstOrNull;
       });
