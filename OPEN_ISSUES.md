@@ -323,6 +323,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
 
+- September 19 second UX pass: contact searches discard stale results after changed/cleared input, distinguish errors from empty results and offer retry. Pull-to-refresh waits for the specific refresh completion, including unchanged snapshots; it retains cached contacts. Contact/conversation menus scroll on short screens and use a Material surface for visible press feedback. Account rows now use the existing typography/spacing tokens and respect bottom safe-area padding. Ninety targeted tests pass, including asynchronous search ordering, pending refresh, retry, short-screen menu access and light/dark fixtures. These checks do not establish native push or feedback-device acceptance.
+
 - September 19 UX update: the chat header exposes the active identity and account selector. The chooser serializes switching/add-account actions, blocks UI switching during a call, and retains a retry/re-authentication explanation after failure. Chat and profile roots are keyed by account identity to discard the preceding account's page state. Narrow-screen, 130% text and light/dark widget checks pass. Native push registration, OS process restart and the feedback phones remain unverified; the earlier synthetic SDK acceptance in QA-009 is not native UI acceptance.
 
 - Severity: M

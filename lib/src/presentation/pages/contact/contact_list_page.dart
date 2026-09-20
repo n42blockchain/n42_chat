@@ -136,6 +136,9 @@ class _ContactListPageState extends State<ContactListPage> {
                 }
               },
               builder: (context, state) {
+                if (state.searchQuery.isNotEmpty) {
+                  return _buildSearchResults(state, isDark);
+                }
                 if (state.isLoading &&
                     state.contacts.isEmpty &&
                     state.friendRequests.isEmpty) {
@@ -282,10 +285,20 @@ class _ContactListPageState extends State<ContactListPage> {
         // 联系人列表
         RefreshIndicator(
           onRefresh: () async {
-            context.read<ContactBloc>().add(const RefreshContacts());
+            final completion = Completer<void>();
+            context.read<ContactBloc>().add(
+              RefreshContacts(completion: completion),
+            );
+            try {
+              await completion.future.timeout(const Duration(seconds: 30));
+            } on TimeoutException {
+              // Preserve the list while the outstanding request finishes.
+            }
           },
           child: CustomScrollView(
             controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
               // 功能入口
               SliverToBoxAdapter(child: _buildFunctionEntries(state, isDark)),
@@ -369,6 +382,14 @@ class _ContactListPageState extends State<ContactListPage> {
     final localResults = state.filteredContacts;
     final globalResults = state.searchResults;
 
+    if (state.searchFailed) {
+      return N42EmptyState.error(
+        title: S.of(context)!.commonLoadFailed,
+        buttonText: S.of(context)!.commonRetry,
+        onButtonPressed: () => _onSearchChanged(_searchController.text),
+      );
+    }
+
     if (localResults.isEmpty &&
         globalResults.isEmpty &&
         !state.isSearching &&
@@ -379,6 +400,12 @@ class _ContactListPageState extends State<ContactListPage> {
         description:
             S.of(context)?.contactTryOtherKeywords ??
             'Try other keywords or global search',
+        buttonText: S.of(context)!.commonClear,
+        onButtonPressed: () {
+          _searchController.clear();
+          _onSearchChanged('');
+          setState(() {});
+        },
       );
     }
 
@@ -707,14 +734,15 @@ class _ContactListPageState extends State<ContactListPage> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      builder: (context) => Material(
+        color: context.surfaceColor,
+        clipBehavior: Clip.antiAlias,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusXL),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: ListView(
+            shrinkWrap: true,
             children: [
               // 联系人信息头部
               Container(
