@@ -225,6 +225,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-009 TestFlight registration, friendship and historical-key acceptance
 
+- September 20 feedback: build 2692 was confirmed; the actual workflow is explicit logout/relogin, not retained-session switching. A read-only device-key check found xian07 had one published device and xian01 had none. Missing recipient keys now have a specific actionable error, without bypassing verification or sending plaintext. Conversation previews synchronously retry available keys, refresh on key events and invalidate room caches across account identity changes. The extended live SDK test passed preview agreement, retained-device bidirectional messages/history/restart and missing-peer-key rejection after logout. Both disposable accounts were deactivated. Feedback-phone/native acceptance remains open; old overwritten keys are not reconstructed.
+
+
 - September 19 / build 2026072692 acceptance: the user confirms the other ten items in the eleven-item report passed; only encrypted-message readability remains failing. The precise current switch-versus-logout workflow and whether newly received messages fail are awaiting clarification.
 - Reproduced and repaired a separate durable-key regression with the production server and Matrix 6.2.0: A→B, B→A, switch back, send another A→B event using the same outbound session, restart/switch, reread the first A→B event. Before the repair this consistently failed with first-known index 1 versus message index 0. Matrix 6.x compares received room keys only against its memory cache, so a newly shared later-index key can overwrite an earlier durable key after reopening a device. SessionPreservingClient loads durable inbound sessions before the first sync for each encryption identity; local snapshot restoration no longer empties that cache. Disk failures stop sync until retry. No trust policy or plaintext downgrade was introduced.
 - The extended real-server test passes after repair, including application message-repository reads, retained identities, client restart, failed-login rollback and logout isolation. All disposable accounts were deactivated. A separate deterministic regression proves an initial-yield subscription gap could drop a key-arrival update; message-list and single-message observers now subscribe before yielding. 66 focused tests pass. Native feedback-device acceptance remains OPEN; build 2692 does not include these changes. Keys already overwritten cannot be promised recoverable without an existing earlier copy. Initial sync now loads all stored inbound sessions; large-history startup performance is unmeasured.
@@ -295,6 +298,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-003 AI smart replies and webhook automation were not live-tested end to end
 
+- September 20: replaced the failing Groq path in the host with an authenticated OpenRouter free-model gateway. Deployed gateway synthetic Chinese-summary smoke passed with a disposable Matrix account; invalid authentication was rejected, account deactivated. Six backend tests cover credential replacement, persistent/concurrent quotas and sanitized failures; a client test checks tokens change across accounts and logout prevents requests. Free routing can return an empty result at low output budgets (observed gateway 503); 1,024-token smoke succeeded. Native summary/smart-reply UI and webhook paths remain unverified. Text proxy emits one completed chunk; image generation is unsupported by this trial gateway.
+
+
 - Severity: M
 - Added: 2026-03-21
 - Current state: the new AI smart reply suggestions, extensible bot command registry, and webhook automation paths were unit/analyze verified only. They were not exercised against the shared real homeserver or a real external webhook endpoint in this round.
@@ -322,6 +328,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Next step: run a real multi-device or multi-account smoke covering group voice join, group video join, screen share, and the JWT endpoint contract.
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
+
+- September 20 feedback UI: tag rows open their contact list and profiles; starred contacts are grouped once at the star index. Bottom Contacts badge shares the contacts-page GroupBloc and combines incoming requests with ordinary group invitations. Internal social invitations are filtered using room markers/invite reasons, never room names. Group totals distinguish joined and invited members; ordinary group invitations still require acceptance. Native badge clearing, internal invitation filtering and group count acceptance remain open.
+
 
 - September 19 second UX pass: contact searches discard stale results after changed/cleared input, distinguish errors from empty results and offer retry. Pull-to-refresh waits for the specific refresh completion, including unchanged snapshots; it retains cached contacts. Contact/conversation menus scroll on short screens and use a Material surface for visible press feedback. Account rows now use the existing typography/spacing tokens and respect bottom safe-area padding. Ninety targeted tests pass, including asynchronous search ordering, pending refresh, retry, short-screen menu access and light/dark fixtures. These checks do not establish native push or feedback-device acceptance.
 
@@ -357,6 +366,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Verification: real widget routes cover direct settings, privacy/account hubs, multi-hop auth propagation, save/reopen, failures, slider commits, logout confirmation, and Arabic narrow-screen layout. Live account mutation is still outside this verification (QA-005).
 
 ### QA-006 Direct UI literals still need module-by-module translation review
+
+- September 20: six feedback labels have English, Simplified Chinese and Traditional Chinese translations. Other locales use explicit English fallbacks pending translation review. Localization code was regenerated.
+
 
 - September 19 UX update: new interaction labels are translated in English, Simplified/Traditional Chinese, German, French, Spanish, Italian, Portuguese and Brazilian Portuguese. The remaining catalogs explicitly use English fallback for these new labels, keeping key parity; linguistic review/translation for those locales remains open.
 

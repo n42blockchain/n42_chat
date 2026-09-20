@@ -139,7 +139,16 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
             : state.filteredContacts,
         friendRequests: requests ?? state.friendRequests,
         groupedContacts: grouped,
-        indexLetters: grouped.keys.toList()..sort(),
+        indexLetters: grouped.keys.toList()
+          ..sort(
+            (a, b) => a == b
+                ? 0
+                : a == '☆'
+                ? -1
+                : b == '☆'
+                ? 1
+                : a.compareTo(b),
+          ),
       ),
     );
   }
@@ -421,7 +430,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     final grouped = <String, List<ContactEntity>>{};
 
     for (final contact in contacts) {
-      final letter = contact.indexLetter;
+      final letter = contact.isStarred ? '☆' : contact.indexLetter;
       if (!grouped.containsKey(letter)) {
         grouped[letter] = [];
       }

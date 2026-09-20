@@ -22,6 +22,26 @@ void main() {
       () => mockRepository.watchOnlineStatus(),
     ).thenAnswer((_) => const Stream.empty());
   });
+  test(
+    'starred friends form the first group without duplicate alphabetical rows',
+    () async {
+      when(() => mockRepository.getContacts()).thenAnswer(
+        (_) async => [_contact1, _contact2.copyWith(isStarred: true)],
+      );
+      when(
+        () => mockRepository.getPendingFriendRequests(),
+      ).thenAnswer((_) async => []);
+      final bloc = ContactBloc(mockRepository);
+      final done = Completer<void>();
+      bloc.add(RefreshContacts(completion: done));
+      await done.future;
+      expect(bloc.state.indexLetters.first, '☆');
+      expect(bloc.state.groupedContacts['☆']!.single.userId, _contact2.userId);
+      expect(bloc.state.groupedContacts.values.expand((c) => c).length, 2);
+      await bloc.close();
+    },
+  );
+
   test('late contact search cannot replace the newer query', () async {
     final oldResult = Completer<List<ContactEntity>>();
     final started = Completer<void>();

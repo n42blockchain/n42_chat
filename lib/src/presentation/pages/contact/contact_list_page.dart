@@ -41,7 +41,9 @@ class ContactListPage extends StatefulWidget {
   /// 是否显示 AppBar（嵌入到主框架时可设为 false）
   final bool showAppBar;
 
-  const ContactListPage({super.key, this.showAppBar = true});
+  final GroupBloc? groupBloc;
+
+  const ContactListPage({super.key, this.showAppBar = true, this.groupBloc});
 
   @override
   State<ContactListPage> createState() => _ContactListPageState();
@@ -58,15 +60,15 @@ class _ContactListPageState extends State<ContactListPage> {
   void initState() {
     super.initState();
     context.read<ContactBloc>().add(const LoadContacts());
-    _groupBloc = getIt<GroupBloc>();
-    // Load groups first, which will also load invites
-    _groupBloc.add(const LoadGroups());
+    _groupBloc = widget.groupBloc ?? getIt<GroupBloc>();
+    if (widget.groupBloc == null) _groupBloc.add(const LoadGroups());
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+    if (widget.groupBloc == null) _groupBloc.close();
     super.dispose();
   }
 
@@ -359,7 +361,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   if (letter == '🔍') {
                     _searchController.clear();
                     FocusScope.of(context).unfocus();
-                  } else if (letter == '☆') {
+                  } else if (letter == '☆' && !_letterKeys.containsKey('☆')) {
                     // 滚动到顶部
                     _scrollController.animateTo(
                       0,
@@ -484,10 +486,7 @@ class _ContactListPageState extends State<ContactListPage> {
                 BlocBuilder<GroupBloc, GroupState>(
                   bloc: _groupBloc,
                   builder: (context, groupState) {
-                    int inviteCount = 0;
-                    if (groupState.status == GroupStatus.loaded) {
-                      inviteCount = groupState.invites.length;
-                    }
+                    final inviteCount = groupState.invites.length;
                     return _buildFunctionItem(
                       isDark: isDark,
                       icon: _GroupChatIcon(),
@@ -619,7 +618,7 @@ class _ContactListPageState extends State<ContactListPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       color: context.pageBackground,
       child: Text(
-        letter,
+        letter == '☆' ? S.of(context)!.contactStarredFriends : letter,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
