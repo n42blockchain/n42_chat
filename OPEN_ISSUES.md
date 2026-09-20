@@ -329,6 +329,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
 
+- September 20 UI completion: shared search/controller lifecycle, accessible responsive navigation/index, 48-point composer targets, expanding conversation rows, active-account cards and persistent switch errors are implemented. Small-screen/large-text, contrast, semantics and light/dark widget fixtures are covered; native VoiceOver/TalkBack and feedback-phone acceptance remain unverified.
+
 - September 20 feedback UI: tag rows open their contact list and profiles; starred contacts are grouped once at the star index. Bottom Contacts badge shares the contacts-page GroupBloc and combines incoming requests with ordinary group invitations. Internal social invitations are filtered using room markers/invite reasons, never room names. Group totals distinguish joined and invited members; ordinary group invitations still require acceptance. Native badge clearing, internal invitation filtering and group count acceptance remain open.
 
 
@@ -367,7 +369,7 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-006 Direct UI literals still need module-by-module translation review
 
-- September 20: six feedback labels have English, Simplified Chinese and Traditional Chinese translations. Other locales use explicit English fallbacks pending translation review. Localization code was regenerated.
+- September 20: six feedback labels plus pending-request count, draft and contact-index labels have English, Simplified/Traditional Chinese, German, French, Spanish, Italian, Portuguese and Brazilian Portuguese translations. Other locales retain explicit English fallbacks pending translation review. Localization code was regenerated.
 
 
 - September 19 UX update: new interaction labels are translated in English, Simplified/Traditional Chinese, German, French, Spanish, Italian, Portuguese and Brazilian Portuguese. The remaining catalogs explicitly use English fallback for these new labels, keeping key parity; linguistic review/translation for those locales remains open.
