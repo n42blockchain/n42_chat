@@ -264,6 +264,23 @@ void main() {
         );
         await signIn(0); // Refresh cleanup credentials after explicit logout.
         expect(manager.client!.deviceID, isNot(aDevice));
+        final freshDevice = manager.client!.deviceID;
+        await switchTo(1);
+        final freshMessage = await sender.sendTextMessage(
+          roomId,
+          'N42 new inbound after explicit logout and fresh login',
+        );
+        expect(freshMessage, isNotNull);
+        await switchTo(0);
+        expect(manager.client!.deviceID, freshDevice);
+        await expectRepositoryReadable(
+          roomId,
+          freshMessage!,
+          'N42 new inbound after explicit logout and fresh login',
+        );
+        print(
+          'QA fresh login receives newly encrypted peer message without restoring old keys',
+        );
       } finally {
         messages.disposeAllTimelines();
         await manager.dispose();
