@@ -84,6 +84,34 @@ void main() {
   });
 
   testWidgets(
+    'shared card resolves existing friendship before contacts hydrate',
+    (tester) async {
+      final repository = MockContactRepository();
+      when(
+        () => repository.getContactById(userId),
+      ).thenAnswer((_) async => contact);
+      when(() => mockContactBloc.state).thenReturn(const ContactState());
+      getIt.registerSingleton<IContactRepository>(repository);
+      addTearDown(() async {
+        await getIt.unregister<IContactRepository>();
+      });
+      await tester.pumpWidget(
+        _buildTestWidget(
+          const ContactDetailPage(userId: userId, displayName: 'Alice'),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('contact_relationship_action')),
+        findsNothing,
+      );
+      verify(() => repository.getContactById(userId)).called(1);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'standalone relationship failure offers retry and resolves existing friend',
     (tester) async {
       final repository = MockContactRepository();

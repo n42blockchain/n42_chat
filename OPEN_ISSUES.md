@@ -55,6 +55,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### OFFICE-001 Collaborative tasks and calendar synchronization remain incomplete
 
+- September 20: event message action opens the native iOS EventKit/Android calendar editor instead of sharing an ICS attachment. Native save/cancel and permission acceptance remain to be checked on feedback phones; this does not implement shared calendar synchronization.
+
 - Severity: M
 - Updated: 2026-09-12
 - Evidence: `lib/src/core/services/reminder_service.dart`, `chat_page_message_actions.dart`, `favorite_list_page.dart`
@@ -119,6 +121,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- September 20 / 2696 media and payment feedback: bundled sticker upload now sends mxc media with matching SVG/Lottie MIME; legacy asset messages render locally. Plain/unknown-language code uses text rendering because HighlightView rejects null languages (reproduced by widget tests). GIF requests time out with retry; provider/device availability is still unverified. Gallery video thumbnails are reused with plugin fallbacks; native capture/playback acceptance remains open. Image/OCR controls use dark surfaces and contrasting icons. Transfer scanner accepts raw addresses and host-generated n42://pay as well as n42pay://pay, selects the requested supported token, and rejects network-bearing requests the current form cannot safely honor. EIP-681 chain/contract routing remains unsupported here. Missing peer wallet addresses can be entered and validated; automatic verified peer-wallet discovery is still absent. Red packets are explicitly local demo records, not on-chain payments, and no longer check real CNY funds. Native media/payment acceptance remains required.
+
 - Severity: M
 - Added: 2026-03-20
 - Evidence: `tool/live_message_smoke.dart`
@@ -142,6 +146,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Next step: add an authenticated backend endpoint that starts/stops LiveKit Egress jobs and surface its status back into the client.
 
 ### CALL-004 Exact per-app system ringtone playback is still constrained by CallKit/plugin limits
+
+- September 20 HarmonyOS feedback: on Android, connection now hides the current incoming CallKit notification/sound before marking the call connected, without ending the call. Method-channel ordering and no-hangup tests pass; the reported HarmonyOS device is not connected and ringing/vibration acceptance remains open.
 
 - Severity: M
 - Added: 2026-03-21
@@ -298,6 +304,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-003 AI smart replies and webhook automation were not live-tested end to end
 
+- September 20 image follow-up: gateway and nginx now accept a bounded inline image; client compresses to JPEG at 1280 pixels. OCR remote translation batches all recognized blocks into one consented request. Seven backend tests and client compression/batching tests pass. Deployed synthetic vision request reached upstream but returned HTTP 429 (gateway daily usage was 26, below its limit of 50); temporary test account deactivated. Successful live vision and quota-reset acceptance remain open. Do not claim free AI is unlimited or reset stored quota to bypass the provider.
+
 - September 20: replaced the failing Groq path in the host with an authenticated OpenRouter free-model gateway. Deployed gateway synthetic Chinese-summary smoke passed with a disposable Matrix account; invalid authentication was rejected, account deactivated. Six backend tests cover credential replacement, persistent/concurrent quotas and sanitized failures; a client test checks tokens change across accounts and logout prevents requests. Free routing can return an empty result at low output budgets (observed gateway 503); 1,024-token smoke succeeded. Native summary/smart-reply UI and webhook paths remain unverified. Text proxy emits one completed chunk; image generation is unsupported by this trial gateway.
 
 
@@ -329,9 +337,11 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
 
+- September 20 / build 2696 feedback: explicit logout removes its revoked saved-account entry; missing/expired encryption identities open prefilled reauthentication, while transient restore failures remain retryable. A live Flutter/Matrix SDK test now uses the real AuthRepositoryImpl (including logout, password login and stored-account switching), verifies incoming peer history after relogin and fresh messages, and deactivates both temporary accounts. Native secure-storage persistence, feedback-phone switching and push remain unverified. Friend invitations now autojoin only after confirming the inviter is an existing unblocked friend; strangers and failed joins remain pending. Five invitation-policy unit cases pass. Group member add excludes joined/invited users; remove/settings own their GroupBloc; announcement readback and room nickname persistence are implemented but require native acceptance.
+
 - September 20 UI completion: shared search/controller lifecycle, accessible responsive navigation/index, 48-point composer targets, expanding conversation rows, active-account cards and persistent switch errors are implemented. Small-screen/large-text, contrast, semantics and light/dark widget fixtures are covered; native VoiceOver/TalkBack and feedback-phone acceptance remain unverified.
 
-- September 20 feedback UI: tag rows open their contact list and profiles; starred contacts are grouped once at the star index. Bottom Contacts badge shares the contacts-page GroupBloc and combines incoming requests with ordinary group invitations. Internal social invitations are filtered using room markers/invite reasons, never room names. Group totals distinguish joined and invited members; ordinary group invitations still require acceptance. Native badge clearing, internal invitation filtering and group count acceptance remain open.
+- September 20 feedback UI: tag rows open their contact list and profiles; starred contacts are grouped once at the star index. Bottom Contacts badge shares the contacts-page GroupBloc and combines incoming requests with ordinary group invitations. Internal social invitations are filtered using room markers/invite reasons, never room names. Group totals distinguish joined and invited members; ordinary invitations initially required acceptance; see the September 20 build 2696 policy update above. Native badge clearing, internal invitation filtering and group count acceptance remain open.
 
 
 - September 19 second UX pass: contact searches discard stale results after changed/cleared input, distinguish errors from empty results and offer retry. Pull-to-refresh waits for the specific refresh completion, including unchanged snapshots; it retains cached contacts. Contact/conversation menus scroll on short screens and use a Material surface for visible press feedback. Account rows now use the existing typography/spacing tokens and respect bottom safe-area padding. Ninety targeted tests pass, including asynchronous search ordering, pending refresh, retry, short-screen menu access and light/dark fixtures. These checks do not establish native push or feedback-device acceptance.

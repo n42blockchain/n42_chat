@@ -176,6 +176,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     }
 
     final contactState = contactBloc.state;
+    if (contactState.deletedUserId != widget.userId &&
+        !contactState.contacts.any((c) => c.userId == widget.userId)) {
+      unawaited(_loadStandaloneRelationship());
+      return;
+    }
     if (contactState.status != ContactStatus.initial ||
         contactState.contacts.isNotEmpty) {
       final contact = contactState.contacts
@@ -208,7 +213,8 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       final requests = contact?.isFriend == true
           ? <FriendRequest>[]
           : await repository.getPendingFriendRequests();
-      if (!mounted) return;
+      if (!mounted || _maybeContactBloc()?.state.deletedUserId == widget.userId)
+        return;
       setState(() {
         _contact = _mergeRemarkIntoContact(contact);
         _isFriend = contact?.isFriend == true;
