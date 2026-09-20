@@ -24,6 +24,16 @@ class FriendRequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context)!;
+    final actionStyle = ButtonStyle(
+      minimumSize: const WidgetStatePropertyAll(
+        Size(0, AppDimensions.buttonHeight),
+      ),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        ),
+      ),
+    );
     return Card(
       key: ValueKey('friend_request_${request.id}'),
       elevation: 0,
@@ -74,10 +84,12 @@ class FriendRequestCard extends StatelessWidget {
                 runSpacing: AppDimensions.spacingS,
                 children: [
                   FilledButton(
+                    style: actionStyle,
                     onPressed: onAccept,
                     child: Text(l10n.commonAccept),
                   ),
                   OutlinedButton(
+                    style: actionStyle,
                     onPressed: onReject,
                     child: Text(l10n.commonReject),
                   ),
