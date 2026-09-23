@@ -67,6 +67,7 @@ class _GroupTopicsBody extends StatelessWidget {
     return BlocBuilder<GroupBloc, GroupState>(
       builder: (context, state) {
         final canManage = state.currentGroup?.canChangeSettings ?? false;
+        final groupBloc = context.read<GroupBloc>();
         final channels = state.channels;
 
         // 分区：置顶（order == 0 或名称含 announcement）+ 普通
@@ -92,7 +93,10 @@ class _GroupTopicsBody extends StatelessWidget {
                 TextButton(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
-                      builder: (_) => GroupChannelsPage(roomId: roomId),
+                      builder: (_) => BlocProvider<GroupBloc>.value(
+                        value: groupBloc,
+                        child: GroupChannelsPage(roomId: roomId),
+                      ),
                     ),
                   ),
                   child: Text(
@@ -208,7 +212,7 @@ class _GroupTopicsBody extends StatelessWidget {
     final lastMsg = channel.lastMessage;
     final unread = channel.unreadCount;
 
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: Column(
         children: [
