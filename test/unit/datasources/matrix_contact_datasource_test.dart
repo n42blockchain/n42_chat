@@ -22,6 +22,9 @@ void main() {
     client = _MockClient();
     when(() => clientManager.client).thenReturn(client);
     when(() => client.userID).thenReturn('@me:example.org');
+    when(() => client.accountData).thenReturn(<String, matrix.BasicEvent>{});
+    when(() => client.rooms).thenReturn(<matrix.Room>[]);
+    when(() => client.getAccountData(any(), any())).thenAnswer((_) async => {});
     when(
       () =>
           client.setPresence(any(), any(), statusMsg: any(named: 'statusMsg')),
@@ -54,6 +57,12 @@ void main() {
           'Busy',
           false,
           '@me:example.org',
+        ),
+      );
+      when(() => client.getPresence('@me:example.org')).thenAnswer(
+        (_) async => matrix.GetPresenceResponse(
+          presence: matrix.PresenceType.unavailable,
+          statusMsg: 'Busy',
         ),
       );
 
