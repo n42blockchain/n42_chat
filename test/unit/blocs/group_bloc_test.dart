@@ -1124,6 +1124,43 @@ void main() {
         ),
       ],
     );
+
+    blocTest<GroupBloc, GroupState>(
+      'keeps the new channel visible when Matrix has not synced its state yet',
+      build: () {
+        when(
+          () => mockRepository.createChannel(
+            _roomId1,
+            name: 'Support',
+            topic: 'Ask the team',
+            category: 'Help',
+          ),
+        ).thenAnswer((_) async => '!support:server.com');
+        when(
+          () => mockRepository.getChannels(_roomId1),
+        ).thenAnswer((_) async => const []);
+        return GroupBloc(mockRepository);
+      },
+      act: (bloc) => bloc.add(
+        const CreateChannel(
+          parentRoomId: _roomId1,
+          name: 'Support',
+          topic: 'Ask the team',
+          category: 'Help',
+        ),
+      ),
+      expect: () => [
+        isA<GroupState>().having((state) => state.channels, 'channels', const [
+          ChannelEntity(
+            roomId: '!support:server.com',
+            parentRoomId: _roomId1,
+            name: 'Support',
+            topic: 'Ask the team',
+            category: 'Help',
+          ),
+        ]),
+      ],
+    );
   });
 
   group('UpdateChannel', () {

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/services/bot_webhook_service.dart';
 import '../../../core/services/room_join_service.dart';
 import '../../../domain/entities/bot_config_entity.dart';
+import '../../../domain/entities/channel_entity.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../bloc_message_keys.dart';
@@ -287,13 +288,29 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     Emitter<GroupState> emit,
   ) async {
     try {
-      await _groupRepository.createChannel(
+      final channelRoomId = await _groupRepository.createChannel(
         event.parentRoomId,
         name: event.name,
         topic: event.topic,
         category: event.category,
       );
-      final channels = await _groupRepository.getChannels(event.parentRoomId);
+      final channels = List<ChannelEntity>.of(
+        await _groupRepository.getChannels(event.parentRoomId),
+      );
+      // Matrix may acknowledge the state-event write before the local room
+      // cache reflects it. Keep the new topic visible until the next sync.
+      if (!channels.any((channel) => channel.roomId == channelRoomId)) {
+        channels.add(
+          ChannelEntity(
+            roomId: channelRoomId,
+            parentRoomId: event.parentRoomId,
+            name: event.name,
+            topic: event.topic,
+            category: event.category,
+            order: channels.length,
+          ),
+        );
+      }
       emit(
         state.copyWith(
           channels: channels,
