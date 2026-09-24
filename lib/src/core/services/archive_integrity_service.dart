@@ -77,7 +77,7 @@ class ArchiveIntegrityService {
     for (final msg in messages) {
       buffer.writeln(_serializeMessage(msg));
     }
-    final rawBytes = Uint8List.fromList(buffer.toString().codeUnits);
+    final rawBytes = utf8.encode(buffer.toString());
 
     // 压缩
     final compressed = gzip.encode(rawBytes);
@@ -148,7 +148,7 @@ class ArchiveIntegrityService {
       // 解压
       final compressedBytes = await compressedFile.readAsBytes();
       final decompressed = gzip.decode(compressedBytes);
-      final content = String.fromCharCodes(decompressed);
+      final content = utf8.decode(decompressed);
 
       // 解析 JSON Lines
       final lines = content.split('\n').where((l) => l.trim().isNotEmpty);
@@ -181,10 +181,7 @@ class ArchiveIntegrityService {
         'from ${compressedFile.path}',
       );
 
-      return ImportResult(
-        success: true,
-        messagesImported: inserted,
-      );
+      return ImportResult(success: true, messagesImported: inserted);
     } catch (e) {
       return ImportResult(
         success: false,
@@ -212,10 +209,12 @@ class ArchiveIntegrityService {
 
   /// 查询指定季度的所有消息
   Future<List<ArchivedMessage>> _queryQuarterMessages(int quarter) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM archived_messages WHERE quarter = ?',
-      variables: [Variable.withInt(quarter)],
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT * FROM archived_messages WHERE quarter = ?',
+          variables: [Variable.withInt(quarter)],
+        )
+        .get();
 
     return rows.map((row) {
       return ArchivedMessage(
