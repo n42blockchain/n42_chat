@@ -58,6 +58,31 @@ void main() {
       expect(providers.single.id, 'github');
       expect(providers.single.name, 'SSO');
     });
+
+    test('ignores provider fields with unexpected JSON types', () {
+      final providers = AuthMethodsService.parseSsoProviders({
+        'flows': [
+          {
+            'type': 'm.login.sso',
+            'identity_providers': [
+              {'id': 42, 'name': 'Invalid ID'},
+              {
+                'id': ' github ',
+                'name': 123,
+                'icon': false,
+                'brand': {'name': 'github'},
+              },
+            ],
+          },
+        ],
+      });
+
+      expect(providers, hasLength(1));
+      expect(providers.single.id, 'github');
+      expect(providers.single.name, 'SSO');
+      expect(providers.single.icon, isNull);
+      expect(providers.single.brand, isNull);
+    });
   });
 
   group('AuthMethodsService SSO URLs', () {

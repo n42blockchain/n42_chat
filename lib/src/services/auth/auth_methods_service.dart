@@ -1198,15 +1198,19 @@ class AuthMethodsService {
 
       for (final provider in identityProviders) {
         if (provider is! Map<String, dynamic>) continue;
-        final id = (provider['id'] as String? ?? '').trim();
+        final rawId = provider['id'];
+        final id = rawId is String ? rawId.trim() : '';
         if (id.isEmpty) continue;
-        final name = (provider['name'] as String? ?? '').trim();
+        final rawName = provider['name'];
+        final name = rawName is String ? rawName.trim() : '';
+        final rawIcon = provider['icon'];
+        final rawBrand = provider['brand'];
         providers.add(
           SsoProvider(
             id: id,
             name: name.isEmpty ? 'SSO' : name,
-            icon: (provider['icon'] as String?)?.trim(),
-            brand: (provider['brand'] as String?)?.trim(),
+            icon: rawIcon is String ? rawIcon.trim() : null,
+            brand: rawBrand is String ? rawBrand.trim() : null,
           ),
         );
       }
