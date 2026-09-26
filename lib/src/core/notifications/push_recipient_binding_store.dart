@@ -27,10 +27,11 @@ class PushRecipientBindingStore {
   static String _key(String accountId) =>
       '$_prefix${sha256.convert(utf8.encode(accountId))}';
 
+  static bool _validAccount(String accountId) =>
+      accountId.startsWith('@') && accountId.contains(':');
+
   static bool _valid(String accountId, String bindingId) =>
-      accountId.startsWith('@') &&
-      accountId.contains(':') &&
-      bindingId.isNotEmpty;
+      _validAccount(accountId) && bindingId.isNotEmpty;
 
   Future<bool> activate(String accountId, String bindingId) async {
     if (!_valid(accountId, bindingId)) return false;
@@ -49,21 +50,29 @@ class PushRecipientBindingStore {
     }
   }
 
-  Future<bool> matches(String accountId, String bindingId) async {
-    if (!_valid(accountId, bindingId)) return false;
+  Future<String?> activeBinding(String accountId) async {
+    if (!_validAccount(accountId)) return null;
     try {
       final raw = await _storage.read(key: _key(accountId));
-      if (raw == null) return false;
+      if (raw == null) return null;
       final value = jsonDecode(raw);
-      return value is Map &&
+      if (value is Map &&
           value['accountId'] == accountId &&
-          value['bindingId'] == bindingId &&
+          value['bindingId'] is String &&
+          (value['bindingId'] as String).isNotEmpty &&
           value['expiresAt'] is int &&
-          (value['expiresAt'] as int) > _now().millisecondsSinceEpoch;
+          (value['expiresAt'] as int) > _now().millisecondsSinceEpoch) {
+        return value['bindingId'] as String;
+      }
+      return null;
     } catch (_) {
-      return false;
+      return null;
     }
   }
+
+  Future<bool> matches(String accountId, String bindingId) async =>
+      _valid(accountId, bindingId) &&
+      await activeBinding(accountId) == bindingId;
 
   Future<void> revoke(String accountId, String bindingId) async {
     if (await matches(accountId, bindingId)) {

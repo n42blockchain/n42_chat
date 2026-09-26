@@ -6,6 +6,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/notifications/firebase_push_service.dart';
 import 'package:n42_chat/src/core/notifications/push_recipient_binding_store.dart';
+import 'package:n42_chat/src/services/voip/missed_call_callback_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _Client extends Mock implements matrix.Client {}
@@ -207,4 +208,156 @@ void main() {
     expect(service.isPusherVerified, isFalse);
     await service.dispose();
   });
+
+  test('same-account startup preserves a saved background callback', () async {
+    final client = _Client();
+    when(() => client.isLogged()).thenReturn(true);
+    when(() => client.userID).thenReturn('@recipient:hs');
+    when(() => client.deviceID).thenReturn('device');
+    when(() => client.deviceName).thenReturn('Device');
+    final posted = <matrix.Pusher>[];
+    when(() => client.postPusher(any(), append: false)).thenAnswer((
+      call,
+    ) async {
+      posted.add(call.positionalArguments.first as matrix.Pusher);
+    });
+    when(
+      () => client.getPushers(),
+    ).thenAnswer((_) async => [matrix.Pusher.fromJson(posted.last.toJson())]);
+    FirebasePushService newService() => FirebasePushService(
+      client,
+      pushGatewayUrl: 'https://push.example.org/_matrix/push/v1/notify',
+      tokenLoader: () async => 'same-token',
+    );
+    final first = newService();
+    await first.registerForPush();
+    final firstBinding =
+        (posted.single.data.toJson()['default_payload']
+                as Map)['n42_push_binding_id']
+            as String;
+    final routes = MissedCallCallbackStore(
+      currentAccountId: () => client.userID,
+    );
+    expect(
+      await routes.rememberBound(
+        const MissedCallRoute(
+          callId: 'saved-call',
+          roomId: '!room:hs',
+          callerId: '@alice:hs',
+          isVideo: false,
+        ),
+        accountId: '@recipient:hs',
+        bindingId: firstBinding,
+      ),
+      isTrue,
+    );
+    await first.dispose();
+    final restored = newService();
+    await restored.registerForPush();
+    expect(restored.isPusherVerified, isTrue);
+    expect(posted, hasLength(1));
+    expect(
+      await PushRecipientBindingStore().matches('@recipient:hs', firstBinding),
+      isTrue,
+    );
+    expect((await routes.consume('saved-call'))?.roomId, '!room:hs');
+    await restored.dispose();
+  });
+
+  test('token change revokes the old generation and its callback', () async {
+    final client = _Client();
+    when(() => client.isLogged()).thenReturn(true);
+    when(() => client.userID).thenReturn('@recipient:hs');
+    when(() => client.deviceID).thenReturn('device');
+    when(() => client.deviceName).thenReturn('Device');
+    final posted = <matrix.Pusher>[];
+    when(() => client.postPusher(any(), append: false)).thenAnswer((
+      call,
+    ) async {
+      posted.add(call.positionalArguments.first as matrix.Pusher);
+    });
+    when(() => client.getPushers()).thenAnswer((_) async => [posted.last]);
+    when(() => client.deletePusher(any())).thenAnswer((_) async {});
+    FirebasePushService service(String token) => FirebasePushService(
+      client,
+      pushGatewayUrl: 'https://push.example.org/_matrix/push/v1/notify',
+      tokenLoader: () async => token,
+    );
+    final first = service('token-a');
+    await first.registerForPush();
+    final oldBinding =
+        (posted.single.data.toJson()['default_payload']
+                as Map)['n42_push_binding_id']
+            as String;
+    final routes = MissedCallCallbackStore(
+      currentAccountId: () => client.userID,
+    );
+    await routes.rememberBound(
+      const MissedCallRoute(
+        callId: 'old-call',
+        roomId: '!room:hs',
+        callerId: '@alice:hs',
+        isVideo: false,
+      ),
+      accountId: '@recipient:hs',
+      bindingId: oldBinding,
+    );
+    await first.dispose();
+    final second = service('token-b');
+    await second.registerForPush();
+    expect(posted, hasLength(2));
+    expect(
+      await PushRecipientBindingStore().matches('@recipient:hs', oldBinding),
+      isFalse,
+    );
+    expect(await routes.consume('old-call'), isNull);
+    await second.unregisterPush();
+    final newBinding =
+        (posted.last.data.toJson()['default_payload']
+                as Map)['n42_push_binding_id']
+            as String;
+    expect(
+      await PushRecipientBindingStore().matches('@recipient:hs', newBinding),
+      isFalse,
+    );
+    await second.dispose();
+  });
+
+  test(
+    'registering account B revokes the active account A generation',
+    () async {
+      final client = _Client();
+      var account = '@a:hs';
+      when(() => client.isLogged()).thenReturn(true);
+      when(() => client.userID).thenAnswer((_) => account);
+      when(() => client.deviceID).thenReturn('device');
+      when(() => client.deviceName).thenReturn('Device');
+      final posted = <matrix.Pusher>[];
+      when(() => client.postPusher(any(), append: false)).thenAnswer((
+        call,
+      ) async {
+        posted.add(call.positionalArguments.first as matrix.Pusher);
+      });
+      when(() => client.getPushers()).thenAnswer((_) async => [posted.last]);
+      final service = FirebasePushService(
+        client,
+        pushGatewayUrl: 'https://push.example.org/_matrix/push/v1/notify',
+        tokenLoader: () async => 'same-device-token',
+      );
+      await service.registerForPush();
+      final aBinding =
+          (posted.single.data.toJson()['default_payload']
+                  as Map)['n42_push_binding_id']
+              as String;
+      account = '@b:hs';
+      await service.registerForPush();
+      expect(posted, hasLength(2));
+      expect(
+        await PushRecipientBindingStore().matches('@a:hs', aBinding),
+        isFalse,
+      );
+      expect(service.isPusherVerified, isTrue);
+      await service.dispose();
+    },
+  );
 }

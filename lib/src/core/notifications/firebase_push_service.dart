@@ -1294,13 +1294,18 @@ class FirebasePushService implements IPushNotificationService {
     _isRegistering = true;
     _registrationAccountId = accountId;
     _registrationCompleter = Completer<void>();
+    final previousVerifiedAccount = _verifiedAccountId;
     _isPusherVerified = false;
     _verifiedAccountId = null;
     pushLog('REG', 'Starting push registration');
     try {
-      if (!await _bindingStore.revokeAccount(accountId)) return;
+      if (previousVerifiedAccount != null &&
+          previousVerifiedAccount != accountId &&
+          !await _bindingStore.revokeAccount(previousVerifiedAccount)) {
+        return;
+      }
       if (!_owns(accountId, deviceId)) return;
-      await _registerForPushImpl(accountId, deviceId, const Uuid().v4());
+      await _registerForPushImpl(accountId, deviceId);
     } finally {
       _isRegistering = false;
       _registrationAccountId = null;
@@ -1318,11 +1323,7 @@ class FirebasePushService implements IPushNotificationService {
       _client.userID == accountId &&
       _client.deviceID == deviceId;
 
-  Future<void> _registerForPushImpl(
-    String accountId,
-    String deviceId,
-    String bindingId,
-  ) async {
+  Future<void> _registerForPushImpl(String accountId, String deviceId) async {
     // 如果 FCM Token 还没有获取到，尝试获取
     if (_fcmToken == null) {
       pushLog('REG', 'FCM token is null, attempting to get token');
@@ -1356,10 +1357,38 @@ class FirebasePushService implements IPushNotificationService {
       deviceId: deviceId,
     );
     if (!_owns(accountId, deviceId)) return;
+    final existingBinding = await _bindingStore.activeBinding(accountId);
+    if (!_owns(accountId, deviceId)) return;
+    if (previousPushkey == pushkey && existingBinding != null) {
+      // A normal process restart must keep routes already saved against this
+      // generation. Reuse only when the homeserver still echoes it for the
+      // same account/device token; transient echo errors leave it untouched.
+      final bool echoed;
+      try {
+        final pushers = await _client.getPushers();
+        if (!_owns(accountId, deviceId)) return;
+        if (pushers == null) return;
+        echoed = pushers.any(
+          (p) => _matchesPusher(p, pushkey, accountId, existingBinding),
+        );
+      } catch (_) {
+        return;
+      }
+      if (echoed) {
+        _verifiedAccountId = accountId;
+        _isPusherVerified = true;
+        _lastRegisteredPushkey = pushkey;
+        _lastRegisteredAccountId = accountId;
+        return;
+      }
+    }
+    if (!await _bindingStore.revokeAccount(accountId)) return;
+    if (!_owns(accountId, deviceId)) return;
     if (previousPushkey != null && previousPushkey != pushkey) {
       await _deletePusherByKey(previousPushkey);
       if (!_owns(accountId, deviceId)) return;
     }
+    final bindingId = const Uuid().v4();
 
     // 指数退避重试：最多 3 次（初始 + 2 次重试），间隔 4s、8s
     const maxAttempts = 3;
@@ -1452,6 +1481,20 @@ class FirebasePushService implements IPushNotificationService {
   /// 验证 Pusher 注册是否成功
   ///
   /// 调用 getPushers() 确认当前 pushkey 的 Pusher 已存在于服务器
+  bool _matchesPusher(
+    matrix.Pusher pusher,
+    String pushkey,
+    String accountId,
+    String bindingId,
+  ) {
+    final payload = pusher.data.additionalProperties['default_payload'];
+    return pusher.pushkey == pushkey &&
+        pusher.appId == appId &&
+        payload is Map &&
+        payload['n42_receiver_account_id'] == accountId &&
+        payload['n42_push_binding_id'] == bindingId;
+  }
+
   Future<bool> _verifyPusherRegistration(
     String pushkey,
     String accountId,
@@ -1465,14 +1508,9 @@ class FirebasePushService implements IPushNotificationService {
         return false;
       }
 
-      final found = pushers.any((p) {
-        final payload = p.data.additionalProperties['default_payload'];
-        return p.pushkey == pushkey &&
-            p.appId == appId &&
-            payload is Map &&
-            payload['n42_receiver_account_id'] == accountId &&
-            payload['n42_push_binding_id'] == bindingId;
-      });
+      final found = pushers.any(
+        (p) => _matchesPusher(p, pushkey, accountId, bindingId),
+      );
 
       if (found) {
         pushLog('VERIFY_OK', 'Pusher verified on server (appId=$appId)');
@@ -1547,6 +1585,11 @@ class FirebasePushService implements IPushNotificationService {
         'Waiting for current registration to complete before force re-register',
       );
       await _registrationCompleter?.future;
+    }
+
+    final accountId = _client.userID;
+    if (accountId != null && !await _bindingStore.revokeAccount(accountId)) {
+      return;
     }
 
     await registerForPush();
