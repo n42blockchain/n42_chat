@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:n42_chat/src/core/notifications/firebase_push_service.dart';
+import 'package:n42_chat/src/core/notifications/push_recipient_binding_store.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -303,10 +304,164 @@ void main() {
         (event) => actions.add(event.$1),
       );
       addTearDown(sub.cancel);
+      await nativeEvent(
+        'ACTION_CALL_INCOMING',
+        args['id'] as String,
+        extraBody: {'extra': args['extra']},
+      );
       await nativeEvent('ACTION_CALL_CALLBACK', args['id'] as String);
       expect(actions, isEmpty);
     },
   );
+
+  test('early id-only callback waits for its verified account', () async {
+    await PushRecipientBindingStore().activate('@me:hs', 'generation-a');
+    await FirebasePushService.showBackgroundCallKitForTest(
+      const RemoteMessage(
+        data: {
+          'type': 'm.call.invite',
+          'room_id': '!background:hs',
+          'sender': '@alice:hs',
+          'n42_receiver_account_id': '@me:hs',
+          'n42_push_binding_id': 'generation-a',
+        },
+      ),
+    );
+    final args =
+        callkitCalls
+                .lastWhere((call) => call.method == 'showCallkitIncoming')
+                .arguments
+            as Map;
+    final service = CallNotificationService();
+    service.dispose();
+    await service.initialize();
+    final delivered = Completer<(CallAction, IncomingCallInfo)>();
+    final sub = service.callActions.listen(delivered.complete);
+    addTearDown(sub.cancel);
+    await nativeEvent('ACTION_CALL_CALLBACK', args['id'] as String);
+    await service.initialize(currentAccountId: () => account);
+    final action = await delivered.future;
+    expect(action.$1, CallAction.callback);
+    expect(action.$2.roomId, '!background:hs');
+  });
+
+  test(
+    'verified background push survives service recreation and dials once',
+    () async {
+      await PushRecipientBindingStore().activate('@me:hs', 'generation-a');
+      await FirebasePushService.showBackgroundCallKitForTest(
+        const RemoteMessage(
+          data: {
+            'type': 'm.call.invite',
+            'room_id': '!background:hs',
+            'sender': '@alice:hs',
+            'n42_receiver_account_id': '@me:hs',
+            'n42_push_binding_id': 'generation-a',
+          },
+        ),
+      );
+      final args =
+          callkitCalls
+                  .lastWhere((call) => call.method == 'showCallkitIncoming')
+                  .arguments
+              as Map;
+      final id = args['id'] as String;
+      final service = CallNotificationService();
+      service.dispose();
+      await service.initialize(currentAccountId: () => account);
+      final actions = <(CallAction, IncomingCallInfo)>[];
+      final sub = service.callActions.listen(actions.add);
+      addTearDown(sub.cancel);
+      await nativeEvent('ACTION_CALL_CALLBACK', id);
+      await nativeEvent('ACTION_CALL_CALLBACK', id);
+      expect(actions, hasLength(1));
+      expect(actions.single.$1, CallAction.callback);
+      expect(actions.single.$2.roomId, '!background:hs');
+      expect(actions.single.$2.callerId, '@alice:hs');
+    },
+  );
+
+  test(
+    'queued account A call cannot be rebound to account B by native event',
+    () async {
+      await PushRecipientBindingStore().activate('@a:hs', 'generation-a');
+      account = '@b:hs';
+      await FirebasePushService.showBackgroundCallKitForTest(
+        const RemoteMessage(
+          data: {
+            'type': 'm.call.invite',
+            'room_id': '!a-room:hs',
+            'sender': '@alice:hs',
+            'n42_receiver_account_id': '@a:hs',
+            'n42_push_binding_id': 'generation-a',
+          },
+        ),
+      );
+      final args =
+          callkitCalls
+                  .lastWhere((call) => call.method == 'showCallkitIncoming')
+                  .arguments
+              as Map;
+      final id = args['id'] as String;
+      final service = CallNotificationService();
+      final actions = <(CallAction, IncomingCallInfo)>[];
+      final sub = service.callActions.listen(actions.add);
+      addTearDown(sub.cancel);
+      await nativeEvent(
+        'ACTION_CALL_INCOMING',
+        id,
+        extraBody: {'extra': args['extra']},
+      );
+      await nativeEvent('ACTION_CALL_CALLBACK', id);
+      expect(
+        actions.where((action) => action.$1 == CallAction.callback),
+        isEmpty,
+      );
+      account = '@a:hs';
+      await nativeEvent('ACTION_CALL_CALLBACK', id);
+      expect(
+        actions.where((action) => action.$1 == CallAction.callback),
+        hasLength(1),
+      );
+      expect(actions.last.$2.roomId, '!a-room:hs');
+    },
+  );
+
+  test('same remote event for A and B gets distinct native callback IDs', () async {
+    final bindings = PushRecipientBindingStore();
+    await bindings.activate('@a:hs', 'generation-a');
+    await bindings.activate('@b:hs', 'generation-b');
+    for (final recipient in ['@a:hs', '@b:hs']) {
+      await FirebasePushService.showBackgroundCallKitForTest(
+        RemoteMessage(data: {
+          'type': 'm.call.invite',
+          'event_id': r'$same-event:hs',
+          'room_id': '!shared:hs',
+          'sender': '@alice:hs',
+          'n42_receiver_account_id': recipient,
+          'n42_push_binding_id': recipient == '@a:hs'
+              ? 'generation-a'
+              : 'generation-b',
+        }),
+      );
+    }
+    final shown = callkitCalls.where(
+      (call) => call.method == 'showCallkitIncoming',
+    ).map((call) => call.arguments as Map).toList();
+    final aNativeId = shown[0]['id'] as String;
+    final bNativeId = shown[1]['id'] as String;
+    expect(aNativeId, isNot(bNativeId));
+    account = '@b:hs';
+    final service = CallNotificationService();
+    final actions = <(CallAction, IncomingCallInfo)>[];
+    final sub = service.callActions.listen(actions.add);
+    addTearDown(sub.cancel);
+    await nativeEvent('ACTION_CALL_CALLBACK', aNativeId);
+    expect(actions, isEmpty);
+    await nativeEvent('ACTION_CALL_CALLBACK', bNativeId);
+    expect(actions, hasLength(1));
+    expect(actions.single.$2.callId, bNativeId);
+  });
 
   testWidgets(
     'early callback expires if account binding takes over 90 seconds',

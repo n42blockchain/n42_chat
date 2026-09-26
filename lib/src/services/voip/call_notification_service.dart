@@ -125,6 +125,9 @@ class CallNotificationService {
   }
 
   Future<void> _rememberCall(IncomingCallInfo info) async {
+    // Background isolates saved a route only after matching the pusher
+    // generation. A later native event must not adopt it as the active login.
+    if (info.extra?['n42_background_push'] == true) return;
     _forgetCall(info.callId);
     _knownCalls[info.callId] = info;
     _knownCallAccounts[info.callId] = _currentAccountId();
@@ -215,6 +218,12 @@ class CallNotificationService {
     final parameterInfo = params == null
         ? null
         : IncomingCallInfo.fromMap(params.toJson());
+    final extra = parameterInfo?.extra ?? const <String, dynamic>{};
+    final isBackground = extra['n42_background_push'] == true;
+    final backgroundRecipient = extra['n42_receiver_account_id'];
+    if (isBackground && backgroundRecipient != _currentAccountId()) {
+      return;
+    }
     if (parameterInfo != null &&
         (event is callkit.CallEventActionCallIncoming ||
             event is callkit.CallEventActionCallStart ||

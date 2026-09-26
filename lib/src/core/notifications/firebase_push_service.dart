@@ -16,12 +16,14 @@ import '../../domain/entities/user_profile_entity.dart'
     show NotificationPrivacyMode;
 import '../../services/voip/call_manager.dart';
 import '../../services/voip/incoming_call_ringtone_preference.dart';
+import '../../services/voip/missed_call_callback_store.dart';
 import '../../data/datasources/local/preferences_datasource.dart';
 import '../utils/conversation_notification_utils.dart';
 import '../../domain/entities/notification_filter_rules.dart';
 import 'notification_filter_store.dart';
 import 'push_dedup_store.dart';
 import 'push_notification_service.dart';
+import 'push_recipient_binding_store.dart';
 import '../utils/debug_log.dart';
 
 /// 后台消息处理器 - 顶级函数，供独立使用 n42_chat 插件时注册。
@@ -111,6 +113,7 @@ class FirebasePushService implements IPushNotificationService {
   String? _fcmToken;
   String? _apnsToken;
   String? _lastRegisteredPushkey;
+  String? _lastRegisteredAccountId;
   bool _isInitialized = false;
   StreamSubscription<RemoteMessage>? _foregroundSubscription;
   StreamSubscription<RemoteMessage>? _messageOpenedSubscription;
@@ -128,6 +131,10 @@ class FirebasePushService implements IPushNotificationService {
 
   /// Pusher 是否已通过服务端验证
   bool _isPusherVerified = false;
+  String? _verifiedAccountId;
+  String? _registrationAccountId;
+  final PushRecipientBindingStore _bindingStore = PushRecipientBindingStore();
+  final Future<String?> Function()? _tokenLoader;
 
   /// 通知配置
   NotificationConfig _notificationConfig = const NotificationConfig();
@@ -172,7 +179,8 @@ class FirebasePushService implements IPushNotificationService {
     this.appId = 'com.n42.chat',
     this.pushkeyType = 'http',
     this.onNotificationTap,
-  });
+    Future<String?> Function()? tokenLoader,
+  }) : _tokenLoader = tokenLoader;
 
   static Future<NotificationConfig> _loadPersistedNotificationConfig() async {
     final settings = await PreferencesDataSource()
@@ -950,6 +958,23 @@ class FirebasePushService implements IPushNotificationService {
     final ringtonePreference = await IncomingCallRingtonePreference.load();
 
     final callId = const Uuid().v4();
+    final recipient = message.data['n42_receiver_account_id'];
+    final bindingId = message.data['n42_push_binding_id'];
+    if (recipient is String &&
+        bindingId is String &&
+        roomId != null &&
+        senderId != null) {
+      await MissedCallCallbackStore(currentAccountId: () => null).rememberBound(
+        MissedCallRoute(
+          callId: callId,
+          roomId: roomId,
+          callerId: senderId,
+          isVideo: false,
+        ),
+        accountId: recipient,
+        bindingId: bindingId,
+      );
+    }
 
     final params = CallKitParams(
       id: callId,
@@ -958,7 +983,13 @@ class FirebasePushService implements IPushNotificationService {
       handle: senderId ?? '',
       type: 0, // 默认语音（后台推送无法确定通话类型）
       duration: 60000,
-      extra: <String, dynamic>{'callerId': senderId, 'roomId': roomId},
+      extra: <String, dynamic>{
+        'callerId': senderId,
+        'roomId': roomId,
+        'n42_background_push': true,
+        if (recipient is String) 'n42_receiver_account_id': recipient,
+        if (bindingId is String) 'n42_push_binding_id': bindingId,
+      },
       android: buildIncomingCallAndroidParams(
         ringtonePreference: ringtonePreference,
       ),
@@ -1241,18 +1272,38 @@ class FirebasePushService implements IPushNotificationService {
 
   @override
   Future<void> registerForPush() async {
+    final accountId = _client.userID;
+    final deviceId = _client.deviceID;
+    if (accountId == null ||
+        accountId.isEmpty ||
+        deviceId == null ||
+        deviceId.isEmpty ||
+        !_client.isLogged()) {
+      _isPusherVerified = false;
+      return;
+    }
     if (_isRegistering) {
       pushLog('REG', 'Push registration already in progress, waiting');
+      final inProgressAccount = _registrationAccountId;
       await _registrationCompleter?.future;
+      if (inProgressAccount != accountId && _owns(accountId, deviceId)) {
+        return registerForPush();
+      }
       return;
     }
     _isRegistering = true;
+    _registrationAccountId = accountId;
     _registrationCompleter = Completer<void>();
+    _isPusherVerified = false;
+    _verifiedAccountId = null;
     pushLog('REG', 'Starting push registration');
     try {
-      await _registerForPushImpl();
+      if (!await _bindingStore.revokeAccount(accountId)) return;
+      if (!_owns(accountId, deviceId)) return;
+      await _registerForPushImpl(accountId, deviceId, const Uuid().v4());
     } finally {
       _isRegistering = false;
+      _registrationAccountId = null;
       _registrationCompleter?.complete();
       _registrationCompleter = null;
       pushLog(
@@ -1262,14 +1313,24 @@ class FirebasePushService implements IPushNotificationService {
     }
   }
 
-  Future<void> _registerForPushImpl() async {
+  bool _owns(String accountId, String deviceId) =>
+      _client.isLogged() &&
+      _client.userID == accountId &&
+      _client.deviceID == deviceId;
+
+  Future<void> _registerForPushImpl(
+    String accountId,
+    String deviceId,
+    String bindingId,
+  ) async {
     // 如果 FCM Token 还没有获取到，尝试获取
     if (_fcmToken == null) {
       pushLog('REG', 'FCM token is null, attempting to get token');
-      _fcmToken = await _getFCMTokenWithRetry(maxRetries: 2);
+      _fcmToken =
+          await (_tokenLoader?.call() ?? _getFCMTokenWithRetry(maxRetries: 2));
     }
 
-    if (_fcmToken == null) {
+    if (!_owns(accountId, deviceId) || _fcmToken == null) {
       pushLog('REG_FAIL', 'Cannot register push - FCM token is null');
       return;
     }
@@ -1290,9 +1351,14 @@ class FirebasePushService implements IPushNotificationService {
       pushLog('REG', 'Using FCM token as pushkey');
     }
 
-    final previousPushkey = await _getStoredPushkey();
+    final previousPushkey = await _getStoredPushkey(
+      accountId: accountId,
+      deviceId: deviceId,
+    );
+    if (!_owns(accountId, deviceId)) return;
     if (previousPushkey != null && previousPushkey != pushkey) {
       await _deletePusherByKey(previousPushkey);
+      if (!_owns(accountId, deviceId)) return;
     }
 
     // 指数退避重试：最多 3 次（初始 + 2 次重试），间隔 4s、8s
@@ -1305,7 +1371,7 @@ class FirebasePushService implements IPushNotificationService {
 
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       // 每次重试前检查登录状态
-      if (!_client.isLogged()) {
+      if (!_owns(accountId, deviceId)) {
         pushLog('REG_FAIL', 'Client not logged in, aborting push registration');
         return;
       }
@@ -1324,6 +1390,12 @@ class FirebasePushService implements IPushNotificationService {
             lang: 'en',
             data: matrix.PusherData(
               url: Uri.parse(pushGatewayUrl!),
+              additionalProperties: {
+                'default_payload': {
+                  'n42_receiver_account_id': accountId,
+                  'n42_push_binding_id': bindingId,
+                },
+              },
               // iOS (APNs): 不使用 event_id_only，让 Sygnal 发送完整通知内容
               // (包含 alert/sound/badge)，否则 APNs 只收到静默推送不会显示给用户。
               // Android (FCM): 使用 event_id_only，由 Firebase onBackgroundMessage 处理。
@@ -1332,19 +1404,41 @@ class FirebasePushService implements IPushNotificationService {
           ),
           append: false,
         );
+        if (!_owns(accountId, deviceId)) return;
         pushLog('REG_OK', 'Pusher registered successfully on attempt $attempt');
 
         // 注册成功后验证 Pusher 是否确实存在于服务器
-        await _verifyPusherRegistration(pushkey);
+        final verified = await _verifyPusherRegistration(
+          pushkey,
+          accountId,
+          bindingId,
+        );
+        if (!_owns(accountId, deviceId)) return;
+        if (!verified) return;
+        if (!await _bindingStore.activate(accountId, bindingId)) return;
+        if (!_owns(accountId, deviceId)) {
+          await _bindingStore.revoke(accountId, bindingId);
+          return;
+        }
+        _verifiedAccountId = accountId;
+        _isPusherVerified = true;
         _lastRegisteredPushkey = pushkey;
-        await _storePushkey(pushkey);
+        _lastRegisteredAccountId = accountId;
+        await _storePushkey(pushkey, accountId: accountId, deviceId: deviceId);
+        if (!_owns(accountId, deviceId)) {
+          _isPusherVerified = false;
+          _verifiedAccountId = null;
+          await _bindingStore.revoke(accountId, bindingId);
+        }
         return; // 成功，退出重试循环
       } catch (e) {
         pushLog('REG_FAIL', 'Attempt $attempt/$maxAttempts failed: $e');
         if (attempt < maxAttempts) {
+          if (!_owns(accountId, deviceId)) return;
           final delay = Duration(seconds: 4 * attempt); // 4s, 8s
           pushLog('REG', 'Retrying in ${delay.inSeconds}s');
           await Future<void>.delayed(delay);
+          if (!_owns(accountId, deviceId)) return;
         } else {
           pushLog(
             'REG_FAIL',
@@ -1358,20 +1452,28 @@ class FirebasePushService implements IPushNotificationService {
   /// 验证 Pusher 注册是否成功
   ///
   /// 调用 getPushers() 确认当前 pushkey 的 Pusher 已存在于服务器
-  Future<void> _verifyPusherRegistration(String pushkey) async {
+  Future<bool> _verifyPusherRegistration(
+    String pushkey,
+    String accountId,
+    String bindingId,
+  ) async {
     try {
       final pushers = await _client.getPushers();
       if (pushers == null) {
         pushLog('VERIFY_WARN', 'getPushers() returned null');
         _isPusherVerified = false;
-        return;
+        return false;
       }
 
-      final found = pushers.any(
-        (p) => p.pushkey == pushkey && p.appId == appId,
-      );
+      final found = pushers.any((p) {
+        final payload = p.data.additionalProperties['default_payload'];
+        return p.pushkey == pushkey &&
+            p.appId == appId &&
+            payload is Map &&
+            payload['n42_receiver_account_id'] == accountId &&
+            payload['n42_push_binding_id'] == bindingId;
+      });
 
-      _isPusherVerified = found;
       if (found) {
         pushLog('VERIFY_OK', 'Pusher verified on server (appId=$appId)');
       } else {
@@ -1381,14 +1483,17 @@ class FirebasePushService implements IPushNotificationService {
               'Registered ${pushers.length} pushers, none match appId=$appId',
         );
       }
+      return found;
     } catch (e) {
       pushLog('VERIFY_FAIL', 'Verification failed: $e');
       _isPusherVerified = false;
+      return false;
     }
   }
 
   /// Pusher 是否已通过服务端验证
-  bool get isPusherVerified => _isPusherVerified;
+  bool get isPusherVerified =>
+      _isPusherVerified && _verifiedAccountId == _client.userID;
 
   /// 获取推送诊断信息
   ///
@@ -1397,7 +1502,7 @@ class FirebasePushService implements IPushNotificationService {
     final String status;
     if (!_isInitialized) {
       status = 'not_initialized';
-    } else if (_isPusherVerified) {
+    } else if (isPusherVerified) {
       status = 'registered_verified';
     } else if (_isRegistering) {
       status = 'registering';
@@ -1415,7 +1520,7 @@ class FirebasePushService implements IPushNotificationService {
       'pushGatewayUrl': pushGatewayUrl,
       'appId': appId,
       'pushkeyType': pushkeyType,
-      'isPusherVerified': _isPusherVerified,
+      'isPusherVerified': isPusherVerified,
       'isRegistering': _isRegistering,
       'clientIsLogged': _client.isLogged(),
       'platform': Platform.isIOS ? 'iOS' : 'Android',
@@ -1449,6 +1554,12 @@ class FirebasePushService implements IPushNotificationService {
 
   @override
   Future<void> unregisterPush() async {
+    final accountId = _client.userID;
+    if (accountId != null) {
+      await _bindingStore.revokeAccount(accountId);
+    }
+    _isPusherVerified = false;
+    _verifiedAccountId = null;
     final pushkeys = <String>{};
     if (Platform.isIOS && _apnsToken != null) {
       pushkeys.add(_apnsToken!);
@@ -1461,7 +1572,8 @@ class FirebasePushService implements IPushNotificationService {
     if (storedPushkey != null) {
       pushkeys.add(storedPushkey);
     }
-    if (_lastRegisteredPushkey != null) {
+    if (_lastRegisteredPushkey != null &&
+        _lastRegisteredAccountId == accountId) {
       pushkeys.add(_lastRegisteredPushkey!);
     }
     if (pushkeys.isEmpty) return;
@@ -1470,6 +1582,7 @@ class FirebasePushService implements IPushNotificationService {
       await _deletePusherByKey(pushkey);
     }
     _lastRegisteredPushkey = null;
+    _lastRegisteredAccountId = null;
     await _clearStoredPushkey();
   }
 
@@ -1491,20 +1604,32 @@ class FirebasePushService implements IPushNotificationService {
     }
   }
 
-  String _pushkeyStorageKey() {
-    final userId = _client.userID ?? 'unknown_user';
-    final deviceId = _client.deviceID ?? 'unknown_device';
-    return 'n42_chat.last_pushkey.$appId.$userId.$deviceId';
+  String _pushkeyStorageKey({String? accountId, String? deviceId}) {
+    final user = accountId ?? _client.userID ?? 'unknown_user';
+    final device = deviceId ?? _client.deviceID ?? 'unknown_device';
+    return 'n42_chat.last_pushkey.$appId.$user.$device';
   }
 
-  Future<String?> _getStoredPushkey() async {
+  Future<String?> _getStoredPushkey({
+    String? accountId,
+    String? deviceId,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_pushkeyStorageKey());
+    return prefs.getString(
+      _pushkeyStorageKey(accountId: accountId, deviceId: deviceId),
+    );
   }
 
-  Future<void> _storePushkey(String pushkey) async {
+  Future<void> _storePushkey(
+    String pushkey, {
+    String? accountId,
+    String? deviceId,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_pushkeyStorageKey(), pushkey);
+    await prefs.setString(
+      _pushkeyStorageKey(accountId: accountId, deviceId: deviceId),
+      pushkey,
+    );
   }
 
   Future<void> _clearStoredPushkey() async {
