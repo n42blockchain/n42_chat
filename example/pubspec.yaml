@@ -23,7 +23,16 @@ dependencies:
   cupertino_icons: ^1.0.6
 
 dependency_overrides:
-  flutter_secure_storage: ^10.0.0
+  flutter_secure_storage:
+    git:
+      url: https://github.com/n42blockchain/n42appv2.git
+      ref: 9733aa21eb7e4fa98c2aa8a287ef9588960023c2
+      path: packages/flutter_secure_storage
+  facebook_auth_desktop:
+    git:
+      url: https://github.com/n42blockchain/n42appv2.git
+      ref: 9733aa21eb7e4fa98c2aa8a287ef9588960023c2
+      path: packages/facebook_auth_desktop
 
 dev_dependencies:
   flutter_test:

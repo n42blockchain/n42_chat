@@ -1,4 +1,5 @@
 name: n42_chat
+publish_to: none
 description: >
   A Matrix-based chat module with WeChat-style UI for N42 Wallet integration.
   可独立运行或作为package嵌入其他Flutter应用的聊天模块。
@@ -58,7 +59,11 @@ dependencies:
   sqlite3: ^3.6.0
   sqflite: ^2.4.3
   # BSD-3-Clause License
-  flutter_secure_storage: ^10.0.0
+  flutter_secure_storage:
+    git:
+      url: https://github.com/n42blockchain/n42appv2.git
+      ref: 9733aa21eb7e4fa98c2aa8a287ef9588960023c2
+      path: packages/flutter_secure_storage
   shared_preferences: ^2.5.4
   path_provider: ^2.1.5
   path: ^1.9.0
@@ -235,8 +240,18 @@ dependencies:
   flutter_cache_manager: ^3.4.1
 
 dependency_overrides:
-  # flutter_facebook_auth 依赖旧版 flutter_secure_storage，强制使用新版与主项目对齐
-  flutter_secure_storage: ^10.0.0
+  # Resolve transitive hosted constraints to the same reviewed Git source.
+  flutter_secure_storage:
+    git:
+      url: https://github.com/n42blockchain/n42appv2.git
+      ref: 9733aa21eb7e4fa98c2aa8a287ef9588960023c2
+      path: packages/flutter_secure_storage
+  # The maintained desktop plugin supports the reviewed secure-storage 11 source.
+  facebook_auth_desktop:
+    git:
+      url: https://github.com/n42blockchain/n42appv2.git
+      ref: 9733aa21eb7e4fa98c2aa8a287ef9588960023c2
+      path: packages/facebook_auth_desktop
 
 dev_dependencies:
   vodozemac: ^0.8.0
