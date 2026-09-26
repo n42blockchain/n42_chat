@@ -189,7 +189,8 @@ class CallManager {
     unawaited(
       Future.microtask(() async {
         try {
-          final pending = _notificationService.consumePendingAcceptAction();
+          final pending = await _notificationService
+              .consumePendingAcceptAction();
           if (pending != null) {
             final (_, callInfo) = pending;
             debugLog(
@@ -738,8 +739,11 @@ class CallManager {
         hangupCall();
         break;
       case CallAction.accept:
-        _notificationService.consumePendingAcceptAction();
-        answerCall();
+        unawaited(() async {
+          final pending = await _notificationService
+              .consumePendingAcceptAction();
+          if (pending != null) await answerCall();
+        }());
         break;
       case CallAction.decline:
         _setPendingAnswer(false);

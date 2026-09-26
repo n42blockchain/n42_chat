@@ -136,6 +136,42 @@ class MissedCallCallbackStore {
     return _bindingStore.matches(accountId, bindingId);
   }
 
+  /// Inspect a retained background call without consuming its callback route.
+  Future<MissedCallRoute?> lookupBound(
+    String callId, {
+    required String accountId,
+    required String bindingId,
+  }) async {
+    if (!await _bindingStore.matches(accountId, bindingId)) return null;
+    try {
+      final raw = await _storage.read(key: _key(accountId, callId));
+      if (raw == null) return null;
+      final entry = jsonDecode(raw);
+      if (entry is! Map ||
+          entry['accountId'] != accountId ||
+          entry['callId'] != callId ||
+          entry['bindingId'] != bindingId ||
+          entry['roomId'] is! String ||
+          (entry['roomId'] as String).isEmpty ||
+          entry['callerId'] is! String ||
+          (entry['callerId'] as String).isEmpty ||
+          entry['isVideo'] is! bool ||
+          entry['expiresAt'] is! int ||
+          (entry['expiresAt'] as int) <= _now().millisecondsSinceEpoch ||
+          !await _bindingStore.matches(accountId, bindingId)) {
+        return null;
+      }
+      return MissedCallRoute(
+        callId: callId,
+        roomId: entry['roomId'] as String,
+        callerId: entry['callerId'] as String,
+        isVideo: entry['isVideo'] as bool,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<MissedCallRoute?> consume(String callId) {
     final account = currentAccountId();
     return _serialized(() async {

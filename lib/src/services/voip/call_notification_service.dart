@@ -78,12 +78,54 @@ class CallNotificationService {
   StreamSubscription<callkit.CallEvent?>? _callKitSubscription;
   final Map<String, IncomingCallInfo> _knownCalls = {};
   final Map<String, String?> _knownCallAccounts = {};
+  final Set<String> _locallyShownCallIds = {};
+  final Set<String> _handledBackgroundAcceptIds = {};
   String? Function() _currentAccountId = () => null;
   late final _callbackStore = MissedCallCallbackStore(
     currentAccountId: () => _currentAccountId(),
   );
   String? _pendingCallbackId;
   Timer? _pendingCallbackExpiry;
+  Future<void>? _backgroundAcceptValidation;
+  String? _pendingAcceptAccountId;
+  String? _pendingAcceptBindingId;
+  int _lifecycleSerial = 0;
+
+  Future<void> _receiveBackgroundAccept(IncomingCallInfo info) async {
+    final account = info.extra?['n42_receiver_account_id'];
+    final binding = info.extra?['n42_push_binding_id'];
+    if (account is! String || binding is! String) return;
+    final current = _currentAccountId();
+    if (current != null && current != account) return;
+    final serial = _lifecycleSerial;
+    final route = await _callbackStore.lookupBound(
+      info.callId,
+      accountId: account,
+      bindingId: binding,
+    );
+    if (serial != _lifecycleSerial ||
+        route == null ||
+        route.roomId != info.roomId ||
+        route.callerId != info.callerId ||
+        route.isVideo != info.isVideo ||
+        _handledBackgroundAcceptIds.contains(info.callId)) {
+      return;
+    }
+    final active = _currentAccountId();
+    if (active != null && active != account) return;
+    _handledBackgroundAcceptIds.add(info.callId);
+    if (_handledBackgroundAcceptIds.length > 64) {
+      _handledBackgroundAcceptIds.remove(_handledBackgroundAcceptIds.first);
+    }
+    _pendingAcceptAction = (CallAction.accept, info);
+    _pendingAcceptTime = DateTime.now();
+    _pendingAcceptAccountId = account;
+    _pendingAcceptBindingId = binding;
+    _currentCallId ??= info.callId;
+    if (active == account) {
+      _callActionController.add((CallAction.accept, info));
+    }
+  }
 
   Future<void> _dispatchCallback(String id) async {
     if (_dismissedCallIds.contains(id)) return;
@@ -121,6 +163,7 @@ class CallNotificationService {
   void _forgetCall(String id) {
     _knownCalls.remove(id);
     _knownCallAccounts.remove(id);
+    _locallyShownCallIds.remove(id);
     _callMetadataExpiry.remove(id)?.cancel();
   }
 
@@ -128,7 +171,9 @@ class CallNotificationService {
     // Background isolates saved a route only after matching the pusher
     // generation. A later native event must not adopt it as the active login.
     if (info.extra?['n42_background_push'] == true) return;
+    final locallyShown = _locallyShownCallIds.contains(info.callId);
     _forgetCall(info.callId);
+    if (locallyShown) _locallyShownCallIds.add(info.callId);
     _knownCalls[info.callId] = info;
     _knownCallAccounts[info.callId] = _currentAccountId();
     _callMetadataExpiry[info.callId] = Timer(
@@ -170,16 +215,38 @@ class CallNotificationService {
   static const Duration _kPendingActionTtl = Duration(seconds: 90);
 
   /// 取出并清除待处理的接听动作（TTL 内有效）
-  (CallAction, IncomingCallInfo)? consumePendingAcceptAction() {
+  Future<(CallAction, IncomingCallInfo)?> consumePendingAcceptAction() async {
     final action = _pendingAcceptAction;
     final time = _pendingAcceptTime;
+    final account = _pendingAcceptAccountId;
+    final binding = _pendingAcceptBindingId;
+    if (account != null && account != _currentAccountId()) {
+      return null;
+    }
     _pendingAcceptAction = null;
     _pendingAcceptTime = null;
+    _pendingAcceptAccountId = null;
+    _pendingAcceptBindingId = null;
     if (action == null || time == null) return null;
     if (DateTime.now().difference(time) > _kPendingActionTtl) {
       debugLog(
         'CallNotificationService: Pending accept action expired (TTL exceeded)',
       );
+      return null;
+    }
+    if (account != null && binding != null) {
+      final route = await _callbackStore.lookupBound(
+        action.$2.callId,
+        accountId: account,
+        bindingId: binding,
+      );
+      if (route == null ||
+          route.roomId != action.$2.roomId ||
+          route.callerId != action.$2.callerId ||
+          account != _currentAccountId()) {
+        return null;
+      }
+    } else if (account != null && account != _currentAccountId()) {
       return null;
     }
     return action;
@@ -191,6 +258,26 @@ class CallNotificationService {
     _callKitSubscription ??= FlutterCallkitIncoming.onEvent.listen(
       _handleCallKitEvent,
     );
+    await _backgroundAcceptValidation;
+    final pending = _pendingAcceptAction;
+    final pendingAccount = _pendingAcceptAccountId;
+    final pendingBinding = _pendingAcceptBindingId;
+    if (pending != null &&
+        pendingAccount != null &&
+        pendingBinding != null &&
+        _currentAccountId() == pendingAccount) {
+      final route = await _callbackStore.lookupBound(
+        pending.$2.callId,
+        accountId: pendingAccount,
+        bindingId: pendingBinding,
+      );
+      if (route == null) {
+        _pendingAcceptAction = null;
+        _pendingAcceptTime = null;
+        _pendingAcceptAccountId = null;
+        _pendingAcceptBindingId = null;
+      }
+    }
     final pendingCallback = _pendingCallbackId;
     if (pendingCallback != null && _currentAccountId() != null) {
       _pendingCallbackId = null;
@@ -221,7 +308,21 @@ class CallNotificationService {
     final extra = parameterInfo?.extra ?? const <String, dynamic>{};
     final isBackground = extra['n42_background_push'] == true;
     final backgroundRecipient = extra['n42_receiver_account_id'];
+    if (event is callkit.CallEventActionCallAccept &&
+        isBackground &&
+        parameterInfo != null) {
+      _backgroundAcceptValidation = _receiveBackgroundAccept(parameterInfo);
+      unawaited(_backgroundAcceptValidation);
+      return;
+    }
     if (isBackground && backgroundRecipient != _currentAccountId()) {
+      return;
+    }
+    if (event is callkit.CallEventActionCallAccept &&
+        !isBackground &&
+        (!_locallyShownCallIds.contains(parameterInfo?.callId) ||
+            _currentAccountId() == null ||
+            _knownCallAccounts[parameterInfo?.callId] != _currentAccountId())) {
       return;
     }
     if (parameterInfo != null &&
@@ -248,6 +349,8 @@ class CallNotificationService {
       case callkit.CallEventActionCallAccept():
         _pendingAcceptAction = (CallAction.accept, info!);
         _pendingAcceptTime = DateTime.now();
+        _pendingAcceptAccountId = _currentAccountId();
+        _pendingAcceptBindingId = null;
         _callActionController.add((CallAction.accept, info));
       case callkit.CallEventActionCallDecline():
         _callActionController.add((CallAction.decline, info!));
@@ -328,6 +431,7 @@ class CallNotificationService {
     );
 
     await _rememberCall(IncomingCallInfo.fromMap(params.toJson()));
+    if (_currentAccountId() != null) _locallyShownCallIds.add(callId);
     await FlutterCallkitIncoming.showCallkitIncoming(params);
 
     debugLog(
@@ -492,5 +596,11 @@ class CallNotificationService {
     _callMetadataExpiry.clear();
     _knownCalls.clear();
     _knownCallAccounts.clear();
+    _locallyShownCallIds.clear();
+    _handledBackgroundAcceptIds.clear();
+    _backgroundAcceptValidation = null;
+    _pendingAcceptAccountId = null;
+    _pendingAcceptBindingId = null;
+    _lifecycleSerial++;
   }
 }

@@ -191,6 +191,32 @@ void main() {
     expect(await store.consume('call'), isNull);
   });
 
+  test('background accept lookup requires a live retained route', () async {
+    final bindings = PushRecipientBindingStore(
+      storage: storage,
+      now: () => now,
+    );
+    await bindings.activate('@me:hs', 'gen');
+    expect(
+      await store.lookupBound('call', accountId: '@me:hs', bindingId: 'gen'),
+      isNull,
+    );
+    await store.rememberBound(route, accountId: '@me:hs', bindingId: 'gen');
+    expect(
+      (await store.lookupBound(
+        'call',
+        accountId: '@me:hs',
+        bindingId: 'gen',
+      ))?.roomId,
+      '!room:hs',
+    );
+    now = now.add(const Duration(hours: 24));
+    expect(
+      await store.lookupBound('call', accountId: '@me:hs', bindingId: 'gen'),
+      isNull,
+    );
+  });
+
   test('one account cleanup cannot remove another account new route', () async {
     await store.remember(route);
     account = '@other:hs';
