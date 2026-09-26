@@ -11,6 +11,15 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
+### DEP-001 Latest generator stack awaits coupled storage migration
+
+- Severity: M
+- Added: 2026-09-25
+- Current state: Task 12 runtime majors resolve and compile, but build_runner 2.16.1 requires analyzer >=13.3 while drift_dev compatible with sqlite3 2.x requires analyzer <11. The real solver rejection is retained in `docs/testing/dependency-completion-2026-09-25/task12-target-solve.log.gz`.
+- Temporary scope ruling: retain the currently compatible generator stack for Task 12; upgrade generators with Matrix/drift/sqlite3/vodozemac/FRB and secure storage in Task 13. This is not a final version cap. Normal generation succeeds but warns that analyzer supports Dart 3.11 while the SDK is Dart 3.13.
+- Verification gap: the new CallKit, permissions, media picker, editor and ML Kit native integrations have automated Dart coverage but have not been accepted on physical Android/iOS devices in this task. Existing native call/privacy acceptance items remain open.
+- Next step: complete the coupled Task 13 solve and generation, then the host/native acceptance checks in Tasks 14–15.
+
 ### GROUP-001 Token gates are not authoritative admission control across join paths
 
 - Severity: H
