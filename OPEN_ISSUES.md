@@ -11,14 +11,25 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
-### DEP-001 Latest generator stack awaits coupled storage migration
+### DEP-001 Latest generator stack — resolved in Task 13A
 
 - Severity: M
-- Added: 2026-09-25
-- Current state: Task 12 runtime majors resolve and compile, but build_runner 2.16.1 requires analyzer >=13.3 while drift_dev compatible with sqlite3 2.x requires analyzer <11. The real solver rejection is retained in `docs/testing/dependency-completion-2026-09-25/task12-target-solve.log.gz`.
-- Temporary scope ruling: retain the currently compatible generator stack for Task 12; upgrade generators with Matrix/drift/sqlite3/vodozemac/FRB and secure storage in Task 13. This is not a final version cap. Normal generation succeeds but warns that analyzer supports Dart 3.11 while the SDK is Dart 3.13.
-- Verification gap: the new CallKit, permissions, media picker, editor and ML Kit native integrations have automated Dart coverage but have not been accepted on physical Android/iOS devices in this task. Existing native call/privacy acceptance items remain open.
-- Next step: complete the coupled Task 13 solve and generation, then the host/native acceptance checks in Tasks 14–15.
+- Added: 2026-09-25; resolved: 2026-09-26
+- Resolution: Matrix 13 / drift 2.35 / sqlite3 3.6 release the old analyzer restriction. Stable build_runner 2.16.1, drift_dev 2.35, mockito 5.8.1 and injectable_generator 3.1.3 now resolve and normal generation succeeds. See `docs/testing/dependency-completion-2026-09-25/task13-storage.md`.
+
+### DEP-003 Secure storage 11 requires verified legacy credential import
+
+- Severity: H
+- Added: 2026-09-26
+- Current state: Task 13A intentionally retains secure-storage 10 while historical host v9 EncryptedSharedPreferences users need a safe path around the readers removed in 11. Existing facebook_auth_desktop also bounds the dependency to 10.x. A direct major bump has not been performed.
+- Next step: Task 13B implements a minimal legacy-import adapter and validates real Android emulator upgrade/readback without deleting original credentials; Task 14 handles host namespace integration. Mock secure-storage archive tests do not prove Android keystore migration.
+
+### DEP-004 Host native SQLCipher selection requires integration validation
+
+- Severity: H
+- Added: 2026-09-26
+- Current state: standalone Chat native hooks load SQLCipher 4.19 and real archive/Vodozemac tests pass on macOS. The host's existing Android AAR already contains `libsqlcipher.so`; blindly bundling the standalone hook asset would create a duplicate. The iOS host requires executable SQLCipher symbols. Host builds/device behavior have not been verified by Task 13A.
+- Next step: Task 14 configures entrypoint sqlite3 hooks for Android system library `sqlcipher`, iOS executable, and default SQLCipher asset, retains native linkage, and validates real archive opens/build outputs. Do not hide collisions with arbitrary pickFirst.
 
 ### DEP-002 Background missed-call callbacks lack recipient account provenance
 
