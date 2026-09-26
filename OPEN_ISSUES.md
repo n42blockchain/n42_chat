@@ -20,6 +20,15 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Verification gap: the new CallKit, permissions, media picker, editor and ML Kit native integrations have automated Dart coverage but have not been accepted on physical Android/iOS devices in this task. Existing native call/privacy acceptance items remain open.
 - Next step: complete the coupled Task 13 solve and generation, then the host/native acceptance checks in Tasks 14–15.
 
+### DEP-002 Background missed-call callbacks lack recipient account provenance
+
+- Severity: M
+- Added: 2026-09-26
+- Observed limitation: the existing background call push contract and fixtures include room_id/sender/type but no recipient account or push-registration identifier. Assigning a queued push to the active secure session could route an old-account call through a different account, so background-only missed notifications without a previously account-bound callback record fail closed.
+- Upstream evidence: CallKit 3.1.6 Android still sends callback Bundle metadata, but its Dart adapter emits only the call ID; timed-out calls are removed from activeCalls and there is no public missed-call lookup API. The previous raw-event API exposed metadata. Separately, the old CallManager-generated missed notification already omitted its room ID.
+- Fixed path: notifications created with a known authenticated account retain minimal routing in secure storage (64 total entries, 24h TTL). Early callback IDs wait up to 90 seconds for account binding. Cache recreation, consumption, account isolation, expiry, storage errors and actual CallManager restart routing have automated coverage.
+- Next step: add an authenticated recipient/registration-account association to the push contract, then cache background callback routing only after that association is verified. Physical background/terminated Android/iOS notification acceptance remains unverified. No account is inferred from the current session alone.
+
 ### GROUP-001 Token gates are not authoritative admission control across join paths
 
 - Severity: H

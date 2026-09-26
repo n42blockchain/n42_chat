@@ -1,18 +1,31 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:n42_chat/src/core/notifications/firebase_push_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:matrix/matrix.dart' as matrix;
+import 'package:matrix/src/utils/cached_stream_controller.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:n42_chat/src/services/voip/call_manager.dart';
 import 'package:n42_chat/src/services/voip/call_notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _Client extends Mock implements matrix.Client {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   final List<MethodCall> callkitCalls = <MethodCall>[];
+  String? account;
 
-  setUp(() {
+  setUp(() async {
     callkitCalls.clear();
     SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
+    account = '@me:hs';
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
@@ -22,9 +35,11 @@ void main() {
             return null;
           },
         );
+    await CallNotificationService().initialize(currentAccountId: () => account);
   });
 
   tearDown(() {
+    CallNotificationService().dispose();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
           const MethodChannel('flutter_callkit_incoming'),
@@ -36,6 +51,7 @@ void main() {
     String action,
     String id, {
     Map<String, dynamic> extraBody = const {},
+    bool waitEventLoop = true,
   }) async {
     final done = Completer<void>();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -54,7 +70,7 @@ void main() {
           (_) => done.complete(),
         );
     await done.future;
-    await Future<void>.delayed(Duration.zero);
+    if (waitEventLoop) await Future<void>.delayed(Duration.zero);
   }
 
   for (final entry in {
@@ -115,7 +131,7 @@ void main() {
       final service = CallNotificationService();
       service.dispose();
       await Future<void>.delayed(Duration.zero);
-      await service.initialize();
+      await service.initialize(currentAccountId: () => account);
       for (var index = 0; index < 65; index++) {
         await nativeEvent('ACTION_CALL_INCOMING', 'bounded-$index');
       }
@@ -124,27 +140,230 @@ void main() {
       addTearDown(sub.cancel);
       await nativeEvent('ACTION_CALL_CALLBACK', 'bounded-0');
       await nativeEvent('ACTION_CALL_CALLBACK', 'bounded-64');
-      expect(actions.first.$2.callId, 'bounded-0');
-      expect(actions.first.$2.callerId, isEmpty);
-      expect(actions.last.$2.callerId, '@alice:hs');
+      expect(actions, hasLength(1));
+      expect(actions.single.$2.callId, 'bounded-64');
+      expect(actions.single.$2.callerId, '@alice:hs');
       service.dispose();
     },
   );
 
-  test('timeout clears retained call metadata', () async {
+  test(
+    'timeout callback retains routing metadata and consumes it once',
+    () async {
+      final service = CallNotificationService();
+      final actions = <(CallAction, IncomingCallInfo)>[];
+      final sub = service.callActions.listen(actions.add);
+      addTearDown(sub.cancel);
+      await nativeEvent('ACTION_CALL_INCOMING', 'missed-call');
+      await nativeEvent('ACTION_CALL_TIMEOUT', 'missed-call');
+      await nativeEvent('ACTION_CALL_CALLBACK', 'missed-call');
+      expect(actions.last.$1, CallAction.callback);
+      expect(actions.last.$2.callId, 'missed-call');
+      expect(actions.last.$2.callerId, '@alice:hs');
+      expect(actions.last.$2.roomId, '!room:hs');
+      expect(service.currentCallId, isNull);
+      await nativeEvent('ACTION_CALL_CALLBACK', 'missed-call');
+      expect(actions, hasLength(2));
+    },
+  );
+
+  test(
+    'CallManager missed notification callback starts the original room call',
+    () async {
+      final client = _Client();
+      when(() => client.userID).thenReturn('@me:hs');
+      final timeline = CachedStreamController<matrix.Event>();
+      final calls = CachedStreamController<List<matrix.BasicEventWithSender>>();
+      when(() => client.onTimelineEvent).thenReturn(timeline);
+      when(() => client.onCallEvents).thenReturn(calls);
+      // Stop after routing reaches WebRTC rather than opening a real microphone.
+      when(() => client.getRoomById(any())).thenReturn(null);
+      var textureId = 0;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('FlutterWebRTC.Method'),
+            (call) async {
+              if (call.method == 'createVideoRenderer')
+                return {'textureId': ++textureId};
+              return null;
+            },
+          );
+      final manager = CallManager();
+      await manager.initialize(client: client);
+      addTearDown(() async {
+        await manager.dispose();
+        await timeline.close();
+        await calls.close();
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+              const MethodChannel('FlutterWebRTC.Method'),
+              null,
+            );
+      });
+      await nativeEvent('ACTION_CALL_INCOMING', 'displayed-call');
+      await nativeEvent('ACTION_CALL_TIMEOUT', 'displayed-call');
+      await Future<void>.delayed(Duration.zero);
+      final args =
+          callkitCalls
+                  .lastWhere((c) => c.method == 'showMissCallNotification')
+                  .arguments
+              as Map;
+      expect(args['id'], 'displayed-call');
+      expect(args['extra']['roomId'], '!room:hs');
+      await manager.dispose();
+      await CallNotificationService().initialize();
+      await nativeEvent('ACTION_CALL_CALLBACK', args['id'] as String);
+      expect(callkitCalls.where((call) => call.method == 'startCall'), isEmpty);
+      await manager.initialize(client: client);
+      await Future<void>.delayed(Duration.zero);
+      final outgoing =
+          callkitCalls.lastWhere((c) => c.method == 'startCall').arguments
+              as Map;
+      expect(outgoing['handle'], '@alice:hs');
+      expect(outgoing['extra']['roomId'], '!room:hs');
+      verify(() => client.getRoomById('!room:hs')).called(1);
+    },
+  );
+
+  test(
+    'early cold-start callback waits for account binding then restores routing',
+    () async {
+      final service = CallNotificationService();
+      await nativeEvent('ACTION_CALL_INCOMING', 'cold-call');
+      await nativeEvent('ACTION_CALL_TIMEOUT', 'cold-call');
+      service.dispose();
+      await service
+          .initialize(); // Starts listening before authentication is ready.
+      final actions = <(CallAction, IncomingCallInfo)>[];
+      final sub = service.callActions.listen(actions.add);
+      addTearDown(sub.cancel);
+      await nativeEvent('ACTION_CALL_CALLBACK', 'cold-call');
+      expect(actions, isEmpty);
+      await service.initialize(currentAccountId: () => account);
+      await Future<void>.delayed(Duration.zero);
+      expect(actions.single.$2.roomId, '!room:hs');
+      expect(actions.single.$2.callerId, '@alice:hs');
+      await nativeEvent('ACTION_CALL_CALLBACK', 'cold-call');
+      expect(actions, hasLength(1));
+    },
+  );
+
+  test('cold-start callback never routes to a different account', () async {
     final service = CallNotificationService();
+    await nativeEvent('ACTION_CALL_INCOMING', 'other-account-call');
+    service.dispose();
     await service.initialize();
     final actions = <(CallAction, IncomingCallInfo)>[];
     final sub = service.callActions.listen(actions.add);
     addTearDown(sub.cancel);
-    await nativeEvent('ACTION_CALL_INCOMING', 'expiring-call');
-    await nativeEvent('ACTION_CALL_TIMEOUT', 'expiring-call');
-    await nativeEvent('ACTION_CALL_CALLBACK', 'expiring-call');
-    expect(actions.first.$2.callerId, '@alice:hs');
-    expect(actions.last.$2.callId, 'expiring-call');
-    expect(actions.last.$2.callerId, isEmpty);
-    expect(service.currentCallId, isNull);
+    await nativeEvent('ACTION_CALL_CALLBACK', 'other-account-call');
+    account = '@other:hs';
+    await service.initialize(currentAccountId: () => account);
+    await Future<void>.delayed(Duration.zero);
+    expect(actions, isEmpty);
   });
+
+  test(
+    'account switch before timeout cannot rebind a saved callback',
+    () async {
+      final service = CallNotificationService();
+      await nativeEvent('ACTION_CALL_INCOMING', 'switch-before-timeout');
+      account = '@other:hs';
+      final actions = <(CallAction, IncomingCallInfo)>[];
+      final sub = service.callActions.listen(actions.add);
+      addTearDown(sub.cancel);
+      await nativeEvent('ACTION_CALL_TIMEOUT', 'switch-before-timeout');
+      await nativeEvent('ACTION_CALL_CALLBACK', 'switch-before-timeout');
+      expect(actions, isEmpty);
+      account = '@me:hs';
+      await nativeEvent('ACTION_CALL_CALLBACK', 'switch-before-timeout');
+      expect(actions.single.$2.roomId, '!room:hs');
+    },
+  );
+
+  test(
+    'unscoped background push cannot route a callback as the current account',
+    () async {
+      await FirebasePushService.showBackgroundCallKitForTest(
+        const RemoteMessage(
+          data: {
+            'type': 'm.call.invite',
+            'room_id': '!background:hs',
+            'sender': '@alice:hs',
+          },
+        ),
+      );
+      final args =
+          callkitCalls
+                  .lastWhere((c) => c.method == 'showCallkitIncoming')
+                  .arguments
+              as Map;
+      final actions = <CallAction>[];
+      final sub = CallNotificationService().callActions.listen(
+        (event) => actions.add(event.$1),
+      );
+      addTearDown(sub.cancel);
+      await nativeEvent('ACTION_CALL_CALLBACK', args['id'] as String);
+      expect(actions, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'early callback expires if account binding takes over 90 seconds',
+    (tester) async {
+      final service = CallNotificationService();
+      await tester.runAsync(
+        () => service.showMissedCall(
+          callId: 'pending-expired',
+          roomId: '!room:hs',
+          callerId: '@alice:hs',
+          callerName: 'Alice',
+        ),
+      );
+      service.dispose();
+      await service.initialize();
+      final actions = <CallAction>[];
+      final sub = service.callActions.listen((event) => actions.add(event.$1));
+      await nativeEvent(
+        'ACTION_CALL_CALLBACK',
+        'pending-expired',
+        waitEventLoop: false,
+      );
+      await tester.pump(const Duration(seconds: 91));
+      await tester.runAsync(() async {
+        await service.initialize(currentAccountId: () => account);
+        await Future<void>.delayed(Duration.zero);
+      });
+      expect(actions, isEmpty);
+      service.dispose();
+      await tester.runAsync(sub.cancel);
+    },
+  );
+
+  test('late end event never resurrects dismissed callback storage', () async {
+    final service = CallNotificationService();
+    await nativeEvent('ACTION_CALL_INCOMING', 'late-ended-call');
+    await service.endCall('late-ended-call');
+    await nativeEvent('ACTION_CALL_ENDED', 'late-ended-call');
+    final values = await const FlutterSecureStorage().readAll();
+    for (final value in values.values) {
+      expect(jsonDecode(value) as List, isEmpty);
+    }
+  });
+
+  for (final action in ['ACTION_CALL_DECLINE', 'ACTION_CALL_ENDED']) {
+    test('$action removes callback metadata', () async {
+      final service = CallNotificationService();
+      final actions = <(CallAction, IncomingCallInfo)>[];
+      final sub = service.callActions.listen(actions.add);
+      addTearDown(sub.cancel);
+      await nativeEvent('ACTION_CALL_INCOMING', 'terminal-$action');
+      await nativeEvent(action, 'terminal-$action');
+      await nativeEvent('ACTION_CALL_CALLBACK', 'terminal-$action');
+      expect(actions, hasLength(1));
+      expect(actions.single.$1, isNot(CallAction.callback));
+    });
+  }
 
   test('localized answer labels are passed to Android parameters', () async {
     await CallNotificationService().showIncomingCall(

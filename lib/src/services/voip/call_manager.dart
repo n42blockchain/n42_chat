@@ -159,9 +159,7 @@ class CallManager {
     _navigatorKey = navigatorKey;
     _client = client;
 
-    // 初始化通知服务
-    await _notificationService.initialize();
-
+    // Subscribe before binding the account, which may replay an early callback.
     // 监听来电通知动作
     _callActionSubscription = _notificationService.callActions.listen((event) {
       final (action, callInfo) = event;
@@ -181,6 +179,9 @@ class CallManager {
     _liveKitService = LiveKitService();
 
     _isInitialized = true;
+    await _notificationService.initialize(
+      currentAccountId: () => _client?.userID,
+    );
     debugLog('CallManager: Initialized');
 
     // 检查是否有在 app 冷启动期间（CallManager 尚未就绪时）用户已点击接听的缓存事件。
@@ -749,6 +750,8 @@ class CallManager {
         hangupCall();
         // 显示未接来电
         _notificationService.showMissedCall(
+          callId: callInfo.callId,
+          roomId: callInfo.roomId,
           callerId: callInfo.callerId,
           callerName: callInfo.callerName,
           callerAvatarUrl: callInfo.callerAvatarUrl,

@@ -16,6 +16,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:uuid/uuid.dart';
 import '../../core/utils/debug_log.dart';
 import 'incoming_call_ringtone_preference.dart';
+import 'missed_call_callback_store.dart';
 
 /// 来电动作类型
 enum CallAction { accept, decline, timeout, callback, ended }
@@ -76,6 +77,73 @@ class CallNotificationService {
 
   StreamSubscription<callkit.CallEvent?>? _callKitSubscription;
   final Map<String, IncomingCallInfo> _knownCalls = {};
+  final Map<String, String?> _knownCallAccounts = {};
+  String? Function() _currentAccountId = () => null;
+  late final _callbackStore = MissedCallCallbackStore(
+    currentAccountId: () => _currentAccountId(),
+  );
+  String? _pendingCallbackId;
+  Timer? _pendingCallbackExpiry;
+
+  Future<void> _dispatchCallback(String id) async {
+    if (_dismissedCallIds.contains(id)) return;
+    if (_currentAccountId() == null) {
+      _pendingCallbackId = id;
+      _pendingCallbackExpiry?.cancel();
+      _pendingCallbackExpiry = Timer(const Duration(seconds: 90), () {
+        _pendingCallbackId = null;
+      });
+      return;
+    }
+    final account = _currentAccountId();
+    final route = await _callbackStore.consume(id);
+    if (route == null || account != _currentAccountId()) return;
+    final cached = _knownCalls[id];
+    final info =
+        cached != null &&
+            cached.roomId == route.roomId &&
+            cached.callerId == route.callerId
+        ? cached
+        : IncomingCallInfo(
+            callId: id,
+            callerId: route.callerId,
+            callerName: route.callerId,
+            roomId: route.roomId,
+            isVideo: route.isVideo,
+          );
+    _forgetCall(id);
+    _callActionController.add((CallAction.callback, info));
+  }
+
+  final Map<String, Timer> _callMetadataExpiry = {};
+  static const _callMetadataTtl = Duration(hours: 24);
+
+  void _forgetCall(String id) {
+    _knownCalls.remove(id);
+    _knownCallAccounts.remove(id);
+    _callMetadataExpiry.remove(id)?.cancel();
+  }
+
+  Future<void> _rememberCall(IncomingCallInfo info) async {
+    _forgetCall(info.callId);
+    _knownCalls[info.callId] = info;
+    _knownCallAccounts[info.callId] = _currentAccountId();
+    _callMetadataExpiry[info.callId] = Timer(
+      _callMetadataTtl,
+      () => _forgetCall(info.callId),
+    );
+    if (_knownCalls.length > 64) _forgetCall(_knownCalls.keys.first);
+    if (info.roomId != null) {
+      await _callbackStore.remember(
+        MissedCallRoute(
+          callId: info.callId,
+          roomId: info.roomId!,
+          callerId: info.callerId,
+          isVideo: info.isVideo,
+        ),
+      );
+    }
+  }
 
   final _uuid = const Uuid();
 
@@ -115,10 +183,17 @@ class CallNotificationService {
   }
 
   /// 初始化（事件监听已在构造函数中设置，此处仅作日志标记）
-  Future<void> initialize() async {
+  Future<void> initialize({String? Function()? currentAccountId}) async {
+    if (currentAccountId != null) _currentAccountId = currentAccountId;
     _callKitSubscription ??= FlutterCallkitIncoming.onEvent.listen(
       _handleCallKitEvent,
     );
+    final pendingCallback = _pendingCallbackId;
+    if (pendingCallback != null && _currentAccountId() != null) {
+      _pendingCallbackId = null;
+      _pendingCallbackExpiry?.cancel();
+      unawaited(_dispatchCallback(pendingCallback));
+    }
     debugLog(
       'CallNotificationService: Initialized (listener was attached in constructor)',
     );
@@ -137,11 +212,14 @@ class CallNotificationService {
       callkit.CallEventActionCallEnded(:final callKitParams) => callKitParams,
       _ => null,
     };
-    if (params != null) {
-      final info = IncomingCallInfo.fromMap(params.toJson());
-      _knownCalls[info.callId] = info;
-      // Keep metadata for id-only timeout/callback events without unbounded growth.
-      if (_knownCalls.length > 64) _knownCalls.remove(_knownCalls.keys.first);
+    final parameterInfo = params == null
+        ? null
+        : IncomingCallInfo.fromMap(params.toJson());
+    if (parameterInfo != null &&
+        (event is callkit.CallEventActionCallIncoming ||
+            event is callkit.CallEventActionCallStart ||
+            event is callkit.CallEventActionCallAccept)) {
+      unawaited(_rememberCall(parameterInfo));
     }
     final id =
         params?.id ??
@@ -152,7 +230,8 @@ class CallNotificationService {
         };
     final info = id == null
         ? null
-        : _knownCalls[id] ??
+        : parameterInfo ??
+              _knownCalls[id] ??
               IncomingCallInfo(callId: id, callerId: '', callerName: 'Unknown');
     switch (event) {
       case callkit.CallEventActionCallIncoming():
@@ -164,13 +243,14 @@ class CallNotificationService {
       case callkit.CallEventActionCallDecline():
         _callActionController.add((CallAction.decline, info!));
         _currentCallId = null;
-        _knownCalls.remove(info.callId);
+        _rememberDismissed(info.callId);
       case callkit.CallEventActionCallTimeout():
-        _callActionController.add((CallAction.timeout, info!));
+        if (_knownCallAccounts[info!.callId] != _currentAccountId()) return;
+        _callActionController.add((CallAction.timeout, info));
+        // Preserve the original account binding and expiry until callback.
         _currentCallId = null;
-        _knownCalls.remove(info.callId);
-      case callkit.CallEventActionCallCallback():
-        _callActionController.add((CallAction.callback, info!));
+      case callkit.CallEventActionCallCallback(:final id):
+        unawaited(_dispatchCallback(id));
       case callkit.CallEventActionCallEnded():
         if (_dismissedCallIds.contains(info!.callId)) return;
         if (_currentCallId != null && _currentCallId != info.callId) return;
@@ -178,7 +258,7 @@ class CallNotificationService {
         _pendingAcceptTime = null;
         _currentCallId = null;
         _callActionController.add((CallAction.ended, info));
-        _knownCalls.remove(info.callId);
+        _rememberDismissed(info.callId);
       default:
         break;
     }
@@ -238,8 +318,7 @@ class CallNotificationService {
       ios: buildIncomingCallIOSParams(ringtonePreference: ringtonePreference),
     );
 
-    _knownCalls[callId] = IncomingCallInfo.fromMap(params.toJson());
-    if (_knownCalls.length > 64) _knownCalls.remove(_knownCalls.keys.first);
+    await _rememberCall(IncomingCallInfo.fromMap(params.toJson()));
     await FlutterCallkitIncoming.showCallkitIncoming(params);
 
     debugLog(
@@ -325,7 +404,8 @@ class CallNotificationService {
   void _rememberDismissed(String? id) {
     if (id == null) return;
     _dismissedCallIds.add(id);
-    _knownCalls.remove(id);
+    _forgetCall(id);
+    unawaited(_callbackStore.remove(id));
     if (_dismissedCallIds.length > 64)
       _dismissedCallIds.remove(_dismissedCallIds.first);
   }
@@ -344,6 +424,8 @@ class CallNotificationService {
 
   /// 显示未接来电通知
   Future<void> showMissedCall({
+    String? callId,
+    String? roomId,
     required String callerId,
     required String callerName,
     String? callerAvatarUrl,
@@ -358,11 +440,12 @@ class CallNotificationService {
         : (missedVoiceCallText ?? 'Missed voice call');
 
     final params = CallKitParams(
-      id: _uuid.v4(),
+      id: callId ?? _uuid.v4(),
       nameCaller: callerName,
       avatar: callerAvatarUrl,
       handle: callerId,
       type: isVideo ? 1 : 0,
+      extra: {'callerId': callerId, 'roomId': roomId},
       missedCallNotification: NotificationParams(
         showNotification: true,
         isShowCallback: true,
@@ -371,6 +454,7 @@ class CallNotificationService {
       ),
     );
 
+    await _rememberCall(IncomingCallInfo.fromMap(params.toJson()));
     await FlutterCallkitIncoming.showMissCallNotification(params);
     debugLog('CallNotificationService: Showing missed call from $callerName');
   }
@@ -386,9 +470,18 @@ class CallNotificationService {
     // 单例在同一进程内会被重复复用，不能把事件流永久关闭。
     _callKitSubscription?.cancel();
     _callKitSubscription = null;
+    _currentAccountId = () => null;
+    _pendingCallbackId = null;
+    _pendingCallbackExpiry?.cancel();
+    _pendingCallbackExpiry = null;
     _currentCallId = null;
     _pendingAcceptAction = null;
     _pendingAcceptTime = null;
+    for (final timer in _callMetadataExpiry.values) {
+      timer.cancel();
+    }
+    _callMetadataExpiry.clear();
     _knownCalls.clear();
+    _knownCallAccounts.clear();
   }
 }
