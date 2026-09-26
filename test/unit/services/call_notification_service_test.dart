@@ -12,6 +12,7 @@ import 'package:matrix/src/utils/cached_stream_controller.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/services/voip/call_manager.dart';
 import 'package:n42_chat/src/services/voip/call_notification_service.dart';
+import 'package:n42_chat/src/services/voip/webrtc_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _Client extends Mock implements matrix.Client {}
@@ -504,7 +505,7 @@ void main() {
     expect(await service.consumePendingAcceptAction(), isNull);
   });
 
-  test('CallManager binds after an early verified native accept', () async {
+  test('CallManager dispatches early verified accept', () async {
     await PushRecipientBindingStore().activate('@me:hs', 'generation-a');
     await FirebasePushService.showBackgroundCallKitForTest(
       const RemoteMessage(
@@ -560,6 +561,13 @@ void main() {
           return null;
         });
     final manager = CallManager();
+    final debugMessages = <String>[];
+    final previousDebugPrint = debugPrint;
+    debugPrint = (message, {wrapWidth}) {
+      if (message != null) debugMessages.add(message);
+      previousDebugPrint(message, wrapWidth: wrapWidth);
+    };
+    addTearDown(() => debugPrint = previousDebugPrint);
     addTearDown(() async {
       await manager.dispose();
       await timeline.close();
@@ -573,6 +581,29 @@ void main() {
     await manager.initialize(client: client);
     await managerReady.future.timeout(const Duration(seconds: 5));
     expect(await service.consumePendingAcceptAction(), isNull);
+
+    final incomingHandled = Completer<void>();
+    manager.onIncomingCall = (_) => incomingHandled.complete();
+    final nativeIncomingCount = callkitCalls
+        .where((call) => call.method == 'showCallkitIncoming')
+        .length;
+    manager.webRTCService!.onIncomingCall!.call(
+      CallSession(
+        callId: 'matrix-invite',
+        roomId: '!background:hs',
+        peerId: '@alice:hs',
+        peerName: 'Alice',
+        type: CallType.voice,
+        direction: CallDirection.incoming,
+        startTime: DateTime.now(),
+      ),
+    );
+    await incomingHandled.future.timeout(const Duration(seconds: 5));
+    expect(debugMessages, contains(startsWith('WebRTCService: answerCall -')));
+    expect(
+      callkitCalls.where((call) => call.method == 'showCallkitIncoming'),
+      hasLength(nativeIncomingCount),
+    );
   });
 
   test(
