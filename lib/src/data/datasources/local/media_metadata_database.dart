@@ -6,8 +6,6 @@ import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
-import 'package:sqlite3/open.dart';
 import '../../../core/utils/debug_log.dart';
 
 part 'media_metadata_database.g.dart';
@@ -328,22 +326,9 @@ Future<LazyDatabase> _openConnection() async {
       dbDir.createSync(recursive: true);
     }
     final file = File(p.join(dbDir.path, 'media_meta.db'));
-    if (Platform.isAndroid) {
-      await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
-    }
-    return NativeDatabase.createInBackground(
-      file,
-      isolateSetup: _configureMediaDatabaseLibrary,
-    );
+    // Native assets resolve the same SQLCipher library in background isolates.
+    return NativeDatabase.createInBackground(file);
   });
-}
-
-void _configureMediaDatabaseLibrary() {
-  // The APK ships SQLCipher, and a background isolate does not inherit the
-  // archive connection's SQLite loader override from the main isolate.
-  if (Platform.isAndroid) {
-    open.overrideFor(OperatingSystem.android, openCipherOnAndroid);
-  }
 }
 
 // ============================================

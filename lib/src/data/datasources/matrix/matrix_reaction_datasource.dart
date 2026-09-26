@@ -274,7 +274,7 @@ class MatrixReactionDataSource {
     final powerLevels = room.getState('m.room.power_levels')?.content;
     if (powerLevels == null) return false;
 
-    final userPowerLevel = room.ownPowerLevel;
+    final userPowerLevel = room.ownPowerLevel.level;
     final redactLevel = (powerLevels['redact'] as num?) ?? 50;
 
     return userPowerLevel >= redactLevel.toInt();

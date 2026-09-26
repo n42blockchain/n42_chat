@@ -10,7 +10,10 @@ import 'package:n42_chat/src/data/datasources/matrix/message/matrix_media_upload
 
 class _Client extends Mock implements Client {}
 
-class _Database extends Mock implements DatabaseApi {}
+class _Database extends Mock implements DatabaseApi {
+  @override
+  Future<User?> getUser(String userId, Room room) async => null;
+}
 
 class _Manager extends Mock implements MatrixClientManager {}
 
@@ -28,6 +31,7 @@ void main() {
   late MatrixMessageSender sender;
   setUp(() {
     client = _Client();
+    when(() => client.database).thenReturn(_Database());
     final manager = _Manager();
     room = _Room();
     partner = _User();
@@ -35,6 +39,8 @@ void main() {
     when(() => client.isLogged()).thenReturn(true);
     when(() => client.userID).thenReturn('@alice:test');
     when(() => client.ignoredUsers).thenReturn([]);
+    // Match Matrix 13's real client default when using real SDK Room/User.
+    when(() => client.getDisplayNameAndAvatarFromPrevContent).thenReturn(true);
     when(() => room.client).thenReturn(client);
     when(
       () => client.getRoomStateWithKey(any(), EventTypes.RoomMember, any()),

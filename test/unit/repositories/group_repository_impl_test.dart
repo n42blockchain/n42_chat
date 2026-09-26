@@ -212,7 +212,7 @@ void main() {
       when(() => mockUser1.displayName).thenReturn('Alice');
       when(() => mockUser1.calcDisplayname()).thenReturn('Alice');
       when(() => mockUser1.avatarUrl).thenReturn(null);
-      when(() => mockUser1.powerLevel).thenReturn(100);
+      when(() => mockUser1.powerLevel).thenReturn(matrix.PowerLevel(100));
       when(() => mockUser1.membership).thenReturn(matrix.Membership.join);
       when(
         () => mockGroupDS.getUserPowerLevel(testRoomId, '@alice:matrix.org'),
@@ -223,7 +223,7 @@ void main() {
       when(() => mockUser2.displayName).thenReturn('Bob');
       when(() => mockUser2.calcDisplayname()).thenReturn('Bob');
       when(() => mockUser2.avatarUrl).thenReturn(null);
-      when(() => mockUser2.powerLevel).thenReturn(0);
+      when(() => mockUser2.powerLevel).thenReturn(matrix.PowerLevel(0));
       when(() => mockUser2.membership).thenReturn(matrix.Membership.join);
       when(
         () => mockGroupDS.getUserPowerLevel(testRoomId, '@bob:matrix.org'),

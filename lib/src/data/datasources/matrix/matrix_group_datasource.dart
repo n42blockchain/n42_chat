@@ -51,7 +51,9 @@ class MatrixGroupDataSource {
     }
 
     final userId = _client?.userID;
-    final powerLevel = userId != null ? room.getPowerLevelByUserId(userId) : 0;
+    final powerLevel = userId != null
+        ? room.getPowerLevelByUserId(userId).level
+        : 0;
     debugLog(
       'MatrixGroupDataSource: Permission denied for $action, '
       'roomId=${room.id}, eventType=$eventType, powerLevel=$powerLevel',
@@ -92,7 +94,7 @@ class MatrixGroupDataSource {
     if (userId == null) {
       return false;
     }
-    return room.getPowerLevelByUserId(userId) >= fallbackMinPowerLevel;
+    return room.getPowerLevelByUserId(userId).level >= fallbackMinPowerLevel;
   }
 
   // ============================================
@@ -196,7 +198,9 @@ class MatrixGroupDataSource {
     // 检查权限
     final canChange = room.canSendEvent('m.room.name');
     final userId = _client?.userID;
-    final powerLevel = userId != null ? room.getPowerLevelByUserId(userId) : 0;
+    final powerLevel = userId != null
+        ? room.getPowerLevelByUserId(userId).level
+        : 0;
     debugLog(
       'setGroupName: roomId=$roomId, name=$name, canSendEvent=$canChange, powerLevel=$powerLevel',
     );
@@ -363,7 +367,7 @@ class MatrixGroupDataSource {
   /// 获取用户在群中的权限级别
   int getUserPowerLevel(String roomId, String userId) {
     final room = _client?.getRoomById(roomId);
-    return room?.getPowerLevelByUserId(userId) ?? 0;
+    return room?.getPowerLevelByUserId(userId).level ?? 0;
   }
 
   /// 设置用户权限级别
@@ -420,7 +424,7 @@ class MatrixGroupDataSource {
     try {
       final userId = _client?.userID;
       if (userId != null) {
-        final powerLevel = room.getPowerLevelByUserId(userId);
+        final powerLevel = room.getPowerLevelByUserId(userId).level;
         debugLog('canChangeSettings: userId=$userId, powerLevel=$powerLevel');
         // 权限级别 >= 50 通常表示版主或管理员
         if (powerLevel >= 50) return true;
@@ -1034,7 +1038,10 @@ class MatrixGroupDataSource {
             if (event.type == 'm.room.member' &&
                 event.content['membership'] == 'join') {
               // 检查是否是新加入（之前不是 join 状态）
-              final prevMembership = event.prevContent?['membership'];
+              final previous = event.unsigned?['prev_content'];
+              final prevMembership = previous is Map
+                  ? previous['membership']
+                  : null;
               if (prevMembership != 'join') {
                 final joinedUserId = event.stateKey;
                 if (joinedUserId != null && joinedUserId != client.userID) {

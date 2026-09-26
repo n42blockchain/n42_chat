@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:matrix/src/utils/cached_stream_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
@@ -36,6 +37,57 @@ void main() {
     when(() => clientManager.client).thenReturn(client);
     when(() => client.getRoomById(roomId)).thenReturn(room);
   });
+
+  test('Matrix PowerLevel preserves exact integer permissions', () {
+    for (final level in [-1, 0, 49, 50, 100, 9007199254740991]) {
+      when(
+        () => room.getPowerLevelByUserId('@me:hs'),
+      ).thenReturn(matrix.PowerLevel(level));
+      expect(dataSource.getUserPowerLevel(roomId, '@me:hs'), level);
+    }
+  });
+
+  test(
+    'membership updates read previous membership from unsigned content',
+    () async {
+      final updates = CachedStreamController<matrix.SyncUpdate>();
+      when(() => client.onSync).thenReturn(updates);
+      when(() => client.userID).thenReturn('@me:hs');
+      final joined = <String>[];
+      final sub = dataSource.watchMemberJoinEvents(roomId).listen(joined.add);
+      updates.add(
+        matrix.SyncUpdate.fromJson({
+          'next_batch': 'next',
+          'rooms': {
+            'join': {
+              roomId: {
+                'timeline': {
+                  'events': [
+                    for (final previous in ['join', 'invite'])
+                      {
+                        'type': 'm.room.member',
+                        'content': {'membership': 'join'},
+                        'sender': '@friend:hs',
+                        'state_key': '@$previous:hs',
+                        'event_id': previous,
+                        'origin_server_ts': 1,
+                        'unsigned': {
+                          'prev_content': {'membership': previous},
+                        },
+                      },
+                  ],
+                },
+              },
+            },
+          },
+        }),
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(joined, ['@invite:hs']);
+      await sub.cancel();
+      await updates.close();
+    },
+  );
 
   test(
     'room nickname preserves membership and avatar in its state event',
