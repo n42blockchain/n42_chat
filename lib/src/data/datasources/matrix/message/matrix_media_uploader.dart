@@ -151,7 +151,7 @@ class MatrixMediaUploader {
         debugLog(
           'MatrixMessageDataSource: Auth endpoint failed (${response.statusCode}), trying legacy endpoint...',
         );
-        return _uploadContentLegacy(
+        return await _uploadContentLegacy(
           content,
           filename: filename,
           contentType: contentType,
@@ -329,7 +329,7 @@ class MatrixMediaUploader {
       await request.sink.addStream(contentStream);
       await request.sink.close();
       final streamedResponse = await sendFuture;
-      return http.Response.fromStream(streamedResponse);
+      return await http.Response.fromStream(streamedResponse);
     } finally {
       httpClient.close();
     }

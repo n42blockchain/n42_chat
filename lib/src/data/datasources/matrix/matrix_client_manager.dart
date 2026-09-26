@@ -975,7 +975,7 @@ class MatrixClientManager {
         debugLog(
           'MatrixClientManager: Auth endpoint failed, trying legacy endpoint...',
         );
-        return _uploadContentLegacy(
+        return await _uploadContentLegacy(
           content,
           filename: filename,
           contentType: contentType,

@@ -857,7 +857,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       debugLog('forwardMediaMessage: Event sent: $eventId');
 
       if (eventId == null) return null;
-      return _getMessageById(roomId, eventId);
+      return await _getMessageById(roomId, eventId);
     } catch (e, stackTrace) {
       debugLog('forwardMediaMessage: Error: $e');
       debugLog('forwardMediaMessage: Stack trace: $stackTrace');

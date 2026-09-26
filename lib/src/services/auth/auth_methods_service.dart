@@ -487,7 +487,7 @@ class AuthMethodsService {
 
       // 如果有服务端地址，提交认证结果获取登录 token
       if (homeserver != null) {
-        return _submitPasskeyAuthentication(
+        return await _submitPasskeyAuthentication(
           homeserver: homeserver,
           assertion: assertion,
         );
