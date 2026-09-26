@@ -91,3 +91,23 @@ flutter test test/ --concurrency=4 --reporter expanded
 ```
 
 No extra native-library environment override is required on macOS: tests resolve the official package artifact and sqlite3's generated hook asset. The native ABI test explicitly skips non-macOS hosts, where a platform-specific native artifact test remains necessary.
+
+## Independent review fix — preservation and historical crypto fixtures
+
+Review base: `a54624c3b47a928a4b7410f5ac4a8acb5284ecaf`.
+
+The reviewer identified a pre-existing preservation violation: a valid-format wrong archive key caused verification to fail, but a plaintext backup older than seven days was still shredded. The new regression uses real old encrypted ciphertext and a real plaintext database backup aged 30 days. It reproduced the deletion before the fix (`task13-review-backup-red.log.gz`). Missing-key handling follows an earlier rejection path and was covered separately.
+
+Removed age-based backup deletion entirely. Failed keyed verification now preserves both ciphertext and plaintext backup byte-for-byte regardless of age. Tests prove correct-key recovery subsequently opens history and only then permits backup cleanup. No reset, plaintext fallback, or key replacement was added. All four sqlite3 `dispose()` calls were updated to `close()`.
+
+The crypto fixture gap is now covered with genuine old native data. An isolated writer resolved exact vodozemac 0.5.0 / FRB 2.11.1 and loaded the previously shipped flutter_vodozemac 0.6.0 framework. It generated synthetic encrypted **Account**, **inbound Megolm**, and **outbound Megolm** pickles using Matrix 6's actual persisted key derivation. The writer source, exact lockfile, public fixture and package/native hashes are under `test/fixtures/crypto/`. The new native test derives the key through current Matrix's production `toPickleKey`, imports all three old pickles, preserves both identity public keys, verifies/reproduces the old signature, decrypts historical ciphertext and continues the outbound session. Wrong keys are rejected. This is native pickle compatibility evidence, not Android secure-storage migration evidence.
+
+Generation cleanup: use `dart run build_runner build` without the removed flag. `build.yaml` explicitly limits sources to package/lib/test/example-lib/pubspec so `example/.dart_tool` artifacts are not builder inputs. Generation succeeded with no tracked generated-source changes; `task13-review-generation.log.gz` contains neither obsolete-option nor cache-input warnings.
+
+Review-fix verification:
+
+- Focused native/database/crypto/Matrix/group/archive regression: **176 passed**, zero skipped/failed (`task13-review-focused-final.log.gz`).
+- Analyzer: **exit 0, 284 infos, zero warnings/errors** (`task13-review-analyze-final.log.gz`); all four new SQLite deprecation notices are removed.
+- Original failed backup regression, legacy harness resolution/generation and successful generation are retained as separate compressed logs.
+- No full-suite rerun in this scoped fix round: production changes only remove unsafe backup expiry and use equivalent SQLite close APIs; affected archive/native/crypto paths have focused regression coverage. The **6780 pass / 3 skip** full-suite result above belongs to the pre-review implementation, not this revised HEAD.
+- Secure storage 11 remains Task 13B; host Android/iOS native selection/device acceptance remains Task 14. No push or host-source edit.
