@@ -583,7 +583,7 @@ bool _isSqlCipherAvailable() {
   } catch (_) {
     return false;
   } finally {
-    probe?.dispose();
+    probe?.close();
   }
 }
 
@@ -655,28 +655,11 @@ void _removeMigrationBackupWhenSafe(File file, String passphrase) {
     _shredPlaintextFile(backup);
     debugLog('ArchiveDatabase: removed verified plaintext migration backup');
   } catch (e) {
-    // The backup is the only way back if the encrypted archive turns out to be
-    // unreadable, so it is kept — but a verify failure that repeats on every
-    // launch would otherwise retain a full cleartext database forever with only
-    // a debug log. Once the encrypted archive has been the live database for
-    // longer than the grace period, the plaintext copy is no longer a useful
-    // rollback and its disclosure risk outweighs it.
-    debugLog('ArchiveDatabase: retained migration backup after verify: $e');
-    _shredStaleMigrationBackup(backup);
-  }
-}
-
-/// How long an unverifiable plaintext backup may linger before it is shredded.
-const Duration _kPlaintextBackupGrace = Duration(days: 7);
-
-void _shredStaleMigrationBackup(File backup) {
-  try {
-    final age = DateTime.now().difference(backup.lastModifiedSync());
-    if (age < _kPlaintextBackupGrace) return;
-    _shredPlaintextFile(backup);
-    debugLog('ArchiveDatabase: shredded stale plaintext migration backup');
-  } catch (e) {
-    debugLog('ArchiveDatabase: could not shred stale backup: $e');
+    // A failed verification does not establish that the encrypted copy is
+    // recoverable. Preserve the source regardless of its age for a keyed retry.
+    debugLog(
+      'ArchiveDatabase: retained migration backup after verify (${e.runtimeType})',
+    );
   }
 }
 
@@ -746,7 +729,7 @@ void _verifyEncryptedArchive(File file, String passphrase) {
       throw StateError('Encrypted archive.db failed integrity_check');
     }
   } finally {
-    db?.dispose();
+    db?.close();
   }
 }
 
@@ -792,7 +775,7 @@ Future<void> _migratePlaintextArchiveIfNeeded(
     );
     db.execute("SELECT sqlcipher_export('encrypted');");
     db.execute('DETACH DATABASE encrypted;');
-    db.dispose();
+    db.close();
     db = null;
 
     // Verify the export before it can replace the only readable source.
@@ -805,7 +788,7 @@ Future<void> _migratePlaintextArchiveIfNeeded(
   } catch (e) {
     // SQLite exceptions include the ATTACH statement and its key.
     debugLog('ArchiveDatabase: SQLCipher migration failed (${e.runtimeType})');
-    db?.dispose();
+    db?.close();
     // Delete only the incomplete destination. Preserve the source and retry
     // on a later launch rather than silently losing history.
     if (encFile.existsSync()) encFile.deleteSync();

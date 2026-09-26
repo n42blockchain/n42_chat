@@ -95,6 +95,49 @@ void main() {
       },
     );
   }
+  for (final stored in [null, List.filled(64, 'b').join()]) {
+    test(
+      'aged plaintext backup survives ${stored == null ? 'missing' : 'wrong'} key until verified recovery',
+      () async {
+        await copyLegacy();
+        final backup = File('${archive.path}.plaintext.bak');
+        final plaintext = ArchiveDatabase.forTesting(NativeDatabase(backup));
+        await plaintext.customStatement(
+          "INSERT INTO archived_messages(event_id,room_id,sender_id,origin_server_ts,type,body,quarter,archived_at) VALUES('backup','!room:hs','@me:hs',1,'m.room.message','Recoverable plaintext history',202601,1)",
+        );
+        await plaintext.close();
+        backup.setLastModifiedSync(
+          DateTime.now().subtract(const Duration(days: 30)),
+        );
+        final encryptedBefore = await archive.readAsBytes();
+        final backupBefore = await backup.readAsBytes();
+        FlutterSecureStorage.setMockInitialValues({
+          'n42_chat_archive_db_key': ?stored,
+        });
+        await expectLater(bodies(), throwsA(anything));
+        if (stored == null) {
+          await expectLater(
+            ArchiveDatabase.closeInstance(),
+            throwsA(isA<StateError>()),
+          );
+        } else {
+          await ArchiveDatabase.closeInstance();
+        }
+        expect(await archive.readAsBytes(), encryptedBefore);
+        expect(backup.existsSync(), isTrue);
+        expect(await backup.readAsBytes(), backupBefore);
+        FlutterSecureStorage.setMockInitialValues({
+          'n42_chat_archive_db_key': key,
+        });
+        expect(await bodies(), ['Historical encrypted archive fixture']);
+        expect(
+          backup.existsSync(),
+          isFalse,
+          reason: 'Only successful keyed verification permits cleanup',
+        );
+      },
+    );
+  }
   test(
     'production plaintext migration preserves schema version and search history',
     () async {
