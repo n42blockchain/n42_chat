@@ -57,13 +57,10 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
 
   Future<void> _pickMusic() async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.audio,
-        allowMultiple: false,
-      );
+      final result = await FilePicker.pickFile(type: FileType.audio);
 
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
+      if (result != null) {
+        final file = result;
         if (file.path != null) {
           if (!mounted) return;
           setState(() {
@@ -253,7 +250,11 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                   // 删除按钮
                   IconButton(
                     onPressed: _removeMusic,
-                    icon: const Icon(Icons.close, size: 18, color: AppColors.error),
+                    icon: const Icon(
+                      Icons.close,
+                      size: 18,
+                      color: AppColors.error,
+                    ),
                   ),
                 ],
               ),

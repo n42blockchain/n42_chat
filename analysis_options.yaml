@@ -6,6 +6,7 @@ analyzer:
     - "**/*.freezed.dart"
     - "**/*.mocks.dart"
     - "lib/src/data/datasources/local/database/*.drift.dart"
+    - build/**
   errors:
     invalid_annotation_target: ignore
     deprecated_member_use_from_same_package: ignore

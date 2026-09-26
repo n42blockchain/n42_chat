@@ -7,9 +7,9 @@ import '../../../core/utils/debug_log.dart';
 
 class MusicSelectSheet extends StatefulWidget {
   final bool isDark;
-  
+
   const MusicSelectSheet({super.key, required this.isDark});
-  
+
   @override
   State<MusicSelectSheet> createState() => _MusicSelectSheetState();
 }
@@ -17,35 +17,74 @@ class MusicSelectSheet extends StatefulWidget {
 class _MusicSelectSheetState extends State<MusicSelectSheet> {
   String _searchQuery = '';
   int _selectedTab = 0; // 0: 最近播放, 1: 我喜欢, 2: 网络链接, 3: 本地文件
-  
+
   final TextEditingController _linkController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _artistController = TextEditingController();
-  
+
   // 模拟音乐列表
   final List<Map<String, dynamic>> _recentSongs = [
-    {'name': '晴天', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=186016'},
-    {'name': '稻香', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=185813'},
-    {'name': '青花瓷', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=185805'},
-    {'name': '七里香', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=186001'},
-    {'name': '告白气球', 'artist': '周杰伦', 'url': 'https://music.163.com/#/song?id=418603077'},
+    {
+      'name': '晴天',
+      'artist': '周杰伦',
+      'url': 'https://music.163.com/#/song?id=186016',
+    },
+    {
+      'name': '稻香',
+      'artist': '周杰伦',
+      'url': 'https://music.163.com/#/song?id=185813',
+    },
+    {
+      'name': '青花瓷',
+      'artist': '周杰伦',
+      'url': 'https://music.163.com/#/song?id=185805',
+    },
+    {
+      'name': '七里香',
+      'artist': '周杰伦',
+      'url': 'https://music.163.com/#/song?id=186001',
+    },
+    {
+      'name': '告白气球',
+      'artist': '周杰伦',
+      'url': 'https://music.163.com/#/song?id=418603077',
+    },
   ];
-  
+
   final List<Map<String, dynamic>> _favoriteSongs = [
-    {'name': '起风了', 'artist': '买辣椒也用券', 'url': 'https://music.163.com/#/song?id=1330348068'},
-    {'name': '年少有为', 'artist': '李荣浩', 'url': 'https://music.163.com/#/song?id=1293886117'},
-    {'name': '光年之外', 'artist': 'G.E.M.邓紫棋', 'url': 'https://music.163.com/#/song?id=449818741'},
+    {
+      'name': '起风了',
+      'artist': '买辣椒也用券',
+      'url': 'https://music.163.com/#/song?id=1330348068',
+    },
+    {
+      'name': '年少有为',
+      'artist': '李荣浩',
+      'url': 'https://music.163.com/#/song?id=1293886117',
+    },
+    {
+      'name': '光年之外',
+      'artist': 'G.E.M.邓紫棋',
+      'url': 'https://music.163.com/#/song?id=449818741',
+    },
   ];
-  
+
   List<Map<String, dynamic>> get _currentSongs {
     final songs = _selectedTab == 0 ? _recentSongs : _favoriteSongs;
     if (_searchQuery.isEmpty) return songs;
-    return songs.where((s) => 
-      (s['name'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
-      (s['artist'] as String).toLowerCase().contains(_searchQuery.toLowerCase())
-    ).toList();
+    return songs
+        .where(
+          (s) =>
+              (s['name'] as String).toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ||
+              (s['artist'] as String).toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ),
+        )
+        .toList();
   }
-  
+
   @override
   void dispose() {
     _linkController.dispose();
@@ -53,17 +92,14 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
     _artistController.dispose();
     super.dispose();
   }
-  
+
   /// 选择本地音频文件
   Future<void> _pickLocalAudio() async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.audio,
-        allowMultiple: false,
-      );
-      
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
+      final result = await FilePicker.pickFile(type: FileType.audio);
+
+      if (result != null) {
+        final file = result;
         final fileName = file.name;
         // 从文件名中提取歌曲名和歌手（假设格式为 "歌手 - 歌曲名.mp3"）
         String songName = fileName;
@@ -94,40 +130,59 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
       debugLog('Error picking audio file: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.chatSelectFileFailed(e.toString()) ?? 'Failed to select file: $e')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.chatSelectFileFailed(e.toString()) ??
+                'Failed to select file: $e',
+          ),
+        ),
       );
     }
   }
-  
+
   /// 分享网络链接
   void _shareNetworkLink() {
     final link = _linkController.text.trim();
     final title = _titleController.text.trim();
     final artist = _artistController.text.trim();
-    
+
     if (link.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.chatPleaseEnterMusicLink ?? 'Please enter music link')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.chatPleaseEnterMusicLink ??
+                'Please enter music link',
+          ),
+        ),
       );
       return;
     }
-    
+
     // 验证链接格式
     if (!link.startsWith('http://') && !link.startsWith('https://')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.chatPleaseEnterValidLink ?? 'Please enter a valid URL')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.chatPleaseEnterValidLink ??
+                'Please enter a valid URL',
+          ),
+        ),
       );
       return;
     }
-    
+
     Navigator.pop(context, {
-      'name': title.isNotEmpty ? title : (S.of(context)?.chatSharedSong ?? 'Shared Song'),
-      'artist': artist.isNotEmpty ? artist : (S.of(context)?.chatUnknownArtist ?? 'Unknown Artist'),
+      'name': title.isNotEmpty
+          ? title
+          : (S.of(context)?.chatSharedSong ?? 'Shared Song'),
+      'artist': artist.isNotEmpty
+          ? artist
+          : (S.of(context)?.chatUnknownArtist ?? 'Unknown Artist'),
       'url': link,
       'isNetwork': true,
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -143,9 +198,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: AppColors.dividerOf(widget.isDark),
-                ),
+                bottom: BorderSide(color: AppColors.dividerOf(widget.isDark)),
               ),
             ),
             child: Row(
@@ -174,22 +227,36 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildTab(0, S.of(context)?.chatRecentPlayed ?? 'Recent', Icons.history),
-                _buildTab(1, S.of(context)?.chatMyFavorites ?? 'Favorites', Icons.favorite),
-                _buildTab(2, S.of(context)?.chatNetworkLink ?? 'Link', Icons.link),
-                _buildTab(3, S.of(context)?.chatLocalFile ?? 'Local', Icons.folder),
+                _buildTab(
+                  0,
+                  S.of(context)?.chatRecentPlayed ?? 'Recent',
+                  Icons.history,
+                ),
+                _buildTab(
+                  1,
+                  S.of(context)?.chatMyFavorites ?? 'Favorites',
+                  Icons.favorite,
+                ),
+                _buildTab(
+                  2,
+                  S.of(context)?.chatNetworkLink ?? 'Link',
+                  Icons.link,
+                ),
+                _buildTab(
+                  3,
+                  S.of(context)?.chatLocalFile ?? 'Local',
+                  Icons.folder,
+                ),
               ],
             ),
           ),
           // 内容区域
-          Expanded(
-            child: _buildContent(),
-          ),
+          Expanded(child: _buildContent()),
         ],
       ),
     );
   }
-  
+
   Widget _buildTab(int index, String label, IconData icon) {
     final isSelected = _selectedTab == index;
     return GestureDetector(
@@ -210,16 +277,16 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
             Icon(
               icon,
               size: 18,
-              color: isSelected 
-                  ? AppColors.primary 
+              color: isSelected
+                  ? AppColors.primary
                   : (AppColors.textSecondaryOf(widget.isDark)),
             ),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: isSelected 
-                    ? AppColors.primary 
+                color: isSelected
+                    ? AppColors.primary
                     : (AppColors.textSecondaryOf(widget.isDark)),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
@@ -229,7 +296,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
       ),
     );
   }
-  
+
   Widget _buildContent() {
     switch (_selectedTab) {
       case 0:
@@ -243,7 +310,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
         return _buildMusicList();
     }
   }
-  
+
   Widget _buildMusicList() {
     return Column(
       children: [
@@ -252,7 +319,9 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
           padding: const EdgeInsets.all(12),
           child: TextField(
             decoration: InputDecoration(
-              hintText: S.of(context)?.chatSearchSongOrArtist ?? 'Search song or artist',
+              hintText:
+                  S.of(context)?.chatSearchSongOrArtist ??
+                  'Search song or artist',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: AppColors.inputBgOf(widget.isDark),
@@ -321,12 +390,12 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
       ],
     );
   }
-  
+
   Widget _buildNetworkLinkInput() {
     final textColor = AppColors.textPrimaryOf(widget.isDark);
     final hintColor = AppColors.textSecondaryOf(widget.isDark);
     final fillColor = AppColors.inputBgOf(widget.isDark);
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -341,7 +410,11 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, color: AppColors.primary, size: 20),
+                const Icon(
+                  Icons.info_outline,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -354,7 +427,10 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
           ),
           const SizedBox(height: 20),
           // 音乐链接
-          Text('${S.of(context)?.chatMusicLinkLabel ?? 'Music Link'} *', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text(
+            '${S.of(context)?.chatMusicLinkLabel ?? 'Music Link'} *',
+            style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: _linkController,
@@ -373,7 +449,10 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
           ),
           const SizedBox(height: 16),
           // 歌曲名称
-          Text(S.of(context)?.chatSongNameOptional ?? 'Song Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text(
+            S.of(context)?.chatSongNameOptional ?? 'Song Name (Optional)',
+            style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: _titleController,
@@ -392,13 +471,17 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
           ),
           const SizedBox(height: 16),
           // 歌手名称
-          Text(S.of(context)?.chatArtistNameOptional ?? 'Artist Name (Optional)', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+          Text(
+            S.of(context)?.chatArtistNameOptional ?? 'Artist Name (Optional)',
+            style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: _artistController,
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
-              hintText: S.of(context)?.chatEnterArtistName ?? 'Enter artist name',
+              hintText:
+                  S.of(context)?.chatEnterArtistName ?? 'Enter artist name',
               hintStyle: TextStyle(color: hintColor),
               prefixIcon: Icon(Icons.person, color: hintColor),
               filled: true,
@@ -423,18 +506,21 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text(S.of(context)?.chatShareMusicButton ?? 'Share Music', style: const TextStyle(fontSize: 16)),
+              child: Text(
+                S.of(context)?.chatShareMusicButton ?? 'Share Music',
+                style: const TextStyle(fontSize: 16),
+              ),
             ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildLocalFilePicker() {
     final textColor = AppColors.textPrimaryOf(widget.isDark);
     final subtextColor = AppColors.textSecondaryOf(widget.isDark);
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -465,11 +551,9 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
             ),
             const SizedBox(height: 8),
             Text(
-              S.of(context)?.chatSupportedAudioFormats ?? 'Supports MP3, M4A, WAV, FLAC, etc.',
-              style: TextStyle(
-                fontSize: 14,
-                color: subtextColor,
-              ),
+              S.of(context)?.chatSupportedAudioFormats ??
+                  'Supports MP3, M4A, WAV, FLAC, etc.',
+              style: TextStyle(fontSize: 14, color: subtextColor),
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
@@ -479,7 +563,10 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

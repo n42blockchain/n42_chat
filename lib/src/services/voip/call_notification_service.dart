@@ -43,7 +43,11 @@ class IncomingCallInfo {
   factory IncomingCallInfo.fromMap(Map<String, dynamic> map) {
     return IncomingCallInfo(
       callId: map['id'] as String? ?? '',
-      callerId: map['callerId'] as String? ?? '',
+      callerId:
+          map['extra']?['callerId'] as String? ??
+          map['callerId'] as String? ??
+          map['handle'] as String? ??
+          '',
       callerName: map['nameCaller'] as String? ?? 'Unknown',
       callerAvatarUrl: map['avatar'] as String?,
       isVideo: map['type'] == 1,
@@ -70,7 +74,9 @@ class CallNotificationService {
     debugLog('CallNotificationService: Event listener attached in constructor');
   }
 
-  StreamSubscription<dynamic>? _callKitSubscription;
+  StreamSubscription<callkit.CallEvent?>? _callKitSubscription;
+  final Map<String, IncomingCallInfo> _knownCalls = {};
+
   final _uuid = const Uuid();
 
   // 事件流
@@ -119,86 +125,63 @@ class CallNotificationService {
   }
 
   /// 处理 CallKit 事件
-  void _handleCallKitEvent(dynamic event) {
+  void _handleCallKitEvent(callkit.CallEvent? event) {
     if (event == null) return;
-
-    final eventType = _parseCallKitEvent(event.event);
-    debugLog('CallNotificationService: Event - ${event.event}');
-
-    final body = event.body;
-    if (body is! Map) return;
-
-    final callInfo = IncomingCallInfo.fromMap(Map<String, dynamic>.from(body));
-
-    if (eventType == callkit.Event.actionCallIncoming) {
-      _currentCallId ??= callInfo.callId;
-      debugLog(
-        'CallNotificationService: Incoming call from ${callInfo.callerName}',
-      );
-    } else if (eventType == callkit.Event.actionCallAccept) {
-      debugLog('CallNotificationService: Call accepted by user');
-      // 同时存入缓存，防止 CallManager 尚未初始化时事件丢失
-      _pendingAcceptAction = (CallAction.accept, callInfo);
-      _pendingAcceptTime = DateTime.now();
-      _callActionController.add((CallAction.accept, callInfo));
-    } else if (eventType == callkit.Event.actionCallDecline) {
-      debugLog('CallNotificationService: Call declined');
-      _callActionController.add((CallAction.decline, callInfo));
-      _currentCallId = null;
-    } else if (eventType == callkit.Event.actionCallTimeout) {
-      debugLog('CallNotificationService: Call timeout');
-      _callActionController.add((CallAction.timeout, callInfo));
-      _currentCallId = null;
-    } else if (eventType == callkit.Event.actionCallCallback) {
-      debugLog('CallNotificationService: Callback');
-      _callActionController.add((CallAction.callback, callInfo));
-    } else if (eventType == callkit.Event.actionCallEnded) {
-      if (_dismissedCallIds.contains(callInfo.callId)) return;
-      if (_currentCallId != null && _currentCallId != callInfo.callId) return;
-      debugLog('CallNotificationService: Call ended by system');
-      _pendingAcceptAction = null;
-      _pendingAcceptTime = null;
-      _currentCallId = null;
-      _callActionController.add((CallAction.ended, callInfo));
-    } else if (eventType == callkit.Event.actionCallStart) {
-      debugLog('CallNotificationService: Call started');
+    debugLog('CallNotificationService: Event - ${event.eventName}');
+    final params = switch (event) {
+      callkit.CallEventActionCallIncoming(:final callKitParams) =>
+        callKitParams,
+      callkit.CallEventActionCallStart(:final callKitParams) => callKitParams,
+      callkit.CallEventActionCallAccept(:final callKitParams) => callKitParams,
+      callkit.CallEventActionCallDecline(:final callKitParams) => callKitParams,
+      callkit.CallEventActionCallEnded(:final callKitParams) => callKitParams,
+      _ => null,
+    };
+    if (params != null) {
+      final info = IncomingCallInfo.fromMap(params.toJson());
+      _knownCalls[info.callId] = info;
+      // Keep metadata for id-only timeout/callback events without unbounded growth.
+      if (_knownCalls.length > 64) _knownCalls.remove(_knownCalls.keys.first);
     }
-  }
-
-  callkit.Event? _parseCallKitEvent(Object? rawEvent) {
-    if (rawEvent is callkit.Event) return rawEvent;
-    final normalized = rawEvent?.toString().toLowerCase();
-    if (normalized == null) return null;
-
-    if (normalized.contains('actioncallincoming') ||
-        normalized.contains('action_call_incoming')) {
-      return callkit.Event.actionCallIncoming;
+    final id =
+        params?.id ??
+        switch (event) {
+          callkit.CallEventActionCallTimeout(:final id) => id,
+          callkit.CallEventActionCallCallback(:final id) => id,
+          _ => null,
+        };
+    final info = id == null
+        ? null
+        : _knownCalls[id] ??
+              IncomingCallInfo(callId: id, callerId: '', callerName: 'Unknown');
+    switch (event) {
+      case callkit.CallEventActionCallIncoming():
+        _currentCallId ??= info!.callId;
+      case callkit.CallEventActionCallAccept():
+        _pendingAcceptAction = (CallAction.accept, info!);
+        _pendingAcceptTime = DateTime.now();
+        _callActionController.add((CallAction.accept, info));
+      case callkit.CallEventActionCallDecline():
+        _callActionController.add((CallAction.decline, info!));
+        _currentCallId = null;
+        _knownCalls.remove(info.callId);
+      case callkit.CallEventActionCallTimeout():
+        _callActionController.add((CallAction.timeout, info!));
+        _currentCallId = null;
+        _knownCalls.remove(info.callId);
+      case callkit.CallEventActionCallCallback():
+        _callActionController.add((CallAction.callback, info!));
+      case callkit.CallEventActionCallEnded():
+        if (_dismissedCallIds.contains(info!.callId)) return;
+        if (_currentCallId != null && _currentCallId != info.callId) return;
+        _pendingAcceptAction = null;
+        _pendingAcceptTime = null;
+        _currentCallId = null;
+        _callActionController.add((CallAction.ended, info));
+        _knownCalls.remove(info.callId);
+      default:
+        break;
     }
-    if (normalized.contains('actioncallstart') ||
-        normalized.contains('action_call_start')) {
-      return callkit.Event.actionCallStart;
-    }
-    if (normalized.contains('actioncallaccept') ||
-        normalized.contains('action_call_accept')) {
-      return callkit.Event.actionCallAccept;
-    }
-    if (normalized.contains('actioncalldecline') ||
-        normalized.contains('action_call_decline')) {
-      return callkit.Event.actionCallDecline;
-    }
-    if (normalized.contains('actioncallended') ||
-        normalized.contains('action_call_ended')) {
-      return callkit.Event.actionCallEnded;
-    }
-    if (normalized.contains('actioncalltimeout') ||
-        normalized.contains('action_call_timeout')) {
-      return callkit.Event.actionCallTimeout;
-    }
-    if (normalized.contains('actioncallcallback') ||
-        normalized.contains('action_call_callback')) {
-      return callkit.Event.actionCallCallback;
-    }
-    return null;
   }
 
   /// 显示来电通知
@@ -229,8 +212,6 @@ class CallNotificationService {
       avatar: callerAvatarUrl,
       handle: callerId,
       type: isVideo ? 1 : 0, // 1 = video, 0 = audio
-      textAccept: textAccept,
-      textDecline: textDecline,
       missedCallNotification: NotificationParams(
         showNotification: true,
         isShowCallback: true,
@@ -248,6 +229,8 @@ class CallNotificationService {
       },
       android: buildIncomingCallAndroidParams(
         ringtonePreference: ringtonePreference,
+        textAccept: textAccept,
+        textDecline: textDecline,
         avatarUrl: callerAvatarUrl,
         incomingCallChannelName: incomingCallChannelName,
         missedCallChannelName: missedCallChannelName,
@@ -255,6 +238,8 @@ class CallNotificationService {
       ios: buildIncomingCallIOSParams(ringtonePreference: ringtonePreference),
     );
 
+    _knownCalls[callId] = IncomingCallInfo.fromMap(params.toJson());
+    if (_knownCalls.length > 64) _knownCalls.remove(_knownCalls.keys.first);
     await FlutterCallkitIncoming.showCallkitIncoming(params);
 
     debugLog(
@@ -340,6 +325,7 @@ class CallNotificationService {
   void _rememberDismissed(String? id) {
     if (id == null) return;
     _dismissedCallIds.add(id);
+    _knownCalls.remove(id);
     if (_dismissedCallIds.length > 64)
       _dismissedCallIds.remove(_dismissedCallIds.first);
   }
@@ -403,5 +389,6 @@ class CallNotificationService {
     _currentCallId = null;
     _pendingAcceptAction = null;
     _pendingAcceptTime = null;
+    _knownCalls.clear();
   }
 }

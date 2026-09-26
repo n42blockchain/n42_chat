@@ -824,23 +824,12 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
   Future<void> _pickFile({DateTime? scheduledAt}) async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.any,
-        allowMultiple: true,
-        withReadStream: true,
-      );
+      final result = await FilePicker.pickFiles(type: FileType.any);
 
-      if (result == null || result.files.isEmpty) return;
+      if (result.isEmpty) return;
 
       // 发送选中的文件
-      for (final file in result.files) {
-        if ((file.path == null || file.path!.isEmpty) &&
-            (file.readStream == null) &&
-            (file.bytes == null || file.bytes!.isEmpty)) {
-          debugLog('File bytes is empty: ${file.name}');
-          continue;
-        }
-
+      for (final file in result) {
         await _sendFile(file, scheduledAt: scheduledAt);
       }
     } catch (e) {
@@ -863,7 +852,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     try {
       final filename = file.name;
       final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
-      final fileSize = file.size;
+      final fileSize = await file.length();
+      if (fileSize == null) throw StateError('Unable to read file size');
 
       debugLog(
         'Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType',
@@ -873,9 +863,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         filename: filename,
         mimeType: mimeType,
         fileSize: fileSize,
-        fileBytes: file.bytes,
         filePath: file.path,
-        fileStream: file.readStream,
+        fileStream: file.readAsByteStream(),
         scheduledAt: scheduledAt,
       );
 

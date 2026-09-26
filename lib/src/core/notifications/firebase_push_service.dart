@@ -604,7 +604,9 @@ class FirebasePushService implements IPushNotificationService {
         if (decoded.contains(roomId)) return true;
       }
     } catch (e) {
-      debugLog('FirebasePushService: hidden-chat list unreadable, clearing: $e');
+      debugLog(
+        'FirebasePushService: hidden-chat list unreadable, clearing: $e',
+      );
       try {
         await prefs.remove('n42_chat_hidden_chats');
       } catch (_) {
@@ -1596,16 +1598,9 @@ class FirebasePushService implements IPushNotificationService {
   Future<NotificationPermissionStatus> getPermissionStatus() async {
     final settings = await FirebaseMessaging.instance.getNotificationSettings();
 
-    switch (settings.authorizationStatus) {
-      case AuthorizationStatus.authorized:
-        return NotificationPermissionStatus.granted;
-      case AuthorizationStatus.denied:
-        return NotificationPermissionStatus.denied;
-      case AuthorizationStatus.notDetermined:
-        return NotificationPermissionStatus.notDetermined;
-      case AuthorizationStatus.provisional:
-        return NotificationPermissionStatus.granted;
-    }
+    return notificationPermissionFromAuthorization(
+      settings.authorizationStatus,
+    );
   }
 
   @override
@@ -1693,6 +1688,18 @@ class FirebasePushService implements IPushNotificationService {
     _isInitialized = false;
   }
 }
+
+/// Converts Firebase authorization, treating permanent denial as denied access.
+NotificationPermissionStatus notificationPermissionFromAuthorization(
+  AuthorizationStatus status,
+) => switch (status) {
+  AuthorizationStatus.authorized ||
+  AuthorizationStatus.provisional => NotificationPermissionStatus.granted,
+  AuthorizationStatus.denied ||
+  AuthorizationStatus.deniedPermanently => NotificationPermissionStatus.denied,
+  AuthorizationStatus.notDetermined =>
+    NotificationPermissionStatus.notDetermined,
+};
 
 /// Firebase 推送服务构建器
 class FirebasePushServiceBuilder {
