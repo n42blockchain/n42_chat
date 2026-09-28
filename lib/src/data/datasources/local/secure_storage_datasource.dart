@@ -130,22 +130,27 @@ class SecureStorageDataSource {
 
   /// Remove only the deleted Matrix identity's current session. A later B
   /// login must remain intact if it replaced the session during deletion UIA.
-  Future<void> clearSessionIfMatches(String userId, Uri homeserver) =>
-      _withIdentityWrite(() async {
-        final raw = await _storage.read(key: _keySession);
-        if (raw == null) return;
-        final decoded = jsonDecode(raw);
-        if (decoded is! Map ||
-            decoded['userId'] is! String ||
-            decoded['homeserver'] is! String) {
-          throw const FormatException('Invalid saved Matrix session');
-        }
-        if (decoded['userId'] == userId &&
-            _sameHomeserver(decoded['homeserver'] as String, homeserver)) {
-          await _storage.delete(key: _keySession);
-          secureLog('Session cleared for $userId');
-        }
-      });
+  Future<void> clearSessionIfMatches(
+    String userId,
+    Uri homeserver, {
+    bool Function()? canDelete,
+  }) => _withIdentityWrite(() async {
+    if (canDelete?.call() == false) return;
+    final raw = await _storage.read(key: _keySession);
+    if (raw == null) return;
+    final decoded = jsonDecode(raw);
+    if (decoded is! Map ||
+        decoded['userId'] is! String ||
+        decoded['homeserver'] is! String) {
+      throw const FormatException('Invalid saved Matrix session');
+    }
+    if (decoded['userId'] == userId &&
+        _sameHomeserver(decoded['homeserver'] as String, homeserver) &&
+        canDelete?.call() != false) {
+      await _storage.delete(key: _keySession);
+      secureLog('Session cleared for $userId');
+    }
+  });
 
   /// 检查是否有保存的会话
   Future<bool> hasSession() async {
@@ -208,10 +213,7 @@ class SecureStorageDataSource {
         return null;
       }
       secureLog('Credentials loaded');
-      return {
-        'homeserver': homeserver,
-        'username': username,
-      };
+      return {'homeserver': homeserver, 'username': username};
     } catch (e) {
       secureLog('Failed to read credentials - $e');
       return null;
@@ -290,31 +292,36 @@ class SecureStorageDataSource {
     secureLog('Account removed - $userId');
   });
 
-  Future<void> removeAccountIfMatches(String userId, Uri homeserver) =>
-      _withIdentityWrite(() async {
-        final raw = await _storage.read(key: _keyAccounts);
-        if (raw == null) return;
-        final decoded = jsonDecode(raw);
-        if (decoded is! Map) {
-          throw const FormatException('Invalid saved Matrix accounts');
-        }
-        final accounts = Map<String, dynamic>.from(decoded);
-        final account = accounts[userId];
-        if (account == null) return;
-        if (account is! Map || account['homeserver'] is! String) {
-          throw const FormatException('Invalid saved Matrix account');
-        }
-        if (!_sameHomeserver(account['homeserver'] as String, homeserver)) {
-          return;
-        }
-        accounts.remove(userId);
-        if (accounts.isEmpty) {
-          await _storage.delete(key: _keyAccounts);
-        } else {
-          await _storage.write(key: _keyAccounts, value: jsonEncode(accounts));
-        }
-        secureLog('Account removed - $userId');
-      });
+  Future<void> removeAccountIfMatches(
+    String userId,
+    Uri homeserver, {
+    bool Function()? canDelete,
+  }) => _withIdentityWrite(() async {
+    if (canDelete?.call() == false) return;
+    final raw = await _storage.read(key: _keyAccounts);
+    if (raw == null) return;
+    final decoded = jsonDecode(raw);
+    if (decoded is! Map) {
+      throw const FormatException('Invalid saved Matrix accounts');
+    }
+    final accounts = Map<String, dynamic>.from(decoded);
+    final account = accounts[userId];
+    if (account == null) return;
+    if (account is! Map || account['homeserver'] is! String) {
+      throw const FormatException('Invalid saved Matrix account');
+    }
+    if (!_sameHomeserver(account['homeserver'] as String, homeserver) ||
+        canDelete?.call() == false) {
+      return;
+    }
+    accounts.remove(userId);
+    if (accounts.isEmpty) {
+      await _storage.delete(key: _keyAccounts);
+    } else {
+      await _storage.write(key: _keyAccounts, value: jsonEncode(accounts));
+    }
+    secureLog('Account removed - $userId');
+  });
 
   bool _sameHomeserver(String? stored, Uri homeserver) {
     if (stored == null) return false;

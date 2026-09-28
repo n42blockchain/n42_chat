@@ -9,6 +9,95 @@ import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.da
 class _Storage extends Mock implements FlutterSecureStorage {}
 
 void main() {
+  for (final accountRecord in [false, true]) {
+    test(
+      'old A guarded ${accountRecord ? 'account' : 'session'} delete cannot erase new A save',
+      () async {
+        final key = accountRecord ? 'n42_chat_accounts' : 'n42_chat_session';
+        final values = <String, String>{
+          key: accountRecord
+              ? jsonEncode({
+                  '@a:hs': {
+                    'homeserver': 'https://hs.test',
+                    'deviceId': 'old-A',
+                    'accessToken': 'old-token',
+                  },
+                })
+              : jsonEncode({
+                  'homeserver': 'https://hs.test',
+                  'userId': '@a:hs',
+                  'deviceId': 'old-A',
+                  'accessToken': 'old-token',
+                }),
+        };
+        final readEntered = Completer<void>();
+        final releaseRead = Completer<void>();
+        var pause = true;
+        var originalGeneration = true;
+        final underlying = _Storage();
+        when(() => underlying.read(key: any(named: 'key'))).thenAnswer((
+          call,
+        ) async {
+          final readKey = call.namedArguments[#key] as String;
+          final captured = values[readKey];
+          if (readKey == key && pause) {
+            pause = false;
+            readEntered.complete();
+            await releaseRead.future;
+          }
+          return captured;
+        });
+        when(
+          () => underlying.write(
+            key: any(named: 'key'),
+            value: any(named: 'value'),
+          ),
+        ).thenAnswer((call) async {
+          values[call.namedArguments[#key] as String] =
+              call.namedArguments[#value] as String;
+        });
+        when(() => underlying.delete(key: any(named: 'key'))).thenAnswer((
+          call,
+        ) async {
+          values.remove(call.namedArguments[#key] as String);
+        });
+        final cleanupStore = SecureStorageDataSource(storage: underlying);
+        final loginStore = SecureStorageDataSource(storage: underlying);
+        final cleanup = accountRecord
+            ? cleanupStore.removeAccountIfMatches(
+                '@a:hs',
+                Uri.parse('https://hs.test'),
+                canDelete: () => originalGeneration,
+              )
+            : cleanupStore.clearSessionIfMatches(
+                '@a:hs',
+                Uri.parse('https://hs.test'),
+                canDelete: () => originalGeneration,
+              );
+        await readEntered.future;
+        originalGeneration = false;
+        final save = accountRecord
+            ? loginStore.addAccount(
+                userId: '@a:hs',
+                homeserver: 'https://hs.test',
+                accessToken: 'new-token',
+                deviceId: 'new-A',
+              )
+            : loginStore.saveSession(
+                homeserver: 'https://hs.test',
+                accessToken: 'new-token',
+                userId: '@a:hs',
+                deviceId: 'new-A',
+              );
+        releaseRead.complete();
+        await Future.wait([cleanup, save]);
+        final decoded = jsonDecode(values[key]!) as Map;
+        final saved = accountRecord ? decoded['@a:hs'] as Map : decoded;
+        expect(saved['accessToken'], 'new-token');
+        expect(saved['deviceId'], 'new-A');
+      },
+    );
+  }
   test('A cleanup cannot erase a concurrent B session save', () async {
     final values = <String, String>{
       'n42_chat_session': jsonEncode({

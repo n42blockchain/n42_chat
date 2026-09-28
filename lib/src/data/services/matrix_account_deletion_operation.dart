@@ -109,13 +109,10 @@ class MatrixAccountDeletionOperation {
   bool get isSameAccountGeneration =>
       generationIsSame() && _matchesCapturedClient;
 
-  bool get _hasSameIdentityReplacement {
-    final current = _manager.client;
-    return current != null &&
-        current.userID == userId &&
-        current.homeserver == homeserver &&
-        !isSameAccountGeneration;
-  }
+  // Client.clear removes the SDK identity fields, so the captured client's
+  // object identity and the auth generation are the stable cleanup boundary.
+  bool get _ownsOriginalGeneration =>
+      generationIsSame() && identical(_manager.client, client);
 
   Future<void> request(AuthenticationData? auth) async {
     if (serverConfirmed || _requestInProgress || !isCurrentAccount) {
@@ -183,37 +180,66 @@ class MatrixAccountDeletionOperation {
     if (_cleanupInProgress) throw StateError('Matrix cleanup already running');
     _cleanupInProgress = true;
     try {
-      // These local records are keyed by user/homeserver, not generation.
-      // A newer login for that identity may own them even if old A succeeded.
-      if (_hasSameIdentityReplacement) {
+      // Shared local records cannot be attributed to an old generation once
+      // another login has begun, even if the current account is B again.
+      if (!_ownsOriginalGeneration) {
+        return DeletionCleanupStatus.deferredClientClear;
+      }
+      // Capture the old mapping before SDK clear erases its device identity.
+      // A later mapping for this device must not be forgotten.
+      final databaseName = deviceId == null
+          ? null
+          : await _accountSessions.lookup(homeserver, userId, deviceId!);
+      if (!_ownsOriginalGeneration) {
         return DeletionCleanupStatus.deferredClientClear;
       }
       // SDK clear deletes this account's database without preserving inbound
       // keys or making a second server request. Never clear the current B SDK.
-      if (!_clientCleared && isSameAccountGeneration) {
+      if (!_clientCleared) {
         await client.clear(reason: SessionClearReason.logout);
         _clientCleared = true;
       }
-      if (_hasSameIdentityReplacement) {
+      if (!_ownsOriginalGeneration) {
         return DeletionCleanupStatus.deferredClientClear;
       }
-      await _roomKeys.deleteForIdentity(homeserver, userId);
-      if (_hasSameIdentityReplacement) {
+      await _roomKeys.deleteForIdentity(
+        homeserver,
+        userId,
+        canDelete: () => _ownsOriginalGeneration,
+      );
+      if (!_ownsOriginalGeneration) {
         return DeletionCleanupStatus.deferredClientClear;
       }
       // Keep the A database mapping while its SDK data still needs a scoped
       // clear; otherwise a later retry loses the only path to that database.
-      if (_clientCleared && deviceId != null) {
-        await _accountSessions.forget(homeserver, userId, deviceId!);
+      if (databaseName != null && deviceId != null) {
+        await _accountSessions.forget(
+          homeserver,
+          userId,
+          deviceId!,
+          expectedDatabaseName: databaseName,
+          canForget: () => _ownsOriginalGeneration,
+        );
       }
-      if (_hasSameIdentityReplacement) {
+      if (!_ownsOriginalGeneration) {
         return DeletionCleanupStatus.deferredClientClear;
       }
-      await _storage.removeAccountIfMatches(userId, homeserver);
-      if (_hasSameIdentityReplacement) {
+      await _storage.removeAccountIfMatches(
+        userId,
+        homeserver,
+        canDelete: () => _ownsOriginalGeneration,
+      );
+      if (!_ownsOriginalGeneration) {
         return DeletionCleanupStatus.deferredClientClear;
       }
-      await _storage.clearSessionIfMatches(userId, homeserver);
+      await _storage.clearSessionIfMatches(
+        userId,
+        homeserver,
+        canDelete: () => _ownsOriginalGeneration,
+      );
+      if (!_ownsOriginalGeneration) {
+        return DeletionCleanupStatus.deferredClientClear;
+      }
       return _clientCleared
           ? DeletionCleanupStatus.complete
           : DeletionCleanupStatus.deferredClientClear;

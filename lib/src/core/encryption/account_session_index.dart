@@ -87,15 +87,28 @@ class AccountSessionIndex {
         }
       });
 
-  Future<void> forget(Uri server, String user, String device) =>
-      _withMutation(() async {
-        final value = await _read();
-        (value['sessions'] as Map).remove(identity(server, user, device));
-        if (!await (await SharedPreferences.getInstance()).setString(
-          _key,
-          jsonEncode(value),
-        )) {
-          throw StateError('Unable to update account session index');
-        }
-      });
+  Future<void> forget(
+    Uri server,
+    String user,
+    String device, {
+    String? expectedDatabaseName,
+    bool Function()? canForget,
+  }) => _withMutation(() async {
+    if (canForget?.call() == false) return;
+    final value = await _read();
+    final sessions = value['sessions'] as Map;
+    final scope = identity(server, user, device);
+    if (expectedDatabaseName != null &&
+        sessions[scope] != expectedDatabaseName) {
+      return;
+    }
+    if (canForget?.call() == false) return;
+    sessions.remove(scope);
+    if (!await (await SharedPreferences.getInstance()).setString(
+      _key,
+      jsonEncode(value),
+    )) {
+      throw StateError('Unable to update account session index');
+    }
+  });
 }

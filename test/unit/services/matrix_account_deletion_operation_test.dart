@@ -55,7 +55,11 @@ void main() {
     when(() => b.homeserver).thenReturn(server);
     when(() => b.deviceID).thenReturn('device-B');
     when(
-      () => roomKeys.deleteForIdentity(server, userA),
+      () => roomKeys.deleteForIdentity(
+        server,
+        userA,
+        canDelete: any(named: 'canDelete'),
+      ),
     ).thenAnswer((_) async {});
     when(
       () => a.clear(reason: SessionClearReason.logout),
@@ -313,7 +317,13 @@ void main() {
         DeletionCleanupStatus.complete,
       );
       verify(() => a.clear(reason: SessionClearReason.logout)).called(1);
-      verify(() => roomKeys.deleteForIdentity(server, userA)).called(1);
+      verify(
+        () => roomKeys.deleteForIdentity(
+          server,
+          userA,
+          canDelete: any(named: 'canDelete'),
+        ),
+      ).called(1);
       expect(await storage.getSession(), isNull);
       expect((await storage.getAccounts()).keys, [userB]);
       expect(await index.lookup(server, userA, 'device-A'), isNull);
@@ -361,12 +371,18 @@ void main() {
       DeletionCleanupStatus.deferredClientClear,
     );
     expect((await storage.getSession())?['userId'], userB);
-    expect((await storage.getAccounts()).keys, [userB]);
+    expect((await storage.getAccounts()).keys, containsAll([userA, userB]));
     expect(await index.lookup(server, userA, 'device-A'), 'N42Chat_A');
     expect(await index.lookup(server, userB, 'device-B'), 'N42Chat_B');
     verifyNever(() => a.clear(reason: SessionClearReason.logout));
     verifyNever(() => b.clear(reason: SessionClearReason.logout));
-    verify(() => roomKeys.deleteForIdentity(server, userA)).called(1);
+    verifyNever(
+      () => roomKeys.deleteForIdentity(
+        server,
+        userA,
+        canDelete: any(named: 'canDelete'),
+      ),
+    );
   });
 
   test('old A cleanup cannot erase a newer same-identity generation', () async {
@@ -405,7 +421,13 @@ void main() {
     );
     expect((await storage.getSession())?['deviceId'], 'new-device-A');
     expect((await storage.getAccounts())[userA]?['deviceId'], 'new-device-A');
-    verifyNever(() => roomKeys.deleteForIdentity(server, userA));
+    verifyNever(
+      () => roomKeys.deleteForIdentity(
+        server,
+        userA,
+        canDelete: any(named: 'canDelete'),
+      ),
+    );
     verifyNever(() => a.clear(reason: SessionClearReason.logout));
     verifyNever(() => b.clear(reason: SessionClearReason.logout));
   });
@@ -433,7 +455,13 @@ void main() {
         await operation.cleanup(receipt()),
         DeletionCleanupStatus.deferredClientClear,
       );
-      verifyNever(() => roomKeys.deleteForIdentity(server, userA));
+      verifyNever(
+        () => roomKeys.deleteForIdentity(
+          server,
+          userA,
+          canDelete: any(named: 'canDelete'),
+        ),
+      );
       verifyNever(() => a.clear(reason: SessionClearReason.logout));
     },
   );
@@ -468,7 +496,13 @@ void main() {
     clearRelease.complete();
 
     expect(await pending, DeletionCleanupStatus.deferredClientClear);
-    verifyNever(() => roomKeys.deleteForIdentity(server, userA));
+    verifyNever(
+      () => roomKeys.deleteForIdentity(
+        server,
+        userA,
+        canDelete: any(named: 'canDelete'),
+      ),
+    );
   });
 
   test(
@@ -520,9 +554,13 @@ void main() {
         () => a.deactivateAccount(auth: null, erase: true),
       ).thenAnswer((_) async => IdServerUnbindResult.success);
       var fails = true;
-      when(() => roomKeys.deleteForIdentity(server, userA)).thenAnswer((
-        _,
-      ) async {
+      when(
+        () => roomKeys.deleteForIdentity(
+          server,
+          userA,
+          canDelete: any(named: 'canDelete'),
+        ),
+      ).thenAnswer((_) async {
         if (fails) throw StateError('fixture storage failure');
       });
       final operation = MatrixAccountDeletionOperation.capture(
@@ -551,7 +589,13 @@ void main() {
         DeletionCleanupStatus.complete,
       );
       verify(() => a.clear(reason: SessionClearReason.logout)).called(1);
-      verify(() => roomKeys.deleteForIdentity(server, userA)).called(2);
+      verify(
+        () => roomKeys.deleteForIdentity(
+          server,
+          userA,
+          canDelete: any(named: 'canDelete'),
+        ),
+      ).called(2);
     },
   );
 
@@ -566,6 +610,12 @@ void main() {
     );
     await expectLater(operation.cleanup(receipt()), throwsStateError);
     verifyNever(() => a.clear(reason: SessionClearReason.logout));
-    verifyNever(() => roomKeys.deleteForIdentity(server, userA));
+    verifyNever(
+      () => roomKeys.deleteForIdentity(
+        server,
+        userA,
+        canDelete: any(named: 'canDelete'),
+      ),
+    );
   });
 }
