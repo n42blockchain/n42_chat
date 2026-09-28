@@ -173,8 +173,7 @@ class AuthRepositoryImpl
       _isAuthenticating = false;
       _authInProgress?.complete();
       _authInProgress = null;
-      unawaited(_flushPendingLogoutState());
-      _startMonitoringLoginState();
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -201,8 +200,7 @@ class AuthRepositoryImpl
       _isAuthenticating = false;
       _authInProgress?.complete();
       _authInProgress = null;
-      unawaited(_flushPendingLogoutState());
-      _startMonitoringLoginState();
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -341,8 +339,7 @@ class AuthRepositoryImpl
       _isAuthenticating = false;
       _authInProgress?.complete();
       _authInProgress = null;
-      unawaited(_flushPendingLogoutState());
-      _startMonitoringLoginState();
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -1067,8 +1064,7 @@ class AuthRepositoryImpl
       _isAuthenticating = false;
       _authInProgress?.complete();
       _authInProgress = null;
-      unawaited(_flushPendingLogoutState());
-      _startMonitoringLoginState();
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -1446,6 +1442,16 @@ class AuthRepositoryImpl
     await _handleSdkLogout(pending.$1, pending.$2);
   }
 
+  void _resumeMonitoringAfterAuthentication() {
+    // Refresh a replaced client's listener, but keep the exact generation
+    // that observed a pending same-account logout until its scoped clear ends.
+    final pending = _pendingLogoutState;
+    if (pending == null || !pending.$2.isCurrent) {
+      _startMonitoringLoginState();
+    }
+    unawaited(_flushPendingLogoutState());
+  }
+
   /// 后台启动同步——不阻塞认证返回，本地缓存数据立即可用。
   /// `startSync()` 自身幂等（重复调用只是把 backgroundSync 设为 true）。
   void _kickOffBackgroundSync() {
@@ -1472,8 +1478,7 @@ class AuthRepositoryImpl
     if (stream == null ||
         observedClient == null ||
         observedUserId == null ||
-        observedHomeserver == null ||
-        observedDeviceId == null) {
+        observedHomeserver == null) {
       return;
     }
     bool sameOrigin() {

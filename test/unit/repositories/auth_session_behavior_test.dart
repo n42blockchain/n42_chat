@@ -456,6 +456,126 @@ void main() {
     });
   }
 
+  test('SDK expiry invalidates a token session without a device ID', () async {
+    final client = MockClient();
+    when(() => client.userID).thenReturn(session['userId']);
+    when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => client.deviceID).thenReturn(null);
+    when(() => client.accessToken).thenReturn(session['accessToken']);
+    when(() => manager.client).thenReturn(client);
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {});
+    await tokenLogin();
+    final notice = repository.accountInvalidationStream.first;
+    sdk.add(LoginState.softLoggedOut);
+    expect((await notice.timeout(const Duration(seconds: 1))).deviceId, isNull);
+    verify(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).called(1);
+  });
+
+  test('pending SDK expiry survives same-account auth finalization', () async {
+    final client = MockClient();
+    when(() => client.userID).thenReturn(session['userId']);
+    when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => client.deviceID).thenReturn('device');
+    when(() => manager.client).thenReturn(client);
+    when(() => auth.isLoggedIn).thenReturn(true);
+    when(
+      () => client.getAccountData(session['userId']!, 'n42.user.profile'),
+    ).thenAnswer((_) async => <String, Object?>{});
+    final profileEntered = Completer<void>();
+    final profileRelease = Completer<Profile>();
+    when(() => manager.getUserProfile(session['userId']!)).thenAnswer((_) {
+      profileEntered.complete();
+      return profileRelease.future;
+    });
+    final clearEntered = Completer<void>();
+    final clearRelease = Completer<void>();
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {
+      clearEntered.complete();
+      await clearRelease.future;
+    });
+    final notice = repository.accountInvalidationStream.first;
+    final loginFuture = login();
+    await profileEntered.future;
+    sdk.add(LoginState.loggedOut);
+    await Future<void>.delayed(Duration.zero);
+    profileRelease.complete(Profile(userId: session['userId']!));
+    expect((await loginFuture).success, isTrue);
+    await clearEntered.future;
+    clearRelease.complete();
+    expect(
+      (await notice.timeout(const Duration(seconds: 1))).userId,
+      session['userId'],
+    );
+  });
+
+  test('pending SDK expiry cannot invalidate a switched account', () async {
+    final a = MockClient();
+    final b = MockClient();
+    when(() => a.userID).thenReturn(session['userId']);
+    when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => a.deviceID).thenReturn('device');
+    when(() => b.userID).thenReturn('@bob:hs.test');
+    when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => b.deviceID).thenReturn('B-device');
+    when(() => manager.client).thenReturn(a);
+    when(() => auth.isLoggedIn).thenReturn(true);
+    when(
+      () => a.getAccountData(session['userId']!, 'n42.user.profile'),
+    ).thenAnswer((_) async => <String, Object?>{});
+    final profileEntered = Completer<void>();
+    final profileRelease = Completer<Profile>();
+    when(() => manager.getUserProfile(session['userId']!)).thenAnswer((_) {
+      profileEntered.complete();
+      return profileRelease.future;
+    });
+    final clearEntered = Completer<void>();
+    final clearRelease = Completer<void>();
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {
+      clearEntered.complete();
+      await clearRelease.future;
+    });
+    final notices = <AuthSessionInvalidation>[];
+    final subscription = repository.accountInvalidationStream.listen(
+      notices.add,
+    );
+    addTearDown(subscription.cancel);
+    final boolEvents = <bool>[];
+    final boolSubscription = repository.loginStateStream.listen(boolEvents.add);
+    addTearDown(boolSubscription.cancel);
+    final loginFuture = login();
+    await profileEntered.future;
+    sdk.add(LoginState.loggedOut);
+    await Future<void>.delayed(Duration.zero);
+    profileRelease.complete(Profile(userId: session['userId']!));
+    expect((await loginFuture).success, isTrue);
+    await clearEntered.future;
+    when(() => manager.client).thenReturn(b);
+    clearRelease.complete();
+    await Future<void>.delayed(Duration.zero);
+    expect(notices, isEmpty);
+    expect(boolEvents, isNot(contains(false)));
+  });
+
   test('SDK A logout paused during storage cannot invalidate B', () async {
     final a = MockClient();
     final b = MockClient();

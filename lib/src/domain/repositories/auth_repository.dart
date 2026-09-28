@@ -8,7 +8,7 @@ import '../entities/user_entity.dart';
 class AuthSessionInvalidation {
   final String userId;
   final Uri homeserver;
-  final String deviceId;
+  final String? deviceId;
   final bool Function() _isCurrent;
 
   AuthSessionInvalidation({
