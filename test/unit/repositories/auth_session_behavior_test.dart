@@ -426,20 +426,183 @@ void main() {
   });
   for (final state in [LoginState.loggedOut, LoginState.softLoggedOut]) {
     test('SDK $state invalidates the local session after login', () async {
+      final currentClient = MockClient();
+      when(() => currentClient.userID).thenReturn(session['userId']);
+      when(
+        () => currentClient.homeserver,
+      ).thenReturn(Uri.parse(session['homeserver']!));
+      when(() => currentClient.deviceID).thenReturn(session['deviceId']);
+      when(() => manager.client).thenReturn(currentClient);
+      when(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse(session['homeserver']!),
+        ),
+      ).thenAnswer((_) async {});
       await tokenLogin();
       final loggedOut = repository.loginStateStream.firstWhere(
         (value) => !value,
       );
+      final invalidation = repository.accountInvalidationStream.first;
       sdk.add(state);
       expect(await loggedOut, isFalse);
-      verify(storage.clearSession).called(1);
+      expect((await invalidation).userId, session['userId']);
+      verify(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse(session['homeserver']!),
+        ),
+      ).called(1);
     });
   }
+
+  test('SDK A logout paused during storage cannot invalidate B', () async {
+    final a = MockClient();
+    final b = MockClient();
+    when(() => a.userID).thenReturn(session['userId']);
+    when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => a.deviceID).thenReturn('device');
+    when(() => b.userID).thenReturn('@bob:hs.test');
+    when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => b.deviceID).thenReturn('B-device');
+    when(() => b.accessToken).thenReturn('B-token');
+    when(() => manager.client).thenReturn(a);
+    final entered = Completer<void>();
+    final release = Completer<void>();
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {
+      entered.complete();
+      await release.future;
+    });
+    final notices = <AuthSessionInvalidation>[];
+    final subscription = repository.accountInvalidationStream.listen(
+      notices.add,
+    );
+    addTearDown(subscription.cancel);
+    final boolEvents = <bool>[];
+    final boolSubscription = repository.loginStateStream.listen(boolEvents.add);
+    addTearDown(boolSubscription.cancel);
+    await tokenLogin();
+    sdk.add(LoginState.loggedOut);
+    await entered.future;
+    when(() => manager.client).thenReturn(b);
+    final switched = await repository.loginWithToken(
+      homeserver: 'https://hs.test',
+      accessToken: 'B-token',
+      userId: '@bob:hs.test',
+      deviceId: 'B-device',
+    );
+    expect(switched.success, isTrue);
+    release.complete();
+    await Future<void>.delayed(Duration.zero);
+    expect(notices, isEmpty);
+    expect(boolEvents, isNot(contains(false)));
+    verifyNever(storage.clearSession);
+  });
+
+  test('SDK A logout is stale after A to B to A monitor generation', () async {
+    final a = MockClient();
+    final b = MockClient();
+    when(() => a.userID).thenReturn(session['userId']);
+    when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => a.deviceID).thenReturn('device');
+    when(() => a.accessToken).thenReturn('A-token');
+    when(() => b.userID).thenReturn('@bob:hs.test');
+    when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => b.deviceID).thenReturn('B-device');
+    when(() => b.accessToken).thenReturn('B-token');
+    when(() => manager.client).thenReturn(a);
+    final entered = Completer<void>();
+    final release = Completer<void>();
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {
+      entered.complete();
+      await release.future;
+    });
+    final notices = <AuthSessionInvalidation>[];
+    final subscription = repository.accountInvalidationStream.listen(
+      notices.add,
+    );
+    addTearDown(subscription.cancel);
+    final boolEvents = <bool>[];
+    final boolSubscription = repository.loginStateStream.listen(boolEvents.add);
+    addTearDown(boolSubscription.cancel);
+    await tokenLogin();
+    sdk.add(LoginState.loggedOut);
+    await entered.future;
+    when(() => manager.client).thenReturn(b);
+    await repository.loginWithToken(
+      homeserver: 'https://hs.test',
+      accessToken: 'B-token',
+      userId: '@bob:hs.test',
+      deviceId: 'B-device',
+    );
+    when(() => manager.client).thenReturn(a);
+    await tokenLogin();
+    release.complete();
+    await Future<void>.delayed(Duration.zero);
+    expect(notices, isEmpty);
+    expect(boolEvents, isNot(contains(false)));
+  });
+
+  test(
+    'SDK clear can null client identity before same-generation event',
+    () async {
+      final a = MockClient();
+      String? user = session['userId'];
+      Uri? homeserver = Uri.parse('https://hs.test');
+      String? device = 'device';
+      when(() => a.userID).thenAnswer((_) => user);
+      when(() => a.homeserver).thenAnswer((_) => homeserver);
+      when(() => a.deviceID).thenAnswer((_) => device);
+      when(() => manager.client).thenReturn(a);
+      when(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse('https://hs.test'),
+        ),
+      ).thenAnswer((_) async {});
+      await tokenLogin();
+      final notice = repository.accountInvalidationStream.first;
+      user = null;
+      homeserver = null;
+      device = null;
+      sdk.add(LoginState.loggedOut);
+      expect((await notice).userId, session['userId']);
+      verify(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse('https://hs.test'),
+        ),
+      ).called(1);
+    },
+  );
   test(
     'logout from replaced client cannot clear the switched account session',
     () async {
       final oldClient = MockClient();
       final newClient = MockClient();
+      when(() => oldClient.userID).thenReturn(session['userId']);
+      when(() => oldClient.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => oldClient.deviceID).thenReturn('device');
+      when(() => newClient.userID).thenReturn('@bob:hs.test');
+      when(() => newClient.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => newClient.deviceID).thenReturn('B-device');
+      when(() => newClient.accessToken).thenReturn('B-token');
+      when(
+        () => storage.clearSessionIfMatches(
+          '@bob:hs.test',
+          Uri.parse('https://hs.test'),
+        ),
+      ).thenAnswer((_) async {});
       when(() => manager.client).thenReturn(oldClient);
       expect((await tokenLogin()).success, isTrue);
 
@@ -452,7 +615,12 @@ void main() {
           deviceId: any(named: 'deviceId'),
         ),
       ).thenAnswer((_) => replacement.future);
-      final switching = tokenLogin();
+      final switching = repository.loginWithToken(
+        homeserver: 'https://hs.test',
+        accessToken: 'B-token',
+        userId: '@bob:hs.test',
+        deviceId: 'B-device',
+      );
       sdk.add(LoginState.loggedOut);
       await Future<void>.delayed(Duration.zero);
       when(() => manager.client).thenReturn(newClient);
@@ -466,7 +634,12 @@ void main() {
       );
       sdk.add(LoginState.loggedOut);
       expect(await loggedOut, isFalse);
-      verify(storage.clearSession).called(1);
+      verify(
+        () => storage.clearSessionIfMatches(
+          '@bob:hs.test',
+          Uri.parse('https://hs.test'),
+        ),
+      ).called(1);
     },
   );
   test(

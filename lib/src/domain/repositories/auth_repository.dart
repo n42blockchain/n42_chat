@@ -3,6 +3,30 @@ import 'dart:typed_data';
 import '../entities/stored_account_entity.dart';
 import '../entities/user_entity.dart';
 
+/// A Matrix SDK logout tied to the client generation that emitted it.
+/// Call [isCurrent] again when a queued UI action is about to run.
+class AuthSessionInvalidation {
+  final String userId;
+  final Uri homeserver;
+  final String deviceId;
+  final bool Function() _isCurrent;
+
+  AuthSessionInvalidation({
+    required this.userId,
+    required this.homeserver,
+    required this.deviceId,
+    required bool Function() isCurrent,
+  }) : _isCurrent = isCurrent;
+
+  bool get isCurrent => _isCurrent();
+}
+
+/// Optional capability; older [IAuthRepository] implementations keep their
+/// existing boolean login-state stream contract.
+abstract interface class IAccountBoundAuthInvalidation {
+  Stream<AuthSessionInvalidation> get accountInvalidationStream;
+}
+
 /// 认证仓库接口
 ///
 /// 定义认证相关的所有操作，由 Data 层实现

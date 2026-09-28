@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/repositories/auth_repository.dart';
+
 /// 认证事件基类
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
@@ -35,7 +37,12 @@ class AuthLoginRequested extends AuthEvent {
 
 /// 登出请求
 class AuthLogoutRequested extends AuthEvent {
-  const AuthLogoutRequested();
+  final AuthSessionInvalidation? invalidation;
+
+  const AuthLogoutRequested({this.invalidation});
+
+  @override
+  List<Object?> get props => [invalidation];
 }
 
 /// 注册请求
