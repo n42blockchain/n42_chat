@@ -326,11 +326,12 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
               '${_selectedToken!.chain} / ${_selectedToken!.network} · ${_selectedToken!.assetType}',
               style: TextStyle(fontSize: 12, color: context.textSecondary),
             ),
-            Text(
-              _selectedToken!.assetId!,
-              softWrap: true,
-              style: TextStyle(fontSize: 12, color: context.textSecondary),
-            ),
+            if (_selectedToken!.assetId != null)
+              Text(
+                _selectedToken!.assetId!,
+                softWrap: true,
+                style: TextStyle(fontSize: 12, color: context.textSecondary),
+              ),
           ],
           const SizedBox(height: 16),
           TextField(

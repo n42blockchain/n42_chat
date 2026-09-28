@@ -54,6 +54,16 @@ const _caseVariantAsset = TokenInfo(
   contractAddress: '0xabcdef0123456789bbcdef0123456789abcdef01',
   receiverAddress: '0xselectedCase',
 );
+const _nativeAsset = TokenInfo(
+  symbol: 'ETH',
+  name: 'Ether',
+  decimals: 18,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'native',
+  isNative: true,
+  receiverAddress: '0xnativeReceiver',
+);
 const _missingReceiver = TokenInfo(
   symbol: 'USDT',
   name: 'No receiver',
@@ -233,6 +243,36 @@ void main() {
     expect(find.text('Payment asset is unavailable'), findsOneWidget);
   });
 
+  testWidgets('merchant native QR shows identity without contract ID', (
+    tester,
+  ) async {
+    final wallet = _Wallet();
+    when(() => wallet.walletAddress).thenReturn('0xglobal');
+    when(
+      () => wallet.getSupportedTokens(),
+    ).thenAnswer((_) async => const [_nativeAsset]);
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await tester.pumpWidget(
+      const MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: MerchantQrPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    final request = PaymentRequestUri.tryParseExact(
+      (tester.widget<QrImageView>(find.byType(QrImageView)).key
+              as ValueKey<String>)
+          .value,
+    );
+    expect(request?.receiverAddress, '0xnativeReceiver');
+    expect(request?.assetType, 'native');
+    expect(request?.assetId, isNull);
+    expect(find.textContaining('ETH / mainnet · native'), findsWidgets);
+    expect(find.text('null'), findsNothing);
+  });
+
   testWidgets(
     'receive QR and payment request use selected receiver and identity',
     (tester) async {
@@ -329,6 +369,43 @@ void main() {
     await tester.tap(find.text('Send Request'));
     await tester.pump();
     verifyNever(() => bloc.add(any(that: isA<CreatePaymentRequest>())));
+  });
+
+  testWidgets('receive native QR shows identity without contract ID', (
+    tester,
+  ) async {
+    final bloc = _Bloc();
+    const state = TransferState(
+      status: TransferBlocStatus.walletLoaded,
+      isWalletConnected: true,
+      walletAddress: '0xglobal',
+      tokens: [_nativeAsset],
+    );
+    when(() => bloc.state).thenReturn(state);
+    whenListen(bloc, Stream<TransferState>.value(state), initialState: state);
+    when(() => bloc.add(any())).thenReturn(null);
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: BlocProvider<TransferBloc>.value(
+          value: bloc,
+          child: const ReceivePage(roomId: '!room'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    final request = PaymentRequestUri.tryParseExact(
+      (tester.widget<QrImageView>(find.byType(QrImageView)).key
+              as ValueKey<String>)
+          .value,
+    );
+    expect(request?.receiverAddress, '0xnativeReceiver');
+    expect(request?.assetType, 'native');
+    expect(request?.assetId, isNull);
+    expect(find.textContaining('ETH / mainnet · native'), findsWidgets);
+    expect(find.text('null'), findsNothing);
   });
 
   testWidgets(

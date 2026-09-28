@@ -376,11 +376,12 @@ class _ReceivePageState extends State<ReceivePage> {
           '${token.chain} / ${token.network} · ${token.assetType}',
           style: TextStyle(fontSize: 12, color: context.textSecondary),
         ),
-        Text(
-          token.assetId!,
-          softWrap: true,
-          style: TextStyle(fontSize: 12, color: context.textSecondary),
-        ),
+        if (token.assetId != null)
+          Text(
+            token.assetId!,
+            softWrap: true,
+            style: TextStyle(fontSize: 12, color: context.textSecondary),
+          ),
       ],
     );
   }
