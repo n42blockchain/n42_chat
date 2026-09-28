@@ -10,21 +10,36 @@ class AuthSessionInvalidation {
   final Uri homeserver;
   final String? deviceId;
   final bool Function() _isCurrent;
+  final bool Function() _isSameGeneration;
 
   AuthSessionInvalidation({
     required this.userId,
     required this.homeserver,
     required this.deviceId,
     required bool Function() isCurrent,
-  }) : _isCurrent = isCurrent;
+    bool Function()? isSameGeneration,
+  }) : _isCurrent = isCurrent,
+       _isSameGeneration = isSameGeneration ?? isCurrent;
 
   bool get isCurrent => _isCurrent();
+  bool get isSameGeneration => _isSameGeneration();
 }
 
 /// Optional capability; older [IAuthRepository] implementations keep their
 /// existing boolean login-state stream contract.
 abstract interface class IAccountBoundAuthInvalidation {
   Stream<AuthSessionInvalidation> get accountInvalidationStream;
+}
+
+/// Optional deletion lifecycle. The request wrapper marks the captured SDK
+/// generation only when the server request itself completes successfully.
+abstract interface class IAccountBoundDeletionLifecycle {
+  AuthSessionInvalidation? get currentAccountGeneration;
+
+  Future<void> runAccountDeletionRequest(
+    AuthSessionInvalidation generation,
+    Future<void> Function() request,
+  );
 }
 
 /// 认证仓库接口

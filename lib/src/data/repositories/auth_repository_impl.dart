@@ -20,7 +20,10 @@ import '../services/email_change_service.dart';
 
 /// 认证仓库实现
 class AuthRepositoryImpl
-    implements IAuthRepository, IAccountBoundAuthInvalidation {
+    implements
+        IAuthRepository,
+        IAccountBoundAuthInvalidation,
+        IAccountBoundDeletionLifecycle {
   final MatrixAuthDataSource _authDataSource;
   final SecureStorageDataSource _secureStorage;
   final SocialAuthApi _socialAuthApi;
@@ -41,6 +44,10 @@ class AuthRepositoryImpl
   final _accountInvalidationController =
       StreamController<AuthSessionInvalidation>.broadcast();
   int _matrixMonitorEpoch = 0;
+  AuthSessionInvalidation? _currentMonitorOrigin;
+  AuthSessionInvalidation? _deletionRequestOrigin;
+  (LoginState, AuthSessionInvalidation)? _deletionRequestLogout;
+  AuthSessionInvalidation? _confirmedDeletionOrigin;
 
   // 订阅 Matrix SDK 的登录状态变化，用于检测 token 过期
   StreamSubscription<LoginState>? _matrixLoginStateSubscription;
@@ -96,6 +103,50 @@ class AuthRepositoryImpl
   @override
   Stream<AuthSessionInvalidation> get accountInvalidationStream =>
       _accountInvalidationController.stream;
+
+  @override
+  AuthSessionInvalidation? get currentAccountGeneration {
+    final origin = _currentMonitorOrigin;
+    return origin != null && origin.isCurrent ? origin : null;
+  }
+
+  @override
+  Future<void> runAccountDeletionRequest(
+    AuthSessionInvalidation generation,
+    Future<void> Function() request,
+  ) async {
+    if (!identical(generation, _currentMonitorOrigin) ||
+        !generation.isCurrent ||
+        _deletionRequestOrigin != null) {
+      throw StateError('Matrix deletion account changed or request is busy');
+    }
+    _deletionRequestOrigin = generation;
+    try {
+      await request();
+      // The server response is authoritative even if B became active while
+      // the request was in flight. Only A's captured generation is suppressed.
+      _confirmedDeletionOrigin = generation;
+      _deletionRequestLogout = null;
+    } catch (error, stack) {
+      _deletionRequestOrigin = null;
+      final pending = _deletionRequestLogout;
+      _deletionRequestLogout = null;
+      if (pending != null && identical(pending.$2, generation)) {
+        try {
+          await _handleSdkLogout(pending.$1, pending.$2);
+        } catch (cleanupError) {
+          authLog(
+            'Could not resume SDK logout after deletion rejection: $cleanupError',
+          );
+        }
+      }
+      Error.throwWithStackTrace(error, stack);
+    } finally {
+      if (identical(_deletionRequestOrigin, generation)) {
+        _deletionRequestOrigin = null;
+      }
+    }
+  }
 
   @override
   Future<AuthResult> login({
@@ -1399,6 +1450,10 @@ class AuthRepositoryImpl
     _emailChange.reset();
     _isDisposed = true;
     _matrixMonitorEpoch++;
+    _currentMonitorOrigin = null;
+    _deletionRequestOrigin = null;
+    _deletionRequestLogout = null;
+    _confirmedDeletionOrigin = null;
     _matrixLoginStateSubscription?.cancel();
     _loginStateController.close();
     _accountInvalidationController.close();
@@ -1408,6 +1463,12 @@ class AuthRepositoryImpl
     LoginState loginState,
     AuthSessionInvalidation origin,
   ) async {
+    if (identical(_deletionRequestOrigin, origin)) {
+      if (origin.isSameGeneration) {
+        _deletionRequestLogout = (loginState, origin);
+      }
+      return;
+    }
     if (!origin.isCurrent) return;
     _emailChange.reset();
     authLog(
@@ -1469,6 +1530,7 @@ class AuthRepositoryImpl
   /// 从而让 AuthBloc 正确导航到登录页面。
   void _startMonitoringLoginState() {
     _matrixLoginStateSubscription?.cancel();
+    _currentMonitorOrigin = null;
     final epoch = ++_matrixMonitorEpoch;
     final observedClient = _authDataSource.clientManager.client;
     final observedUserId = observedClient?.userID;
@@ -1497,12 +1559,19 @@ class AuthRepositoryImpl
               observedClient.deviceID == observedDeviceId);
     }
 
-    final origin = AuthSessionInvalidation(
+    late final AuthSessionInvalidation origin;
+    origin = AuthSessionInvalidation(
       userId: observedUserId,
       homeserver: observedHomeserver,
       deviceId: observedDeviceId,
-      isCurrent: () => sameOrigin() && !_isAuthenticating,
+      isSameGeneration: sameOrigin,
+      isCurrent: () =>
+          sameOrigin() &&
+          !_isAuthenticating &&
+          !identical(_deletionRequestOrigin, origin) &&
+          !identical(_confirmedDeletionOrigin, origin),
     );
+    _currentMonitorOrigin = origin;
     _matrixLoginStateSubscription = stream.listen((loginState) async {
       if (!sameOrigin()) {
         authLog('Ignoring login state from a replaced Matrix client');
