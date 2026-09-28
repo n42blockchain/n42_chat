@@ -65,7 +65,11 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
         _selectedToken =
             tokens.isNotEmpty &&
                 tokens
-                        .where((token) => token.symbol == tokens.first.symbol)
+                        .where(
+                          (token) =>
+                              token.symbol.toLowerCase() ==
+                              tokens.first.symbol.toLowerCase(),
+                        )
                         .length ==
                     1
             ? tokens.first
@@ -174,9 +178,9 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
                   const SizedBox(height: 24),
                   _buildForm(l10n),
                   const SizedBox(height: 24),
-                      N42Button(
-                        text: l10n?.commonShare ?? 'Share',
-                        onPressed: _qrData == null ? null : _shareQr,
+                  N42Button(
+                    text: l10n?.commonShare ?? 'Share',
+                    onPressed: _qrData == null ? null : _shareQr,
                   ),
                 ],
               ),
@@ -273,6 +277,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
         children: [
           DropdownButtonFormField<TokenInfo>(
             isExpanded: true,
+            itemHeight: 86,
             initialValue: _selectedToken,
             decoration: InputDecoration(
               labelText: l10n?.transferSelectToken ?? 'Select Token',
@@ -282,18 +287,51 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
                 .map(
                   (token) => DropdownMenuItem(
                     value: token,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '${token.symbol} - ${token.name} · ${token.chain ?? ''} ${token.network ?? ''} ${token.assetId ?? ''}',
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${token.symbol} - ${token.name}'),
+                        if (_hasIdentity(token))
+                          Text(
+                            '${token.chain} / ${token.network} · ${token.assetType}',
+                          ),
+                        if (token.assetId != null)
+                          Text(
+                            token.assetId!,
+                            softWrap: true,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
+            selectedItemBuilder: (_) => _tokens
+                .map(
+                  (token) => Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${token.symbol} - ${token.name}',
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 )
                 .toList(),
             onChanged: (value) => setState(() => _selectedToken = value),
           ),
+          if (_selectedToken != null && _hasIdentity(_selectedToken!)) ...[
+            const SizedBox(height: 8),
+            Text(
+              '${_selectedToken!.chain} / ${_selectedToken!.network} · ${_selectedToken!.assetType}',
+              style: TextStyle(fontSize: 12, color: context.textSecondary),
+            ),
+            Text(
+              _selectedToken!.assetId!,
+              softWrap: true,
+              style: TextStyle(fontSize: 12, color: context.textSecondary),
+            ),
+          ],
           const SizedBox(height: 16),
           TextField(
             controller: _amountController,

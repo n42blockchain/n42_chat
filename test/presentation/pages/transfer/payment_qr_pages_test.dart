@@ -43,6 +43,17 @@ const _assetB = TokenInfo(
   contractAddress: '0x1111111111111111111111111111111111111111',
   receiverAddress: '0xselectedB',
 );
+const _caseVariantAsset = TokenInfo(
+  symbol: 'usdt',
+  name: 'Tether A',
+  decimals: 6,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'token',
+  assetId: '0xabcdef0123456789bbcdef0123456789abcdef01',
+  contractAddress: '0xabcdef0123456789bbcdef0123456789abcdef01',
+  receiverAddress: '0xselectedCase',
+);
 const _missingReceiver = TokenInfo(
   symbol: 'USDT',
   name: 'No receiver',
@@ -156,6 +167,46 @@ void main() {
     expect(find.textContaining('Tether A'), findsNothing);
     expect(find.text('Payment asset is unavailable'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('merchant requires case-variant selection and shows full ID', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(900, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final wallet = _Wallet();
+    when(() => wallet.walletAddress).thenReturn('0xglobal');
+    when(
+      () => wallet.getSupportedTokens(),
+    ).thenAnswer((_) async => const [_assetA, _caseVariantAsset]);
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await tester.pumpWidget(
+      const MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: MerchantQrPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(QrImageView), findsNothing);
+    await tester.tap(find.byType(DropdownButtonFormField<TokenInfo>));
+    await tester.pumpAndSettle();
+    expect(find.textContaining(_assetA.assetId!), findsWidgets);
+    expect(find.textContaining(_caseVariantAsset.assetId!), findsWidgets);
+    await tester.tap(find.textContaining(_caseVariantAsset.assetId!).last);
+    await tester.pumpAndSettle();
+    final detail = tester.widget<Text>(
+      find.text(_caseVariantAsset.assetId!).last,
+    );
+    expect(detail.softWrap, isTrue);
+    expect(
+      PaymentRequestUri.tryParseExact(
+        (tester.widget<QrImageView>(find.byType(QrImageView)).key
+                as ValueKey<String>)
+            .value,
+      )?.assetId,
+      _caseVariantAsset.assetId,
+    );
   });
 
   testWidgets('merchant QR does not encode excess asset decimals', (
@@ -279,4 +330,49 @@ void main() {
     await tester.pump();
     verifyNever(() => bloc.add(any(that: isA<CreatePaymentRequest>())));
   });
+
+  testWidgets(
+    'receive requires case-variant choice and repeats full ID in request form',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(900, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final bloc = _Bloc();
+      const state = TransferState(
+        status: TransferBlocStatus.walletLoaded,
+        isWalletConnected: true,
+        walletAddress: '0xglobal',
+        tokens: [_assetA, _caseVariantAsset],
+      );
+      when(() => bloc.state).thenReturn(state);
+      whenListen(bloc, Stream<TransferState>.value(state), initialState: state);
+      when(() => bloc.add(any())).thenReturn(null);
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          home: BlocProvider<TransferBloc>.value(
+            value: bloc,
+            child: const ReceivePage(roomId: '!room'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(QrImageView), findsNothing);
+      await tester.tap(find.byType(DropdownButtonFormField<TokenInfo>));
+      await tester.pumpAndSettle();
+      expect(find.textContaining(_assetA.assetId!), findsWidgets);
+      expect(find.textContaining(_caseVariantAsset.assetId!), findsWidgets);
+      await tester.tap(find.textContaining(_caseVariantAsset.assetId!).last);
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<Text>(find.text(_caseVariantAsset.assetId!).last)
+            .softWrap,
+        isTrue,
+      );
+      await tester.tap(find.text('Send Payment Request'));
+      await tester.pumpAndSettle();
+      expect(find.text(_caseVariantAsset.assetId!), findsAtLeastNWidgets(2));
+    },
+  );
 }

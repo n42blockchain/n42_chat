@@ -135,7 +135,11 @@ class _ReceivePageState extends State<ReceivePage> {
           if (_selectedToken == null &&
               tokens.isNotEmpty &&
               tokens
-                      .where((token) => token.symbol == tokens.first.symbol)
+                      .where(
+                        (token) =>
+                            token.symbol.toLowerCase() ==
+                            tokens.first.symbol.toLowerCase(),
+                      )
                       .length ==
                   1) {
             _selectedToken = tokens.first;
@@ -186,6 +190,10 @@ class _ReceivePageState extends State<ReceivePage> {
         children: [
           // 收款二维码
           _buildTokenSelector(tokens),
+          if (_selectedToken != null && _hasIdentity(_selectedToken!)) ...[
+            const SizedBox(height: 8),
+            _buildSelectedAssetDetail(),
+          ],
 
           const SizedBox(height: 16),
 
@@ -315,6 +323,7 @@ class _ReceivePageState extends State<ReceivePage> {
     List<TokenInfo> tokens,
   ) => DropdownButtonFormField<TokenInfo>(
     isExpanded: true,
+    itemHeight: 86,
     initialValue: _selectedToken,
     decoration: InputDecoration(
       labelText: S.of(context)?.transferSelectToken ?? 'Select Token',
@@ -324,18 +333,57 @@ class _ReceivePageState extends State<ReceivePage> {
         .map(
           (token) => DropdownMenuItem(
             value: token,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '${token.symbol} - ${token.name} · ${token.chain ?? ''} ${token.network ?? ''} ${token.assetId ?? ''}',
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${token.symbol} - ${token.name}'),
+                if (_hasIdentity(token))
+                  Text(
+                    '${token.chain} / ${token.network} · ${token.assetType}',
+                  ),
+                if (token.assetId != null)
+                  Text(
+                    token.assetId!,
+                    softWrap: true,
+                    style: const TextStyle(fontSize: 11),
+                  ),
+              ],
+            ),
+          ),
+        )
+        .toList(),
+    selectedItemBuilder: (_) => tokens
+        .map(
+          (token) => Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '${token.symbol} - ${token.name}',
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         )
         .toList(),
     onChanged: (value) => setState(() => _selectedToken = value),
   );
+
+  Widget _buildSelectedAssetDetail() {
+    final token = _selectedToken!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${token.chain} / ${token.network} · ${token.assetType}',
+          style: TextStyle(fontSize: 12, color: context.textSecondary),
+        ),
+        Text(
+          token.assetId!,
+          softWrap: true,
+          style: TextStyle(fontSize: 12, color: context.textSecondary),
+        ),
+      ],
+    );
+  }
 
   Widget _buildAddressSection(String walletAddress) {
     return Container(
@@ -412,6 +460,8 @@ class _ReceivePageState extends State<ReceivePage> {
                 (S.of(context)?.transferPleaseSelectToken ??
                     'Please select a token'),
           ),
+          if (_selectedToken != null && _hasIdentity(_selectedToken!))
+            _buildSelectedAssetDetail(),
 
           const SizedBox(height: 16),
 
