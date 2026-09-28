@@ -289,6 +289,19 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     final candidates = exact
         ? <TokenInfo>[resolution.asset!]
         : resolution.candidates;
+    if (exact &&
+            createExactPaymentRequestForAsset(
+                  candidates.single,
+                  amount: payment.amount,
+                ) ==
+                null ||
+        _hasDuplicateCandidates(candidates)) {
+      _showError(
+        S.of(context)?.transferAssetUnavailable ??
+            'Payment asset is unavailable',
+      );
+      return false;
+    }
     TokenInfo? selected = exact ? resolution.asset : null;
     final amountController = TextEditingController(
       text: payment.hasAmount ? payment.amount.trim() : '',
@@ -358,16 +371,15 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                               .map(
                                 (asset) => DropdownMenuItem(
                                   value: asset,
-                                  child: Text(
-                                    _assetLabel(asset),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                  child: _assetChoice(asset),
                                 ),
                               )
                               .toList(),
                           onChanged: (value) =>
                               setSheetState(() => selected = value),
                         ),
+                        if (selected != null)
+                          Text(_assetLabel(selected!), softWrap: true),
                       ],
                       if (!payment.hasAmount) ...[
                         const SizedBox(height: 16),
@@ -439,19 +451,69 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     if (!mounted || amountToPay == null || selected == null) return false;
 
     try {
-      final asset = selected!;
-      final hasExactAsset = createExactPaymentRequestForAsset(asset) != null;
-      final sameSymbolCount = assets
-          .where((item) => item.symbol == asset.symbol)
-          .length;
-      if (!exact && !hasExactAsset && sameSymbolCount != 1) {
+      final original = selected!;
+      final refreshed = await bridge.getSupportedTokens();
+      if (!mounted) return false;
+      final hasExactAsset =
+          createExactPaymentRequestForAsset(original, amount: amountToPay) !=
+          null;
+      TokenInfo? asset;
+      if (hasExactAsset) {
+        final lookup = exact
+            ? PaymentRequestData(
+                receiverAddress: payment.receiverAddress,
+                amount: amountToPay,
+                chain: payment.chain,
+                network: payment.network,
+                assetType: payment.assetType,
+                assetId: payment.assetId,
+              )
+            : PaymentRequestData(
+                receiverAddress: payment.receiverAddress,
+                amount: amountToPay,
+                chain: original.chain,
+                network: original.network,
+                assetType: original.assetType,
+                assetId: original.assetId,
+              );
+        final current = resolvePaymentAsset(lookup, refreshed);
+        final match = current.asset;
+        if (current.status == PaymentAssetResolutionStatus.matched &&
+            match != null &&
+            match.symbol == original.symbol &&
+            match.receiverAddress == original.receiverAddress &&
+            match.decimals == original.decimals &&
+            createExactPaymentRequestForAsset(match, amount: amountToPay) !=
+                null) {
+          asset = match;
+        }
+      } else if (!exact && payment.chain == null && !_hasIdentity(original)) {
+        final matches = refreshed
+            .where(
+              (item) =>
+                  item.symbol.toLowerCase() == original.symbol.toLowerCase(),
+            )
+            .toList();
+        if (matches.length == 1 &&
+            !_hasIdentity(matches.single) &&
+            matches.single.name == original.name &&
+            matches.single.decimals == original.decimals &&
+            matches.single.receiverAddress == original.receiverAddress &&
+            isValidPaymentAmountForDecimals(
+              amountToPay,
+              matches.single.decimals,
+            )) {
+          asset = matches.single;
+        }
+      }
+      if (asset == null) {
         _showError(
           S.of(context)?.transferAssetUnavailable ??
               'Payment asset is unavailable',
         );
         return false;
       }
-      final result = exact || hasExactAsset
+      final result = hasExactAsset
           ? await requestWalletTransferExact(
               bridge,
               toAddress: payment.receiverAddress,
@@ -489,15 +551,42 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       asset.assetType,
     ].whereType<String>().join(' / ');
     final id = asset.assetId;
-    final shortId = id == null
-        ? ''
-        : id.length > 16
-        ? '${id.substring(0, 8)}…${id.substring(id.length - 6)}'
-        : id;
-    final suffix = id == null ? '' : ' · $shortId';
+    final suffix = id == null ? '' : ' · $id';
     return identity.isEmpty
-        ? asset.symbol
-        : '${asset.symbol} · $identity$suffix';
+        ? '${asset.symbol} · ${asset.name}'
+        : '${asset.symbol} · ${asset.name} · $identity$suffix';
+  }
+
+  static Widget _assetChoice(TokenInfo asset) => FittedBox(
+    fit: BoxFit.scaleDown,
+    alignment: Alignment.centerLeft,
+    child: Text(_assetLabel(asset), maxLines: 1),
+  );
+
+  static bool _hasIdentity(TokenInfo asset) =>
+      asset.chain != null ||
+      asset.network != null ||
+      asset.assetType != null ||
+      asset.assetId != null;
+
+  static bool _hasDuplicateCandidates(List<TokenInfo> candidates) {
+    for (var i = 0; i < candidates.length; i++) {
+      for (var j = i + 1; j < candidates.length; j++) {
+        final left = candidates[i];
+        final right = candidates[j];
+        if (left.symbol.toLowerCase() != right.symbol.toLowerCase() ||
+            left.chain != right.chain ||
+            left.network != right.network ||
+            left.assetType != right.assetType) {
+          continue;
+        }
+        if (left.assetId == null && right.assetId == null ||
+            samePaymentAssetId(left.assetId, right.assetId)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   Future<bool> _startChatWithUser(String userId) async {

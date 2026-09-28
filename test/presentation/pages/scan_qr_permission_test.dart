@@ -14,6 +14,8 @@ import 'package:n42_chat/src/integration/wallet_bridge.dart';
 class _ExactWallet extends Mock
     implements IWalletBridge, IExactWalletTransfer {}
 
+class _LegacyWallet extends Mock implements IWalletBridge {}
+
 const _exactAsset = TokenInfo(
   symbol: 'USDT',
   name: 'Tether',
@@ -34,6 +36,27 @@ const _otherAsset = TokenInfo(
   assetType: 'token',
   assetId: '0x1111111111111111111111111111111111111111',
   contractAddress: '0x1111111111111111111111111111111111111111',
+  receiverAddress: '0xmine',
+);
+const _noReceiverAsset = TokenInfo(
+  symbol: 'USDT',
+  name: 'Tether',
+  decimals: 6,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'token',
+  assetId: '0xabcdef0123456789abcdef0123456789abcdef01',
+  contractAddress: '0xabcdef0123456789abcdef0123456789abcdef01',
+);
+const _collisionAsset = TokenInfo(
+  symbol: 'USDT',
+  name: 'Tether',
+  decimals: 6,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'token',
+  assetId: '0xabcdef01234567ffabcdef0123456789abcdef01',
+  contractAddress: '0xabcdef01234567ffabcdef0123456789abcdef01',
   receiverAddress: '0xmine',
 );
 
@@ -170,6 +193,17 @@ void main() {
       ),
     );
     await tester.pump();
+  }
+
+  Future<void> scanGallery(WidgetTester tester, String uri) async {
+    permission = 1;
+    gallery.image = XFile('/test/qr.png');
+    camera.capture = BarcodeCapture(barcodes: [Barcode(rawValue: uri)]);
+    await open(tester);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('scan_gallery_button')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
   }
 
   Future<void> resume(WidgetTester tester) async {
@@ -360,6 +394,207 @@ void main() {
         assetId: '0x1111111111111111111111111111111111111111',
       ),
     ).called(1);
+  });
+
+  testWidgets('v1 asset without selected receiver never calls wallet', (
+    tester,
+  ) async {
+    final wallet = _ExactWallet();
+    when(
+      () => wallet.getSupportedTokens(),
+    ).thenAnswer((_) async => const [_noReceiverAsset]);
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await scanGallery(
+      tester,
+      'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1',
+    );
+    expect(find.text('Payment asset is unavailable'), findsOneWidget);
+    verifyNever(
+      () => wallet.requestTransferExact(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+        chain: any(named: 'chain'),
+        network: any(named: 'network'),
+        assetType: any(named: 'assetType'),
+        assetId: any(named: 'assetId'),
+      ),
+    );
+  });
+
+  testWidgets('fresh asset removal during confirmation prevents transfer', (
+    tester,
+  ) async {
+    final wallet = _ExactWallet();
+    var reads = 0;
+    when(() => wallet.getSupportedTokens()).thenAnswer(
+      (_) async => ++reads == 1 ? const [_exactAsset] : const <TokenInfo>[],
+    );
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await scanGallery(
+      tester,
+      'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1',
+    );
+    expect(find.byKey(const ValueKey('scan_selected_asset')), findsOneWidget);
+    await tester.tap(find.byType(ElevatedButton).last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(reads, 2);
+    verifyNever(
+      () => wallet.requestTransferExact(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+        chain: any(named: 'chain'),
+        network: any(named: 'network'),
+        assetType: any(named: 'assetType'),
+        assetId: any(named: 'assetId'),
+      ),
+    );
+  });
+
+  testWidgets('legacy chain hint cannot use symbol-only bridge', (
+    tester,
+  ) async {
+    final wallet = _ExactWallet();
+    when(() => wallet.getSupportedTokens()).thenAnswer(
+      (_) async => const [
+        TokenInfo(symbol: 'USDT', name: 'Legacy', decimals: 6, chain: 'ETH'),
+      ],
+    );
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await scanGallery(
+      tester,
+      'n42pay://pay?to=0xrecipient&amount=1&token=USDT&chain=ETH',
+    );
+    await tester.tap(find.byKey(const ValueKey('scan_asset_selector')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.textContaining('Legacy').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byType(ElevatedButton).last);
+    await tester.pump();
+    verifyNever(
+      () => wallet.requestTransfer(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+      ),
+    );
+  });
+
+  testWidgets('duplicate identical legacy assets fail before chooser', (
+    tester,
+  ) async {
+    final wallet = _ExactWallet();
+    when(
+      () => wallet.getSupportedTokens(),
+    ).thenAnswer((_) async => const [_exactAsset, _exactAsset]);
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await scanGallery(
+      tester,
+      'n42pay://pay?to=0xrecipient&amount=1&token=USDT',
+    );
+    expect(find.text('Payment asset is unavailable'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('colliding abbreviated IDs are fully visible in legacy chooser', (
+    tester,
+  ) async {
+    final wallet = _ExactWallet();
+    when(
+      () => wallet.getSupportedTokens(),
+    ).thenAnswer((_) async => const [_exactAsset, _collisionAsset]);
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await scanGallery(
+      tester,
+      'n42pay://pay?to=0xrecipient&amount=1&token=USDT',
+    );
+    await tester.tap(find.byKey(const ValueKey('scan_asset_selector')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.textContaining(_exactAsset.assetId!), findsOneWidget);
+    expect(find.textContaining(_collisionAsset.assetId!), findsOneWidget);
+    expect(
+      _exactAsset.assetId!.substring(0, 8),
+      _collisionAsset.assetId!.substring(0, 8),
+    );
+    expect(
+      _exactAsset.assetId!.substring(_exactAsset.assetId!.length - 6),
+      _collisionAsset.assetId!.substring(_collisionAsset.assetId!.length - 6),
+    );
+  });
+
+  testWidgets('chainless unique legacy asset still uses old bridge', (
+    tester,
+  ) async {
+    final wallet = _LegacyWallet();
+    when(() => wallet.getSupportedTokens()).thenAnswer(
+      (_) async => const [
+        TokenInfo(symbol: 'USDT', name: 'Legacy', decimals: 6),
+      ],
+    );
+    when(
+      () => wallet.requestTransfer(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+      ),
+    ).thenAnswer((_) async => TransferResult.failure('declined'));
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await scanGallery(
+      tester,
+      'n42pay://pay?to=0xrecipient&amount=1&token=USDT',
+    );
+    await tester.tap(find.byKey(const ValueKey('scan_asset_selector')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.textContaining('Legacy').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byType(ElevatedButton).last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    verify(
+      () => wallet.requestTransfer(
+        toAddress: '0xrecipient',
+        amount: '1',
+        token: 'USDT',
+        memo: null,
+      ),
+    ).called(1);
+  });
+
+  testWidgets('case-variant duplicate symbols never use old bridge', (
+    tester,
+  ) async {
+    final wallet = _LegacyWallet();
+    when(() => wallet.getSupportedTokens()).thenAnswer(
+      (_) async => const [
+        TokenInfo(symbol: 'USDT', name: 'One', decimals: 6),
+        TokenInfo(symbol: 'usdt', name: 'Two', decimals: 6),
+      ],
+    );
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await scanGallery(
+      tester,
+      'n42pay://pay?to=0xrecipient&amount=1&token=USDT',
+    );
+    expect(find.text('Payment asset is unavailable'), findsOneWidget);
+    verifyNever(
+      () => wallet.requestTransfer(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+      ),
+    );
   });
 
   testWidgets('denied permission stays usable across repeated resumes', (
