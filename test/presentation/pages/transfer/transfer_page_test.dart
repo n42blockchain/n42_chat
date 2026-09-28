@@ -16,9 +16,214 @@ class MockTransferBloc extends MockBloc<TransferEvent, TransferState>
 
 class FakeTransferEvent extends Fake implements TransferEvent {}
 
+const _contractA = '0xabcdef0123456789abcdef0123456789abcdef01';
+const _contractB = '0x1111111111111111111111111111111111111111';
+const _tokenA = TokenInfo(
+  symbol: 'USDT',
+  name: 'Tether A',
+  decimals: 6,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'token',
+  assetId: _contractA,
+  contractAddress: _contractA,
+  receiverAddress: '0xsender',
+);
+const _tokenB = TokenInfo(
+  symbol: 'USDT',
+  name: 'Tether B',
+  decimals: 6,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'token',
+  assetId: _contractB,
+  contractAddress: _contractB,
+  receiverAddress: '0xsender',
+);
+
 void main() {
   setUpAll(() {
     registerFallbackValue(FakeTransferEvent());
+  });
+
+  Future<MockTransferBloc> openRequest(
+    WidgetTester tester,
+    PaymentRequest request,
+    List<TokenInfo> tokens,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final bloc = MockTransferBloc();
+    final state = TransferState(
+      status: TransferBlocStatus.addressValidated,
+      isWalletConnected: true,
+      walletAddress: '0xsender',
+      tokens: tokens,
+      balances: const {'USDT': '99'},
+      validatedAddress: '0xreceiver',
+      isAddressValid: true,
+    );
+    when(() => bloc.state).thenReturn(state);
+    whenListen(bloc, Stream<TransferState>.value(state), initialState: state);
+    when(() => bloc.add(any())).thenReturn(null);
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        locale: const Locale('en'),
+        home: BlocProvider<TransferBloc>.value(
+          value: bloc,
+          child: TransferPage(
+            roomId: '!room:server.test',
+            paymentRequest: request,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    return bloc;
+  }
+
+  for (final scenario in [
+    (
+      name: 'wrong network',
+      network: 'testnet',
+      amount: '1',
+      assets: const [_tokenA],
+    ),
+    (
+      name: 'duplicate identity',
+      network: 'mainnet',
+      amount: '1',
+      assets: const [_tokenA, _tokenA],
+    ),
+    (
+      name: 'excess precision',
+      network: 'mainnet',
+      amount: '1.0000001',
+      assets: const [_tokenA],
+    ),
+    (
+      name: 'partial identity',
+      network: null,
+      amount: '1',
+      assets: const [_tokenA],
+    ),
+  ]) {
+    testWidgets('exact request ${scenario.name} cannot be fulfilled', (
+      tester,
+    ) async {
+      final request = PaymentRequest(
+        requestId: 'req-invalid',
+        amount: scenario.amount,
+        token: 'USDT',
+        receiverAddress: '0xreceiver',
+        qrCodeData: 'v1',
+        chain: 'ETH',
+        network: scenario.network,
+        assetType: 'token',
+        assetId: _contractA,
+        createdAt: DateTime(2026, 1, 1),
+      );
+      final bloc = await openRequest(tester, request, scenario.assets);
+      expect(find.byIcon(Icons.check_circle), findsNothing);
+      await tester.tap(find.byType(N42Button));
+      await tester.pump();
+      verifyNever(() => bloc.add(any(that: isA<FulfillPaymentRequest>())));
+    });
+  }
+
+  testWidgets(
+    'legacy request with duplicate ticker requires selected identity',
+    (tester) async {
+      final request = PaymentRequest(
+        requestId: 'req-legacy',
+        amount: '1.25',
+        token: 'USDT',
+        receiverAddress: '0xreceiver',
+        qrCodeData: 'legacy',
+        createdAt: DateTime(2026, 1, 1),
+      );
+      final bloc = await openRequest(tester, request, const [_tokenA, _tokenB]);
+      expect(find.byIcon(Icons.check_circle), findsNothing);
+      await tester.tap(find.byType(N42Button));
+      await tester.pump();
+      verifyNever(() => bloc.add(any(that: isA<FulfillPaymentRequest>())));
+      await tester.tap(find.text('Tether B'));
+      await tester.pump();
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      await tester.tap(find.byType(N42Button));
+      await tester.pump();
+      verify(
+        () => bloc.add(
+          const FulfillPaymentRequest(
+            roomId: '!room:server.test',
+            requestId: 'req-legacy',
+            receiverAddress: '0xreceiver',
+            amount: '1.25',
+            token: 'USDT',
+            chain: 'ETH',
+            network: 'mainnet',
+            assetType: 'token',
+            assetId: _contractB,
+          ),
+        ),
+      ).called(1);
+    },
+  );
+
+  testWidgets('manual transfer selects one same-symbol contract', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final bloc = MockTransferBloc();
+    const state = TransferState(
+      status: TransferBlocStatus.addressValidated,
+      isWalletConnected: true,
+      walletAddress: '0xsender',
+      tokens: [_tokenA, _tokenB],
+      balances: {'USDT': '99'},
+      validatedAddress: '0xreceiver',
+      isAddressValid: true,
+    );
+    when(() => bloc.state).thenReturn(state);
+    whenListen(bloc, Stream<TransferState>.value(state), initialState: state);
+    when(() => bloc.add(any())).thenReturn(null);
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        locale: const Locale('en'),
+        home: BlocProvider<TransferBloc>.value(
+          value: bloc,
+          child: const TransferPage(
+            roomId: '!room:server.test',
+            recipientAddress: '0xreceiver',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.check_circle), findsNothing);
+    await tester.tap(find.text('Tether B'));
+    await tester.enterText(find.byType(TextField).at(1), '1.250000');
+    await tester.tap(find.byType(N42Button));
+    await tester.pump();
+    verify(
+      () => bloc.add(
+        const InitiateTransfer(
+          roomId: '!room:server.test',
+          receiverAddress: '0xreceiver',
+          amount: '1.250000',
+          token: 'USDT',
+          chain: 'ETH',
+          network: 'mainnet',
+          assetType: 'token',
+          assetId: _contractB,
+        ),
+      ),
+    ).called(1);
   });
 
   testWidgets('payment request forwards exact identity into fulfillment', (
@@ -31,7 +236,30 @@ void main() {
       status: TransferBlocStatus.addressValidated,
       isWalletConnected: true,
       walletAddress: '0xsender',
-      tokens: [TokenInfo(symbol: 'USDT', name: 'Tether', decimals: 6)],
+      tokens: [
+        TokenInfo(
+          symbol: 'USDT',
+          name: 'Other Tether',
+          decimals: 6,
+          chain: 'ETH',
+          network: 'mainnet',
+          assetType: 'token',
+          assetId: '0x1111111111111111111111111111111111111111',
+          contractAddress: '0x1111111111111111111111111111111111111111',
+          receiverAddress: '0xsender',
+        ),
+        TokenInfo(
+          symbol: 'USDT',
+          name: 'Tether',
+          decimals: 6,
+          chain: 'ETH',
+          network: 'mainnet',
+          assetType: 'token',
+          assetId: '0xabcdef0123456789abcdef0123456789abcdef01',
+          contractAddress: '0xabcdef0123456789abcdef0123456789abcdef01',
+          receiverAddress: '0xsender',
+        ),
+      ],
       balances: {'USDT': '99'},
       validatedAddress: '0xreceiver',
       isAddressValid: true,
@@ -65,6 +293,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    expect(find.text('Other Tether'), findsNothing);
     await tester.tap(find.byType(N42Button));
     await tester.pump();
     verify(
