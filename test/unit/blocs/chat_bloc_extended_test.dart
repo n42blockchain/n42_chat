@@ -3,6 +3,7 @@
 //   DisposeChat, SendTypingNotification, SendSystemNotice, SendPokeMessage,
 //   DeleteFailedMessage, ReplyToMessage, LoadPinnedMessages, PinMessage, UnpinMessage
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -12,7 +13,9 @@ import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
+import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
+import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
 import 'package:n42_chat/src/domain/repositories/group_repository.dart';
@@ -20,6 +23,7 @@ import 'package:n42_chat/src/domain/repositories/message_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_event.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_state.dart';
+import 'package:n42_chat/src/presentation/blocs/chat/message_report_origin.dart';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 
@@ -32,6 +36,9 @@ class MockGroupRepository extends Mock implements IGroupRepository {}
 class MockMatrixClientManager extends Mock implements MatrixClientManager {}
 
 class MockClient extends Mock implements matrix.Client {}
+
+class MockReportAuth extends Mock
+    implements IAuthRepository, IAccountBoundDeletionLifecycle {}
 
 class MockRoom extends Mock implements matrix.Room {}
 
@@ -1175,5 +1182,128 @@ void main() {
         await bloc.close();
       },
     );
+  });
+
+  group('ReportMessage account-bound acknowledgement', () {
+    for (final replacementA in [false, true]) {
+      test(
+        'queued report from A cannot reach ${replacementA ? 'new A' : 'B'}',
+        () async {
+          final auth = MockReportAuth();
+          final a = mockClient;
+          final replacement = MockClient();
+          var active = true;
+          final generation = AuthSessionInvalidation(
+            userId: '@me:server.com',
+            homeserver: Uri.parse('https://server.com'),
+            deviceId: null,
+            isCurrent: () => active,
+            matchesClient: (candidate) => identical(candidate, a),
+          );
+          when(() => a.homeserver).thenReturn(Uri.parse('https://server.com'));
+          when(() => a.accessToken).thenReturn('token-A');
+          when(() => a.deviceID).thenReturn(null);
+          when(a.isLogged).thenReturn(true);
+          when(() => auth.currentAccountGeneration).thenReturn(generation);
+          getIt.pushNewScope();
+          getIt.registerSingleton<MatrixClientManager>(mockClientManager);
+          getIt.registerSingleton<IAuthRepository>(auth);
+          addTearDown(getIt.popScope);
+          final origin = MessageReportOrigin.capture();
+          expect(origin, isNotNull);
+          final bloc = buildBlocWithClientManager();
+          await initBloc(bloc);
+          active = false;
+          if (replacementA) {
+            when(() => auth.currentAccountGeneration).thenReturn(
+              AuthSessionInvalidation(
+                userId: '@me:server.com',
+                homeserver: Uri.parse('https://server.com'),
+                deviceId: null,
+                isCurrent: () => true,
+                matchesClient: (candidate) => identical(candidate, a),
+              ),
+            );
+          } else {
+            when(() => mockClientManager.client).thenReturn(replacement);
+          }
+          bloc.add(ReportMessage(r'$event1', 'Spam', origin: origin));
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+          verifyNever(
+            () => mockRepo.reportMessage(_roomId, r'$event1', reason: 'Spam'),
+          );
+          await bloc.close();
+        },
+      );
+    }
+
+    test('waits for exact room and event acknowledgement', () async {
+      final pending = Completer<void>();
+      when(
+        () => mockRepo.reportMessage(_roomId, r'$event1', reason: 'Spam'),
+      ).thenAnswer((_) => pending.future);
+      final bloc = buildBlocWithClientManager();
+      await initBloc(bloc);
+      final results = <String>[];
+      final subscription = bloc.stream.listen((state) {
+        if (state.error != null) results.add(state.error!);
+      });
+      bloc.add(const ReportMessage(r'$event1', 'Spam'));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      verify(
+        () => mockRepo.reportMessage(_roomId, r'$event1', reason: 'Spam'),
+      ).called(1);
+      expect(results, isNot(contains('success:report')));
+      pending.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(results, contains('success:report'));
+      await subscription.cancel();
+      await bloc.close();
+    });
+
+    test('late A success after client switch is not B success', () async {
+      final pending = Completer<void>();
+      when(
+        () => mockRepo.reportMessage(_roomId, r'$event1', reason: 'Spam'),
+      ).thenAnswer((_) => pending.future);
+      final bloc = buildBlocWithClientManager();
+      await initBloc(bloc);
+      final results = <String>[];
+      final subscription = bloc.stream.listen((state) {
+        if (state.error != null) results.add(state.error!);
+      });
+      bloc.add(const ReportMessage(r'$event1', 'Spam'));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      when(() => mockClientManager.client).thenReturn(MockClient());
+      pending.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(results, isNot(contains('success:report')));
+      await subscription.cancel();
+      await bloc.close();
+    });
+
+    test('late A failure after client switch is not B error', () async {
+      final pending = Completer<void>();
+      when(
+        () => mockRepo.reportMessage(_roomId, r'$event1', reason: 'Spam'),
+      ).thenAnswer((_) async {
+        await pending.future;
+        throw StateError('Account changed');
+      });
+      final bloc = buildBlocWithClientManager();
+      await initBloc(bloc);
+      final results = <String>[];
+      final subscription = bloc.stream.listen((state) {
+        if (state.error != null) results.add(state.error!);
+      });
+      bloc.add(const ReportMessage(r'$event1', 'Spam'));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      when(() => mockClientManager.client).thenReturn(MockClient());
+      pending.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(results, isNot(contains('Failed to report message')));
+      await subscription.cancel();
+      await bloc.close();
+    });
   });
 }

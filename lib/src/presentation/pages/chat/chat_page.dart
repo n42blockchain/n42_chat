@@ -59,6 +59,7 @@ import '../../../domain/repositories/message_repository.dart';
 import '../../../domain/repositories/transfer_repository.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
+import '../../blocs/chat/message_report_origin.dart';
 import '../../blocs/chat/chat_state.dart';
 import '../../blocs/message_action/message_action_bloc.dart';
 import '../../blocs/message_action/message_action_event.dart' as action_event;

@@ -1823,8 +1823,27 @@ class MessageRepositoryImpl implements IMessageRepository {
   }) async {
     final client = _clientManager.client;
     if (client == null) throw Exception('Matrix client not initialized');
+    final account = client.userID;
+    final homeserver = client.homeserver;
+    final token = client.accessToken;
+    final device = client.deviceID;
+    if (account == null || homeserver == null || token == null) {
+      throw StateError('Matrix account is unavailable');
+    }
+    bool sameAccount() =>
+        identical(_clientManager.client, client) &&
+        client.userID == account &&
+        client.homeserver == homeserver &&
+        client.accessToken == token &&
+        client.deviceID == device;
     final room = client.getRoomById(roomId);
     if (room == null) throw Exception('Room not found');
-    await client.reportEvent(roomId, eventId, reason: reason);
+    try {
+      await client.reportEvent(roomId, eventId, reason: reason);
+    } catch (_) {
+      if (!sameAccount()) throw StateError('Account changed');
+      rethrow;
+    }
+    if (!sameAccount()) throw StateError('Account changed');
   }
 }
