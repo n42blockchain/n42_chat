@@ -6000,4 +6000,11 @@ class SPl extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Zasób płatniczy jest niedostępny';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'Żądanie płatności jest niedostępne';
 }

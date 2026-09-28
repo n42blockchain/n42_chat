@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} pending requests",
   "chatDraftLabel": "Draft",
-  "contactIndexLabel": "Contact index"
+  "contactIndexLabel": "Contact index",
+  "transferAssetUnavailable": "Mali ya malipo haipatikani",
+  "transferPaymentRequestUnavailable": "Ombi la malipo halipatikani"
 }

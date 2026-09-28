@@ -5939,4 +5939,10 @@ class SAr extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'أصل الدفع غير متاح';
+
+  @override
+  String get transferPaymentRequestUnavailable => 'طلب الدفع غير متاح';
 }

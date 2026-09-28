@@ -5812,6 +5812,12 @@ class SZh extends S {
 
   @override
   String get contactIndexLabel => '联系人索引';
+
+  @override
+  String get transferAssetUnavailable => '支付资产不可用';
+
+  @override
+  String get transferPaymentRequestUnavailable => '收款请求不可用';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -11623,4 +11629,10 @@ class SZhTw extends SZh {
 
   @override
   String get contactIndexLabel => '聯絡人索引';
+
+  @override
+  String get transferAssetUnavailable => '支付資產無法使用';
+
+  @override
+  String get transferPaymentRequestUnavailable => '收款請求無法使用';
 }

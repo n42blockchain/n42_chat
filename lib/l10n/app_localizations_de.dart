@@ -6010,4 +6010,11 @@ class SDe extends S {
 
   @override
   String get contactIndexLabel => 'Kontaktindex';
+
+  @override
+  String get transferAssetUnavailable => 'Der Zahlungswert ist nicht verfügbar';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'Die Zahlungsanforderung ist nicht verfügbar';
 }

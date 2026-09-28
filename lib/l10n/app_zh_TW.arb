@@ -2203,5 +2203,7 @@
   },
   "contactPendingCount": "{count} 則待處理申請",
   "chatDraftLabel": "草稿",
-  "contactIndexLabel": "聯絡人索引"
+  "contactIndexLabel": "聯絡人索引",
+  "transferAssetUnavailable": "支付資產無法使用",
+  "transferPaymentRequestUnavailable": "收款請求無法使用"
 }

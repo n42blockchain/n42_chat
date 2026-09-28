@@ -5936,4 +5936,11 @@ class SEn extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Payment asset is unavailable';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'Payment request is unavailable';
 }

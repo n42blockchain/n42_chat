@@ -5986,4 +5986,12 @@ class SIt extends S {
 
   @override
   String get contactIndexLabel => 'Indice contatti';
+
+  @override
+  String get transferAssetUnavailable =>
+      'La risorsa di pagamento non è disponibile';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'La richiesta di pagamento non è disponibile';
 }

@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} pending requests",
   "chatDraftLabel": "Draft",
-  "contactIndexLabel": "Contact index"
+  "contactIndexLabel": "Contact index",
+  "transferAssetUnavailable": "Ödeme varlığı kullanılamıyor",
+  "transferPaymentRequestUnavailable": "Ödeme isteği kullanılamıyor"
 }

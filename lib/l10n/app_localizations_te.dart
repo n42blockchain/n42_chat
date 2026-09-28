@@ -6006,4 +6006,11 @@ class STe extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'చెల్లింపు ఆస్తి అందుబాటులో లేదు';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'చెల్లింపు అభ్యర్థన అందుబాటులో లేదు';
 }

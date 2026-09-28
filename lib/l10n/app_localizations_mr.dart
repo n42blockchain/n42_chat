@@ -5960,4 +5960,10 @@ class SMr extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'पेमेंट मालमत्ता उपलब्ध नाही';
+
+  @override
+  String get transferPaymentRequestUnavailable => 'पेमेंट विनंती उपलब्ध नाही';
 }

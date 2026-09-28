@@ -5992,4 +5992,10 @@ class SRu extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Платёжный актив недоступен';
+
+  @override
+  String get transferPaymentRequestUnavailable => 'Запрос на оплату недоступен';
 }

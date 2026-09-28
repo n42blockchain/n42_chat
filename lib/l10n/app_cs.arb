@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} pending requests",
   "chatDraftLabel": "Draft",
-  "contactIndexLabel": "Contact index"
+  "contactIndexLabel": "Contact index",
+  "transferAssetUnavailable": "Platební aktivum není dostupné",
+  "transferPaymentRequestUnavailable": "Žádost o platbu není dostupná"
 }

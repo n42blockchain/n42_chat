@@ -11014,6 +11014,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Contact index'**
   String get contactIndexLabel;
+
+  /// No description provided for @transferAssetUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment asset is unavailable'**
+  String get transferAssetUnavailable;
+
+  /// No description provided for @transferPaymentRequestUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment request is unavailable'**
+  String get transferPaymentRequestUnavailable;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

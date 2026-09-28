@@ -7,6 +7,35 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/presentation/pages/qrcode/scan_qr_page.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:n42_chat/src/core/di/injection.dart';
+import 'package:n42_chat/src/integration/wallet_bridge.dart';
+
+class _ExactWallet extends Mock
+    implements IWalletBridge, IExactWalletTransfer {}
+
+const _exactAsset = TokenInfo(
+  symbol: 'USDT',
+  name: 'Tether',
+  decimals: 6,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'token',
+  assetId: '0xabcdef0123456789abcdef0123456789abcdef01',
+  contractAddress: '0xabcdef0123456789abcdef0123456789abcdef01',
+  receiverAddress: '0xmine',
+);
+const _otherAsset = TokenInfo(
+  symbol: 'USDT',
+  name: 'Other Tether',
+  decimals: 6,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'token',
+  assetId: '0x1111111111111111111111111111111111111111',
+  contractAddress: '0x1111111111111111111111111111111111111111',
+  receiverAddress: '0xmine',
+);
 
 class _Gallery extends ImagePickerPlatform {
   int calls = 0;
@@ -120,6 +149,7 @@ void main() {
         });
   });
   tearDown(() {
+    if (getIt.isRegistered<IWalletBridge>()) getIt.unregister<IWalletBridge>();
     ImagePickerPlatform.instance = originalGallery;
     MobileScannerPlatform.instance = originalCamera;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -148,6 +178,189 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
     await tester.pump();
   }
+
+  testWidgets('v1 gallery QR confirms selected exact asset before transfer', (
+    tester,
+  ) async {
+    permission = 1;
+    gallery.image = XFile('/test/qr.png');
+    camera.capture = const BarcodeCapture(
+      barcodes: [
+        Barcode(
+          rawValue:
+              'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1.250000',
+        ),
+      ],
+    );
+    final wallet = _ExactWallet();
+    when(
+      () => wallet.getSupportedTokens(),
+    ).thenAnswer((_) async => [_exactAsset]);
+    when(
+      () => wallet.requestTransferExact(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+        chain: any(named: 'chain'),
+        network: any(named: 'network'),
+        assetType: any(named: 'assetType'),
+        assetId: any(named: 'assetId'),
+      ),
+    ).thenAnswer((_) async => TransferResult.failure('declined'));
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await open(tester);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('scan_gallery_button')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.textContaining('ETH'), findsWidgets);
+    await tester.tap(find.byType(ElevatedButton).last);
+    await tester.pumpAndSettle();
+    verify(
+      () => wallet.requestTransferExact(
+        toAddress: '0xrecipient',
+        amount: '1.250000',
+        token: 'USDT',
+        memo: null,
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'token',
+        assetId: '0xabcdef0123456789abcdef0123456789abcdef01',
+      ),
+    ).called(1);
+    verifyNever(
+      () => wallet.requestTransfer(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+      ),
+    );
+  });
+
+  for (final scenario in [
+    (
+      name: 'wrong network',
+      uri:
+          'n42pay://v1/pay?chain=ETH&network=testnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1',
+      assets: const [_exactAsset],
+    ),
+    (
+      name: 'duplicate identity',
+      uri:
+          'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1',
+      assets: const [_exactAsset, _exactAsset],
+    ),
+    (
+      name: 'excess precision',
+      uri:
+          'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1.0000001',
+      assets: const [_exactAsset],
+    ),
+  ]) {
+    testWidgets('v1 ${scenario.name} is rejected before wallet transfer', (
+      tester,
+    ) async {
+      permission = 1;
+      gallery.image = XFile('/test/qr.png');
+      camera.capture = BarcodeCapture(
+        barcodes: [Barcode(rawValue: scenario.uri)],
+      );
+      final wallet = _ExactWallet();
+      when(
+        () => wallet.getSupportedTokens(),
+      ).thenAnswer((_) async => scenario.assets);
+      getIt.registerSingleton<IWalletBridge>(wallet);
+      await open(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('scan_gallery_button')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.text('Payment asset is unavailable'), findsOneWidget);
+      verifyNever(
+        () => wallet.requestTransferExact(
+          toAddress: any(named: 'toAddress'),
+          amount: any(named: 'amount'),
+          token: any(named: 'token'),
+          memo: any(named: 'memo'),
+          chain: any(named: 'chain'),
+          network: any(named: 'network'),
+          assetType: any(named: 'assetType'),
+          assetId: any(named: 'assetId'),
+        ),
+      );
+    });
+  }
+
+  testWidgets('manual legacy QR requires a choice between same-symbol assets', (
+    tester,
+  ) async {
+    final wallet = _ExactWallet();
+    when(
+      () => wallet.getSupportedTokens(),
+    ).thenAnswer((_) async => const [_exactAsset, _otherAsset]);
+    when(
+      () => wallet.requestTransferExact(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+        chain: any(named: 'chain'),
+        network: any(named: 'network'),
+        assetType: any(named: 'assetType'),
+        assetId: any(named: 'assetId'),
+      ),
+    ).thenAnswer((_) async => TransferResult.failure('declined'));
+    getIt.registerSingleton<IWalletBridge>(wallet);
+    await open(tester);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Manual Input User ID'));
+    await tester.pump();
+    await tester.enterText(
+      find.byType(TextField),
+      'n42pay://pay?to=0xrecipient&amount=1.25&token=USDT',
+    );
+    await tester.tap(find.text('Add'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('scan_asset_selector')), findsOneWidget);
+    await tester.tap(find.byType(ElevatedButton).last);
+    await tester.pump();
+    verifyNever(
+      () => wallet.requestTransferExact(
+        toAddress: any(named: 'toAddress'),
+        amount: any(named: 'amount'),
+        token: any(named: 'token'),
+        memo: any(named: 'memo'),
+        chain: any(named: 'chain'),
+        network: any(named: 'network'),
+        assetType: any(named: 'assetType'),
+        assetId: any(named: 'assetId'),
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('scan_asset_selector')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.textContaining('0x111111').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byType(ElevatedButton).last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    verify(
+      () => wallet.requestTransferExact(
+        toAddress: '0xrecipient',
+        amount: '1.25',
+        token: 'USDT',
+        memo: null,
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'token',
+        assetId: '0x1111111111111111111111111111111111111111',
+      ),
+    ).called(1);
+  });
 
   testWidgets('denied permission stays usable across repeated resumes', (
     tester,
@@ -280,6 +493,13 @@ void main() {
           Barcode(rawValue: 'n42pay://pay?to=test-address&amount=1&token=ETH'),
         ],
       );
+      final wallet = _ExactWallet();
+      when(() => wallet.getSupportedTokens()).thenAnswer(
+        (_) async => const [
+          TokenInfo(symbol: 'ETH', name: 'Ethereum', decimals: 18),
+        ],
+      );
+      getIt.registerSingleton<IWalletBridge>(wallet);
       await open(tester);
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('scan_gallery_button')));

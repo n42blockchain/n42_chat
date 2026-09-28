@@ -5963,4 +5963,10 @@ class SBn extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'পেমেন্টের সম্পদ উপলব্ধ নেই';
+
+  @override
+  String get transferPaymentRequestUnavailable => 'পেমেন্টের অনুরোধ উপলব্ধ নেই';
 }

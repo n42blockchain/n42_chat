@@ -6028,4 +6028,11 @@ class SFr extends S {
 
   @override
   String get contactIndexLabel => 'Index des contacts';
+
+  @override
+  String get transferAssetUnavailable => 'L’actif de paiement est indisponible';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'La demande de paiement est indisponible';
 }

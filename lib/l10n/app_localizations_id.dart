@@ -5974,4 +5974,11 @@ class SId extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Aset pembayaran tidak tersedia';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'Permintaan pembayaran tidak tersedia';
 }

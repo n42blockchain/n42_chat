@@ -6004,4 +6004,11 @@ class SEs extends S {
 
   @override
   String get contactIndexLabel => 'Índice de contactos';
+
+  @override
+  String get transferAssetUnavailable => 'El activo de pago no está disponible';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'La solicitud de pago no está disponible';
 }

@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} pending requests",
   "chatDraftLabel": "Draft",
-  "contactIndexLabel": "Contact index"
+  "contactIndexLabel": "Contact index",
+  "transferAssetUnavailable": "পেমেন্টের সম্পদ উপলব্ধ নেই",
+  "transferPaymentRequestUnavailable": "পেমেন্টের অনুরোধ উপলব্ধ নেই"
 }

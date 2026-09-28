@@ -5844,4 +5844,10 @@ class SKo extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => '결제 자산을 사용할 수 없습니다';
+
+  @override
+  String get transferPaymentRequestUnavailable => '결제 요청을 사용할 수 없습니다';
 }

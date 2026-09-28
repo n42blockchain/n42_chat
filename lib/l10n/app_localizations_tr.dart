@@ -5967,4 +5967,10 @@ class STr extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Ödeme varlığı kullanılamıyor';
+
+  @override
+  String get transferPaymentRequestUnavailable => 'Ödeme isteği kullanılamıyor';
 }

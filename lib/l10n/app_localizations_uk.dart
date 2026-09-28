@@ -5995,4 +5995,10 @@ class SUk extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Платіжний актив недоступний';
+
+  @override
+  String get transferPaymentRequestUnavailable => 'Запит на оплату недоступний';
 }

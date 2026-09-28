@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} pending requests",
   "chatDraftLabel": "Draft",
-  "contactIndexLabel": "Contact index"
+  "contactIndexLabel": "Contact index",
+  "transferAssetUnavailable": "Платёжный актив недоступен",
+  "transferPaymentRequestUnavailable": "Запрос на оплату недоступен"
 }

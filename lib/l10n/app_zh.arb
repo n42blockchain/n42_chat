@@ -2203,5 +2203,7 @@
   },
   "contactPendingCount": "{count} 条待处理申请",
   "chatDraftLabel": "草稿",
-  "contactIndexLabel": "联系人索引"
+  "contactIndexLabel": "联系人索引",
+  "transferAssetUnavailable": "支付资产不可用",
+  "transferPaymentRequestUnavailable": "收款请求不可用"
 }

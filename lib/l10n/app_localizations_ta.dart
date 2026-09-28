@@ -6026,4 +6026,11 @@ class STa extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'பணம் செலுத்தும் சொத்து கிடைக்கவில்லை';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'கட்டணக் கோரிக்கை கிடைக்கவில்லை';
 }

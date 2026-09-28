@@ -5995,6 +5995,14 @@ class SPt extends S {
 
   @override
   String get contactIndexLabel => 'Índice de contactos';
+
+  @override
+  String get transferAssetUnavailable =>
+      'O ativo de pagamento não está disponível';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'O pedido de pagamento não está disponível';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -11988,4 +11996,12 @@ class SPtBr extends SPt {
 
   @override
   String get contactIndexLabel => 'Índice de contatos';
+
+  @override
+  String get transferAssetUnavailable =>
+      'O ativo de pagamento não está disponível';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'A solicitação de pagamento não está disponível';
 }

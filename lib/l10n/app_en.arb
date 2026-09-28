@@ -2837,5 +2837,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "transferAssetUnavailable": "Payment asset is unavailable",
+  "transferPaymentRequestUnavailable": "Payment request is unavailable"
 }

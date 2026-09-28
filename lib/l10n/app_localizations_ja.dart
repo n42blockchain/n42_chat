@@ -5845,4 +5845,10 @@ class SJa extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => '支払い資産を利用できません';
+
+  @override
+  String get transferPaymentRequestUnavailable => '支払いリクエストを利用できません';
 }

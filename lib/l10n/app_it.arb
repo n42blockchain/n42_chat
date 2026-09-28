@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} richieste in sospeso",
   "chatDraftLabel": "Bozza",
-  "contactIndexLabel": "Indice contatti"
+  "contactIndexLabel": "Indice contatti",
+  "transferAssetUnavailable": "La risorsa di pagamento non è disponibile",
+  "transferPaymentRequestUnavailable": "La richiesta di pagamento non è disponibile"
 }

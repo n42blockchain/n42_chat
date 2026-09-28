@@ -5962,4 +5962,11 @@ class SHi extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'भुगतान परिसंपत्ति उपलब्ध नहीं है';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'भुगतान अनुरोध उपलब्ध नहीं है';
 }

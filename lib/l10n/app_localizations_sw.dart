@@ -5995,4 +5995,10 @@ class SSw extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Mali ya malipo haipatikani';
+
+  @override
+  String get transferPaymentRequestUnavailable => 'Ombi la malipo halipatikani';
 }

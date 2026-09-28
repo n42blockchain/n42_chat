@@ -5975,4 +5975,11 @@ class SUr extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'ادائیگی کا اثاثہ دستیاب نہیں ہے';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'ادائیگی کی درخواست دستیاب نہیں ہے';
 }

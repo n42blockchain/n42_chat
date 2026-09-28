@@ -5951,4 +5951,11 @@ class SVi extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Tài sản thanh toán không khả dụng';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'Yêu cầu thanh toán không khả dụng';
 }

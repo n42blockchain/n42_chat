@@ -5975,4 +5975,11 @@ class SCs extends S {
 
   @override
   String get contactIndexLabel => 'Contact index';
+
+  @override
+  String get transferAssetUnavailable => 'Platební aktivum není dostupné';
+
+  @override
+  String get transferPaymentRequestUnavailable =>
+      'Žádost o platbu není dostupná';
 }
