@@ -79,4 +79,60 @@ void main() {
     );
     verifyNever(() => underlying.delete(key: 'n42_chat_session'));
   });
+
+  for (final oldValue in [
+    '{malformed A',
+    jsonEncode({
+      'homeserver': 'https://hs.test',
+      'userId': '@a:hs',
+      'accessToken': 'A-token',
+    }),
+  ]) {
+    test('old invalid session read cannot delete a later B save', () async {
+      final values = <String, String>{'n42_chat_session': oldValue};
+      final readStarted = Completer<void>();
+      final releaseRead = Completer<void>();
+      var pauseFirstRead = true;
+      final underlying = _Storage();
+      when(() => underlying.read(key: 'n42_chat_session')).thenAnswer((
+        _,
+      ) async {
+        final captured = values['n42_chat_session'];
+        if (pauseFirstRead) {
+          pauseFirstRead = false;
+          readStarted.complete();
+          await releaseRead.future;
+        }
+        return captured;
+      });
+      when(
+        () => underlying.write(
+          key: 'n42_chat_session',
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((call) async {
+        values['n42_chat_session'] = call.namedArguments[#value] as String;
+      });
+      when(() => underlying.delete(key: 'n42_chat_session')).thenAnswer((
+        _,
+      ) async {
+        values.remove('n42_chat_session');
+      });
+      final oldReader = SecureStorageDataSource(storage: underlying);
+      final newLogin = SecureStorageDataSource(storage: underlying);
+      final pendingRead = oldReader.getSession();
+      await readStarted.future;
+      final saveB = newLogin.saveSession(
+        homeserver: 'https://hs.test',
+        accessToken: 'B-token',
+        userId: '@b:hs',
+        deviceId: 'B',
+      );
+      await Future<void>.delayed(Duration.zero);
+      releaseRead.complete();
+      expect(await pendingRead, isNull);
+      await saveB;
+      expect((await oldReader.getSession())?['userId'], '@b:hs');
+    });
+  }
 }

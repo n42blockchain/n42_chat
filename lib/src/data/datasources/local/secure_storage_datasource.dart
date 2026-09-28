@@ -81,8 +81,8 @@ class SecureStorageDataSource {
       try {
         json = jsonDecode(data) as Map<String, dynamic>;
       } on FormatException catch (e) {
-        secureLog('Session data corrupted (JSON), clearing: $e');
-        await _storage.delete(key: _keySession);
+        secureLog('Session data corrupted (JSON), checking removal: $e');
+        await _deleteSessionIfUnchanged(data);
         return null;
       }
 
@@ -97,9 +97,9 @@ class SecureStorageDataSource {
           userId == null ||
           deviceId == null) {
         secureLog(
-          'Session data incomplete (missing required fields), clearing',
+          'Session data incomplete (missing required fields), checking removal',
         );
-        await _storage.delete(key: _keySession);
+        await _deleteSessionIfUnchanged(data);
         return null;
       }
 
@@ -114,6 +114,13 @@ class SecureStorageDataSource {
       return null;
     }
   }
+
+  Future<void> _deleteSessionIfUnchanged(String observed) =>
+      _withIdentityWrite(() async {
+        if (await _storage.read(key: _keySession) == observed) {
+          await _storage.delete(key: _keySession);
+        }
+      });
 
   /// 清除会话
   Future<void> clearSession() => _withIdentityWrite(() async {
