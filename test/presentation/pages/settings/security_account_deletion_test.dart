@@ -41,6 +41,7 @@ class _Session implements IMatrixAccountDeletionSession {
   int retries = 0;
   Future<DeletionUiaStatus> Function()? startAction;
   Future<DeletionUiaStatus> Function()? retryAction;
+  Future<DeletionCleanupStatus> Function()? cleanupAction;
   DeletionCleanupStatus cleanupResult = DeletionCleanupStatus.complete;
 
   @override
@@ -105,7 +106,7 @@ class _Session implements IMatrixAccountDeletionSession {
   @override
   Future<DeletionCleanupStatus> cleanupConfirmed() async {
     cleanups++;
-    return cleanupResult;
+    return await cleanupAction?.call() ?? cleanupResult;
   }
 
   @override
@@ -134,21 +135,28 @@ void main() {
     WidgetTester tester, {
     Future<bool> Function(Uri)? openFallback,
     Future<Uri?> Function(IMatrixAccountDeletionSession)? management,
+    bool secondRoute = false,
   }) async {
+    final page = SecuritySettingsPage(
+      e2eeManager: e2ee,
+      keyBackupService: backup,
+      restoreKeysOnOpen: false,
+      deletionSessionFactory: (erase) => session..eraseValue = erase,
+      openDeletionFallback: openFallback,
+      resolveDeletionManagement: management,
+    );
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: S.localizationsDelegates,
         supportedLocales: S.supportedLocales,
-        home: SecuritySettingsPage(
-          e2eeManager: e2ee,
-          keyBackupService: backup,
-          restoreKeysOnOpen: false,
-          deletionSessionFactory: (erase) => session..eraseValue = erase,
-          openDeletionFallback: openFallback,
-          resolveDeletionManagement: management,
-        ),
+        home: secondRoute ? const Scaffold(body: Text('Account root')) : page,
       ),
     );
+    if (secondRoute) {
+      tester
+          .state<NavigatorState>(find.byType(Navigator))
+          .push(MaterialPageRoute<void>(builder: (_) => page));
+    }
     await tester.pumpAndSettle();
   }
 
@@ -285,6 +293,121 @@ void main() {
     expect(session.cleanups, 0);
     expect(find.byType(SecuritySettingsPage), findsOneWidget);
     expect(await MatrixPendingDeletionStore().list(), hasLength(1));
+  });
+
+  testWidgets('unrecorded confirmed A remains reachable for local retry', (
+    tester,
+  ) async {
+    session.cleanupAction = () async {
+      if (session.cleanups == 1) throw StateError('journal write failed');
+      return DeletionCleanupStatus.complete;
+    };
+    await open(tester);
+    await tapDelete(tester);
+    await tester.tap(find.byKey(const ValueKey('confirm_delete_account')));
+    await tester.pumpAndSettle();
+    expect(session.starts, 1);
+    expect(session.cleanups, 1);
+    expect(await MatrixPendingDeletionStore().list(), isEmpty);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    final target = find.byKey(const ValueKey('pending_delete_account'));
+    await tester.scrollUntilVisible(target, 300);
+    await tester.ensureVisible(target);
+    await tester.drag(find.byType(ListView).first, const Offset(0, -180));
+    await tester.pumpAndSettle();
+    await tester.tap(target);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('retry_deletion_@a:hs')));
+    await tester.pumpAndSettle();
+    expect(session.cleanups, 2);
+    expect(session.starts, 1);
+    expect(find.byKey(const ValueKey('pending_delete_account')), findsNothing);
+  });
+
+  testWidgets('unrecorded A retry cannot clean after generation switch', (
+    tester,
+  ) async {
+    session.cleanupAction = () async {
+      throw StateError('journal write failed');
+    };
+    await open(tester);
+    await tapDelete(tester);
+    await tester.tap(find.byKey(const ValueKey('confirm_delete_account')));
+    await tester.pumpAndSettle();
+    session.original = false;
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    final target = find.byKey(const ValueKey('pending_delete_account'));
+    await tester.scrollUntilVisible(target, 300);
+    await tester.ensureVisible(target);
+    await tester.drag(find.byType(ListView).first, const Offset(0, -180));
+    await tester.pumpAndSettle();
+    await tester.tap(target);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('retry_deletion_@a:hs')));
+    await tester.pumpAndSettle();
+    expect(session.starts, 1);
+    expect(session.cleanups, 1);
+    expect(find.byType(SecuritySettingsPage), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('pending_delete_account')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('paused A retry cannot be attributed to a new deletion', (
+    tester,
+  ) async {
+    final originalA = session;
+    final retryResult = Completer<DeletionCleanupStatus>();
+    originalA.cleanupAction = () async {
+      if (originalA.cleanups == 1) throw StateError('journal write failed');
+      return retryResult.future;
+    };
+    await open(tester, secondRoute: true);
+    await tapDelete(tester);
+    await tester.tap(find.byKey(const ValueKey('confirm_delete_account')));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    final pending = find.byKey(const ValueKey('pending_delete_account'));
+    await tester.scrollUntilVisible(pending, 300);
+    await tester.ensureVisible(pending);
+    await tester.drag(find.byType(ListView).first, const Offset(0, -180));
+    await tester.pumpAndSettle();
+    await tester.tap(pending);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('retry_deletion_@a:hs')));
+    await tester.pump();
+    expect(originalA.cleanups, 2);
+
+    final newGeneration = _Session()
+      ..cleanupResult = DeletionCleanupStatus.deferredClientClear;
+    session = newGeneration;
+    final deleteAgain = find.byKey(const ValueKey('delete_account')).last;
+    await tester.scrollUntilVisible(
+      deleteAgain,
+      300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.ensureVisible(deleteAgain);
+    await tester.drag(find.byType(ListView).last, const Offset(0, -180));
+    await tester.pumpAndSettle();
+    await tester.tap(deleteAgain);
+    await tester.pumpAndSettle();
+    final confirmation = find.byKey(const ValueKey('confirm_delete_account'));
+    if (confirmation.evaluate().isNotEmpty) {
+      await tester.tap(confirmation);
+      await tester.pumpAndSettle();
+    }
+    originalA.original = false;
+    retryResult.complete(DeletionCleanupStatus.complete);
+    await tester.pumpAndSettle();
+
+    expect(newGeneration.starts, 0);
+    expect(find.byType(SecuritySettingsPage), findsOneWidget);
+    expect(find.text('Account root'), findsNothing);
   });
 
   testWidgets('account management link never marks server deletion', (

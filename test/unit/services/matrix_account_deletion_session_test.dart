@@ -9,6 +9,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class _Operation extends Mock implements MatrixAccountDeletionOperation {}
 
+class _FailOnceJournal extends MatrixPendingDeletionStore {
+  bool failNextWrite = true;
+
+  @override
+  Future<void> markPending({
+    required String userId,
+    required Uri homeserver,
+    required String? deviceId,
+  }) {
+    if (failNextWrite) {
+      failNextWrite = false;
+      throw StateError('journal write failed');
+    }
+    return super.markPending(
+      userId: userId,
+      homeserver: homeserver,
+      deviceId: deviceId,
+    );
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   final server = Uri.parse('https://hs.test');
@@ -99,4 +120,27 @@ void main() {
     expect((await journal.list()).single.userId, '@a:hs');
     expect(flow.confirmedDeletion?.userId, '@a:hs');
   });
+
+  test(
+    'journal write failure retains receipt for same-process retry',
+    () async {
+      final failOnceJournal = _FailOnceJournal();
+      journal = failOnceJournal;
+      when(
+        () => operation.cleanup(any()),
+      ).thenAnswer((_) async => DeletionCleanupStatus.complete);
+      final flow = session();
+      expect(await flow.start(), DeletionUiaStatus.deactivated);
+
+      await expectLater(flow.cleanupConfirmed(), throwsStateError);
+      expect(flow.confirmedDeletion?.userId, '@a:hs');
+      expect(await journal.list(), isEmpty);
+      verifyNever(() => operation.cleanup(any()));
+
+      expect(await flow.cleanupConfirmed(), DeletionCleanupStatus.complete);
+      expect(await journal.list(), isEmpty);
+      verify(() => operation.request(null)).called(1);
+      verify(() => operation.cleanup(any())).called(1);
+    },
+  );
 }

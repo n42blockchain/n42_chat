@@ -86,6 +86,34 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
   List<MatrixPendingDeletionEntry> _pendingDeletion = const [];
   bool _pendingDeletionLoadFailed = false;
 
+  List<MatrixPendingDeletionEntry> get _visiblePendingDeletion {
+    final flow = _retryDeletionSession;
+    final receipt = flow?.confirmedDeletion;
+    if (flow == null ||
+        receipt == null ||
+        receipt.userId != flow.generation.userId ||
+        receipt.homeserver != flow.generation.homeserver) {
+      return _pendingDeletion;
+    }
+    final pending = MatrixPendingDeletionEntry(
+      userId: flow.generation.userId,
+      homeserver: flow.generation.homeserver,
+      deviceId: flow.generation.deviceId,
+    );
+    if (_pendingDeletion.any((entry) => _samePendingEntry(entry, pending))) {
+      return _pendingDeletion;
+    }
+    return [..._pendingDeletion, pending];
+  }
+
+  bool _samePendingEntry(
+    MatrixPendingDeletionEntry a,
+    MatrixPendingDeletionEntry b,
+  ) =>
+      a.userId == b.userId &&
+      a.homeserver == b.homeserver &&
+      a.deviceId == b.deviceId;
+
   // Passkey 状态
   bool _isPasskeySupported = false;
   List<PasskeyCredential> _registeredPasskeys = [];
@@ -1034,7 +1062,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
             onTap: _showDeleteAccountConfirmation,
             isDestructive: true,
           ),
-          if (_pendingDeletion.isNotEmpty || _pendingDeletionLoadFailed) ...[
+          if (_visiblePendingDeletion.isNotEmpty ||
+              _pendingDeletionLoadFailed) ...[
             _buildDivider(),
             _buildListItem(
               key: const ValueKey('pending_delete_account'),
@@ -1233,6 +1262,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       if (flow.confirmedDeletion == null) return;
       _retryDeletionSession = flow;
       final cleanup = await flow.cleanupConfirmed();
+      if (cleanup == DeletionCleanupStatus.complete) {
+        _retryDeletionSession = null;
+      }
       await _loadPendingDeletion();
       if (cleanup == DeletionCleanupStatus.complete &&
           flow.isOriginalGeneration) {
@@ -1351,6 +1383,17 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
   );
 
   Future<void> _showPendingDeletion() async {
+    if (_deletionBusy) return;
+    _deletionBusy = true;
+    try {
+      await _showPendingDeletionUnlocked();
+    } finally {
+      _deletionBusy = false;
+    }
+  }
+
+  Future<void> _showPendingDeletionUnlocked() async {
+    final flow = _retryDeletionSession;
     final entry = await showDialog<MatrixPendingDeletionEntry>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1359,7 +1402,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              for (final pending in _pendingDeletion)
+              for (final pending in _visiblePendingDeletion)
                 ListTile(
                   title: Text(pending.userId),
                   subtitle: Text(pending.homeserver.toString()),
@@ -1382,17 +1425,39 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     );
     if (entry == null || !mounted) return;
     try {
-      final retry = MatrixPendingDeletionRetry(_pendingDeletionStore);
-      final result = await retry.retry(
-        entry,
-        originalSession: _retryDeletionSession,
+      final recorded = (await _pendingDeletionStore.list()).any(
+        (candidate) => _samePendingEntry(candidate, entry),
       );
+      DeletionCleanupStatus result;
+      if (recorded) {
+        result = await MatrixPendingDeletionRetry(
+          _pendingDeletionStore,
+        ).retry(entry, originalSession: flow);
+      } else if (flow != null &&
+          flow.isOriginalGeneration &&
+          flow.confirmedDeletion?.userId == entry.userId &&
+          flow.confirmedDeletion?.homeserver == entry.homeserver &&
+          flow.generation.userId == entry.userId &&
+          flow.generation.homeserver == entry.homeserver &&
+          flow.generation.deviceId == entry.deviceId) {
+        // The original in-memory server receipt can retry a journal write
+        // that failed before an entry was saved. A replacement generation
+        // cannot use this path or clean the current account.
+        result = await flow.cleanupConfirmed();
+      } else {
+        result = DeletionCleanupStatus.deferredClientClear;
+      }
+      if (result == DeletionCleanupStatus.complete) {
+        if (identical(_retryDeletionSession, flow)) {
+          _retryDeletionSession = null;
+        }
+      }
       await _loadPendingDeletion();
       if (!mounted) return;
       if (result == DeletionCleanupStatus.complete &&
-          _retryDeletionSession?.isOriginalGeneration == true) {
+          flow?.isOriginalGeneration == true) {
         _deletionAuthBloc()?.add(
-          AuthAccountDeletionConfirmed(_retryDeletionSession!.generation),
+          AuthAccountDeletionConfirmed(flow!.generation),
         );
         Navigator.of(context).popUntil((route) => route.isFirst);
       } else {
