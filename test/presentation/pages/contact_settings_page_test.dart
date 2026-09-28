@@ -407,6 +407,114 @@ void main() {
       await tester.pumpAndSettle();
     });
 
+    for (final dismissal in ['Cancel', 'barrier', 'back']) {
+      testWidgets(
+        'pending report resists $dismissal and retains a failed draft',
+        (tester) async {
+          final owner = _ReportOwner();
+          final acknowledgement = Completer<void>();
+          when(
+            () => owner.reporter.reportUser(
+              userId: '@test:server.com',
+              reason: 'Spam\nDraft details',
+            ),
+          ).thenAnswer((_) => acknowledgement.future);
+          await tester.pumpWidget(
+            buildTestWidget(
+              const ContactSettingsPage(
+                userId: '@test:server.com',
+                displayName: 'Test User',
+              ),
+              contactBloc: mockContactBloc,
+            ),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Report'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Spam'));
+          await tester.enterText(find.byType(TextField), 'Draft details');
+          await tester.tap(find.text('Confirm'));
+          await tester.pump();
+          switch (dismissal) {
+            case 'Cancel':
+              await tester.tap(find.text('Cancel'));
+            case 'barrier':
+              await tester.tapAt(const Offset(5, 5));
+            case 'back':
+              await tester.binding.handlePopRoute();
+          }
+          await tester.pump();
+          final draftWasVisibleWhilePending = find
+              .text('Draft details')
+              .evaluate()
+              .isNotEmpty;
+          acknowledgement.completeError(
+            const ContentReportException(ContentReportFailure.transport),
+          );
+          await tester.pumpAndSettle();
+          expect(draftWasVisibleWhilePending, isTrue);
+          expect(find.text('Draft details'), findsOneWidget);
+          expect(
+            find.text('Could not send report. Please try again.'),
+            findsOneWidget,
+          );
+          expect(find.text('Report submitted'), findsNothing);
+          await tester.tap(find.text('Cancel'));
+          await tester.pumpAndSettle();
+          expect(find.text('Draft details'), findsNothing);
+          verify(
+            () => owner.reporter.reportUser(
+              userId: '@test:server.com',
+              reason: 'Spam\nDraft details',
+            ),
+          ).called(1);
+        },
+      );
+    }
+
+    testWidgets(
+      'pending report stays open until one successful acknowledgement',
+      (tester) async {
+        final owner = _ReportOwner();
+        final acknowledgement = Completer<void>();
+        when(
+          () => owner.reporter.reportUser(
+            userId: '@test:server.com',
+            reason: 'Spam',
+          ),
+        ).thenAnswer((_) => acknowledgement.future);
+        await tester.pumpWidget(
+          buildTestWidget(
+            const ContactSettingsPage(
+              userId: '@test:server.com',
+              displayName: 'Test User',
+            ),
+            contactBloc: mockContactBloc,
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Report'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Spam'));
+        await tester.tap(find.text('Confirm'));
+        await tester.pump();
+        await tester.tapAt(const Offset(5, 5));
+        await tester.pump();
+        final stayedOpen = find.byType(AlertDialog).evaluate().isNotEmpty;
+        acknowledgement.complete();
+        await tester.pumpAndSettle();
+        expect(stayedOpen, isTrue);
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.text('Report submitted'), findsOneWidget);
+        verify(
+          () => owner.reporter.reportUser(
+            userId: '@test:server.com',
+            reason: 'Spam',
+          ),
+        ).called(1);
+      },
+    );
+
     testWidgets('a stale dialog cannot send under a replacement account', (
       tester,
     ) async {
@@ -498,6 +606,18 @@ void main() {
       await tester.tap(find.text('Confirm'));
       await tester.pump();
       owner.current = false;
+      // The visible MXID/client fields return to A, but the old monitor epoch
+      // remains invalid and a distinct generation now owns that session.
+      final returnedA = AuthSessionInvalidation(
+        userId: '@me:hs.test',
+        homeserver: Uri.parse('https://hs.test'),
+        deviceId: 'device-A',
+        isCurrent: () => true,
+        matchesClient: (candidate) => identical(candidate, owner.client),
+      );
+      when(() => owner.auth.currentAccountGeneration).thenReturn(returnedA);
+      expect(returnedA.isCurrent, isTrue);
+      expect(identical(returnedA, owner.generation), isFalse);
       acknowledgement.complete();
       await tester.pumpAndSettle();
       expect(find.text('Report submitted'), findsNothing);
@@ -548,6 +668,25 @@ void main() {
       await tester.pumpAndSettle();
 
       // 验证对话框已关闭（不再显示举报原因选项）
+      expect(find.text('Spam'), findsNothing);
+    });
+
+    testWidgets('report barrier dismisses the idle draft', (tester) async {
+      await tester.pumpWidget(
+        buildTestWidget(
+          const ContactSettingsPage(
+            userId: '@test:server.com',
+            displayName: 'Test User',
+          ),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Report'));
+      await tester.pumpAndSettle();
+      expect(find.text('Spam'), findsOneWidget);
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
       expect(find.text('Spam'), findsNothing);
     });
   });

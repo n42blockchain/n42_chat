@@ -33,6 +33,7 @@ Future<void> _showReportDialog(
       : null;
   return showDialog<void>(
     context: context,
+    barrierDismissible: false,
     builder: (_) => _ContentReportDialog(
       userId: userId,
       roomId: roomId,
@@ -249,7 +250,7 @@ class _ContentReportDialogState extends State<_ContentReportDialog> {
       l10n?.reportReasonFraud ?? 'Fraud',
       l10n?.reportReasonOther ?? 'Other',
     ];
-    return AlertDialog(
+    final dialog = AlertDialog(
       backgroundColor: context.surfaceColor,
       title: Text(
         l10n?.reportTitle ?? 'Report',
@@ -310,7 +311,7 @@ class _ContentReportDialogState extends State<_ContentReportDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _submitting ? null : () => Navigator.of(context).pop(),
           child: Text(l10n?.commonCancel ?? 'Cancel'),
         ),
         TextButton(
@@ -318,6 +319,20 @@ class _ContentReportDialogState extends State<_ContentReportDialog> {
           child: Text(l10n?.commonConfirm ?? 'Submit'),
         ),
       ],
+    );
+    return PopScope(
+      canPop: !_submitting,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _submitting ? null : () => Navigator.of(context).pop(),
+            ),
+          ),
+          Center(child: dialog),
+        ],
+      ),
     );
   }
 }
