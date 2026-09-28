@@ -23,7 +23,8 @@ class AuthRepositoryImpl
     implements
         IAuthRepository,
         IAccountBoundAuthInvalidation,
-        IAccountBoundDeletionLifecycle {
+        IAccountBoundDeletionLifecycle,
+        IConfirmedAccountDeletionGeneration {
   final MatrixAuthDataSource _authDataSource;
   final SecureStorageDataSource _secureStorage;
   final SocialAuthApi _socialAuthApi;
@@ -109,6 +110,11 @@ class AuthRepositoryImpl
     final origin = _currentMonitorOrigin;
     return origin != null && origin.isCurrent ? origin : null;
   }
+
+  @override
+  bool isConfirmedDeletionGeneration(AuthSessionInvalidation generation) =>
+      identical(generation, _confirmedDeletionOrigin) &&
+      generation.isSameGeneration;
 
   @override
   Future<void> runAccountDeletionRequest(

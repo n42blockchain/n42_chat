@@ -45,6 +45,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
+    on<AuthAccountDeletionConfirmed>(_onAccountDeletionConfirmed);
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AuthWalletAuthRequested>(_onWalletAuthRequested);
     on<AuthAnonymousRegisterRequested>(_onAnonymousRegisterRequested);
@@ -207,6 +208,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     } finally {
       _logoutInProgress = false;
+    }
+  }
+
+  void _onAccountDeletionConfirmed(
+    AuthAccountDeletionConfirmed event,
+    Emitter<AuthState> emit,
+  ) {
+    final generation = event.generation;
+    if (_authRepository case final IConfirmedAccountDeletionGeneration proof) {
+      if (!generation.isSameGeneration ||
+          !proof.isConfirmedDeletionGeneration(generation) ||
+          state.status != AuthStatus.authenticated ||
+          state.user?.userId != generation.userId) {
+        return;
+      }
+      emit(
+        const AuthState.initial().copyWith(status: AuthStatus.unauthenticated),
+      );
+      N42Chat.notifyUserChanged();
     }
   }
 

@@ -46,6 +46,12 @@ abstract interface class IAccountBoundDeletionLifecycle {
   );
 }
 
+/// Optional proof for a deletion-only UI transition. This is true only after
+/// the captured generation's server request completed successfully.
+abstract interface class IConfirmedAccountDeletionGeneration {
+  bool isConfirmedDeletionGeneration(AuthSessionInvalidation generation);
+}
+
 /// 认证仓库接口
 ///
 /// 定义认证相关的所有操作，由 Data 层实现

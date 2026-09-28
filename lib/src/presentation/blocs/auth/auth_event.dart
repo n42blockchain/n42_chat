@@ -45,6 +45,17 @@ class AuthLogoutRequested extends AuthEvent {
   List<Object?> get props => [invalidation];
 }
 
+/// Local transition after the original generation's real server-confirmed
+/// deletion and scoped SDK cleanup. This never invokes ordinary logout.
+class AuthAccountDeletionConfirmed extends AuthEvent {
+  final AuthSessionInvalidation generation;
+
+  const AuthAccountDeletionConfirmed(this.generation);
+
+  @override
+  List<Object?> get props => [generation];
+}
+
 /// 注册请求
 class AuthRegisterRequested extends AuthEvent {
   final String homeserver;
