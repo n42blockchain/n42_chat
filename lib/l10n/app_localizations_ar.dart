@@ -1980,6 +1980,72 @@ class SAr extends S {
   String get settingsSecurityTitle => 'الأمن';
 
   @override
+  String get settingsDeleteAccountTitle => 'Delete account';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'Deactivate this Matrix account and clean up its local chat data';
+
+  @override
+  String get settingsDeleteAccountExplanation =>
+      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+
+  @override
+  String get settingsDeleteAccountPasswordOptional =>
+      'Matrix password, if requested';
+
+  @override
+  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+
+  @override
+  String get settingsDeleteAccountServerEraseDetail =>
+      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+
+  @override
+  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+
+  @override
+  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+
+  @override
+  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+
+  @override
+  String get settingsDeleteAccountFallbackTitle =>
+      'Return from Matrix verification';
+
+  @override
+  String get settingsDeleteAccountFallbackExplanation =>
+      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+
+  @override
+  String get settingsDeleteAccountCheckServer => 'Check with server';
+
+  @override
+  String get settingsDeleteAccountRequestFailed =>
+      'The Matrix server did not confirm account deletion.';
+
+  @override
+  String get settingsDeleteAccountPendingTitle =>
+      'Pending local account cleanup';
+
+  @override
+  String get settingsDeleteAccountPendingSubtitle =>
+      'Review cleanup for a previously deactivated Matrix account';
+
+  @override
+  String get settingsDeleteAccountPendingReadError =>
+      'Unable to read pending cleanup records. Tap to retry.';
+
+  @override
+  String get settingsDeleteAccountPendingDetail =>
+      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+
+  @override
+  String get settingsDeleteAccountManagementNotConfirmed =>
+      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+
+  @override
   String get settingsKeyBackup => 'النسخ الاحتياطي للمفتاح';
 
   @override

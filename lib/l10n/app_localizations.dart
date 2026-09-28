@@ -3725,6 +3725,114 @@ abstract class S {
   /// **'Security'**
   String get settingsSecurityTitle;
 
+  /// No description provided for @settingsDeleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get settingsDeleteAccountTitle;
+
+  /// No description provided for @settingsDeleteAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate this Matrix account and clean up its local chat data'**
+  String get settingsDeleteAccountSubtitle;
+
+  /// No description provided for @settingsDeleteAccountExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.'**
+  String get settingsDeleteAccountExplanation;
+
+  /// No description provided for @settingsDeleteAccountPasswordOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Matrix password, if requested'**
+  String get settingsDeleteAccountPasswordOptional;
+
+  /// No description provided for @settingsDeleteAccountServerErase.
+  ///
+  /// In en, this message translates to:
+  /// **'Request server data erasure'**
+  String get settingsDeleteAccountServerErase;
+
+  /// No description provided for @settingsDeleteAccountServerEraseDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.'**
+  String get settingsDeleteAccountServerEraseDetail;
+
+  /// No description provided for @settingsDeleteAccountChooseStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify this Matrix account'**
+  String get settingsDeleteAccountChooseStage;
+
+  /// No description provided for @settingsDeleteAccountUsePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Matrix password'**
+  String get settingsDeleteAccountUsePassword;
+
+  /// No description provided for @settingsDeleteAccountUseBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue in browser'**
+  String get settingsDeleteAccountUseBrowser;
+
+  /// No description provided for @settingsDeleteAccountFallbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Return from Matrix verification'**
+  String get settingsDeleteAccountFallbackTitle;
+
+  /// No description provided for @settingsDeleteAccountFallbackExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.'**
+  String get settingsDeleteAccountFallbackExplanation;
+
+  /// No description provided for @settingsDeleteAccountCheckServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Check with server'**
+  String get settingsDeleteAccountCheckServer;
+
+  /// No description provided for @settingsDeleteAccountRequestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The Matrix server did not confirm account deletion.'**
+  String get settingsDeleteAccountRequestFailed;
+
+  /// No description provided for @settingsDeleteAccountPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending local account cleanup'**
+  String get settingsDeleteAccountPendingTitle;
+
+  /// No description provided for @settingsDeleteAccountPendingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review cleanup for a previously deactivated Matrix account'**
+  String get settingsDeleteAccountPendingSubtitle;
+
+  /// No description provided for @settingsDeleteAccountPendingReadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to read pending cleanup records. Tap to retry.'**
+  String get settingsDeleteAccountPendingReadError;
+
+  /// No description provided for @settingsDeleteAccountPendingDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.'**
+  String get settingsDeleteAccountPendingDetail;
+
+  /// No description provided for @settingsDeleteAccountManagementNotConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.'**
+  String get settingsDeleteAccountManagementNotConfirmed;
+
   /// No description provided for @settingsKeyBackup.
   ///
   /// In en, this message translates to:
