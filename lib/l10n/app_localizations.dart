@@ -9263,6 +9263,36 @@ abstract class S {
   /// **'Please select a reason'**
   String get reportSelectReason;
 
+  /// No description provided for @reportUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to send a report.'**
+  String get reportUnavailable;
+
+  /// No description provided for @reportAccountChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Account changed. Open this report again to send it.'**
+  String get reportAccountChanged;
+
+  /// No description provided for @reportUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This homeserver does not support user reports.'**
+  String get reportUnsupported;
+
+  /// No description provided for @reportRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many reports. Please try again later.'**
+  String get reportRateLimited;
+
+  /// No description provided for @reportCouldNotSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send report. Please try again.'**
+  String get reportCouldNotSend;
+
   /// No description provided for @gameCenter.
   ///
   /// In en, this message translates to:

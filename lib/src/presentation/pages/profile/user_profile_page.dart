@@ -15,6 +15,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/common/user_report_dialog.dart';
 import '../../../n42_chat.dart';
 
 typedef UserProfileChatStartedCallback =
@@ -459,57 +460,42 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildMoreOptions() {
     return Container(
       margin: const EdgeInsets.only(top: 10),
-      color: context.surfaceColor,
-      child: Column(
-        children: [
-          // 设置备注
-          ListTile(
-            title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
-            trailing: Icon(
-              AppIcons.chevron,
-              color: context.textSecondary,
+      child: Material(
+        color: context.surfaceColor,
+        child: Column(
+          children: [
+            // 设置备注
+            ListTile(
+              title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
+              trailing: Icon(AppIcons.chevron, color: context.textSecondary),
+              onTap: _setRemark,
             ),
-            onTap: _setRemark,
-          ),
 
-          Divider(
-            height: 1,
-            indent: 16,
-            color: context.dividerColor,
-          ),
+            Divider(height: 1, indent: 16, color: context.dividerColor),
 
-          // 加入黑名单
-          ListTile(
-            title: Text(
-              getIt<IContactRepository>().isUserIgnored(widget.userId)
-                  ? (S.of(context)?.profileRemoveFromBlacklist ??
-                        'Remove from Blacklist')
-                  : (S.of(context)?.profileAddToBlacklist ??
-                        'Add to Blacklist'),
+            // 加入黑名单
+            ListTile(
+              title: Text(
+                getIt<IContactRepository>().isUserIgnored(widget.userId)
+                    ? (S.of(context)?.profileRemoveFromBlacklist ??
+                          'Remove from Blacklist')
+                    : (S.of(context)?.profileAddToBlacklist ??
+                          'Add to Blacklist'),
+              ),
+              trailing: Icon(AppIcons.chevron, color: context.textSecondary),
+              onTap: _toggleBlock,
             ),
-            trailing: Icon(
-              AppIcons.chevron,
-              color: context.textSecondary,
-            ),
-            onTap: _toggleBlock,
-          ),
 
-          Divider(
-            height: 1,
-            indent: 16,
-            color: context.dividerColor,
-          ),
+            Divider(height: 1, indent: 16, color: context.dividerColor),
 
-          // 举报
-          ListTile(
-            title: Text(S.of(context)?.commonReport ?? 'Report'),
-            trailing: Icon(
-              AppIcons.chevron,
-              color: context.textSecondary,
+            // 举报
+            ListTile(
+              title: Text(S.of(context)?.commonReport ?? 'Report'),
+              trailing: Icon(AppIcons.chevron, color: context.textSecondary),
+              onTap: _report,
             ),
-            onTap: _report,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -606,100 +592,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _report() {
-    final descController = TextEditingController();
-    String? selectedReason;
-
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: context.surfaceColor,
-          title: Text(
-            S.of(context)?.reportTitle ?? 'Report',
-            style: TextStyle(
-              color: context.textPrimary,
-            ),
-          ),
-          content: RadioGroup<String>(
-            groupValue: selectedReason,
-            onChanged: (val) => setDialogState(() => selectedReason = val),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ...[
-                  S.of(context)?.reportReasonSpam ?? 'Spam',
-                  S.of(context)?.reportReasonHarassment ?? 'Harassment',
-                  S.of(context)?.reportReasonFraud ?? 'Fraud',
-                  S.of(context)?.reportReasonOther ?? 'Other',
-                ].map(
-                  (reason) => RadioListTile<String>(
-                    title: Text(
-                      reason,
-                      style: TextStyle(
-                        color: context.textPrimary,
-                      ),
-                    ),
-                    value: reason,
-                    activeColor: AppColors.primary,
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: descController,
-                  maxLines: 2,
-                  style: TextStyle(
-                    color: context.textPrimary,
-                  ),
-                  decoration: InputDecoration(
-                    hintText:
-                        S.of(context)?.reportDescription ??
-                        'Additional description (optional)',
-                    hintStyle: TextStyle(
-                      color: context.textSecondary,
-                    ),
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (selectedReason == null) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        S.of(context)?.reportSelectReason ??
-                            'Please select a reason',
-                      ),
-                      duration: const Duration(seconds: 1),
-                    ),
-                  );
-                  return;
-                }
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.reportSubmitted ?? 'Report submitted',
-                    ),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-              child: Text(S.of(context)?.commonConfirm ?? 'Submit'),
-            ),
-          ],
-        ),
-      ),
-    ).whenComplete(descController.dispose);
+    showUserReportDialog(context, userId: widget.userId);
   }
 
   Future<void> _startVoiceCall() async {

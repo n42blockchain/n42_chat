@@ -4897,6 +4897,23 @@ class SZh extends S {
   String get reportSelectReason => '請選擇投訴原因';
 
   @override
+  String get reportUnavailable => 'Sign in to send a report.';
+
+  @override
+  String get reportAccountChanged =>
+      'Account changed. Open this report again to send it.';
+
+  @override
+  String get reportUnsupported =>
+      'This homeserver does not support user reports.';
+
+  @override
+  String get reportRateLimited => 'Too many reports. Please try again later.';
+
+  @override
+  String get reportCouldNotSend => 'Could not send report. Please try again.';
+
+  @override
   String get gameCenter => '遊戲中心';
 
   @override

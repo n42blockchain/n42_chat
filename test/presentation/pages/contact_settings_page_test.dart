@@ -6,15 +6,60 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
+import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/domain/repositories/contact_repository.dart';
+import 'package:n42_chat/src/domain/repositories/content_report_repository.dart';
+import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/contact/contact_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/contact/contact_state.dart';
 import 'package:n42_chat/src/presentation/pages/contact/contact_settings_page.dart';
 
 class _ContactRepository extends Mock implements IContactRepository {}
+
+class _ReportRepository extends Mock implements IContentReportRepository {}
+
+class _ReportManager extends Mock implements MatrixClientManager {}
+
+class _ReportClient extends Mock implements matrix.Client {}
+
+class _ReportAuth extends Mock
+    implements IAuthRepository, IAccountBoundDeletionLifecycle {}
+
+class _ReportOwner {
+  _ReportOwner() {
+    when(() => manager.client).thenReturn(client);
+    when(() => client.userID).thenReturn('@me:hs.test');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => client.accessToken).thenAnswer((_) => token);
+    when(() => client.deviceID).thenReturn('device-A');
+    when(client.isLogged).thenReturn(true);
+    when(() => auth.currentAccountGeneration).thenReturn(generation);
+    getIt.pushNewScope();
+    getIt.registerSingleton<MatrixClientManager>(manager);
+    getIt.registerSingleton<IAuthRepository>(auth);
+    getIt.registerSingleton<IContentReportRepository>(reporter);
+    addTearDown(getIt.popScope);
+  }
+
+  final manager = _ReportManager();
+  final client = _ReportClient();
+  final auth = _ReportAuth();
+  final reporter = _ReportRepository();
+  bool current = true;
+  String token = 'session-A';
+
+  late final generation = AuthSessionInvalidation(
+    userId: '@me:hs.test',
+    homeserver: Uri.parse('https://hs.test'),
+    deviceId: 'device-A',
+    isCurrent: () => current,
+    matchesClient: (candidate) => identical(candidate, client),
+  );
+}
 
 class MockContactBloc extends Mock implements ContactBloc {
   @override
@@ -197,9 +242,17 @@ void main() {
       },
     );
 
-    testWidgets('report dialog submits successfully when reason is selected', (
+    testWidgets('report dialog waits for acknowledgement before success', (
       tester,
     ) async {
+      final owner = _ReportOwner();
+      final acknowledgement = Completer<void>();
+      when(
+        () => owner.reporter.reportUser(
+          userId: '@test:server.com',
+          reason: 'Spam\nDetails',
+        ),
+      ).thenAnswer((_) => acknowledgement.future);
       await tester.pumpWidget(
         buildTestWidget(
           const ContactSettingsPage(
@@ -218,13 +271,240 @@ void main() {
       // 选择 Spam 原因
       await tester.tap(find.text('Spam'));
       await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Details');
 
       // 点击提交
       await tester.tap(find.text('Confirm'));
+      await tester.pump();
+
+      expect(find.text('Report submitted'), findsNothing);
+      expect(find.text('Details'), findsOneWidget);
+      verify(
+        () => owner.reporter.reportUser(
+          userId: '@test:server.com',
+          reason: 'Spam\nDetails',
+        ),
+      ).called(1);
+
+      acknowledgement.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('Report submitted'), findsOneWidget);
+    });
+
+    testWidgets('failed report retains reason and description for retry', (
+      tester,
+    ) async {
+      final owner = _ReportOwner();
+      var attempts = 0;
+      when(
+        () => owner.reporter.reportUser(
+          userId: '@test:server.com',
+          reason: 'Spam\nDetails',
+        ),
+      ).thenAnswer((_) async {
+        attempts++;
+        if (attempts == 1) {
+          throw const ContentReportException(ContentReportFailure.transport);
+        }
+      });
+      await tester.pumpWidget(
+        buildTestWidget(
+          const ContactSettingsPage(
+            userId: '@test:server.com',
+            displayName: 'Test User',
+          ),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Report'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Spam'));
+      await tester.enterText(find.byType(TextField), 'Details');
+      await tester.tap(find.text('Confirm'));
       await tester.pumpAndSettle();
 
-      // 对话框应关闭，显示成功 SnackBar
+      expect(
+        find.text('Could not send report. Please try again.'),
+        findsOneWidget,
+      );
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('Report submitted'), findsNothing);
+      await tester.tap(find.text('Confirm'));
+      await tester.pumpAndSettle();
+      expect(attempts, 2);
       expect(find.text('Report submitted'), findsOneWidget);
+    });
+
+    testWidgets('unsupported homeserver leaves the report draft open', (
+      tester,
+    ) async {
+      final owner = _ReportOwner();
+      when(
+        () => owner.reporter.reportUser(
+          userId: '@test:server.com',
+          reason: 'Fraud',
+        ),
+      ).thenThrow(
+        const ContentReportException(ContentReportFailure.unsupported),
+      );
+      await tester.pumpWidget(
+        buildTestWidget(
+          const ContactSettingsPage(
+            userId: '@test:server.com',
+            displayName: 'Test User',
+          ),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Report'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Fraud'));
+      await tester.tap(find.text('Confirm'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('This homeserver does not support user reports.'),
+        findsOneWidget,
+      );
+      expect(find.text('Fraud'), findsOneWidget);
+      expect(find.text('Report submitted'), findsNothing);
+    });
+
+    testWidgets('duplicate report taps send only one request', (tester) async {
+      final owner = _ReportOwner();
+      final acknowledgement = Completer<void>();
+      when(
+        () => owner.reporter.reportUser(
+          userId: '@test:server.com',
+          reason: 'Spam',
+        ),
+      ).thenAnswer((_) => acknowledgement.future);
+      await tester.pumpWidget(
+        buildTestWidget(
+          const ContactSettingsPage(
+            userId: '@test:server.com',
+            displayName: 'Test User',
+          ),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Report'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Spam'));
+      await tester.tap(find.text('Confirm'));
+      await tester.pump();
+      await tester.tap(find.text('Confirm'));
+      await tester.pump();
+      verify(
+        () => owner.reporter.reportUser(
+          userId: '@test:server.com',
+          reason: 'Spam',
+        ),
+      ).called(1);
+      acknowledgement.complete();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('a stale dialog cannot send under a replacement account', (
+      tester,
+    ) async {
+      final owner = _ReportOwner();
+      await tester.pumpWidget(
+        buildTestWidget(
+          const ContactSettingsPage(
+            userId: '@test:server.com',
+            displayName: 'Test User',
+          ),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Report'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Spam'));
+      owner.current = false;
+      await tester.tap(find.text('Confirm'));
+      await tester.pump();
+      expect(
+        find.text('Account changed. Open this report again to send it.'),
+        findsOneWidget,
+      );
+      verifyNever(
+        () => owner.reporter.reportUser(
+          userId: any(named: 'userId'),
+          reason: any(named: 'reason'),
+        ),
+      );
+    });
+
+    testWidgets('a replaced token cannot send from the old dialog', (
+      tester,
+    ) async {
+      final owner = _ReportOwner();
+      await tester.pumpWidget(
+        buildTestWidget(
+          const ContactSettingsPage(
+            userId: '@test:server.com',
+            displayName: 'Test User',
+          ),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Report'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Spam'));
+      owner.token = 'session-B';
+      await tester.tap(find.text('Confirm'));
+      await tester.pump();
+      expect(
+        find.text('Account changed. Open this report again to send it.'),
+        findsOneWidget,
+      );
+      verifyNever(
+        () => owner.reporter.reportUser(
+          userId: any(named: 'userId'),
+          reason: any(named: 'reason'),
+        ),
+      );
+    });
+
+    testWidgets('A acknowledgement after ABA does not become new A success', (
+      tester,
+    ) async {
+      final owner = _ReportOwner();
+      final acknowledgement = Completer<void>();
+      when(
+        () => owner.reporter.reportUser(
+          userId: '@test:server.com',
+          reason: 'Spam',
+        ),
+      ).thenAnswer((_) => acknowledgement.future);
+      await tester.pumpWidget(
+        buildTestWidget(
+          const ContactSettingsPage(
+            userId: '@test:server.com',
+            displayName: 'Test User',
+          ),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Report'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Spam'));
+      await tester.tap(find.text('Confirm'));
+      await tester.pump();
+      owner.current = false;
+      acknowledgement.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('Report submitted'), findsNothing);
+      expect(
+        find.text('Account changed. Open this report again to send it.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('report dialog has optional description field', (tester) async {

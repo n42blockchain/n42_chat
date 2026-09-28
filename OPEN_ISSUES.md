@@ -11,6 +11,13 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
+### UGC-001 Matrix reporting still needs room, moment and operational acceptance
+
+- Severity: H
+- Added: 2026-09-28
+- Current state: Task 16D has an optional Matrix user/room report repository with stable-version and account-bound checks. The profile and contact user-report dialogs now await a homeserver acknowledgement and keep drafts on failure. Group room reporting is not yet exposed; Moments post/comment reports still need canonical room/event identity, and block controls still need no-client and account-switch truth. A protocol acknowledgement does not prove moderator receipt or action. Generated new UI strings are English fallbacks outside the source locale until localization is completed.
+- Next step: finish the bounded group, block, message-regression and canonical Moments UI/data-source slices, then run final Chat tests/localization audit. Separately confirm deployed homeserver support, owned moderation handling and synthetic device acceptance before claiming operational coverage.
+
 ### QR-001 Exact-asset payment requests need host integration
 
 - Severity: H
