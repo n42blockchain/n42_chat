@@ -22,6 +22,13 @@ class MatrixPendingDeletionStore {
   static const key = 'n42_chat_pending_deletion_cleanup_v1';
   static Future<void> _writeTail = Future<void>.value();
 
+  static bool _validHomeserver(Uri uri) =>
+      (uri.scheme == 'https' || uri.scheme == 'http') &&
+      uri.host.isNotEmpty &&
+      uri.userInfo.isEmpty &&
+      !uri.hasQuery &&
+      !uri.hasFragment;
+
   Future<void> _withWrite(Future<void> Function() action) {
     final previous = _writeTail;
     final done = Completer<void>();
@@ -60,7 +67,7 @@ class MatrixPendingDeletionStore {
           final deviceId = entry['deviceId'] as String;
           if (userId.isEmpty ||
               homeserver == null ||
-              homeserver.host.isEmpty ||
+              !_validHomeserver(homeserver) ||
               deviceId.isEmpty) {
             throw const FormatException(
               'Invalid pending Matrix deletion identity',
@@ -80,7 +87,7 @@ class MatrixPendingDeletionStore {
     required Uri homeserver,
     required String deviceId,
   }) => _withWrite(() async {
-    if (userId.isEmpty || homeserver.host.isEmpty || deviceId.isEmpty) {
+    if (userId.isEmpty || !_validHomeserver(homeserver) || deviceId.isEmpty) {
       throw ArgumentError('Invalid pending Matrix deletion identity');
     }
     final entries = await list();
