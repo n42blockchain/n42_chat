@@ -109,6 +109,14 @@ class MatrixAccountDeletionOperation {
   bool get isSameAccountGeneration =>
       generationIsSame() && _matchesCapturedClient;
 
+  bool get _hasSameIdentityReplacement {
+    final current = _manager.client;
+    return current != null &&
+        current.userID == userId &&
+        current.homeserver == homeserver &&
+        !isSameAccountGeneration;
+  }
+
   Future<void> request(AuthenticationData? auth) async {
     if (serverConfirmed || _requestInProgress || !isCurrentAccount) {
       throw StateError('Matrix deletion account changed or request is busy');
@@ -175,19 +183,36 @@ class MatrixAccountDeletionOperation {
     if (_cleanupInProgress) throw StateError('Matrix cleanup already running');
     _cleanupInProgress = true;
     try {
+      // These local records are keyed by user/homeserver, not generation.
+      // A newer login for that identity may own them even if old A succeeded.
+      if (_hasSameIdentityReplacement) {
+        return DeletionCleanupStatus.deferredClientClear;
+      }
       // SDK clear deletes this account's database without preserving inbound
       // keys or making a second server request. Never clear the current B SDK.
       if (!_clientCleared && isSameAccountGeneration) {
         await client.clear(reason: SessionClearReason.logout);
         _clientCleared = true;
       }
+      if (_hasSameIdentityReplacement) {
+        return DeletionCleanupStatus.deferredClientClear;
+      }
       await _roomKeys.deleteForIdentity(homeserver, userId);
+      if (_hasSameIdentityReplacement) {
+        return DeletionCleanupStatus.deferredClientClear;
+      }
       // Keep the A database mapping while its SDK data still needs a scoped
       // clear; otherwise a later retry loses the only path to that database.
       if (_clientCleared && deviceId != null) {
         await _accountSessions.forget(homeserver, userId, deviceId!);
       }
+      if (_hasSameIdentityReplacement) {
+        return DeletionCleanupStatus.deferredClientClear;
+      }
       await _storage.removeAccountIfMatches(userId, homeserver);
+      if (_hasSameIdentityReplacement) {
+        return DeletionCleanupStatus.deferredClientClear;
+      }
       await _storage.clearSessionIfMatches(userId, homeserver);
       return _clientCleared
           ? DeletionCleanupStatus.complete

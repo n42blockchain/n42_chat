@@ -369,6 +369,108 @@ void main() {
     verify(() => roomKeys.deleteForIdentity(server, userA)).called(1);
   });
 
+  test('old A cleanup cannot erase a newer same-identity generation', () async {
+    when(
+      () => a.deactivateAccount(auth: null, erase: true),
+    ).thenAnswer((_) async => IdServerUnbindResult.success);
+    final operation = MatrixAccountDeletionOperation.capture(
+      manager: manager,
+      storage: storage,
+      roomKeys: roomKeys,
+      accountSessions: index,
+      erase: true,
+      generationIsCurrent: () => true,
+    );
+    await operation.request(null);
+    when(() => b.userID).thenReturn(userA);
+    when(() => b.homeserver).thenReturn(server);
+    when(() => b.deviceID).thenReturn('new-device-A');
+    when(() => manager.client).thenReturn(b);
+    await storage.saveSession(
+      homeserver: server.toString(),
+      accessToken: 'new-A-token',
+      userId: userA,
+      deviceId: 'new-device-A',
+    );
+    await storage.addAccount(
+      userId: userA,
+      homeserver: server.toString(),
+      accessToken: 'new-A-token',
+      deviceId: 'new-device-A',
+    );
+
+    expect(
+      await operation.cleanup(receipt()),
+      DeletionCleanupStatus.deferredClientClear,
+    );
+    expect((await storage.getSession())?['deviceId'], 'new-device-A');
+    expect((await storage.getAccounts())[userA]?['deviceId'], 'new-device-A');
+    verifyNever(() => roomKeys.deleteForIdentity(server, userA));
+    verifyNever(() => a.clear(reason: SessionClearReason.logout));
+    verifyNever(() => b.clear(reason: SessionClearReason.logout));
+  });
+
+  test(
+    'same client ABA generation cannot clean newer identity cache',
+    () async {
+      var sameGeneration = true;
+      when(
+        () => a.deactivateAccount(auth: null, erase: true),
+      ).thenAnswer((_) async => IdServerUnbindResult.success);
+      final operation = MatrixAccountDeletionOperation.capture(
+        manager: manager,
+        storage: storage,
+        roomKeys: roomKeys,
+        accountSessions: index,
+        erase: true,
+        generationIsCurrent: () => sameGeneration,
+        generationIsSame: () => sameGeneration,
+      );
+      await operation.request(null);
+      sameGeneration = false;
+
+      expect(
+        await operation.cleanup(receipt()),
+        DeletionCleanupStatus.deferredClientClear,
+      );
+      verifyNever(() => roomKeys.deleteForIdentity(server, userA));
+      verifyNever(() => a.clear(reason: SessionClearReason.logout));
+    },
+  );
+
+  test('switch to same identity during A clear skips newer cache', () async {
+    final clearEntered = Completer<void>();
+    final clearRelease = Completer<void>();
+    when(
+      () => a.deactivateAccount(auth: null, erase: true),
+    ).thenAnswer((_) async => IdServerUnbindResult.success);
+    when(() => a.clear(reason: SessionClearReason.logout)).thenAnswer((
+      _,
+    ) async {
+      clearEntered.complete();
+      await clearRelease.future;
+    });
+    final operation = MatrixAccountDeletionOperation.capture(
+      manager: manager,
+      storage: storage,
+      roomKeys: roomKeys,
+      accountSessions: index,
+      erase: true,
+      generationIsCurrent: () => true,
+    );
+    await operation.request(null);
+    final pending = operation.cleanup(receipt());
+    await clearEntered.future;
+    when(() => b.userID).thenReturn(userA);
+    when(() => b.homeserver).thenReturn(server);
+    when(() => b.deviceID).thenReturn('new-device-A');
+    when(() => manager.client).thenReturn(b);
+    clearRelease.complete();
+
+    expect(await pending, DeletionCleanupStatus.deferredClientClear);
+    verifyNever(() => roomKeys.deleteForIdentity(server, userA));
+  });
+
   test(
     'generation change rejects an ABA retry on the same client object',
     () async {
