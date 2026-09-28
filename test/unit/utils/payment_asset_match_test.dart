@@ -250,4 +250,25 @@ void main() {
       expect(createExactPaymentRequestForAsset(ethNative), isNotNull);
     },
   );
+
+  test('receive choices keep distinct exact same-symbol assets', () {
+    expect(selectableReceiveAssets([ethUsdt, arbUsdt]), [ethUsdt, arbUsdt]);
+  });
+
+  test('receive choices exclude duplicate and incomplete exact identities', () {
+    const partial = TokenInfo(
+      symbol: 'USDT',
+      name: 'Partial',
+      decimals: 6,
+      chain: 'ETH',
+    );
+    expect(selectableReceiveAssets([ethUsdt, ethUsdt, partial]), isEmpty);
+  });
+
+  test('receive choices retain only unambiguous legacy symbols', () {
+    const legacy = TokenInfo(symbol: 'OLD', name: 'Old', decimals: 8);
+    const variant = TokenInfo(symbol: 'old', name: 'Variant', decimals: 8);
+    expect(selectableReceiveAssets([legacy]), [legacy]);
+    expect(selectableReceiveAssets([legacy, variant]), isEmpty);
+  });
 }

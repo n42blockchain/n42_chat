@@ -119,6 +119,36 @@ PaymentAssetResolution resolvePaymentAsset(
   );
 }
 
+/// Assets safe to offer for a receive QR or payment request selection.
+/// Duplicate exact identities and indistinguishable legacy tickers are hidden.
+List<TokenInfo> selectableReceiveAssets(Iterable<TokenInfo> supportedAssets) {
+  final assets = supportedAssets.toList(growable: false);
+  return assets
+      .where((asset) {
+        final hasIdentity =
+            asset.chain != null ||
+            asset.network != null ||
+            asset.assetType != null ||
+            asset.assetId != null;
+        if (hasIdentity) {
+          final request = createExactPaymentRequestForAsset(asset);
+          if (request == null) return false;
+          final resolution = resolvePaymentAsset(request, assets);
+          return resolution.status == PaymentAssetResolutionStatus.matched &&
+              identical(resolution.asset, asset);
+        }
+        return assets
+                .where(
+                  (candidate) =>
+                      candidate.symbol.toLowerCase() ==
+                      asset.symbol.toLowerCase(),
+                )
+                .length ==
+            1;
+      })
+      .toList(growable: false);
+}
+
 bool _matchesExactAsset(PaymentRequestData request, TokenInfo asset) {
   if (asset.chain != request.chain ||
       asset.network != request.network ||

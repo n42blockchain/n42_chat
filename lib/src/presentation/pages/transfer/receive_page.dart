@@ -6,6 +6,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/payment_asset_match.dart';
+import '../../../core/utils/payment_request_uri.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
 import '../../blocs/transfer/transfer_event.dart';
@@ -18,10 +20,7 @@ import 'merchant_qr_page.dart';
 class ReceivePage extends StatefulWidget {
   final String? roomId;
 
-  const ReceivePage({
-    super.key,
-    this.roomId,
-  });
+  const ReceivePage({super.key, this.roomId});
 
   @override
   State<ReceivePage> createState() => _ReceivePageState();
@@ -51,27 +50,57 @@ class _ReceivePageState extends State<ReceivePage> {
     final amount = _amountController.text.trim();
     final memo = _memoController.text.trim();
 
-    if (amount.isEmpty || double.tryParse(amount) == null) {
+    if (_selectedToken == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.transferPleaseEnterValidAmount ?? 'Please enter a valid amount')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.transferPleaseSelectToken ?? 'Please select a token',
+          ),
+        ),
       );
       return;
     }
 
-    if (_selectedToken == null) {
+    if (!isValidPaymentAmountForDecimals(amount, _selectedToken!.decimals)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context)?.transferPleaseSelectToken ?? 'Please select a token')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.transferPleaseEnterValidAmount ??
+                'Please enter a valid amount',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final selected = _selectedToken!;
+    final exact = _hasIdentity(selected);
+    if (exact &&
+        createExactPaymentRequestForAsset(selected, amount: amount) == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            S.of(context)?.transferAssetUnavailable ??
+                'Payment asset is unavailable',
+          ),
+        ),
       );
       return;
     }
 
     if (widget.roomId != null) {
-      context.read<TransferBloc>().add(CreatePaymentRequest(
-            roomId: widget.roomId!,
-            amount: amount,
-            token: _selectedToken!.symbol,
-            memo: memo.isNotEmpty ? memo : null,
-          ));
+      context.read<TransferBloc>().add(
+        CreatePaymentRequest(
+          roomId: widget.roomId!,
+          amount: amount,
+          token: _selectedToken!.symbol,
+          memo: memo.isNotEmpty ? memo : null,
+          chain: exact ? selected.chain : null,
+          network: exact ? selected.network : null,
+          assetType: exact ? selected.assetType : null,
+          assetId: exact ? selected.assetId : null,
+        ),
+      );
     }
   }
 
@@ -81,9 +110,12 @@ class _ReceivePageState extends State<ReceivePage> {
       listener: (context, state) {
         if (state.status == TransferBlocStatus.paymentCreated) {
           Navigator.pop(context, state.paymentRequest!);
-        } else if (state.status == TransferBlocStatus.failure && state.errorMessage != null) {
+        } else if (state.status == TransferBlocStatus.failure &&
+            state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(resolveBlocMessage(context, state.errorMessage!))),
+            SnackBar(
+              content: Text(resolveBlocMessage(context, state.errorMessage!)),
+            ),
           );
         }
       },
@@ -93,9 +125,19 @@ class _ReceivePageState extends State<ReceivePage> {
 
         if (state.status == TransferBlocStatus.walletLoaded) {
           walletAddress = state.walletAddress;
-          tokens = state.tokens;
+          tokens = selectableReceiveAssets(state.tokens);
 
-          if (_selectedToken == null && tokens.isNotEmpty) {
+          if (_selectedToken != null &&
+              !tokens.any((token) => identical(token, _selectedToken))) {
+            _selectedToken = null;
+          }
+
+          if (_selectedToken == null &&
+              tokens.isNotEmpty &&
+              tokens
+                      .where((token) => token.symbol == tokens.first.symbol)
+                      .length ==
+                  1) {
             _selectedToken = tokens.first;
           }
         }
@@ -128,8 +170,12 @@ class _ReceivePageState extends State<ReceivePage> {
       return Center(
         child: N42EmptyState(
           icon: Icons.account_balance_wallet_outlined,
-          title: S.of(context)?.transferWalletNotConnected ?? 'Wallet Not Connected',
-          description: S.of(context)?.transferPleaseConnectWallet ?? 'Please connect your wallet first',
+          title:
+              S.of(context)?.transferWalletNotConnected ??
+              'Wallet Not Connected',
+          description:
+              S.of(context)?.transferPleaseConnectWallet ??
+              'Please connect your wallet first',
         ),
       );
     }
@@ -139,12 +185,17 @@ class _ReceivePageState extends State<ReceivePage> {
       child: Column(
         children: [
           // 收款二维码
+          _buildTokenSelector(tokens),
+
+          const SizedBox(height: 16),
+
           _buildQRCode(walletAddress),
 
           const SizedBox(height: 24),
 
           // 钱包地址
-          _buildAddressSection(walletAddress),
+          if (_receiveAddress(walletAddress) != null)
+            _buildAddressSection(_receiveAddress(walletAddress)!),
 
           const SizedBox(height: 32),
 
@@ -155,9 +206,7 @@ class _ReceivePageState extends State<ReceivePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute<void>(
-                  builder: (_) => const MerchantQrPage(),
-                ),
+                MaterialPageRoute<void>(builder: (_) => const MerchantQrPage()),
               );
             },
           ),
@@ -167,7 +216,9 @@ class _ReceivePageState extends State<ReceivePage> {
             const SizedBox(height: 16),
             if (!_showRequestForm) ...[
               N42Button(
-                text: S.of(context)?.transferSendPaymentRequest ?? 'Send Payment Request',
+                text:
+                    S.of(context)?.transferSendPaymentRequest ??
+                    'Send Payment Request',
                 type: N42ButtonType.secondary,
                 onPressed: () {
                   setState(() {
@@ -185,6 +236,15 @@ class _ReceivePageState extends State<ReceivePage> {
   }
 
   Widget _buildQRCode(String walletAddress) {
+    final asset = _selectedToken;
+    final request = asset != null && _hasIdentity(asset)
+        ? createExactPaymentRequestForAsset(asset)
+        : null;
+    final data = asset == null
+        ? null
+        : _hasIdentity(asset)
+        ? (request == null ? null : PaymentRequestUri.encode(request))
+        : asset.receiverAddress ?? walletAddress;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -200,15 +260,30 @@ class _ReceivePageState extends State<ReceivePage> {
       ),
       child: Column(
         children: [
-          QrImageView(
-            data: walletAddress,
-            version: QrVersions.auto,
-            size: 200,
-            backgroundColor: Colors.white,
-            errorStateBuilder: (ctx, error) => Center(
-              child: Text(S.of(context)?.transferQrCodeGenerateFailed ?? 'QR code generation failed'),
+          if (data != null)
+            QrImageView(
+              key: ValueKey<String>(data),
+              data: data,
+              version: QrVersions.auto,
+              size: 200,
+              backgroundColor: Colors.white,
+              errorStateBuilder: (ctx, error) => Center(
+                child: Text(
+                  S.of(context)?.transferQrCodeGenerateFailed ??
+                      'QR code generation failed',
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: 200,
+              child: Center(
+                child: Text(
+                  S.of(context)?.transferAssetUnavailable ??
+                      'Payment asset is unavailable',
+                ),
+              ),
             ),
-          ),
           const SizedBox(height: 16),
           Text(
             S.of(context)?.transferScanQrToPayMe ?? 'Scan QR code to pay me',
@@ -222,6 +297,46 @@ class _ReceivePageState extends State<ReceivePage> {
     );
   }
 
+  bool _hasIdentity(TokenInfo asset) =>
+      asset.chain != null ||
+      asset.network != null ||
+      asset.assetType != null ||
+      asset.assetId != null;
+
+  String? _receiveAddress(String walletAddress) {
+    final asset = _selectedToken;
+    if (asset == null) return null;
+    return _hasIdentity(asset)
+        ? createExactPaymentRequestForAsset(asset)?.receiverAddress
+        : asset.receiverAddress ?? walletAddress;
+  }
+
+  Widget _buildTokenSelector(
+    List<TokenInfo> tokens,
+  ) => DropdownButtonFormField<TokenInfo>(
+    isExpanded: true,
+    initialValue: _selectedToken,
+    decoration: InputDecoration(
+      labelText: S.of(context)?.transferSelectToken ?? 'Select Token',
+      border: const OutlineInputBorder(),
+    ),
+    items: tokens
+        .map(
+          (token) => DropdownMenuItem(
+            value: token,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '${token.symbol} - ${token.name} · ${token.chain ?? ''} ${token.network ?? ''} ${token.assetId ?? ''}',
+              ),
+            ),
+          ),
+        )
+        .toList(),
+    onChanged: (value) => setState(() => _selectedToken = value),
+  );
+
   Widget _buildAddressSection(String walletAddress) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -234,10 +349,7 @@ class _ReceivePageState extends State<ReceivePage> {
         children: [
           Text(
             S.of(context)?.transferMyWalletAddress ?? 'My Wallet Address',
-            style: TextStyle(
-              fontSize: 13,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: context.textSecondary),
           ),
           const SizedBox(height: 8),
           Row(
@@ -257,7 +369,11 @@ class _ReceivePageState extends State<ReceivePage> {
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: walletAddress));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(S.of(context)?.commonAddressCopied ?? 'Address copied')),
+                    SnackBar(
+                      content: Text(
+                        S.of(context)?.commonAddressCopied ?? 'Address copied',
+                      ),
+                    ),
                   );
                 },
               ),
@@ -279,7 +395,8 @@ class _ReceivePageState extends State<ReceivePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            S.of(context)?.transferCreatePaymentRequest ?? 'Create Payment Request',
+            S.of(context)?.transferCreatePaymentRequest ??
+                'Create Payment Request',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -290,23 +407,10 @@ class _ReceivePageState extends State<ReceivePage> {
           const SizedBox(height: 16),
 
           // 代币选择
-          DropdownButtonFormField<TokenInfo>(
-            initialValue: _selectedToken,
-            decoration: InputDecoration(
-              labelText: S.of(context)?.transferSelectToken ?? 'Select Token',
-              border: const OutlineInputBorder(),
-            ),
-            items: tokens.map((token) {
-              return DropdownMenuItem(
-                value: token,
-                child: Text('${token.symbol} - ${token.name}'),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedToken = value;
-              });
-            },
+          Text(
+            _selectedToken?.name ??
+                (S.of(context)?.transferPleaseSelectToken ??
+                    'Please select a token'),
           ),
 
           const SizedBox(height: 16),
@@ -328,7 +432,8 @@ class _ReceivePageState extends State<ReceivePage> {
           TextField(
             controller: _memoController,
             decoration: InputDecoration(
-              labelText: S.of(context)?.transferMemoOptional ?? 'Memo (optional)',
+              labelText:
+                  S.of(context)?.transferMemoOptional ?? 'Memo (optional)',
               border: const OutlineInputBorder(),
             ),
           ),
@@ -363,4 +468,3 @@ class _ReceivePageState extends State<ReceivePage> {
     );
   }
 }
-
