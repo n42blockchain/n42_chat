@@ -237,8 +237,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         token == null ||
         token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Payment request is unavailable'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.transferPaymentRequestUnavailable ??
+                'Payment request is unavailable',
+          ),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -268,21 +271,6 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           content: Text(
             S.of(context)?.commonWaitingToReceive ?? 'Waiting to receive',
           ),
-        ),
-      );
-      return;
-    }
-
-    // This entry still selects by ticker. Exact requests need asset-aware
-    // selection before this page can safely fulfill them.
-    if (metadata?.paymentChain != null ||
-        metadata?.paymentNetwork != null ||
-        metadata?.paymentAssetType != null ||
-        metadata?.paymentAssetId != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Payment request is unavailable'),
-          backgroundColor: AppColors.warning,
         ),
       );
       return;
