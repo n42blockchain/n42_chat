@@ -6,11 +6,14 @@ import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart'
 import 'package:n42_chat/src/data/datasources/matrix/matrix_moment_datasource.dart';
 import 'package:n42_chat/src/data/repositories/moment_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/moment_entity.dart';
+import 'package:n42_chat/src/domain/repositories/moment_repository.dart';
 
 class MockMatrixMomentDataSource extends Mock
     implements MatrixMomentDataSource {}
 
 class MockPreferencesDataSource extends Mock implements PreferencesDataSource {}
+
+class _LegacyMomentRepository extends Mock implements IMomentRepository {}
 
 void main() {
   late MomentRepositoryImpl repository;
@@ -181,5 +184,33 @@ void main() {
 
       verify(() => mockMomentDS.deleteMoment(momentId)).called(1);
     });
+  });
+
+  test('optional report capability leaves legacy repository implementers valid',
+      () async {
+    expect(_LegacyMomentRepository(), isA<IMomentRepository>());
+    expect(repository, isA<IMomentReportRepository>());
+    final post = makeMoment('same').copyWith(
+      sourceRoomId: '!a:hs.test',
+      sourceEventId: r'$real-post',
+    );
+    final comment = MomentComment(
+      id: 'comment-id',
+      userId: '@other:hs.test',
+      userName: 'Other',
+      content: 'Text',
+      timestamp: DateTime.utc(2026),
+      sourceRoomId: '!a:hs.test',
+      sourceEventId: r'$real-comment',
+    );
+    when(() => mockMomentDS.reportMoment(post, 'Spam'))
+        .thenAnswer((_) async {});
+    when(() => mockMomentDS.reportComment(post, comment, 'Abuse'))
+        .thenAnswer((_) async {});
+    final reports = repository as IMomentReportRepository;
+    await reports.reportMoment(post, 'Spam');
+    await reports.reportComment(post, comment, 'Abuse');
+    verify(() => mockMomentDS.reportMoment(post, 'Spam')).called(1);
+    verify(() => mockMomentDS.reportComment(post, comment, 'Abuse')).called(1);
   });
 }

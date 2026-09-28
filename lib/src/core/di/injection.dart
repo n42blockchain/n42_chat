@@ -764,7 +764,15 @@ Future<void> _registerDataSources() async {
 
   // Matrix动态数据源
   getIt.registerLazySingleton<MatrixMomentDataSource>(
-    () => MatrixMomentDataSource(getIt<MatrixClientManager>()),
+    () {
+      final auth = getIt<IAuthRepository>();
+      return MatrixMomentDataSource(
+        getIt<MatrixClientManager>(),
+        accountLifecycle: auth is IAccountBoundDeletionLifecycle
+            ? auth as IAccountBoundDeletionLifecycle
+            : null,
+      );
+    },
   );
 
   // Matrix贴纸数据源

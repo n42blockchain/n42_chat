@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'dart:async';
+import 'dart:io';
 import 'package:async/async.dart';
+import 'package:http/http.dart' as http;
 import 'contact_privacy_service.dart';
 import 'message/direct_chat_send_guard.dart';
 
@@ -9,6 +11,8 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../../core/utils/friendly_display_name.dart';
 import '../../../core/utils/matrix_utils.dart';
 import '../../../domain/entities/moment_entity.dart';
+import '../../../domain/repositories/auth_repository.dart';
+import '../../../domain/repositories/content_report_repository.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -18,6 +22,7 @@ import '../../../core/utils/debug_log.dart';
 /// 动态存储在用户的个人状态房间中，使用自定义事件类型
 class MatrixMomentDataSource {
   final MatrixClientManager _clientManager;
+  final IAccountBoundDeletionLifecycle? accountLifecycle;
 
   /// 动态事件类型
   static const String momentEventType = 'n42.moment';
@@ -40,7 +45,10 @@ class MatrixMomentDataSource {
   /// momentId → eventId 索引
   final Map<String, String> _momentEventIndex = {};
 
-  MatrixMomentDataSource(this._clientManager);
+  MatrixMomentDataSource(
+    this._clientManager, {
+    this.accountLifecycle,
+  });
 
   final Set<String> _deletedMomentIds = {};
   matrix.Client? _cacheClient;
@@ -62,6 +70,163 @@ class MatrixMomentDataSource {
 
   /// 公开当前用户ID（供 Repository 使用）
   String? get currentUserId => _currentUserId;
+
+  /// Report a post only after resolving its exact Matrix event.
+  Future<void> reportMoment(MomentEntity moment, String reason) =>
+      _reportCanonicalEvent(
+        roomId: moment.sourceRoomId,
+        eventId: moment.sourceEventId,
+        type: momentEventType,
+        senderId: moment.userId,
+        momentId: moment.id,
+        reason: reason,
+      );
+
+  /// Report the comment event, never its parent post event.
+  Future<void> reportComment(
+    MomentEntity moment,
+    MomentComment comment,
+    String reason,
+  ) {
+    if (comment.sourceRoomId == null ||
+        comment.sourceRoomId != moment.sourceRoomId ||
+        moment.sourceEventId == null) {
+      throw const ContentReportException(ContentReportFailure.unavailable);
+    }
+    return _reportCanonicalEvent(
+      roomId: comment.sourceRoomId,
+      eventId: comment.sourceEventId,
+      type: momentCommentEventType,
+      senderId: comment.userId,
+      momentId: moment.id,
+      commentId: comment.id,
+      parentEventId: moment.sourceEventId,
+      reason: reason,
+    );
+  }
+
+  Future<void> _reportCanonicalEvent({
+    required String? roomId,
+    required String? eventId,
+    required String type,
+    required String senderId,
+    required String momentId,
+    String? commentId,
+    String? parentEventId,
+    required String reason,
+  }) async {
+    if (roomId == null ||
+        !roomId.startsWith('!') ||
+        !roomId.contains(':') ||
+        eventId == null ||
+        !eventId.startsWith(r'$') ||
+        momentId.isEmpty ||
+        senderId.isEmpty) {
+      throw const ContentReportException(ContentReportFailure.unavailable);
+    }
+    final client = _clientManager.client;
+    final lifecycle = accountLifecycle;
+    final generation = lifecycle?.currentAccountGeneration;
+    final account = client?.userID;
+    final homeserver = client?.homeserver;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    if (client == null ||
+        lifecycle == null ||
+        generation == null ||
+        !client.isLogged() ||
+        account == null ||
+        homeserver == null ||
+        token == null ||
+        !generation.isCurrent ||
+        !generation.matchesClient(client) ||
+        generation.userId != account ||
+        generation.homeserver != homeserver ||
+        generation.deviceId != device) {
+      throw const ContentReportException(ContentReportFailure.unavailable);
+    }
+    bool sameOrigin() =>
+        identical(_clientManager.client, client) &&
+        identical(lifecycle.currentAccountGeneration, generation) &&
+        generation.isCurrent &&
+        generation.matchesClient(client) &&
+        client.isLogged() &&
+        client.userID == account &&
+        client.homeserver == homeserver &&
+        client.accessToken == token &&
+        client.deviceID == device;
+    void checkOrigin() {
+      if (!sameOrigin()) {
+        throw const ContentReportException(ContentReportFailure.accountChanged);
+      }
+    }
+
+    try {
+      final room = client.getRoomById(roomId);
+      if (room == null ||
+          room.id != roomId ||
+          room.membership != matrix.Membership.join) {
+        throw const ContentReportException(ContentReportFailure.unavailable);
+      }
+      checkOrigin();
+      final event = await room.getEventById(eventId);
+      checkOrigin();
+      if (event == null ||
+          event.eventId != eventId ||
+          event.room.id != roomId ||
+          event.type != type ||
+          event.senderId != senderId ||
+          event.redacted ||
+          event.content['moment_id'] != momentId ||
+          (commentId != null && event.content['comment_id'] != commentId) ||
+          (parentEventId != null &&
+              event.content['moment_event_id'] != parentEventId)) {
+        throw const ContentReportException(ContentReportFailure.unavailable);
+      }
+      checkOrigin();
+      await client.reportEvent(roomId, eventId, reason: reason);
+      checkOrigin();
+    } on ContentReportException {
+      checkOrigin();
+      rethrow;
+    } on matrix.MatrixException catch (error) {
+      checkOrigin();
+      throw switch (error.error) {
+        matrix.MatrixError.M_UNRECOGNIZED => const ContentReportException(
+          ContentReportFailure.unsupported,
+        ),
+        matrix.MatrixError.M_NOT_FOUND => const ContentReportException(
+          ContentReportFailure.subjectNotFound,
+        ),
+        matrix.MatrixError.M_FORBIDDEN => const ContentReportException(
+          ContentReportFailure.forbidden,
+        ),
+        matrix.MatrixError.M_UNAUTHORIZED ||
+        matrix.MatrixError.M_UNKNOWN_TOKEN => const ContentReportException(
+          ContentReportFailure.unauthorized,
+        ),
+        matrix.MatrixError.M_LIMIT_EXCEEDED => ContentReportException(
+          ContentReportFailure.rateLimited,
+          retryAfter: error.retryAfterMs == null || error.retryAfterMs! < 0
+              ? null
+              : Duration(milliseconds: error.retryAfterMs!),
+        ),
+        _ => const ContentReportException(ContentReportFailure.server),
+      };
+    } on TimeoutException {
+      checkOrigin();
+      throw const ContentReportException(ContentReportFailure.transport);
+    } on IOException {
+      checkOrigin();
+      throw const ContentReportException(ContentReportFailure.transport);
+    } on http.ClientException {
+      checkOrigin();
+      throw const ContentReportException(ContentReportFailure.transport);
+    } catch (_) {
+      checkOrigin();
+      rethrow;
+    }
+  }
 
   ContactPrivacyService get _privacy => ContactPrivacyService(_clientManager);
   static const String momentInviteReason = ContactPrivacyService.momentReason;
@@ -359,6 +524,8 @@ class MatrixMomentDataSource {
 
     final entity = MomentEntity(
       id: momentId,
+      sourceRoomId: room.id,
+      sourceEventId: sentEventId,
       userId: userId,
       userName: FriendlyDisplayName.resolve(
         displayName: user.displayName,
@@ -664,6 +831,8 @@ class MatrixMomentDataSource {
           comments.add(
             MomentComment(
               id: content['comment_id'] as String,
+              sourceRoomId: room.id,
+              sourceEventId: event.eventId,
               userId: event.senderId,
               userName: FriendlyDisplayName.resolve(
                 displayName: user.displayName,
@@ -760,6 +929,8 @@ class MatrixMomentDataSource {
 
       return MomentEntity(
         id: content['moment_id'] as String? ?? event.eventId,
+        sourceRoomId: room.id,
+        sourceEventId: event.eventId,
         userId: event.senderId,
         userName: FriendlyDisplayName.resolve(
           displayName: user.displayName,
