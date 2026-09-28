@@ -13,15 +13,29 @@ import '../../../domain/repositories/content_report_repository.dart';
 Future<void> showUserReportDialog(
   BuildContext context, {
   required String userId,
+}) => _showReportDialog(context, userId: userId);
+
+/// Opens a room report using the exact Matrix room ID.
+Future<void> showRoomReportDialog(
+  BuildContext context, {
+  required String roomId,
+}) => _showReportDialog(context, roomId: roomId);
+
+Future<void> _showReportDialog(
+  BuildContext context, {
+  String? userId,
+  String? roomId,
 }) {
+  assert((userId == null) != (roomId == null));
   final origin = _ReportOrigin.capture();
   final repository = getIt.isRegistered<IContentReportRepository>()
       ? getIt<IContentReportRepository>()
       : null;
   return showDialog<void>(
     context: context,
-    builder: (_) => _UserReportDialog(
+    builder: (_) => _ContentReportDialog(
       userId: userId,
+      roomId: roomId,
       repository: repository,
       origin: origin,
     ),
@@ -96,22 +110,24 @@ class _ReportOrigin {
       client.deviceID == deviceId;
 }
 
-class _UserReportDialog extends StatefulWidget {
-  const _UserReportDialog({
+class _ContentReportDialog extends StatefulWidget {
+  const _ContentReportDialog({
     required this.userId,
+    required this.roomId,
     required this.repository,
     required this.origin,
   });
 
-  final String userId;
+  final String? userId;
+  final String? roomId;
   final IContentReportRepository? repository;
   final _ReportOrigin? origin;
 
   @override
-  State<_UserReportDialog> createState() => _UserReportDialogState();
+  State<_ContentReportDialog> createState() => _ContentReportDialogState();
 }
 
-class _UserReportDialogState extends State<_UserReportDialog> {
+class _ContentReportDialogState extends State<_ContentReportDialog> {
   final _description = TextEditingController();
   String? _reason;
   String? _error;
@@ -157,7 +173,11 @@ class _UserReportDialogState extends State<_UserReportDialog> {
       _error = null;
     });
     try {
-      await repository.reportUser(userId: widget.userId, reason: details);
+      if (widget.roomId case final roomId?) {
+        await repository.reportRoom(roomId: roomId, reason: details);
+      } else {
+        await repository.reportUser(userId: widget.userId!, reason: details);
+      }
     } on ContentReportException catch (error) {
       if (!mounted) return;
       setState(() {
@@ -210,8 +230,11 @@ class _UserReportDialogState extends State<_UserReportDialog> {
     ContentReportFailure.unavailable || ContentReportFailure.unauthorized =>
       l10n?.reportUnavailable ?? 'Sign in to send a report.',
     ContentReportFailure.unsupported =>
-      l10n?.reportUnsupported ??
-          'This homeserver does not support user reports.',
+      widget.roomId == null
+          ? (l10n?.reportUnsupported ??
+                'This homeserver does not support user reports.')
+          : (l10n?.reportRoomUnsupported ??
+                'This homeserver does not support room reports.'),
     ContentReportFailure.rateLimited =>
       l10n?.reportRateLimited ?? 'Too many reports. Please try again later.',
     _ => l10n?.reportCouldNotSend ?? 'Could not send report. Please try again.',

@@ -2355,6 +2355,7 @@
   "reportUnavailable": "Sign in to send a report.",
   "reportAccountChanged": "Account changed. Open this report again to send it.",
   "reportUnsupported": "This homeserver does not support user reports.",
+  "reportRoomUnsupported": "This homeserver does not support room reports.",
   "reportRateLimited": "Too many reports. Please try again later.",
   "reportCouldNotSend": "Could not send report. Please try again.",
   "gameCenter": "Games",

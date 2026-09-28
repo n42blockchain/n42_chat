@@ -17,6 +17,7 @@ import '../../blocs/search/search_bloc.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/common/user_report_dialog.dart';
 import '../../widgets/chat/group_points_entry.dart';
 import '../search/chat_search_page.dart';
 import 'bot_settings_page.dart';
@@ -604,7 +605,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       }
     }
 
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: Column(children: widgets),
     );
@@ -619,7 +620,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   }
 
   Widget _buildActionSection(GroupEntity group, bool isDark) {
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: Column(
         children: [
@@ -1015,6 +1016,14 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               onTap: () async {
                 Navigator.pop(sheetContext);
                 await _searchChatHistory();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.report_outlined),
+              title: Text(S.of(context)?.commonReport ?? 'Report'),
+              onTap: () async {
+                Navigator.pop(sheetContext);
+                await showRoomReportDialog(context, roomId: widget.roomId);
               },
             ),
           ],

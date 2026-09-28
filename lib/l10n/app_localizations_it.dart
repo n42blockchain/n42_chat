@@ -5041,6 +5041,10 @@ class SIt extends S {
       'This homeserver does not support user reports.';
 
   @override
+  String get reportRoomUnsupported =>
+      'This homeserver does not support room reports.';
+
+  @override
   String get reportRateLimited => 'Too many reports. Please try again later.';
 
   @override

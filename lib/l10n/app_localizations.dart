@@ -9281,6 +9281,12 @@ abstract class S {
   /// **'This homeserver does not support user reports.'**
   String get reportUnsupported;
 
+  /// No description provided for @reportRoomUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This homeserver does not support room reports.'**
+  String get reportRoomUnsupported;
+
   /// No description provided for @reportRateLimited.
   ///
   /// In en, this message translates to:
