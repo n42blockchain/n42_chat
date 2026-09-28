@@ -287,6 +287,12 @@ class PaymentRequest {
   /// 代币符号
   final String token;
 
+  /// Optional exact asset identity, absent on legacy requests.
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
+
   /// 收款地址
   final String receiverAddress;
 
@@ -306,6 +312,10 @@ class PaymentRequest {
     required this.requestId,
     required this.amount,
     required this.token,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
     required this.receiverAddress,
     this.memo,
     required this.qrCodeData,
