@@ -1,9 +1,7 @@
 import '../../../data/datasources/matrix/message/encrypted_send_guard.dart';
 import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart' as matrix;
 import '../../../core/services/friend_details_store.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
-import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -12,8 +10,8 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/repositories/contact_repository.dart';
-import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
+import '../../blocs/contact/contact_block_origin.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
@@ -22,61 +20,6 @@ import '../../widgets/common/user_report_dialog.dart';
 import 'contact_detail_page.dart';
 import 'contact_permissions_page.dart';
 import '../../../core/utils/debug_log.dart';
-
-class _BlockOrigin {
-  _BlockOrigin(this.manager, this.lifecycle, this.client, this.generation)
-    : userId = client.userID!,
-      homeserver = client.homeserver!,
-      token = client.accessToken!,
-      deviceId = client.deviceID;
-
-  final MatrixClientManager manager;
-  final IAccountBoundDeletionLifecycle lifecycle;
-  final matrix.Client client;
-  final AuthSessionInvalidation generation;
-  final String userId;
-  final Uri homeserver;
-  final String token;
-  final String? deviceId;
-
-  static _BlockOrigin? capture() {
-    if (!getIt.isRegistered<MatrixClientManager>() ||
-        !getIt.isRegistered<IAuthRepository>()) {
-      return null;
-    }
-    final manager = getIt<MatrixClientManager>();
-    final auth = getIt<IAuthRepository>();
-    if (auth is! IAccountBoundDeletionLifecycle) return null;
-    final lifecycle = auth as IAccountBoundDeletionLifecycle;
-    final client = manager.client;
-    final generation = lifecycle.currentAccountGeneration;
-    if (client == null ||
-        generation == null ||
-        !client.isLogged() ||
-        client.userID == null ||
-        client.homeserver == null ||
-        client.accessToken == null ||
-        !generation.isCurrent ||
-        !generation.matchesClient(client) ||
-        generation.userId != client.userID ||
-        generation.homeserver != client.homeserver ||
-        generation.deviceId != client.deviceID) {
-      return null;
-    }
-    return _BlockOrigin(manager, lifecycle, client, generation);
-  }
-
-  bool get isCurrent =>
-      identical(lifecycle.currentAccountGeneration, generation) &&
-      generation.isCurrent &&
-      generation.matchesClient(client) &&
-      identical(manager.client, client) &&
-      client.isLogged() &&
-      client.userID == userId &&
-      client.homeserver == homeserver &&
-      client.accessToken == token &&
-      client.deviceID == deviceId;
-}
 
 /// 联系人设置页面（仿微信 - 图二）
 class ContactSettingsPage extends StatefulWidget {
@@ -98,7 +41,7 @@ class ContactSettingsPage extends StatefulWidget {
 }
 
 class _ContactSettingsPageState extends State<ContactSettingsPage> {
-  late final _BlockOrigin? _blockOrigin;
+  late final ContactBlockOrigin? _blockOrigin;
   late bool _isStarred;
   bool _isBlocked = false;
   bool _isDeleting = false;
@@ -111,7 +54,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   @override
   void initState() {
     super.initState();
-    _blockOrigin = _BlockOrigin.capture();
+    _blockOrigin = ContactBlockOrigin.capture();
     _isStarred = widget.isStarred;
     _loadStar();
     try {

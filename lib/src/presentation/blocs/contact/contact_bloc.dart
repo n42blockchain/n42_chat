@@ -6,6 +6,7 @@ import '../../../core/services/remark_service.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import 'contact_event.dart';
+import 'contact_block_origin.dart';
 import 'contact_state.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -245,10 +246,14 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     IgnoreUser event,
     Emitter<ContactState> emit,
   ) async {
+    final origin = event.origin ?? ContactBlockOrigin.capture();
+    if (origin != null && !origin.isCurrent) return;
     try {
       await _contactRepository.ignoreUser(event.userId);
+      if (origin != null && !origin.isCurrent) return;
       add(const RefreshContacts());
     } catch (e) {
+      if (origin != null && !origin.isCurrent) return;
       emit(
         state.copyWith(status: ContactStatus.error, errorMessage: e.toString()),
       );
@@ -259,10 +264,14 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     UnignoreUser event,
     Emitter<ContactState> emit,
   ) async {
+    final origin = event.origin ?? ContactBlockOrigin.capture();
+    if (origin != null && !origin.isCurrent) return;
     try {
       await _contactRepository.unignoreUser(event.userId);
+      if (origin != null && !origin.isCurrent) return;
       add(const RefreshContacts());
     } catch (e) {
+      if (origin != null && !origin.isCurrent) return;
       emit(
         state.copyWith(status: ContactStatus.error, errorMessage: e.toString()),
       );

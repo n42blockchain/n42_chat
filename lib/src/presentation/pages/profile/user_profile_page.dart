@@ -12,6 +12,7 @@ import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../widgets/chat/contact_card_select_sheet.dart';
 import '../../blocs/contact/contact_bloc.dart';
+import '../../blocs/contact/contact_block_origin.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -33,6 +34,7 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
+  late final ContactBlockOrigin? _blockOrigin;
   ContactEntity? _contact;
   bool _isLoading = true;
   bool _isSavingRemark = false;
@@ -41,6 +43,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   void initState() {
     super.initState();
+    _blockOrigin = ContactBlockOrigin.capture();
     _loadUserProfile();
   }
 
@@ -548,6 +551,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _toggleBlock() {
+    final origin = _blockOrigin;
+    if (origin == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.commonSaveFailed ?? 'Failed to save'),
+        ),
+      );
+      return;
+    }
+    if (!origin.isCurrent) return;
     final isBlocked = getIt<IContactRepository>().isUserIgnored(widget.userId);
 
     showDialog<void>(
@@ -573,11 +586,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ),
           TextButton(
             onPressed: () {
+              if (!origin.isCurrent) {
+                Navigator.pop(dialogContext);
+                return;
+              }
               Navigator.pop(dialogContext);
               if (isBlocked) {
-                context.read<ContactBloc>().add(UnignoreUser(widget.userId));
+                context.read<ContactBloc>().add(
+                  UnignoreUser(widget.userId, origin: origin),
+                );
               } else {
-                context.read<ContactBloc>().add(IgnoreUser(widget.userId));
+                context.read<ContactBloc>().add(
+                  IgnoreUser(widget.userId, origin: origin),
+                );
               }
             },
             child: Text(

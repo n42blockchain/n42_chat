@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 
+import 'contact_block_origin.dart';
+
 /// 联系人事件基类
 abstract class ContactEvent extends Equatable {
   const ContactEvent();
@@ -64,21 +66,23 @@ class StartChat extends ContactEvent {
 /// 忽略用户
 class IgnoreUser extends ContactEvent {
   final String userId;
+  final ContactBlockOrigin? origin;
 
-  const IgnoreUser(this.userId);
+  const IgnoreUser(this.userId, {this.origin});
 
   @override
-  List<Object?> get props => [userId];
+  List<Object?> get props => [userId, origin];
 }
 
 /// 取消忽略用户
 class UnignoreUser extends ContactEvent {
   final String userId;
+  final ContactBlockOrigin? origin;
 
-  const UnignoreUser(this.userId);
+  const UnignoreUser(this.userId, {this.origin});
 
   @override
-  List<Object?> get props => [userId];
+  List<Object?> get props => [userId, origin];
 }
 
 /// 加载好友请求
