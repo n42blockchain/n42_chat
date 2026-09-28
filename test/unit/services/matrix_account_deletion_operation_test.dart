@@ -96,6 +96,93 @@ void main() {
     },
   );
 
+  test('bound lifecycle wraps only the captured server request', () async {
+    final order = <String>[];
+    when(() => a.deactivateAccount(auth: null, erase: true)).thenAnswer((
+      _,
+    ) async {
+      order.add('server');
+      return IdServerUnbindResult.success;
+    });
+    final operation = MatrixAccountDeletionOperation.capture(
+      manager: manager,
+      storage: storage,
+      roomKeys: roomKeys,
+      accountSessions: index,
+      erase: true,
+      generationIsCurrent: () => true,
+      runBoundRequest: (request) async {
+        order.add('guard-before');
+        await request();
+        order.add('guard-after');
+      },
+    );
+
+    await operation.request(null);
+
+    expect(order, ['guard-before', 'server', 'guard-after']);
+    expect(operation.serverConfirmed, isTrue);
+    verifyNever(() => a.clear(reason: SessionClearReason.logout));
+  });
+
+  test('failed bound request never confirms server deletion', () async {
+    final operation = MatrixAccountDeletionOperation.capture(
+      manager: manager,
+      storage: storage,
+      roomKeys: roomKeys,
+      accountSessions: index,
+      erase: true,
+      generationIsCurrent: () => true,
+      runBoundRequest: (_) async => throw StateError('guard rejected'),
+    );
+
+    await expectLater(operation.request(null), throwsStateError);
+    expect(operation.serverConfirmed, isFalse);
+    verifyNever(() => a.deactivateAccount(auth: null, erase: true));
+    verifyNever(() => a.clear(reason: SessionClearReason.logout));
+  });
+
+  test(
+    'bound lifecycle cannot confirm without sending the server request',
+    () async {
+      final operation = MatrixAccountDeletionOperation.capture(
+        manager: manager,
+        storage: storage,
+        roomKeys: roomKeys,
+        accountSessions: index,
+        erase: true,
+        generationIsCurrent: () => true,
+        runBoundRequest: (_) async {},
+      );
+
+      await expectLater(operation.request(null), throwsStateError);
+      expect(operation.serverConfirmed, isFalse);
+      verifyNever(() => a.deactivateAccount(auth: null, erase: true));
+    },
+  );
+
+  test('server success survives a later lifecycle wrapper error', () async {
+    when(
+      () => a.deactivateAccount(auth: null, erase: true),
+    ).thenAnswer((_) async => IdServerUnbindResult.success);
+    final operation = MatrixAccountDeletionOperation.capture(
+      manager: manager,
+      storage: storage,
+      roomKeys: roomKeys,
+      accountSessions: index,
+      erase: true,
+      generationIsCurrent: () => true,
+      runBoundRequest: (request) async {
+        await request();
+        throw StateError('local wrapper failed after server response');
+      },
+    );
+
+    await operation.request(null);
+    expect(operation.serverConfirmed, isTrue);
+    verify(() => a.deactivateAccount(auth: null, erase: true)).called(1);
+  });
+
   test(
     'cleanup clears A without saving keys and retains unrelated B state',
     () async {

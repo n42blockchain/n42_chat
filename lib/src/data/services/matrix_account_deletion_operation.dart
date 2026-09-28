@@ -31,6 +31,7 @@ class MatrixAccountDeletionOperation {
     this.deviceId,
     this.erase,
     this.generationIsCurrent,
+    this._runBoundRequest,
     this._manager,
     this._storage,
     this._roomKeys,
@@ -44,6 +45,7 @@ class MatrixAccountDeletionOperation {
     required AccountSessionIndex accountSessions,
     required bool erase,
     required bool Function() generationIsCurrent,
+    Future<void> Function(Future<void> Function() request)? runBoundRequest,
   }) {
     final client = manager.client;
     final userId = client?.userID;
@@ -67,6 +69,7 @@ class MatrixAccountDeletionOperation {
       deviceId,
       erase,
       generationIsCurrent,
+      runBoundRequest,
       manager,
       storage,
       roomKeys,
@@ -80,6 +83,8 @@ class MatrixAccountDeletionOperation {
   final String deviceId;
   final bool erase;
   final bool Function() generationIsCurrent;
+  final Future<void> Function(Future<void> Function() request)?
+  _runBoundRequest;
   final MatrixClientManager _manager;
   final SecureStorageDataSource _storage;
   final LocalRoomKeyStore _roomKeys;
@@ -103,10 +108,30 @@ class MatrixAccountDeletionOperation {
     }
     _requestInProgress = true;
     try {
-      await client.deactivateAccount(auth: auth, erase: erase);
-      // A successful server response remains true even if the active account
-      // switches or the user dismisses the UI while this Future is pending.
-      serverConfirmed = true;
+      var sent = false;
+      Future<void> sendCapturedRequest() async {
+        if (sent) throw StateError('Matrix deletion request already sent');
+        sent = true;
+        await client.deactivateAccount(auth: auth, erase: erase);
+        // This receipt follows the server response, regardless of a local
+        // lifecycle or account change while the request was in flight.
+        serverConfirmed = true;
+      }
+
+      final runBoundRequest = _runBoundRequest;
+      if (runBoundRequest == null) {
+        await sendCapturedRequest();
+      } else {
+        try {
+          await runBoundRequest(sendCapturedRequest);
+        } catch (_) {
+          if (!serverConfirmed) rethrow;
+          // A later local lifecycle failure cannot reverse server success.
+        }
+      }
+      if (!serverConfirmed) {
+        throw StateError('Matrix deletion request was not confirmed');
+      }
     } finally {
       _requestInProgress = false;
     }
