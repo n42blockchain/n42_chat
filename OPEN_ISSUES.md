@@ -11,6 +11,13 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
+### QR-001 Exact-asset payment requests are only supported at the bridge API boundary
+
+- Severity: H
+- Added: 2026-09-27
+- Current state: Task 15B's first source slice adds optional wallet capability dispatch and `TokenInfo` identity fields. Existing transfer repository, events, bloc, QR parsing and screens still use legacy symbol-only paths. The host has not opted into the new capability or pinned this Chat source.
+- Next step: complete v1 URI parsing and exact identity propagation through repository, bloc and UI; validate selected token, recipient and decimal precision before dispatch; then adapt the host bridge and repin the reviewed Chat commit. Keep legacy transfers available only through explicit, unambiguous selection.
+
 ### DEP-001 Latest generator stack — resolved in Task 13A
 
 - Severity: M

@@ -153,6 +153,84 @@ abstract class IWalletBridge {
   Future<String?> signTypedData(String typedDataJson) async => null;
 }
 
+/// Optional capability for a wallet that can transfer a specific chain asset.
+///
+/// This is separate from [IWalletBridge] so existing `implements IWalletBridge`
+/// integrations keep their source contract unchanged. A wallet must opt in;
+/// exact requests never fall back to a symbol-only transfer.
+abstract interface class IExactWalletTransfer {
+  Future<TransferResult> requestTransferExact({
+    required String toAddress,
+    required String amount,
+    required String token,
+    String? memo,
+    required String chain,
+    required String network,
+    required String assetType,
+    String? assetId,
+  });
+}
+
+/// Dispatch an exact request only when the wallet explicitly supports it.
+Future<TransferResult> requestWalletTransferExact(
+  IWalletBridge bridge, {
+  required String toAddress,
+  required String amount,
+  required String token,
+  String? memo,
+  required String chain,
+  required String network,
+  required String assetType,
+  String? assetId,
+}) async {
+  final validIdentity =
+      _isExactIdentityField(toAddress) &&
+      _isExactIdentityField(token) &&
+      _isExactIdentityField(chain) &&
+      (network == 'mainnet' || network == 'testnet') &&
+      (assetType == 'native' && assetId == null ||
+          assetType == 'token' &&
+              assetId != null &&
+              _isExactIdentityField(assetId));
+  if (!validIdentity) {
+    return TransferResult.failure(
+      'Incomplete payment asset identity',
+      code: 'invalid_identity',
+    );
+  }
+  if (!_isPositiveDecimal(amount)) {
+    return TransferResult.failure(
+      'Invalid transfer amount',
+      code: 'invalid_amount',
+    );
+  }
+  if (bridge is! IExactWalletTransfer) {
+    return TransferResult.failure(
+      'Exact asset transfer not supported',
+      code: 'unsupported',
+    );
+  }
+  return (bridge as IExactWalletTransfer).requestTransferExact(
+    toAddress: toAddress,
+    amount: amount,
+    token: token,
+    memo: memo,
+    chain: chain,
+    network: network,
+    assetType: assetType,
+    assetId: assetId,
+  );
+}
+
+bool _isExactIdentityField(String value) =>
+    value.isNotEmpty &&
+    value == value.trim() &&
+    !RegExp(r'[\s?#&]').hasMatch(value);
+
+bool _isPositiveDecimal(String value) =>
+    RegExp(r'^[0-9]+(?:\.[0-9]+)?$').hasMatch(value) &&
+    RegExp(r'[1-9]').hasMatch(value);
+
 /// NFT 标准
 enum NftStandard { erc721, erc1155 }
 
@@ -265,6 +343,13 @@ class TokenInfo {
   /// 是否是原生代币
   final bool isNative;
 
+  /// Optional exact identity published by a chain-aware wallet integration.
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
+  final String? receiverAddress;
+
   const TokenInfo({
     required this.symbol,
     required this.name,
@@ -272,6 +357,11 @@ class TokenInfo {
     this.contractAddress,
     this.iconUrl,
     this.isNative = false,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
+    this.receiverAddress,
   });
 }
 
