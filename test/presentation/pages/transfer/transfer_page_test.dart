@@ -40,6 +40,24 @@ const _tokenB = TokenInfo(
   contractAddress: _contractB,
   receiverAddress: '0xsender',
 );
+const _caseVariantToken = TokenInfo(
+  symbol: 'usdt',
+  name: 'Lower case',
+  decimals: 6,
+);
+const _legacyToken = TokenInfo(symbol: 'USDT', name: 'Upper case', decimals: 6);
+const _collisionContract = '0xabcdef01234567ffabcdef0123456789abcdef01';
+const _collisionToken = TokenInfo(
+  symbol: 'USDT',
+  name: 'Tether A',
+  decimals: 6,
+  chain: 'ETH',
+  network: 'mainnet',
+  assetType: 'token',
+  assetId: _collisionContract,
+  contractAddress: _collisionContract,
+  receiverAddress: '0xsender',
+);
 
 void main() {
   setUpAll(() {
@@ -172,6 +190,49 @@ void main() {
     },
   );
 
+  testWidgets(
+    'case-variant legacy request cannot emit ticker-only fulfillment',
+    (tester) async {
+      final request = PaymentRequest(
+        requestId: 'req-case',
+        amount: '1',
+        token: 'USDT',
+        receiverAddress: '0xreceiver',
+        qrCodeData: 'legacy',
+        createdAt: DateTime(2026, 1, 1),
+      );
+      final bloc = await openRequest(tester, request, const [
+        _legacyToken,
+        _caseVariantToken,
+      ]);
+      expect(find.byIcon(Icons.check_circle), findsNothing);
+      await tester.tap(find.text('Upper case'));
+      await tester.tap(find.byType(N42Button));
+      await tester.pump();
+      verifyNever(() => bloc.add(any(that: isA<FulfillPaymentRequest>())));
+    },
+  );
+
+  testWidgets('same-name contracts show full distinguishing IDs', (
+    tester,
+  ) async {
+    final request = PaymentRequest(
+      requestId: 'req-legacy',
+      amount: '1',
+      token: 'USDT',
+      receiverAddress: '0xreceiver',
+      qrCodeData: 'legacy',
+      createdAt: DateTime(2026, 1, 1),
+    );
+    await openRequest(tester, request, const [_tokenA, _collisionToken]);
+    final first = tester.widget<Text>(find.textContaining(_contractA));
+    final second = tester.widget<Text>(find.textContaining(_collisionContract));
+    expect(first.overflow, isNot(TextOverflow.ellipsis));
+    expect(second.overflow, isNot(TextOverflow.ellipsis));
+    expect(first.maxLines, isNull);
+    expect(second.maxLines, isNull);
+  });
+
   testWidgets('manual transfer selects one same-symbol contract', (
     tester,
   ) async {
@@ -224,6 +285,47 @@ void main() {
         ),
       ),
     ).called(1);
+  });
+
+  testWidgets('manual case-variant ticker cannot default or dispatch', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final bloc = MockTransferBloc();
+    const state = TransferState(
+      status: TransferBlocStatus.addressValidated,
+      isWalletConnected: true,
+      walletAddress: '0xsender',
+      tokens: [_legacyToken, _caseVariantToken],
+      balances: {'USDT': '99'},
+      validatedAddress: '0xreceiver',
+      isAddressValid: true,
+    );
+    when(() => bloc.state).thenReturn(state);
+    whenListen(bloc, Stream<TransferState>.value(state), initialState: state);
+    when(() => bloc.add(any())).thenReturn(null);
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        locale: const Locale('en'),
+        home: BlocProvider<TransferBloc>.value(
+          value: bloc,
+          child: const TransferPage(
+            roomId: '!room:server.test',
+            recipientAddress: '0xreceiver',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.check_circle), findsNothing);
+    await tester.tap(find.text('Upper case'));
+    await tester.enterText(find.byType(TextField).at(1), '1');
+    await tester.tap(find.byType(N42Button));
+    await tester.pump();
+    verifyNever(() => bloc.add(any(that: isA<InitiateTransfer>())));
   });
 
   testWidgets('payment request forwards exact identity into fulfillment', (

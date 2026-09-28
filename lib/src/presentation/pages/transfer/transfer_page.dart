@@ -214,7 +214,13 @@ class _TransferPageState extends State<TransferPage> {
         createExactPaymentRequestForAsset(selected) != null;
     if (hasIdentity && !exactMatch ||
         !hasIdentity &&
-            tokens.where((token) => token.symbol == selected.symbol).length !=
+            tokens
+                    .where(
+                      (token) =>
+                          token.symbol.toLowerCase() ==
+                          selected.symbol.toLowerCase(),
+                    )
+                    .length !=
                 1 ||
         _hasExactRequest && !exactMatch) {
       _showAssetUnavailable();
@@ -326,7 +332,9 @@ class _TransferPageState extends State<TransferPage> {
           : (choices.isNotEmpty &&
                     choices
                             .where(
-                              (token) => token.symbol == choices.first.symbol,
+                              (token) =>
+                                  token.symbol.toLowerCase() ==
+                                  choices.first.symbol.toLowerCase(),
                             )
                             .length ==
                         1
@@ -648,9 +656,18 @@ class _TransferPageState extends State<TransferPage> {
                           ),
                           if (_hasAssetIdentity(token))
                             Text(
-                              '${token.chain ?? '?'} / ${token.network ?? '?'} · ${token.assetId ?? token.assetType ?? '?'}',
+                              '${token.chain ?? '?'} / ${token.network ?? '?'} · ${token.assetType ?? '?'}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: context.textSecondary,
+                              ),
+                            ),
+                          if (token.assetId != null)
+                            Text(
+                              token.assetId!,
+                              softWrap: true,
                               style: TextStyle(
                                 fontSize: 11,
                                 color: context.textSecondary,
