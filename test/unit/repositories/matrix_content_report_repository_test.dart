@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart';
 import 'package:mocktail/mocktail.dart';
@@ -253,6 +254,70 @@ void main() {
       ),
     );
   });
+
+  for (final (label, failure) in <(String, Object)>[
+    ('timeout', TimeoutException('late timeout')),
+    ('I/O', const SocketException('late disconnect')),
+    ('HTTP client', http.ClientException('late disconnect')),
+  ]) {
+    test(
+      '$label failure after client switch during versions is account changed',
+      () async {
+        final versions = Completer<GetVersionsResponse>();
+        when(client.getVersions).thenAnswer((_) => versions.future);
+        final report = repository.reportUser(
+          userId: '@a:hs.test',
+          reason: 'spam',
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        when(() => manager.client).thenReturn(_Client());
+        final result = expectLater(
+          report,
+          throwsA(
+            isA<ContentReportException>().having(
+              (error) => error.kind,
+              'kind',
+              ContentReportFailure.accountChanged,
+            ),
+          ),
+        );
+        versions.completeError(failure);
+        await result;
+        verifyNever(() => client.reportUser(any(), any()));
+      },
+    );
+
+    test(
+      '$label failure after token switch during report is account changed',
+      () async {
+        final ack = Completer<Map<String, Object?>>();
+        when(
+          () => client.reportUser('@a:hs.test', 'spam'),
+        ).thenAnswer((_) => ack.future);
+        final report = repository.reportUser(
+          userId: '@a:hs.test',
+          reason: 'spam',
+        );
+        await Future<void>.delayed(Duration.zero);
+        verify(() => client.reportUser('@a:hs.test', 'spam')).called(1);
+
+        token = 'session-B';
+        final result = expectLater(
+          report,
+          throwsA(
+            isA<ContentReportException>().having(
+              (error) => error.kind,
+              'kind',
+              ContentReportFailure.accountChanged,
+            ),
+          ),
+        );
+        ack.completeError(failure);
+        await result;
+      },
+    );
+  }
 
   test(
     'missing versions endpoint is distinct from missing report subject',

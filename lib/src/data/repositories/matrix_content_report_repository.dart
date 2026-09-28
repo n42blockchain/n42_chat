@@ -97,10 +97,19 @@ class MatrixContentReportRepository implements IContentReportRepository {
       }
       throw _mapMatrixError(error);
     } on TimeoutException {
+      if (!sameAccount()) {
+        throw const ContentReportException(ContentReportFailure.accountChanged);
+      }
       throw const ContentReportException(ContentReportFailure.transport);
     } on IOException {
+      if (!sameAccount()) {
+        throw const ContentReportException(ContentReportFailure.accountChanged);
+      }
       throw const ContentReportException(ContentReportFailure.transport);
     } on http.ClientException {
+      if (!sameAccount()) {
+        throw const ContentReportException(ContentReportFailure.accountChanged);
+      }
       throw const ContentReportException(ContentReportFailure.transport);
     }
   }
