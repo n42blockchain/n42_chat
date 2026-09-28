@@ -4,6 +4,7 @@ enum DeletionUiaStatus {
   idle,
   awaitingAuthentication,
   deactivated,
+  deactivatedNeedsScopedCleanup,
   failed,
   cancelled,
 }
@@ -26,6 +27,24 @@ class DeletionUiaException implements Exception {
 
   @override
   String toString() => 'Deletion UIA failed: $reason';
+}
+
+/// A successful server response for the original Matrix account. If the UI
+/// was cancelled or the active account changed while the request was pending,
+/// cleanup must be reconciled against this identity rather than the active UI.
+class DeletionUiaReceipt {
+  final String userId;
+  final Uri homeserver;
+
+  /// True when the active UI cannot safely run immediate account-local cleanup.
+  /// The normal confirmed path also needs account-local cleanup.
+  final bool requiresDeferredCleanup;
+
+  const DeletionUiaReceipt({
+    required this.userId,
+    required this.homeserver,
+    required this.requiresDeferredCleanup,
+  });
 }
 
 /// Coordinates only the server's Matrix UIA request. It does not clean local
@@ -59,6 +78,8 @@ class MatrixDeletionUiaCoordinator {
   final int maxAttempts;
 
   DeletionUiaStatus status = DeletionUiaStatus.idle;
+  DeletionUiaReceipt? _confirmedDeletion;
+  DeletionUiaReceipt? get confirmedDeletion => _confirmedDeletion;
   String? session;
   List<String> _nextStages = const [];
   List<String> get nextStages => List.unmodifiable(_nextStages);
@@ -128,7 +149,7 @@ class MatrixDeletionUiaCoordinator {
   }
 
   void cancel() {
-    if (status != DeletionUiaStatus.deactivated) {
+    if (_confirmedDeletion == null) {
       status = DeletionUiaStatus.cancelled;
       _nextStages = const [];
       _openedFallbackStages.clear();
@@ -151,8 +172,7 @@ class MatrixDeletionUiaCoordinator {
   }
 
   Future<DeletionUiaStatus> _attempt(AuthenticationData? auth) async {
-    if (status == DeletionUiaStatus.cancelled ||
-        status == DeletionUiaStatus.deactivated) {
+    if (status == DeletionUiaStatus.cancelled || _confirmedDeletion != null) {
       throw const DeletionUiaException(DeletionUiaFailure.invalidState);
     }
     if (_busy) throw const DeletionUiaException(DeletionUiaFailure.busy);
@@ -164,8 +184,24 @@ class MatrixDeletionUiaCoordinator {
     _busy = true;
     try {
       await request(auth);
-      _checkAfterRequest();
-      status = DeletionUiaStatus.deactivated;
+      var currentAccount = false;
+      try {
+        currentAccount = isCurrentAccount();
+      } catch (_) {
+        // The server result is authoritative even if local account inspection
+        // fails after the request has completed.
+      }
+      final requiresDeferredCleanup =
+          status == DeletionUiaStatus.cancelled || !currentAccount;
+      _confirmedDeletion = DeletionUiaReceipt(
+        userId: userId,
+        homeserver: homeserver,
+        requiresDeferredCleanup: requiresDeferredCleanup,
+      );
+      status = requiresDeferredCleanup
+          ? DeletionUiaStatus.deactivatedNeedsScopedCleanup
+          : DeletionUiaStatus.deactivated;
+      session = null;
       _nextStages = const [];
       _openedFallbackStages.clear();
       return status;
@@ -195,6 +231,12 @@ class MatrixDeletionUiaCoordinator {
   }
 
   void _acceptChallenge(MatrixException error) {
+    // An unusable replacement challenge must not leave an earlier fallback
+    // window or session authorized to resubmit the deactivation request.
+    status = DeletionUiaStatus.failed;
+    session = null;
+    _nextStages = const [];
+    _openedFallbackStages.clear();
     final newSession = error.session;
     final rawFlows = error.raw['flows'];
     final rawCompleted = error.raw['completed'];
@@ -233,7 +275,6 @@ class MatrixDeletionUiaCoordinator {
     if (next.isEmpty) {
       throw const DeletionUiaException(DeletionUiaFailure.invalidChallenge);
     }
-    _openedFallbackStages.clear();
     session = newSession;
     _nextStages = next;
     status = DeletionUiaStatus.awaitingAuthentication;

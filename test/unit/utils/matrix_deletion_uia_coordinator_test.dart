@@ -65,6 +65,8 @@ void main() {
       request: (_) async {},
     );
     expect(await coordinator.start(), DeletionUiaStatus.deactivated);
+    expect(coordinator.confirmedDeletion?.userId, userId);
+    expect(coordinator.confirmedDeletion?.requiresDeferredCleanup, isFalse);
     expect(() => coordinator.start(), throwsA(isA<DeletionUiaException>()));
   });
 
@@ -290,6 +292,57 @@ void main() {
     expect(calls, 2);
   });
 
+  test(
+    'malformed replacement challenge invalidates an opened fallback',
+    () async {
+      for (final replacement in [
+        challenge(session: ''),
+        challenge(flows: []),
+      ]) {
+        var calls = 0;
+        final coordinator = MatrixDeletionUiaCoordinator(
+          userId: userId,
+          homeserver: homeserver,
+          isCurrentAccount: () => true,
+          request: (_) async {
+            calls++;
+            if (calls == 1) {
+              throw challenge(
+                session: 'old',
+                flows: [
+                  ['m.login.sso'],
+                  ['m.login.password'],
+                ],
+              );
+            }
+            throw replacement;
+          },
+        );
+        expect(
+          await coordinator.start(),
+          DeletionUiaStatus.awaitingAuthentication,
+        );
+        coordinator.fallbackUri('m.login.sso');
+        await expectLater(
+          coordinator.submitPassword('wrong'),
+          throwsA(isA<DeletionUiaException>()),
+        );
+        expect(coordinator.session, isNull);
+        expect(coordinator.nextStages, isEmpty);
+        expect(coordinator.status, DeletionUiaStatus.failed);
+        await expectLater(
+          coordinator.retryAfterFallback(
+            stage: 'm.login.sso',
+            session: 'old',
+            origin: Uri.parse('https://matrix.example.org'),
+          ),
+          throwsA(isA<DeletionUiaException>()),
+        );
+        expect(calls, 2);
+      }
+    },
+  );
+
   test('attempt limit prevents unbounded password retries', () async {
     var calls = 0;
     final coordinator = MatrixDeletionUiaCoordinator(
@@ -320,20 +373,30 @@ void main() {
     expect(calls, 2);
   });
 
-  test('cancellation during a pending request cannot report success', () async {
-    final wait = Completer<void>();
-    final coordinator = MatrixDeletionUiaCoordinator(
-      userId: userId,
-      homeserver: homeserver,
-      isCurrentAccount: () => true,
-      request: (_) => wait.future,
-    );
-    final pending = coordinator.start();
-    coordinator.cancel();
-    wait.complete();
-    await expectLater(pending, throwsA(isA<DeletionUiaException>()));
-    expect(coordinator.status, DeletionUiaStatus.cancelled);
-  });
+  test(
+    'cancellation after dispatch preserves confirmed deletion receipt',
+    () async {
+      final wait = Completer<void>();
+      final coordinator = MatrixDeletionUiaCoordinator(
+        userId: userId,
+        homeserver: homeserver,
+        isCurrentAccount: () => true,
+        request: (_) => wait.future,
+      );
+      final pending = coordinator.start();
+      coordinator.cancel();
+      wait.complete();
+      expect(await pending, DeletionUiaStatus.deactivatedNeedsScopedCleanup);
+      expect(coordinator.confirmedDeletion?.userId, userId);
+      expect(coordinator.confirmedDeletion?.homeserver, homeserver);
+      expect(coordinator.confirmedDeletion?.requiresDeferredCleanup, isTrue);
+      coordinator.cancel();
+      expect(
+        coordinator.status,
+        DeletionUiaStatus.deactivatedNeedsScopedCleanup,
+      );
+    },
+  );
 
   test(
     'network errors propagate and cancellation blocks later requests',
@@ -380,9 +443,14 @@ void main() {
       );
       current = false;
       wait.complete();
-      await expectLater(first, throwsA(isA<DeletionUiaException>()));
+      expect(await first, DeletionUiaStatus.deactivatedNeedsScopedCleanup);
       expect(calls, 2);
-      expect(coordinator.status, isNot(DeletionUiaStatus.deactivated));
+      expect(coordinator.confirmedDeletion?.userId, userId);
+      expect(coordinator.confirmedDeletion?.requiresDeferredCleanup, isTrue);
+      await expectLater(
+        coordinator.submitPassword('after switch'),
+        throwsA(isA<DeletionUiaException>()),
+      );
     },
   );
 }
