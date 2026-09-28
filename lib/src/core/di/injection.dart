@@ -64,6 +64,7 @@ import '../../data/repositories/moment_repository_impl.dart';
 import '../../data/repositories/sticker_repository_impl.dart';
 import '../../data/repositories/story_repository_impl.dart';
 import '../../data/repositories/contact_repository_impl.dart';
+import '../../data/repositories/matrix_content_report_repository.dart';
 import '../../data/repositories/conversation_repository_impl.dart';
 import '../../data/repositories/group_repository_impl.dart';
 import '../../data/repositories/message_repository_impl.dart';
@@ -72,6 +73,7 @@ import '../../data/repositories/search_repository_impl.dart';
 import '../../data/repositories/transfer_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/contact_repository.dart';
+import '../../domain/repositories/content_report_repository.dart';
 import '../../domain/repositories/conversation_repository.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../../domain/repositories/message_repository.dart';
@@ -870,6 +872,10 @@ void _registerRepositories() {
           : null,
     );
   }, dispose: (repo) => (repo as AuthRepositoryImpl).dispose());
+
+  getIt.registerLazySingleton<IContentReportRepository>(
+    () => MatrixContentReportRepository(getIt<MatrixClientManager>()),
+  );
 
   // 会话仓库
   getIt.registerLazySingleton<IConversationRepository>(
