@@ -6,6 +6,43 @@ import 'package:n42_chat/src/data/datasources/matrix/message/matrix_metadata_ext
 class _MockEvent extends Mock implements matrix.Event {}
 
 void main() {
+  test(
+    'extracts exact payment identity and preserves it in metadata copies',
+    () {
+      final event = _MockEvent();
+      when(() => event.type).thenReturn(matrix.EventTypes.Message);
+      when(() => event.messageType).thenReturn(matrix.MessageTypes.Text);
+      when(() => event.content).thenReturn({
+        'msgtype': 'n42.payment_request',
+        'request_id': 'req-1',
+        'receiver_address': '0xreceiver',
+        'amount': '1.250000',
+        'token': 'USDT',
+        'chain': 'ETH',
+        'network': 'mainnet',
+        'asset_type': 'token',
+        'asset_id': '0xabcdef0123456789abcdef0123456789abcdef01',
+      });
+      final metadata = MatrixMetadataExtractor(
+        () => null,
+        (mxc, {width, height}) => null,
+      ).extractMetadataWithHttpUrl(event)!;
+
+      expect(metadata.paymentChain, 'ETH');
+      expect(metadata.paymentNetwork, 'mainnet');
+      expect(metadata.paymentAssetType, 'token');
+      expect(
+        metadata.paymentAssetId,
+        '0xabcdef0123456789abcdef0123456789abcdef01',
+      );
+      final copy = metadata.copyWithTransfer(transferStatus: 'pending');
+      expect(copy.paymentChain, metadata.paymentChain);
+      expect(copy.paymentNetwork, metadata.paymentNetwork);
+      expect(copy.paymentAssetType, metadata.paymentAssetType);
+      expect(copy.paymentAssetId, metadata.paymentAssetId);
+    },
+  );
+
   test('extracts encrypted file material for image messages', () {
     final event = _MockEvent();
     when(() => event.type).thenReturn(matrix.EventTypes.Message);

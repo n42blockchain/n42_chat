@@ -21,6 +21,69 @@ void main() {
     registerFallbackValue(FakeTransferEvent());
   });
 
+  testWidgets('payment request forwards exact identity into fulfillment', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final bloc = MockTransferBloc();
+    const state = TransferState(
+      status: TransferBlocStatus.addressValidated,
+      isWalletConnected: true,
+      walletAddress: '0xsender',
+      tokens: [TokenInfo(symbol: 'USDT', name: 'Tether', decimals: 6)],
+      balances: {'USDT': '99'},
+      validatedAddress: '0xreceiver',
+      isAddressValid: true,
+    );
+    when(() => bloc.state).thenReturn(state);
+    whenListen(bloc, Stream<TransferState>.value(state), initialState: state);
+    when(() => bloc.add(any())).thenReturn(null);
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        locale: const Locale('en'),
+        home: BlocProvider<TransferBloc>.value(
+          value: bloc,
+          child: TransferPage(
+            roomId: '!room:server.test',
+            paymentRequest: PaymentRequest(
+              requestId: 'req-exact',
+              amount: '1.250000',
+              token: 'USDT',
+              receiverAddress: '0xreceiver',
+              qrCodeData: 'n42pay://v1/pay',
+              chain: 'ETH',
+              network: 'mainnet',
+              assetType: 'token',
+              assetId: '0xabcdef0123456789abcdef0123456789abcdef01',
+              createdAt: DateTime(2026, 1, 1),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(N42Button));
+    await tester.pump();
+    verify(
+      () => bloc.add(
+        const FulfillPaymentRequest(
+          roomId: '!room:server.test',
+          requestId: 'req-exact',
+          receiverAddress: '0xreceiver',
+          amount: '1.250000',
+          token: 'USDT',
+          chain: 'ETH',
+          network: 'mainnet',
+          assetType: 'token',
+          assetId: '0xabcdef0123456789abcdef0123456789abcdef01',
+        ),
+      ),
+    ).called(1);
+  });
+
   testWidgets(
     'payment request mode keeps wallet tokens visible after address validation and dispatches fulfill event',
     (tester) async {

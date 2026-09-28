@@ -273,6 +273,21 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       return;
     }
 
+    // This entry still selects by ticker. Exact requests need asset-aware
+    // selection before this page can safely fulfill them.
+    if (metadata?.paymentChain != null ||
+        metadata?.paymentNetwork != null ||
+        metadata?.paymentAssetType != null ||
+        metadata?.paymentAssetId != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Payment request is unavailable'),
+          backgroundColor: AppColors.warning,
+        ),
+      );
+      return;
+    }
+
     final roomTransfers = await getIt<ITransferRepository>().getTransfersByRoom(
       widget.conversation.id,
     );
@@ -309,6 +324,10 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       qrCodeData: receiverAddress,
       createdAt: message.timestamp,
       expiresAt: metadata?.paymentRequestExpiresAt,
+      chain: metadata?.paymentChain,
+      network: metadata?.paymentNetwork,
+      assetType: metadata?.paymentAssetType,
+      assetId: metadata?.paymentAssetId,
     );
 
     if (!mounted) return;

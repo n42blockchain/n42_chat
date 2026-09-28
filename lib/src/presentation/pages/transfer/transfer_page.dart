@@ -142,6 +142,10 @@ class _TransferPageState extends State<TransferPage> {
           receiverAddress: request.receiverAddress,
           amount: request.amount,
           token: request.token,
+          chain: request.chain,
+          network: request.network,
+          assetType: request.assetType,
+          assetId: request.assetId,
         ),
       );
       return;

@@ -15,8 +15,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 - Severity: H
 - Added: 2026-09-27
-- Current state: Task 15B now has optional wallet capability dispatch, `TokenInfo` identity fields, strict v1 URI parsing/encoding and selected-asset matching/amount helpers. V1 parsing is isolated in `tryParseExact`; the existing `tryParse` remains legacy-only because current scanner callers use symbol-only transfer. Transfer repository, events, bloc and screens still use legacy paths. The host has not opted into the new capability or pinned this Chat source.
-- Next step: propagate exact identity through repository, bloc and UI; explicitly adopt `tryParseExact` and selected-asset checks before transfer or QR creation, then adapt the host bridge and repin the reviewed Chat commit. Keep legacy transfers available only through explicit, unambiguous selection.
+- Current state: Task 15B has optional wallet and repository capabilities, `TokenInfo` identity fields, strict v1 URI parsing/encoding, selected-asset matching and decimal checks, and exact identity in transfer requests, Matrix messages, events and bloc dispatch. `tryParseExact` remains separate from the legacy scanner. The existing payment-message tap rejects exact requests until the selection UI is asset-aware; legacy payment messages still open normally. The host has not opted into the new capability or pinned this Chat source.
+- Next step: adopt `tryParseExact` in the QR scanner and exact selected-asset checks in transfer/payment UI, then adapt the host bridge and repin the reviewed Chat commit. Keep legacy transfers available through explicit, unambiguous selection.
 
 ### DEP-001 Latest generator stack — resolved in Task 13A
 

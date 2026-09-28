@@ -553,6 +553,10 @@ class MessageMetadata extends Equatable {
 
   /// 收款请求过期时间
   final DateTime? paymentRequestExpiresAt;
+  final String? paymentChain;
+  final String? paymentNetwork;
+  final String? paymentAssetType;
+  final String? paymentAssetId;
 
   /// 红包 ID（用于领取和查询真实红包状态）
   final String? redPacketId;
@@ -679,6 +683,10 @@ class MessageMetadata extends Equatable {
     this.paymentRequestId,
     this.paymentReceiverAddress,
     this.paymentRequestExpiresAt,
+    this.paymentChain,
+    this.paymentNetwork,
+    this.paymentAssetType,
+    this.paymentAssetId,
     this.redPacketId,
     this.pollQuestion,
     this.pollOptions,
@@ -757,6 +765,10 @@ class MessageMetadata extends Equatable {
     paymentRequestId,
     paymentReceiverAddress,
     paymentRequestExpiresAt,
+    paymentChain,
+    paymentNetwork,
+    paymentAssetType,
+    paymentAssetId,
     redPacketId,
     pollQuestion,
     pollOptions,
@@ -830,6 +842,10 @@ class MessageMetadata extends Equatable {
     paymentRequestId: paymentRequestId,
     paymentReceiverAddress: paymentReceiverAddress,
     paymentRequestExpiresAt: paymentRequestExpiresAt,
+    paymentChain: paymentChain,
+    paymentNetwork: paymentNetwork,
+    paymentAssetType: paymentAssetType,
+    paymentAssetId: paymentAssetId,
     redPacketId: redPacketId,
     encryptKey: encryptKey,
     encryptIv: encryptIv,
@@ -877,6 +893,10 @@ class MessageMetadata extends Equatable {
     paymentRequestId: paymentRequestId,
     paymentReceiverAddress: paymentReceiverAddress,
     paymentRequestExpiresAt: paymentRequestExpiresAt,
+    paymentChain: paymentChain,
+    paymentNetwork: paymentNetwork,
+    paymentAssetType: paymentAssetType,
+    paymentAssetId: paymentAssetId,
     redPacketId: redPacketId,
     pollQuestion: pollQuestion,
     pollOptions: pollOptions,
@@ -911,6 +931,10 @@ class MessageMetadata extends Equatable {
     String? paymentRequestId,
     String? paymentReceiverAddress,
     DateTime? paymentRequestExpiresAt,
+    String? paymentChain,
+    String? paymentNetwork,
+    String? paymentAssetType,
+    String? paymentAssetId,
     String? redPacketId,
   }) => MessageMetadata(
     mediaUrl: mediaUrl,
@@ -941,6 +965,10 @@ class MessageMetadata extends Equatable {
         paymentReceiverAddress ?? this.paymentReceiverAddress,
     paymentRequestExpiresAt:
         paymentRequestExpiresAt ?? this.paymentRequestExpiresAt,
+    paymentChain: paymentChain ?? this.paymentChain,
+    paymentNetwork: paymentNetwork ?? this.paymentNetwork,
+    paymentAssetType: paymentAssetType ?? this.paymentAssetType,
+    paymentAssetId: paymentAssetId ?? this.paymentAssetId,
     redPacketId: redPacketId ?? this.redPacketId,
     pollQuestion: pollQuestion,
     pollOptions: pollOptions,
