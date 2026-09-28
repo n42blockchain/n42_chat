@@ -1,6 +1,8 @@
 import 'package:uuid/uuid.dart';
 
 import '../../core/utils/debug_log.dart';
+import '../../core/utils/payment_asset_match.dart';
+import '../../core/utils/payment_request_uri.dart';
 import '../../domain/entities/transfer_entity.dart';
 import '../../domain/repositories/transfer_repository.dart';
 import '../../integration/wallet_bridge.dart';
@@ -8,7 +10,8 @@ import '../datasources/matrix/matrix_message_datasource.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 
 /// 转账仓库实现
-class TransferRepositoryImpl implements ITransferRepository {
+class TransferRepositoryImpl
+    implements ITransferRepository, IExactTransferRepository {
   final IWalletBridge _walletBridge;
   final MatrixMessageDataSource _messageDataSource;
   final MatrixClientManager _clientManager;
@@ -39,7 +42,97 @@ class TransferRepositoryImpl implements ITransferRepository {
       throw Exception('无法获取钱包地址');
     }
 
-    // 创建转账实体
+    return _executeTransfer(
+      roomId: roomId,
+      senderAddress: senderAddress,
+      receiverAddress: receiverAddress,
+      amount: amount,
+      token: token,
+      memo: memo,
+      request: () => _walletBridge.requestTransfer(
+        toAddress: receiverAddress,
+        amount: amount,
+        token: token,
+        memo: memo,
+      ),
+    );
+  }
+
+  @override
+  Future<TransferEntity> initiateTransferExact({
+    required String roomId,
+    required String receiverAddress,
+    required String amount,
+    required String token,
+    String? memo,
+    required String chain,
+    required String network,
+    required String assetType,
+    String? assetId,
+  }) async {
+    if (!_walletBridge.isWalletConnected) {
+      throw StateError('Wallet not connected');
+    }
+    if (_walletBridge is! IExactWalletTransfer) {
+      throw UnsupportedError('Exact asset transfer not supported');
+    }
+    final payment = PaymentRequestData(
+      receiverAddress: receiverAddress,
+      amount: amount,
+      chain: chain,
+      network: network,
+      assetType: assetType,
+      assetId: assetId,
+    );
+    final resolution = resolvePaymentAsset(
+      payment,
+      await _walletBridge.getSupportedTokens(),
+    );
+    final selected = resolution.asset;
+    if (resolution.status != PaymentAssetResolutionStatus.matched ||
+        selected == null ||
+        selected.symbol != token ||
+        createExactPaymentRequestForAsset(selected, amount: amount) == null) {
+      throw StateError('Exact payment asset is unavailable or invalid');
+    }
+    return _executeTransfer(
+      roomId: roomId,
+      senderAddress: selected.receiverAddress!,
+      receiverAddress: receiverAddress,
+      amount: amount,
+      token: token,
+      memo: memo,
+      chain: chain,
+      network: network,
+      assetType: assetType,
+      assetId: assetId,
+      request: () => requestWalletTransferExact(
+        _walletBridge,
+        toAddress: receiverAddress,
+        amount: amount,
+        token: token,
+        memo: memo,
+        chain: chain,
+        network: network,
+        assetType: assetType,
+        assetId: assetId,
+      ),
+    );
+  }
+
+  Future<TransferEntity> _executeTransfer({
+    required String roomId,
+    required String senderAddress,
+    required String receiverAddress,
+    required String amount,
+    required String token,
+    String? memo,
+    String? chain,
+    String? network,
+    String? assetType,
+    String? assetId,
+    required Future<TransferResult> Function() request,
+  }) async {
     final transferId = const Uuid().v4();
     final transfer = TransferEntity(
       id: transferId,
@@ -49,6 +142,10 @@ class TransferRepositoryImpl implements ITransferRepository {
       senderUserId: _clientManager.client?.userID,
       amount: amount,
       token: token,
+      chain: chain,
+      network: network,
+      assetType: assetType,
+      assetId: assetId,
       status: TransferStatus.pending,
       memo: memo,
       createdAt: DateTime.now(),
@@ -58,12 +155,7 @@ class TransferRepositoryImpl implements ITransferRepository {
     _transfersCache[transferId] = transfer;
 
     // 发起转账
-    final result = await _walletBridge.requestTransfer(
-      toAddress: receiverAddress,
-      amount: amount,
-      token: token,
-      memo: memo,
-    );
+    final result = await request();
 
     // 更新转账状态
     TransferEntity updatedTransfer;
@@ -114,6 +206,10 @@ class TransferRepositoryImpl implements ITransferRepository {
       receiverAddress: transfer.receiverAddress,
       amount: transfer.amount,
       token: transfer.token,
+      chain: transfer.chain,
+      network: transfer.network,
+      assetType: transfer.assetType,
+      assetId: transfer.assetId,
       transactionHash: transfer.transactionHash,
       status: transfer.status,
       memo: transfer.memo,
@@ -159,6 +255,43 @@ class TransferRepositoryImpl implements ITransferRepository {
   }
 
   @override
+  Future<PaymentRequest> createPaymentRequestExact({
+    required TokenInfo asset,
+    required String amount,
+    String? memo,
+  }) async {
+    if (!_walletBridge.isWalletConnected) {
+      throw StateError('Wallet not connected');
+    }
+    final data = createExactPaymentRequestForAsset(asset, amount: amount);
+    if (data == null) throw StateError('Exact payment asset is invalid');
+    final resolution = resolvePaymentAsset(
+      data,
+      await _walletBridge.getSupportedTokens(),
+    );
+    final selected = resolution.asset;
+    if (resolution.status != PaymentAssetResolutionStatus.matched ||
+        selected == null ||
+        selected.symbol != asset.symbol ||
+        selected.receiverAddress != data.receiverAddress) {
+      throw StateError('Exact payment asset is unavailable');
+    }
+    return PaymentRequest(
+      requestId: const Uuid().v4(),
+      amount: amount,
+      token: selected.symbol,
+      chain: data.chain,
+      network: data.network,
+      assetType: data.assetType,
+      assetId: data.assetId,
+      receiverAddress: data.receiverAddress,
+      memo: memo,
+      qrCodeData: PaymentRequestUri.encode(data),
+      createdAt: DateTime.now(),
+    );
+  }
+
+  @override
   Future<String> sendPaymentRequestMessage({
     required String roomId,
     required PaymentRequest request,
@@ -168,6 +301,10 @@ class TransferRepositoryImpl implements ITransferRepository {
       receiverAddress: request.receiverAddress,
       amount: request.amount,
       token: request.token,
+      chain: request.chain,
+      network: request.network,
+      assetType: request.assetType,
+      assetId: request.assetId,
       memo: request.memo,
       expiresAt: request.expiresAt,
     );
@@ -195,6 +332,51 @@ class TransferRepositoryImpl implements ITransferRepository {
       memo: '支付请求: $requestId',
     );
 
+    await _sendFulfillmentAcknowledgement(
+      roomId: roomId,
+      requestId: requestId,
+      transfer: transfer,
+    );
+    return transfer;
+  }
+
+  @override
+  Future<TransferEntity> fulfillPaymentRequestExact({
+    required String roomId,
+    required String requestId,
+    required String receiverAddress,
+    required String amount,
+    required String token,
+    required String chain,
+    required String network,
+    required String assetType,
+    String? assetId,
+  }) async {
+    final transfer = await initiateTransferExact(
+      roomId: roomId,
+      receiverAddress: receiverAddress,
+      amount: amount,
+      token: token,
+      memo: '支付请求: $requestId',
+      chain: chain,
+      network: network,
+      assetType: assetType,
+      assetId: assetId,
+    );
+
+    await _sendFulfillmentAcknowledgement(
+      roomId: roomId,
+      requestId: requestId,
+      transfer: transfer,
+    );
+    return transfer;
+  }
+
+  Future<void> _sendFulfillmentAcknowledgement({
+    required String roomId,
+    required String requestId,
+    required TransferEntity transfer,
+  }) async {
     if (transfer.isSuccess) {
       try {
         await _messageDataSource.sendRoomEvent(
@@ -208,6 +390,10 @@ class TransferRepositoryImpl implements ITransferRepository {
             receiverAddress: transfer.receiverAddress,
             amount: transfer.amount,
             token: transfer.token,
+            chain: transfer.chain,
+            network: transfer.network,
+            assetType: transfer.assetType,
+            assetId: transfer.assetId,
             transactionHash: transfer.transactionHash,
             fulfilledAt: transfer.completedAt ?? DateTime.now(),
           ).toEventContent(),
@@ -218,8 +404,6 @@ class TransferRepositoryImpl implements ITransferRepository {
         );
       }
     }
-
-    return transfer;
   }
 
   @override
