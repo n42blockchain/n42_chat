@@ -107,32 +107,54 @@ class MatrixAccountDeletionOperation {
       throw StateError('Matrix deletion account changed or request is busy');
     }
     _requestInProgress = true;
+    var acceptingCallback = true;
+    Future<void>? launchedRequest;
     try {
-      var sent = false;
-      Future<void> sendCapturedRequest() async {
-        if (sent) throw StateError('Matrix deletion request already sent');
-        sent = true;
-        await client.deactivateAccount(auth: auth, erase: erase);
-        // This receipt follows the server response, regardless of a local
-        // lifecycle or account change while the request was in flight.
-        serverConfirmed = true;
+      Future<void> sendCapturedRequest() {
+        if (!acceptingCallback || launchedRequest != null) {
+          return Future<void>.error(
+            StateError('Matrix deletion request callback is unavailable'),
+          );
+        }
+        final request = Future<void>.sync(() async {
+          await client.deactivateAccount(auth: auth, erase: erase);
+          // The actual server response remains authoritative even if the
+          // wrapper returns early or the active account switches.
+          serverConfirmed = true;
+        });
+        launchedRequest = request;
+        // An early-returning wrapper may not attach its own error listener.
+        request.ignore();
+        return request;
       }
 
       final runBoundRequest = _runBoundRequest;
-      if (runBoundRequest == null) {
-        await sendCapturedRequest();
-      } else {
-        try {
+      Object? wrapperError;
+      StackTrace? wrapperStack;
+      try {
+        if (runBoundRequest == null) {
+          await sendCapturedRequest();
+        } else {
           await runBoundRequest(sendCapturedRequest);
-        } catch (_) {
-          if (!serverConfirmed) rethrow;
-          // A later local lifecycle failure cannot reverse server success.
         }
+      } catch (error, stack) {
+        wrapperError = error;
+        wrapperStack = stack;
       }
-      if (!serverConfirmed) {
-        throw StateError('Matrix deletion request was not confirmed');
+      acceptingCallback = false;
+      final request = launchedRequest;
+      if (request == null) {
+        if (wrapperError != null) {
+          Error.throwWithStackTrace(wrapperError, wrapperStack!);
+        }
+        throw StateError('Matrix deletion request was not sent');
       }
+      // Keep the operation busy until the real request settles. A server
+      // failure wins over a wrapper's unrelated failure; a server success
+      // cannot be rolled back by local wrapper work.
+      await request;
     } finally {
+      acceptingCallback = false;
       _requestInProgress = false;
     }
   }

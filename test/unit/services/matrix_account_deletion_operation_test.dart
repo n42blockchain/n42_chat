@@ -183,6 +183,96 @@ void main() {
     verify(() => a.deactivateAccount(auth: null, erase: true)).called(1);
   });
 
+  for (final wrapperThrows in [false, true]) {
+    test(
+      'early wrapper ${wrapperThrows ? 'throw' : 'return'} waits for server success',
+      () async {
+        final serverResult = Completer<IdServerUnbindResult>();
+        when(
+          () => a.deactivateAccount(auth: null, erase: true),
+        ).thenAnswer((_) => serverResult.future);
+        final operation = MatrixAccountDeletionOperation.capture(
+          manager: manager,
+          storage: storage,
+          roomKeys: roomKeys,
+          accountSessions: index,
+          erase: true,
+          generationIsCurrent: () => true,
+          runBoundRequest: (request) async {
+            unawaited(request());
+            if (wrapperThrows) throw StateError('wrapper ended early');
+          },
+        );
+        var settled = false;
+        final pending = operation.request(null).then((_) => settled = true);
+        await Future<void>.delayed(Duration.zero);
+        expect(settled, isFalse);
+        await expectLater(operation.request(null), throwsStateError);
+        serverResult.complete(IdServerUnbindResult.success);
+        await pending;
+        expect(operation.serverConfirmed, isTrue);
+        verify(() => a.deactivateAccount(auth: null, erase: true)).called(1);
+      },
+    );
+  }
+
+  for (final wrapperThrows in [false, true]) {
+    test(
+      'early wrapper ${wrapperThrows ? 'throw' : 'return'} reports server failure',
+      () async {
+        final serverResult = Completer<IdServerUnbindResult>();
+        when(
+          () => a.deactivateAccount(auth: null, erase: true),
+        ).thenAnswer((_) => serverResult.future);
+        final operation = MatrixAccountDeletionOperation.capture(
+          manager: manager,
+          storage: storage,
+          roomKeys: roomKeys,
+          accountSessions: index,
+          erase: true,
+          generationIsCurrent: () => true,
+          runBoundRequest: (request) async {
+            unawaited(request().catchError((Object _) {}));
+            if (wrapperThrows) throw StateError('wrapper ended early');
+          },
+        );
+        final pending = expectLater(
+          operation.request(null),
+          throwsA(
+            isA<StateError>().having(
+              (error) => error.message,
+              'server failure',
+              'server rejected',
+            ),
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+        serverResult.completeError(StateError('server rejected'));
+        await pending;
+        expect(operation.serverConfirmed, isFalse);
+        verify(() => a.deactivateAccount(auth: null, erase: true)).called(1);
+      },
+    );
+  }
+
+  test('late callback after no-send wrapper rejection cannot send', () async {
+    Future<void> Function()? retained;
+    final operation = MatrixAccountDeletionOperation.capture(
+      manager: manager,
+      storage: storage,
+      roomKeys: roomKeys,
+      accountSessions: index,
+      erase: true,
+      generationIsCurrent: () => true,
+      runBoundRequest: (request) async => retained = request,
+    );
+
+    await expectLater(operation.request(null), throwsStateError);
+    await expectLater(retained!(), throwsStateError);
+    expect(operation.serverConfirmed, isFalse);
+    verifyNever(() => a.deactivateAccount(auth: null, erase: true));
+  });
+
   test(
     'cleanup clears A without saving keys and retains unrelated B state',
     () async {
