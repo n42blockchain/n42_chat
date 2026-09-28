@@ -31,6 +31,7 @@ class MatrixAccountDeletionOperation {
     this.deviceId,
     this.erase,
     this.generationIsCurrent,
+    this.generationIsSame,
     this._runBoundRequest,
     this._manager,
     this._storage,
@@ -45,6 +46,7 @@ class MatrixAccountDeletionOperation {
     required AccountSessionIndex accountSessions,
     required bool erase,
     required bool Function() generationIsCurrent,
+    bool Function()? generationIsSame,
     Future<void> Function(Future<void> Function() request)? runBoundRequest,
   }) {
     final client = manager.client;
@@ -57,8 +59,7 @@ class MatrixAccountDeletionOperation {
         userId == null ||
         userId.isEmpty ||
         homeserver == null ||
-        deviceId == null ||
-        deviceId.isEmpty ||
+        (deviceId?.isEmpty ?? false) ||
         !generationIsCurrent()) {
       throw StateError('No stable Matrix account to deactivate');
     }
@@ -69,6 +70,7 @@ class MatrixAccountDeletionOperation {
       deviceId,
       erase,
       generationIsCurrent,
+      generationIsSame ?? generationIsCurrent,
       runBoundRequest,
       manager,
       storage,
@@ -80,9 +82,10 @@ class MatrixAccountDeletionOperation {
   final Client client;
   final String userId;
   final Uri homeserver;
-  final String deviceId;
+  final String? deviceId;
   final bool erase;
   final bool Function() generationIsCurrent;
+  final bool Function() generationIsSame;
   final Future<void> Function(Future<void> Function() request)?
   _runBoundRequest;
   final MatrixClientManager _manager;
@@ -95,12 +98,16 @@ class MatrixAccountDeletionOperation {
   bool _cleanupInProgress = false;
   bool _clientCleared = false;
 
-  bool get isCurrentAccount =>
-      generationIsCurrent() &&
+  bool get _matchesCapturedClient =>
       identical(_manager.client, client) &&
       client.userID == userId &&
       client.homeserver == homeserver &&
       client.deviceID == deviceId;
+
+  bool get isCurrentAccount => generationIsCurrent() && _matchesCapturedClient;
+
+  bool get isSameAccountGeneration =>
+      generationIsSame() && _matchesCapturedClient;
 
   Future<void> request(AuthenticationData? auth) async {
     if (serverConfirmed || _requestInProgress || !isCurrentAccount) {
@@ -170,15 +177,15 @@ class MatrixAccountDeletionOperation {
     try {
       // SDK clear deletes this account's database without preserving inbound
       // keys or making a second server request. Never clear the current B SDK.
-      if (!_clientCleared && isCurrentAccount) {
+      if (!_clientCleared && isSameAccountGeneration) {
         await client.clear(reason: SessionClearReason.logout);
         _clientCleared = true;
       }
       await _roomKeys.deleteForIdentity(homeserver, userId);
       // Keep the A database mapping while its SDK data still needs a scoped
       // clear; otherwise a later retry loses the only path to that database.
-      if (_clientCleared) {
-        await _accountSessions.forget(homeserver, userId, deviceId);
+      if (_clientCleared && deviceId != null) {
+        await _accountSessions.forget(homeserver, userId, deviceId!);
       }
       await _storage.removeAccountIfMatches(userId, homeserver);
       await _storage.clearSessionIfMatches(userId, homeserver);

@@ -1565,6 +1565,7 @@ class AuthRepositoryImpl
       homeserver: observedHomeserver,
       deviceId: observedDeviceId,
       isSameGeneration: sameOrigin,
+      matchesClient: (client) => identical(client, observedClient),
       isCurrent: () =>
           sameOrigin() &&
           !_isAuthenticating &&

@@ -39,7 +39,9 @@ class MatrixAccountDeletionSession implements IMatrixAccountDeletionSession {
   }) : _coordinator = MatrixDeletionUiaCoordinator(
          userId: operation.userId,
          homeserver: operation.homeserver,
-         isCurrentAccount: () => operation.isCurrentAccount,
+         isCurrentAccount: () =>
+             operation.isCurrentAccount ||
+             (operation.serverConfirmed && operation.isSameAccountGeneration),
          request: operation.request,
        );
 
@@ -63,10 +65,12 @@ class MatrixAccountDeletionSession implements IMatrixAccountDeletionSession {
       accountSessions: accountSessions,
       erase: erase,
       generationIsCurrent: () => generation.isCurrent,
+      generationIsSame: () => generation.isSameGeneration,
       runBoundRequest: (request) =>
           lifecycle.runAccountDeletionRequest(generation, request),
     );
-    if (generation.userId != operation.userId ||
+    if (!generation.matchesClient(operation.client) ||
+        generation.userId != operation.userId ||
         generation.homeserver != operation.homeserver ||
         generation.deviceId != operation.deviceId) {
       throw StateError('Matrix account generation does not match client');

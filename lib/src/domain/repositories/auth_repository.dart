@@ -11,6 +11,7 @@ class AuthSessionInvalidation {
   final String? deviceId;
   final bool Function() _isCurrent;
   final bool Function() _isSameGeneration;
+  final bool Function(Object client)? _matchesClient;
 
   AuthSessionInvalidation({
     required this.userId,
@@ -18,11 +19,14 @@ class AuthSessionInvalidation {
     required this.deviceId,
     required bool Function() isCurrent,
     bool Function()? isSameGeneration,
+    bool Function(Object client)? matchesClient,
   }) : _isCurrent = isCurrent,
-       _isSameGeneration = isSameGeneration ?? isCurrent;
+       _isSameGeneration = isSameGeneration ?? isCurrent,
+       _matchesClient = matchesClient;
 
   bool get isCurrent => _isCurrent();
   bool get isSameGeneration => _isSameGeneration();
+  bool matchesClient(Object client) => _matchesClient?.call(client) ?? false;
 }
 
 /// Optional capability; older [IAuthRepository] implementations keep their

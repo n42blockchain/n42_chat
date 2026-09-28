@@ -137,4 +137,27 @@ void main() {
       pathServer,
     );
   });
+
+  test(
+    'null device identity stays null and cannot erase a named device',
+    () async {
+      final store = MatrixPendingDeletionStore();
+      await store.markPending(
+        userId: '@a:hs',
+        homeserver: server,
+        deviceId: null,
+      );
+      await store.markPending(
+        userId: '@a:hs',
+        homeserver: server,
+        deviceId: 'device-A',
+      );
+      expect(
+        (await MatrixPendingDeletionStore().list()).map((e) => e.deviceId),
+        [null, 'device-A'],
+      );
+      await store.complete(userId: '@a:hs', homeserver: server, deviceId: null);
+      expect((await store.list()).single.deviceId, 'device-A');
+    },
+  );
 }

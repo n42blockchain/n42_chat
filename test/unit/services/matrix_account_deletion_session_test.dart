@@ -36,6 +36,10 @@ void main() {
     when(() => operation.deviceId).thenReturn('device-A');
     when(() => operation.erase).thenReturn(true);
     when(() => operation.isCurrentAccount).thenAnswer((_) => sameGeneration);
+    when(
+      () => operation.isSameAccountGeneration,
+    ).thenAnswer((_) => sameGeneration);
+    when(() => operation.serverConfirmed).thenReturn(true);
     when(() => operation.request(any())).thenAnswer((_) async {});
   });
 

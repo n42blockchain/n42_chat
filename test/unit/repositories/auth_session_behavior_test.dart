@@ -1,9 +1,11 @@
 import 'package:n42_chat/src/core/encryption/local_room_key_store.dart';
+import 'package:n42_chat/src/core/encryption/account_session_index.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 import 'package:mocktail/mocktail.dart';
@@ -12,7 +14,12 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_auth_datasource.dart
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/remote/social_auth_api.dart';
 import 'package:n42_chat/src/data/repositories/auth_repository_impl.dart';
+import 'package:n42_chat/src/data/services/matrix_account_deletion_session.dart';
+import 'package:n42_chat/src/data/services/matrix_account_deletion_operation.dart';
+import 'package:n42_chat/src/data/services/matrix_pending_deletion_store.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
+import 'package:n42_chat/src/core/utils/matrix_deletion_uia_coordinator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockAuth extends Mock implements MatrixAuthDataSource {}
 
@@ -1147,4 +1154,169 @@ void main() {
       AuthErrorType.serverError,
     );
   });
+
+  test(
+    'real lifecycle and session clear unchanged A after confirmation',
+    () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({});
+      final client = MockClient();
+      String? user = session['userId'];
+      Uri? server = Uri.parse('https://hs.test');
+      String? device = 'device';
+      when(() => client.userID).thenAnswer((_) => user);
+      when(() => client.homeserver).thenAnswer((_) => server);
+      when(() => client.deviceID).thenAnswer((_) => device);
+      when(() => client.isLogged()).thenReturn(true);
+      when(() => manager.client).thenReturn(client);
+      when(() => manager.isLoggedIn).thenReturn(true);
+      when(
+        () => client.deactivateAccount(auth: null, erase: true),
+      ).thenAnswer((_) async => IdServerUnbindResult.success);
+      when(() => client.clear(reason: SessionClearReason.logout)).thenAnswer((
+        _,
+      ) async {
+        user = null;
+        server = null;
+        device = null;
+        sdk.add(LoginState.loggedOut);
+      });
+      await tokenLogin();
+      final flow = MatrixAccountDeletionSession.capture(
+        lifecycle: repository,
+        manager: manager,
+        storage: SecureStorageDataSource(),
+        roomKeys: LocalRoomKeyStore(),
+        accountSessions: AccountSessionIndex(),
+        journal: MatrixPendingDeletionStore(),
+        erase: true,
+      );
+
+      expect(await flow.start(), DeletionUiaStatus.deactivated);
+      expect(await flow.cleanupConfirmed(), DeletionCleanupStatus.complete);
+      expect(await MatrixPendingDeletionStore().list(), isEmpty);
+      verify(() => client.clear(reason: SessionClearReason.logout)).called(1);
+      verifyNever(storage.clearSession);
+    },
+  );
+
+  test('real lifecycle defers old A cleanup after switching to B', () async {
+    FlutterSecureStorage.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({});
+    final a = MockClient();
+    final b = MockClient();
+    when(() => a.userID).thenReturn(session['userId']);
+    when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => a.deviceID).thenReturn('device');
+    when(() => a.isLogged()).thenReturn(true);
+    when(() => b.userID).thenReturn('@bob:hs.test');
+    when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => b.deviceID).thenReturn('B-device');
+    when(() => manager.client).thenReturn(a);
+    when(() => manager.isLoggedIn).thenReturn(true);
+    final response = Completer<IdServerUnbindResult>();
+    when(
+      () => a.deactivateAccount(auth: null, erase: true),
+    ).thenAnswer((_) => response.future);
+    await tokenLogin();
+    final flow = MatrixAccountDeletionSession.capture(
+      lifecycle: repository,
+      manager: manager,
+      storage: SecureStorageDataSource(),
+      roomKeys: LocalRoomKeyStore(),
+      accountSessions: AccountSessionIndex(),
+      journal: MatrixPendingDeletionStore(),
+      erase: true,
+    );
+    final pending = flow.start();
+    when(() => manager.client).thenReturn(b);
+    response.complete(IdServerUnbindResult.success);
+
+    expect(await pending, DeletionUiaStatus.deactivatedNeedsScopedCleanup);
+    expect(
+      await flow.cleanupConfirmed(),
+      DeletionCleanupStatus.deferredClientClear,
+    );
+    expect(
+      (await MatrixPendingDeletionStore().list()).single.userId,
+      session['userId'],
+    );
+    verifyNever(() => a.clear(reason: SessionClearReason.logout));
+    verifyNever(() => b.clear(reason: SessionClearReason.logout));
+  });
+
+  test(
+    'same account fields on another SDK client cannot bind a request',
+    () async {
+      final a = MockClient();
+      final b = MockClient();
+      for (final client in [a, b]) {
+        when(() => client.userID).thenReturn(session['userId']);
+        when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+        when(() => client.deviceID).thenReturn('device');
+        when(() => client.isLogged()).thenReturn(true);
+      }
+      when(() => manager.client).thenReturn(a);
+      final otherManager = MockManager();
+      when(() => otherManager.client).thenReturn(b);
+      when(() => otherManager.isLoggedIn).thenReturn(true);
+      await tokenLogin();
+
+      expect(
+        () => MatrixAccountDeletionSession.capture(
+          lifecycle: repository,
+          manager: otherManager,
+          storage: SecureStorageDataSource(),
+          roomKeys: LocalRoomKeyStore(),
+          accountSessions: AccountSessionIndex(),
+          journal: MatrixPendingDeletionStore(),
+          erase: true,
+        ),
+        throwsStateError,
+      );
+      verifyNever(() => b.deactivateAccount(auth: null, erase: true));
+    },
+  );
+
+  test(
+    'real null-device token generation can confirm and clear its client',
+    () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({});
+      final client = MockClient();
+      String? user = session['userId'];
+      Uri? server = Uri.parse('https://hs.test');
+      when(() => client.userID).thenAnswer((_) => user);
+      when(() => client.homeserver).thenAnswer((_) => server);
+      when(() => client.deviceID).thenReturn(null);
+      when(() => client.isLogged()).thenReturn(true);
+      when(() => manager.client).thenReturn(client);
+      when(() => manager.isLoggedIn).thenReturn(true);
+      when(
+        () => client.deactivateAccount(auth: null, erase: true),
+      ).thenAnswer((_) async => IdServerUnbindResult.success);
+      when(() => client.clear(reason: SessionClearReason.logout)).thenAnswer((
+        _,
+      ) async {
+        user = null;
+        server = null;
+        sdk.add(LoginState.loggedOut);
+      });
+      await tokenLogin();
+      final flow = MatrixAccountDeletionSession.capture(
+        lifecycle: repository,
+        manager: manager,
+        storage: SecureStorageDataSource(),
+        roomKeys: LocalRoomKeyStore(),
+        accountSessions: AccountSessionIndex(),
+        journal: MatrixPendingDeletionStore(),
+        erase: true,
+      );
+
+      expect(flow.generation.deviceId, isNull);
+      expect(await flow.start(), DeletionUiaStatus.deactivated);
+      expect(await flow.cleanupConfirmed(), DeletionCleanupStatus.complete);
+      verify(() => client.clear(reason: SessionClearReason.logout)).called(1);
+    },
+  );
 }

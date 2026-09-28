@@ -14,7 +14,7 @@ class MatrixPendingDeletionEntry {
 
   final String userId;
   final Uri homeserver;
-  final String deviceId;
+  final String? deviceId;
   int get version => 1;
 }
 
@@ -57,18 +57,19 @@ class MatrixPendingDeletionStore {
           if (entry is! Map ||
               entry['userId'] is! String ||
               entry['homeserver'] is! String ||
-              entry['deviceId'] is! String) {
+              !entry.containsKey('deviceId') ||
+              (entry['deviceId'] != null && entry['deviceId'] is! String)) {
             throw const FormatException(
               'Invalid pending Matrix deletion entry',
             );
           }
           final userId = entry['userId'] as String;
           final homeserver = Uri.tryParse(entry['homeserver'] as String);
-          final deviceId = entry['deviceId'] as String;
+          final deviceId = entry['deviceId'] as String?;
           if (userId.isEmpty ||
               homeserver == null ||
               !_validHomeserver(homeserver) ||
-              deviceId.isEmpty) {
+              (deviceId?.isEmpty ?? false)) {
             throw const FormatException(
               'Invalid pending Matrix deletion identity',
             );
@@ -85,9 +86,11 @@ class MatrixPendingDeletionStore {
   Future<void> markPending({
     required String userId,
     required Uri homeserver,
-    required String deviceId,
+    required String? deviceId,
   }) => _withWrite(() async {
-    if (userId.isEmpty || !_validHomeserver(homeserver) || deviceId.isEmpty) {
+    if (userId.isEmpty ||
+        !_validHomeserver(homeserver) ||
+        (deviceId?.isEmpty ?? false)) {
       throw ArgumentError('Invalid pending Matrix deletion identity');
     }
     final entries = await list();
@@ -112,7 +115,7 @@ class MatrixPendingDeletionStore {
   Future<void> complete({
     required String userId,
     required Uri homeserver,
-    required String deviceId,
+    required String? deviceId,
   }) => _withWrite(() async {
     final entries = await list();
     await _save(
