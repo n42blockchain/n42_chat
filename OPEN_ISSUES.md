@@ -11,12 +11,12 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
-### QR-001 Exact-asset payment requests are not wired end to end
+### QR-001 Exact-asset payment requests need host integration
 
 - Severity: H
 - Added: 2026-09-27
-- Current state: Task 15B has optional wallet and repository capabilities, `TokenInfo` identity fields, strict v1 URI parsing/encoding, selected-asset matching and decimal checks, and exact identity in transfer requests, Matrix messages, events and bloc dispatch. `tryParseExact` remains separate from the legacy scanner. The existing payment-message tap rejects exact requests until the selection UI is asset-aware; legacy payment messages still open normally. The host has not opted into the new capability or pinned this Chat source.
-- Next step: adopt `tryParseExact` in the QR scanner and exact selected-asset checks in transfer/payment UI, then adapt the host bridge and repin the reviewed Chat commit. Keep legacy transfers available through explicit, unambiguous selection.
+- Current state: Task 15B Chat source through `42de7970` implements and tests the optional exact wallet/repository capabilities, strict v1 URI parsing, selected-asset matching and decimal checks, repository/bloc/message identity propagation, and scanner, transfer, merchant/receive QR and payment-message UI. Legacy transfers remain available with unambiguous asset selection. The host has not yet opted into `IExactWalletTransfer`, pinned this Chat source or verified its adapter integration; no live transfer or deployment was tested.
+- Next step: explicitly implement the exact capability in the host bridge, map authoritative asset identity and selected receiver, pin the reviewed immutable Chat commit, and verify host integration. Other external account, UGC deletion and store/compliance issues remain separate and open; this QR source work does not resolve them.
 
 ### DEP-001 Latest generator stack — resolved in Task 13A
 
