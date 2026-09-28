@@ -220,8 +220,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Severity: M
 - Added: 2026-03-20
 - Evidence: `lib/src/presentation/pages/settings/security_settings_page.dart`, `lib/src/core/utils/matrix_uia_utils.dart`, `lib/src/data/datasources/matrix/matrix_auth_datasource.dart`
-- Current state: account deactivation no longer forces a password up front, but the retry path only handles `m.login.password`. Homeservers that require SSO/passkey or other UIA stages still fail closed.
-- Next step: implement a generic UIA handler for deactivation instead of password-only fallback logic.
+- Current state: account deactivation no longer forces a password up front, but the settings page still retries only `m.login.password` and loses the UIA session. A decoded-challenge coordinator now handles ordered stages, session-bound password submissions and trusted fallback retries in isolation; it is not connected to the settings page yet. Homeservers requiring SSO/passkey or other stages still fail closed in the visible flow.
+- Next step: connect the coordinator to account-bound deactivation UI, then verify account-scoped cleanup and actual server behavior.
 
 ### SEC-005 iOS background APNs still bypasses client-side notification privacy mode
 
