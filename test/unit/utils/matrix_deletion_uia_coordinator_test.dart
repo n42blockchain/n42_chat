@@ -70,6 +70,52 @@ void main() {
     expect(() => coordinator.start(), throwsA(isA<DeletionUiaException>()));
   });
 
+  test(
+    'external fallback return only retries the bound server session',
+    () async {
+      var calls = 0;
+      final coordinator = MatrixDeletionUiaCoordinator(
+        userId: userId,
+        homeserver: homeserver,
+        isCurrentAccount: () => true,
+        request: (auth) async {
+          calls++;
+          if (auth == null) {
+            throw challenge(
+              session: 'bound-session',
+              flows: [
+                ['m.login.sso'],
+              ],
+            );
+          }
+          expect(auth.toJson()['session'], 'bound-session');
+        },
+      );
+      expect(
+        await coordinator.start(),
+        DeletionUiaStatus.awaitingAuthentication,
+      );
+      final url = coordinator.fallbackUri('m.login.sso');
+      expect(url.host, homeserver.host);
+      await expectLater(
+        coordinator.retryAfterExternalFallback(
+          stage: 'm.login.sso',
+          session: 'other-session',
+        ),
+        throwsA(isA<DeletionUiaException>()),
+      );
+      expect(calls, 1);
+      expect(
+        await coordinator.retryAfterExternalFallback(
+          stage: 'm.login.sso',
+          session: 'bound-session',
+        ),
+        DeletionUiaStatus.deactivated,
+      );
+      expect(calls, 2);
+    },
+  );
+
   test('completed stages are an ordered prefix of an offered flow', () async {
     final coordinator = MatrixDeletionUiaCoordinator(
       userId: userId,

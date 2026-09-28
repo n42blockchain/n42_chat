@@ -144,6 +144,26 @@ class MatrixDeletionUiaCoordinator {
         origin.port != homeserver.port) {
       throw const DeletionUiaException(DeletionUiaFailure.untrustedOrigin);
     }
+    return _retryOpenedFallback(stage: stage, session: session);
+  }
+
+  /// An external browser supplies no trusted completion callback. A manual
+  /// return only permits retrying the original server operation/session.
+  Future<DeletionUiaStatus> retryAfterExternalFallback({
+    required String stage,
+    required String session,
+  }) async {
+    _requireStage(stage);
+    if (!_openedFallbackStages.contains(stage) || session != this.session) {
+      throw const DeletionUiaException(DeletionUiaFailure.staleSession);
+    }
+    return _retryOpenedFallback(stage: stage, session: session);
+  }
+
+  Future<DeletionUiaStatus> _retryOpenedFallback({
+    required String stage,
+    required String session,
+  }) async {
     _openedFallbackStages.remove(stage);
     return await _attempt(AuthenticationData(session: session));
   }
