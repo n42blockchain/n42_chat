@@ -406,7 +406,9 @@ extension ChatBlocActionHandlers on ChatBloc {
       return;
     }
     final roomId = _currentRoomId;
-    if (roomId == null) return;
+    if (roomId == null || (event.roomId != null && event.roomId != roomId)) {
+      return;
+    }
     final manager = _clientManager;
     final client = manager?.client;
     final account = client?.userID;

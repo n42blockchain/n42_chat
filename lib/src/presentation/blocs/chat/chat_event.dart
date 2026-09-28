@@ -871,11 +871,12 @@ class ReportMessage extends ChatEvent {
   final String messageId;
   final String reason;
   final MessageReportOrigin? origin;
+  final String? roomId;
 
-  const ReportMessage(this.messageId, this.reason, {this.origin});
+  const ReportMessage(this.messageId, this.reason, {this.origin, this.roomId});
 
   @override
-  List<Object?> get props => [messageId, reason, origin];
+  List<Object?> get props => [messageId, reason, origin, roomId];
 }
 
 /// 关键词过滤配置加载完成（内部事件）

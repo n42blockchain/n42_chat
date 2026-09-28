@@ -375,6 +375,7 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
                           message.id,
                           selectedReason!,
                           origin: origin,
+                          roomId: message.roomId,
                         ),
                       );
                     },

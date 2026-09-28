@@ -161,6 +161,7 @@ void main() {
       expect(reports, hasLength(1));
       expect(reports.single.messageId, eventId);
       expect(reports.single.reason, 'Spam');
+      expect(reports.single.roomId, roomId);
       expect(reports.single.origin?.isCurrent, isTrue);
       expect(account.active, isTrue);
     });

@@ -1185,6 +1185,59 @@ void main() {
   });
 
   group('ReportMessage account-bound acknowledgement', () {
+    test('queued A room report never uses newly selected B room', () async {
+      const roomB = '!other:server.com';
+      const report = ReportMessage(r'$event1', 'Spam', roomId: _roomId);
+      final bloc = buildBlocWithClientManager();
+      await initBloc(bloc);
+      bloc.add(const InitializeChat(roomB));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      bloc.add(report);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      verifyNever(
+        () => mockRepo.reportMessage(roomB, r'$event1', reason: 'Spam'),
+      );
+      verifyNever(
+        () => mockRepo.reportMessage(_roomId, r'$event1', reason: 'Spam'),
+      );
+      await bloc.close();
+    });
+
+    for (final fails in [false, true]) {
+      test(
+        'room change while report is pending does not show old ${fails ? 'error' : 'success'}',
+        () async {
+          const roomB = '!other:server.com';
+          final pending = Completer<void>();
+          when(
+            () => mockRepo.reportMessage(_roomId, r'$event1', reason: 'Spam'),
+          ).thenAnswer((_) async {
+            await pending.future;
+            if (fails) throw StateError('Transport failed');
+          });
+          final bloc = buildBlocWithClientManager();
+          await initBloc(bloc);
+          final results = <String>[];
+          final subscription = bloc.stream.listen((state) {
+            if (state.error != null) results.add(state.error!);
+          });
+          bloc.add(const ReportMessage(r'$event1', 'Spam', roomId: _roomId));
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+          verify(
+            () => mockRepo.reportMessage(_roomId, r'$event1', reason: 'Spam'),
+          ).called(1);
+          bloc.add(const InitializeChat(roomB));
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+          pending.complete();
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+          expect(results, isNot(contains('success:report')));
+          expect(results, isNot(contains('Failed to report message')));
+          await subscription.cancel();
+          await bloc.close();
+        },
+      );
+    }
+
     for (final replacementA in [false, true]) {
       test(
         'queued report from A cannot reach ${replacementA ? 'new A' : 'B'}',
