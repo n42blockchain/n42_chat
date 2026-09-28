@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -9,6 +10,24 @@ import '../../../core/utils/debug_log.dart';
 /// 仅保留会话、凭据、多账号、生物识别等真正需要加密的方法。
 /// 非敏感数据（外观、备注、草稿等）已迁移至 PreferencesDataSource。
 class SecureStorageDataSource {
+  // All instances share these fixed account/session keys. Serialize their
+  // read-modify-write operations so a late A deletion cannot erase a B login.
+  static Future<void> _identityWriteTail = Future<void>.value();
+
+  Future<void> _withIdentityWrite(Future<void> Function() action) {
+    final previous = _identityWriteTail;
+    final done = Completer<void>();
+    _identityWriteTail = done.future;
+    return () async {
+      await previous;
+      try {
+        await action();
+      } finally {
+        done.complete();
+      }
+    }();
+  }
+
   static const String _keySession = 'n42_chat_session';
   static const String _keyCredentials = 'n42_chat_credentials';
   static const String _keyAccounts = 'n42_chat_accounts';
@@ -38,7 +57,7 @@ class SecureStorageDataSource {
     required String accessToken,
     required String userId,
     required String deviceId,
-  }) async {
+  }) => _withIdentityWrite(() async {
     final sessionData = {
       'homeserver': homeserver,
       'accessToken': accessToken,
@@ -50,7 +69,7 @@ class SecureStorageDataSource {
     await _storage.write(key: _keySession, value: jsonEncode(sessionData));
 
     secureLog('Session saved for $userId');
-  }
+  });
 
   /// 获取保存的会话
   Future<Map<String, String>?> getSession() async {
@@ -97,10 +116,29 @@ class SecureStorageDataSource {
   }
 
   /// 清除会话
-  Future<void> clearSession() async {
+  Future<void> clearSession() => _withIdentityWrite(() async {
     await _storage.delete(key: _keySession);
     secureLog('Session cleared');
-  }
+  });
+
+  /// Remove only the deleted Matrix identity's current session. A later B
+  /// login must remain intact if it replaced the session during deletion UIA.
+  Future<void> clearSessionIfMatches(String userId, Uri homeserver) =>
+      _withIdentityWrite(() async {
+        final raw = await _storage.read(key: _keySession);
+        if (raw == null) return;
+        final decoded = jsonDecode(raw);
+        if (decoded is! Map ||
+            decoded['userId'] is! String ||
+            decoded['homeserver'] is! String) {
+          throw const FormatException('Invalid saved Matrix session');
+        }
+        if (decoded['userId'] == userId &&
+            _sameHomeserver(decoded['homeserver'] as String, homeserver)) {
+          await _storage.delete(key: _keySession);
+          secureLog('Session cleared for $userId');
+        }
+      });
 
   /// 检查是否有保存的会话
   Future<bool> hasSession() async {
@@ -197,7 +235,7 @@ class SecureStorageDataSource {
     required String deviceId,
     String? displayName,
     String? avatarUrl,
-  }) async {
+  }) => _withIdentityWrite(() async {
     final accounts = await getAccounts();
 
     accounts[userId] = {
@@ -213,7 +251,7 @@ class SecureStorageDataSource {
     await _storage.write(key: _keyAccounts, value: jsonEncode(accounts));
 
     secureLog('Account added - $userId');
-  }
+  });
 
   /// 获取所有账号
   Future<Map<String, Map<String, dynamic>>> getAccounts() async {
@@ -232,7 +270,7 @@ class SecureStorageDataSource {
   }
 
   /// 删除账号
-  Future<void> removeAccount(String userId) async {
+  Future<void> removeAccount(String userId) => _withIdentityWrite(() async {
     final accounts = await getAccounts();
     accounts.remove(userId);
 
@@ -243,6 +281,41 @@ class SecureStorageDataSource {
     }
 
     secureLog('Account removed - $userId');
+  });
+
+  Future<void> removeAccountIfMatches(String userId, Uri homeserver) =>
+      _withIdentityWrite(() async {
+        final raw = await _storage.read(key: _keyAccounts);
+        if (raw == null) return;
+        final decoded = jsonDecode(raw);
+        if (decoded is! Map) {
+          throw const FormatException('Invalid saved Matrix accounts');
+        }
+        final accounts = Map<String, dynamic>.from(decoded);
+        final account = accounts[userId];
+        if (account == null) return;
+        if (account is! Map || account['homeserver'] is! String) {
+          throw const FormatException('Invalid saved Matrix account');
+        }
+        if (!_sameHomeserver(account['homeserver'] as String, homeserver)) {
+          return;
+        }
+        accounts.remove(userId);
+        if (accounts.isEmpty) {
+          await _storage.delete(key: _keyAccounts);
+        } else {
+          await _storage.write(key: _keyAccounts, value: jsonEncode(accounts));
+        }
+        secureLog('Account removed - $userId');
+      });
+
+  bool _sameHomeserver(String? stored, Uri homeserver) {
+    if (stored == null) return false;
+    final parsed = Uri.tryParse(stored);
+    if (parsed == null) return false;
+    String normalized(Uri uri) =>
+        uri.removeFragment().toString().replaceFirst(RegExp(r'/+$'), '');
+    return normalized(parsed) == normalized(homeserver);
   }
 
   /// 获取账号数量

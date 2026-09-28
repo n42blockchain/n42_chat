@@ -81,4 +81,15 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('concurrent A forget and B remember retain only B mapping', () async {
+    final server = Uri.parse('https://hs.test');
+    await index.remember(server, '@a:hs', 'A', 'N42Chat_A');
+    await Future.wait([
+      index.forget(server, '@a:hs', 'A'),
+      AccountSessionIndex().remember(server, '@b:hs', 'B', 'N42Chat_B'),
+    ]);
+    expect(await index.lookup(server, '@a:hs', 'A'), isNull);
+    expect(await index.lookup(server, '@b:hs', 'B'), 'N42Chat_B');
+  });
 }
