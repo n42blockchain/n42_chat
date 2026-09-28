@@ -35,6 +35,10 @@ class InitiateTransfer extends TransferEvent {
   final String amount;
   final String token;
   final String? memo;
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
 
   const InitiateTransfer({
     required this.roomId,
@@ -42,10 +46,27 @@ class InitiateTransfer extends TransferEvent {
     required this.amount,
     required this.token,
     this.memo,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
   });
 
+  bool get hasExactIdentity =>
+      chain != null || network != null || assetType != null || assetId != null;
+
   @override
-  List<Object?> get props => [roomId, receiverAddress, amount, token, memo];
+  List<Object?> get props => [
+    roomId,
+    receiverAddress,
+    amount,
+    token,
+    memo,
+    chain,
+    network,
+    assetType,
+    assetId,
+  ];
 }
 
 /// 创建收款请求
@@ -54,16 +75,36 @@ class CreatePaymentRequest extends TransferEvent {
   final String amount;
   final String token;
   final String? memo;
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
 
   const CreatePaymentRequest({
     required this.roomId,
     required this.amount,
     required this.token,
     this.memo,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
   });
 
+  bool get hasExactIdentity =>
+      chain != null || network != null || assetType != null || assetId != null;
+
   @override
-  List<Object?> get props => [roomId, amount, token, memo];
+  List<Object?> get props => [
+    roomId,
+    amount,
+    token,
+    memo,
+    chain,
+    network,
+    assetType,
+    assetId,
+  ];
 }
 
 /// 处理收款请求
@@ -73,6 +114,10 @@ class FulfillPaymentRequest extends TransferEvent {
   final String receiverAddress;
   final String amount;
   final String token;
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
 
   const FulfillPaymentRequest({
     required this.roomId,
@@ -80,10 +125,27 @@ class FulfillPaymentRequest extends TransferEvent {
     required this.receiverAddress,
     required this.amount,
     required this.token,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
   });
 
+  bool get hasExactIdentity =>
+      chain != null || network != null || assetType != null || assetId != null;
+
   @override
-  List<Object?> get props => [roomId, requestId, receiverAddress, amount, token];
+  List<Object?> get props => [
+    roomId,
+    requestId,
+    receiverAddress,
+    amount,
+    token,
+    chain,
+    network,
+    assetType,
+    assetId,
+  ];
 }
 
 /// 验证地址
@@ -100,4 +162,3 @@ class ValidateAddress extends TransferEvent {
 class ClearTransferState extends TransferEvent {
   const ClearTransferState();
 }
-

@@ -50,7 +50,10 @@ void main() {
     });
 
     test('same token → equal', () {
-      expect(const LoadTokenBalance('ETH'), equals(const LoadTokenBalance('ETH')));
+      expect(
+        const LoadTokenBalance('ETH'),
+        equals(const LoadTokenBalance('ETH')),
+      );
     });
 
     test('different token → not equal', () {
@@ -70,6 +73,41 @@ void main() {
   // ─────────────────────────────────────────────────
 
   group('InitiateTransfer', () {
+    test('exact identity changes event equality even with the same ticker', () {
+      const base = InitiateTransfer(
+        roomId: '!r:s',
+        receiverAddress: 'receiver',
+        amount: '1',
+        token: 'USDT',
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'token',
+        assetId: 'contract-a',
+      );
+      const otherContract = InitiateTransfer(
+        roomId: '!r:s',
+        receiverAddress: 'receiver',
+        amount: '1',
+        token: 'USDT',
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'token',
+        assetId: 'contract-b',
+      );
+      expect(base, isNot(otherContract));
+      expect(base.hasExactIdentity, isTrue);
+    });
+
+    test('partial exact identity is visible for rejection by the bloc', () {
+      const event = InitiateTransfer(
+        roomId: '!r:s',
+        receiverAddress: 'receiver',
+        amount: '1',
+        token: 'USDT',
+        chain: 'ETH',
+      );
+      expect(event.hasExactIdentity, isTrue);
+    });
     test('stores all required fields', () {
       const e = InitiateTransfer(
         roomId: '!room:server',
@@ -107,25 +145,51 @@ void main() {
     test('same fields → equal', () {
       expect(
         const InitiateTransfer(
-          roomId: '!r:s', receiverAddress: '0x', amount: '1', token: 'ETH'),
-        equals(const InitiateTransfer(
-          roomId: '!r:s', receiverAddress: '0x', amount: '1', token: 'ETH')),
+          roomId: '!r:s',
+          receiverAddress: '0x',
+          amount: '1',
+          token: 'ETH',
+        ),
+        equals(
+          const InitiateTransfer(
+            roomId: '!r:s',
+            receiverAddress: '0x',
+            amount: '1',
+            token: 'ETH',
+          ),
+        ),
       );
     });
 
     test('different amount → not equal', () {
       expect(
         const InitiateTransfer(
-          roomId: '!r:s', receiverAddress: '0x', amount: '1', token: 'ETH'),
-        isNot(equals(const InitiateTransfer(
-          roomId: '!r:s', receiverAddress: '0x', amount: '2', token: 'ETH'))),
+          roomId: '!r:s',
+          receiverAddress: '0x',
+          amount: '1',
+          token: 'ETH',
+        ),
+        isNot(
+          equals(
+            const InitiateTransfer(
+              roomId: '!r:s',
+              receiverAddress: '0x',
+              amount: '2',
+              token: 'ETH',
+            ),
+          ),
+        ),
       );
     });
 
     test('is a TransferEvent', () {
       expect(
         const InitiateTransfer(
-          roomId: '!r:s', receiverAddress: '0x', amount: '1', token: 'ETH'),
+          roomId: '!r:s',
+          receiverAddress: '0x',
+          amount: '1',
+          token: 'ETH',
+        ),
         isA<TransferEvent>(),
       );
     });
@@ -136,6 +200,26 @@ void main() {
   // ─────────────────────────────────────────────────
 
   group('CreatePaymentRequest', () {
+    test('different network changes exact request event equality', () {
+      const mainnet = CreatePaymentRequest(
+        roomId: '!r:s',
+        amount: '1',
+        token: 'ETH',
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'native',
+      );
+      const testnet = CreatePaymentRequest(
+        roomId: '!r:s',
+        amount: '1',
+        token: 'ETH',
+        chain: 'ETH',
+        network: 'testnet',
+        assetType: 'native',
+      );
+      expect(mainnet, isNot(testnet));
+      expect(mainnet.hasExactIdentity, isTrue);
+    });
     test('stores roomId, amount, token', () {
       const e = CreatePaymentRequest(
         roomId: '!r:s',
@@ -154,14 +238,20 @@ void main() {
 
     test('stores memo', () {
       const e = CreatePaymentRequest(
-        roomId: '!r:s', amount: '1', token: 'ETH', memo: 'split bill');
+        roomId: '!r:s',
+        amount: '1',
+        token: 'ETH',
+        memo: 'split bill',
+      );
       expect(e.memo, 'split bill');
     });
 
     test('same fields → equal', () {
       expect(
         const CreatePaymentRequest(roomId: '!r:s', amount: '1', token: 'ETH'),
-        equals(const CreatePaymentRequest(roomId: '!r:s', amount: '1', token: 'ETH')),
+        equals(
+          const CreatePaymentRequest(roomId: '!r:s', amount: '1', token: 'ETH'),
+        ),
       );
     });
 
@@ -178,6 +268,31 @@ void main() {
   // ─────────────────────────────────────────────────
 
   group('FulfillPaymentRequest', () {
+    test('different asset type changes fulfillment event equality', () {
+      const native = FulfillPaymentRequest(
+        roomId: '!r:s',
+        requestId: 'req',
+        receiverAddress: 'receiver',
+        amount: '1',
+        token: 'ETH',
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'native',
+      );
+      const token = FulfillPaymentRequest(
+        roomId: '!r:s',
+        requestId: 'req',
+        receiverAddress: 'receiver',
+        amount: '1',
+        token: 'ETH',
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'token',
+        assetId: 'contract',
+      );
+      expect(native, isNot(token));
+      expect(token.hasExactIdentity, isTrue);
+    });
     test('stores all fields', () {
       const e = FulfillPaymentRequest(
         roomId: '!r:s',
@@ -195,19 +310,31 @@ void main() {
 
     test('same fields → equal', () {
       const a = FulfillPaymentRequest(
-        roomId: '!r:s', requestId: 'req', receiverAddress: '0x',
-        amount: '1', token: 'ETH');
+        roomId: '!r:s',
+        requestId: 'req',
+        receiverAddress: '0x',
+        amount: '1',
+        token: 'ETH',
+      );
       const b = FulfillPaymentRequest(
-        roomId: '!r:s', requestId: 'req', receiverAddress: '0x',
-        amount: '1', token: 'ETH');
+        roomId: '!r:s',
+        requestId: 'req',
+        receiverAddress: '0x',
+        amount: '1',
+        token: 'ETH',
+      );
       expect(a, equals(b));
     });
 
     test('is a TransferEvent', () {
       expect(
         const FulfillPaymentRequest(
-          roomId: '!r:s', requestId: 'req', receiverAddress: '0x',
-          amount: '1', token: 'ETH'),
+          roomId: '!r:s',
+          requestId: 'req',
+          receiverAddress: '0x',
+          amount: '1',
+          token: 'ETH',
+        ),
         isA<TransferEvent>(),
       );
     });
