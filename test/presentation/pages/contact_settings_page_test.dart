@@ -15,6 +15,7 @@ import 'package:n42_chat/src/domain/repositories/contact_repository.dart';
 import 'package:n42_chat/src/domain/repositories/content_report_repository.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/contact/contact_bloc.dart';
+import 'package:n42_chat/src/presentation/blocs/contact/contact_event.dart';
 import 'package:n42_chat/src/presentation/blocs/contact/contact_state.dart';
 import 'package:n42_chat/src/presentation/pages/contact/contact_settings_page.dart';
 
@@ -132,11 +133,10 @@ void main() {
     testWidgets(
       'blocked user absent from contacts has truthful switch; save failure=$fail',
       (tester) async {
+        _ReportOwner();
         final repository = _ContactRepository();
         final saved = Completer<void>();
-        getIt.pushNewScope();
         getIt.registerSingleton<IContactRepository>(repository);
-        addTearDown(getIt.popScope);
         when(
           () => repository.isUserIgnored('@test:server.com'),
         ).thenReturn(true);
@@ -172,6 +172,172 @@ void main() {
         verify(() => repository.unignoreUser('@test:server.com')).called(1);
       },
     );
+  }
+
+  testWidgets('old block acknowledgement does not flip or refresh B page', (
+    tester,
+  ) async {
+    final owner = _ReportOwner();
+    final repository = _ContactRepository();
+    getIt.registerSingleton<IContactRepository>(repository);
+    final acknowledgement = Completer<void>();
+    when(() => repository.isUserIgnored('@test:server.com')).thenReturn(false);
+    when(
+      () => repository.ignoreUser('@test:server.com'),
+    ).thenAnswer((_) => acknowledgement.future);
+    await tester.pumpWidget(
+      buildTestWidget(
+        const ContactSettingsPage(
+          userId: '@test:server.com',
+          displayName: 'Test User',
+        ),
+        contactBloc: mockContactBloc,
+      ),
+    );
+    await tester.pumpAndSettle();
+    final toggle = find.byType(Switch).last;
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pump();
+    owner.current = false;
+    acknowledgement.complete();
+    await tester.pumpAndSettle();
+    expect(tester.widget<Switch>(toggle).value, isFalse);
+    verifyNever(() => mockContactBloc.add(const RefreshContacts()));
+    expect(find.text('Save failed'), findsNothing);
+  });
+
+  testWidgets('old block acknowledgement does not flip after ABA login', (
+    tester,
+  ) async {
+    final owner = _ReportOwner();
+    final repository = _ContactRepository();
+    getIt.registerSingleton<IContactRepository>(repository);
+    final acknowledgement = Completer<void>();
+    when(() => repository.isUserIgnored('@test:server.com')).thenReturn(false);
+    when(
+      () => repository.ignoreUser('@test:server.com'),
+    ).thenAnswer((_) => acknowledgement.future);
+    await tester.pumpWidget(
+      buildTestWidget(
+        const ContactSettingsPage(
+          userId: '@test:server.com',
+          displayName: 'Test User',
+        ),
+        contactBloc: mockContactBloc,
+      ),
+    );
+    await tester.pumpAndSettle();
+    final toggle = find.byType(Switch).last;
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pump();
+    owner.current = false;
+    final returnedA = AuthSessionInvalidation(
+      userId: '@me:hs.test',
+      homeserver: Uri.parse('https://hs.test'),
+      deviceId: 'device-A',
+      isCurrent: () => true,
+      matchesClient: (candidate) => identical(candidate, owner.client),
+    );
+    when(() => owner.auth.currentAccountGeneration).thenReturn(returnedA);
+    acknowledgement.complete();
+    await tester.pumpAndSettle();
+    expect(tester.widget<Switch>(toggle).value, isFalse);
+    verifyNever(() => mockContactBloc.add(const RefreshContacts()));
+  });
+
+  testWidgets('old block failure does not show A error on B page', (
+    tester,
+  ) async {
+    final owner = _ReportOwner();
+    final repository = _ContactRepository();
+    getIt.registerSingleton<IContactRepository>(repository);
+    final acknowledgement = Completer<void>();
+    when(() => repository.isUserIgnored('@test:server.com')).thenReturn(false);
+    when(
+      () => repository.ignoreUser('@test:server.com'),
+    ).thenAnswer((_) => acknowledgement.future);
+    await tester.pumpWidget(
+      buildTestWidget(
+        const ContactSettingsPage(
+          userId: '@test:server.com',
+          displayName: 'Test User',
+        ),
+        contactBloc: mockContactBloc,
+      ),
+    );
+    await tester.pumpAndSettle();
+    final toggle = find.byType(Switch).last;
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pump();
+    owner.token = 'session-B';
+    acknowledgement.completeError(StateError('A request failed'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<Switch>(toggle).value, isFalse);
+    expect(find.text('Save failed'), findsNothing);
+    verifyNever(() => mockContactBloc.add(const RefreshContacts()));
+  });
+
+  testWidgets('old settings page cannot start a block for new account', (
+    tester,
+  ) async {
+    final owner = _ReportOwner();
+    final repository = _ContactRepository();
+    getIt.registerSingleton<IContactRepository>(repository);
+    when(() => repository.isUserIgnored('@test:server.com')).thenReturn(false);
+    await tester.pumpWidget(
+      buildTestWidget(
+        const ContactSettingsPage(
+          userId: '@test:server.com',
+          displayName: 'Test User',
+        ),
+        contactBloc: mockContactBloc,
+      ),
+    );
+    await tester.pumpAndSettle();
+    owner.current = false;
+    final toggle = find.byType(Switch).last;
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(tester.widget<Switch>(toggle).value, isFalse);
+    verifyNever(() => repository.ignoreUser('@test:server.com'));
+    verifyNever(() => mockContactBloc.add(const RefreshContacts()));
+  });
+
+  for (final initiallyBlocked in [false, true]) {
+    testWidgets('missing client keeps block=$initiallyBlocked unchanged', (
+      tester,
+    ) async {
+      final owner = _ReportOwner();
+      when(() => owner.manager.client).thenReturn(null);
+      final repository = _ContactRepository();
+      getIt.registerSingleton<IContactRepository>(repository);
+      when(
+        () => repository.isUserIgnored('@test:server.com'),
+      ).thenReturn(initiallyBlocked);
+      await tester.pumpWidget(
+        buildTestWidget(
+          const ContactSettingsPage(
+            userId: '@test:server.com',
+            displayName: 'Test User',
+          ),
+          contactBloc: mockContactBloc,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final toggle = find.byType(Switch).last;
+      await tester.ensureVisible(toggle);
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Switch>(toggle).value, initiallyBlocked);
+      expect(find.text('Save failed'), findsOneWidget);
+      verifyNever(() => repository.ignoreUser('@test:server.com'));
+      verifyNever(() => repository.unignoreUser('@test:server.com'));
+      verifyNever(() => mockContactBloc.add(const RefreshContacts()));
+    });
   }
 
   group('ContactSettingsPage', () {
