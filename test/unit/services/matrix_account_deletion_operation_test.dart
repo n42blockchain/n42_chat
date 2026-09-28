@@ -64,6 +64,14 @@ void main() {
     when(
       () => a.clear(reason: SessionClearReason.logout),
     ).thenAnswer((_) async {});
+    when(() => manager.clearCapturedClientForDeletion(a, any())).thenAnswer((
+      call,
+    ) async {
+      final ownsGeneration = call.positionalArguments[1] as bool Function();
+      if (!identical(manager.client, a) || !ownsGeneration()) return false;
+      await a.clear(reason: SessionClearReason.logout);
+      return true;
+    });
   });
 
   test(

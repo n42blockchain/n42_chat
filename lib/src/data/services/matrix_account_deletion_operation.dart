@@ -196,7 +196,11 @@ class MatrixAccountDeletionOperation {
       // SDK clear deletes this account's database without preserving inbound
       // keys or making a second server request. Never clear the current B SDK.
       if (!_clientCleared) {
-        await client.clear(reason: SessionClearReason.logout);
+        final cleared = await _manager.clearCapturedClientForDeletion(
+          client,
+          () => _ownsOriginalGeneration,
+        );
+        if (!cleared) return DeletionCleanupStatus.deferredClientClear;
         _clientCleared = true;
       }
       if (!_ownsOriginalGeneration) {

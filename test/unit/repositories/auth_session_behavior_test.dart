@@ -1181,6 +1181,14 @@ void main() {
         device = null;
         sdk.add(LoginState.loggedOut);
       });
+      when(
+        () => manager.clearCapturedClientForDeletion(client, any()),
+      ).thenAnswer((call) async {
+        final owns = call.positionalArguments[1] as bool Function();
+        if (!owns()) return false;
+        await client.clear(reason: SessionClearReason.logout);
+        return true;
+      });
       await tokenLogin();
       final flow = MatrixAccountDeletionSession.capture(
         lifecycle: repository,
@@ -1301,6 +1309,14 @@ void main() {
         user = null;
         server = null;
         sdk.add(LoginState.loggedOut);
+      });
+      when(
+        () => manager.clearCapturedClientForDeletion(client, any()),
+      ).thenAnswer((call) async {
+        final owns = call.positionalArguments[1] as bool Function();
+        if (!owns()) return false;
+        await client.clear(reason: SessionClearReason.logout);
+        return true;
       });
       await tokenLogin();
       final flow = MatrixAccountDeletionSession.capture(
