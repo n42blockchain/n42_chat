@@ -608,9 +608,25 @@ class MatrixClientManager {
     }
   }
 
+  /// Drops the local session of an account the server already invalidated
+  /// (e.g. after deactivation) without calling the server again.
+  Future<void> discardLocalSession() async {
+    final client = _client;
+    if (client == null) return;
+    final server = client.homeserver;
+    final user = client.userID;
+    final device = client.deviceID;
+    await client.clear();
+    if (server != null && user != null && device != null) {
+      await _accountSessions.forget(server, user, device);
+    }
+  }
+
   /// 登出
   Future<void> logout() async {
     if (_client == null) return;
+    // Nothing to revoke server-side once the session is gone locally.
+    if (!_client!.isLogged()) return;
 
     try {
       final server = _client!.homeserver;

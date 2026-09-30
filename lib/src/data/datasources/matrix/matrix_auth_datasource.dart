@@ -380,7 +380,18 @@ class MatrixAuthDataSource {
 
     final homeserver = client.homeserver;
     final accountId = client.userID;
-    await client.deactivateAccount(auth: requestAuth, erase: erase);
+    // Pause sync so no request races the token revocation; resume if the
+    // server rejects the request (e.g. a UIA password challenge).
+    client.backgroundSync = false;
+    try {
+      await client.deactivateAccount(auth: requestAuth, erase: erase);
+    } catch (_) {
+      client.backgroundSync = true;
+      rethrow;
+    }
+    // The token is now invalid: drop the session locally instead of a server
+    // logout, so a later logout() cannot re-preserve this account's room keys.
+    await _clientManager.discardLocalSession();
     if (homeserver != null && accountId != null) {
       await _localRoomKeys.deleteForIdentity(homeserver, accountId);
     }
