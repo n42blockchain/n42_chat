@@ -253,7 +253,8 @@ class MatrixClientManager {
       );
 
       _activeClientName = clientName;
-      await rememberCurrentAccount();
+      // The database just loaded is authoritative for who owns it.
+      await rememberCurrentAccount(reclaim: true);
       _isInitialized = true;
       debugLog('MatrixClientManager: Initialized successfully');
       debugLog(
@@ -343,7 +344,12 @@ class MatrixClientManager {
     ),
   );
 
-  Future<void> rememberCurrentAccount() async {
+  /// Whether the active SDK database is registered to any account. A cleared
+  /// but still-registered database must not receive a new session in place.
+  Future<bool> isActiveDatabaseOwned() =>
+      _accountSessions.isOwned(_activeClientName);
+
+  Future<void> rememberCurrentAccount({bool reclaim = false}) async {
     final current = _client;
     if (current == null ||
         !current.isLogged() ||
@@ -356,6 +362,7 @@ class MatrixClientManager {
       current.userID!,
       current.deviceID!,
       _activeClientName,
+      reclaim: reclaim,
     );
   }
 
@@ -609,9 +616,14 @@ class MatrixClientManager {
       final server = _client!.homeserver;
       final user = _client!.userID;
       final device = _client!.deviceID;
-      await _client!.logout();
-      if (server != null && user != null && device != null) {
-        await _accountSessions.forget(server, user, device);
+      try {
+        await _client!.logout();
+      } finally {
+        // The SDK clears the local database even when the server call fails,
+        // so the index entry must go too or it keeps owning an empty database.
+        if (server != null && user != null && device != null) {
+          await _accountSessions.forget(server, user, device);
+        }
       }
       debugLog('MatrixClientManager: Logout successful');
     } catch (e) {

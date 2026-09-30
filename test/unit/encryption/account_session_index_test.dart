@@ -75,6 +75,20 @@ void main() {
     },
   );
 
+  test(
+    'reclaim drops stale owners of a database now holding another session',
+    () async {
+      final server = Uri.parse('https://hs.test');
+      await index.remember(server, '@a:hs', 'A', 'N42Chat');
+      expect(await index.isOwned('N42Chat'), isTrue);
+      await index.remember(server, '@b:hs', 'B', 'N42Chat', reclaim: true);
+      expect(await index.lookup(server, '@a:hs', 'A'), isNull);
+      expect(await index.lookup(server, '@b:hs', 'B'), 'N42Chat');
+      await index.forget(server, '@b:hs', 'B');
+      expect(await index.isOwned('N42Chat'), isFalse);
+    },
+  );
+
   test('rejects database paths outside the managed directory', () async {
     await expectLater(
       index.remember(Uri.parse('https://hs.test'), '@a:hs', 'A', '../other'),

@@ -56,14 +56,21 @@ class AccountSessionIndex {
     Uri server,
     String user,
     String device,
-    String name,
-  ) async {
+    String name, {
+    bool reclaim = false,
+  }) async {
     if (!_validName(name)) throw ArgumentError('Invalid account database');
     final value = await _read();
     final sessions = Map<String, dynamic>.from(value['sessions'] as Map);
     final scope = identity(server, user, device);
     // Never associate two different devices/accounts with one SDK database.
-    if (sessions.entries.any((e) => e.key != scope && e.value == name)) {
+    // [reclaim] is only for callers that just loaded [name] and found this
+    // identity logged in: an SDK database holds one session, so any other
+    // entry pointing at it is stale (its session was cleared, e.g. by a
+    // failed logout or a server-side token revocation) and is dropped.
+    if (reclaim) {
+      sessions.removeWhere((key, v) => key != scope && v == name);
+    } else if (sessions.entries.any((e) => e.key != scope && e.value == name)) {
       throw StateError('Account database is already owned');
     }
     sessions[scope] = name;
@@ -74,6 +81,10 @@ class AccountSessionIndex {
       throw StateError('Unable to save account session index');
     }
   }
+
+  /// Whether any account is registered against database [name].
+  Future<bool> isOwned(String name) async =>
+      ((await _read())['sessions'] as Map).containsValue(name);
 
   Future<void> forget(Uri server, String user, String device) async {
     final value = await _read();

@@ -207,7 +207,8 @@ class MatrixAuthDataSource {
       throw StateError('Matrix client is not initialized');
     }
 
-    if (finalClient.userID != null) {
+    if (finalClient.userID != null ||
+        await _clientManager.isActiveDatabaseOwned()) {
       return _clientManager.withFreshDevice(
         () => register(
           homeserver: homeserver,
