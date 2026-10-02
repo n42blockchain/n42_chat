@@ -429,8 +429,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
   Widget _buildSettingsSection(GroupEntity group, bool isDark) {
     final widgets = <Widget>[
-      GroupPointsEntry(roomId: widget.roomId, userId: N42Chat.currentUser?.userId,
-        isAdmin: group.isAdmin),
+      GroupPointsEntry(
+        roomId: widget.roomId,
+        userId: N42Chat.currentUser?.userId,
+        isAdmin: group.isAdmin,
+      ),
       // 聊天文件
       ListTile(
         leading: const Icon(Icons.folder_outlined),
@@ -604,22 +607,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       }
     }
 
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: Column(children: widgets),
     );
   }
 
   Widget _buildSettingsDivider(bool isDark) {
-    return Divider(
-      height: 1,
-      indent: 16,
-      color: context.dividerColor,
-    );
+    return Divider(height: 1, indent: 16, color: context.dividerColor);
   }
 
   Widget _buildActionSection(GroupEntity group, bool isDark) {
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: Column(
         children: [
@@ -632,11 +631,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             onTap: () => _clearChatHistory(),
           ),
 
-          Divider(
-            height: 1,
-            indent: 16,
-            color: context.dividerColor,
-          ),
+          Divider(height: 1, indent: 16, color: context.dividerColor),
 
           // 退出/解散群聊
           ListTile(
@@ -669,162 +664,74 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     }
   }
 
-  void _editGroupName(GroupEntity group) {
-    final controller = TextEditingController(text: group.name);
-    showDialog<void>(
+  Future<void> _editGroupName(GroupEntity group) async {
+    final name = await showDialog<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.groupChangeGroupName ?? 'Change Group Name'),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: S.of(context)?.commonEnterGroupName ?? 'Enter group name',
-            border: const OutlineInputBorder(),
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              if (name.isNotEmpty) {
-                Navigator.pop(dialogContext);
-                context.read<GroupBloc>().add(
-                  UpdateGroupName(widget.roomId, name),
-                );
-              }
-            },
-            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
-          ),
-        ],
+      builder: (_) => _GroupTextInputDialog(
+        title: S.of(context)?.groupChangeGroupName ?? 'Change Group Name',
+        initialValue: group.name,
+        hintText: S.of(context)?.commonEnterGroupName ?? 'Enter group name',
+        confirmLabel: S.of(context)?.commonConfirm ?? 'OK',
+        allowEmpty: false,
       ),
-    ).whenComplete(controller.dispose);
-  }
-
-  void _editTopic(GroupEntity group) {
-    final controller = TextEditingController(text: group.topic);
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(
-          S.of(context)?.groupEditGroupDescription ?? 'Edit Group Description',
-        ),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText:
-                S.of(context)?.groupEnterGroupDescription ??
-                'Enter group description',
-            border: const OutlineInputBorder(),
-          ),
-          maxLines: 3,
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<GroupBloc>().add(
-                UpdateGroupTopic(widget.roomId, controller.text.trim()),
-              );
-            },
-            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
-          ),
-        ],
-      ),
-    ).whenComplete(controller.dispose);
-  }
-
-  void _editAnnouncement(GroupEntity group) {
-    final controller = TextEditingController(text: group.announcement);
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(
-          S.of(context)?.groupEditGroupAnnouncement ??
-              'Edit Group Announcement',
-        ),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText:
-                S.of(context)?.groupEnterGroupAnnouncement ??
-                'Enter group announcement',
-            border: const OutlineInputBorder(),
-          ),
-          maxLines: 5,
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<GroupBloc>().add(
-                UpdateGroupAnnouncement(widget.roomId, controller.text.trim()),
-              );
-            },
-            child: Text(S.of(context)?.groupPublish ?? 'Publish'),
-          ),
-        ],
-      ),
-    ).whenComplete(controller.dispose);
-  }
-
-  void _showMaxMembersDialog(GroupEntity group) {
-    final controller = TextEditingController(
-      text: group.maxMembers?.toString() ?? '',
     );
-    showDialog<void>(
+    if (name != null && mounted) {
+      context.read<GroupBloc>().add(UpdateGroupName(widget.roomId, name));
+    }
+  }
+
+  Future<void> _editTopic(GroupEntity group) async {
+    final topic = await showDialog<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.groupMaxMembers ?? 'Member Limit'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText:
-                    S.of(context)?.groupMaxMembersHint ??
-                    'Enter limit (leave empty for unlimited)',
-                border: const OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              final text = controller.text.trim();
-              final value = text.isEmpty ? null : int.tryParse(text);
-              context.read<GroupBloc>().add(
-                SetMaxMembers(widget.roomId, value),
-              );
-            },
-            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
-          ),
-        ],
+      builder: (_) => _GroupTextInputDialog(
+        title:
+            S.of(context)?.groupEditGroupDescription ??
+            'Edit Group Description',
+        initialValue: group.topic ?? '',
+        hintText:
+            S.of(context)?.groupEnterGroupDescription ??
+            'Enter group description',
+        confirmLabel: S.of(context)?.commonConfirm ?? 'OK',
+        maxLines: 3,
       ),
-    ).whenComplete(controller.dispose);
+    );
+    if (topic != null && mounted) {
+      context.read<GroupBloc>().add(UpdateGroupTopic(widget.roomId, topic));
+    }
+  }
+
+  Future<void> _editAnnouncement(GroupEntity group) async {
+    final announcement = await showDialog<String>(
+      context: context,
+      builder: (_) => _GroupTextInputDialog(
+        title:
+            S.of(context)?.groupEditGroupAnnouncement ??
+            'Edit Group Announcement',
+        initialValue: group.announcement ?? '',
+        hintText:
+            S.of(context)?.groupEnterGroupAnnouncement ??
+            'Enter group announcement',
+        confirmLabel: S.of(context)?.groupPublish ?? 'Publish',
+        maxLines: 5,
+      ),
+    );
+    if (announcement != null && mounted) {
+      context.read<GroupBloc>().add(
+        UpdateGroupAnnouncement(widget.roomId, announcement),
+      );
+    }
+  }
+
+  Future<void> _showMaxMembersDialog(GroupEntity group) async {
+    final result = await showDialog<_MaxMembersDialogResult>(
+      context: context,
+      builder: (_) => _MaxMembersDialog(initialValue: group.maxMembers),
+    );
+    if (result != null && mounted) {
+      context.read<GroupBloc>().add(
+        SetMaxMembers(widget.roomId, result.maxMembers),
+      );
+    }
   }
 
   void _navigateToMemberList(GroupEntity group) {
@@ -1020,6 +927,156 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _GroupTextInputDialog extends StatefulWidget {
+  const _GroupTextInputDialog({
+    required this.title,
+    required this.initialValue,
+    required this.hintText,
+    required this.confirmLabel,
+    this.maxLines = 1,
+    this.allowEmpty = true,
+  });
+
+  final String title;
+  final String initialValue;
+  final String hintText;
+  final String confirmLabel;
+  final int maxLines;
+  final bool allowEmpty;
+
+  @override
+  State<_GroupTextInputDialog> createState() => _GroupTextInputDialogState();
+}
+
+class _GroupTextInputDialogState extends State<_GroupTextInputDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          border: const OutlineInputBorder(),
+        ),
+        maxLines: widget.maxLines,
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(s?.commonCancel ?? 'Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            final value = _controller.text.trim();
+            if (!widget.allowEmpty && value.isEmpty) return;
+            Navigator.pop(context, value);
+          },
+          child: Text(widget.confirmLabel),
+        ),
+      ],
+    );
+  }
+}
+
+class _MaxMembersDialogResult {
+  const _MaxMembersDialogResult(this.maxMembers);
+
+  final int? maxMembers;
+}
+
+class _MaxMembersDialog extends StatefulWidget {
+  const _MaxMembersDialog({required this.initialValue});
+
+  final int? initialValue;
+
+  @override
+  State<_MaxMembersDialog> createState() => _MaxMembersDialogState();
+}
+
+class _MaxMembersDialogState extends State<_MaxMembersDialog> {
+  late final TextEditingController _controller;
+  bool _hasInvalidValue = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: widget.initialValue?.toString() ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final value = _controller.text.trim();
+    if (value.isEmpty) {
+      Navigator.pop(context, const _MaxMembersDialogResult(null));
+      return;
+    }
+
+    final parsed = int.tryParse(value);
+    if (parsed == null || parsed <= 0) {
+      setState(() => _hasInvalidValue = true);
+      return;
+    }
+    Navigator.pop(context, _MaxMembersDialogResult(parsed));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    return AlertDialog(
+      title: Text(s?.groupMaxMembers ?? 'Member Limit'),
+      content: TextField(
+        controller: _controller,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          hintText:
+              s?.groupMaxMembersHint ??
+              'Enter limit (leave empty for unlimited)',
+          errorText: _hasInvalidValue
+              ? s?.transferEnterValidAmount ??
+                    'Enter a positive whole number or leave empty for unlimited'
+              : null,
+          border: const OutlineInputBorder(),
+        ),
+        autofocus: true,
+        onChanged: (_) {
+          if (_hasInvalidValue) setState(() => _hasInvalidValue = false);
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(s?.commonCancel ?? 'Cancel'),
+        ),
+        TextButton(onPressed: _submit, child: Text(s?.commonConfirm ?? 'OK')),
+      ],
     );
   }
 }

@@ -647,14 +647,13 @@ class _ContactListPageState extends State<ContactListPage> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        ),
+      builder: (context) => Material(
+        color: context.surfaceColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        clipBehavior: Clip.antiAlias,
         child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: ListView(
+            shrinkWrap: true,
             children: [
               // 联系人信息头部
               Container(
@@ -844,46 +843,17 @@ class _ContactListPageState extends State<ContactListPage> {
 
   /// 设置联系人备注
   void _setContactRemark(ContactEntity contact) {
-    final controller = TextEditingController(text: contact.remark);
-
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText:
-                S.of(context)?.contactEnterRemarkName ?? 'Enter remark name',
-            border: const OutlineInputBorder(),
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () => controller.clear(),
-            ),
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final remark = controller.text.trim();
-              Navigator.pop(dialogContext);
-              context.read<ContactBloc>().add(
-                SetContactRemark(
-                  contact.userId,
-                  remark.isEmpty ? null : remark,
-                ),
-              );
-            },
-            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
-          ),
-        ],
+      builder: (_) => _ContactRemarkDialog(
+        initialRemark: contact.remark,
+        onSave: (remark) {
+          context.read<ContactBloc>().add(
+            SetContactRemark(contact.userId, remark),
+          );
+        },
       ),
-    ).whenComplete(controller.dispose);
+    );
   }
 
   Future<void> _startChatWithContact(ContactEntity contact) async {
@@ -2076,6 +2046,65 @@ class _GroupListPageState extends State<_GroupListPage> {
   }
 }
 
+class _ContactRemarkDialog extends StatefulWidget {
+  final String? initialRemark;
+  final ValueChanged<String?> onSave;
+
+  const _ContactRemarkDialog({
+    required this.initialRemark,
+    required this.onSave,
+  });
+
+  @override
+  State<_ContactRemarkDialog> createState() => _ContactRemarkDialogState();
+}
+
+class _ContactRemarkDialogState extends State<_ContactRemarkDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialRemark,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
+      content: TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          hintText:
+              S.of(context)?.contactEnterRemarkName ?? 'Enter remark name',
+          border: const OutlineInputBorder(),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: _controller.clear,
+          ),
+        ),
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final remark = _controller.text.trim();
+            Navigator.pop(context);
+            widget.onSave(remark.isEmpty ? null : remark);
+          },
+          child: Text(S.of(context)?.commonConfirm ?? 'OK'),
+        ),
+      ],
+    );
+  }
+}
+
 /// 推荐联系人选择弹窗
 class _RecommendContactSheet extends StatefulWidget {
   final String excludeUserId;
@@ -2221,24 +2250,28 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                     itemCount: _filteredContacts.length,
                     itemBuilder: (context, index) {
                       final contact = _filteredContacts[index];
-                      return ListTile(
-                        leading: N42Avatar(
-                          imageUrl: contact.avatarUrl,
-                          name: contact.effectiveDisplayName,
-                          size: 44,
-                        ),
-                        title: Text(
-                          contact.effectiveDisplayName,
-                          style: TextStyle(color: context.textPrimary),
-                        ),
-                        subtitle: Text(
-                          contact.userId,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textTertiaryOf(widget.isDark),
+                      return Material(
+                        color: Colors.transparent,
+                        clipBehavior: Clip.antiAlias,
+                        child: ListTile(
+                          leading: N42Avatar(
+                            imageUrl: contact.avatarUrl,
+                            name: contact.effectiveDisplayName,
+                            size: 44,
                           ),
+                          title: Text(
+                            contact.effectiveDisplayName,
+                            style: TextStyle(color: context.textPrimary),
+                          ),
+                          subtitle: Text(
+                            contact.userId,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textTertiaryOf(widget.isDark),
+                            ),
+                          ),
+                          onTap: () => Navigator.pop(context, contact),
                         ),
-                        onTap: () => Navigator.pop(context, contact),
                       );
                     },
                   ),
