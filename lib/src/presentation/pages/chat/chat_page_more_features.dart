@@ -1,6 +1,99 @@
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
+class _TipDraft {
+  const _TipDraft({
+    required this.amount,
+    required this.token,
+    required this.note,
+  });
+
+  final String amount;
+  final String token;
+  final String note;
+}
+
+class _TipDialog extends StatefulWidget {
+  const _TipDialog();
+
+  @override
+  State<_TipDialog> createState() => _TipDialogState();
+}
+
+class _TipDialogState extends State<_TipDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _amountController = TextEditingController();
+  final _tokenController = TextEditingController(text: 'USDT');
+  final _noteController = TextEditingController();
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _tokenController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  String? _validateAmount(String? value) {
+    final amount = double.tryParse(value?.trim() ?? '');
+    if (amount == null || !amount.isFinite || amount <= 0) {
+      return S.of(context)?.transferEnterValidAmount ??
+          'Please enter a valid amount';
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    backgroundColor: context.surfaceColor,
+    title: const Text('Send a tip'),
+    content: Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextFormField(
+            controller: _amountController,
+            keyboardType: TextInputType.number,
+            validator: _validateAmount,
+            decoration: const InputDecoration(labelText: 'Amount'),
+          ),
+          TextField(
+            controller: _tokenController,
+            decoration: const InputDecoration(labelText: 'Token'),
+          ),
+          TextField(
+            controller: _noteController,
+            decoration: const InputDecoration(labelText: 'Note (optional)'),
+          ),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+      ),
+      TextButton(
+        onPressed: () {
+          if (!_formKey.currentState!.validate()) return;
+          Navigator.pop(
+            context,
+            _TipDraft(
+              amount: _amountController.text.trim(),
+              token: _tokenController.text.trim().isEmpty
+                  ? 'USDT'
+                  : _tokenController.text.trim(),
+              note: _noteController.text.trim(),
+            ),
+          );
+        },
+        child: const Text('Tip'),
+      ),
+    ],
+  );
+}
+
 /// 更多功能相关方法（红包、转账、位置、名片、音乐、投票、GIF、贴纸、通话等）
 extension _ChatPageMoreFeaturesMethods on _ChatPageState {
   /// 显示位置选项菜单（微信风格）
@@ -20,91 +113,94 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // 发送位置
-                ListTile(
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                Material(
+                  color: context.surfaceColor,
+                  child: ListTile(
+                    leading: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.location_on,
+                        color: AppColors.primary,
+                        size: 24,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.location_on,
-                      color: AppColors.primary,
-                      size: 24,
+                    title: Text(
+                      S.of(context)?.chatSendLocation ?? 'Send Location',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.3,
+                        color: context.textPrimary,
+                      ),
                     ),
+                    subtitle: Text(
+                      S.of(context)?.chatSelectLocationAndSend ??
+                          'Select location and send',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.3,
+                        color: context.textSecondary,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _openLocationPicker();
+                    },
                   ),
-                  title: Text(
-                    S.of(context)?.chatSendLocation ?? 'Send Location',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 1.3,
-                      color: context.textPrimary,
-                    ),
-                  ),
-                  subtitle: Text(
-                    S.of(context)?.chatSelectLocationAndSend ??
-                        'Select location and send',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 1.3,
-                      color: context.textSecondary,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _openLocationPicker();
-                  },
                 ),
-                Divider(
-                  height: 1,
-                  color: context.dividerColor,
-                ),
+                Divider(height: 1, color: context.dividerColor),
                 // 共享实时位置
-                ListTile(
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                Material(
+                  color: context.surfaceColor,
+                  child: ListTile(
+                    leading: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.share_location,
+                        color: AppColors.success,
+                        size: 24,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.share_location,
-                      color: AppColors.success,
-                      size: 24,
+                    title: Text(
+                      S.of(context)?.chatShareRealTimeLocation ??
+                          'Share Real-time Location',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.3,
+                        color: context.textPrimary,
+                      ),
                     ),
+                    subtitle: Text(
+                      S.of(context)?.chatShareLocationForOneHour ??
+                          'Share real-time location with friend for 1 hour',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.3,
+                        color: context.textSecondary,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _shareRealTimeLocation();
+                    },
                   ),
-                  title: Text(
-                    S.of(context)?.chatShareRealTimeLocation ??
-                        'Share Real-time Location',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 1.3,
-                      color: context.textPrimary,
-                    ),
-                  ),
-                  subtitle: Text(
-                    S.of(context)?.chatShareLocationForOneHour ??
-                        'Share real-time location with friend for 1 hour',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 1.3,
-                      color: context.textSecondary,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _shareRealTimeLocation();
-                  },
                 ),
                 const SizedBox(height: 8),
                 // 取消按钮
@@ -250,6 +346,9 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     final chatBloc = context.read<ChatBloc>();
     final roomId = chatBloc.state.roomId ?? '';
     final walletBridge = getIt<IWalletBridge>();
+    final feedbackMessenger = ScaffoldMessenger.of(
+      Navigator.of(context).context,
+    );
 
     // 余额校验
     try {
@@ -258,7 +357,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       final amountNum = double.tryParse(amount) ?? 0;
       if (balanceNum < amountNum) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          feedbackMessenger.showSnackBar(
             SnackBar(
               content: Text(
                 l10n?.redPacketInsufficientBalance ?? 'Insufficient balance',
@@ -292,7 +391,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     } catch (e) {
       debugLog('Red packet creation failed: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        feedbackMessenger.showSnackBar(
           const SnackBar(
             content: Text('Failed to create red packet'),
             backgroundColor: AppColors.error,
@@ -383,8 +482,9 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     if (widget.conversation.isDirect &&
         widget.conversation.directUserId != null) {
       try {
-        final contact = await getIt<IContactRepository>()
-            .getContactById(widget.conversation.directUserId!);
+        final contact = await getIt<IContactRepository>().getContactById(
+          widget.conversation.directUserId!,
+        );
         toAddress = contact?.walletAddress;
       } catch (_) {}
     }
@@ -396,53 +496,15 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       return;
     }
 
-    final amountC = TextEditingController();
-    final tokenC = TextEditingController(text: 'USDT');
-    final noteC = TextEditingController();
-    final ok = await showDialog<bool>(
+    final draft = await showDialog<_TipDraft>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: context.surfaceColor,
-        title: const Text('Send a tip'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: amountC,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Amount'),
-            ),
-            TextField(
-              controller: tokenC,
-              decoration: const InputDecoration(labelText: 'Token'),
-            ),
-            TextField(
-              controller: noteC,
-              decoration: const InputDecoration(labelText: 'Note (optional)'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Tip'),
-          ),
-        ],
-      ),
+      builder: (_) => const _TipDialog(),
     );
 
-    final amount = amountC.text.trim();
-    final token = tokenC.text.trim().isEmpty ? 'USDT' : tokenC.text.trim();
-    final note = noteC.text.trim();
-    amountC.dispose();
-    tokenC.dispose();
-    noteC.dispose();
-    if (ok != true || !mounted) return;
-    if (amount.isEmpty || double.tryParse(amount) == null) return;
+    if (draft == null || !mounted) return;
+    final amount = draft.amount;
+    final token = draft.token;
+    final note = draft.note;
 
     TransferResult result;
     try {
@@ -454,8 +516,9 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Tip failed: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Tip failed: $e')));
       }
       return;
     }
@@ -467,15 +530,17 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       return;
     }
 
-    context.read<ChatBloc>().add(SendCustomMessage(
-          content: note,
-          type: MessageType.tip,
-          metadata: MessageMetadata(
-            amount: amount,
-            token: token,
-            txHash: result.transactionHash,
-          ),
-        ));
+    context.read<ChatBloc>().add(
+      SendCustomMessage(
+        content: note,
+        type: MessageType.tip,
+        metadata: MessageMetadata(
+          amount: amount,
+          token: token,
+          txHash: result.transactionHash,
+        ),
+      ),
+    );
   }
 
   /// 赠送 NFT：解析接收方地址 → 选择 NFT → 钱包桥转移 → 发聊天通知
@@ -484,8 +549,9 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     if (widget.conversation.isDirect &&
         widget.conversation.directUserId != null) {
       try {
-        final contact = await getIt<IContactRepository>()
-            .getContactById(widget.conversation.directUserId!);
+        final contact = await getIt<IContactRepository>().getContactById(
+          widget.conversation.directUserId!,
+        );
         toAddress = contact?.walletAddress;
       } catch (_) {}
     }
@@ -510,8 +576,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
           children: [
             TextField(
               controller: contractC,
-              decoration:
-                  const InputDecoration(labelText: 'Contract address'),
+              decoration: const InputDecoration(labelText: 'Contract address'),
             ),
             TextField(
               controller: tokenIdC,
@@ -568,8 +633,9 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('NFT gift failed: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('NFT gift failed: $e')));
       }
       return;
     }
@@ -605,10 +671,8 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         color: AppColors.primary,
         title: 'AI Assistant',
         subtitle: 'Describe a task, open the right mini app',
-        onTap: () => MiniAppAgentSheet.show(
-          context,
-          roomId: widget.conversation.id,
-        ),
+        onTap: () =>
+            MiniAppAgentSheet.show(context, roomId: widget.conversation.id),
       ),
       PaymentCommerceAction(
         icon: Icons.card_giftcard_outlined,

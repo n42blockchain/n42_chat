@@ -701,31 +701,39 @@ extension _ChatPageMessageListMethods on _ChatPageState {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildMultiSelectAction(
-            icon: Icons.forward,
-            label: S.of(context)?.chatMultiForward ?? 'Forward',
-            enabled: hasSelection,
-            onTap: hasSelection ? _forwardSelectedMessages : null,
+          Expanded(
+            child: _buildMultiSelectAction(
+              icon: Icons.forward,
+              label: S.of(context)?.chatMultiForward ?? 'Forward',
+              enabled: hasSelection,
+              onTap: hasSelection ? _forwardSelectedMessages : null,
+            ),
           ),
-          _buildMultiSelectAction(
-            icon: Icons.star_border,
-            label: S.of(context)?.chatCollect ?? 'Collect',
-            enabled: hasSelection,
-            onTap: hasSelection ? _favoriteSelectedMessages : null,
+          Expanded(
+            child: _buildMultiSelectAction(
+              icon: Icons.star_border,
+              label: S.of(context)?.chatCollect ?? 'Collect',
+              enabled: hasSelection,
+              onTap: hasSelection ? _favoriteSelectedMessages : null,
+            ),
           ),
-          _buildMultiSelectAction(
-            icon: Icons.undo,
-            label: '撤回',
-            enabled: hasOwnSelection,
-            onTap: hasOwnSelection ? _recallSelectedMessages : null,
-            isDestructive: true,
+          Expanded(
+            child: _buildMultiSelectAction(
+              icon: Icons.undo,
+              label: '撤回',
+              enabled: hasOwnSelection,
+              onTap: hasOwnSelection ? _recallSelectedMessages : null,
+              isDestructive: true,
+            ),
           ),
-          _buildMultiSelectAction(
-            icon: Icons.delete_outline,
-            label: S.of(context)?.commonDelete ?? 'Delete',
-            enabled: hasSelection,
-            onTap: hasSelection ? _deleteSelectedMessages : null,
-            isDestructive: true,
+          Expanded(
+            child: _buildMultiSelectAction(
+              icon: Icons.delete_outline,
+              label: S.of(context)?.commonDelete ?? 'Delete',
+              enabled: hasSelection,
+              onTap: hasSelection ? _deleteSelectedMessages : null,
+              isDestructive: true,
+            ),
           ),
         ],
       ),
