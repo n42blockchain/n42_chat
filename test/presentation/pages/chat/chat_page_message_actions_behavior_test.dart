@@ -78,11 +78,13 @@ void main() {
     WidgetTester tester, {
     required MessageEntity message,
     bool canPinMessages = false,
+    bool canSendMessages = true,
     List<MessageEntity> pinnedMessages = const [],
   }) async {
     currentChatState = ChatState(
       messages: [message],
       canPinMessages: canPinMessages,
+      canSendMessages: canSendMessages,
       pinnedMessages: pinnedMessages,
     );
     tester.view.physicalSize = const Size(430, 1000);
@@ -313,6 +315,21 @@ void main() {
     expect(find.text(l10n.chatRedPacketTransferCannotForward), findsOneWidget);
     expect(events, isEmpty);
     expect(find.text(l10n.chatSelectedCount(1)), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('read-only channels show a notice instead of the composer', (
+    tester,
+  ) async {
+    final l10n = await openChat(
+      tester,
+      message: _message(),
+      canSendMessages: false,
+    );
+
+    expect(find.text(l10n.channelReadOnly), findsOneWidget);
+    expect(find.byIcon(Icons.campaign_outlined), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }
