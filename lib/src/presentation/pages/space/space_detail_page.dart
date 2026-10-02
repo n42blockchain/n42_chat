@@ -279,9 +279,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                     child: Center(
                       child: Text(
                         S.of(context)?.spacesNoChannels ?? 'No channels yet',
-                        style: TextStyle(
-                          color: context.textSecondary,
-                        ),
+                        style: TextStyle(color: context.textSecondary),
                       ),
                     ),
                   ),
@@ -418,7 +416,11 @@ class _SpaceDetailScaffold extends StatelessWidget {
                         '${space.memberCount} members',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.3),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      height: 1.3,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Icon(
@@ -433,7 +435,11 @@ class _SpaceDetailScaffold extends StatelessWidget {
                         : (S.of(context)?.spacesPrivate ?? 'Private'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.3),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      height: 1.3,
+                    ),
                   ),
                 ],
               ),
@@ -563,11 +569,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: 18,
-              color: AppColors.textSecondaryOf(isDark),
-            ),
+            Icon(icon, size: 18, color: AppColors.textSecondaryOf(isDark)),
             const SizedBox(width: 8),
             Text(
               title,
@@ -604,7 +606,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
     SpaceChild child,
     bool isDark,
   ) {
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: ListTile(
         leading: Container(
@@ -630,10 +632,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 child.description!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: context.textSecondary,
-                ),
+                style: TextStyle(fontSize: 12, color: context.textSecondary),
               )
             : null,
         trailing: Row(
@@ -664,10 +663,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 color: AppColors.error.withValues(alpha: 0.7),
                 onPressed: () => _confirmDeleteChannel(context, child),
               ),
-            Icon(
-              AppIcons.chevron,
-              color: context.textSecondary,
-            ),
+            Icon(AppIcons.chevron, color: context.textSecondary),
           ],
         ),
         onTap: () => _navigateToChannelChat(context, child),
@@ -680,7 +676,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
     SpaceChild child,
     bool isDark,
   ) {
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: ListTile(
         leading: Container(
@@ -710,16 +706,10 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 child.description!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: context.textSecondary,
-                ),
+                style: TextStyle(fontSize: 12, color: context.textSecondary),
               )
             : null,
-        trailing: Icon(
-          AppIcons.chevron,
-          color: context.textSecondary,
-        ),
+        trailing: Icon(AppIcons.chevron, color: context.textSecondary),
         onTap: () {
           // 进入子 Space 详情
           Navigator.push<void>(
@@ -1116,10 +1106,7 @@ class _MembersBottomSheet extends StatelessWidget {
                   '(${members.length})',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    height: 1.3,
-                    color: context.textSecondary,
-                  ),
+                  style: TextStyle(height: 1.3, color: context.textSecondary),
                 ),
                 const Spacer(),
                 if (isAdmin)
@@ -1201,7 +1188,12 @@ class _MembersBottomSheet extends StatelessWidget {
         label,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(fontSize: 11, height: 1.3, fontWeight: FontWeight.w500, color: color),
+        style: TextStyle(
+          fontSize: 11,
+          height: 1.3,
+          fontWeight: FontWeight.w500,
+          color: color,
+        ),
       ),
     );
   }

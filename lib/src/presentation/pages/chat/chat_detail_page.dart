@@ -450,6 +450,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     ConversationNotificationMode mode,
   ) async {
     final previousMode = _notificationMode;
+    if (mounted) {
+      setState(() => _notificationMode = mode);
+    }
     try {
       final repository = getIt<IConversationRepository>();
       await repository.setNotificationMode(widget.conversation.id, mode);
@@ -535,7 +538,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       return;
     }
 
-    setState(() => _notificationMode = selected);
     await _updateNotificationMode(selected);
   }
 
@@ -592,45 +594,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       return;
     }
 
-    final controller = TextEditingController(text: _groupName);
-
-    String? newName;
-    try {
-      newName = await showDialog<String>(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: context.surfaceColor,
-          title: Text(
-            S.of(context)?.chatGroupName ?? 'Group Name',
-            style: TextStyle(color: context.textPrimary),
-          ),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            maxLength: 50,
-            style: TextStyle(color: context.textPrimary),
-            decoration: InputDecoration(
-              hintText:
-                  S.of(context)?.commonEnterGroupName ?? 'Enter group name',
-              hintStyle: TextStyle(color: context.textSecondary),
-              counterStyle: TextStyle(color: context.textSecondary),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: Text(S.of(context)?.commonSave ?? 'Save'),
-            ),
-          ],
-        ),
-      );
-    } finally {
-      controller.dispose();
-    }
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (_) => _GroupNameDialog(initialName: _groupName),
+    );
 
     if (newName != null && newName.isNotEmpty && newName != _groupName) {
       await _updateGroupName(newName);
@@ -1490,92 +1457,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 显示投诉对话框
   void _showReportDialog() {
-    final descController = TextEditingController();
-    String? selectedReason;
-
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: context.surfaceColor,
-          title: Text(
-            S.of(context)?.reportTitle ?? 'Report',
-            style: TextStyle(color: context.textPrimary),
-          ),
-          content: RadioGroup<String>(
-            groupValue: selectedReason,
-            onChanged: (val) => setDialogState(() => selectedReason = val),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ...[
-                  S.of(context)?.reportReasonSpam ?? 'Spam',
-                  S.of(context)?.reportReasonHarassment ?? 'Harassment',
-                  S.of(context)?.reportReasonFraud ?? 'Fraud',
-                  S.of(context)?.reportReasonOther ?? 'Other',
-                ].map(
-                  (reason) => RadioListTile<String>(
-                    title: Text(
-                      reason,
-                      style: TextStyle(color: context.textPrimary),
-                    ),
-                    value: reason,
-                    activeColor: AppColors.primary,
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: descController,
-                  maxLines: 2,
-                  style: TextStyle(color: context.textPrimary),
-                  decoration: InputDecoration(
-                    hintText:
-                        S.of(context)?.reportDescription ??
-                        'Additional description (optional)',
-                    hintStyle: TextStyle(color: context.textSecondary),
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (selectedReason == null) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        S.of(context)?.reportSelectReason ??
-                            'Please select a reason',
-                      ),
-                      duration: const Duration(seconds: 1),
-                    ),
-                  );
-                  return;
-                }
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.reportSubmitted ?? 'Report submitted',
-                    ),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-              child: Text(S.of(context)?.commonConfirm ?? 'Submit'),
-            ),
-          ],
-        ),
-      ),
-    ).whenComplete(descController.dispose);
+    showDialog<void>(context: context, builder: (_) => const _ReportDialog());
   }
 
   void _openContactDetail() {
@@ -1765,6 +1647,163 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _GroupNameDialog extends StatefulWidget {
+  final String initialName;
+
+  const _GroupNameDialog({required this.initialName});
+
+  @override
+  State<_GroupNameDialog> createState() => _GroupNameDialogState();
+}
+
+class _GroupNameDialogState extends State<_GroupNameDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialName);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: context.surfaceColor,
+      title: Text(
+        S.of(context)?.chatGroupName ?? 'Group Name',
+        style: TextStyle(color: context.textPrimary),
+      ),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        maxLength: 50,
+        style: TextStyle(color: context.textPrimary),
+        decoration: InputDecoration(
+          hintText: S.of(context)?.commonEnterGroupName ?? 'Enter group name',
+          hintStyle: TextStyle(color: context.textSecondary),
+          counterStyle: TextStyle(color: context.textSecondary),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, _controller.text.trim()),
+          child: Text(S.of(context)?.commonSave ?? 'Save'),
+        ),
+      ],
+    );
+  }
+}
+
+class _ReportDialog extends StatefulWidget {
+  const _ReportDialog();
+
+  @override
+  State<_ReportDialog> createState() => _ReportDialogState();
+}
+
+class _ReportDialogState extends State<_ReportDialog> {
+  final TextEditingController _descriptionController = TextEditingController();
+  String? _selectedReason;
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = S.of(context);
+    return AlertDialog(
+      backgroundColor: context.surfaceColor,
+      title: Text(
+        l10n?.reportTitle ?? 'Report',
+        style: TextStyle(color: context.textPrimary),
+      ),
+      content: RadioGroup<String>(
+        groupValue: _selectedReason,
+        onChanged: (reason) => setState(() => _selectedReason = reason),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ...[
+              l10n?.reportReasonSpam ?? 'Spam',
+              l10n?.reportReasonHarassment ?? 'Harassment',
+              l10n?.reportReasonFraud ?? 'Fraud',
+              l10n?.reportReasonOther ?? 'Other',
+            ].map(
+              (reason) => RadioListTile<String>(
+                title: Text(
+                  reason,
+                  style: TextStyle(color: context.textPrimary),
+                ),
+                value: reason,
+                activeColor: AppColors.primary,
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _descriptionController,
+              maxLines: 2,
+              style: TextStyle(color: context.textPrimary),
+              decoration: InputDecoration(
+                hintText:
+                    l10n?.reportDescription ??
+                    'Additional description (optional)',
+                hintStyle: TextStyle(color: context.textSecondary),
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n?.commonCancel ?? 'Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            if (_selectedReason == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    l10n?.reportSelectReason ?? 'Please select a reason',
+                  ),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+              return;
+            }
+
+            final messenger = ScaffoldMessenger.of(context);
+            Navigator.pop(context);
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text(l10n?.reportSubmitted ?? 'Report submitted'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          },
+          child: Text(l10n?.commonConfirm ?? 'Submit'),
+        ),
+      ],
     );
   }
 }
