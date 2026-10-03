@@ -395,22 +395,39 @@ class MatrixContactDataSource {
     DateTime? expiresAt,
     bool preserveCurrentPresence = false,
   }) async {
-    if (_client == null) return;
+    final client = _client;
+    if (client == null) return;
+    final userId = client.userID;
+    if (userId == null) return;
+
+    if (preserveCurrentPresence) {
+      final presence = await client.fetchCurrentPresence(userId);
+      await client.setPresence(userId, presence.presence, statusMsg: null);
+    }
+
     final metadata = TimedStatusMetadata(
       message: statusMessage,
       expiresAt: expiresAt,
     ).toJson();
     final privacy = ContactPrivacyService(_clientManager);
-    await privacy.load(_client!.userID!);
-    await privacy.publishStatus(
-      metadata,
-      presenceType: preserveCurrentPresence ? null : matrix.PresenceType.online,
+    await privacy.load(userId);
+    final hasExistingStoryRoom = client.rooms.any(
+      (room) =>
+          room.tags.containsKey(ContactPrivacyService.storyTag) &&
+          privacy.isOwn(room) &&
+          room.getState(ContactPrivacyService.audienceType) == null,
     );
-    await _client!.setAccountData(
-      _client!.userID!,
-      'n42.user.status',
-      metadata,
-    );
+    if (statusMessage != null ||
+        !preserveCurrentPresence ||
+        hasExistingStoryRoom) {
+      await privacy.publishStatus(
+        metadata,
+        presenceType: preserveCurrentPresence
+            ? null
+            : matrix.PresenceType.online,
+      );
+    }
+    await client.setAccountData(userId, 'n42.user.status', metadata);
   }
 
   Future<String?> getCurrentUserStatusMessage() async {

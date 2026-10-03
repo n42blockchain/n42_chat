@@ -12,6 +12,7 @@ void main() {
   late _MockMatrixClientManager clientManager;
   late _MockClient client;
   late MatrixContactDataSource dataSource;
+  late List<matrix.Room> rooms;
 
   setUpAll(() {
     registerFallbackValue(matrix.PresenceType.online);
@@ -20,8 +21,14 @@ void main() {
   setUp(() {
     clientManager = _MockMatrixClientManager();
     client = _MockClient();
+    rooms = [];
     when(() => clientManager.client).thenReturn(client);
     when(() => client.userID).thenReturn('@me:example.org');
+    when(() => client.accountData).thenReturn(<String, matrix.BasicEvent>{});
+    when(() => client.rooms).thenReturn(rooms);
+    when(
+      () => client.getAccountData(any(), any()),
+    ).thenAnswer((_) async => <String, dynamic>{});
     when(
       () =>
           client.setPresence(any(), any(), statusMsg: any(named: 'statusMsg')),
@@ -59,7 +66,6 @@ void main() {
 
       final result = await dataSource.getCurrentUserStatusMessage();
 
-      expect(result, isNull);
       verify(
         () => client.setPresence(
           '@me:example.org',
@@ -67,6 +73,15 @@ void main() {
           statusMsg: null,
         ),
       ).called(1);
+      verify(
+        () => client.setAccountData(
+          '@me:example.org',
+          'n42.user.status',
+          <String, dynamic>{},
+        ),
+      ).called(1);
+      verifyNever(() => client.createRoom(name: any(named: 'name')));
+      expect(result, isNull);
     },
   );
 }
