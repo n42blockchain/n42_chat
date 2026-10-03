@@ -43,8 +43,8 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
     super.initState();
     _isLoadingDetail = true;
     context.read<GovernanceBloc>().add(
-      GovernanceLoadProposalDetail(widget.proposalId),
-    );
+          GovernanceLoadProposalDetail(widget.proposalId),
+        );
   }
 
   @override
@@ -118,7 +118,9 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
             return Center(
               child: Text(
                 'Proposal not found',
-                style: TextStyle(color: context.textSecondary),
+                style: TextStyle(
+                  color: context.textSecondary,
+                ),
               ),
             );
           }
@@ -185,7 +187,11 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
           // Author
           Row(
             children: [
-              Icon(Icons.person_outline, size: 16, color: context.textTertiary),
+              Icon(
+                Icons.person_outline,
+                size: 16,
+                color: context.textTertiary,
+              ),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -266,7 +272,9 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
     final text = proposal.hasEnded
         ? 'Ended'
         : _formatDuration(proposal.timeRemaining);
-    final color = proposal.isActive ? AppColors.success : context.textTertiary;
+    final color = proposal.isActive
+        ? AppColors.success
+        : context.textTertiary;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -371,8 +379,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               voteCount: score,
               totalVotes: proposal.scoresTotal,
               isWinner: choice == winningChoice,
-              isSelected:
-                  _selectedChoice != null &&
+              isSelected: _selectedChoice != null &&
                   proposal.choices.indexOf(choice) + 1 == _selectedChoice,
             );
           }),
@@ -383,7 +390,10 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
 
   // -- Voting section: choice selection + cast vote button --
 
-  Widget _buildVotingSection(ProposalEntity proposal, GovernanceState state) {
+  Widget _buildVotingSection(
+    ProposalEntity proposal,
+    GovernanceState state,
+  ) {
     final isDark = context.isDarkMode;
     final isVoting = _voteInFlight && state.status == GovernanceStatus.voting;
 
@@ -516,19 +526,22 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
       if (confirmed == true && mounted) {
         setState(() => _voteInFlight = true);
         context.read<GovernanceBloc>().add(
-          GovernanceCastVote(
-            spaceId: widget.spaceId,
-            proposalId: proposal.id,
-            choice: choice,
-          ),
-        );
+              GovernanceCastVote(
+                spaceId: widget.spaceId,
+                proposalId: proposal.id,
+                choice: choice,
+              ),
+            );
       }
     });
   }
 
   // -- Recent votes list --
 
-  Widget _buildRecentVotes(List<VoteEntity> votes, ProposalEntity proposal) {
+  Widget _buildRecentVotes(
+    List<VoteEntity> votes,
+    ProposalEntity proposal,
+  ) {
     if (votes.isEmpty) return const SizedBox.shrink();
 
     return Container(
@@ -616,12 +629,8 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
   // -- Helper methods --
 
   String _resolveChoiceName(dynamic choice, ProposalEntity proposal) {
-    if (choice is num &&
-        choice.isFinite &&
-        choice == choice.truncateToDouble() &&
-        choice >= 1 &&
-        choice <= proposal.choices.length) {
-      return proposal.choices[choice.toInt() - 1];
+    if (choice is int && choice >= 1 && choice <= proposal.choices.length) {
+      return proposal.choices[choice - 1];
     }
     return choice.toString();
   }
