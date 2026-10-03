@@ -161,7 +161,7 @@ dependencies:
   # Location & Maps - 位置服务与地图
   # ============================================
   # MIT License
-  geolocator: ^14.0.0
+  geolocator: ^14.1.1
   geocoding: ^4.0.0
   # BSD License - OpenStreetMap 地图组件
   flutter_map: ^8.3.2
