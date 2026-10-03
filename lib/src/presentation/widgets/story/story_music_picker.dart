@@ -57,13 +57,9 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
 
   Future<void> _pickMusic() async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.audio,
-        allowMultiple: false,
-      );
+      final file = await FilePicker.pickFile(type: FileType.audio);
 
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
+      if (file != null) {
         if (file.path != null) {
           if (!mounted) return;
           setState(() {

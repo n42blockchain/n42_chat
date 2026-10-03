@@ -824,24 +824,14 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
   Future<void> _pickFile({DateTime? scheduledAt}) async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.any,
-        allowMultiple: true,
-        withReadStream: true,
-      );
+      final files = await FilePicker.pickFiles(type: FileType.any);
 
-      if (result == null || result.files.isEmpty) return;
+      if (files.isEmpty) return;
 
       // 发送选中的文件
-      for (final file in result.files) {
-        if ((file.path == null || file.path!.isEmpty) &&
-            (file.readStream == null) &&
-            (file.bytes == null || file.bytes!.isEmpty)) {
-          debugLog('File bytes is empty: ${file.name}');
-          continue;
-        }
-
-        await _sendFile(file, scheduledAt: scheduledAt);
+      for (final file in files) {
+        final source = await PickedFileUploadSource.from(file);
+        await _sendFile(source, scheduledAt: scheduledAt);
       }
     } catch (e) {
       debugLog('Pick file error: $e');
@@ -859,11 +849,14 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
   }
 
-  Future<void> _sendFile(PlatformFile file, {DateTime? scheduledAt}) async {
+  Future<void> _sendFile(
+    PickedFileUploadSource file, {
+    DateTime? scheduledAt,
+  }) async {
     try {
-      final filename = file.name;
+      final filename = file.filename;
       final mimeType = lookupMimeType(filename) ?? 'application/octet-stream';
-      final fileSize = file.size;
+      final fileSize = file.fileSize;
 
       debugLog(
         'Sending file: $filename, size: $fileSize bytes, mimeType: $mimeType',
@@ -873,9 +866,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         filename: filename,
         mimeType: mimeType,
         fileSize: fileSize,
-        fileBytes: file.bytes,
-        filePath: file.path,
-        fileStream: file.readStream,
+        filePath: file.filePath,
+        fileStream: file.fileStream,
         scheduledAt: scheduledAt,
       );
 

@@ -126,6 +126,7 @@ import '../../widgets/chat/forward_message_sheet.dart';
 import '../../widgets/chat/member_picker_sheet.dart';
 import '../../widgets/chat/multi_forward_sheet.dart';
 import '../../widgets/chat/music_select_sheet.dart';
+import 'picked_file_upload_source.dart';
 import '../../widgets/chat/poll_create_sheet.dart';
 import '../mini_app/mini_app_market_page.dart';
 import '../../../core/services/bot_command_processor.dart';

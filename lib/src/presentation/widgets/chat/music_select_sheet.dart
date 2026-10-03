@@ -57,13 +57,9 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
   /// 选择本地音频文件
   Future<void> _pickLocalAudio() async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.audio,
-        allowMultiple: false,
-      );
+      final file = await FilePicker.pickFile(type: FileType.audio);
       
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
+      if (file != null) {
         final fileName = file.name;
         // 从文件名中提取歌曲名和歌手（假设格式为 "歌手 - 歌曲名.mp3"）
         String songName = fileName;

@@ -432,13 +432,10 @@ class _RestoreSection extends StatelessWidget {
 
   Future<void> _pickAndRestore(BuildContext context) async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.any,
-        allowMultiple: false,
-      );
+      final file = await FilePicker.pickFile(type: FileType.any);
 
-      if (result != null && result.files.isNotEmpty) {
-        final filePath = result.files.first.path;
+      if (file != null) {
+        final filePath = file.path;
         if (filePath != null && context.mounted) {
           context.read<BackupBloc>().add(
                 RestoreFromBackup(backupFilePath: filePath),
