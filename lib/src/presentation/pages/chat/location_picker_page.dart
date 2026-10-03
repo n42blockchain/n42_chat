@@ -16,7 +16,9 @@ import '../../../core/services/moment_location_resolver.dart';
 
 /// 位置选择页面（微信风格）
 class ChatLocationPickerPage extends StatefulWidget {
-  const ChatLocationPickerPage({super.key});
+  const ChatLocationPickerPage({super.key, this.tileProvider});
+
+  final TileProvider? tileProvider;
 
   @override
   State<ChatLocationPickerPage> createState() => _ChatLocationPickerPageState();
@@ -167,12 +169,13 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
 
     _searchDebounce = Timer(const Duration(milliseconds: 500), () async {
       try {
-        final locations = await geocoding.locationFromAddress(query);
+        final geocoder = geocoding.Geocoding();
+        final locations = await geocoder.locationFromAddress(query);
         if (!mounted || generation != _searchGeneration) return;
 
         final results = <NearbyPlace>[];
         for (final loc in locations.take(5)) {
-          final placemarks = await geocoding.placemarkFromCoordinates(
+          final placemarks = await geocoder.placemarkFromCoordinates(
             loc.latitude,
             loc.longitude,
           );
@@ -380,6 +383,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                             urlTemplate:
                                 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                             userAgentPackageName: 'com.n42.wallet',
+                            tileProvider: widget.tileProvider,
                           ),
                         ],
                       ),

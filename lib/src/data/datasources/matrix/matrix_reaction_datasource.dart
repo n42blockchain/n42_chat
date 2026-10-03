@@ -277,7 +277,7 @@ class MatrixReactionDataSource {
     final userPowerLevel = room.ownPowerLevel.level;
     final redactLevel = (powerLevels['redact'] as num?) ?? 50;
 
-    return userPowerLevel >= redactLevel.toInt();
+    return userPowerLevel >= matrix.PowerLevel(redactLevel.toInt()).level;
   }
 
   /// 检查用户是否可以编辑消息

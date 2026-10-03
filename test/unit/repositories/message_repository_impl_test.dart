@@ -116,6 +116,51 @@ void main() {
     });
   });
 
+  test(
+    'reportMessage forwards the reason supported by Matrix reporting API',
+    () async {
+      when(() => mockClient.userID).thenReturn('@alice:matrix.org');
+      when(() => mockClient.homeserver).thenReturn(Uri.https('matrix.org', ''));
+      when(() => mockClient.accessToken).thenReturn('account-token');
+      when(() => mockClient.deviceID).thenReturn('device-1');
+      when(
+        () => mockClient.reportEvent(testRoomId, testEventId, reason: 'Spam'),
+      ).thenAnswer((_) async {});
+
+      await repository.reportMessage(testRoomId, testEventId, reason: 'Spam');
+
+      verify(
+        () => mockClient.reportEvent(testRoomId, testEventId, reason: 'Spam'),
+      ).called(1);
+    },
+  );
+
+  test(
+    'reportMessage rejects a response after the active account changes',
+    () async {
+      when(() => mockClient.userID).thenReturn('@alice:matrix.org');
+      when(() => mockClient.homeserver).thenReturn(Uri.https('matrix.org', ''));
+      when(() => mockClient.accessToken).thenReturn('account-token');
+      when(() => mockClient.deviceID).thenReturn('device-1');
+      when(
+        () => mockClient.reportEvent(testRoomId, testEventId, reason: 'Spam'),
+      ).thenAnswer((_) async {
+        when(() => mockClientMgr.client).thenReturn(MockClient());
+      });
+
+      await expectLater(
+        repository.reportMessage(testRoomId, testEventId, reason: 'Spam'),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            'Account changed',
+          ),
+        ),
+      );
+    },
+  );
+
   group('replyToMessage', () {
     test('delegates reply metadata to datasource', () async {
       when(

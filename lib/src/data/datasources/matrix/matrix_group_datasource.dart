@@ -205,7 +205,7 @@ class MatrixGroupDataSource {
       'setGroupName: roomId=$roomId, name=$name, canSendEvent=$canChange, powerLevel=$powerLevel',
     );
 
-    if (!canChange && powerLevel < 50) {
+    if (!canChange && powerLevel < matrix.PowerLevel.moderator.level) {
       throw Exception('You do not have permission to change the group name');
     }
 
@@ -427,7 +427,7 @@ class MatrixGroupDataSource {
         final powerLevel = room.getPowerLevelByUserId(userId).level;
         debugLog('canChangeSettings: userId=$userId, powerLevel=$powerLevel');
         // 权限级别 >= 50 通常表示版主或管理员
-        if (powerLevel >= 50) return true;
+        if (powerLevel >= matrix.PowerLevel.moderator.level) return true;
       }
     } catch (e) {
       debugLog('canChangeSettings: Error checking power level: $e');

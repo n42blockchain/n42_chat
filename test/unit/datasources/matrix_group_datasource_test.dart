@@ -215,6 +215,67 @@ void main() {
 
     expect(members.map((user) => user.id), ['@owner:hs', '@invited:hs']);
   });
+
+  test('moderator fallback preserves the 50 power-level threshold', () {
+    when(() => room.canSendEvent('m.room.name')).thenReturn(false);
+    when(() => client.userID).thenReturn('@me:hs');
+    when(
+      () => room.getPowerLevelByUserId('@me:hs'),
+    ).thenReturn(matrix.PowerLevel(50));
+
+    expect(dataSource.canChangeSettings(roomId), isTrue);
+  });
+
+  test('user power level remains an integer at the datasource boundary', () {
+    when(
+      () => room.getPowerLevelByUserId('@member:hs'),
+    ).thenReturn(matrix.PowerLevel(37));
+
+    expect(dataSource.getUserPowerLevel(roomId, '@member:hs'), 37);
+  });
+
+  test('member joins read the prior membership from event unsigned data', () async {
+    final sync = CachedStreamController<matrix.SyncUpdate>();
+    when(() => client.onSync).thenReturn(sync);
+    when(() => client.userID).thenReturn('@me:hs');
+    matrix.MatrixEvent joinedEvent({
+      required String userId,
+      required String previous,
+    }) =>
+        matrix.MatrixEvent(
+          type: 'm.room.member',
+          content: {'membership': 'join'},
+          senderId: userId,
+          stateKey: userId,
+          eventId: '\$$userId',
+          originServerTs: DateTime.utc(2026),
+          unsigned: {
+            'prev_content': {'membership': previous},
+          },
+        );
+
+    final joinedUser = dataSource.watchMemberJoinEvents(roomId).first;
+    sync.add(
+      matrix.SyncUpdate(
+        nextBatch: 'next',
+        rooms: matrix.RoomsUpdate(
+          join: {
+            roomId: matrix.JoinedRoomUpdate(
+              timeline: matrix.TimelineUpdate(
+                events: [
+                  joinedEvent(userId: '@existing:hs', previous: 'join'),
+                  joinedEvent(userId: '@new:hs', previous: 'invite'),
+                ],
+              ),
+            ),
+          },
+        ),
+      ),
+    );
+
+    expect(await joinedUser, '@new:hs');
+  });
+
   for (final reason in ['n42_moments', 'n42_stories']) {
     test('stripped $reason invitations are not ordinary group requests', () {
       when(() => client.userID).thenReturn('@me:hs');

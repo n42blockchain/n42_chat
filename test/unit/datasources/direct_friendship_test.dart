@@ -37,6 +37,7 @@ void main() {
     partner = _User();
     when(() => manager.client).thenReturn(client);
     when(() => client.isLogged()).thenReturn(true);
+    when(() => client.getDisplayNameAndAvatarFromPrevContent).thenReturn(true);
     when(() => client.userID).thenReturn('@alice:test');
     when(() => client.ignoredUsers).thenReturn([]);
     // Match Matrix 13's real client default when using real SDK Room/User.
@@ -325,7 +326,7 @@ void main() {
       ).onRoomState;
       when(() => client.onRoomState).thenReturn(stateUpdates);
       addTearDown(stateUpdates.close);
-      final syncedRoom = Room(id: '!dm:test', client: client);
+      final syncedRoom = Room(id: '!dm:test', client: client)..partial = false;
       syncedRoom.setState(
         User('@bob:test', membership: 'invite', room: syncedRoom),
       );
@@ -501,7 +502,7 @@ void main() {
       ).onRoomState;
       when(() => client.onRoomState).thenReturn(updates);
       addTearDown(updates.close);
-      final actual = Room(id: '!dm:test', client: client);
+      final actual = Room(id: '!dm:test', client: client)..partial = false;
       actual.setState(User('@bob:test', membership: 'invite', room: actual));
       client.accountData['m.direct'] = BasicEvent(
         type: 'm.direct',
