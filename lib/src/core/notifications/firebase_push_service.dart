@@ -1601,6 +1601,8 @@ class FirebasePushService implements IPushNotificationService {
         return NotificationPermissionStatus.granted;
       case AuthorizationStatus.denied:
         return NotificationPermissionStatus.denied;
+      case AuthorizationStatus.deniedPermanently:
+        return NotificationPermissionStatus.denied;
       case AuthorizationStatus.notDetermined:
         return NotificationPermissionStatus.notDetermined;
       case AuthorizationStatus.provisional:

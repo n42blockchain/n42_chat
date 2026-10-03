@@ -203,8 +203,8 @@ dependencies:
   # 移进了 AndroidParams，本仓 voip/call_notification_service.dart 仍用顶层写法，
   # 漂到 3.1.x 会编译失败。如需升级 3.1.x 须先把 text 参数迁入 AndroidParams 并真机验证。
   flutter_callkit_incoming: ">=3.0.0 <3.1.0"
-  firebase_core: ^4.5.0
-  firebase_messaging: ^16.1.2
+  firebase_core: ^4.14.0
+  firebase_messaging: ^16.7.0
   flutter_local_notifications: ^22.2.0
   # 系统级集成：动态快捷方式（Android Shortcuts / iOS Quick Actions）
   quick_actions: ^1.1.0
@@ -240,6 +240,8 @@ dependency_overrides:
   flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
+  firebase_core_platform_interface: ^8.1.1
+  firebase_messaging_platform_interface: ^4.10.0
   vodozemac: ^0.5.0
   image_picker_platform_interface: ^2.11.1
   shared_preferences_platform_interface: ^2.4.1
