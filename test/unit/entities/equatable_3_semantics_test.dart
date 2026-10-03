@@ -1,5 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
+import 'package:n42_chat/src/domain/entities/governance/vote_entity.dart';
+import 'package:n42_chat/src/domain/protocols/protocol_event.dart';
 import 'package:n42_chat/src/presentation/blocs/auth/auth_state.dart';
 
 class _Value extends Equatable {
@@ -42,6 +46,69 @@ void main() {
 
       expect(integerValue, doubleValue);
       expect(integerValue.hashCode, doubleValue.hashCode);
+    });
+
+    test('applies nested numeric equality to weakly typed domain fields', () {
+      final timestamp = DateTime.utc(2026, 1, 2);
+      final intProtocolEvent = ProtocolEvent(
+        type: ProtocolEventType.message,
+        eventId: 'event-1',
+        timestamp: timestamp,
+        data: const {
+          'sequence': 1,
+          'values': [2],
+        },
+      );
+      final doubleProtocolEvent = ProtocolEvent(
+        type: ProtocolEventType.message,
+        eventId: 'event-1',
+        timestamp: timestamp,
+        data: const {
+          'sequence': 1.0,
+          'values': [2.0],
+        },
+      );
+      final intDraft = ScheduledMessageDraft(
+        messageId: 'draft-1',
+        text: 'scheduled',
+        type: MessageType.text,
+        scheduledAt: timestamp,
+        createdAt: timestamp,
+        payload: const {
+          'metadata': {'value': 1},
+        },
+      );
+      final doubleDraft = ScheduledMessageDraft(
+        messageId: 'draft-1',
+        text: 'scheduled',
+        type: MessageType.text,
+        scheduledAt: timestamp,
+        createdAt: timestamp,
+        payload: const {
+          'metadata': {'value': 1.0},
+        },
+      );
+      final intVote = VoteEntity(
+        id: 'vote-1',
+        voter: 'voter',
+        proposalId: 'proposal-1',
+        choice: 1,
+        created: timestamp,
+      );
+      final doubleVote = VoteEntity(
+        id: 'vote-1',
+        voter: 'voter',
+        proposalId: 'proposal-1',
+        choice: 1.0,
+        created: timestamp,
+      );
+
+      expect(intProtocolEvent, doubleProtocolEvent);
+      expect(intProtocolEvent.hashCode, doubleProtocolEvent.hashCode);
+      expect(intDraft, doubleDraft);
+      expect(intDraft.hashCode, doubleDraft.hashCode);
+      expect(intVote, doubleVote);
+      expect(intVote.hashCode, doubleVote.hashCode);
     });
 
     test('preserves custom state diagnostic string output', () {
