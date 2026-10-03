@@ -138,12 +138,12 @@ dependencies:
   # ML Kit - 机器学习
   # ============================================
   # Apache 2.0 License - 人脸检测（自动模糊）
-  google_mlkit_face_detection: ^0.14.0
+  google_mlkit_face_detection: ^0.15.1
   # On-device structured OCR and image-text translation.
-  google_mlkit_text_recognition: ^0.16.0
-  google_mlkit_translation: ^0.14.0
+  google_mlkit_text_recognition: ^0.17.1
+  google_mlkit_translation: ^0.15.1
   # Apache 2.0 License - 人像分割（通话虚拟背景 / 背景模糊）
-  google_mlkit_selfie_segmentation: ^0.11.0
+  google_mlkit_selfie_segmentation: ^0.12.1
   # image codec - 图片编解码
   image: ^4.8.0
 
