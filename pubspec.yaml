@@ -81,7 +81,7 @@ dependencies:
   # UI Components - UI组件
   # ============================================
   # MIT License
-  cached_network_image: ^3.4.1
+  cached_network_image: '>=4.0.3 <4.0.4' # 4.0.4's material_ui bound blocks Dart 3.12
   shimmer: ^3.0.0
   flutter_slidable: ^4.0.3
 
