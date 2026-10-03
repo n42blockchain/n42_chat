@@ -1590,7 +1590,7 @@ packages:
     source: hosted
     version: "0.13.0"
   material_ui:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: material_ui
       sha256: fbfb53cab6c4629438feeade5f3d305f72944bc9d9f25786b19106d32b80ec45
@@ -1937,10 +1937,10 @@ packages:
     dependency: "direct main"
     description:
       name: pro_image_editor
-      sha256: "80f3677566c29eec012ce3aafa7c06bc009c838fd733c72fa909579bf56b17df"
+      sha256: cdc9108e879adac0c094771e3f51454d80f3cb1ffe0d02d5337880e2d289cbe7
       url: "https://pub.dev"
     source: hosted
-    version: "13.2.3"
+    version: "14.6.2"
   proj4dart:
     dependency: transitive
     description:

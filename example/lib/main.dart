@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:n42_chat/n42_chat.dart';
 
 import 'server_test_page.dart';
@@ -77,7 +78,10 @@ class _N42ChatExampleAppState extends State<N42ChatExampleApp> {
       themeMode: ThemeMode.system,
       // 国际化配置
       locale: _locale,
-      localizationsDelegates: S.localizationsDelegates,
+      localizationsDelegates: const [
+        ...material_ui.GlobalMaterialLocalizations.delegates,
+        ...S.localizationsDelegates,
+      ],
       supportedLocales: S.supportedLocales,
       home: const MainScreen(),
     );
@@ -451,4 +455,3 @@ class _ProfileItem extends StatelessWidget {
     );
   }
 }
-

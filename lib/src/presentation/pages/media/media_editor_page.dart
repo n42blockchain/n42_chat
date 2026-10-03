@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:pro_image_editor/pro_image_editor.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -56,16 +57,16 @@ class _MediaEditorPageState extends State<MediaEditorPage> {
   Widget build(BuildContext context) {
     final l10n = S.of(context);
 
-    final editorTheme = ThemeData.dark().copyWith(
-      colorScheme: const ColorScheme.dark(
+    final editorTheme = material_ui.ThemeData.dark().copyWith(
+      colorScheme: const material_ui.ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.primary,
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+      appBarTheme: const material_ui.AppBarTheme(
+        backgroundColor: material_ui.Colors.black,
+        foregroundColor: material_ui.Colors.white,
       ),
-      scaffoldBackgroundColor: Colors.black,
+      scaffoldBackgroundColor: material_ui.Colors.black,
     );
 
     return ProImageEditor.memory(
