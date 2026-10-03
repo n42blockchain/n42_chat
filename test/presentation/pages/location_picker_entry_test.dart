@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
@@ -33,6 +34,7 @@ class _PositionSource extends GeolocatorPlatform {
 class _Places extends GeocodingPlatform {
   bool unavailable = false;
   final queries = <String, Completer<List<Location>>>{};
+  final requestedCoordinates = <({double latitude, double longitude})>[];
   @override
   Future<List<Location>> locationFromAddress(String address) =>
       (queries[address] = Completer<List<Location>>()).future;
@@ -41,6 +43,7 @@ class _Places extends GeocodingPlatform {
     double latitude,
     double longitude,
   ) async {
+    requestedCoordinates.add((latitude: latitude, longitude: longitude));
     if (unavailable) throw StateError('Geocoder unavailable');
     return [Placemark(name: 'Place $latitude', street: 'Street $latitude')];
   }
@@ -173,5 +176,49 @@ void main() {
     expect(selected?['latitude'], 10);
     expect(selected?['longitude'], 20);
     expect(selected?['address'], 'Street 10.0');
+  });
+
+  testWidgets('dragging the map sends its visible center', (tester) async {
+    Map<String, dynamic>? selected;
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () async {
+              selected = await Navigator.of(context).push<Map<String, dynamic>>(
+                MaterialPageRoute(
+                  builder: (_) => const ChatLocationPickerPage(),
+                ),
+              );
+            },
+            child: const Text('Open'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final map = find.byType(FlutterMap);
+    await tester.ensureVisible(map);
+    await tester.dragFrom(
+      tester.getTopLeft(map) + const Offset(80, 100),
+      const Offset(120, 0),
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.tap(find.text('Send'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(selected, isNotNull);
+    expect(places.requestedCoordinates, isNotEmpty);
+    final resolvedCenter = places.requestedCoordinates.last;
+    expect(resolvedCenter.latitude, isNot(10));
+    expect(resolvedCenter.longitude, isNot(20));
+    expect(selected!['latitude'], resolvedCenter.latitude);
+    expect(selected!['longitude'], resolvedCenter.longitude);
   });
 }

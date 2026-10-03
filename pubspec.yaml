@@ -163,8 +163,8 @@ dependencies:
   geolocator: ^14.0.0
   geocoding: ^4.0.0
   # BSD License - OpenStreetMap 地图组件
-  flutter_map: ^7.0.2
-  latlong2: ^0.9.1
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
   
   # ============================================
   # URL Launcher - 启动外部应用
