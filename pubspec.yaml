@@ -230,8 +230,6 @@ dependencies:
   flutter_facebook_auth: ^7.1.1  # Facebook 登录
   twitter_login: ^4.4.2  # Twitter 登录
   fluwx: ^5.0.0  # 微信 SDK（登录、分享等）
-  # OTP 输入框
-  pinput: ^6.0.2
   # 生物识别 - 面部/指纹登录
   local_auth: ^3.0.1
 
