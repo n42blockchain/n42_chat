@@ -304,6 +304,9 @@ class FirebasePushService implements IPushNotificationService {
     _applyIOSForegroundPresentationOptions(config);
   }
 
+  @visibleForTesting
+  NotificationConfig get notificationConfigForTest => _notificationConfig;
+
   /// 当前智能过滤规则
   NotificationFilterRules get filterRules => _filterRules;
 

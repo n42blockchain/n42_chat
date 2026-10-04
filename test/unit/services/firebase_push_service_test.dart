@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:n42_chat/src/core/notifications/push_notification_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -364,13 +366,27 @@ void main() {
 
     test('should not register concurrently (lock mechanism)', () async {
       // 并发调用 registerForPush 时第二次应被跳过
+      final tokenCompleter = Completer<String?>();
+      when(() => mockClient.userID).thenReturn('@alice:example.org');
+      when(() => mockClient.deviceID).thenReturn('DEVICE-A');
       when(() => mockClient.isLogged()).thenReturn(true);
+      await service.dispose();
+      service = FirebasePushService(
+        mockClient,
+        pushGatewayUrl: 'https://push.example.com',
+        appId: 'com.test.app',
+        tokenLoader: () => tokenCompleter.future,
+      );
 
-      // 两次调用都应安全完成
       final f1 = service.registerForPush();
+      await Future<void>.delayed(Duration.zero);
+      expect(service.getDiagnosticInfo(), containsPair('isRegistering', true));
+
       final f2 = service.registerForPush();
+      tokenCompleter.complete(null);
       await Future.wait([f1, f2]);
-      // 不抛异常即通过
+
+      expect(service.getDiagnosticInfo(), containsPair('isRegistering', false));
     });
   });
 

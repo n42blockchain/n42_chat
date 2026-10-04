@@ -14,9 +14,9 @@ void main() {
     nativeReturn = null;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall call) async {
-      nativeCalls.add(call);
-      return nativeReturn;
-    });
+          nativeCalls.add(call);
+          return nativeReturn;
+        });
   });
 
   // app_badge_plus 的平台通道（用于校验角标兜底）
@@ -29,10 +29,10 @@ void main() {
     badgeSupported = true;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(badgeChannel, (MethodCall call) async {
-      badgeCalls.add(call);
-      if (call.method == 'isSupported') return badgeSupported;
-      return null;
-    });
+          badgeCalls.add(call);
+          if (call.method == 'isSupported') return badgeSupported;
+          return null;
+        });
   });
 
   tearDown(() {
@@ -85,8 +85,9 @@ void main() {
       nativeReturn = true;
       final svc = SystemIntegrationService();
       await svc.updateLiveActivity(id: 'call', title: 'In call', body: 'x');
-      final call =
-          nativeCalls.firstWhere((c) => c.method == 'updateLiveActivity');
+      final call = nativeCalls.firstWhere(
+        (c) => c.method == 'updateLiveActivity',
+      );
       final args = call.arguments as Map;
       expect(args['id'], 'call');
       expect(args['title'], 'In call');
@@ -97,8 +98,7 @@ void main() {
       nativeReturn = true;
       final svc = SystemIntegrationService();
       await svc.endLiveActivity('call');
-      final call =
-          nativeCalls.firstWhere((c) => c.method == 'endLiveActivity');
+      final call = nativeCalls.firstWhere((c) => c.method == 'endLiveActivity');
       expect((call.arguments as Map)['id'], 'call');
     });
 
@@ -110,8 +110,9 @@ void main() {
         title: 'Bob',
         message: 'hi',
       );
-      final call =
-          nativeCalls.firstWhere((c) => c.method == 'showConversationBubble');
+      final call = nativeCalls.firstWhere(
+        (c) => c.method == 'showConversationBubble',
+      );
       final args = call.arguments as Map;
       expect(args['roomId'], '!r:s');
       expect(args['message'], 'hi');
@@ -123,8 +124,9 @@ void main() {
       await svc.setDynamicShortcuts([
         {'type': 'search', 'title': 'Search'},
       ]);
-      final call =
-          nativeCalls.firstWhere((c) => c.method == 'setDynamicShortcuts');
+      final call = nativeCalls.firstWhere(
+        (c) => c.method == 'setDynamicShortcuts',
+      );
       expect(call.arguments, isA<Map<dynamic, dynamic>>());
     });
 
@@ -162,8 +164,20 @@ void main() {
       await svc.setDynamicShortcuts(const []);
       await svc.setTrayBadge(3);
       await svc.flashWindow();
-      // 走到此处未抛异常即视为优雅降级成功
-      expect(true, isTrue);
+
+      expect(nativeCalls.map((call) => call.method), [
+        'updateLiveActivity',
+        'endLiveActivity',
+        'showConversationBubble',
+        'setDynamicShortcuts',
+        'setTrayBadge',
+        'flashWindow',
+      ]);
+      expect(badgeCalls.map((call) => call.method), [
+        'isSupported',
+        'updateBadge',
+      ]);
+      expect((badgeCalls.last.arguments as Map)['count'], 3);
     });
   });
 }

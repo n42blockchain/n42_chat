@@ -69,7 +69,7 @@ void main() {
 
     test('getIceServers should include public STUN servers', () {
       final servers = config.getIceServers();
-      
+
       // 应该至少包含公共 STUN 服务器
       expect(servers, isNotEmpty);
       expect(
@@ -84,7 +84,7 @@ void main() {
       config.turnPassword = 'pass';
 
       final servers = config.getIceServers();
-      
+
       expect(
         servers.any((s) => s['urls'] == 'turn:turn.example.com:3478'),
         isTrue,
@@ -175,13 +175,17 @@ void main() {
     });
 
     test('toggleMicrophone should be safe when not in meeting', () async {
+      expect(liveKitService.isMuted, isFalse);
       // Should not throw
       await liveKitService.toggleMicrophone();
+      expect(liveKitService.isMuted, isFalse);
     });
 
     test('toggleCamera should be safe when not in meeting', () async {
+      expect(liveKitService.isVideoEnabled, isTrue);
       // Should not throw
       await liveKitService.toggleCamera();
+      expect(liveKitService.isVideoEnabled, isTrue);
     });
 
     test('duration should be zero when not in meeting', () {
@@ -191,10 +195,7 @@ void main() {
 
   group('MeetingParticipant', () {
     test('should create with required fields', () {
-      final participant = MeetingParticipant(
-        id: 'user-123',
-        name: 'Test User',
-      );
+      final participant = MeetingParticipant(id: 'user-123', name: 'Test User');
 
       expect(participant.id, equals('user-123'));
       expect(participant.name, equals('Test User'));
@@ -204,10 +205,7 @@ void main() {
     });
 
     test('copyWith should create new instance with updated fields', () {
-      final participant = MeetingParticipant(
-        id: 'user-123',
-        name: 'Test User',
-      );
+      final participant = MeetingParticipant(id: 'user-123', name: 'Test User');
 
       final updated = participant.copyWith(
         isMuted: true,

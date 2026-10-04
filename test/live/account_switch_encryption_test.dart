@@ -302,6 +302,10 @@ void main() {
       }
     },
     timeout: const Timeout(Duration(minutes: 4)),
-    skip: !Platform.isMacOS || Platform.environment['N42_QA_STATE'] == null,
+    skip: !Platform.isMacOS
+        ? 'Requires macOS with the native crypto library.'
+        : Platform.environment['N42_QA_STATE'] == null
+        ? 'Requires an N42_QA_STATE file with disposable QA accounts.'
+        : null,
   );
 }

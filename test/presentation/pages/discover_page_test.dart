@@ -191,13 +191,24 @@ void main() {
     });
 
     testWidgets('tapping Scan triggers navigation', (tester) async {
+      useTallViewport(tester);
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
-      // 验证 Scan 菜单项可点击（InkWell 包裹）
-      await tester.tap(find.text('Scan'));
-      // 只 pump 一帧验证不报异常，不 pumpAndSettle（ScanQRPage 含平台插件）
-      await tester.pump();
+      await tester.ensureVisible(find.text('Scan'));
+      final scanTapTarget = find.ancestor(
+        of: find.text('Scan'),
+        matching: find.byType(InkWell),
+      );
+      expect(scanTapTarget, findsOneWidget);
+      expect(scanTapTarget.hitTestable(), findsOneWidget);
+      expect(tester.widget<InkWell>(scanTapTarget).onTap, isNotNull);
+      await tester.tap(scanTapTarget);
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(
+        tester.state<NavigatorState>(find.byType(Navigator)).canPop(),
+        isTrue,
+      );
     });
 
     testWidgets('tapping Search navigates to GlobalSearchPage', (tester) async {

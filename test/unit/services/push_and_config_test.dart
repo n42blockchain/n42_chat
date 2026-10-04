@@ -83,34 +83,35 @@ void main() {
       await service.dispose();
     });
 
-    test(
-      'setNotificationConfig should accept a custom config without errors',
-      () {
-        // 设置一个自定义配置，确保不抛出异常
-        const config = NotificationConfig(
-          enabled: false,
-          showPreview: false,
-          playSound: false,
-          vibrate: false,
-          doNotDisturb: true,
-          dndStartTime: TimeOfDay(hour: 22, minute: 0),
-          dndEndTime: TimeOfDay(hour: 7, minute: 0),
-        );
+    test('stores every custom notification preference', () {
+      const config = NotificationConfig(
+        enabled: false,
+        showPreview: false,
+        playSound: false,
+        vibrate: false,
+        doNotDisturb: true,
+        dndStartTime: TimeOfDay(hour: 22, minute: 0),
+        dndEndTime: TimeOfDay(hour: 7, minute: 0),
+      );
 
-        expect(() => service.setNotificationConfig(config), returnsNormally);
-      },
-    );
+      service.setNotificationConfig(config);
+
+      expect(service.notificationConfigForTest, config);
+    });
 
     test('setNotificationConfig can be called multiple times', () {
       // 多次设置配置不应出错
       service.setNotificationConfig(const NotificationConfig(enabled: false));
       service.setNotificationConfig(const NotificationConfig(enabled: true));
-      service.setNotificationConfig(
-        const NotificationConfig(showPreview: false, playSound: false),
+      const finalConfig = NotificationConfig(
+        showPreview: false,
+        playSound: false,
       );
+      service.setNotificationConfig(finalConfig);
 
-      // 不抛异常即通过
-      expect(true, isTrue);
+      expect(service.notificationConfigForTest, finalConfig);
+      expect(service.notificationConfigForTest.enabled, isTrue);
+      expect(service.notificationConfigForTest.vibrate, isTrue);
     });
 
     test('android channel id should vary with sound and vibration config', () {
