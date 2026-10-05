@@ -409,7 +409,7 @@ class N42ChatConfig {
   /// 为 `true` 时，AI 数据源不会再自动拼接 `/v1/chat/completions`。
   final bool aiUseProxyEndpoint;
 
-  /// 端侧 LLM（Gemma via flutter_gemma/MediaPipe）模型源 URL。
+  /// 端侧 LLM（Gemma via Flutter Edge AI/MediaPipe）模型源 URL。
   ///
   /// 指向 MediaPipe `.task` 模型（Gemma 系列多为 HuggingFace 受限模型，需配
   /// [localLlmHuggingFaceToken]）。**未配置时端侧推理不可用**，`AiProviderRouter`

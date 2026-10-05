@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -135,9 +135,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
           _lastShownError = null;
         } else if (state.error != _lastShownError) {
           _lastShownError = state.error;
-          ScaffoldMessenger.maybeOf(
-            context,
-          )?.showSnackBar(SnackBar(content: Text(state.error!)));
+          ScaffoldMessenger.maybeOf(context)
+              ?.showSnackBar(SnackBar(content: Text(state.error!)));
         }
         if (state.isGenerating || state.messages.isNotEmpty) {
           _scrollToBottom();
@@ -233,8 +232,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             ),
             const SizedBox(height: 8),
             Text(
-              l10n?.aiAssistantWelcome ??
-                  'Ask me anything! I can help with questions, writing, analysis, and more.',
+              l10n?.aiAssistantWelcome ?? 'Ask me anything! I can help with questions, writing, analysis, and more.',
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -256,8 +254,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  l10n?.aiAssistantNotConfigured ??
-                      'AI service not configured. Please set API key in settings.',
+                  l10n?.aiAssistantNotConfigured ?? 'AI service not configured. Please set API key in settings.',
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -452,9 +449,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: context.surfaceColor,
-                borderRadius: BorderRadius.circular(
-                  16,
-                ).copyWith(topLeft: const Radius.circular(4)),
+                borderRadius: BorderRadius.circular(16)
+                    .copyWith(topLeft: const Radius.circular(4)),
               ),
               child: text.isEmpty
                   ? _buildTypingIndicator()
