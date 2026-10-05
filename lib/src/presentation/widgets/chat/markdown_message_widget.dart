@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/custom_emoji.dart';
 import '../../../core/utils/message_markdown_utils.dart';
 import 'custom_emoji_text.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Markdown 消息渲染组件
 ///
@@ -120,16 +121,16 @@ class MarkdownMessageWidget extends StatelessWidget {
           color: isDark
               ? Colors.white.withValues(alpha: 0.08)
               : Colors.black.withValues(alpha: 0.04),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
-        codeblockPadding: const EdgeInsets.all(12),
+        codeblockPadding: const EdgeInsets.all(AppDimensions.spacingM),
         // 引用块
         blockquoteDecoration: BoxDecoration(
           border: Border(
             left: BorderSide(color: textColor.withValues(alpha: 0.4), width: 3),
           ),
         ),
-        blockquotePadding: const EdgeInsets.only(left: 12),
+        blockquotePadding: const EdgeInsets.only(left: AppDimensions.spacingM),
         // 链接
         a: TextStyle(color: linkColor, decoration: TextDecoration.underline),
         // 删除线

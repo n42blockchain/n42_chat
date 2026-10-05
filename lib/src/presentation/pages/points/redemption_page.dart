@@ -7,6 +7,7 @@ import '../../../domain/entities/points/redemption_item.dart';
 import '../../blocs/points/points_bloc.dart';
 import '../../blocs/points/points_event.dart';
 import '../../blocs/points/points_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Redemption store page where users spend points on items.
 ///
@@ -19,11 +20,7 @@ class RedemptionPage extends StatefulWidget {
   final String userId;
   final String roomId;
 
-  const RedemptionPage({
-    super.key,
-    required this.userId,
-    required this.roomId,
-  });
+  const RedemptionPage({super.key, required this.userId, required this.roomId});
 
   @override
   State<RedemptionPage> createState() => _RedemptionPageState();
@@ -65,9 +62,9 @@ class _RedemptionPageState extends State<RedemptionPage> {
                 backgroundColor: AppColors.success,
               ),
             );
-            context
-                .read<PointsBloc>()
-                .add(const PointsClearRedemptionFeedback());
+            context.read<PointsBloc>().add(
+              const PointsClearRedemptionFeedback(),
+            );
           } else if (state.redemptionStatus == PointsRedemptionStatus.failed) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -77,9 +74,9 @@ class _RedemptionPageState extends State<RedemptionPage> {
                 backgroundColor: AppColors.error,
               ),
             );
-            context
-                .read<PointsBloc>()
-                .add(const PointsClearRedemptionFeedback());
+            context.read<PointsBloc>().add(
+              const PointsClearRedemptionFeedback(),
+            );
           }
         },
         builder: (context, state) {
@@ -106,45 +103,39 @@ class _RedemptionPageState extends State<RedemptionPage> {
             color: AppColors.primary,
             child: CustomScrollView(
               slivers: [
-                SliverToBoxAdapter(
-                  child: _buildPointsHeader(context, state),
-                ),
+                SliverToBoxAdapter(child: _buildPointsHeader(context, state)),
                 if (state.redemptionItems.isEmpty)
-                  SliverFillRemaining(
-                    child: _buildEmptyState(context),
-                  )
+                  SliverFillRemaining(child: _buildEmptyState(context))
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppDimensions.spacing),
                     sliver: SliverGrid(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: 0.75,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final item = state.redemptionItems[index];
-                          final canAfford =
-                              (state.balance?.availablePoints ?? 0) >= item.cost;
-                          return _RedemptionCard(
-                            item: item,
-                            canAfford: canAfford,
-                            isRedeeming:
-                                state.redemptionStatus ==
-                                        PointsRedemptionStatus.inProgress &&
-                                    state.redeemingItemId == item.id,
-                            isBusy: state.redemptionStatus ==
-                                PointsRedemptionStatus.inProgress,
-                            isDark: isDark,
-                            onRedeem: () =>
-                                _showRedeemConfirmation(context, item, canAfford),
-                          );
-                        },
-                        childCount: state.redemptionItems.length,
-                      ),
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.75,
+                          ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final item = state.redemptionItems[index];
+                        final canAfford =
+                            (state.balance?.availablePoints ?? 0) >= item.cost;
+                        return _RedemptionCard(
+                          item: item,
+                          canAfford: canAfford,
+                          isRedeeming:
+                              state.redemptionStatus ==
+                                  PointsRedemptionStatus.inProgress &&
+                              state.redeemingItemId == item.id,
+                          isBusy:
+                              state.redemptionStatus ==
+                              PointsRedemptionStatus.inProgress,
+                          isDark: isDark,
+                          onRedeem: () =>
+                              _showRedeemConfirmation(context, item, canAfford),
+                        );
+                      }, childCount: state.redemptionItems.length),
                     ),
                   ),
               ],
@@ -157,16 +148,16 @@ class _RedemptionPageState extends State<RedemptionPage> {
 
   Widget _buildPointsHeader(BuildContext context, PointsState state) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(AppDimensions.spacing),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Row(
         children: [
           const Icon(Icons.stars_outlined, color: AppColors.warning, size: 28),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -208,7 +199,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
             size: 64,
             color: context.textTertiary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             'No items available',
             maxLines: 1,
@@ -219,7 +210,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             'Check back later for new rewards',
             maxLines: 1,
@@ -238,12 +229,12 @@ class _RedemptionPageState extends State<RedemptionPage> {
   Widget _buildErrorState(BuildContext context, String? errorMessage) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'Failed to load rewards',
               maxLines: 1,
@@ -256,7 +247,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
               ),
             ),
             if (errorMessage != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
@@ -269,11 +260,8 @@ class _RedemptionPageState extends State<RedemptionPage> {
                 ),
               ),
             ],
-            const SizedBox(height: 24),
-            OutlinedButton(
-              onPressed: _loadItems,
-              child: const Text('Retry'),
-            ),
+            const SizedBox(height: AppDimensions.spacingXL),
+            OutlinedButton(onPressed: _loadItems, child: const Text('Retry')),
           ],
         ),
       ),
@@ -286,12 +274,16 @@ class _RedemptionPageState extends State<RedemptionPage> {
   }) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.block_outlined, size: 48, color: AppColors.warning),
-            const SizedBox(height: 16),
+            const Icon(
+              Icons.block_outlined,
+              size: 48,
+              color: AppColors.warning,
+            ),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -328,7 +320,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Redeem "${item.name}" for ${item.cost} points?'),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 item.description,
                 style: TextStyle(
@@ -343,9 +335,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 'Cancel',
-                style: TextStyle(
-                  color: dialogContext.textSecondary,
-                ),
+                style: TextStyle(color: dialogContext.textSecondary),
               ),
             ),
             ElevatedButton(
@@ -355,11 +345,13 @@ class _RedemptionPageState extends State<RedemptionPage> {
               ),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
-                context.read<PointsBloc>().add(PointsRedeemItem(
-                      userId: widget.userId,
-                      roomId: widget.roomId,
-                      itemId: item.id,
-                    ));
+                context.read<PointsBloc>().add(
+                  PointsRedeemItem(
+                    userId: widget.userId,
+                    roomId: widget.roomId,
+                    itemId: item.id,
+                  ),
+                );
               },
               child: const Text('Redeem'),
             ),
@@ -398,7 +390,7 @@ class _RedemptionCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         boxShadow: isDark
             ? null
             : [
@@ -423,11 +415,7 @@ class _RedemptionCard extends StatelessWidget {
                 ),
               ),
               child: Center(
-                child: Icon(
-                  _categoryIcon,
-                  size: 40,
-                  color: _categoryColor,
-                ),
+                child: Icon(_categoryIcon, size: 40, color: _categoryColor),
               ),
             ),
           ),
@@ -503,8 +491,8 @@ class _RedemptionCard extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isDisabled
                             ? (isDark
-                                ? const Color(0xFF333333)
-                                : const Color(0xFFE0E0E0))
+                                  ? const Color(0xFF2A2A2A)
+                                  : const Color(0xFFE0E0E0))
                             : AppColors.primary,
                         foregroundColor: isDisabled
                             ? AppColors.textDisabled

@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 消息操作菜单项
 class MessageMenuItem {
@@ -56,7 +57,7 @@ class MessageMenu extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
@@ -80,16 +81,13 @@ class MessageMenu extends StatelessWidget {
 
   Widget _buildQuickReactions(bool isDark) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: CommonEmojis.reactions.take(6).map((emoji) {
           return GestureDetector(
             onTap: () => onReaction?.call(emoji),
-            child: Text(
-              emoji,
-              style: const TextStyle(fontSize: 28),
-            ),
+            child: Text(emoji, style: const TextStyle(fontSize: 28)),
           );
         }).toList(),
       ),
@@ -116,7 +114,11 @@ class MessageMenu extends StatelessWidget {
             Clipboard.setData(ClipboardData(text: message.content));
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(s?.commonCopiedToClipboard ?? 'Copied to clipboard')),
+              SnackBar(
+                content: Text(
+                  s?.commonCopiedToClipboard ?? 'Copied to clipboard',
+                ),
+              ),
             );
             onCopy?.call();
           },
@@ -178,7 +180,10 @@ class MessageMenu extends StatelessWidget {
     return InkWell(
       onTap: item.onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: AppDimensions.spacingM,
+        ),
         child: Row(
           children: [
             Icon(
@@ -188,7 +193,7 @@ class MessageMenu extends StatelessWidget {
                   ? AppColors.error
                   : (AppColors.textPrimaryOf(isDark)),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimensions.spacing),
             Text(
               item.label,
               style: TextStyle(
@@ -210,11 +215,7 @@ class ForwardDialog extends StatefulWidget {
   final List<ForwardTarget> targets;
   final void Function(List<String> roomIds)? onConfirm;
 
-  const ForwardDialog({
-    super.key,
-    required this.targets,
-    this.onConfirm,
-  });
+  const ForwardDialog({super.key, required this.targets, this.onConfirm});
 
   @override
   State<ForwardDialog> createState() => _ForwardDialogState();
@@ -237,11 +238,12 @@ class _ForwardDialogState extends State<ForwardDialog> {
         children: [
           // 标题栏
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.chatSelectForwardTarget ?? 'Select Forward Target',
+                  S.of(context)?.chatSelectForwardTarget ??
+                      'Select Forward Target',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
@@ -257,7 +259,8 @@ class _ForwardDialogState extends State<ForwardDialog> {
                           Navigator.pop(context);
                         },
                   child: Text(
-                    S.of(context)?.commonSendCount(_selectedIds.length) ?? 'Send(${_selectedIds.length})',
+                    S.of(context)?.commonSendCount(_selectedIds.length) ??
+                        'Send(${_selectedIds.length})',
                     style: TextStyle(
                       color: _selectedIds.isEmpty
                           ? AppColors.textSecondary
@@ -334,4 +337,3 @@ class ForwardTarget {
     this.isGroup = false,
   });
 }
-

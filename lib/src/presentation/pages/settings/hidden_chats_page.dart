@@ -9,16 +9,14 @@ import '../../blocs/conversation/conversation_bloc.dart';
 import '../../blocs/conversation/conversation_event.dart';
 import '../../blocs/conversation/conversation_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 隐藏聊天列表页面
 class HiddenChatsPage extends StatefulWidget {
   /// 点击会话回调（进入聊天）
   final void Function(ConversationEntity conversation)? onConversationTap;
 
-  const HiddenChatsPage({
-    super.key,
-    this.onConversationTap,
-  });
+  const HiddenChatsPage({super.key, this.onConversationTap});
 
   @override
   State<HiddenChatsPage> createState() => _HiddenChatsPageState();
@@ -52,7 +50,8 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
           if (state.hiddenConversations.isEmpty) {
             return N42EmptyState.noData(
               title: l10n?.settingsNoHiddenChats ?? 'No hidden chats',
-              description: l10n?.settingsNoHiddenChatsDescription ??
+              description:
+                  l10n?.settingsNoHiddenChatsDescription ??
                   'Chats you hide will appear here',
             );
           }
@@ -127,10 +126,9 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
   }
 
   void _unhideChat(BuildContext context, ConversationEntity conversation) {
-    context.read<ConversationBloc>().add(SetConversationHidden(
-          conversationId: conversation.id,
-          hidden: false,
-        ));
+    context.read<ConversationBloc>().add(
+      SetConversationHidden(conversationId: conversation.id, hidden: false),
+    );
   }
 
   void _showOptions(BuildContext context, ConversationEntity conversation) {
@@ -150,12 +148,14 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
             children: [
               // 拖动指示器
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
+                margin: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.spacingM,
+                ),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
                   color: context.dividerColor,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
 
@@ -167,9 +167,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 ),
                 title: Text(
                   l10n?.settingsUnhideChat ?? 'Unhide',
-                  style: TextStyle(
-                    color: context.textPrimary,
-                  ),
+                  style: TextStyle(color: context.textPrimary),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -185,9 +183,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 ),
                 title: Text(
                   l10n?.commonChat ?? 'Chat',
-                  style: TextStyle(
-                    color: context.textPrimary,
-                  ),
+                  style: TextStyle(color: context.textPrimary),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -195,7 +191,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
                 },
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
             ],
           ),
         ),

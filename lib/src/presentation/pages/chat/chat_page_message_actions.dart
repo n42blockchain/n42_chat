@@ -536,7 +536,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(emoji, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Text(feedbackText),
           ],
         ),
@@ -673,7 +673,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                   'Are you sure you want to delete ${selectedMessages.length} messages?',
             ),
             if (otherMessages.isNotEmpty) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 S.of(context)?.chatNoteOtherMessages(otherMessages.length) ??
                     'Note: ${otherMessages.length} messages are from others, can only delete locally.',
@@ -687,7 +687,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
               ),
             ],
             if (myMessages.isNotEmpty) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 S
                         .of(context)
@@ -913,7 +913,9 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(resultMsg),
           duration: const Duration(seconds: 2),
-          backgroundColor: failCount == 0 ? AppColors.success : AppColors.warning,
+          backgroundColor: failCount == 0
+              ? AppColors.success
+              : AppColors.warning,
         ),
       );
     }
@@ -976,8 +978,13 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
       initialTime: TimeOfDay.fromDateTime(now.add(const Duration(hours: 1))),
     );
     if (time == null || !mounted) return;
-    final dueAt =
-        DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    final dueAt = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
     if (!getIt.isRegistered<ReminderService>()) return;
     final preview = message.content.trim().isEmpty
         ? '[${message.type.name}]'

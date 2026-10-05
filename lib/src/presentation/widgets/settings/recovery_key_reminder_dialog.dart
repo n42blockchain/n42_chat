@@ -7,6 +7,7 @@ import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../pages/settings/security_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 恢复密钥提醒 Banner
 ///
@@ -36,8 +37,7 @@ class RecoveryKeyReminderBanner extends StatefulWidget {
       _RecoveryKeyReminderBannerState();
 }
 
-class _RecoveryKeyReminderBannerState
-    extends State<RecoveryKeyReminderBanner> {
+class _RecoveryKeyReminderBannerState extends State<RecoveryKeyReminderBanner> {
   static const _dismissedKey = 'recovery_key_reminder_dismissed_until';
 
   bool _shouldShow = false;
@@ -114,15 +114,18 @@ class _RecoveryKeyReminderBannerState
       elevation: 4,
       color: Colors.transparent,
       child: Container(
-        margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.all(AppDimensions.spacingM),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: AppDimensions.spacingM,
+        ),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF6C63FF), Color(0xFF9B59B6)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF6C63FF).withValues(alpha: 0.3),
@@ -134,7 +137,7 @@ class _RecoveryKeyReminderBannerState
         child: Row(
           children: [
             const Icon(Icons.shield_outlined, color: Colors.white, size: 28),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,17 +155,14 @@ class _RecoveryKeyReminderBannerState
                   Text(
                     l10n?.recoveryKeyReminderDesc ??
                         'Create a recovery key to sync encrypted messages across devices',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -171,22 +171,28 @@ class _RecoveryKeyReminderBannerState
                   onPressed: () => _openSecuritySettings(context),
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: Text(
                     l10n?.recoveryKeySetupNow ?? 'Set up',
                     style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 GestureDetector(
                   onTap: _dismissFor7Days,
                   child: Text(

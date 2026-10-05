@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 滑动删除组件
 class SlideToDeleteWidget extends StatefulWidget {
@@ -38,7 +39,8 @@ class _SlideToDeleteWidgetState extends State<SlideToDeleteWidget>
   double _dragExtent = 0;
 
   double get _actionWidth {
-    final actionCount = (widget.actions?.length ?? 0) + (widget.onDelete != null ? 1 : 0);
+    final actionCount =
+        (widget.actions?.length ?? 0) + (widget.onDelete != null ? 1 : 0);
     return actionCount * 70.0;
   }
 
@@ -59,7 +61,10 @@ class _SlideToDeleteWidgetState extends State<SlideToDeleteWidget>
 
   void _handleDragUpdate(DragUpdateDetails details) {
     setState(() {
-      _dragExtent = (_dragExtent + details.primaryDelta!).clamp(-_actionWidth, 0);
+      _dragExtent = (_dragExtent + details.primaryDelta!).clamp(
+        -_actionWidth,
+        0,
+      );
     });
   }
 
@@ -101,15 +106,17 @@ class _SlideToDeleteWidgetState extends State<SlideToDeleteWidget>
 
                 // 删除按钮
                 if (widget.onDelete != null)
-                  _buildAction(SlideAction(
-                    icon: Icons.delete,
-                    label: widget.deleteLabel,
-                    backgroundColor: AppColors.error,
-                    onTap: () {
-                      _close();
-                      widget.onDelete?.call();
-                    },
-                  )),
+                  _buildAction(
+                    SlideAction(
+                      icon: Icons.delete,
+                      label: widget.deleteLabel,
+                      backgroundColor: AppColors.error,
+                      onTap: () {
+                        _close();
+                        widget.onDelete?.call();
+                      },
+                    ),
+                  ),
               ],
             ),
           ),
@@ -137,19 +144,12 @@ class _SlideToDeleteWidgetState extends State<SlideToDeleteWidget>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (action.icon != null)
-              Icon(
-                action.icon,
-                color: action.foregroundColor,
-                size: 22,
-              ),
+              Icon(action.icon, color: action.foregroundColor, size: 22),
             if (action.label != null) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: AppDimensions.spacingXS),
               Text(
                 action.label!,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: action.foregroundColor,
-                ),
+                style: TextStyle(fontSize: 12, color: action.foregroundColor),
               ),
             ],
           ],
@@ -196,13 +196,14 @@ class PullToRefreshIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (pullDistance / refreshTriggerPullDistance).clamp(0.0, 1.0);
+    final progress = (pullDistance / refreshTriggerPullDistance).clamp(
+      0.0,
+      1.0,
+    );
 
     return SizedBox(
       height: pullDistance.clamp(0, refreshTriggerPullDistance * 1.5),
-      child: Center(
-        child: _buildContent(progress),
-      ),
+      child: Center(child: _buildContent(progress)),
     );
   }
 
@@ -218,25 +219,15 @@ class PullToRefreshIndicator extends StatelessWidget {
           ),
         );
       case RefreshIndicatorState.armed:
-        return const Icon(
-          Icons.arrow_upward,
-          size: 24,
-          color: Colors.grey,
-        );
+        return const Icon(Icons.arrow_upward, size: 24, color: Colors.grey);
       case RefreshIndicatorState.refreshing:
         return const SizedBox(
-          width: 24,
+          width: AppDimensions.spacingXL,
           height: 24,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-          ),
+          child: CircularProgressIndicator(strokeWidth: 2),
         );
       case RefreshIndicatorState.done:
-        return const Icon(
-          Icons.check,
-          size: 24,
-          color: AppColors.success,
-        );
+        return const Icon(Icons.check, size: 24, color: AppColors.success);
       case RefreshIndicatorState.idle:
         return const SizedBox.shrink();
     }
@@ -260,4 +251,3 @@ enum RefreshIndicatorState {
   /// 完成
   done,
 }
-

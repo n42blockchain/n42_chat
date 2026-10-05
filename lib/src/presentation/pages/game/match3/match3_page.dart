@@ -11,6 +11,7 @@ import '../widgets/game_scaffold.dart';
 import '../widgets/leaderboard_widget.dart';
 import 'match3_board.dart';
 import 'match3_logic.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class Match3Page extends StatefulWidget {
   const Match3Page({super.key});
@@ -60,11 +61,7 @@ class _Match3PageState extends State<Match3Page> {
       onPause: _togglePause,
       isPaused: _isPaused,
       topWidget: _buildTimerBar(l10n),
-      child: Match3Board(
-        logic: _logic,
-        onTap: _onTap,
-        onSwipe: _onSwipe,
-      ),
+      child: Match3Board(logic: _logic, onTap: _onTap, onSwipe: _onSwipe),
     );
   }
 
@@ -72,7 +69,10 @@ class _Match3PageState extends State<Match3Page> {
     final progress = _logic.timeLeft / Match3Logic.gameDuration;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing,
+        vertical: AppDimensions.spacingS,
+      ),
       child: Column(
         children: [
           Row(
@@ -88,11 +88,14 @@ class _Match3PageState extends State<Match3Page> {
               ),
               Text(
                 '${l10n?.gameScore ?? 'Score'}: ${_logic.score}',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           LinearProgressIndicator(
             value: progress,
             backgroundColor: Colors.grey[300],

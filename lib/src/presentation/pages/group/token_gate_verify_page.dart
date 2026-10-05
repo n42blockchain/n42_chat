@@ -8,6 +8,7 @@ import '../../../domain/entities/token_gate_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
 import '../../blocs/group/group_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 代币门控验证页面
 ///
@@ -45,7 +46,8 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
       ),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
-          if (state.status == GroupStatus.tokenGateVerified && state.tokenGateResult!.passed) {
+          if (state.status == GroupStatus.tokenGateVerified &&
+              state.tokenGateResult!.passed) {
             Navigator.of(context).pop(true);
           }
         },
@@ -74,7 +76,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const CircularProgressIndicator(),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
           Text(
             s?.tokenGateVerifying ?? 'Verifying token holdings...',
             style: const TextStyle(fontSize: 16),
@@ -86,7 +88,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
 
   Widget _buildResult(TokenGateVerificationResult result, S? s, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       child: Column(
         children: [
           // 结果图标
@@ -95,7 +97,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
             size: 80,
             color: result.passed ? AppColors.success : AppColors.error,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             result.passed
                 ? (s?.tokenGateVerifyPassed ?? 'Verification Passed')
@@ -106,21 +108,20 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
               color: result.passed ? AppColors.success : AppColors.error,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           if (!result.passed && widget.config.denialMessage != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacing,
+              ),
               child: Text(
                 widget.config.denialMessage!,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: context.textSecondary),
               ),
             ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
 
           // 逐条规则结果
           Expanded(
@@ -135,7 +136,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
 
           // 操作按钮
           if (!result.passed) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
@@ -157,9 +158,9 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline, size: 64, color: AppColors.error),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
           OutlinedButton(
             onPressed: () {
               context.read<GroupBloc>().add(VerifyTokenGate(widget.roomId));
@@ -197,7 +198,7 @@ class _RuleResultCard extends StatelessWidget {
     final s = S.of(context);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
       child: ListTile(
         leading: Icon(
           ruleResult.passed ? Icons.check_circle : Icons.cancel,
@@ -210,9 +211,7 @@ class _RuleResultCard extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${s?.tokenGateRequired ?? 'Required'}: ${rule.minBalance}',
-            ),
+            Text('${s?.tokenGateRequired ?? 'Required'}: ${rule.minBalance}'),
             Text(
               '${s?.tokenGateYourBalance ?? 'Your balance'}: ${ruleResult.actualBalance}',
               style: TextStyle(

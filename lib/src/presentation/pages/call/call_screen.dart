@@ -17,6 +17,7 @@ import '../../../services/voip/webrtc_service.dart';
 import '../../widgets/call/call_enhancement_sheet.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 通话页面
 class CallScreen extends StatefulWidget {
@@ -59,7 +60,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   void Function(String)? _originalErrorCallback;
 
   // 通话页面始终黑底；_bgColor 略浅给镜头预览容器边界。
-  static const Color _bgColor = Color(0xFF1F1F1F);
+  static const Color _bgColor = Color(0xFF181818);
   static const Color _controlBgColor = AppColors.dividerDark;
   static const Color _controlActiveBgColor = Colors.white;
   static const Color _hangupColor = AppColors.error;
@@ -256,7 +257,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 // 头像
                 _buildAvatar(),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppDimensions.spacingL),
 
                 // 用户名
                 Text(
@@ -268,7 +269,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
 
                 // 状态文字或通话时长
                 Text(
@@ -370,7 +371,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   Widget _buildTopBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       child: Row(
         children: [
           // 最小化按钮
@@ -483,7 +484,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppDimensions.spacingXL),
           // 下行：挂断按钮居中
           _buildWeChatHangupButton(),
         ],
@@ -629,7 +630,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           width: 100,
           height: 140,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.3),
               width: 1,
@@ -675,7 +676,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             onTap: () => Navigator.of(context).pop(),
             backgroundColor: Colors.black.withValues(alpha: 0.3),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           // 用户名和状态
           Expanded(
             child: Column(
@@ -771,7 +772,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             // 下行：挂断按钮居中
             _buildWeChatHangupButton(),
           ],

@@ -12,6 +12,7 @@ import '../../blocs/group/group_state.dart';
 import '../../helpers/bloc_message_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../n42_chat.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群成员管理页面
 class GroupMembersPage extends StatefulWidget {
@@ -114,7 +115,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         // 搜索栏
         Container(
           color: context.surfaceColor,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppDimensions.spacingM),
           child: N42SearchBar(
             controller: _searchController,
             hintText: S.of(context)?.groupSearchMembers ?? 'Search members',
@@ -128,15 +129,15 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
 
         // 成员数量
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: AppDimensions.spacingM,
+          ),
           alignment: Alignment.centerLeft,
           child: Text(
             S.of(context)?.groupTotalMembers(state.currentGroup!.memberCount) ??
                 '${state.currentGroup!.memberCount} members',
-            style: TextStyle(
-              fontSize: 13,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: context.textSecondary),
           ),
         ),
 
@@ -177,12 +178,12 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
               ),
             ),
             if (member.isOwner) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.warning,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(
                   S.of(context)?.commonGroupOwner ?? 'Owner',
@@ -190,12 +191,12 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 ),
               ),
             ] else if (member.isAdmin) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(
                   S.of(context)?.commonGroupAdmin ?? 'Admin',
@@ -207,10 +208,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
         ),
         subtitle: Text(
           member.userId,
-          style: TextStyle(
-            fontSize: 13,
-            color: context.textSecondary,
-          ),
+          style: TextStyle(fontSize: 13, color: context.textSecondary),
         ),
         onTap: () => _showMemberOptions(member, group),
       ),
@@ -300,7 +298,10 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             // 移出群聊
             if (canManage)
               ListTile(
-                leading: const Icon(Icons.person_remove, color: AppColors.error),
+                leading: const Icon(
+                  Icons.person_remove,
+                  color: AppColors.error,
+                ),
                 title: Text(
                   S.of(this.context)?.chatRemoveFromGroup ??
                       'Remove from Group',

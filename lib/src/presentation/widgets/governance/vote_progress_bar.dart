@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// A reusable progress bar widget for displaying vote results.
 ///
@@ -38,12 +39,13 @@ class VoteProgressBar extends StatelessWidget {
 
   double get _percentage => totalVotes > 0 ? voteCount / totalVotes : 0;
 
-  String get _percentageText =>
-      '${(_percentage * 100).toStringAsFixed(1)}%';
+  String get _percentageText => '${(_percentage * 100).toStringAsFixed(1)}%';
 
   String get _voteCountText => voteCount >= 1000
       ? '${(voteCount / 1000).toStringAsFixed(1)}k'
-      : voteCount.toStringAsFixed(voteCount == voteCount.roundToDouble() ? 0 : 1);
+      : voteCount.toStringAsFixed(
+          voteCount == voteCount.roundToDouble() ? 0 : 1,
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +54,14 @@ class VoteProgressBar extends StatelessWidget {
     final barColor = isWinner
         ? AppColors.primary
         : isSelected
-            ? AppColors.info
-            : (isDark ? const Color(0xFF3D3D3D) : const Color(0xFFE0E0E0));
+        ? AppColors.info
+        : (isDark ? const Color(0xFF3D3D3D) : const Color(0xFFE0E0E0));
 
     final textColor = context.textPrimary;
     final secondaryTextColor = context.textSecondary;
-    final trackColor =
-        isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5);
+    final trackColor = isDark
+        ? const Color(0xFF2A2A2A)
+        : const Color(0xFFF7F7F7);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -89,15 +92,12 @@ class VoteProgressBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Text(
                 '$_voteCountText votes',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: secondaryTextColor,
-                ),
+                style: TextStyle(fontSize: 12, color: secondaryTextColor),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               SizedBox(
                 width: 48,
                 child: Text(
@@ -115,9 +115,9 @@ class VoteProgressBar extends StatelessWidget {
           const SizedBox(height: 6),
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
             child: SizedBox(
-              height: 8,
+              height: AppDimensions.spacingS,
               child: Stack(
                 children: [
                   // Track
@@ -125,7 +125,9 @@ class VoteProgressBar extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: trackColor,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusS,
+                      ),
                     ),
                   ),
                   // Progress fill
@@ -137,7 +139,9 @@ class VoteProgressBar extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         color: barColor,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusS,
+                        ),
                       ),
                     ),
                   ),
@@ -180,17 +184,21 @@ class AnimatedFractionallySizedBoxState
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _widthFactor = visitor(
-      _widthFactor,
-      widget.widthFactor ?? 0,
-      (dynamic value) => Tween<double>(begin: value as double),
-    ) as Tween<double>?;
+    _widthFactor =
+        visitor(
+              _widthFactor,
+              widget.widthFactor ?? 0,
+              (dynamic value) => Tween<double>(begin: value as double),
+            )
+            as Tween<double>?;
 
-    _heightFactor = visitor(
-      _heightFactor,
-      widget.heightFactor ?? 1,
-      (dynamic value) => Tween<double>(begin: value as double),
-    ) as Tween<double>?;
+    _heightFactor =
+        visitor(
+              _heightFactor,
+              widget.heightFactor ?? 1,
+              (dynamic value) => Tween<double>(begin: value as double),
+            )
+            as Tween<double>?;
   }
 
   @override

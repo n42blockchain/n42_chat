@@ -6,6 +6,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Toast 类型
 enum ToastType {
@@ -45,10 +46,7 @@ class WeChatToast {
     final overlay = Overlay.of(context);
 
     _currentEntry = OverlayEntry(
-      builder: (context) => _ToastWidget(
-        message: message,
-        type: type,
-      ),
+      builder: (context) => _ToastWidget(message: message, type: type),
     );
 
     overlay.insert(_currentEntry!);
@@ -87,10 +85,7 @@ class WeChatToast {
 }
 
 class _ToastWidget extends StatefulWidget {
-  const _ToastWidget({
-    required this.message,
-    required this.type,
-  });
+  const _ToastWidget({required this.message, required this.type});
 
   final String message;
   final ToastType type;
@@ -112,12 +107,14 @@ class _ToastWidgetState extends State<_ToastWidget>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
     _controller.forward();
   }
 
@@ -156,12 +153,12 @@ class _ToastWidgetState extends State<_ToastWidget>
                     maxWidth: 280,
                   ),
                   padding: EdgeInsets.symmetric(
-                    horizontal: 24,
+                    horizontal: AppDimensions.spacingXL,
                     vertical: _icon != null ? 20 : 14,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.78),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.15),
@@ -175,7 +172,7 @@ class _ToastWidgetState extends State<_ToastWidget>
                     children: [
                       if (_icon != null) ...[
                         Icon(_icon, color: Colors.white, size: 40),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppDimensions.spacingM),
                       ],
                       // 限 4 行 + 省略号防止极长文案把 toast 撑过半屏。
                       Text(

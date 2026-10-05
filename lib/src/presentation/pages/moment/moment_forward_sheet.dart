@@ -11,15 +11,13 @@ import '../../blocs/conversation/conversation_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 转发朋友圈动态到聊天的底部弹窗
 class MomentForwardSheet extends StatefulWidget {
   final MomentEntity moment;
 
-  const MomentForwardSheet({
-    super.key,
-    required this.moment,
-  });
+  const MomentForwardSheet({super.key, required this.moment});
 
   /// 显示转发弹窗
   static Future<void> show(BuildContext context, MomentEntity moment) {
@@ -40,10 +38,7 @@ class MomentForwardSheet extends StatefulWidget {
       builder: (ctx) {
         final sheet = MomentForwardSheet(moment: moment);
         if (conversationBloc != null) {
-          return BlocProvider.value(
-            value: conversationBloc,
-            child: sheet,
-          );
+          return BlocProvider.value(value: conversationBloc, child: sheet);
         }
         return sheet;
       },
@@ -107,7 +102,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                   imageUrl: conversation.avatarUrl,
                   size: 36,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Expanded(
                   child: Text(
                     conversation.name,
@@ -118,13 +113,13 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             // 转发内容预览
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppDimensions.spacingS),
               decoration: BoxDecoration(
                 color: context.isDarkMode ? Colors.grey[800] : Colors.grey[100],
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
               ),
               child: Text(
                 _buildForwardText(),
@@ -136,7 +131,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             // 附言输入
             TextField(
               controller: commentController,
@@ -177,7 +172,9 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
         if (messenger.mounted) {
           messenger.showSnackBar(
             SnackBar(
-              content: Text(s?.momentForwardSuccess ?? 'Forwarded successfully'),
+              content: Text(
+                s?.momentForwardSuccess ?? 'Forwarded successfully',
+              ),
             ),
           );
         }
@@ -218,18 +215,18 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
             children: [
               // 顶部拖拽指示器
               Container(
-                margin: const EdgeInsets.only(top: 8),
+                margin: const EdgeInsets.only(top: AppDimensions.spacingS),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
                   color: isDark ? Colors.grey[600] : Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
 
               // 标题
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing),
                 child: Text(
                   s?.momentForwardTo ?? 'Forward to',
                   style: TextStyle(
@@ -242,7 +239,9 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
 
               // 搜索框
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing,
+                ),
                 child: TextField(
                   onChanged: (v) => setState(() => _searchQuery = v),
                   decoration: InputDecoration(
@@ -251,15 +250,19 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                     filled: true,
                     fillColor: AppColors.inputBgOf(isDark),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: AppDimensions.spacingS,
+                    ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
 
               // 会话列表
               Expanded(
@@ -267,9 +270,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                     ? Center(
                         child: Text(
                           s?.momentNoConversations ?? 'No conversations',
-                          style: TextStyle(
-                            color: context.textSecondary,
-                          ),
+                          style: TextStyle(color: context.textSecondary),
                         ),
                       )
                     : ListView.builder(
@@ -285,9 +286,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                             ),
                             title: Text(
                               conv.name,
-                              style: TextStyle(
-                                color: context.textPrimary,
-                              ),
+                              style: TextStyle(color: context.textPrimary),
                             ),
                             subtitle: conv.lastMessage != null
                                 ? Text(

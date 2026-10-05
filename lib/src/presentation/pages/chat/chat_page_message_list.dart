@@ -62,7 +62,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildEncryptionNotice(),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               N42EmptyState.noData(
                 title: S.of(context)?.chatNoMessages ?? 'No messages',
                 description:
@@ -86,7 +86,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         return ListView.builder(
           controller: _scrollController,
           reverse: true, // 从底部开始显示
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
           itemCount: state.messages.length + extraItems,
           // Web 端长会话性能（#32）：聊天项无需在滚出视口后保活内部状态，
           // 关掉 keepAlive 降内存/重建开销；语义索引对消息流也无意义。
@@ -108,7 +108,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             if (state.isLoadingMore &&
                 messageIndex == state.messages.length + 1) {
               return const Padding(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(AppDimensions.spacing),
                 child: N42Loading(),
               );
             }
@@ -331,7 +331,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           children: [
             // 复选框（已撤回的消息显示禁用状态）
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingS,
+              ),
               child: Container(
                 width: 24,
                 height: 24,
@@ -391,19 +393,25 @@ extension _ChatPageMessageListMethods on _ChatPageState {
   /// 构建端对端加密提示
   Widget _buildEncryptionNotice() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppDimensions.spacing,
+        horizontal: AppDimensions.spacingXL,
+      ),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: AppDimensions.spacingM,
+        ),
         decoration: BoxDecoration(
           color: AppColors.primaryWithOpacity,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.lock_outline, size: 16, color: AppColors.primary),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Flexible(
               child: Text(
                 S.of(context)?.chatEncryptionNotice ??
@@ -443,7 +451,10 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         return GestureDetector(
           onTap: () => _scrollToMessage(msg.id),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingM,
+              vertical: 10,
+            ),
             decoration: BoxDecoration(
               color: bgColor,
               border: Border(
@@ -454,7 +465,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
               children: [
                 // 置顶图标
                 const Icon(Icons.push_pin, size: 16, color: AppColors.primary),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 // 消息内容预览
                 Expanded(
                   child: Column(
@@ -480,7 +491,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 ),
                 // 多条置顶时显示计数和导航
                 if (state.pinnedMessages.length > 1) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   GestureDetector(
                     onTap: () {
                       context.read<ChatBloc>().add(
@@ -489,12 +500,14 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: AppDimensions.spacingS,
+                        vertical: AppDimensions.spacingXS,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusL,
+                        ),
                       ),
                       child: Text(
                         '${state.currentPinnedIndex + 1}/${state.pinnedMessages.length}',
@@ -570,7 +583,10 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             'Reply to ${state.replyTarget!.senderName}';
 
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: AppDimensions.spacingS,
+          ),
           decoration: BoxDecoration(
             color: context.surfaceColor,
             border: Border(
@@ -587,7 +603,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                   borderRadius: BorderRadius.circular(1.5),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -638,7 +654,10 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         }
 
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: AppDimensions.spacingS,
+          ),
           decoration: BoxDecoration(
             color: context.surfaceColor,
             border: Border(
@@ -655,7 +674,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                   borderRadius: BorderRadius.circular(1.5),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -713,9 +732,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
 
     return Container(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 12,
+        left: AppDimensions.spacing,
+        right: AppDimensions.spacing,
+        top: AppDimensions.spacingM,
         bottom: MediaQuery.of(context).padding.bottom + 12,
       ),
       decoration: BoxDecoration(
@@ -778,12 +797,15 @@ extension _ChatPageMessageListMethods on _ChatPageState {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacingL,
+          vertical: AppDimensions.spacingS,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: color, size: 24),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(label, style: TextStyle(color: color, fontSize: 12)),
           ],
         ),

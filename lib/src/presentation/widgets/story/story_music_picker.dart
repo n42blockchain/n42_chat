@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Story 音乐选择/搜索组件
 ///
@@ -145,7 +146,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
     final l10n = S.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: AppColors.surfaceOf(isDark),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
@@ -157,7 +158,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
           Row(
             children: [
               const Icon(Icons.music_note, size: 20),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: Text(
                   l10n?.storyBackgroundMusic ?? 'Background Music',
@@ -173,15 +174,15 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
 
           // 已选音乐预览
           if (_selectedFilePath != null) ...[
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: isDark ? 0.1 : 0.05),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 border: Border.all(
                   color: AppColors.primary.withValues(alpha: 0.2),
                 ),
@@ -205,7 +206,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacingM),
                   // 音乐信息
                   Expanded(
                     child: Column(
@@ -221,7 +222,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppDimensions.spacingXS),
                         // 进度条
                         LinearProgressIndicator(
                           value: _duration.inMilliseconds > 0
@@ -249,12 +250,16 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                   // 删除按钮
                   IconButton(
                     onPressed: _removeMusic,
-                    icon: const Icon(Icons.close, size: 18, color: AppColors.error),
+                    icon: const Icon(
+                      Icons.close,
+                      size: 18,
+                      color: AppColors.error,
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
           ],
 
           // 选择音乐按钮
@@ -269,15 +274,17 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                     : (l10n?.storyChooseFromDevice ?? 'Choose from Device'),
               ),
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.spacingM,
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
 
           // 确认按钮
           if (_selectedFilePath != null)
@@ -288,9 +295,11 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.spacingM,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   ),
                 ),
                 child: Text(l10n?.storyUseThisMusic ?? 'Use This Music'),

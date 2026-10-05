@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/article_reader_utils.dart';
 import '../../../core/utils/message_markdown_utils.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 长文阅读模式
 ///
@@ -17,11 +18,7 @@ class ArticleReaderPage extends StatefulWidget {
   final String content;
   final String? title;
 
-  const ArticleReaderPage({
-    super.key,
-    required this.content,
-    this.title,
-  });
+  const ArticleReaderPage({super.key, required this.content, this.title});
 
   @override
   State<ArticleReaderPage> createState() => _ArticleReaderPageState();
@@ -45,8 +42,10 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _fontScale = (prefs.getDouble(_fontScaleKey) ?? 1.0)
-          .clamp(_minScale, _maxScale);
+      _fontScale = (prefs.getDouble(_fontScaleKey) ?? 1.0).clamp(
+        _minScale,
+        _maxScale,
+      );
       _loaded = true;
     });
   }
@@ -106,12 +105,15 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
                         color: context.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppDimensions.spacingS),
                     Row(
                       children: [
-                        Icon(Icons.schedule,
-                            size: 14, color: context.textTertiary),
-                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.schedule,
+                          size: 14,
+                          color: context.textTertiary,
+                        ),
+                        const SizedBox(width: AppDimensions.spacingXS),
                         Text(
                           '$minutes min read',
                           style: TextStyle(
@@ -121,7 +123,7 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppDimensions.spacingL),
                     MarkdownBody(
                       data: display,
                       selectable: true,
@@ -130,8 +132,10 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
                         if (href == null) return;
                         final uri = Uri.tryParse(href);
                         if (uri != null && await canLaunchUrl(uri)) {
-                          await launchUrl(uri,
-                              mode: LaunchMode.externalApplication);
+                          await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          );
                         }
                       },
                       styleSheet: _readerStyle(context, _fontScale),
@@ -154,11 +158,20 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
       p: body,
       listBullet: body,
       h1: TextStyle(
-          fontSize: 24 * scale, height: 1.4, fontWeight: FontWeight.w700),
+        fontSize: 24 * scale,
+        height: 1.4,
+        fontWeight: FontWeight.w700,
+      ),
       h2: TextStyle(
-          fontSize: 21 * scale, height: 1.4, fontWeight: FontWeight.w700),
+        fontSize: 21 * scale,
+        height: 1.4,
+        fontWeight: FontWeight.w700,
+      ),
       h3: TextStyle(
-          fontSize: 19 * scale, height: 1.4, fontWeight: FontWeight.w600),
+        fontSize: 19 * scale,
+        height: 1.4,
+        fontWeight: FontWeight.w600,
+      ),
       blockquoteDecoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.06),
         border: const Border(

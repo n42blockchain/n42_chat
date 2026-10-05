@@ -43,30 +43,30 @@ class N42BottomNavBar extends StatelessWidget {
 
   /// 默认Tab配置 (使用英文，调用者应传入翻译后的 items)
   List<N42BottomNavItem> get defaultItems => [
-        N42BottomNavItem(
-          icon: Icons.chat_bubble_outline,
-          activeIcon: Icons.chat_bubble,
-          label: 'Messages',
-          badge: messageUnreadCount,
-        ),
-        N42BottomNavItem(
-          icon: Icons.contacts_outlined,
-          activeIcon: Icons.contacts,
-          label: 'Contacts',
-          badge: contactUnreadCount,
-        ),
-        N42BottomNavItem(
-          icon: Icons.explore_outlined,
-          activeIcon: Icons.explore,
-          label: 'Discover',
-          showDot: showDiscoverDot,
-        ),
-        const N42BottomNavItem(
-          icon: Icons.person_outline,
-          activeIcon: Icons.person,
-          label: 'Me',
-        ),
-      ];
+    N42BottomNavItem(
+      icon: Icons.chat_bubble_outline,
+      activeIcon: Icons.chat_bubble,
+      label: 'Messages',
+      badge: messageUnreadCount,
+    ),
+    N42BottomNavItem(
+      icon: Icons.contacts_outlined,
+      activeIcon: Icons.contacts,
+      label: 'Contacts',
+      badge: contactUnreadCount,
+    ),
+    N42BottomNavItem(
+      icon: Icons.explore_outlined,
+      activeIcon: Icons.explore,
+      label: 'Discover',
+      showDot: showDiscoverDot,
+    ),
+    const N42BottomNavItem(
+      icon: Icons.person_outline,
+      activeIcon: Icons.person,
+      label: 'Me',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -76,10 +76,7 @@ class N42BottomNavBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.navBarColor,
         border: Border(
-          top: BorderSide(
-            color: context.dividerColor,
-            width: 0.5,
-          ),
+          top: BorderSide(color: context.dividerColor, width: 0.5),
         ),
       ),
       child: SafeArea(
@@ -87,15 +84,13 @@ class N42BottomNavBar extends StatelessWidget {
         child: SizedBox(
           height: AppDimensions.bottomNavBarHeight,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingXS,
+            ),
             child: Row(
               children: List.generate(navItems.length, (index) {
                 return Expanded(
-                  child: _buildNavItem(
-                    context,
-                    navItems[index],
-                    index,
-                  ),
+                  child: _buildNavItem(context, navItems[index], index),
                 );
               }),
             ),
@@ -105,15 +100,9 @@ class N42BottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(
-    BuildContext context,
-    N42BottomNavItem item,
-    int index,
-  ) {
+  Widget _buildNavItem(BuildContext context, N42BottomNavItem item, int index) {
     final isSelected = currentIndex == index;
-    final color = isSelected
-        ? AppColors.primary
-        : context.textSecondary;
+    final color = isSelected ? AppColors.primary : context.textSecondary;
 
     // InkWell 提供反馈 + 整 cell 命中（带 splashColor / hoverColor）。
     return InkWell(
@@ -175,4 +164,3 @@ class N42BottomNavItem {
     this.showDot = false,
   });
 }
-

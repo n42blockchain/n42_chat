@@ -7,6 +7,7 @@ import '../../../domain/entities/points/points_balance.dart';
 import '../../blocs/points/points_bloc.dart';
 import '../../blocs/points/points_event.dart';
 import '../../blocs/points/points_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Leaderboard page showing room-wide points rankings.
 ///
@@ -84,11 +85,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             onRefresh: () async => _loadLeaderboard(),
             color: AppColors.primary,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               children: [
                 if (state.leaderboard.length >= 3) ...[
                   _buildPodium(state.leaderboard.take(3).toList()),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingXL),
                 ],
                 ...state.leaderboard
                     .skip(state.leaderboard.length >= 3 ? 3 : 0)
@@ -96,15 +97,15 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                     .asMap()
                     .entries
                     .map((entry) {
-                  final rank =
-                      entry.key + (state.leaderboard.length >= 3 ? 4 : 1);
-                  return _LeaderboardTile(
-                    balance: entry.value,
-                    rank: rank,
-                    isCurrentUser:
-                        entry.value.userId == widget.currentUserId,
-                  );
-                }),
+                      final rank =
+                          entry.key + (state.leaderboard.length >= 3 ? 4 : 1);
+                      return _LeaderboardTile(
+                        balance: entry.value,
+                        rank: rank,
+                        isCurrentUser:
+                            entry.value.userId == widget.currentUserId,
+                      );
+                    }),
               ],
             ),
           );
@@ -130,11 +131,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 balance: top3[1],
                 rank: 2,
                 height: 130,
-                medalColor: const Color(0xFFC0C0C0),
+                medalColor: const Color(0xFFCCCCCC),
                 isCurrentUser: top3[1].userId == widget.currentUserId,
               ),
             ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           // 1st place
           Expanded(
             child: _PodiumItem(
@@ -145,7 +146,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               isCurrentUser: top3[0].userId == widget.currentUserId,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           // 3rd place
           if (top3.length > 2)
             Expanded(
@@ -176,7 +177,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             size: 64,
             color: context.textTertiary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             'No rankings yet',
             maxLines: 1,
@@ -187,7 +188,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             'Start earning points to appear on the leaderboard',
             maxLines: 2,
@@ -207,12 +208,16 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   Widget _buildUnavailableState({required String message}) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.block_outlined, size: 48, color: AppColors.warning),
-            const SizedBox(height: 16),
+            const Icon(
+              Icons.block_outlined,
+              size: 48,
+              color: AppColors.warning,
+            ),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -234,12 +239,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   Widget _buildErrorState(String? errorMessage) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'Failed to load leaderboard',
               maxLines: 1,
@@ -252,7 +257,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               ),
             ),
             if (errorMessage != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
@@ -265,7 +270,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 ),
               ),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             OutlinedButton(
               onPressed: _loadLeaderboard,
               child: const Text('Retry'),
@@ -307,8 +312,7 @@ class _PodiumItem extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: rank == 1 ? 28 : 22,
-              backgroundColor:
-                  isCurrentUser ? AppColors.primary : medalColor,
+              backgroundColor: isCurrentUser ? AppColors.primary : medalColor,
               child: Text(
                 _shortName(balance.userId),
                 style: const TextStyle(
@@ -321,11 +325,10 @@ class _PodiumItem extends StatelessWidget {
             Positioned(
               bottom: -4,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: medalColor,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 child: Text(
                   '#$rank',
@@ -345,13 +348,13 @@ class _PodiumItem extends StatelessWidget {
           height: height - 80,
           decoration: BoxDecoration(
             color: medalColor.withValues(alpha: 0.2),
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(8),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
           ),
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingXS,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -408,8 +411,11 @@ class _LeaderboardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing,
+        vertical: AppDimensions.spacingM,
+      ),
       decoration: BoxDecoration(
         color: isCurrentUser
             ? AppColors.primary.withValues(alpha: 0.08)
@@ -422,7 +428,7 @@ class _LeaderboardTile extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 32,
+            width: AppDimensions.spacingXXL,
             child: Text(
               '#$rank',
               maxLines: 1,
@@ -435,11 +441,12 @@ class _LeaderboardTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           CircleAvatar(
             radius: 18,
-            backgroundColor:
-                isCurrentUser ? AppColors.primary : AppColors.textTertiary,
+            backgroundColor: isCurrentUser
+                ? AppColors.primary
+                : AppColors.textTertiary,
             child: Text(
               _shortName(balance.userId),
               style: const TextStyle(
@@ -449,7 +456,7 @@ class _LeaderboardTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -461,8 +468,9 @@ class _LeaderboardTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.3,
-                    fontWeight:
-                        isCurrentUser ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: isCurrentUser
+                        ? FontWeight.w600
+                        : FontWeight.w400,
                     color: context.textPrimary,
                   ),
                 ),

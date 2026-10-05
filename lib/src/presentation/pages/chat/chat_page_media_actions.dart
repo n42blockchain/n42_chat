@@ -368,7 +368,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               title: Text(S.of(context)?.chatRecording ?? 'Recording'),
               onTap: () => Navigator.pop(context, 'video'),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             ListTile(
               leading: const Icon(Icons.close),
               title: Text(S.of(context)?.commonCancel ?? 'Cancel'),

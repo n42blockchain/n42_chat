@@ -201,7 +201,11 @@ class N42Button extends StatelessWidget {
     );
   }
 
-  Widget _buildSecondaryButton(bool isDisabled, double radius, double fontSize) {
+  Widget _buildSecondaryButton(
+    bool isDisabled,
+    double radius,
+    double fontSize,
+  ) {
     final color = foregroundColor ?? AppColors.primary;
 
     return OutlinedButton(
@@ -318,11 +322,11 @@ class N42Button extends StatelessWidget {
   EdgeInsets _getPadding() {
     switch (size) {
       case N42ButtonSize.small:
-        return const EdgeInsets.symmetric(horizontal: 12);
+        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM);
       case N42ButtonSize.medium:
-        return const EdgeInsets.symmetric(horizontal: 16);
+        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacing);
       case N42ButtonSize.large:
-        return const EdgeInsets.symmetric(horizontal: 20);
+        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacingL);
     }
   }
 }
@@ -392,4 +396,3 @@ class N42IconButton extends StatelessWidget {
     return button;
   }
 }
-

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'game_2048_logic.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class Game2048Board extends StatelessWidget {
   final Game2048Logic logic;
   final void Function(Direction) onSwipe;
 
-  const Game2048Board({
-    super.key,
-    required this.logic,
-    required this.onSwipe,
-  });
+  const Game2048Board({super.key, required this.logic, required this.onSwipe});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +43,7 @@ class Game2048Board extends StatelessWidget {
               padding: const EdgeInsets.all(spacing),
               decoration: BoxDecoration(
                 color: const Color(0xFFBBADA0),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -60,7 +57,9 @@ class Game2048Board extends StatelessWidget {
                             margin: const EdgeInsets.all(spacing / 2),
                             decoration: BoxDecoration(
                               color: _tileColor(value),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusS,
+                              ),
                             ),
                             child: Center(
                               child: Text(
@@ -105,7 +104,7 @@ class Game2048Board extends StatelessWidget {
       case 8:
         return const Color(0xFFF2B179);
       case 16:
-        return const Color(0xFFF59563);
+        return const Color(0xFFFF8A65);
       case 32:
         return const Color(0xFFF67C5F);
       case 64:
@@ -121,7 +120,7 @@ class Game2048Board extends StatelessWidget {
       case 2048:
         return const Color(0xFFEDC22E);
       default:
-        return const Color(0xFF3C3A32);
+        return const Color(0xFF3D3D3D);
     }
   }
 }

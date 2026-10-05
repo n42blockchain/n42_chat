@@ -18,6 +18,7 @@ import '../transfer/receive_page.dart';
 import '../transfer/transfer_page.dart';
 import '../red_packet/send_red_packet_page.dart';
 import 'n42_bean_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 服务页面
 class ServicesPage extends StatelessWidget {
@@ -184,7 +185,7 @@ class ServicesPage extends StatelessWidget {
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(title: S.of(context)?.profileServices ?? 'Services'),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         child: GridView.count(
           crossAxisCount: 4,
           mainAxisSpacing: 16,
@@ -194,7 +195,7 @@ class ServicesPage extends StatelessWidget {
             _buildServiceItem(
               context,
               icon: Icons.monetization_on_outlined,
-              color: const Color(0xFFFF9500),
+              color: const Color(0xFFFF8C00),
               label: S.of(context)?.profileN42Bean ?? 'N42 Bean',
               cardColor: cardColor,
               textColor: textColor,
@@ -300,11 +301,11 @@ class ServicesPage extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             ),
             child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,
             style: TextStyle(fontSize: 12, color: textColor),

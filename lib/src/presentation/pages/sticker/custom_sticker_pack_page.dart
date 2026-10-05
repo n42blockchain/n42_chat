@@ -7,6 +7,7 @@ import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 自定义贴纸包管理页
 ///
@@ -92,8 +93,10 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove',
-                style: TextStyle(color: AppColors.error)),
+            child: const Text(
+              'Remove',
+              style: TextStyle(color: AppColors.error),
+            ),
           ),
         ],
       ),
@@ -149,8 +152,10 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete pack'),
-        content: Text('Delete "${_pack?.name ?? 'this pack'}" and all its '
-            'stickers? This cannot be undone.'),
+        content: Text(
+          'Delete "${_pack?.name ?? 'this pack'}" and all its '
+          'stickers? This cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -158,8 +163,10 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete',
-                style: TextStyle(color: AppColors.error)),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: AppColors.error),
+            ),
           ),
         ],
       ),
@@ -226,14 +233,16 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.add_photo_alternate_outlined, size: 56),
-            SizedBox(height: 12),
+            SizedBox(height: AppDimensions.spacingM),
             Text('Tap "Add stickers" to upload images'),
           ],
         ),
       );
     }
     return GridView.builder(
-      padding: const EdgeInsets.all(12).copyWith(bottom: 88),
+      padding: const EdgeInsets.all(
+        AppDimensions.spacingM,
+      ).copyWith(bottom: 88),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 8,
@@ -258,8 +267,11 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
                       shape: BoxShape.circle,
                     ),
                     padding: const EdgeInsets.all(2),
-                    child: const Icon(Icons.close, size: 14,
-                        color: Colors.white),
+                    child: const Icon(
+                      Icons.close,
+                      size: 14,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -282,12 +294,12 @@ class _StickerThumb extends StatelessWidget {
     final httpUrl = sticker.httpUrl ?? sticker.url;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     Widget container(Widget child) => Container(
-          decoration: BoxDecoration(
-            color: AppColors.placeholderOf(isDark),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(child: child),
-        );
+      decoration: BoxDecoration(
+        color: AppColors.placeholderOf(isDark),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+      ),
+      child: Center(child: child),
+    );
 
     if (httpUrl.startsWith('http')) {
       final client = getIt.isRegistered<MatrixClientManager>()
@@ -303,8 +315,7 @@ class _StickerThumb extends StatelessWidget {
               httpUrl,
               client: client,
             ),
-            errorBuilder: (_, _, _) =>
-                const Icon(Icons.image_not_supported),
+            errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported),
           ),
         ),
       );

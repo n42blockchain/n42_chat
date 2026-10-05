@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 企业联系人列表页面
 class EnterpriseContactsPage extends StatelessWidget {
@@ -16,31 +17,31 @@ class EnterpriseContactsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
-        title: S.of(context)?.contactEnterpriseContacts ?? 'Enterprise Contacts',
+        title:
+            S.of(context)?.contactEnterpriseContacts ?? 'Enterprise Contacts',
       ),
       body: Column(
         children: [
           Container(
             color: context.surfaceColor,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingM,
+              vertical: AppDimensions.spacingS,
+            ),
             child: Container(
               height: 36,
               decoration: BoxDecoration(
                 color: AppColors.inputBgOf(isDark),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search, size: 20,
-                      color: context.textTertiary),
+                  Icon(Icons.search, size: 20, color: context.textTertiary),
                   const SizedBox(width: 6),
                   Text(
                     S.of(context)?.commonSearch ?? 'Search',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: context.textTertiary,
-                    ),
+                    style: TextStyle(fontSize: 15, color: context.textTertiary),
                   ),
                 ],
               ),
@@ -56,15 +57,16 @@ class EnterpriseContactsPage extends StatelessWidget {
                     size: 64,
                     color: context.textTertiary,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
-                    S.of(context)?.contactNoEnterpriseContacts ?? 'No enterprise contacts',
+                    S.of(context)?.contactNoEnterpriseContacts ??
+                        'No enterprise contacts',
                     style: TextStyle(
                       fontSize: 16,
                       color: context.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   Text(
                     S.of(context)?.contactEnterpriseContactsDesc ??
                         'Enterprise contacts will appear here',

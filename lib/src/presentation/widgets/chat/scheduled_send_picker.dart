@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 Future<DateTime?> showScheduledSendPicker(BuildContext context) {
   final l10n = S.of(context);
@@ -25,16 +26,16 @@ Future<DateTime?> showScheduledSendPicker(BuildContext context) {
                 height: 4,
                 decoration: BoxDecoration(
                   color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             Text(
               l10n?.scheduledSendTitle ?? 'Schedule message',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             _ScheduledSendOption(
               icon: Icons.schedule,
               label: l10n?.scheduledSendInOneHour ?? 'In 1 hour',
@@ -59,7 +60,7 @@ Future<DateTime?> showScheduledSendPicker(BuildContext context) {
               scheduledAt: null,
               isCustom: true,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
           ],
         ),
       ),

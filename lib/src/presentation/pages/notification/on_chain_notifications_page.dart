@@ -10,6 +10,7 @@ import '../../blocs/on_chain_notification/on_chain_notification_bloc.dart';
 import '../../blocs/on_chain_notification/on_chain_notification_event.dart';
 import '../../blocs/on_chain_notification/on_chain_notification_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 链上事件通知列表页面
 ///
@@ -29,7 +30,9 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<OnChainNotificationBloc>().add(const LoadOnChainNotifications());
+    context.read<OnChainNotificationBloc>().add(
+      const LoadOnChainNotifications(),
+    );
     _scrollController.addListener(_onScroll);
   }
 
@@ -43,9 +46,9 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      context
-          .read<OnChainNotificationBloc>()
-          .add(const LoadMoreOnChainNotifications());
+      context.read<OnChainNotificationBloc>().add(
+        const LoadMoreOnChainNotifications(),
+      );
     }
   }
 
@@ -66,9 +69,9 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
             builder: (context, state) {
               if (state.unreadCount == 0) return const SizedBox.shrink();
               return TextButton(
-                onPressed: () => context
-                    .read<OnChainNotificationBloc>()
-                    .add(const MarkAllOnChainNotificationsRead()),
+                onPressed: () => context.read<OnChainNotificationBloc>().add(
+                  const MarkAllOnChainNotificationsRead(),
+                ),
                 child: Text(
                   l10n?.onChainMarkAllRead ?? 'Mark all read',
                   style: const TextStyle(
@@ -98,23 +101,21 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
 
           return RefreshIndicator(
             onRefresh: () async {
-              context
-                  .read<OnChainNotificationBloc>()
-                  .add(const RefreshOnChainNotifications());
+              context.read<OnChainNotificationBloc>().add(
+                const RefreshOnChainNotifications(),
+              );
             },
             child: ListView.separated(
               controller: _scrollController,
-              itemCount: state.notifications.length +
+              itemCount:
+                  state.notifications.length +
                   (state.hasMore || state.isLoadingMore ? 1 : 0),
-              separatorBuilder: (context, index) => Divider(
-                height: 1,
-                indent: 72,
-                color: context.dividerColor,
-              ),
+              separatorBuilder: (context, index) =>
+                  Divider(height: 1, indent: 72, color: context.dividerColor),
               itemBuilder: (context, index) {
                 if (index == state.notifications.length) {
                   return const Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(AppDimensions.spacing),
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
@@ -124,18 +125,15 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
                   onTap: () {
                     final notif = state.notifications[index];
                     if (!notif.isRead) {
-                      context
-                          .read<OnChainNotificationBloc>()
-                          .add(MarkOnChainNotificationRead(notif.id));
+                      context.read<OnChainNotificationBloc>().add(
+                        MarkOnChainNotificationRead(notif.id),
+                      );
                     }
                     if (notif.ctaUrl != null) {
                       final uri = Uri.tryParse(notif.ctaUrl!);
                       if (uri != null &&
                           (uri.scheme == 'https' || uri.scheme == 'http')) {
-                        launchUrl(
-                          uri,
-                          mode: LaunchMode.externalApplication,
-                        );
+                        launchUrl(uri, mode: LaunchMode.externalApplication);
                       }
                     }
                   },
@@ -159,22 +157,17 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
             size: 64,
             color: context.dividerColor,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             l10n?.onChainNoNotifications ?? 'No on-chain events yet',
-            style: TextStyle(
-              color: context.textSecondary,
-            ),
+            style: TextStyle(color: context.textSecondary),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             l10n?.onChainNoNotificationsDesc ??
                 'Events from subscribed channels will appear here',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: context.textSecondary),
           ),
         ],
       ),
@@ -187,24 +180,18 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.cloud_off_outlined,
-            size: 64,
-            color: context.dividerColor,
-          ),
-          const SizedBox(height: 16),
+          Icon(Icons.cloud_off_outlined, size: 64, color: context.dividerColor),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             message ?? (l10n?.commonLoadFailed ?? 'Failed to load'),
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: context.textSecondary,
-            ),
+            style: TextStyle(color: context.textSecondary),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           OutlinedButton(
-            onPressed: () => context
-                .read<OnChainNotificationBloc>()
-                .add(const LoadOnChainNotifications()),
+            onPressed: () => context.read<OnChainNotificationBloc>().add(
+              const LoadOnChainNotifications(),
+            ),
             child: Text(l10n?.commonRetry ?? 'Retry'),
           ),
         ],
@@ -237,16 +224,19 @@ class _OnChainNotificationItem extends StatelessWidget {
       child: Container(
         color: unread
             ? (isDark
-                ? AppColors.primary.withValues(alpha: 0.08)
-                : AppColors.primary.withValues(alpha: 0.04))
+                  ? AppColors.primary.withValues(alpha: 0.08)
+                  : AppColors.primary.withValues(alpha: 0.04))
             : null,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: AppDimensions.spacingM,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 频道图标 / 类型图标
             _buildTypeIcon(),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,14 +267,13 @@ class _OnChainNotificationItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacingXS),
                   // 标题
                   Text(
                     notification.title,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight:
-                          unread ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: unread ? FontWeight.w600 : FontWeight.w500,
                       color: context.textPrimary,
                     ),
                     maxLines: 1,
@@ -305,7 +294,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                   ],
                   // CTA 链接标识
                   if (notification.ctaUrl != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppDimensions.spacingXS),
                     Row(
                       children: [
                         const Icon(
@@ -313,7 +302,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                           size: 12,
                           color: AppColors.primary,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppDimensions.spacingXS),
                         Text(
                           S.of(context)?.onChainViewDetails ?? 'View details',
                           style: const TextStyle(
@@ -329,7 +318,7 @@ class _OnChainNotificationItem extends StatelessWidget {
             ),
             // 未读小圆点
             if (unread) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Container(
                 width: 8,
                 height: 8,
@@ -349,16 +338,20 @@ class _OnChainNotificationItem extends StatelessWidget {
   Widget _buildTypeIcon() {
     final (icon, color) = switch (notification.type) {
       OnChainNotificationType.transfer => (Icons.swap_horiz, Colors.blue),
-      OnChainNotificationType.nft =>
-        (Icons.image_outlined, Colors.deepPurple),
-      OnChainNotificationType.defi =>
-        (Icons.account_balance_outlined, Colors.teal),
-      OnChainNotificationType.governance =>
-        (Icons.how_to_vote_outlined, Colors.orange),
-      OnChainNotificationType.security =>
-        (Icons.security_outlined, Colors.red),
-      OnChainNotificationType.general =>
-        (Icons.notifications_outlined, Colors.grey),
+      OnChainNotificationType.nft => (Icons.image_outlined, Colors.deepPurple),
+      OnChainNotificationType.defi => (
+        Icons.account_balance_outlined,
+        Colors.teal,
+      ),
+      OnChainNotificationType.governance => (
+        Icons.how_to_vote_outlined,
+        Colors.orange,
+      ),
+      OnChainNotificationType.security => (Icons.security_outlined, Colors.red),
+      OnChainNotificationType.general => (
+        Icons.notifications_outlined,
+        Colors.grey,
+      ),
     };
 
     return Container(

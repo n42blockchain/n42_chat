@@ -15,6 +15,7 @@ import '../../blocs/space/space_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'space_create_page.dart';
 import 'space_detail_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 社区/Space 列表页面
 ///
@@ -89,9 +90,9 @@ class _SpaceListViewState extends State<_SpaceListView>
           context.read<SpaceBloc>().add(const ClearSpaceError());
         }
         if (state.operationSuccess != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.operationSuccess!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.operationSuccess!)));
           context.read<SpaceBloc>().add(const ClearSpaceError());
         }
       },
@@ -135,9 +136,10 @@ class _SpaceListViewState extends State<_SpaceListView>
                     searchController: _searchController,
                     onSearch: (query) {
                       context.read<SpaceBloc>().add(
-                            DiscoverPublicSpaces(
-                                searchQuery: query.isEmpty ? null : query),
-                          );
+                        DiscoverPublicSpaces(
+                          searchQuery: query.isEmpty ? null : query,
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -154,10 +156,8 @@ class _SpaceListViewState extends State<_SpaceListView>
     Navigator.push<void>(
       context,
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: bloc,
-          child: const SpaceCreatePage(),
-        ),
+        builder: (_) =>
+            BlocProvider.value(value: bloc, child: const SpaceCreatePage()),
       ),
     );
   }
@@ -176,8 +176,7 @@ class _JoinedSpacesTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SpaceBloc, SpaceState>(
       buildWhen: (prev, curr) =>
-          prev.joinedSpaces != curr.joinedSpaces ||
-          prev.status != curr.status,
+          prev.joinedSpaces != curr.joinedSpaces || prev.status != curr.status,
       builder: (context, state) {
         if (state.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -188,8 +187,7 @@ class _JoinedSpacesTab extends StatelessWidget {
             icon: Icons.groups_outlined,
             message:
                 S.of(context)?.spacesNoJoined ?? 'No communities joined yet',
-            actionLabel:
-                S.of(context)?.spacesExplore ?? 'Explore Communities',
+            actionLabel: S.of(context)?.spacesExplore ?? 'Explore Communities',
             onAction: onExplore,
           );
         }
@@ -234,8 +232,10 @@ class _DiscoverSpacesTab extends StatelessWidget {
         return Column(
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacing,
+                vertical: AppDimensions.spacingS,
+              ),
               child: TextField(
                 controller: searchController,
                 onSubmitted: onSearch,
@@ -255,7 +255,7 @@ class _DiscoverSpacesTab extends StatelessWidget {
                   filled: true,
                   fillColor: context.surfaceColor,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                     borderSide: BorderSide.none,
                   ),
                 ),
@@ -265,18 +265,19 @@ class _DiscoverSpacesTab extends StatelessWidget {
               child: state.isDiscovering
                   ? const Center(child: CircularProgressIndicator())
                   : state.publicSpaces.isEmpty
-                      ? _EmptySpaceView(
-                          icon: Icons.explore_outlined,
-                          message: S.of(context)?.spacesNoPublic ??
-                              'No public communities found',
-                        )
-                      : ListView.builder(
-                          itemCount: state.publicSpaces.length,
-                          itemBuilder: (context, index) => _SpaceListItem(
-                            space: state.publicSpaces[index],
-                            showJoinButton: true,
-                          ),
-                        ),
+                  ? _EmptySpaceView(
+                      icon: Icons.explore_outlined,
+                      message:
+                          S.of(context)?.spacesNoPublic ??
+                          'No public communities found',
+                    )
+                  : ListView.builder(
+                      itemCount: state.publicSpaces.length,
+                      itemBuilder: (context, index) => _SpaceListItem(
+                        space: state.publicSpaces[index],
+                        showJoinButton: true,
+                      ),
+                    ),
             ),
           ],
         );
@@ -293,10 +294,7 @@ class _SpaceListItem extends StatelessWidget {
   final SpaceEntity space;
   final bool showJoinButton;
 
-  const _SpaceListItem({
-    required this.space,
-    required this.showJoinButton,
-  });
+  const _SpaceListItem({required this.space, required this.showJoinButton});
 
   @override
   Widget build(BuildContext context) {
@@ -307,14 +305,16 @@ class _SpaceListItem extends StatelessWidget {
     }
 
     return ListTile(
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing,
+        vertical: AppDimensions.spacingXS,
+      ),
       leading: Container(
         width: 48,
         height: 48,
         decoration: BoxDecoration(
           color: AppColorPalettes.getAvatarColor(space.name),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
         clipBehavior: Clip.antiAlias,
         child: space.avatarUrl != null
@@ -343,37 +343,24 @@ class _SpaceListItem extends StatelessWidget {
               space.description!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13,
-                color: context.textSecondary,
-              ),
+              style: TextStyle(fontSize: 13, color: context.textSecondary),
             ),
           const SizedBox(height: 2),
           Row(
             children: [
-              Icon(Icons.people_outline,
-                  size: 14,
-                  color: context.textTertiary),
-              const SizedBox(width: 4),
+              Icon(Icons.people_outline, size: 14, color: context.textTertiary),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 '${space.memberCount}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: context.textTertiary,
-                ),
+                style: TextStyle(fontSize: 12, color: context.textTertiary),
               ),
-              const SizedBox(width: 12),
-              Icon(Icons.tag,
-                  size: 14,
-                  color: context.textTertiary),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingM),
+              Icon(Icons.tag, size: 14, color: context.textTertiary),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 S.of(context)?.spacesChannelsCount(space.channelCount) ??
                     '${space.channelCount} channels',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: context.textTertiary,
-                ),
+                style: TextStyle(fontSize: 12, color: context.textTertiary),
               ),
             ],
           ),
@@ -385,16 +372,11 @@ class _SpaceListItem extends StatelessWidget {
               builder: (context, state) => TextButton(
                 onPressed: state.isOperating
                     ? null
-                    : () => context
-                        .read<SpaceBloc>()
-                        .add(JoinSpace(space.id)),
+                    : () => context.read<SpaceBloc>().add(JoinSpace(space.id)),
                 child: Text(S.of(context)?.spacesJoin ?? 'Join'),
               ),
             )
-          : Icon(
-              AppIcons.chevron,
-              color: context.textSecondary,
-            ),
+          : Icon(AppIcons.chevron, color: context.textSecondary),
       onTap: () {
         final bloc = context.read<SpaceBloc>();
         Navigator.push<void>(
@@ -452,18 +434,11 @@ class _EmptySpaceView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon,
-              size: 64,
-              color: context.dividerColor),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: TextStyle(
-              color: context.textSecondary,
-            ),
-          ),
+          Icon(icon, size: 64, color: context.dividerColor),
+          const SizedBox(height: AppDimensions.spacing),
+          Text(message, style: TextStyle(color: context.textSecondary)),
           if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             OutlinedButton.icon(
               onPressed: onAction,
               icon: const Icon(Icons.explore),

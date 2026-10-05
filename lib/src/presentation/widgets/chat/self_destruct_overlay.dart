@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/self_destruct_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 阅后即焚倒计时覆盖层
 ///
@@ -61,7 +62,9 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.message.destroyedAt != widget.message.destroyedAt) {
       _updateRemaining();
-      if (widget.message.isDestructionStarted && _ticker == null && !_isDestroyed) {
+      if (widget.message.isDestructionStarted &&
+          _ticker == null &&
+          !_isDestroyed) {
         _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
           _updateRemaining();
         });
@@ -140,12 +143,15 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
   Widget _buildDestroyedPlaceholder(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing,
+        vertical: 10,
+      ),
       decoration: BoxDecoration(
         color: isDark
             ? Colors.grey.shade800.withValues(alpha: 0.5)
             : Colors.grey.shade200.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: Border.all(
           color: isDark
               ? Colors.grey.shade700.withValues(alpha: 0.3)
@@ -179,15 +185,13 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
 class SelfDestructPendingIcon extends StatelessWidget {
   final int durationSeconds;
 
-  const SelfDestructPendingIcon({
-    super.key,
-    required this.durationSeconds,
-  });
+  const SelfDestructPendingIcon({super.key, required this.durationSeconds});
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: 'Self-destruct: ${SelfDestructService.formatDuration(durationSeconds)}',
+      message:
+          'Self-destruct: ${SelfDestructService.formatDuration(durationSeconds)}',
       child: Padding(
         padding: const EdgeInsets.only(top: 2),
         child: Icon(

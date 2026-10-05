@@ -8,6 +8,7 @@ import '../../../domain/entities/ai_assistant_entity.dart';
 import '../../blocs/ai_assistant/ai_assistant_bloc.dart';
 import '../../blocs/ai_assistant/ai_assistant_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// AI 助手设置页面
 class AiAssistantSettingsPage extends StatelessWidget {
@@ -24,12 +25,10 @@ class AiAssistantSettingsPage extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: context.pageBackground,
-          appBar: N42AppBar(
-            title: l10n?.aiAssistantSettings ?? 'AI Settings',
-          ),
+          appBar: N42AppBar(title: l10n?.aiAssistantSettings ?? 'AI Settings'),
           body: ListView(
             children: [
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
 
               // 助手信息
               _buildSection(
@@ -38,13 +37,15 @@ class AiAssistantSettingsPage extends StatelessWidget {
                 title: l10n?.aiAssistant ?? 'Assistant',
                 children: [
                   _buildInfoTile(
-                    context, isDark,
+                    context,
+                    isDark,
                     icon: Icons.smart_toy_outlined,
                     title: l10n?.aiAssistant ?? 'Name',
                     subtitle: assistant.name,
                   ),
                   _buildInfoTile(
-                    context, isDark,
+                    context,
+                    isDark,
                     icon: Icons.memory_outlined,
                     title: l10n?.aiAssistantModel ?? 'Model',
                     subtitle: assistant.model ?? 'Default',
@@ -52,7 +53,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
 
               // 参数设置
               _buildSection(
@@ -61,19 +62,22 @@ class AiAssistantSettingsPage extends StatelessWidget {
                 title: l10n?.aiAssistantSettings ?? 'Parameters',
                 children: [
                   _buildInfoTile(
-                    context, isDark,
+                    context,
+                    isDark,
                     icon: Icons.thermostat_outlined,
                     title: l10n?.aiAssistantTemperature ?? 'Temperature',
                     subtitle: assistant.temperature.toStringAsFixed(1),
                   ),
                   _buildInfoTile(
-                    context, isDark,
+                    context,
+                    isDark,
                     icon: Icons.token_outlined,
                     title: l10n?.aiAssistantMaxTokens ?? 'Max Tokens',
                     subtitle: assistant.maxTokens.toString(),
                   ),
                   _buildInfoTile(
-                    context, isDark,
+                    context,
+                    isDark,
                     icon: Icons.history_outlined,
                     title: l10n?.aiAssistantContextWindow ?? 'Context Window',
                     subtitle: '${assistant.contextWindow} messages',
@@ -81,7 +85,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
 
               // 服务状态
               _buildSection(
@@ -90,18 +94,23 @@ class AiAssistantSettingsPage extends StatelessWidget {
                 title: l10n?.aiAssistantServiceStatus ?? 'Service Status',
                 children: [
                   _buildInfoTile(
-                    context, isDark,
-                    icon: state.isAvailable ? Icons.check_circle_outline : Icons.error_outline,
+                    context,
+                    isDark,
+                    icon: state.isAvailable
+                        ? Icons.check_circle_outline
+                        : Icons.error_outline,
                     title: l10n?.aiAssistantServiceStatus ?? 'Availability',
                     subtitle: state.isAvailable
                         ? (l10n?.aiAssistantAvailable ?? 'Available')
                         : (l10n?.aiAssistantUnavailable ?? 'Not configured'),
-                    subtitleColor: state.isAvailable ? AppColors.success : AppColors.warning,
+                    subtitleColor: state.isAvailable
+                        ? AppColors.success
+                        : AppColors.warning,
                   ),
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingXL),
             ],
           ),
         );
@@ -119,7 +128,10 @@ class AiAssistantSettingsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: AppDimensions.spacingS,
+          ),
           child: Text(
             title,
             style: TextStyle(
@@ -130,7 +142,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
           ),
         ),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
+          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
           decoration: BoxDecoration(
             color: context.surfaceColor,
             borderRadius: BorderRadius.circular(10),
@@ -153,10 +165,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
       leading: Icon(icon, color: AppColors.primary, size: 22),
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 15,
-          color: context.textPrimary,
-        ),
+        style: TextStyle(fontSize: 15, color: context.textPrimary),
       ),
       trailing: Text(
         subtitle,

@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// AI 链接摘要卡片
 ///
@@ -51,10 +52,8 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.04),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.15),
-        ),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,29 +66,33 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
                 ? A11yL10n.of(context).collapse
                 : A11yL10n.of(context).expand,
             child: InkWell(
-            onTap: () => setState(() => _isExpanded = !_isExpanded),
-            child: Row(
-              children: [
-                const Icon(Icons.auto_awesome, size: 14, color: AppColors.primary),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    l10n?.aiLinkSummary ?? 'AI Summary',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+              onTap: () => setState(() => _isExpanded = !_isExpanded),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.auto_awesome,
+                    size: 14,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      l10n?.aiLinkSummary ?? 'AI Summary',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
-                ),
-                Icon(
-                  _isExpanded ? Icons.expand_less : Icons.expand_more,
-                  size: 16,
-                  color: AppColors.textTertiaryOf(isDark),
-                ),
-              ],
+                  Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    size: 16,
+                    color: AppColors.textTertiaryOf(isDark),
+                  ),
+                ],
+              ),
             ),
-          ),
           ),
 
           if (_isExpanded) ...[
@@ -98,14 +101,14 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
               Row(
                 children: [
                   const SizedBox(
-                    width: 12,
+                    width: AppDimensions.spacingM,
                     height: 12,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       color: AppColors.primary,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   Text(
                     l10n?.aiLinkSummaryAnalyzing ?? 'Analyzing...',
                     style: const TextStyle(
@@ -136,33 +139,35 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
       label: l10n?.aiLinkSummary ?? 'AI Summary',
       excludeSemantics: true,
       child: GestureDetector(
-      onTap: widget.onGenerate,
-      child: Container(
-        margin: const EdgeInsets.only(top: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.04),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.2),
+        onTap: widget.onGenerate,
+        child: Container(
+          margin: const EdgeInsets.only(top: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.04),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.auto_awesome,
+                size: 12,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: AppDimensions.spacingXS),
+              Text(
+                l10n?.aiLinkSummary ?? 'AI Summary',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.auto_awesome, size: 12, color: AppColors.primary),
-            const SizedBox(width: 4),
-            Text(
-              l10n?.aiLinkSummary ?? 'AI Summary',
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
       ),
     );
   }

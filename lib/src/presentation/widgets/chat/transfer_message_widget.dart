@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 转账消息组件（仿微信）
 class TransferMessageWidget extends StatelessWidget {
@@ -191,7 +192,7 @@ class PaymentRequestMessageWidget extends StatelessWidget {
   Color _getBackgroundColor() {
     switch (status) {
       case PaymentRequestMessageStatus.pending:
-        return const Color(0xFF2D9CDB);
+        return const Color(0xFF3498DB);
       case PaymentRequestMessageStatus.paid:
         return const Color(0xFFF9A825);
       case PaymentRequestMessageStatus.expired:
@@ -283,92 +284,95 @@ class _PaymentCardFrame extends StatelessWidget {
       ].where((e) => e != null && e.isNotEmpty).join(', '),
       excludeSemantics: true,
       child: GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 240,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: iconBackgroundColor,
-                      shape: BoxShape.circle,
+        onTap: onTap,
+        child: Container(
+          width: 240,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppDimensions.spacingM),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: iconBackgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        icon,
+                        size: 20,
+                        color: textColor.withValues(alpha: 0.85),
+                      ),
                     ),
-                    child: Icon(
-                      icon,
-                      size: 20,
-                      color: textColor.withValues(alpha: 0.85),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: textColor.withValues(alpha: 0.75),
-                          ),
-                        ),
-                        if (note?.isNotEmpty == true) ...[
-                          const SizedBox(height: 4),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            note!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            title,
                             style: TextStyle(
-                              fontSize: 11,
-                              color: textColor.withValues(alpha: 0.85),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: textColor,
                             ),
                           ),
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: textColor.withValues(alpha: 0.75),
+                            ),
+                          ),
+                          if (note?.isNotEmpty == true) ...[
+                            const SizedBox(height: AppDimensions.spacingXS),
+                            Text(
+                              note!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: textColor.withValues(alpha: 0.85),
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacingM,
+                  vertical: AppDimensions.spacingS,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(4),
+                    bottomRight: Radius.circular(4),
                   ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.05),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(4),
-                  bottomRight: Radius.circular(4),
+                ),
+                child: Text(
+                  footerLabel,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: textColor.withValues(alpha: 0.55),
+                  ),
                 ),
               ),
-              child: Text(
-                footerLabel,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: textColor.withValues(alpha: 0.55),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -424,100 +428,100 @@ class RedPacketMessageWidget extends StatelessWidget {
       ].where((e) => e != null && e.isNotEmpty).join(', '),
       excludeSemantics: true,
       child: GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 260,
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 主体内容
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // 红包图标
-                      _buildRedPacketIcon(isOpened),
-                      const SizedBox(width: 12),
+        onTap: onTap,
+        child: Container(
+          width: 260,
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 主体内容
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // 红包图标
+                        _buildRedPacketIcon(isOpened),
+                        const SizedBox(width: AppDimensions.spacingM),
 
-                      // 祝福语和状态
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              note ??
-                                  (S.of(context)?.chatRedPacketGreeting ??
-                                      'Best wishes'),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: textColor,
-                              ),
-                            ),
-                            if (isOpened) ...[
-                              const SizedBox(height: 2),
+                        // 祝福语和状态
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
                               Text(
-                                _getStatusText(context),
+                                note ??
+                                    (S.of(context)?.chatRedPacketGreeting ??
+                                        'Best wishes'),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  color: textColor.withValues(alpha: 0.7),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: textColor,
                                 ),
                               ),
+                              if (isOpened) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  _getStatusText(context),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: textColor.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                // 底部标签区域
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                  // 底部标签区域
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.spacingM,
+                      vertical: AppDimensions.spacingS,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.05),
+                    ),
+                    child: Text(
+                      S.of(context)?.commonN42RedPacket ?? 'N42 Red Packet',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: textColor.withValues(alpha: 0.6),
+                      ),
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.05),
-                  ),
-                  child: Text(
-                    S.of(context)?.commonN42RedPacket ?? 'N42 Red Packet',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: textColor.withValues(alpha: 0.6),
+                ],
+              ),
+
+              // 封面图片覆盖层（仅未领取时显示）
+              if (coverImageUrl != null && !isOpened)
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.25,
+                    child: Image.network(
+                      coverImageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
                     ),
                   ),
                 ),
-              ],
-            ),
-
-            // 封面图片覆盖层（仅未领取时显示）
-            if (coverImageUrl != null && !isOpened)
-              Positioned.fill(
-                child: Opacity(
-                  opacity: 0.25,
-                  child: Image.network(
-                    coverImageUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                  ),
-                ),
-              ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -543,7 +547,7 @@ class RedPacketMessageWidget extends StatelessWidget {
       height: 50,
       decoration: BoxDecoration(
         color: const Color(0xFFD4380D),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
       child: Center(
         child: Container(

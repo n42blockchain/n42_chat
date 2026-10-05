@@ -9,6 +9,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../blocs/governance/governance_bloc.dart';
 import '../../blocs/governance/governance_event.dart';
 import '../../blocs/governance/governance_state.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Page for creating a new governance proposal.
 ///
@@ -234,22 +235,22 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
           return Stack(
             children: [
               SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppDimensions.spacing),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildTitleField(context),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppDimensions.spacing),
                       _buildBodyField(context),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacingXL),
                       _buildChoicesSection(context),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppDimensions.spacingXL),
                       _buildDateTimeSection(context),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacingXXL),
                       _buildSubmitButton(isDark, isCreating),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppDimensions.spacingXXL),
                     ],
                   ),
                 ),
@@ -270,10 +271,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
 
   Widget _buildTitleField(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,25 +290,23 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           TextFormField(
             controller: _titleController,
             decoration: InputDecoration(
               hintText: 'Enter proposal title...',
-              hintStyle: TextStyle(
-                color: context.textTertiary,
-              ),
+              hintStyle: TextStyle(color: context.textTertiary),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: const BorderSide(color: AppColors.inputBorder),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: const BorderSide(color: AppColors.primary),
               ),
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 12,
+                horizontal: AppDimensions.spacingM,
+                vertical: AppDimensions.spacingM,
               ),
             ),
             maxLength: 256,
@@ -328,10 +327,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
 
   Widget _buildBodyField(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,25 +346,23 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           TextFormField(
             controller: _bodyController,
             decoration: InputDecoration(
               hintText: 'Describe your proposal...',
-              hintStyle: TextStyle(
-                color: context.textTertiary,
-              ),
+              hintStyle: TextStyle(color: context.textTertiary),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: const BorderSide(color: AppColors.inputBorder),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: const BorderSide(color: AppColors.primary),
               ),
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 12,
+                horizontal: AppDimensions.spacingM,
+                vertical: AppDimensions.spacingM,
               ),
             ),
             maxLines: 8,
@@ -385,10 +382,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
 
   Widget _buildChoicesSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -416,10 +413,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           ...List.generate(_choiceControllers.length, (index) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.only(bottom: AppDimensions.spacingS),
               child: Row(
                 children: [
                   // Choice number
@@ -443,23 +440,25 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                       controller: _choiceControllers[index],
                       decoration: InputDecoration(
                         hintText: 'Choice ${index + 1}',
-                        hintStyle: TextStyle(
-                          color: context.textTertiary,
-                        ),
+                        hintStyle: TextStyle(color: context.textTertiary),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusM,
+                          ),
                           borderSide: const BorderSide(
                             color: AppColors.inputBorder,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusM,
+                          ),
                           borderSide: const BorderSide(
                             color: AppColors.primary,
                           ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
+                          horizontal: AppDimensions.spacingM,
                           vertical: 10,
                         ),
                         isDense: true,
@@ -483,14 +482,16 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                         size: 20,
                       ),
                       onPressed: () => _removeChoice(index),
-                      padding: const EdgeInsets.only(left: 4),
+                      padding: const EdgeInsets.only(
+                        left: AppDimensions.spacingXS,
+                      ),
                       constraints: const BoxConstraints(),
                     ),
                 ],
               ),
             );
           }),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           // Add choice button
           SizedBox(
             width: double.infinity,
@@ -504,7 +505,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                   color: AppColors.primary.withValues(alpha: 0.5),
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
               ),
             ),
@@ -516,10 +517,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
 
   Widget _buildDateTimeSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -535,22 +536,15 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               color: context.textPrimary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           _DateTimeTile(
             label: 'Start',
             dateTime: _startTime,
             onTap: _pickStartTime,
           ),
-          Divider(
-            height: 1,
-            color: context.dividerColor,
-          ),
-          _DateTimeTile(
-            label: 'End',
-            dateTime: _endTime,
-            onTap: _pickEndTime,
-          ),
-          const SizedBox(height: 8),
+          Divider(height: 1, color: context.dividerColor),
+          _DateTimeTile(label: 'End', dateTime: _endTime, onTap: _pickEndTime),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             'Duration: ${_formatDuration(_endTime.difference(_startTime))}',
             maxLines: 1,
@@ -582,11 +576,13 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ? AppColors.dividerDark
               : const Color(0xFFE0E0E0),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+          ),
         ),
         child: isCreating
             ? const SizedBox(
-                width: 24,
+                width: AppDimensions.spacingXL,
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
@@ -597,7 +593,11 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 'Create Proposal',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, height: 1.3, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.3,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
       ),
     );
@@ -635,15 +635,11 @@ class _DateTimeTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
         child: Row(
           children: [
-            Icon(
-              Icons.calendar_today,
-              size: 18,
-              color: context.textSecondary,
-            ),
-            const SizedBox(width: 12),
+            Icon(Icons.calendar_today, size: 18, color: context.textSecondary),
+            const SizedBox(width: AppDimensions.spacingM),
             Text(
               label,
               maxLines: 1,
@@ -666,12 +662,8 @@ class _DateTimeTile extends StatelessWidget {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(width: 4),
-            Icon(
-              AppIcons.chevron,
-              size: 20,
-              color: context.textTertiary,
-            ),
+            const SizedBox(width: AppDimensions.spacingXS),
+            Icon(AppIcons.chevron, size: 20, color: context.textTertiary),
           ],
         ),
       ),

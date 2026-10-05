@@ -3,6 +3,7 @@ import 'package:matrix/encryption/utils/key_verification.dart' as kv;
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// SAS Emoji 验证展示组件
 ///
@@ -11,10 +12,7 @@ class EmojiVerificationWidget extends StatelessWidget {
   /// Matrix SDK 返回的 SAS emoji 列表
   final List<kv.KeyVerificationEmoji> emojis;
 
-  const EmojiVerificationWidget({
-    super.key,
-    required this.emojis,
-  });
+  const EmojiVerificationWidget({super.key, required this.emojis});
 
   @override
   Widget build(BuildContext context) {
@@ -25,27 +23,31 @@ class EmojiVerificationWidget extends StatelessWidget {
       children: [
         // 提示文字
         Text(
-          S.of(context)?.securityCompareEmoji ?? 'Compare the emoji on both devices',
-          style: TextStyle(
-            fontSize: 15,
-            color: context.textSecondary,
-          ),
+          S.of(context)?.securityCompareEmoji ??
+              'Compare the emoji on both devices',
+          style: TextStyle(fontSize: 15, color: context.textSecondary),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
 
         // Emoji 网格展示
         Wrap(
           alignment: WrapAlignment.center,
           spacing: 8,
           runSpacing: 16,
-          children: emojis.map((emoji) => _buildEmojiItem(context, emoji, isDark)).toList(),
+          children: emojis
+              .map((emoji) => _buildEmojiItem(context, emoji, isDark))
+              .toList(),
         ),
       ],
     );
   }
 
-  Widget _buildEmojiItem(BuildContext context, kv.KeyVerificationEmoji emoji, bool isDark) {
+  Widget _buildEmojiItem(
+    BuildContext context,
+    kv.KeyVerificationEmoji emoji,
+    bool isDark,
+  ) {
     return SizedBox(
       width: 72,
       child: Column(
@@ -59,23 +61,17 @@ class EmojiVerificationWidget extends StatelessWidget {
               color: isDark
                   ? Colors.white.withValues(alpha: 0.08)
                   : Colors.grey.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             ),
             child: Center(
-              child: Text(
-                emoji.emoji,
-                style: const TextStyle(fontSize: 32),
-              ),
+              child: Text(emoji.emoji, style: const TextStyle(fontSize: 32)),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           // Emoji 名称
           Text(
             emoji.name,
-            style: TextStyle(
-              fontSize: 11,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 11, color: context.textSecondary),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -93,10 +89,7 @@ class NumberVerificationWidget extends StatelessWidget {
   /// 3 个验证数字
   final List<int> numbers;
 
-  const NumberVerificationWidget({
-    super.key,
-    required this.numbers,
-  });
+  const NumberVerificationWidget({super.key, required this.numbers});
 
   @override
   Widget build(BuildContext context) {
@@ -106,25 +99,28 @@ class NumberVerificationWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          S.of(context)?.securityCompareNumbers ?? 'Compare the numbers on both devices',
-          style: TextStyle(
-            fontSize: 15,
-            color: context.textSecondary,
-          ),
+          S.of(context)?.securityCompareNumbers ??
+              'Compare the numbers on both devices',
+          style: TextStyle(fontSize: 15, color: context.textSecondary),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: numbers.map((number) {
             return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              margin: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingS,
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingL,
+                vertical: AppDimensions.spacingM,
+              ),
               decoration: BoxDecoration(
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.08)
                     : Colors.grey.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Text(
                 number.toString().padLeft(4, '0'),

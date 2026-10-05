@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/fiat_ramp_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 法币出入金页（MoonPay/Transak WebView）
 ///
@@ -20,8 +21,9 @@ class FiatRampPage extends StatefulWidget {
 }
 
 class _FiatRampPageState extends State<FiatRampPage> {
-  late final FiatRampService? _service =
-      getIt.isRegistered<FiatRampService>() ? getIt<FiatRampService>() : null;
+  late final FiatRampService? _service = getIt.isRegistered<FiatRampService>()
+      ? getIt<FiatRampService>()
+      : null;
   WebViewController? _controller;
   bool _isBuy = true;
   bool _loading = true;
@@ -63,7 +65,9 @@ class _FiatRampPageState extends State<FiatRampPage> {
             ? PreferredSize(
                 preferredSize: const Size.fromHeight(48),
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.only(
+                    bottom: AppDimensions.spacingS,
+                  ),
                   child: SegmentedButton<bool>(
                     segments: const [
                       ButtonSegment(value: true, label: Text('Buy')),
@@ -85,8 +89,7 @@ class _FiatRampPageState extends State<FiatRampPage> {
               children: [
                 if (_controller != null)
                   WebViewWidget(controller: _controller!),
-                if (_loading)
-                  const Center(child: CircularProgressIndicator()),
+                if (_loading) const Center(child: CircularProgressIndicator()),
               ],
             ),
     );
@@ -95,28 +98,32 @@ class _FiatRampPageState extends State<FiatRampPage> {
   Widget _buildNotConfigured() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.account_balance_outlined,
-                size: 56, color: context.textTertiary),
-            const SizedBox(height: 16),
+            Icon(
+              Icons.account_balance_outlined,
+              size: 56,
+              color: context.textTertiary,
+            ),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'Fiat on/off-ramp not configured',
               style: TextStyle(
-                  color: context.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
+                color: context.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               'Host app needs to provide a MoonPay/Transak publishable key '
               'via N42ChatConfig.fiatRampApiKey.',
               textAlign: TextAlign.center,
               style: TextStyle(color: context.textSecondary, fontSize: 13),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.spacingL),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
               onPressed: () => Navigator.of(context).pop(),

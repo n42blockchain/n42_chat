@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 服务号列表页面
 class ServiceAccountsPage extends StatelessWidget {
@@ -23,25 +24,24 @@ class ServiceAccountsPage extends StatelessWidget {
           // 搜索栏
           Container(
             color: context.surfaceColor,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingM,
+              vertical: AppDimensions.spacingS,
+            ),
             child: Container(
               height: 36,
               decoration: BoxDecoration(
                 color: AppColors.inputBgOf(isDark),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search, size: 20,
-                      color: context.textTertiary),
+                  Icon(Icons.search, size: 20, color: context.textTertiary),
                   const SizedBox(width: 6),
                   Text(
                     S.of(context)?.commonSearch ?? 'Search',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: context.textTertiary,
-                    ),
+                    style: TextStyle(fontSize: 15, color: context.textTertiary),
                   ),
                 ],
               ),
@@ -57,15 +57,16 @@ class ServiceAccountsPage extends StatelessWidget {
                     size: 64,
                     color: AppColors.textTertiaryOf(isDark),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   Text(
-                    S.of(context)?.contactNoServiceAccounts ?? 'No service accounts',
+                    S.of(context)?.contactNoServiceAccounts ??
+                        'No service accounts',
                     style: TextStyle(
                       fontSize: 16,
                       color: context.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingS),
                   Text(
                     S.of(context)?.contactSubscribeServiceAccountsDesc ??
                         'Subscribe to service accounts for convenient services',

@@ -74,7 +74,7 @@ class WhiteboardController extends ChangeNotifier {
   double _width;
 
   WhiteboardController({
-    Color color = const Color(0xFF222222),
+    Color color = const Color(0xFF181818),
     double width = 4,
   }) : _color = color,
        _width = width;

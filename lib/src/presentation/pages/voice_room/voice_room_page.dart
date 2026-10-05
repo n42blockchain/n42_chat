@@ -8,6 +8,7 @@ import '../../blocs/voice_room/voice_room_bloc.dart';
 import '../../blocs/voice_room/voice_room_event.dart';
 import '../../blocs/voice_room/voice_room_state.dart';
 import '../../widgets/voice_room/participant_grid.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 语音房间内页面
 ///
@@ -20,10 +21,7 @@ import '../../widgets/voice_room/participant_grid.dart';
 class VoiceRoomPage extends StatelessWidget {
   final String roomId;
 
-  const VoiceRoomPage({
-    super.key,
-    required this.roomId,
-  });
+  const VoiceRoomPage({super.key, required this.roomId});
 
   @override
   Widget build(BuildContext context) {
@@ -56,106 +54,111 @@ class _VoiceRoomView extends StatelessWidget {
               current.error != null &&
               current.error!.isNotEmpty,
           listener: (context, state) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error!)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.error!)));
           },
         ),
       ],
       child: BlocBuilder<VoiceRoomBloc, VoiceRoomState>(
         builder: (context, state) {
-        final room = state.room;
+          final room = state.room;
 
-        if (room == null) {
+          if (room == null) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: Center(
+                child: state.isLoading
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: AppDimensions.spacing),
+                          Text(s?.voiceRoomConnecting ?? 'Connecting...'),
+                        ],
+                      )
+                    : Text(state.error ?? 'Room not found'),
+              ),
+            );
+          }
+
           return Scaffold(
-            appBar: AppBar(),
-            body: Center(
-              child: state.isLoading
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CircularProgressIndicator(),
-                        const SizedBox(height: 16),
-                        Text(s?.voiceRoomConnecting ?? 'Connecting...'),
-                      ],
-                    )
-                  : Text(state.error ?? 'Room not found'),
-            ),
-          );
-        }
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  room.name,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                if (room.topic != null)
-                  Text(
-                    room.topic!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            appBar: AppBar(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(room.name, style: const TextStyle(fontSize: 16)),
+                  if (room.topic != null)
+                    Text(
+                      room.topic!,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
+                      ),
                     ),
+                ],
+              ),
+              actions: [
+                // 直播标识
+                Container(
+                  margin: const EdgeInsets.only(right: AppDimensions.spacing),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacingS,
+                    vertical: AppDimensions.spacingXS,
                   ),
+                  decoration: BoxDecoration(
+                    color: AppColors.success,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: AppDimensions.spacingXS),
+                      Text(
+                        s?.voiceRoomLive ?? 'LIVE',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-            actions: [
-              // 直播标识
-              Container(
-                margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.success,
-                  borderRadius: BorderRadius.circular(4),
+            body: Column(
+              children: [
+                // 参与者网格
+                Expanded(
+                  child: ParticipantGrid(
+                    room: room,
+                    myRole: state.myRole,
+                    onParticipantLongPress: state.isHost
+                        ? (participant) => _showParticipantOptions(
+                            context,
+                            participant,
+                            state,
+                          )
+                        : null,
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      s?.voiceRoomLive ?? 'LIVE',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          body: Column(
-            children: [
-              // 参与者网格
-              Expanded(
-                child: ParticipantGrid(
-                  room: room,
-                  myRole: state.myRole,
-                  onParticipantLongPress: state.isHost
-                      ? (participant) =>
-                          _showParticipantOptions(context, participant, state)
-                      : null,
-                ),
-              ),
 
-              // 底部控制栏
-              _buildControlBar(context, state),
-            ],
-          ),
-        );
+                // 底部控制栏
+                _buildControlBar(context, state),
+              ],
+            ),
+          );
         },
       ),
     );
@@ -167,10 +170,10 @@ class _VoiceRoomView extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 16,
-        bottom: 16 + MediaQuery.of(context).padding.bottom,
+        left: AppDimensions.spacingXL,
+        right: AppDimensions.spacingXL,
+        top: AppDimensions.spacing,
+        bottom: AppDimensions.spacing + MediaQuery.of(context).padding.bottom,
       ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
@@ -212,7 +215,9 @@ class _VoiceRoomView extends StatelessWidget {
               label: state.isMuted
                   ? (s?.voiceRoomUnmute ?? 'Unmute')
                   : (s?.voiceRoomMute ?? 'Mute'),
-              color: state.isMuted ? AppColors.error : theme.colorScheme.primary,
+              color: state.isMuted
+                  ? AppColors.error
+                  : theme.colorScheme.primary,
               onTap: () {
                 context.read<VoiceRoomBloc>().add(const ToggleMute());
               },
@@ -267,14 +272,8 @@ class _VoiceRoomView extends StatelessWidget {
             ),
             child: Icon(icon, color: effectiveColor, size: 24),
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              color: effectiveColor,
-            ),
-          ),
+          const SizedBox(height: AppDimensions.spacingXS),
+          Text(label, style: TextStyle(fontSize: 10, color: effectiveColor)),
         ],
       ),
     );
@@ -308,8 +307,8 @@ class _VoiceRoomView extends StatelessWidget {
                 title: Text(s?.voiceRoomApprove ?? 'Approve to speak'),
                 onTap: () {
                   context.read<VoiceRoomBloc>().add(
-                        ApproveSpeaker(participant.userId),
-                      );
+                    ApproveSpeaker(participant.userId),
+                  );
                   Navigator.pop(sheetContext);
                 },
               ),
@@ -319,8 +318,8 @@ class _VoiceRoomView extends StatelessWidget {
                 title: Text(s?.voiceRoomDemote ?? 'Move to listener'),
                 onTap: () {
                   context.read<VoiceRoomBloc>().add(
-                        DemoteToListener(participant.userId),
-                      );
+                    DemoteToListener(participant.userId),
+                  );
                   Navigator.pop(sheetContext);
                 },
               ),
@@ -340,7 +339,9 @@ class _VoiceRoomView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(MaterialLocalizations.of(dialogContext).cancelButtonLabel),
+            child: Text(
+              MaterialLocalizations.of(dialogContext).cancelButtonLabel,
+            ),
           ),
           FilledButton(
             onPressed: () {

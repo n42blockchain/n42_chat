@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Streak indicator widget showing consecutive active days.
 ///
@@ -43,9 +44,10 @@ class _StreakIndicatorState extends State<StreakIndicator>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     if (widget.streakDays > 0 && widget.isActiveToday) {
       _controller.repeat(reverse: true);
@@ -74,10 +76,10 @@ class _StreakIndicatorState extends State<StreakIndicator>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         boxShadow: isDark
             ? null
             : [
@@ -103,7 +105,7 @@ class _StreakIndicatorState extends State<StreakIndicator>
                       : context.textTertiary,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -129,11 +131,13 @@ class _StreakIndicatorState extends State<StreakIndicator>
               const Spacer(),
               if (_multiplier > 1)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacingS,
+                    vertical: AppDimensions.spacingXS,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFF6B35).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: Text(
                     '${_multiplier}x',
@@ -146,7 +150,7 @@ class _StreakIndicatorState extends State<StreakIndicator>
                 ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           // 7-day calendar strip
           _buildCalendarStrip(isDark),
         ],
@@ -173,7 +177,8 @@ class _StreakIndicatorState extends State<StreakIndicator>
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: days.map((day) {
         final isActive = _isDayActive(day);
-        final isToday = day.day == now.day &&
+        final isToday =
+            day.day == now.day &&
             day.month == now.month &&
             day.year == now.year;
 
@@ -194,12 +199,15 @@ class _StreakIndicatorState extends State<StreakIndicator>
     }
     // Infer from streak: the last N days (including today if active) are active.
     final now = DateTime.now();
-    final daysDiff = DateTime(now.year, now.month, now.day)
-        .difference(DateTime(day.year, day.month, day.day))
-        .inDays;
+    final daysDiff = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).difference(DateTime(day.year, day.month, day.day)).inDays;
 
-    final effectiveStreak =
-        widget.isActiveToday ? widget.streakDays : (widget.streakDays > 0 ? widget.streakDays - 1 : 0);
+    final effectiveStreak = widget.isActiveToday
+        ? widget.streakDays
+        : (widget.streakDays > 0 ? widget.streakDays - 1 : 0);
     if (widget.isActiveToday) {
       return daysDiff < effectiveStreak;
     } else {
@@ -241,9 +249,7 @@ class _DayDot extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
-            color: isToday
-                ? AppColors.primary
-                : context.textSecondary,
+            color: isToday ? AppColors.primary : context.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -255,9 +261,7 @@ class _DayDot extends StatelessWidget {
             shape: BoxShape.circle,
             color: isActive
                 ? const Color(0xFFFF6B35)
-                : (isDark
-                    ? const Color(0xFF2A2A2A)
-                    : const Color(0xFFF0F0F0)),
+                : (isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F7F7)),
             border: isToday
                 ? Border.all(color: AppColors.primary, width: 2)
                 : null,

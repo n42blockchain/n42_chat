@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 class ChatDeleteConfirmSheet extends StatelessWidget {
   const ChatDeleteConfirmSheet({super.key});
@@ -16,7 +17,7 @@ class ChatDeleteConfirmSheet extends StatelessWidget {
 
     return SafeArea(
       child: Container(
-        margin: const EdgeInsets.all(8),
+        margin: const EdgeInsets.all(AppDimensions.spacingS),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -33,7 +34,8 @@ class ChatDeleteConfirmSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     child: Text(
-                      S.of(context)?.chatDeleteThisMessage ?? 'Delete this message?',
+                      S.of(context)?.chatDeleteThisMessage ??
+                          'Delete this message?',
                       style: TextStyle(
                         fontSize: 13,
                         color: context.textTertiary,
@@ -72,7 +74,7 @@ class ChatDeleteConfirmSheet extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 取消按钮
             Container(
@@ -141,12 +143,14 @@ class ChatMessageMenuSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
+              margin: const EdgeInsets.symmetric(
+                vertical: AppDimensions.spacingM,
+              ),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
               ),
             ),
             if (message.type == MessageType.text)
@@ -194,7 +198,7 @@ class ChatMessageMenuSheet extends StatelessWidget {
                 color: AppColors.error,
                 onTap: onDelete,
               ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
           ],
         ),
       ),

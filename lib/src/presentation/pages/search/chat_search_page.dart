@@ -14,6 +14,7 @@ import '../../blocs/search/search_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'search_message_filter_sheet.dart';
 import '../../../n42_chat.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 房间内搜索页面
 class ChatSearchPage extends StatefulWidget {
@@ -125,15 +126,15 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
 
   Widget _buildSearchBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacingS,
+        vertical: AppDimensions.spacingS,
+      ),
       color: context.surfaceColor,
       child: Row(
         children: [
           IconButton(
-            icon: Icon(
-              AppIcons.back,
-              color: context.textPrimary,
-            ),
+            icon: Icon(AppIcons.back, color: context.textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
           Expanded(
@@ -164,12 +165,11 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                         )
                       : null,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.spacingS,
+                  ),
                 ),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.textPrimary,
-                ),
+                style: TextStyle(fontSize: 14, color: context.textPrimary),
                 onChanged: (value) {
                   setState(() {});
                   _onSearchChanged(value);
@@ -177,7 +177,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           IconButton(
             icon: Stack(
               clipBehavior: Clip.none,
@@ -242,26 +242,23 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         if (state.isSearching) const LinearProgressIndicator(minHeight: 2),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: 10,
+          ),
           color: context.surfaceColor,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 '${results.totalCount} ${S.of(context)?.searchMessageLabel ?? 'messages'}',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: context.textSecondary,
-                ),
+                style: TextStyle(fontSize: 13, color: context.textSecondary),
               ),
               if (results.filter != null) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   'Filters active: ${results.filter!.activeCount}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: context.textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 12, color: context.textSecondary),
                 ),
               ],
             ],
@@ -270,11 +267,8 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         Expanded(
           child: ListView.separated(
             itemCount: results.messages.length + (results.hasMore ? 1 : 0),
-            separatorBuilder: (_, _) => Divider(
-              height: 1,
-              indent: 72,
-              color: context.dividerColor,
-            ),
+            separatorBuilder: (_, _) =>
+                Divider(height: 1, indent: 72, color: context.dividerColor),
             itemBuilder: (context, index) {
               if (index >= results.messages.length) {
                 return ListTile(
@@ -305,7 +299,10 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
   Widget _buildMessageTile(MessageEntity message) {
     final preview = _messagePreview(message);
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing,
+        vertical: 6,
+      ),
       title: Row(
         children: [
           Expanded(
@@ -322,26 +319,20 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Text(
             DateFormat('MM-dd HH:mm').format(message.timestamp),
-            style: TextStyle(
-              fontSize: 12,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: context.textSecondary),
           ),
         ],
       ),
       subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4),
+        padding: const EdgeInsets.only(top: AppDimensions.spacingXS),
         child: Text(
           preview,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 13,
-            color: context.textSecondary,
-          ),
+          style: TextStyle(fontSize: 13, color: context.textSecondary),
         ),
       ),
       onTap: () {

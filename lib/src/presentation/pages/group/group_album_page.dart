@@ -13,6 +13,7 @@ import '../../blocs/group_album/group_album_event.dart';
 import '../../blocs/group_album/group_album_state.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../media/media_preview_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群相册页面
 class GroupAlbumPage extends StatelessWidget {
@@ -101,7 +102,9 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
       builder: (context, state) {
         if (state.isLoading) {
           return Center(
-            child: N42Loading(message: S.of(context)?.commonLoading ?? 'Loading...'),
+            child: N42Loading(
+              message: S.of(context)?.commonLoading ?? 'Loading...',
+            ),
           );
         }
 
@@ -123,7 +126,8 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
           return Center(
             child: N42EmptyState.noData(
               title: S.of(context)?.groupNoMedia ?? 'No media',
-              description: S.of(context)?.groupNoMediaDescription ??
+              description:
+                  S.of(context)?.groupNoMediaDescription ??
                   'No photos or videos in this group yet',
             ),
           );
@@ -136,9 +140,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
           child: CustomScrollView(
             slivers: [
               // 统计信息
-              SliverToBoxAdapter(
-                child: _buildStats(context, state),
-              ),
+              SliverToBoxAdapter(child: _buildStats(context, state)),
               // 按日期分组显示
               ...filteredGroups.map((group) => _buildDateGroup(context, group)),
             ],
@@ -158,10 +160,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
     if (widget.embedded) {
       return Column(
         children: [
-          Material(
-            color: cardColor,
-            child: _buildTabBar(context),
-          ),
+          Material(color: cardColor, child: _buildTabBar(context)),
           Expanded(child: _buildContent(context)),
         ],
       );
@@ -198,7 +197,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
     final textColor = context.textSecondary;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -247,14 +246,8 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
             color: AppColors.primary,
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: textColor,
-          ),
-        ),
+        const SizedBox(height: AppDimensions.spacingXS),
+        Text(label, style: TextStyle(fontSize: 12, color: textColor)),
       ],
     );
   }
@@ -280,7 +273,9 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
           ),
           // 媒体网格
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingS,
+            ),
             child: GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -315,7 +310,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
               color: Colors.grey[300],
               child: const Center(
                 child: SizedBox(
-                  width: 20,
+                  width: AppDimensions.spacingL,
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
@@ -332,10 +327,13 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
               right: 4,
               bottom: 4,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacingXS,
+                  vertical: 2,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -362,22 +360,24 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
 
   void _viewMedia(BuildContext context, AlbumMediaEntity media) {
     final state = context.read<GroupAlbumBloc>().state;
-    final allMedia = state.filteredDateGroups
-        .expand((g) => g.media)
-        .toList();
+    final allMedia = state.filteredDateGroups.expand((g) => g.media).toList();
 
     final index = allMedia.indexWhere((m) => m.eventId == media.eventId);
 
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => MediaPreviewPage(
-          items: allMedia.map((m) => MediaItem(
-            url: m.httpUrl ?? '',
-            thumbnailUrl: m.thumbnailUrl,
-            isVideo: m.isVideo,
-            senderName: m.senderName,
-            sentAt: m.sentAt,
-          )).toList(),
+          items: allMedia
+              .map(
+                (m) => MediaItem(
+                  url: m.httpUrl ?? '',
+                  thumbnailUrl: m.thumbnailUrl,
+                  isVideo: m.isVideo,
+                  senderName: m.senderName,
+                  sentAt: m.sentAt,
+                ),
+              )
+              .toList(),
           initialIndex: index >= 0 ? index : 0,
         ),
       ),

@@ -14,13 +14,15 @@ import '../../../core/utils/sso_brand.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../../n42_chat.dart' show N42Chat;
 import '../../../n42_chat_config.dart' show N42ChatConfig;
-import '../../../services/auth/auth_methods_service.dart' show AuthMethodsService, SsoProvider;
+import '../../../services/auth/auth_methods_service.dart'
+    show AuthMethodsService, SsoProvider;
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../../pages/auth/oauth_webview_page.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../helpers/bloc_message_helper.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 社交登录按钮组件
 ///
@@ -222,7 +224,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           icon: Icons.facebook,
           isLoading: _isFacebookLoading,
           tooltip: 'Facebook',
-          backgroundColor: const Color(0xFF1877F2),
+          backgroundColor: const Color(0xFF1A73E8),
           iconColor: Colors.white,
         ),
       if ((config?.enableTwitterLogin ?? false) &&
@@ -250,7 +252,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           icon: Icons.code,
           isLoading: _isGithubLoading,
           tooltip: 'GitHub',
-          backgroundColor: const Color(0xFF24292F),
+          backgroundColor: const Color(0xFF2A2A2A),
           iconColor: Colors.white,
         ),
       if (_isTelegramConfigured(config))
@@ -259,7 +261,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           icon: Icons.send,
           isLoading: _isTelegramLoading,
           tooltip: 'Telegram',
-          backgroundColor: const Color(0xFF26A5E4),
+          backgroundColor: const Color(0xFF2AABEE),
           iconColor: Colors.white,
         ),
       if ((config?.enableWeChatLogin ?? false) && _isWeChatAvailable)
@@ -307,14 +309,18 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         children: [
           // 分隔线
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppDimensions.spacingXL,
+            ),
             child: Row(
               children: [
                 Expanded(
                   child: Divider(color: textColor.withValues(alpha: 0.3)),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacing,
+                  ),
                   child: Text(
                     S.of(context)?.authOtherLoginMethods ??
                         'Other login methods',
@@ -354,16 +360,14 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       message: tooltip,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         child: Container(
           width: 56,
           height: 56,
           decoration: BoxDecoration(
             color: backgroundColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: context.dividerColor,
-            ),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            border: Border.all(color: context.dividerColor),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -375,7 +379,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           child: Center(
             child: isLoading
                 ? const SizedBox(
-                    width: 24,
+                    width: AppDimensions.spacingXL,
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
@@ -518,7 +522,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       // 先获取服务器支持的 SSO provider 列表
       debugLog('SSO: fetching providers from $_homeserver');
       final providers = await _authService.getSsoProviders(_homeserver);
-      debugLog('SSO: got ${providers.length} providers: ${providers.map((p) => "${p.id}/${p.name}").join(", ")}');
+      debugLog(
+        'SSO: got ${providers.length} providers: ${providers.map((p) => "${p.id}/${p.name}").join(", ")}',
+      );
 
       if (!mounted) return;
 
@@ -527,8 +533,15 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         // 只有一个 provider，直接使用带 provider ID 的端点
         final pid = providers.first.id;
         loginUrl = pid == 'sso'
-            ? _authService.getSsoLoginUrl(homeserver: _homeserver, redirectUrl: redirectUrl)
-            : _authService.getSsoProviderLoginUrl(homeserver: _homeserver, providerId: pid, redirectUrl: redirectUrl);
+            ? _authService.getSsoLoginUrl(
+                homeserver: _homeserver,
+                redirectUrl: redirectUrl,
+              )
+            : _authService.getSsoProviderLoginUrl(
+                homeserver: _homeserver,
+                providerId: pid,
+                redirectUrl: redirectUrl,
+              );
       } else if (providers.length > 1) {
         // 多个 provider，弹出选择框
         _setProviderLoading(sso: false);
@@ -539,10 +552,15 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           ),
           builder: (ctx) => ListView(
             shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppDimensions.spacing,
+            ),
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing,
+                  vertical: AppDimensions.spacingS,
+                ),
                 child: Text(
                   'Choose login method',
                   style: Theme.of(ctx).textTheme.titleMedium,
@@ -713,15 +731,17 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     try {
       // state 用于抗 CSRF（当前仅本地校验形态占位，后端换 token 不依赖它）。
       final state = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
-      final authorizeUrl = Uri.parse(authorizeBase).replace(
-        queryParameters: {
-          'client_id': clientId,
-          'redirect_uri': redirectUri,
-          'response_type': 'code',
-          'scope': scope,
-          'state': state,
-        },
-      ).toString();
+      final authorizeUrl = Uri.parse(authorizeBase)
+          .replace(
+            queryParameters: {
+              'client_id': clientId,
+              'redirect_uri': redirectUri,
+              'response_type': 'code',
+              'scope': scope,
+              'state': state,
+            },
+          )
+          .toString();
 
       if (!mounted) return;
       final result = await OAuthWebViewPage.open(
@@ -769,15 +789,17 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     _setProviderLoading(telegram: true);
     try {
       final redirectUri = config!.oauthRedirectUri;
-      final authorizeUrl = Uri.parse('https://oauth.telegram.org/auth').replace(
-        queryParameters: {
-          'bot_id': config.telegramBotId!,
-          'origin': redirectUri,
-          'return_to': redirectUri,
-          'request_access': 'write',
-          'embed': '0',
-        },
-      ).toString();
+      final authorizeUrl = Uri.parse('https://oauth.telegram.org/auth')
+          .replace(
+            queryParameters: {
+              'bot_id': config.telegramBotId!,
+              'origin': redirectUri,
+              'return_to': redirectUri,
+              'request_access': 'write',
+              'embed': '0',
+            },
+          )
+          .toString();
 
       if (!mounted) return;
       final result = await OAuthWebViewPage.open(
@@ -875,10 +897,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       // 签名下沉到 AuthBloc：待确定走 ID Hub 还是 legacy 路径后再让钱包签一次，
       // 避免两条路径各自签名造成双重签名弹窗。
       context.read<AuthBloc>().add(
-        AuthWalletAuthRequested(
-          homeserver: _homeserver,
-          address: address,
-        ),
+        AuthWalletAuthRequested(homeserver: _homeserver, address: address),
       );
     } catch (e) {
       if (mounted) {
@@ -907,7 +926,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       case SsoBrand.gitlab:
         return (Icons.merge_type, const Color(0xFFFC6D26));
       case SsoBrand.facebook:
-        return (Icons.facebook, const Color(0xFF1877F2));
+        return (Icons.facebook, const Color(0xFF1A73E8));
       case SsoBrand.twitter:
         return (Icons.alternate_email, context.textPrimary);
       case SsoBrand.discord:
@@ -968,7 +987,7 @@ class GoogleSignInButton extends StatelessWidget {
       onPressed: isLoading ? null : onPressed,
       icon: isLoading
           ? const SizedBox(
-              width: 20,
+              width: AppDimensions.spacingL,
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
@@ -981,7 +1000,7 @@ class GoogleSignInButton extends StatelessWidget {
         backgroundColor: Colors.white,
         minimumSize: const Size(double.infinity, 48),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           side: const BorderSide(color: Colors.grey),
         ),
       ),
@@ -1004,7 +1023,7 @@ class AppleSignInButton extends StatelessWidget {
       onPressed: isLoading ? null : onPressed,
       icon: isLoading
           ? const SizedBox(
-              width: 20,
+              width: AppDimensions.spacingL,
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
@@ -1016,7 +1035,9 @@ class AppleSignInButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: isDark ? Colors.white : Colors.black,
         minimumSize: const Size(double.infinity, 48),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        ),
       ),
     );
   }

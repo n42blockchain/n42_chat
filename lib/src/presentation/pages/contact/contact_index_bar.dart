@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 联系人字母索引条
 class ContactIndexBar extends StatefulWidget {
@@ -79,7 +80,7 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
                 height: 60,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -101,12 +102,14 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
           onVerticalDragEnd: _onVerticalDragEnd,
           child: Container(
             width: 20,
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppDimensions.spacingXS,
+            ),
             decoration: BoxDecoration(
               color: _isDragging
                   ? (isDark
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.black.withValues(alpha: 0.05))
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.05))
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
@@ -120,19 +123,23 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
                     child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isActive ? AppColors.primary : Colors.transparent,
+                        color: isActive
+                            ? AppColors.primary
+                            : Colors.transparent,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         letter,
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                          fontWeight: isActive
+                              ? FontWeight.bold
+                              : FontWeight.w500,
                           color: isActive
                               ? Colors.white
                               : (isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary),
+                                    ? AppColors.textSecondaryDark
+                                    : AppColors.textSecondary),
                         ),
                       ),
                     ),
@@ -146,4 +153,3 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
     );
   }
 }
-

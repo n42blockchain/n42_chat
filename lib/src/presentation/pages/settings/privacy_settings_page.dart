@@ -19,6 +19,7 @@ import '../../blocs/conversation/conversation_event.dart';
 import '../../helpers/privacy_security_summary_helper.dart';
 import '../../widgets/common/common_widgets.dart';
 import 'hidden_chats_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 隐私设置页面
 class PrivacySettingsPage extends StatefulWidget {
@@ -129,7 +130,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             absorbing: _isSaving,
             child: ListView(
               children: [
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 可见性设置
                 _buildSectionHeader(
@@ -176,7 +177,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 _buildSectionHeader('Privacy Hardening', isDark),
                 Container(
@@ -234,7 +235,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 _buildSectionHeader('Network Privacy', isDark),
                 Container(
@@ -315,7 +316,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 隐藏聊天入口
                 _buildSectionHeader(l10n?.commonChat ?? 'Chat', isDark),
@@ -334,7 +335,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
 
                 // 消息设置
                 _buildSectionHeader(
@@ -392,7 +393,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
                 // 移动端显示截图防护
                 if (Platform.isAndroid || Platform.isIOS) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   _buildSectionHeader(
                     l10n?.settingsSecurity ?? 'Security',
                     isDark,
@@ -422,7 +423,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   ),
                 ],
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
               ],
             ),
           ),
@@ -443,10 +444,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Text(
         title,
-        style: TextStyle(
-          fontSize: 13,
-          color: context.textSecondary,
-        ),
+        style: TextStyle(fontSize: 13, color: context.textSecondary),
       ),
     );
   }
@@ -454,10 +452,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
   Widget _buildDivider(bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(left: 56),
-      child: Divider(
-        height: 1,
-        color: context.dividerColor,
-      ),
+      child: Divider(height: 1, color: context.dividerColor),
     );
   }
 
@@ -471,7 +466,10 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     Color? iconColor,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing,
+        vertical: AppDimensions.spacingM,
+      ),
       child: Row(
         children: [
           Container(
@@ -483,7 +481,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             ),
             child: Icon(icon, color: Colors.white, size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,7 +532,10 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: AppDimensions.spacingM,
+        ),
         child: Row(
           children: [
             Container(
@@ -546,7 +547,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               ),
               child: Icon(icon, color: Colors.white, size: 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -579,17 +580,12 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               child: Text(
                 value,
                 textAlign: TextAlign.end,
-                style: TextStyle(
-                  color: context.textSecondary,
-                ),
+                style: TextStyle(color: context.textSecondary),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(width: 8),
-            Icon(
-              AppIcons.chevron,
-              color: context.textSecondary,
-            ),
+            const SizedBox(width: AppDimensions.spacingS),
+            Icon(AppIcons.chevron, color: context.textSecondary),
           ],
         ),
       ),
@@ -607,7 +603,10 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     return InkWell(
       onTap: () => _showVisibilityPicker(context, title, value, onChanged),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: AppDimensions.spacingM,
+        ),
         child: Row(
           children: [
             Container(
@@ -619,7 +618,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               ),
               child: Icon(icon, color: Colors.white, size: 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Text(
                 title,
@@ -642,11 +641,8 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(width: 8),
-            Icon(
-              AppIcons.chevron,
-              color: context.textTertiary,
-            ),
+            const SizedBox(width: AppDimensions.spacingS),
+            Icon(AppIcons.chevron, color: context.textTertiary),
           ],
         ),
       ),
@@ -675,7 +671,10 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: AppDimensions.spacingM,
+        ),
         child: Row(
           children: [
             Container(
@@ -687,7 +686,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               ),
               child: Icon(icon, color: Colors.white, size: 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Text(
                 title,
@@ -700,10 +699,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 ),
               ),
             ),
-            Icon(
-              AppIcons.chevron,
-              color: context.textSecondary,
-            ),
+            Icon(AppIcons.chevron, color: context.textSecondary),
           ],
         ),
       ),
@@ -922,7 +918,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 l10n?.settingsWhoCanSeeTitle(title) ?? 'Who can see $title',
                 style: TextStyle(

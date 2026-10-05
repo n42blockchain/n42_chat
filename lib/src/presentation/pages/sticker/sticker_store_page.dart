@@ -8,6 +8,7 @@ import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
 import 'ai_sticker_generate_page.dart';
 import 'custom_sticker_pack_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 贴纸商店页面
 class StickerStorePage extends StatefulWidget {
@@ -100,9 +101,9 @@ class _StickerStorePageState extends State<StickerStorePage>
     final pack = await _repository.createCustomPack(name: name);
     if (!mounted) return;
     if (pack == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to create pack')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to create pack')));
       return;
     }
     await _openCustomPack(pack.id);
@@ -146,7 +147,10 @@ class _StickerStorePageState extends State<StickerStorePage>
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove', style: TextStyle(color: AppColors.error)),
+            child: const Text(
+              'Remove',
+              style: TextStyle(color: AppColors.error),
+            ),
           ),
         ],
       ),
@@ -228,7 +232,7 @@ class _StickerStorePageState extends State<StickerStorePage>
       color: context.surfaceColor,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingS),
         itemCount: _categories.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) {
@@ -262,23 +266,28 @@ class _StickerStorePageState extends State<StickerStorePage>
     bool isDark,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacingXS,
+        vertical: 6,
+      ),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingM,
+          ),
           decoration: BoxDecoration(
             color: isSelected
                 ? AppColors.primary.withValues(alpha: 0.1)
                 : AppColors.inputBgOf(isDark),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             border: isSelected ? Border.all(color: AppColors.primary) : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(icon, style: const TextStyle(fontSize: 16)),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 label,
                 maxLines: 1,
@@ -286,9 +295,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: isSelected
-                      ? AppColors.primary
-                      : context.textPrimary,
+                  color: isSelected ? AppColors.primary : context.textPrimary,
                 ),
               ),
             ],
@@ -328,15 +335,12 @@ class _StickerStorePageState extends State<StickerStorePage>
               size: 64,
               color: AppColors.textTertiaryOf(isDark),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'No stickers found',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                height: 1.3,
-                color: context.textSecondary,
-              ),
+              style: TextStyle(height: 1.3, color: context.textSecondary),
             ),
           ],
         ),
@@ -344,7 +348,7 @@ class _StickerStorePageState extends State<StickerStorePage>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       itemCount: filteredPacks.length,
       itemBuilder: (context, index) {
         final pack = filteredPacks[index];
@@ -356,10 +360,10 @@ class _StickerStorePageState extends State<StickerStorePage>
 
   Widget _buildPackCard(StickerPack pack, bool isInstalled, bool isDark) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXS),
       color: context.surfaceColor,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppDimensions.spacingM),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -372,7 +376,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                   height: 48,
                   decoration: BoxDecoration(
                     color: AppColors.placeholderOf(isDark),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   child: Center(
                     child: pack.stickers.isNotEmpty
@@ -383,7 +387,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                         : const Icon(Icons.emoji_emotions),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacingM),
 
                 // 名称和描述
                 Expanded(
@@ -405,7 +409,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                             ),
                           ),
                           if (pack.isOfficial) ...[
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppDimensions.spacingXS),
                             const Icon(
                               Icons.verified,
                               size: 16,
@@ -461,7 +465,7 @@ class _StickerStorePageState extends State<StickerStorePage>
               ],
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
 
             // 贴纸预览
             SizedBox(
@@ -474,10 +478,14 @@ class _StickerStorePageState extends State<StickerStorePage>
                   return Container(
                     width: 48,
                     height: 48,
-                    margin: const EdgeInsets.only(right: 8),
+                    margin: const EdgeInsets.only(
+                      right: AppDimensions.spacingS,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.placeholderOf(isDark),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
                     ),
                     child: Center(
                       child: Text(
@@ -493,12 +501,8 @@ class _StickerStorePageState extends State<StickerStorePage>
             // 统计信息
             Row(
               children: [
-                Icon(
-                  Icons.download,
-                  size: 14,
-                  color: context.textSecondary,
-                ),
-                const SizedBox(width: 4),
+                Icon(Icons.download, size: 14, color: context.textSecondary),
+                const SizedBox(width: AppDimensions.spacingXS),
                 Text(
                   '${pack.downloadCount}',
                   maxLines: 1,
@@ -509,13 +513,13 @@ class _StickerStorePageState extends State<StickerStorePage>
                     color: context.textSecondary,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppDimensions.spacing),
                 Icon(
                   Icons.emoji_emotions_outlined,
                   size: 14,
                   color: context.textSecondary,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacingXS),
                 Text(
                   '${pack.stickerCount} stickers',
                   maxLines: 1,
@@ -545,7 +549,7 @@ class _StickerStorePageState extends State<StickerStorePage>
               size: 64,
               color: AppColors.textTertiaryOf(isDark),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'No stickers installed',
               maxLines: 1,
@@ -556,7 +560,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               'Get stickers from the store',
               maxLines: 1,
@@ -567,7 +571,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                 color: AppColors.textTertiaryOf(isDark),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             ElevatedButton.icon(
               onPressed: () => _tabController.animateTo(0),
               icon: const Icon(Icons.store),
@@ -583,7 +587,7 @@ class _StickerStorePageState extends State<StickerStorePage>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       itemCount: _installedPacks.length,
       itemBuilder: (context, index) {
         final pack = _installedPacks[index];

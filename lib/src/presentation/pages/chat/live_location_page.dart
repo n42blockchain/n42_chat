@@ -12,27 +12,23 @@ import '../../blocs/live_location/live_location_bloc.dart';
 import '../../blocs/live_location/live_location_event.dart';
 import '../../blocs/live_location/live_location_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 实时位置共享页面
 class LiveLocationPage extends StatelessWidget {
   final String roomId;
 
-  const LiveLocationPage({
-    super.key,
-    required this.roomId,
-  });
+  const LiveLocationPage({super.key, required this.roomId});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<LiveLocationBloc>(
-      create: (_) => GetIt.instance<LiveLocationBloc>()
-        ..add(ObserveLiveLocationRoom(roomId: roomId)),
+      create: (_) =>
+          GetIt.instance<LiveLocationBloc>()
+            ..add(ObserveLiveLocationRoom(roomId: roomId)),
       child: BlocBuilder<LiveLocationBloc, LiveLocationState>(
         builder: (context, state) {
-          return _LiveLocationView(
-            roomId: roomId,
-            state: state,
-          );
+          return _LiveLocationView(roomId: roomId, state: state);
         },
       ),
     );
@@ -43,10 +39,7 @@ class _LiveLocationView extends StatefulWidget {
   final String roomId;
   final LiveLocationState state;
 
-  const _LiveLocationView({
-    required this.roomId,
-    required this.state,
-  });
+  const _LiveLocationView({required this.roomId, required this.state});
 
   @override
   State<_LiveLocationView> createState() => _LiveLocationViewState();
@@ -158,8 +151,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded,
-              color: context.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: context.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -178,8 +170,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.n42.wallet',
                 ),
-                if (markers.isNotEmpty)
-                  MarkerLayer(markers: markers),
+                if (markers.isNotEmpty) MarkerLayer(markers: markers),
               ],
             ),
           ),
@@ -215,45 +206,53 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
 
             // 开始/停止共享按钮
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: widget.state.isSharing
                   ? SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          context
-                              .read<LiveLocationBloc>()
-                              .add(StopLiveLocation(roomId: widget.roomId));
+                          context.read<LiveLocationBloc>().add(
+                            StopLiveLocation(roomId: widget.roomId),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.error,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppDimensions.spacingM,
+                          ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusM,
+                            ),
                           ),
                         ),
                         child: Text(
-                            S.of(context)?.stopLiveLocation ??
-                                'Stop Sharing'),
+                          S.of(context)?.stopLiveLocation ?? 'Stop Sharing',
+                        ),
                       ),
                     )
                   : SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () =>
-                            _showDurationPicker(context),
+                        onPressed: () => _showDurationPicker(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppDimensions.spacingM,
+                          ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusM,
+                            ),
                           ),
                         ),
                         child: Text(
-                            S.of(context)?.startLiveLocation ??
-                                'Share My Location'),
+                          S.of(context)?.startLiveLocation ??
+                              'Share My Location',
+                        ),
                       ),
                     ),
             ),
@@ -280,10 +279,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
       ),
       subtitle: Text(
         _formatRemaining(context, location),
-        style: TextStyle(
-          color: context.textSecondary,
-          fontSize: 12,
-        ),
+        style: TextStyle(color: context.textSecondary, fontSize: 12),
       ),
       trailing: const Icon(
         Icons.my_location,
@@ -311,7 +307,8 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
       case 'minutes':
         return l10n?.minutesRemaining(data.values[0]) ?? '${data.values[0]}min';
       case 'hoursMinutes':
-        return l10n?.hoursMinutesRemaining(data.values[0], data.values[1]) ?? '${data.values[0]}h ${data.values[1]}min';
+        return l10n?.hoursMinutesRemaining(data.values[0], data.values[1]) ??
+            '${data.values[0]}h ${data.values[1]}min';
       default:
         return '';
     }
@@ -325,7 +322,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 S.of(context)?.selectDuration ?? 'Select Duration',
                 style: const TextStyle(
@@ -339,8 +336,8 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
-                      StartLiveLocation(roomId: widget.roomId, durationMinutes: 15),
-                    );
+                  StartLiveLocation(roomId: widget.roomId, durationMinutes: 15),
+                );
               },
             ),
             ListTile(
@@ -348,8 +345,8 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
-                      StartLiveLocation(roomId: widget.roomId, durationMinutes: 30),
-                    );
+                  StartLiveLocation(roomId: widget.roomId, durationMinutes: 30),
+                );
               },
             ),
             ListTile(
@@ -357,8 +354,8 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
-                      StartLiveLocation(roomId: widget.roomId, durationMinutes: 60),
-                    );
+                  StartLiveLocation(roomId: widget.roomId, durationMinutes: 60),
+                );
               },
             ),
             ListTile(
@@ -366,8 +363,11 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.read<LiveLocationBloc>().add(
-                      StartLiveLocation(roomId: widget.roomId, durationMinutes: 480),
-                    );
+                  StartLiveLocation(
+                    roomId: widget.roomId,
+                    durationMinutes: 480,
+                  ),
+                );
               },
             ),
           ],

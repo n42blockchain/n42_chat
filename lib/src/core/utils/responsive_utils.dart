@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_dimensions.dart';
 
 /// 响应式布局工具类
 ///
@@ -119,12 +120,7 @@ class ResponsiveUtils {
 }
 
 /// 屏幕尺寸枚举
-enum ScreenSize {
-  mobile,
-  tablet,
-  desktop,
-  largeDesktop,
-}
+enum ScreenSize { mobile, tablet, desktop, largeDesktop }
 
 /// 响应式构建器
 ///
@@ -179,16 +175,15 @@ class ResponsiveContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveMaxWidth = maxWidth ?? ResponsiveUtils.getContentMaxWidth(context);
-    final effectivePadding = padding ?? EdgeInsets.all(ResponsiveUtils.getAdaptivePadding(context));
+    final effectiveMaxWidth =
+        maxWidth ?? ResponsiveUtils.getContentMaxWidth(context);
+    final effectivePadding =
+        padding ?? EdgeInsets.all(ResponsiveUtils.getAdaptivePadding(context));
 
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: effectiveMaxWidth),
-        child: Padding(
-          padding: effectivePadding,
-          child: child,
-        ),
+        child: Padding(padding: effectivePadding, child: child),
       ),
     );
   }
@@ -230,19 +225,14 @@ class SplitView extends StatelessWidget {
     }
 
     // 桌面/平板上显示分屏
-    final leftWidth = leftPanelWidth ?? ResponsiveUtils.getChatListWidth(context);
+    final leftWidth =
+        leftPanelWidth ?? ResponsiveUtils.getChatListWidth(context);
 
     return Row(
       children: [
-        SizedBox(
-          width: leftWidth,
-          child: leftPanel,
-        ),
-        if (showDivider)
-          const VerticalDivider(width: 1),
-        Expanded(
-          child: rightPanel ?? emptyState ?? const _EmptyRightPanel(),
-        ),
+        SizedBox(width: leftWidth, child: leftPanel),
+        if (showDivider) const VerticalDivider(width: 1),
+        Expanded(child: rightPanel ?? emptyState ?? const _EmptyRightPanel()),
       ],
     );
   }
@@ -258,17 +248,17 @@ class _EmptyRightPanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            IconData(0xe0b7, fontFamily: 'MaterialIcons'), // chat_bubble_outline
+            IconData(
+              0xe0b7,
+              fontFamily: 'MaterialIcons',
+            ), // chat_bubble_outline
             size: 64,
             color: Color(0xFFBDBDBD),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing),
           Text(
             'Select a conversation',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF9E9E9E),
-            ),
+            style: TextStyle(fontSize: 16, color: Color(0xFF999999)),
           ),
         ],
       ),

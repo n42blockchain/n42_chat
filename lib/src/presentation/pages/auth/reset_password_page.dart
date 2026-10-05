@@ -23,10 +23,7 @@ import '../../helpers/bloc_message_helper.dart';
 class ResetPasswordPage extends StatefulWidget {
   final String homeserver;
 
-  const ResetPasswordPage({
-    super.key,
-    required this.homeserver,
-  });
+  const ResetPasswordPage({super.key, required this.homeserver});
 
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();
@@ -75,7 +72,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (_emailController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.commonEnterEmailAddress ?? 'Please enter email address'),
+          content: Text(
+            S.of(context)?.commonEnterEmailAddress ??
+                'Please enter email address',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -85,24 +85,32 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (!_emailRegex.hasMatch(_emailController.text.trim())) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.commonInvalidEmailFormat ?? 'Please enter a valid email address'),
+          content: Text(
+            S.of(context)?.commonInvalidEmailFormat ??
+                'Please enter a valid email address',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
       return;
     }
 
-    context.read<AuthBloc>().add(AuthRequestPasswordResetRequested(
-          homeserver: widget.homeserver,
-          email: _emailController.text.trim(),
-        ));
+    context.read<AuthBloc>().add(
+      AuthRequestPasswordResetRequested(
+        homeserver: widget.homeserver,
+        email: _emailController.text.trim(),
+      ),
+    );
   }
 
   void _verifyCode() {
     if (_codeController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(S.of(context)?.commonEnterVerificationCode ?? 'Please enter verification code'),
+          content: Text(
+            S.of(context)?.commonEnterVerificationCode ??
+                'Please enter verification code',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
@@ -116,12 +124,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   void _resetPassword() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthBloc>().add(AuthConfirmPasswordResetRequested(
-            homeserver: widget.homeserver,
-            email: _emailController.text.trim(),
-            code: _codeController.text.trim(),
-            newPassword: _passwordController.text,
-          ));
+      context.read<AuthBloc>().add(
+        AuthConfirmPasswordResetRequested(
+          homeserver: widget.homeserver,
+          email: _emailController.text.trim(),
+          code: _codeController.text.trim(),
+          newPassword: _passwordController.text,
+        ),
+      );
     }
   }
 
@@ -171,16 +181,22 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             _startResendCountdown();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.authResetCodeSent(_emailController.text.trim()) ??
-                    'Reset code sent to ${_emailController.text.trim()}'),
+                content: Text(
+                  S
+                          .of(context)
+                          ?.authResetCodeSent(_emailController.text.trim()) ??
+                      'Reset code sent to ${_emailController.text.trim()}',
+                ),
                 backgroundColor: AppColors.success,
               ),
             );
           } else if (state.passwordResetStatus == PasswordResetStatus.success) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(S.of(context)?.authPasswordResetSuccess ??
-                    'Password reset successful. Please login with your new password.'),
+                content: Text(
+                  S.of(context)?.authPasswordResetSuccess ??
+                      'Password reset successful. Please login with your new password.',
+                ),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -189,26 +205,32 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           } else if (state.passwordResetStatus == PasswordResetStatus.failed) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage != null
-                    ? resolveBlocMessage(context, state.errorMessage!)
-                    : (S.of(context)?.authResetPasswordFailed ?? 'Reset password failed')),
+                content: Text(
+                  state.errorMessage != null
+                      ? resolveBlocMessage(context, state.errorMessage!)
+                      : (S.of(context)?.authResetPasswordFailed ??
+                            'Reset password failed'),
+                ),
                 backgroundColor: AppColors.error,
               ),
             );
           }
         },
         builder: (context, state) {
-          final isLoading = state.passwordResetStatus == PasswordResetStatus.sendingCode ||
+          final isLoading =
+              state.passwordResetStatus == PasswordResetStatus.sendingCode ||
               state.passwordResetStatus == PasswordResetStatus.resetting;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingXL,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXXL),
 
                   // 步骤指示器
                   _buildStepIndicator(isDark),
@@ -217,10 +239,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
                   // 根据步骤显示不同内容
                   if (_currentStep == 0) _buildEmailStep(isDark, isLoading),
-                  if (_currentStep == 1) _buildCodeStep(isDark, isLoading, state),
+                  if (_currentStep == 1)
+                    _buildCodeStep(isDark, isLoading, state),
                   if (_currentStep == 2) _buildPasswordStep(isDark, isLoading),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXXL),
                 ],
               ),
             ),
@@ -286,54 +309,45 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.of(context)?.authEnterRegisteredEmail ?? 'Enter the email address you registered with',
+          S.of(context)?.authEnterRegisteredEmail ??
+              'Enter the email address you registered with',
           textAlign: TextAlign.center,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 16,
-            height: 1.4,
-            color: textColor,
-          ),
+          style: TextStyle(fontSize: 16, height: 1.4, color: textColor),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.authEmailAddress ?? 'Email Address',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 14,
-            height: 1.3,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _emailController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
-            hintText: S.of(context)?.commonEnterEmailAddress ?? 'Enter email address',
+            hintText:
+                S.of(context)?.commonEnterEmailAddress ?? 'Enter email address',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.email_outlined,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.email_outlined, color: hintColor),
           ),
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _sendVerificationCode(),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         SizedBox(
           height: 48,
           child: ElevatedButton(
@@ -342,13 +356,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               backgroundColor: AppColors.primary,
               disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               elevation: 0,
             ),
             child: isLoading
                 ? const SizedBox(
-                    width: 20,
+                    width: AppDimensions.spacingL,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
@@ -387,39 +401,32 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           textAlign: TextAlign.center,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 16,
-            height: 1.4,
-            color: textColor,
-          ),
+          style: TextStyle(fontSize: 16, height: 1.4, color: textColor),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.authEnterResetCode ?? 'Enter reset code',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 14,
-            height: 1.3,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _codeController,
           style: TextStyle(color: textColor, fontSize: 24, letterSpacing: 8),
           textAlign: TextAlign.center,
           decoration: InputDecoration(
-            hintText: S.of(context)?.authVerificationCodePlaceholder ?? '------',
+            hintText:
+                S.of(context)?.authVerificationCodePlaceholder ?? '------',
             hintStyle: TextStyle(color: hintColor, letterSpacing: 8),
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
           ),
@@ -428,7 +435,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _verifyCode(),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         // 重新发送按钮
         Center(
           child: TextButton(
@@ -439,8 +446,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   },
             child: Text(
               _resendCountdown > 0
-                  ? S.of(context)?.authCanResendAfter(_resendCountdown) ?? 'Can resend after $_resendCountdown seconds'
-                  : S.of(context)?.authResendVerificationCode ?? 'Resend verification code',
+                  ? S.of(context)?.authCanResendAfter(_resendCountdown) ??
+                        'Can resend after $_resendCountdown seconds'
+                  : S.of(context)?.authResendVerificationCode ??
+                        'Resend verification code',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -450,7 +459,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         SizedBox(
           height: 48,
           child: ElevatedButton(
@@ -458,7 +467,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               elevation: 0,
             ),
@@ -493,24 +502,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 16,
-            height: 1.3,
-            color: textColor,
-          ),
+          style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         Text(
           S.of(context)?.commonNewPassword ?? 'New Password',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 14,
-            height: 1.3,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _passwordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
@@ -520,17 +521,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -547,49 +545,47 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           textInputAction: TextInputAction.next,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.authEnterPassword ?? 'Please enter password';
+              return S.of(context)?.authEnterPassword ??
+                  'Please enter password';
             }
             if (value.length < 8) {
-              return S.of(context)?.commonPasswordMinLength ?? 'Password must be at least 8 characters';
+              return S.of(context)?.commonPasswordMinLength ??
+                  'Password must be at least 8 characters';
             }
             return null;
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppDimensions.spacing),
         Text(
           S.of(context)?.commonConfirmNewPassword ?? 'Confirm New Password',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 14,
-            height: 1.3,
-            color: labelColor,
-          ),
+          style: TextStyle(fontSize: 14, height: 1.3, color: labelColor),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppDimensions.spacingS),
         TextFormField(
           controller: _confirmPasswordController,
           style: TextStyle(color: textColor, fontSize: 16, height: 1.3),
           decoration: InputDecoration(
-            hintText: S.of(context)?.commonReenterPassword ?? 'Re-enter password',
+            hintText:
+                S.of(context)?.commonReenterPassword ?? 'Re-enter password',
             hintStyle: TextStyle(color: hintColor),
             filled: true,
             fillColor: inputBgColor,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
+              horizontal: AppDimensions.spacing,
               vertical: 14,
             ),
-            prefixIcon: Icon(
-              Icons.lock_outline,
-              color: hintColor,
-            ),
+            prefixIcon: Icon(Icons.lock_outline, color: hintColor),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                _obscureConfirmPassword
+                    ? Icons.visibility_off
+                    : Icons.visibility,
                 color: hintColor,
               ),
               onPressed: () {
@@ -604,15 +600,17 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           onFieldSubmitted: (_) => _resetPassword(),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return S.of(context)?.commonReenterPassword ?? 'Please re-enter password';
+              return S.of(context)?.commonReenterPassword ??
+                  'Please re-enter password';
             }
             if (value != _passwordController.text) {
-              return S.of(context)?.commonPasswordsDoNotMatch ?? 'Passwords do not match';
+              return S.of(context)?.commonPasswordsDoNotMatch ??
+                  'Passwords do not match';
             }
             return null;
           },
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppDimensions.spacingXL),
         SizedBox(
           height: 48,
           child: ElevatedButton(
@@ -621,13 +619,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               backgroundColor: AppColors.primary,
               disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               elevation: 0,
             ),
             child: isLoading
                 ? const SizedBox(
-                    width: 20,
+                    width: AppDimensions.spacingL,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,

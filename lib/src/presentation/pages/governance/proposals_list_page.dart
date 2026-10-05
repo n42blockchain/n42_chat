@@ -9,6 +9,7 @@ import '../../blocs/governance/governance_event.dart';
 import '../../blocs/governance/governance_state.dart';
 import 'create_proposal_page.dart';
 import 'proposal_detail_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Page displaying a list of governance proposals for a Snapshot space.
 ///
@@ -21,10 +22,7 @@ import 'proposal_detail_page.dart';
 class ProposalsListPage extends StatefulWidget {
   final String spaceId;
 
-  const ProposalsListPage({
-    super.key,
-    required this.spaceId,
-  });
+  const ProposalsListPage({super.key, required this.spaceId});
 
   @override
   State<ProposalsListPage> createState() => _ProposalsListPageState();
@@ -51,18 +49,18 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
 
   void _loadProposals() {
     context.read<GovernanceBloc>().add(
-          GovernanceLoadProposals(
-            spaceId: widget.spaceId,
-            filterState: _selectedFilter,
-          ),
-        );
+      GovernanceLoadProposals(
+        spaceId: widget.spaceId,
+        filterState: _selectedFilter,
+      ),
+    );
   }
 
   void _onScroll() {
     if (_isNearBottom) {
       context.read<GovernanceBloc>().add(
-            GovernanceLoadMoreProposals(spaceId: widget.spaceId),
-          );
+        GovernanceLoadMoreProposals(spaceId: widget.spaceId),
+      );
     }
   }
 
@@ -115,18 +113,19 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
                   child: ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                      horizontal: AppDimensions.spacing,
+                      vertical: AppDimensions.spacingS,
                     ),
-                    itemCount: state.proposals.length +
+                    itemCount:
+                        state.proposals.length +
                         (state.isLoadingMoreProposals ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index >= state.proposals.length) {
                         return const Padding(
-                          padding: EdgeInsets.all(16),
+                          padding: EdgeInsets.all(AppDimensions.spacing),
                           child: Center(
                             child: SizedBox(
-                              width: 24,
+                              width: AppDimensions.spacingXL,
                               height: 24,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
@@ -156,7 +155,10 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
 
   Widget _buildFilterChips(bool isDark) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing,
+        vertical: AppDimensions.spacingS,
+      ),
       color: context.surfaceColor,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -168,21 +170,21 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
               onTap: () => _onFilterChanged(null),
               isDark: isDark,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             _FilterChip(
               label: 'Active',
               isSelected: _selectedFilter == ProposalState.active,
               onTap: () => _onFilterChanged(ProposalState.active),
               isDark: isDark,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             _FilterChip(
               label: 'Pending',
               isSelected: _selectedFilter == ProposalState.pending,
               onTap: () => _onFilterChanged(ProposalState.pending),
               isDark: isDark,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             _FilterChip(
               label: 'Closed',
               isSelected: _selectedFilter == ProposalState.closed,
@@ -205,7 +207,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
             size: 64,
             color: context.textTertiary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Text(
             'No proposals found',
             maxLines: 1,
@@ -216,7 +218,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
               color: context.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             _selectedFilter != null
                 ? 'Try changing the filter'
@@ -238,16 +240,12 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
   Widget _buildErrorState(String? errorMessage) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppColors.error,
-            ),
-            const SizedBox(height: 16),
+            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'Failed to load proposals',
               maxLines: 1,
@@ -260,7 +258,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
               ),
             ),
             if (errorMessage != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
@@ -273,7 +271,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
                 ),
               ),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXL),
             OutlinedButton(
               onPressed: _loadProposals,
               child: const Text('Retry'),
@@ -337,12 +335,15 @@ class _FilterChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: 6,
+        ),
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary
               : AppColors.dividerThinOf(isDark),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         ),
         child: Text(
           label,
@@ -352,9 +353,7 @@ class _FilterChip extends StatelessWidget {
             fontSize: 13,
             height: 1.3,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-            color: isSelected
-                ? Colors.white
-                : context.textSecondary,
+            color: isSelected ? Colors.white : context.textSecondary,
           ),
         ),
       ),
@@ -378,11 +377,11 @@ class _ProposalCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           boxShadow: isDark
               ? null
               : [
@@ -426,7 +425,7 @@ class _ProposalCard extends StatelessWidget {
                 color: context.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             // Author
             Row(
               children: [
@@ -435,7 +434,7 @@ class _ProposalCard extends StatelessWidget {
                   size: 14,
                   color: context.textTertiary,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacingXS),
                 Flexible(
                   child: Text(
                     _shortenAddress(proposal.author),
@@ -454,7 +453,7 @@ class _ProposalCard extends StatelessWidget {
                   size: 14,
                   color: context.textTertiary,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppDimensions.spacingXS),
                 Text(
                   '${proposal.votesCount} votes',
                   maxLines: 1,
@@ -493,10 +492,13 @@ class _ProposalCard extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacingS,
+        vertical: 3,
+      ),
       decoration: BoxDecoration(
         color: badgeColor.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       ),
       child: Text(
         label,

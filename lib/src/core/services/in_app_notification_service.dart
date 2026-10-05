@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../extensions/context_extension.dart';
+import '../theme/app_dimensions.dart';
 
 /// 应用内通知数据
 class InAppNotification {
@@ -23,7 +24,8 @@ class InAppNotification {
 ///
 /// 使用 OverlayEntry 在顶部显示 3 秒通知横幅
 class InAppNotificationService {
-  static final InAppNotificationService _instance = InAppNotificationService._();
+  static final InAppNotificationService _instance =
+      InAppNotificationService._();
   static InAppNotificationService get instance => _instance;
 
   InAppNotificationService._();
@@ -63,10 +65,8 @@ class InAppNotificationService {
     final overlay = Overlay.of(context);
 
     _currentEntry = OverlayEntry(
-      builder: (context) => _NotificationBanner(
-        notification: notification,
-        onDismiss: dismiss,
-      ),
+      builder: (context) =>
+          _NotificationBanner(notification: notification, onDismiss: dismiss),
     );
 
     overlay.insert(_currentEntry!);
@@ -114,10 +114,7 @@ class _NotificationBannerState extends State<_NotificationBanner>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, -1),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _controller.forward();
   }
 
@@ -148,12 +145,12 @@ class _NotificationBannerState extends State<_NotificationBanner>
           },
           child: Material(
             elevation: 8,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Row(
                 children: [
@@ -163,11 +160,13 @@ class _NotificationBannerState extends State<_NotificationBanner>
                     height: 40,
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
                     ),
                     child: Icon(Icons.person, color: context.textTertiary),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppDimensions.spacingM),
                   // 内容
                   Expanded(
                     child: Column(

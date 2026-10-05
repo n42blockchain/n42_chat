@@ -9,6 +9,7 @@ import '../../blocs/chat_folder/chat_folder_bloc.dart';
 import '../../blocs/chat_folder/chat_folder_event.dart';
 import '../../blocs/chat_folder/chat_folder_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 聊天文件夹管理页面
 ///
@@ -41,11 +42,10 @@ class ChatFolderManagementPage extends StatelessWidget {
                 l10n?.chatFolderSystem ?? 'System Folders',
               ),
               ...state.systemFolders.map(
-                (folder) =>
-                    _buildFolderTile(context, folder, isSystem: true),
+                (folder) => _buildFolderTile(context, folder, isSystem: true),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
 
               // 自定义文件夹
               _buildSectionHeader(
@@ -54,7 +54,7 @@ class ChatFolderManagementPage extends StatelessWidget {
               ),
               if (state.customFolders.isEmpty)
                 Padding(
-                  padding: const EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(AppDimensions.spacingXXL),
                   child: Center(
                     child: Column(
                       children: [
@@ -63,12 +63,10 @@ class ChatFolderManagementPage extends StatelessWidget {
                           size: 48,
                           color: context.dividerColor,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacingS),
                         Text(
                           l10n?.chatFolderEmpty ?? 'No custom folders yet',
-                          style: TextStyle(
-                            color: context.textTertiary,
-                          ),
+                          style: TextStyle(color: context.textTertiary),
                         ),
                       ],
                     ),
@@ -76,11 +74,8 @@ class ChatFolderManagementPage extends StatelessWidget {
                 )
               else
                 ...state.customFolders.map(
-                  (folder) => _buildFolderTile(
-                    context,
-                    folder,
-                    isSystem: false,
-                  ),
+                  (folder) =>
+                      _buildFolderTile(context, folder, isSystem: false),
                 ),
             ],
           );
@@ -109,7 +104,10 @@ class ChatFolderManagementPage extends StatelessWidget {
     required bool isSystem,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacing,
+        vertical: 2,
+      ),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(10),
@@ -198,7 +196,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                 ),
                 autofocus: true,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               // 图标选择
               Wrap(
                 spacing: 8,
@@ -213,7 +211,9 @@ class ChatFolderManagementPage extends StatelessWidget {
                             color: icon == selectedIcon
                                 ? AppColors.primary.withValues(alpha: 0.1)
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusM,
+                            ),
                             border: icon == selectedIcon
                                 ? Border.all(color: AppColors.primary)
                                 : null,

@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 恢复密钥展示对话框
 ///
@@ -15,10 +16,7 @@ import '../../../core/theme/app_colors.dart';
 class RecoveryKeyDisplayDialog extends StatelessWidget {
   final String recoveryKey;
 
-  const RecoveryKeyDisplayDialog({
-    super.key,
-    required this.recoveryKey,
-  });
+  const RecoveryKeyDisplayDialog({super.key, required this.recoveryKey});
 
   /// 展示恢复密钥对话框
   static Future<void> show(BuildContext context, String recoveryKey) {
@@ -38,13 +36,8 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
       title: const Row(
         children: [
           Icon(Icons.key, color: AppColors.primary),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Recovery Key',
-              style: TextStyle(fontSize: 18),
-            ),
-          ),
+          SizedBox(width: AppDimensions.spacingS),
+          Expanded(child: Text('Recovery Key', style: TextStyle(fontSize: 18))),
         ],
       ),
       content: SingleChildScrollView(
@@ -54,18 +47,23 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
           children: [
             // 安全警告横幅
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
                 color: AppColors.warning.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.warning_amber_rounded,
-                      color: AppColors.warning, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: AppColors.warning,
+                    size: 20,
+                  ),
+                  const SizedBox(width: AppDimensions.spacingS),
                   Expanded(
                     child: Text(
                       'Store this key safely. It is the only way to recover your encrypted messages if you lose access to all devices.',
@@ -79,17 +77,15 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             // 恢复密钥展示区
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               decoration: BoxDecoration(
                 color: AppColors.inputBgOf(isDark),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: context.dividerColor,
-                ),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                border: Border.all(color: context.dividerColor),
               ),
               child: SelectableText(
                 recoveryKey,
@@ -102,7 +98,7 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             // 操作按钮
             Row(
@@ -118,7 +114,7 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacingM),
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => _saveToFile(context),

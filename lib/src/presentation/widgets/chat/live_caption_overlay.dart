@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/services/live_caption_service.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 实时字幕浮层
 ///
@@ -24,11 +25,15 @@ class LiveCaptionOverlay extends StatelessWidget {
       valueListenable: service.captions,
       builder: (ctx, caps, _) {
         if (caps.isEmpty) return const SizedBox.shrink();
-        final recent =
-            caps.length > maxLines ? caps.sublist(caps.length - maxLines) : caps;
+        final recent = caps.length > maxLines
+            ? caps.sublist(caps.length - maxLines)
+            : caps;
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingM,
+            vertical: AppDimensions.spacingS,
+          ),
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(10),
@@ -37,17 +42,19 @@ class LiveCaptionOverlay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: recent
-                .map((c) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 1),
-                      child: Text(
-                        c.speaker == null ? c.text : '${c.speaker}: ${c.text}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          height: 1.3,
-                        ),
+                .map(
+                  (c) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 1),
+                    child: Text(
+                      c.speaker == null ? c.text : '${c.speaker}: ${c.text}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        height: 1.3,
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         );

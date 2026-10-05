@@ -10,6 +10,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/chat/whiteboard/whiteboard_controller.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 白板 / 涂鸦页（仿微信「涂鸦」、对标 iMessage Digital Touch / Apple Freeform）。
 ///
@@ -138,14 +139,14 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
   }
 
   static const List<Color> _palette = [
-    Color(0xFF222222),
-    Color(0xFFE53935),
-    Color(0xFFFB8C00),
+    Color(0xFF181818),
+    Color(0xFFE64340),
+    Color(0xFFFF8C00),
     Color(0xFFFDD835),
     Color(0xFF43A047),
     Color(0xFF1E88E5),
     Color(0xFF8E24AA),
-    Color(0xFFFFFFFF),
+    Color(0xFFF7F7F7),
   ];
 
   @override
@@ -221,7 +222,7 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
             child: RepaintBoundary(
               key: _canvasKey,
               child: Container(
-                color: const Color(0xFF1A1A1A),
+                color: const Color(0xFF181818),
                 child: GestureDetector(
                   onPanStart: (d) => _controller.startStroke(d.localPosition),
                   onPanUpdate: (d) => _controller.addPoint(d.localPosition),
@@ -249,7 +250,10 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
   Widget _buildToolbar() {
     return Container(
       color: Colors.black,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacingM,
+        vertical: 10,
+      ),
       child: SafeArea(
         top: false,
         child: Row(
@@ -270,7 +274,7 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
                 onPressed: _clearBoard,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppDimensions.spacingXS),
             Expanded(
               child: AnimatedBuilder(
                 animation: _controller,

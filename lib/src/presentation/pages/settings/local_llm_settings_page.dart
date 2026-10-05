@@ -4,6 +4,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/local_llm_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 端侧 AI 设置页（设备能力 / 模型下载 / 启用开关）
 class LocalLlmSettingsPage extends StatefulWidget {
@@ -45,28 +46,31 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
         builder: (ctx, state, _) {
           final available = state != LocalLlmState.unavailable;
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             children: [
               Card(
                 color: context.surfaceColor,
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacing),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.memory,
-                              color: available
-                                  ? AppColors.success
-                                  : context.textTertiary),
+                          Icon(
+                            Icons.memory,
+                            color: available
+                                ? AppColors.success
+                                : context.textTertiary,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               _statusLabel(state),
                               style: TextStyle(
-                                  color: context.textPrimary,
-                                  fontWeight: FontWeight.w600),
+                                color: context.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -77,13 +81,15 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
                         'translate, replies) run fully on-device — data never '
                         'leaves your phone. Otherwise they use the cloud provider.',
                         style: TextStyle(
-                            color: context.textSecondary, fontSize: 12.5),
+                          color: context.textSecondary,
+                          fontSize: 12.5,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.spacingM),
               SwitchListTile(
                 title: const Text('Use on-device AI'),
                 subtitle: const Text('Prefer local inference when ready'),
@@ -95,10 +101,14 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
               ),
               if (state == LocalLlmState.notDownloaded)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacing,
+                    vertical: AppDimensions.spacingS,
+                  ),
                   child: FilledButton.icon(
-                    style:
-                        FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
                     onPressed: () => _service.download(),
                     icon: const Icon(Icons.download),
                     label: const Text('Download model'),
@@ -106,18 +116,17 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
                 ),
               if (state == LocalLlmState.downloading)
                 const Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(AppDimensions.spacing),
                   child: Center(child: CircularProgressIndicator()),
                 ),
               if (!available)
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacing),
                   child: Text(
                     'On-device inference requires the native runtime '
                     '(Android MediaPipe / iOS Core ML). It will activate '
                     'automatically once the platform handler is available.',
-                    style:
-                        TextStyle(color: context.textTertiary, fontSize: 12),
+                    style: TextStyle(color: context.textTertiary, fontSize: 12),
                   ),
                 ),
             ],

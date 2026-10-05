@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// AI 消息改写建议栏
 ///
@@ -50,9 +51,7 @@ class AiRewriteBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceOf(isDark),
         border: Border(
-          top: BorderSide(
-            color: AppColors.primary.withValues(alpha: 0.3),
-          ),
+          top: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
         ),
       ),
       child: Column(
@@ -64,7 +63,11 @@ class AiRewriteBar extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 8, 8, 4),
             child: Row(
               children: [
-                const Icon(Icons.auto_fix_high, size: 16, color: AppColors.primary),
+                const Icon(
+                  Icons.auto_fix_high,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -96,12 +99,15 @@ class AiRewriteBar extends StatelessWidget {
           // 语气选项
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingM,
+              vertical: AppDimensions.spacingXS,
+            ),
             child: Row(
               children: AiTone.values.map((tone) {
                 final isSelected = selectedTone == tone;
                 return Padding(
-                  padding: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.only(right: AppDimensions.spacingS),
                   child: _ToneChip(
                     tone: tone,
                     isSelected: isSelected,
@@ -126,7 +132,7 @@ class AiRewriteBar extends StatelessWidget {
                       color: AppColors.primary,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   Text(
                     l10n?.aiRewriteLoading ?? 'Rewriting...',
                     style: TextStyle(
@@ -139,11 +145,13 @@ class AiRewriteBar extends StatelessWidget {
             )
           else if (rewrittenText != null) ...[
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 12),
+              margin: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingM,
+              ),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: isDark ? 0.1 : 0.05),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Text(
                 rewrittenText!,
@@ -166,23 +174,27 @@ class AiRewriteBar extends StatelessWidget {
                     onPressed: onDismiss,
                     child: Text(
                       l10n?.aiRewriteCancel ?? 'Cancel',
-                      style: TextStyle(
-                        color: AppColors.textTertiaryOf(isDark),
-                      ),
+                      style: TextStyle(color: AppColors.textTertiaryOf(isDark)),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.spacingS),
                   ElevatedButton(
                     onPressed: () => onAccept?.call(rewrittenText!),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.spacingL,
+                        vertical: AppDimensions.spacingS,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: Text(l10n?.aiRewriteAccept ?? 'Use this', style: const TextStyle(fontSize: 13)),
+                    child: Text(
+                      l10n?.aiRewriteAccept ?? 'Use this',
+                      style: const TextStyle(fontSize: 13),
+                    ),
                   ),
                 ],
               ),
@@ -199,17 +211,14 @@ class _ToneChip extends StatelessWidget {
   final bool isSelected;
   final VoidCallback? onTap;
 
-  const _ToneChip({
-    required this.tone,
-    required this.isSelected,
-    this.onTap,
-  });
+  const _ToneChip({required this.tone, required this.isSelected, this.onTap});
 
   String _label(S? l10n) => switch (tone) {
     AiTone.formal => '📝 ${l10n?.aiRewriteFormal ?? "Formal"}',
     AiTone.casual => '😊 ${l10n?.aiRewriteCasual ?? "Casual"}',
     AiTone.playful => '🎉 ${l10n?.aiRewritePlayful ?? "Playful"}',
-    AiTone.professional => '💼 ${l10n?.aiRewriteProfessional ?? "Professional"}',
+    AiTone.professional =>
+      '💼 ${l10n?.aiRewriteProfessional ?? "Professional"}',
   };
 
   @override
@@ -220,17 +229,16 @@ class _ToneChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacingM,
+          vertical: 6,
+        ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary
-              : AppColors.inputBgOf(isDark),
-          borderRadius: BorderRadius.circular(16),
+          color: isSelected ? AppColors.primary : AppColors.inputBgOf(isDark),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: isSelected
               ? null
-              : Border.all(
-                  color: AppColors.dividerOf(isDark),
-                ),
+              : Border.all(color: AppColors.dividerOf(isDark)),
         ),
         child: Text(
           _label(l10n),

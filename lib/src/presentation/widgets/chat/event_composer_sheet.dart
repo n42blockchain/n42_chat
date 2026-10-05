@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/event_message_data.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 弹出日程/事件编辑面板，返回填好的 [EventMessageData]（取消返回 null）。
 Future<EventMessageData?> showEventComposerSheet(BuildContext context) {
@@ -98,7 +99,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
             Row(
               children: [
                 const Icon(Icons.event, color: AppColors.primary),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'New Event',
                   style: TextStyle(
@@ -109,7 +110,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             TextField(
               controller: _titleC,
               autofocus: true,
@@ -119,7 +120,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             _dateTile(
               label: 'Starts',
               value: EventMessageData.formatLocal(_start),
@@ -146,7 +147,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
               },
               onClear: _end != null ? () => setState(() => _end = null) : null,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             TextField(
               controller: _locationC,
               style: TextStyle(color: context.textPrimary),
@@ -155,7 +156,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             TextField(
               controller: _descC,
               maxLines: 3,
@@ -166,13 +167,13 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
               ),
             ),
             if (_error != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 _error!,
                 style: const TextStyle(color: AppColors.error, fontSize: 13),
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

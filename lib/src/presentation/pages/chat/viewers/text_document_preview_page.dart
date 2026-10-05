@@ -7,6 +7,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../widgets/common/common_widgets.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 class TextDocumentPreviewPage extends StatefulWidget {
   final String fileName;
@@ -21,7 +22,8 @@ class TextDocumentPreviewPage extends StatefulWidget {
   });
 
   @override
-  State<TextDocumentPreviewPage> createState() => _TextDocumentPreviewPageState();
+  State<TextDocumentPreviewPage> createState() =>
+      _TextDocumentPreviewPageState();
 }
 
 class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
@@ -113,7 +115,9 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
     if (_error != null) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingXL,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -122,7 +126,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
                 size: 56,
                 color: context.textSecondary,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               Text(
                 'Preview',
                 style: TextStyle(
@@ -131,13 +135,11 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
                   color: context.textPrimary,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 _error!,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: context.textSecondary,
-                ),
+                style: TextStyle(color: context.textSecondary),
               ),
             ],
           ),
@@ -145,24 +147,16 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
       );
     }
 
-    const padding = EdgeInsets.all(16);
+    const padding = EdgeInsets.all(AppDimensions.spacing);
     if (_isMarkdown) {
-      return Markdown(
-        data: _content,
-        padding: padding,
-        selectable: true,
-      );
+      return Markdown(data: _content, padding: padding, selectable: true);
     }
 
     return SingleChildScrollView(
       padding: padding,
       child: SelectableText(
         _content,
-        style: TextStyle(
-          fontSize: 14,
-          height: 1.5,
-          color: context.textPrimary,
-        ),
+        style: TextStyle(fontSize: 14, height: 1.5, color: context.textPrimary),
       ),
     );
   }

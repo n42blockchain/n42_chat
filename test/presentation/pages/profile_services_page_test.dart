@@ -5,7 +5,6 @@ import 'package:n42_chat/src/n42_chat.dart';
 import 'package:n42_chat/src/presentation/pages/profile/orders_and_cards_page.dart';
 import 'package:n42_chat/src/presentation/pages/red_packet/red_packet_history_page.dart';
 import 'package:n42_chat/src/presentation/pages/profile/services_page.dart';
-import 'package:n42_chat/src/presentation/pages/red_packet/red_packet_history_page.dart';
 
 Widget _app(Widget child) => MaterialApp(
   localizationsDelegates: S.localizationsDelegates,

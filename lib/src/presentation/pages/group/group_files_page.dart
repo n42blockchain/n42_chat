@@ -10,6 +10,7 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/group_file_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群文件页面
 class GroupFilesPage extends StatefulWidget {
@@ -241,13 +242,13 @@ class _GroupFilesPageState extends State<GroupFilesPage>
               file.formattedSize,
               style: TextStyle(color: secondaryTextColor, fontSize: 12),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Text(
               _formatDate(file.sentAt),
               style: TextStyle(color: secondaryTextColor, fontSize: 12),
             ),
             if (file.senderName != null) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.spacingS),
               Text(
                 file.senderName!,
                 style: TextStyle(color: secondaryTextColor, fontSize: 12),
@@ -279,7 +280,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
       height: 48,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Icon(icon, color: color, size: 24),
     );

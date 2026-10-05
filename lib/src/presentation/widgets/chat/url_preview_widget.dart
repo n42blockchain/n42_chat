@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// URL 预览组件
 ///
@@ -85,11 +86,11 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
     final isDark = context.isDarkMode;
 
     return Container(
-      margin: const EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(top: AppDimensions.spacingS),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Row(
         children: [
@@ -111,7 +112,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: AppColors.dividerOf(isDark),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -120,7 +121,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                   width: 120,
                   decoration: BoxDecoration(
                     color: AppColors.dividerOf(isDark),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                 ),
               ],
@@ -136,96 +137,100 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
 
     return Semantics(
       button: true,
-      label: A11yL10n.of(context)
-          .openLink(data.title ?? data.siteName ?? data.url),
+      label: A11yL10n.of(
+        context,
+      ).openLink(data.title ?? data.siteName ?? data.url),
       excludeSemantics: true,
       child: GestureDetector(
-      onTap: () => _openUrl(data.url),
-      child: Container(
-        margin: const EdgeInsets.only(top: 8),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(8),
-          border: const Border(
-            left: BorderSide(
-              color: AppColors.primary,
-              width: 3,
+        onTap: () => _openUrl(data.url),
+        child: Container(
+          margin: const EdgeInsets.only(top: AppDimensions.spacingS),
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white10
+                : Colors.black.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+            border: const Border(
+              left: BorderSide(color: AppColors.primary, width: 3),
             ),
           ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 文本内容
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 网站名
-                    if (data.siteName != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          data.siteName!,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w500,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 文本内容
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 网站名
+                      if (data.siteName != null)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppDimensions.spacingXS,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          child: Text(
+                            data.siteName!,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    // 标题
-                    if (data.title != null)
-                      Text(
-                        data.title!,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimaryOf(isDark),
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    // 描述
-                    if (data.description != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          data.description!,
+                      // 标题
+                      if (data.title != null)
+                        Text(
+                          data.title!,
                           style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondaryOf(isDark),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimaryOf(isDark),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                  ],
+                      // 描述
+                      if (data.description != null)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: AppDimensions.spacingXS,
+                          ),
+                          child: Text(
+                            data.description!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondaryOf(isDark),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            // 缩略图
-            if (data.imageUrl != null)
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(8),
-                  bottomRight: Radius.circular(8),
+              // 缩略图
+              if (data.imageUrl != null)
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: data.imageUrl!,
+                    width: 72,
+                    height: 72,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, _, _) => const SizedBox.shrink(),
+                  ),
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: data.imageUrl!,
-                  width: 72,
-                  height: 72,
-                  fit: BoxFit.cover,
-                  errorWidget: (_, _, _) => const SizedBox.shrink(),
-                ),
-              ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }

@@ -11,6 +11,7 @@ import '../../../data/datasources/bundled_sticker_packs.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import 'video_sticker_view.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 贴纸缩略图（emoji / 内置 asset SVG·Lottie / 网络图片·视频）
 ///
@@ -44,7 +45,7 @@ class StickerThumb extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.placeholderOf(isDark),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         padding: padding,
         child: Center(child: _content()),
@@ -54,8 +55,10 @@ class StickerThumb extends StatelessWidget {
 
   Widget _content() {
     if (sticker.url.startsWith('emoji:')) {
-      return Text(sticker.url.substring(6),
-          style: TextStyle(fontSize: emojiFontSize));
+      return Text(
+        sticker.url.substring(6),
+        style: TextStyle(fontSize: emojiFontSize),
+      );
     }
     if (BundledStickerPacks.isAssetSticker(sticker.url)) {
       final path = BundledStickerPacks.assetPath(sticker.url);
@@ -65,8 +68,10 @@ class StickerThumb extends StatelessWidget {
       return SvgPicture.asset(
         path,
         fit: BoxFit.contain,
-        placeholderBuilder: (_) => Text(sticker.emoji ?? '🙂',
-            style: TextStyle(fontSize: emojiFontSize)),
+        placeholderBuilder: (_) => Text(
+          sticker.emoji ?? '🙂',
+          style: TextStyle(fontSize: emojiFontSize),
+        ),
       );
     }
     final httpUrl = sticker.httpUrl ?? sticker.url;
@@ -83,7 +88,7 @@ class StickerThumb extends StatelessWidget {
         url: httpUrl,
       )) {
         return ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           child: VideoStickerView(url: httpUrl, headers: headers),
         );
       }
@@ -94,6 +99,9 @@ class StickerThumb extends StatelessWidget {
         errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported),
       );
     }
-    return Text(sticker.emoji ?? '?', style: TextStyle(fontSize: emojiFontSize));
+    return Text(
+      sticker.emoji ?? '?',
+      style: TextStyle(fontSize: emojiFontSize),
+    );
   }
 }

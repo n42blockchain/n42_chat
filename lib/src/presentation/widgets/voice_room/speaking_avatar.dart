@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/voice_room_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 说话脉冲动画头像
 class SpeakingAvatar extends StatefulWidget {
@@ -34,9 +35,10 @@ class _SpeakingAvatarState extends State<SpeakingAvatar>
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    _animation = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     if (widget.participant.isSpeaking) {
       _controller.repeat(reverse: true);
@@ -151,7 +153,7 @@ class _SpeakingAvatarState extends State<SpeakingAvatar>
               );
             },
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           SizedBox(
             width: widget.radius * 2.5,
             child: Text(

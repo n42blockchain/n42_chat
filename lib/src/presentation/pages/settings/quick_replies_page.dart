@@ -7,6 +7,7 @@ import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/quick_reply_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 快捷回复管理页面
 class QuickRepliesPage extends StatefulWidget {
@@ -274,7 +275,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
 
   Widget _buildReplyList() {
     return ReorderableListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
       itemCount: _replies.length,
       // onReorderItem 取代 onReorder（Flutter 3.41 后弃用）：新回调已按"移除
       // oldIndex 后"的下标给出 newIndex，故不再需要 newIndex -= 1 的补偿。
@@ -306,10 +307,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
           ignoring: _isSaving,
           child: ReorderableDragStartListener(
             index: index,
-            child: Icon(
-              Icons.drag_handle,
-              color: context.textTertiary,
-            ),
+            child: Icon(Icons.drag_handle, color: context.textTertiary),
           ),
         ),
         title: Text(
@@ -340,10 +338,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
             if (!reply.isSystem)
               IconButton(
                 tooltip: S.of(context)?.commonEdit ?? 'Edit',
-                icon: Icon(
-                  Icons.edit_outlined,
-                  color: context.textTertiary,
-                ),
+                icon: Icon(Icons.edit_outlined, color: context.textTertiary),
                 onPressed: _isSaving ? null : () => _editReply(reply),
               ),
             IconButton(

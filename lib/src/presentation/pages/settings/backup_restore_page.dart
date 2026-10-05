@@ -11,6 +11,7 @@ import '../../blocs/backup/backup_bloc.dart';
 import '../../blocs/backup/backup_event.dart';
 import '../../blocs/backup/backup_state.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 备份与恢复页面
 class BackupRestorePage extends StatelessWidget {
@@ -19,9 +20,9 @@ class BackupRestorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => BackupBloc(
-        backupService: GetIt.instance<ChatBackupService>(),
-      )..add(const LoadBackupList()),
+      create: (_) =>
+          BackupBloc(backupService: GetIt.instance<ChatBackupService>())
+            ..add(const LoadBackupList()),
       child: const _BackupRestoreView(),
     );
   }
@@ -62,11 +63,11 @@ class _BackupRestoreView extends StatelessWidget {
           return ListView(
             children: [
               _BackupSection(state: state),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _BackupHistorySection(state: state),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.spacing),
               _RestoreSection(state: state),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppDimensions.spacingXXL),
             ],
           );
         },
@@ -111,7 +112,7 @@ class _BackupSectionState extends State<_BackupSection> {
             child: Row(
               children: [
                 const Icon(Icons.backup, color: AppColors.primary, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'Create Backup',
                   maxLines: 1,
@@ -127,14 +128,20 @@ class _BackupSectionState extends State<_BackupSection> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing,
+            ),
             child: Text(
               'Backup your local chat settings. '
               'Messages will be restored from server after re-login.',
-              style: TextStyle(fontSize: 13, height: 1.4, color: secondaryColor),
+              style: TextStyle(
+                fontSize: 13,
+                height: 1.4,
+                color: secondaryColor,
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingM),
           ListTile(
             leading: const Icon(Icons.key_outlined, color: AppColors.warning),
             title: Text(
@@ -147,7 +154,11 @@ class _BackupSectionState extends State<_BackupSection> {
               'Use Security > Recovery Key to back up encrypted message access.',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12, height: 1.4, color: secondaryColor),
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.4,
+                color: secondaryColor,
+              ),
             ),
           ),
           CheckboxListTile(
@@ -163,45 +174,53 @@ class _BackupSectionState extends State<_BackupSection> {
           ),
           if (_usePassword)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacing,
+              ),
               child: TextField(
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: 'Enter backup password',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: AppDimensions.spacingM,
+                    vertical: 10,
+                  ),
                 ),
               ),
             ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: widget.state.isCreating
                     ? null
                     : () {
-                        context.read<BackupBloc>().add(CreateBackup(
-                              password: _usePassword
-                                  ? _passwordController.text
-                                  : null,
-                            ));
+                        context.read<BackupBloc>().add(
+                          CreateBackup(
+                            password: _usePassword
+                                ? _passwordController.text
+                                : null,
+                          ),
+                        );
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.spacingM,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                 ),
                 child: widget.state.isCreating
                     ? const SizedBox(
-                        width: 20,
+                        width: AppDimensions.spacingL,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
@@ -251,73 +270,87 @@ class _BackupHistorySection extends StatelessWidget {
           ),
           if (state.backups.isEmpty)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
                 'No backups yet',
-                style: TextStyle(fontSize: 14, height: 1.3, color: secondaryColor),
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.3,
+                  color: secondaryColor,
+                ),
               ),
             )
           else
-            ...state.backups.map((backup) => ListTile(
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.info.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+            ...state.backups.map(
+              (backup) => ListTile(
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.info.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  ),
+                  child: const Icon(
+                    Icons.archive,
+                    color: AppColors.info,
+                    size: 22,
+                  ),
+                ),
+                title: Text(
+                  backup.formattedDate,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
+                ),
+                subtitle: Text(
+                  '${backup.roomCount} rooms  ${backup.formattedSize}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.3,
+                    color: secondaryColor,
+                  ),
+                ),
+                trailing: PopupMenuButton<String>(
+                  onSelected: (action) {
+                    if (action == 'delete') {
+                      _confirmDelete(context, backup);
+                    } else if (action == 'restore') {
+                      context.read<BackupBloc>().add(
+                        RestoreFromBackup(backupFilePath: backup.filePath),
+                      );
+                    }
+                  },
+                  itemBuilder: (_) => [
+                    const PopupMenuItem(
+                      value: 'restore',
+                      child: Row(
+                        children: [
+                          Icon(Icons.restore, size: 18),
+                          SizedBox(width: AppDimensions.spacingS),
+                          Text('Restore'),
+                        ],
+                      ),
                     ),
-                    child: const Icon(Icons.archive,
-                        color: AppColors.info, size: 22),
-                  ),
-                  title: Text(
-                    backup.formattedDate,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
-                  ),
-                  subtitle: Text(
-                    '${backup.roomCount} rooms  ${backup.formattedSize}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12, height: 1.3, color: secondaryColor),
-                  ),
-                  trailing: PopupMenuButton<String>(
-                    onSelected: (action) {
-                      if (action == 'delete') {
-                        _confirmDelete(context, backup);
-                      } else if (action == 'restore') {
-                        context.read<BackupBloc>().add(
-                              RestoreFromBackup(
-                                  backupFilePath: backup.filePath),
-                            );
-                      }
-                    },
-                    itemBuilder: (_) => [
-                      const PopupMenuItem(
-                        value: 'restore',
-                        child: Row(
-                          children: [
-                            Icon(Icons.restore, size: 18),
-                            SizedBox(width: 8),
-                            Text('Restore'),
-                          ],
-                        ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, size: 18, color: AppColors.error),
+                          SizedBox(width: AppDimensions.spacingS),
+                          Text(
+                            'Delete',
+                            style: TextStyle(color: AppColors.error),
+                          ),
+                        ],
                       ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, size: 18, color: AppColors.error),
-                            SizedBox(width: 8),
-                            Text('Delete',
-                                style: TextStyle(color: AppColors.error)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                )),
-          const SizedBox(height: 8),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          const SizedBox(height: AppDimensions.spacingS),
         ],
       ),
     );
@@ -339,9 +372,7 @@ class _BackupHistorySection extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              context
-                  .read<BackupBloc>()
-                  .add(DeleteBackup(backup.backupId));
+              context.read<BackupBloc>().add(DeleteBackup(backup.backupId));
             },
             child: const Text(
               'Delete',
@@ -376,7 +407,7 @@ class _RestoreSection extends StatelessWidget {
             child: Row(
               children: [
                 const Icon(Icons.restore, color: AppColors.warning, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'Restore from File',
                   maxLines: 1,
@@ -392,15 +423,21 @@ class _RestoreSection extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing,
+            ),
             child: Text(
               'Import a .n42backup file from another device or previous backup. '
               'Encryption keys are restored separately with your Recovery Key.',
-              style: TextStyle(fontSize: 13, height: 1.4, color: secondaryColor),
+              style: TextStyle(
+                fontSize: 13,
+                height: 1.4,
+                color: secondaryColor,
+              ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacing),
             child: SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -415,11 +452,14 @@ class _RestoreSection extends StatelessWidget {
                       )
                     : const Icon(Icons.file_open),
                 label: Text(
-                    state.isRestoring ? 'Restoring...' : 'Choose Backup File'),
+                  state.isRestoring ? 'Restoring...' : 'Choose Backup File',
+                ),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.spacingM,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
                 ),
               ),
@@ -438,8 +478,8 @@ class _RestoreSection extends StatelessWidget {
         final filePath = file.path;
         if (filePath != null && context.mounted) {
           context.read<BackupBloc>().add(
-                RestoreFromBackup(backupFilePath: filePath),
-              );
+            RestoreFromBackup(backupFilePath: filePath),
+          );
         }
       }
     } catch (e) {

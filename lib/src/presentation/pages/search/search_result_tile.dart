@@ -6,17 +6,14 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart' as chat_date;
 import '../../../domain/entities/search_result_entity.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 搜索结果列表项
 class SearchResultTile extends StatelessWidget {
   final SearchResultItem item;
   final VoidCallback? onTap;
 
-  const SearchResultTile({
-    super.key,
-    required this.item,
-    this.onTap,
-  });
+  const SearchResultTile({super.key, required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -25,18 +22,19 @@ class SearchResultTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: AppDimensions.spacingM,
+          ),
           child: Row(
             children: [
               // 头像
               _buildAvatar(),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingM),
 
               // 内容
-              Expanded(
-                child: _buildContent(context),
-              ),
+              Expanded(child: _buildContent(context)),
 
               // 时间/类型标签
               _buildTrailing(context),
@@ -72,17 +70,13 @@ class SearchResultTile extends StatelessWidget {
         height: 48,
         decoration: BoxDecoration(
           color: iconBgColor,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Icon(icon, color: Colors.white, size: 24),
       );
     }
 
-    return N42Avatar(
-      imageUrl: item.avatarUrl,
-      name: item.title,
-      size: 48,
-    );
+    return N42Avatar(imageUrl: item.avatarUrl, name: item.title, size: 48);
   }
 
   Widget _buildContent(BuildContext context) {
@@ -100,26 +94,21 @@ class SearchResultTile extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
 
         // 内容（消息搜索）或副标题
-        if (item.type == SearchResultType.message && item.matchedContent != null)
+        if (item.type == SearchResultType.message &&
+            item.matchedContent != null)
           _buildHighlightedText(
             item.matchedContent!,
             item.matchedKeyword,
-            TextStyle(
-              fontSize: 13,
-              color: context.textSecondary,
-            ),
+            TextStyle(fontSize: 13, color: context.textSecondary),
             maxLines: 2,
           )
         else if (item.subtitle != null)
           Text(
             item.subtitle!,
-            style: TextStyle(
-              fontSize: 13,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: context.textSecondary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -163,13 +152,15 @@ class SearchResultTile extends StatelessWidget {
       }
 
       // 添加高亮文本
-      spans.add(TextSpan(
-        text: text.substring(matchIndex, matchIndex + keyword.length),
-        style: const TextStyle(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w600,
+      spans.add(
+        TextSpan(
+          text: text.substring(matchIndex, matchIndex + keyword.length),
+          style: const TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ));
+      );
 
       currentIndex = matchIndex + keyword.length;
     }
@@ -190,27 +181,21 @@ class SearchResultTile extends StatelessWidget {
         if (item.timestamp != null)
           Text(
             chat_date.N42DateUtils.formatConversationTime(item.timestamp!),
-            style: TextStyle(
-              fontSize: 12,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: context.textSecondary),
           ),
 
-        const SizedBox(height: 4),
+        const SizedBox(height: AppDimensions.spacingXS),
 
         // 类型标签
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: _getTypeColor().withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           ),
           child: Text(
             _getTypeLabel(context),
-            style: TextStyle(
-              fontSize: 10,
-              color: _getTypeColor(),
-            ),
+            style: TextStyle(fontSize: 10, color: _getTypeColor()),
           ),
         ),
       ],
@@ -247,4 +232,3 @@ class SearchResultTile extends StatelessWidget {
     }
   }
 }
-

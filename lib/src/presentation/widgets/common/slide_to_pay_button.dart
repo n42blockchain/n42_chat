@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// WeChat-inspired slide-to-confirm payment button.
 ///
@@ -65,14 +66,15 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
   @override
   void initState() {
     super.initState();
-    _resetController = AnimationController(
-      duration: const Duration(milliseconds: 350),
-      vsync: this,
-    )
-      ..addListener(_onReset)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) _resetController.reset();
-      });
+    _resetController =
+        AnimationController(
+            duration: const Duration(milliseconds: 350),
+            vsync: this,
+          )
+          ..addListener(_onReset)
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) _resetController.reset();
+          });
     _resetCurve = CurvedAnimation(
       parent: _resetController,
       curve: Curves.easeOutCubic,
@@ -91,8 +93,10 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
   void _onDragUpdate(DragUpdateDetails details, double maxOffset) {
     if (_isCompleted) return;
     setState(() {
-      _dragProgress =
-          (_dragProgress + details.delta.dx / maxOffset).clamp(0.0, 1.0);
+      _dragProgress = (_dragProgress + details.delta.dx / maxOffset).clamp(
+        0.0,
+        1.0,
+      );
     });
     if (_dragProgress >= _completionThreshold) {
       _complete();
@@ -166,8 +170,9 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
                 width: fillWidth.clamp(0.0, trackWidth),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: widget.trackColor
-                        .withValues(alpha: (_dragProgress * 0.55).clamp(0.0, 0.55)),
+                    color: widget.trackColor.withValues(
+                      alpha: (_dragProgress * 0.55).clamp(0.0, 0.55),
+                    ),
                     borderRadius: BorderRadius.circular(widget.height / 2),
                   ),
                 ),
@@ -199,14 +204,14 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        width: 16,
+                        width: AppDimensions.spacing,
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: widget.trackColor,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingS),
                       Text(
                         widget.confirmingLabel,
                         style: TextStyle(

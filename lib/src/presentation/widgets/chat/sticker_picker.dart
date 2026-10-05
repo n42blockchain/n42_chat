@@ -13,6 +13,7 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../data/datasources/bundled_sticker_packs.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 贴纸选择回调
 typedef StickerSelectedCallback = void Function(Sticker sticker, String packId);
@@ -149,10 +150,7 @@ class _StickerPickerState extends State<StickerPicker> {
       decoration: BoxDecoration(
         color: context.inputBarColor,
         border: Border(
-          top: BorderSide(
-            color: context.dividerColor,
-            width: 0.5,
-          ),
+          top: BorderSide(color: context.dividerColor, width: 0.5),
         ),
       ),
       child: SafeArea(
@@ -170,8 +168,8 @@ class _StickerPickerState extends State<StickerPicker> {
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _searchQuery.isNotEmpty
-                      ? _buildSearchResults(isDark)
-                      : _buildStickerGrid(isDark),
+                  ? _buildSearchResults(isDark)
+                  : _buildStickerGrid(isDark),
             ),
           ],
         ),
@@ -207,7 +205,9 @@ class _StickerPickerState extends State<StickerPicker> {
                     fontSize: 14,
                     color: context.textTertiary,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.spacingS,
+                  ),
                 ),
               ),
             ),
@@ -219,9 +219,14 @@ class _StickerPickerState extends State<StickerPicker> {
                 child: GestureDetector(
                   onTap: _clearSearch,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Icon(Icons.close,
-                        size: 18, color: context.textTertiary),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.spacingS,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      size: 18,
+                      color: context.textTertiary,
+                    ),
                   ),
                 ),
               ),
@@ -238,7 +243,7 @@ class _StickerPickerState extends State<StickerPicker> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.search_off, size: 48, color: context.textTertiary),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               S.of(context)?.searchNoResults ?? 'No stickers found',
               style: TextStyle(color: context.textTertiary),
@@ -248,7 +253,7 @@ class _StickerPickerState extends State<StickerPicker> {
       );
     }
     return GridView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 8,
@@ -268,10 +273,7 @@ class _StickerPickerState extends State<StickerPicker> {
       decoration: BoxDecoration(
         color: context.surfaceColor,
         border: Border(
-          bottom: BorderSide(
-            color: context.dividerColor,
-            width: 0.5,
-          ),
+          bottom: BorderSide(color: context.dividerColor, width: 0.5),
         ),
       ),
       child: Row(
@@ -334,37 +336,39 @@ class _StickerPickerState extends State<StickerPicker> {
           : (label ?? A11yL10n.of(context).stickerPack),
       excludeSemantics: true,
       child: GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? AppColors.primary : Colors.transparent,
-              width: 2,
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingM,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected ? AppColors.primary : Colors.transparent,
+                width: 2,
+              ),
             ),
           ),
-        ),
-        child: Center(
-          child: icon != null
-              ? Icon(
-                  icon,
-                  size: 22,
-                  color: isSelected
-                      ? AppColors.primary
-                      : context.textSecondary,
-                )
-              : Text(
-                  emoji ?? label?.substring(0, 1) ?? '?',
-                  style: TextStyle(
-                    fontSize: emoji != null ? 22 : 14,
+          child: Center(
+            child: icon != null
+                ? Icon(
+                    icon,
+                    size: 22,
                     color: isSelected
                         ? AppColors.primary
                         : context.textSecondary,
+                  )
+                : Text(
+                    emoji ?? label?.substring(0, 1) ?? '?',
+                    style: TextStyle(
+                      fontSize: emoji != null ? 22 : 14,
+                      color: isSelected
+                          ? AppColors.primary
+                          : context.textSecondary,
+                    ),
                   ),
-                ),
+          ),
         ),
-      ),
       ),
     );
   }
@@ -391,7 +395,7 @@ class _StickerPickerState extends State<StickerPicker> {
 
   Widget _buildRecentStickers(bool isDark) {
     return GridView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 8,
@@ -411,7 +415,7 @@ class _StickerPickerState extends State<StickerPicker> {
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppDimensions.spacingS),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 8,
@@ -434,7 +438,7 @@ class _StickerPickerState extends State<StickerPicker> {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.placeholderOf(isDark),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Center(child: _buildStickerContent(sticker)),
       ),
@@ -458,8 +462,10 @@ class _StickerPickerState extends State<StickerPicker> {
             : SvgPicture.asset(
                 path,
                 fit: BoxFit.contain,
-                placeholderBuilder: (_) => Text(sticker.emoji ?? '🙂',
-                    style: const TextStyle(fontSize: 32)),
+                placeholderBuilder: (_) => Text(
+                  sticker.emoji ?? '🙂',
+                  style: const TextStyle(fontSize: 32),
+                ),
               ),
       );
     }
@@ -480,13 +486,13 @@ class _StickerPickerState extends State<StickerPicker> {
         url: httpUrl,
       )) {
         return ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
           child: VideoStickerView(url: httpUrl, headers: headers),
         );
       }
       // 静态 / 动画 WebP / GIF（Flutter Image 原生支持动画 WebP & GIF）。
       return ClipRRect(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         child: Image.network(
           httpUrl,
           fit: BoxFit.contain,
@@ -510,15 +516,13 @@ class _StickerPickerState extends State<StickerPicker> {
             size: 48,
             color: context.textTertiary,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             'No stickers yet',
-            style: TextStyle(
-              color: context.textTertiary,
-            ),
+            style: TextStyle(color: context.textTertiary),
           ),
           if (widget.onOpenStore != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             TextButton.icon(
               onPressed: widget.onOpenStore,
               icon: const Icon(Icons.add),

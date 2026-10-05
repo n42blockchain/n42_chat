@@ -3,17 +3,18 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 通话对话框
-/// 
+///
 /// 当前为模拟实现，真正的 VoIP 通话需要集成 WebRTC
-/// 
+///
 /// 实现步骤:
 /// 1. 添加 flutter_webrtc 依赖
 /// 2. 配置 STUN/TURN 服务器
 /// 3. 实现 ICE 候选人交换
 /// 4. 管理本地和远程媒体流
-/// 
+///
 /// 参考 FluffyChat 的 VoIP 实现
 class ChatCallDialog extends StatefulWidget {
   final String contactName;
@@ -38,22 +39,24 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
   int _callDuration = 0;
   bool _isConnecting = true;
   String? _callStatusKey;
-  
+
   @override
   void initState() {
     super.initState();
     _initCall();
   }
-  
+
   Future<void> _initCall() async {
     // 模拟连接过程
     // TODO(backend): 替换为真正的 VoIP 连接（需要 WebRTC/LiveKit 服务）
     // TODO(backend): 使用 VoIPService.startCall(roomId, isVideoCall ? CallType.video : CallType.voice)
-    
-    debugLog('ChatCallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call');
+
+    debugLog(
+      'ChatCallDialog: Initiating ${widget.isVideoCall ? "video" : "voice"} call',
+    );
     debugLog('ChatCallDialog: Contact: ${widget.contactName}');
     debugLog('ChatCallDialog: Room ID: N/A');
-    
+
     // 模拟呼叫状态变化
     await Future<void>.delayed(const Duration(milliseconds: 500));
     if (mounted) {
@@ -75,7 +78,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
       _startTimer();
     }
   }
-  
+
   void _startTimer() {
     Future.doWhile(() async {
       await Future<void>.delayed(const Duration(seconds: 1));
@@ -88,7 +91,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
       return false;
     });
   }
-  
+
   String _formatDuration(int seconds) {
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
@@ -107,25 +110,25 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
         return S.of(context)?.chatCalling ?? 'Calling...';
     }
   }
-  
+
   void _toggleMute() {
     setState(() => _isMuted = !_isMuted);
     debugLog('ChatCallDialog: Mute ${_isMuted ? "on" : "off"}');
     // TODO(backend): voipService.toggleMute()
   }
-  
+
   void _toggleSpeaker() {
     setState(() => _isSpeakerOn = !_isSpeakerOn);
     debugLog('ChatCallDialog: Speaker ${_isSpeakerOn ? "on" : "off"}');
     // TODO(backend): voipService.toggleSpeaker()
   }
-  
+
   void _toggleCamera() {
     setState(() => _isCameraOff = !_isCameraOff);
     debugLog('ChatCallDialog: Camera ${_isCameraOff ? "off" : "on"}');
     // TODO(backend): voipService.toggleCamera()
   }
-  
+
   void _endCall() {
     debugLog('ChatCallDialog: Ending call, duration: $_callDuration seconds');
     // TODO(backend): voipService.hangup()
@@ -140,7 +143,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
         child: Column(
           children: [
             const SizedBox(height: 60),
-            
+
             // 联系人头像
             Container(
               width: 120,
@@ -152,9 +155,9 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
               ),
               child: _buildAvatarPlaceholder(),
             ),
-            
-            const SizedBox(height: 24),
-            
+
+            const SizedBox(height: AppDimensions.spacingXL),
+
             // 联系人名字
             Text(
               widget.contactName,
@@ -164,9 +167,9 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            
-            const SizedBox(height: 12),
-            
+
+            const SizedBox(height: AppDimensions.spacingM),
+
             // 通话状态
             Text(
               _isConnecting
@@ -237,24 +240,26 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             Text(
               S.of(context)?.chatHangUp ?? 'Hang Up',
               style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
-            
+
             const SizedBox(height: 60),
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildAvatarPlaceholder() {
     return Center(
       child: Text(
-        widget.contactName.isNotEmpty ? widget.contactName[0].toUpperCase() : '?',
+        widget.contactName.isNotEmpty
+            ? widget.contactName[0].toUpperCase()
+            : '?',
         style: const TextStyle(
           color: Colors.white,
           fontSize: 48,
@@ -263,7 +268,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
       ),
     );
   }
-  
+
   Widget _buildControlButton({
     required IconData icon,
     required String label,
@@ -279,7 +284,9 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.2),
+              color: isActive
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -288,7 +295,7 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
               size: 28,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,
             style: TextStyle(

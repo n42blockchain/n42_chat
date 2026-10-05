@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_lock_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 聊天锁验证页面
 ///
@@ -99,17 +100,16 @@ class _ChatLockPageState extends State<ChatLockPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.close,
-            color: context.textPrimary,
-          ),
+          icon: Icon(Icons.close, color: context.textPrimary),
           onPressed: () => Navigator.pop(context, false),
         ),
       ),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingXXL,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -126,7 +126,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     color: AppColors.primary,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
                 Text(
                   l10n?.chatLockVerifyTitle ?? 'Chat locked',
                   maxLines: 1,
@@ -139,7 +139,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     color: context.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   widget.chatName,
                   maxLines: 1,
@@ -151,7 +151,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     color: context.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   l10n?.chatLockVerifySubtitle ?? 'Verify to access this chat',
                   maxLines: 2,
@@ -164,7 +164,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   ),
                 ),
                 if (_errorMessage != null) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingM),
                   Text(
                     _errorMessage!,
                     style: const TextStyle(
@@ -173,7 +173,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimensions.spacingXXL),
                 if (_showPinInput) ...[
                   SizedBox(
                     width: 200,
@@ -188,13 +188,15 @@ class _ChatLockPageState extends State<ChatLockPage> {
                         hintText: l10n?.chatLockPinTitle ?? 'Enter PIN',
                         counterText: '',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusL,
+                          ),
                         ),
                       ),
                       onSubmitted: (_) => _verifyPin(),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   SizedBox(
                     width: 200,
                     child: ElevatedButton(
@@ -202,9 +204,13 @@ class _ChatLockPageState extends State<ChatLockPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppDimensions.spacingM,
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusL,
+                          ),
                         ),
                       ),
                       child: Text(l10n?.commonConfirm ?? 'Confirm'),
@@ -212,7 +218,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   ),
                 ],
                 if (_isBiometricAvailable && _showPinInput) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacing),
                   TextButton.icon(
                     onPressed: _verifyBiometric,
                     icon: const Icon(Icons.fingerprint),
@@ -228,11 +234,13 @@ class _ChatLockPageState extends State<ChatLockPage> {
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                        horizontal: AppDimensions.spacingXL,
+                        vertical: AppDimensions.spacingM,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusL,
+                        ),
                       ),
                     ),
                   ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 聊天内支付与电商快捷面板。
 class PaymentCommerceSheet extends StatelessWidget {
@@ -66,7 +67,7 @@ class PaymentCommerceSheet extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       onTap: () {
         Navigator.of(context).pop();
         action.onTap();
@@ -75,11 +76,8 @@ class PaymentCommerceSheet extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: context.pageBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: context.dividerColor,
-            width: 0.5,
-          ),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+          border: Border.all(color: context.dividerColor, width: 0.5),
         ),
         child: Row(
           children: [
@@ -88,7 +86,7 @@ class PaymentCommerceSheet extends StatelessWidget {
               height: 46,
               decoration: BoxDecoration(
                 color: action.color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Icon(action.icon, color: action.color, size: 24),
             ),

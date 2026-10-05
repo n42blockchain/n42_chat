@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_utils.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 时间分隔器（微信风格：无背景，纯灰色文字居中）
 class TimeSeparator extends StatelessWidget {
@@ -12,23 +13,19 @@ class TimeSeparator extends StatelessWidget {
   /// 自定义格式化
   final String? customText;
 
-  const TimeSeparator({
-    super.key,
-    required this.dateTime,
-    this.customText,
-  });
+  const TimeSeparator({super.key, required this.dateTime, this.customText});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing),
       child: Center(
         child: Text(
           customText ?? N42DateUtils.formatMessageTime(dateTime),
           style: TextStyle(
             fontSize: 12,
-            color: isDark ? const Color(0xFF808080) : const Color(0xFF999999),
+            color: isDark ? const Color(0xFF888888) : const Color(0xFF999999),
           ),
         ),
       ),
@@ -55,10 +52,11 @@ class SystemMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
-      child: Center(
-        child: _buildText(),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppDimensions.spacingM,
+        horizontal: 40,
       ),
+      child: Center(child: _buildText()),
     );
   }
 
@@ -66,10 +64,7 @@ class SystemMessageWidget extends StatelessWidget {
     if (clickableTexts == null || clickableTexts!.isEmpty) {
       return Text(
         message,
-        style: const TextStyle(
-          fontSize: 12,
-          color: AppColors.textTertiary,
-        ),
+        style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
         textAlign: TextAlign.center,
       );
     }
@@ -84,36 +79,29 @@ class SystemMessageWidget extends StatelessWidget {
 
       // 添加前面的普通文本
       if (startIndex > currentIndex) {
-        spans.add(TextSpan(
-          text: message.substring(currentIndex, startIndex),
-        ));
+        spans.add(TextSpan(text: message.substring(currentIndex, startIndex)));
       }
 
       // 添加可点击文本
-      spans.add(TextSpan(
-        text: clickable.text,
-        style: const TextStyle(
-          color: AppColors.link,
+      spans.add(
+        TextSpan(
+          text: clickable.text,
+          style: const TextStyle(color: AppColors.link),
+          recognizer: null, // 需要使用 GestureRecognizer
         ),
-        recognizer: null, // 需要使用 GestureRecognizer
-      ));
+      );
 
       currentIndex = startIndex + clickable.text.length;
     }
 
     // 添加剩余的普通文本
     if (currentIndex < message.length) {
-      spans.add(TextSpan(
-        text: message.substring(currentIndex),
-      ));
+      spans.add(TextSpan(text: message.substring(currentIndex)));
     }
 
     return Text.rich(
       TextSpan(
-        style: const TextStyle(
-          fontSize: 12,
-          color: AppColors.textTertiary,
-        ),
+        style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
         children: spans,
       ),
       textAlign: TextAlign.center,
@@ -126,22 +114,19 @@ class ClickableText {
   final String text;
   final VoidCallback? onTap;
 
-  const ClickableText({
-    required this.text,
-    this.onTap,
-  });
+  const ClickableText({required this.text, this.onTap});
 }
 
 /// 红包领取系统消息组件
-/// 
+///
 /// 用于显示 "XXX领取了你的红包" 这类消息
 class RedPacketClaimMessageWidget extends StatelessWidget {
   /// 领取者名称
   final String claimerName;
-  
+
   /// 是否是自己发的红包被领取
   final bool isOwnRedPacket;
-  
+
   /// 点击回调
   final VoidCallback? onTap;
 
@@ -155,18 +140,24 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppDimensions.spacingS,
+        horizontal: AppDimensions.spacingXL,
+      ),
       child: Center(
         child: GestureDetector(
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingM,
+              vertical: AppDimensions.spacingS,
+            ),
             decoration: BoxDecoration(
               border: Border.all(
                 color: const Color(0xFFE64340).withValues(alpha: 0.3),
                 width: 1,
               ),
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusS),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -177,7 +168,7 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
                   height: 16,
                   decoration: BoxDecoration(
                     color: const Color(0xFFE64340),
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                   ),
                   child: Center(
                     child: Container(
@@ -190,7 +181,7 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingS),
                 // 消息文本
                 Text.rich(
                   TextSpan(
@@ -200,12 +191,15 @@ class RedPacketClaimMessageWidget extends StatelessWidget {
                     ),
                     children: [
                       TextSpan(text: claimerName),
-                      TextSpan(text: isOwnRedPacket ? (S.of(context)?.commonClaimedYour ?? ' claimed your ') : (S.of(context)?.commonClaimedText ?? ' claimed ')),
+                      TextSpan(
+                        text: isOwnRedPacket
+                            ? (S.of(context)?.commonClaimedYour ??
+                                  ' claimed your ')
+                            : (S.of(context)?.commonClaimedText ?? ' claimed '),
+                      ),
                       TextSpan(
                         text: S.of(context)?.profileRedPacket ?? 'Red Packet',
-                        style: const TextStyle(
-                          color: Color(0xFFE64340),
-                        ),
+                        style: const TextStyle(color: Color(0xFFE64340)),
                       ),
                     ],
                   ),
@@ -227,11 +221,7 @@ class TypingIndicator extends StatefulWidget {
   /// 是否显示
   final bool isVisible;
 
-  const TypingIndicator({
-    super.key,
-    this.userName,
-    this.isVisible = true,
-  });
+  const TypingIndicator({super.key, this.userName, this.isVisible = true});
 
   @override
   State<TypingIndicator> createState() => _TypingIndicatorState();
@@ -263,7 +253,10 @@ class _TypingIndicatorState extends State<TypingIndicator>
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacingM,
+        vertical: AppDimensions.spacingS,
+      ),
       child: Row(
         children: [
           AnimatedBuilder(
@@ -274,16 +267,16 @@ class _TypingIndicatorState extends State<TypingIndicator>
                 children: List.generate(3, (index) {
                   final delay = index * 0.2;
                   final value = (_controller.value + delay) % 1.0;
-                  final opacity = (value < 0.5)
-                      ? value * 2
-                      : (1 - value) * 2;
+                  final opacity = (value < 0.5) ? value * 2 : (1 - value) * 2;
 
                   return Container(
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     width: 6,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: AppColors.textTertiary.withValues(alpha: opacity.clamp(0.3, 1.0)),
+                      color: AppColors.textTertiary.withValues(
+                        alpha: opacity.clamp(0.3, 1.0),
+                      ),
                       shape: BoxShape.circle,
                     ),
                   );
@@ -291,19 +284,16 @@ class _TypingIndicatorState extends State<TypingIndicator>
               );
             },
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingS),
           Text(
             widget.userName != null
-                ? (S.of(context)?.commonUserTyping(widget.userName!) ?? '${widget.userName} is typing...')
+                ? (S.of(context)?.commonUserTyping(widget.userName!) ??
+                      '${widget.userName} is typing...')
                 : (S.of(context)?.commonTyping ?? 'Typing...'),
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textTertiary,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
           ),
         ],
       ),
     );
   }
 }
-

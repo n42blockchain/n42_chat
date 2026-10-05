@@ -14,6 +14,7 @@ import '../../widgets/common/common_widgets.dart';
 import 'group_channels_page.dart';
 import 'channel_editor_sheet.dart';
 import '../../../n42_chat.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 群话题列表页面（用户视角，Telegram Topics 风格）
 ///
@@ -126,11 +127,7 @@ class _GroupTopicsBody extends StatelessWidget {
                             l10n?.groupChannels ?? 'Pinned',
                           ),
                           ...effectivePinned.map(
-                            (c) => _buildTopicTile(
-                              context,
-                              c,
-                              isPinned: true,
-                            ),
+                            (c) => _buildTopicTile(context, c, isPinned: true),
                           ),
                         ],
 
@@ -139,10 +136,7 @@ class _GroupTopicsBody extends StatelessWidget {
                           Icons.forum_outlined,
                           'General',
                         ),
-                        _buildTopicTile(
-                          context,
-                          ChannelEntity.general(roomId),
-                        ),
+                        _buildTopicTile(context, ChannelEntity.general(roomId)),
                         ...regularByCategory.entries.expand((entry) {
                           final label =
                               entry.key ?? (l10n?.groupTopics ?? 'Topics');
@@ -179,11 +173,7 @@ class _GroupTopicsBody extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 14,
-            color: context.textSecondary,
-          ),
+          Icon(icon, size: 14, color: context.textSecondary),
           const SizedBox(width: 6),
           Text(
             label.toUpperCase(),
@@ -213,8 +203,8 @@ class _GroupTopicsBody extends StatelessWidget {
         children: [
           ListTile(
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 4,
+              horizontal: AppDimensions.spacing,
+              vertical: AppDimensions.spacingXS,
             ),
             leading: Container(
               width: 44,
@@ -246,7 +236,7 @@ class _GroupTopicsBody extends StatelessWidget {
                 if (channel.category != null && channel.roomId != roomId)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: AppDimensions.spacingS,
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
@@ -293,7 +283,9 @@ class _GroupTopicsBody extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
                     ),
                     child: Text(
                       unread > 99 ? '99+' : '$unread',
@@ -305,11 +297,7 @@ class _GroupTopicsBody extends StatelessWidget {
               N42Chat.openConversation(channel.roomId, context: context);
             },
           ),
-          Divider(
-            height: 1,
-            indent: 76,
-            color: context.dividerColor,
-          ),
+          Divider(height: 1, indent: 76, color: context.dividerColor),
         ],
       ),
     );

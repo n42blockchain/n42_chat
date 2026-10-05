@@ -7,6 +7,7 @@ import '../../../core/services/red_packet_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/red_packet_entity.dart';
 import 'red_packet_detail_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 红包历史记录页
 ///
@@ -15,11 +16,7 @@ class RedPacketHistoryPage extends StatefulWidget {
   final String? roomId;
   final String userId;
 
-  const RedPacketHistoryPage({
-    super.key,
-    this.roomId,
-    required this.userId,
-  });
+  const RedPacketHistoryPage({super.key, this.roomId, required this.userId});
 
   @override
   State<RedPacketHistoryPage> createState() => _RedPacketHistoryPageState();
@@ -68,10 +65,9 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
   List<RedPacketEntity> get _sentPackets =>
       _allRedPackets.where((rp) => rp.senderId == widget.userId).toList();
 
-  List<RedPacketEntity> get _receivedPackets =>
-      _allRedPackets.where((rp) =>
-        rp.claims.any((c) => c.userId == widget.userId),
-      ).toList();
+  List<RedPacketEntity> get _receivedPackets => _allRedPackets
+      .where((rp) => rp.claims.any((c) => c.userId == widget.userId))
+      .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +100,11 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     );
   }
 
-  Widget _buildList(List<RedPacketEntity> packets, bool isDark, {required bool isSent}) {
+  Widget _buildList(
+    List<RedPacketEntity> packets,
+    bool isDark, {
+    required bool isSent,
+  }) {
     if (packets.isEmpty) {
       return Center(
         child: Column(
@@ -115,12 +115,10 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
               size: 48,
               color: isDark ? Colors.white24 : Colors.grey.shade300,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             Text(
               'No red packets yet',
-              style: TextStyle(
-                color: AppColors.textTertiaryOf(isDark),
-              ),
+              style: TextStyle(color: AppColors.textTertiaryOf(isDark)),
             ),
           ],
         ),
@@ -128,9 +126,10 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       itemCount: packets.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) =>
+          const SizedBox(height: AppDimensions.spacingS),
       itemBuilder: (context, index) {
         final rp = packets[index];
         return _buildRedPacketCard(rp, isDark, isSent: isSent);
@@ -138,7 +137,11 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     );
   }
 
-  Widget _buildRedPacketCard(RedPacketEntity rp, bool isDark, {required bool isSent}) {
+  Widget _buildRedPacketCard(
+    RedPacketEntity rp,
+    bool isDark, {
+    required bool isSent,
+  }) {
     final l10n = S.of(context);
     final statusText = switch (rp.lifecycle) {
       RedPacketLifecycle.active => '${rp.claimedCount}/${rp.totalCount}',
@@ -154,9 +157,14 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
     return Card(
       color: context.surfaceColor,
       elevation: 0.5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: AppDimensions.spacingS,
+        ),
         leading: Container(
           width: 44,
           height: 44,
@@ -182,10 +190,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
           '${rp.createdAt.month}/${rp.createdAt.day} '
           '${rp.createdAt.hour.toString().padLeft(2, '0')}:'
           '${rp.createdAt.minute.toString().padLeft(2, '0')}',
-          style: TextStyle(
-            fontSize: 12,
-            color: context.textTertiary,
-          ),
+          style: TextStyle(fontSize: 12, color: context.textTertiary),
         ),
         trailing: Text(
           statusText,
@@ -207,12 +212,15 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
                 token: rp.token,
                 isClaimed: rp.claims.any((c) => c.userId == widget.userId),
                 claimers: rp.claims
-                    .map((c) => RedPacketClaimer(
-                          name: c.userName,
-                          amount: c.amount.toStringAsFixed(2),
-                          claimTime: '${c.claimedAt.hour.toString().padLeft(2, '0')}:'
-                              '${c.claimedAt.minute.toString().padLeft(2, '0')}',
-                        ))
+                    .map(
+                      (c) => RedPacketClaimer(
+                        name: c.userName,
+                        amount: c.amount.toStringAsFixed(2),
+                        claimTime:
+                            '${c.claimedAt.hour.toString().padLeft(2, '0')}:'
+                            '${c.claimedAt.minute.toString().padLeft(2, '0')}',
+                      ),
+                    )
                     .toList(),
               ),
             ),

@@ -9,6 +9,7 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../widgets/common/common_widgets.dart';
+import '../../../../core/theme/app_dimensions.dart';
 
 /// PDF 文件查看器
 ///
@@ -32,7 +33,10 @@ class PdfViewerPage extends StatefulWidget {
     this.url,
     required this.fileName,
     this.headers,
-  }) : assert(filePath != null || url != null, 'Either filePath or url must be provided');
+  }) : assert(
+         filePath != null || url != null,
+         'Either filePath or url must be provided',
+       );
 
   @override
   State<PdfViewerPage> createState() => _PdfViewerPageState();
@@ -59,9 +63,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
         document = await PdfDocument.openFile(widget.filePath!);
       } else if (widget.url != null) {
         final bytes = await _downloadFile(widget.url!);
-        document = await PdfDocument.openData(
-          Uint8List.fromList(bytes),
-        );
+        document = await PdfDocument.openData(Uint8List.fromList(bytes));
       } else {
         throw Exception('No file source provided');
       }
@@ -69,9 +71,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       if (!mounted) return;
 
       setState(() {
-        _controller = PdfControllerPinch(
-          document: Future.value(document),
-        );
+        _controller = PdfControllerPinch(document: Future.value(document));
         _totalPages = document.pagesCount;
         _isLoading = false;
       });
@@ -138,16 +138,11 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
         onBackPressed: () => Navigator.pop(context),
         actions: [
           if (widget.filePath != null)
-            IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: _sharePdf,
-            ),
+            IconButton(icon: const Icon(Icons.share), onPressed: _sharePdf),
         ],
       ),
       body: _buildBody(),
-      bottomNavigationBar: _totalPages > 0
-          ? _buildPageIndicator()
-          : null,
+      bottomNavigationBar: _totalPages > 0 ? _buildPageIndicator() : null,
     );
   }
 
@@ -165,28 +160,20 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: context.textSecondary,
-            ),
-            const SizedBox(height: 16),
+            Icon(Icons.error_outline, size: 64, color: context.textSecondary),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               S.of(context)?.pdfLoadFailed ?? 'Failed to load PDF',
-              style: TextStyle(
-                fontSize: 16,
-                color: context.textPrimary,
-              ),
+              style: TextStyle(fontSize: 16, color: context.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingXXL,
+              ),
               child: Text(
                 _error!,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: context.textSecondary,
-                ),
+                style: TextStyle(fontSize: 13, color: context.textSecondary),
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
@@ -216,10 +203,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       child: Center(
         child: Text(
           '$_currentPage / $_totalPages',
-          style: TextStyle(
-            fontSize: 14,
-            color: context.textSecondary,
-          ),
+          style: TextStyle(fontSize: 14, color: context.textSecondary),
         ),
       ),
     );
@@ -228,10 +212,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   Future<void> _sharePdf() async {
     if (widget.filePath == null) return;
     await SharePlus.instance.share(
-      ShareParams(
-        files: [XFile(widget.filePath!)],
-        subject: widget.fileName,
-      ),
+      ShareParams(files: [XFile(widget.filePath!)], subject: widget.fileName),
     );
   }
 }

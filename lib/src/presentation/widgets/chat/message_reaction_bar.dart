@@ -4,6 +4,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 消息反应栏（显示在消息下方）
 class MessageReactionBar extends StatelessWidget {
@@ -28,15 +29,14 @@ class MessageReactionBar extends StatelessWidget {
       spacing: 4,
       runSpacing: 4,
       children: [
-        ...reactions.map((reaction) => _ReactionChip(
-              reaction: reaction,
-              hasReacted: reaction.hasReacted(currentUserId),
-              onTap: () => onReactionTap?.call(reaction.emoji),
-            )),
-        if (onAddReaction != null)
-          _AddReactionButton(
-            onTap: onAddReaction,
+        ...reactions.map(
+          (reaction) => _ReactionChip(
+            reaction: reaction,
+            hasReacted: reaction.hasReacted(currentUserId),
+            onTap: () => onReactionTap?.call(reaction.emoji),
           ),
+        ),
+        if (onAddReaction != null) _AddReactionButton(onTap: onAddReaction),
       ],
     );
   }
@@ -62,43 +62,41 @@ class _ReactionChip extends StatelessWidget {
       label: A11yL10n.of(context).reaction(reaction.emoji, reaction.count),
       excludeSemantics: true,
       child: GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: hasReacted
-              ? AppColors.primary.withValues(alpha: 0.2)
-              : context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingS,
+            vertical: AppDimensions.spacingXS,
+          ),
+          decoration: BoxDecoration(
             color: hasReacted
-                ? AppColors.primary
-                : context.dividerColor,
-            width: 1,
+                ? AppColors.primary.withValues(alpha: 0.2)
+                : context.surfaceColor,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            border: Border.all(
+              color: hasReacted ? AppColors.primary : context.dividerColor,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(reaction.emoji, style: const TextStyle(fontSize: 14)),
+              if (reaction.count > 1) ...[
+                const SizedBox(width: AppDimensions.spacingXS),
+                Text(
+                  '${reaction.count}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: hasReacted
+                        ? AppColors.primary
+                        : context.textSecondary,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              reaction.emoji,
-              style: const TextStyle(fontSize: 14),
-            ),
-            if (reaction.count > 1) ...[
-              const SizedBox(width: 4),
-              Text(
-                '${reaction.count}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: hasReacted
-                      ? AppColors.primary
-                      : context.textSecondary,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
       ),
     );
   }
@@ -108,9 +106,7 @@ class _ReactionChip extends StatelessWidget {
 class _AddReactionButton extends StatelessWidget {
   final VoidCallback? onTap;
 
-  const _AddReactionButton({
-    this.onTap,
-  });
+  const _AddReactionButton({this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -119,23 +115,19 @@ class _AddReactionButton extends StatelessWidget {
       label: A11yL10n.of(context).addReaction,
       excludeSemantics: true,
       child: GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: context.dividerColor,
-            width: 1,
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingS,
+            vertical: AppDimensions.spacingXS,
           ),
+          decoration: BoxDecoration(
+            color: context.surfaceColor,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            border: Border.all(color: context.dividerColor, width: 1),
+          ),
+          child: Icon(Icons.add, size: 14, color: context.textSecondary),
         ),
-        child: Icon(
-          Icons.add,
-          size: 14,
-          color: context.textSecondary,
-        ),
-      ),
       ),
     );
   }
@@ -145,15 +137,15 @@ class _AddReactionButton extends StatelessWidget {
 class QuickReactionPicker extends StatelessWidget {
   final void Function(String emoji)? onReactionSelected;
 
-  const QuickReactionPicker({
-    super.key,
-    this.onReactionSelected,
-  });
+  const QuickReactionPicker({super.key, this.onReactionSelected});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacingM,
+        vertical: AppDimensions.spacingS,
+      ),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(24),
@@ -176,10 +168,7 @@ class QuickReactionPicker extends StatelessWidget {
               onTap: () => onReactionSelected?.call(emoji),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: Text(
-                  emoji,
-                  style: const TextStyle(fontSize: 24),
-                ),
+                child: Text(emoji, style: const TextStyle(fontSize: 24)),
               ),
             ),
           );
@@ -193,10 +182,7 @@ class QuickReactionPicker extends StatelessWidget {
 class FullReactionPicker extends StatelessWidget {
   final void Function(String emoji)? onReactionSelected;
 
-  const FullReactionPicker({
-    super.key,
-    this.onReactionSelected,
-  });
+  const FullReactionPicker({super.key, this.onReactionSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +190,7 @@ class FullReactionPicker extends StatelessWidget {
 
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         decoration: BoxDecoration(
           color: context.surfaceColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
@@ -226,26 +212,20 @@ class FullReactionPicker extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(
-                    Icons.close,
-                    color: context.textSecondary,
-                  ),
+                  icon: Icon(Icons.close, color: context.textSecondary),
                   tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
 
             // 常用表情
             Text(
               'Frequently Used',
-              style: TextStyle(
-                fontSize: 13,
-                color: context.textSecondary,
-              ),
+              style: TextStyle(fontSize: 13, color: context.textSecondary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -255,23 +235,22 @@ class FullReactionPicker extends StatelessWidget {
                   label: emoji,
                   excludeSemantics: true,
                   child: GestureDetector(
-                  onTap: () {
-                    onReactionSelected?.call(emoji);
-                    Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: context.pageBackground,
-                      borderRadius: BorderRadius.circular(8),
+                    onTap: () {
+                      onReactionSelected?.call(emoji);
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: context.pageBackground,
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                      ),
+                      child: Text(emoji, style: const TextStyle(fontSize: 24)),
                     ),
-                    child: Text(
-                      emoji,
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ),
                   ),
                 );
               }).toList(),
@@ -282,4 +261,3 @@ class FullReactionPicker extends StatelessWidget {
     );
   }
 }
-

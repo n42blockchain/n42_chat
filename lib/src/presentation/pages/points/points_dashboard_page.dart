@@ -11,6 +11,7 @@ import '../../blocs/points/points_state.dart';
 import 'leaderboard_page.dart';
 import 'points_admin_page.dart';
 import 'redemption_page.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// Dashboard page for the SocialFi points economy.
 ///
@@ -71,7 +72,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
         builder: (context, state) {
           final showInitialBalanceLoading =
               state.balanceStatus == PointsLoadStatus.loading &&
-                  state.balance == null;
+              state.balance == null;
           if (showInitialBalanceLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -85,30 +86,31 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             onRefresh: () async => _loadData(),
             color: AppColors.primary,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacing),
               children: [
                 _buildBalanceCard(state),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
                 _buildQuickStats(state),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacing),
                 _buildActionSection(state),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
                 _buildRecentTransactionsHeader(),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
                 if (state.transactionsStatus == PointsLoadStatus.loading &&
                     state.transactions.isEmpty)
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 32),
+                    padding: EdgeInsets.symmetric(
+                      vertical: AppDimensions.spacingXXL,
+                    ),
                     child: Center(child: CircularProgressIndicator()),
                   )
                 else if (state.transactionsStatus == PointsLoadStatus.error &&
                     state.transactions.isEmpty)
                   _buildTransactionsError(state.transactionsErrorMessage)
-                else ...state.transactions
-                    .take(10)
-                    .map((tx) => _TransactionTile(
-                          transaction: tx,
-                        )),
+                else
+                  ...state.transactions
+                      .take(10)
+                      .map((tx) => _TransactionTile(transaction: tx)),
                 if (state.transactionsStatus != PointsLoadStatus.loading &&
                     state.transactionsStatus != PointsLoadStatus.error &&
                     state.transactions.isEmpty)
@@ -128,14 +130,14 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   Widget _buildBalanceCard(PointsState state) {
     final balance = state.balance;
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.spacingL),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.3),
@@ -151,13 +153,9 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             'Total Points',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 14,
-              height: 1.3,
-              color: Colors.white70,
-            ),
+            style: TextStyle(fontSize: 14, height: 1.3, color: Colors.white70),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimensions.spacingXS),
           Text(
             '${balance?.totalPoints ?? 0}',
             maxLines: 1,
@@ -169,14 +167,14 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacing),
           Row(
             children: [
               _BalanceStat(
                 label: 'Available',
                 value: '${balance?.availablePoints ?? 0}',
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: AppDimensions.spacingXL),
               _BalanceStat(
                 label: 'Streak',
                 value: '${balance?.streakDays ?? 0} days',
@@ -184,17 +182,19 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
               const Spacer(),
               if (balance?.isActiveToday ?? false)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacingS,
+                    vertical: AppDimensions.spacingXS,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.check_circle, color: Colors.white, size: 14),
-                      SizedBox(width: 4),
+                      SizedBox(width: AppDimensions.spacingXS),
                       Text(
                         'Active today',
                         maxLines: 1,
@@ -232,7 +232,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             isDark: context.isDarkMode,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppDimensions.spacingM),
         Expanded(
           child: _StatCard(
             icon: Icons.redeem_outlined,
@@ -253,15 +253,15 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
     final config = state.config;
     if (config != null && !config.isEnabled) {
       return Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.spacing),
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         ),
         child: Row(
           children: [
             const Icon(Icons.pause_circle_outline, color: AppColors.warning),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingM),
             Expanded(
               child: Text(
                 'Points are disabled in this room.',
@@ -304,7 +304,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
     return Row(
       children: [
         actions.first,
-        const SizedBox(width: 12),
+        const SizedBox(width: AppDimensions.spacingM),
         actions.last,
       ],
     );
@@ -330,16 +330,12 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
 
   Widget _buildEmptyTransactions() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 32),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXXL),
       child: Center(
         child: Column(
           children: [
-            Icon(
-              Icons.history_outlined,
-              size: 48,
-              color: context.textTertiary,
-            ),
-            const SizedBox(height: 8),
+            Icon(Icons.history_outlined, size: 48, color: context.textTertiary),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               'No activity yet',
               maxLines: 1,
@@ -350,7 +346,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 color: context.textSecondary,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXS),
             Text(
               'Start earning points by participating!',
               maxLines: 1,
@@ -369,12 +365,12 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
 
   Widget _buildTransactionsError(String? errorMessage) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXL),
       child: Center(
         child: Column(
           children: [
             const Icon(Icons.error_outline, color: AppColors.error, size: 32),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingS),
             Text(
               'Failed to load recent activity',
               maxLines: 1,
@@ -400,14 +396,14 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 ),
               ),
             ],
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingM),
             OutlinedButton(
               onPressed: () => context.read<PointsBloc>().add(
-                    PointsLoadTransactions(
-                      userId: widget.userId,
-                      roomId: widget.roomId,
-                    ),
-                  ),
+                PointsLoadTransactions(
+                  userId: widget.userId,
+                  roomId: widget.roomId,
+                ),
+              ),
               child: const Text('Retry'),
             ),
           ],
@@ -423,12 +419,12 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
   Widget _buildErrorState(String? errorMessage) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppDimensions.spacingXXL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
             Text(
               'Failed to load points',
               maxLines: 1,
@@ -441,7 +437,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
               ),
             ),
             if (errorMessage != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 errorMessage,
                 textAlign: TextAlign.center,
@@ -454,11 +450,8 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
                 ),
               ),
             ],
-            const SizedBox(height: 24),
-            OutlinedButton(
-              onPressed: _loadData,
-              child: const Text('Retry'),
-            ),
+            const SizedBox(height: AppDimensions.spacingXL),
+            OutlinedButton(onPressed: _loadData, child: const Text('Retry')),
           ],
         ),
       ),
@@ -488,10 +481,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
       MaterialPageRoute<void>(
         builder: (_) => BlocProvider.value(
           value: context.read<PointsBloc>(),
-          child: RedemptionPage(
-            userId: widget.userId,
-            roomId: widget.roomId,
-          ),
+          child: RedemptionPage(userId: widget.userId, roomId: widget.roomId),
         ),
       ),
     );
@@ -528,7 +518,11 @@ class _BalanceStat extends StatelessWidget {
           label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 11, height: 1.3, color: Colors.white60),
+          style: const TextStyle(
+            fontSize: 11,
+            height: 1.3,
+            color: Colors.white60,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
@@ -563,10 +557,10 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
         color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         boxShadow: isDark
             ? null
             : [
@@ -580,7 +574,7 @@ class _StatCard extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 28, color: AppColors.primary),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -632,16 +626,14 @@ class _ActionButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: context.dividerColor,
-          ),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          border: Border.all(color: context.dividerColor),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 20, color: AppColors.primary),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingS),
             Text(
               label,
               maxLines: 1,
@@ -663,17 +655,15 @@ class _ActionButton extends StatelessWidget {
 class _TransactionTile extends StatelessWidget {
   final PointsTransaction transaction;
 
-  const _TransactionTile({
-    required this.transaction,
-  });
+  const _TransactionTile({required this.transaction});
 
   @override
   Widget build(BuildContext context) {
     final isPositive = transaction.isEarned;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
+      padding: const EdgeInsets.all(AppDimensions.spacingM),
       decoration: BoxDecoration(
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(10),
@@ -686,15 +676,17 @@ class _TransactionTile extends StatelessWidget {
             decoration: BoxDecoration(
               color: (isPositive ? AppColors.success : AppColors.error)
                   .withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Icon(
-              isPositive ? Icons.add_circle_outline : Icons.remove_circle_outline,
+              isPositive
+                  ? Icons.add_circle_outline
+                  : Icons.remove_circle_outline,
               size: 20,
               color: isPositive ? AppColors.success : AppColors.error,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

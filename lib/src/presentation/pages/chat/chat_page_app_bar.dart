@@ -10,8 +10,9 @@ extension _ChatPageAppBarMethods on _ChatPageState {
     }
 
     // 检测桥接平台
-    final bridgePlatform =
-        BridgeDetectionUtils.detectFromConversation(widget.conversation);
+    final bridgePlatform = BridgeDetectionUtils.detectFromConversation(
+      widget.conversation,
+    );
 
     return N42AppBar(
       titleWidget: BlocBuilder<ChatBloc, ChatState>(
@@ -24,7 +25,9 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                 children: [
                   if (chatState.isChannel)
                     Padding(
-                      padding: const EdgeInsets.only(right: 4),
+                      padding: const EdgeInsets.only(
+                        right: AppDimensions.spacingXS,
+                      ),
                       child: Icon(
                         Icons.campaign,
                         size: 18,
@@ -34,11 +37,15 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                   // 桥接平台小图标
                   if (bridgePlatform != null)
                     Padding(
-                      padding: const EdgeInsets.only(right: 4),
+                      padding: const EdgeInsets.only(
+                        right: AppDimensions.spacingXS,
+                      ),
                       child: Icon(
                         BridgePlatformRegistry.getInfo(bridgePlatform).icon,
                         size: 16,
-                        color: BridgePlatformRegistry.getInfo(bridgePlatform).brandColor,
+                        color: BridgePlatformRegistry.getInfo(
+                          bridgePlatform,
+                        ).brandColor,
                       ),
                     ),
                   Flexible(
@@ -57,7 +64,12 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                 Text(
                   chatState.isChannel
                       ? '${widget.conversation.memberCount} ${S.of(context)?.channelSubscribers ?? 'subscribers'}'
-                      : (S.of(context)?.commonMemberCount(widget.conversation.memberCount) ?? '${widget.conversation.memberCount} members'),
+                      : (S
+                                .of(context)
+                                ?.commonMemberCount(
+                                  widget.conversation.memberCount,
+                                ) ??
+                            '${widget.conversation.memberCount} members'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.captionSmall.copyWith(
@@ -93,9 +105,8 @@ extension _ChatPageAppBarMethods on _ChatPageState {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (_) => GroupTopicsPage(
-                    roomId: widget.conversation.id,
-                  ),
+                  builder: (_) =>
+                      GroupTopicsPage(roomId: widget.conversation.id),
                 ),
               );
             },
@@ -142,7 +153,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
         _selectedMessageIds.isEmpty
             ? (S.of(context)?.chatSelectMessages ?? 'Select messages')
             : (S.of(context)?.chatSelectedCount(_selectedMessageIds.length) ??
-                'Selected ${_selectedMessageIds.length}'),
+                  'Selected ${_selectedMessageIds.length}'),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: AppTextStyles.headlineSmall.copyWith(color: fgColor),

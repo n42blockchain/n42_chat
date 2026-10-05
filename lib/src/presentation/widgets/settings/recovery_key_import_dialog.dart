@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 /// 恢复密钥导入对话框
 ///
@@ -48,7 +49,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
       title: const Row(
         children: [
           Icon(Icons.key, color: AppColors.primary),
-          SizedBox(width: 8),
+          SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text('Import Recovery Key', style: TextStyle(fontSize: 18)),
           ),
@@ -68,7 +69,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacing),
 
             // 输入框
             TextField(
@@ -86,10 +87,10 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
                   color: context.textTertiary,
                 ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   borderSide: const BorderSide(color: AppColors.primary),
                 ),
                 suffixIcon: IconButton(
@@ -105,7 +106,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
 
             // 错误消息
             if (_error != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingS),
               Text(
                 _error!,
                 style: const TextStyle(fontSize: 12, color: AppColors.error),
@@ -123,7 +124,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
           onPressed: _isLoading ? null : _importKey,
           child: _isLoading
               ? const SizedBox(
-                  width: 16,
+                  width: AppDimensions.spacing,
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,

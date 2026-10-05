@@ -16,6 +16,7 @@ import '../../../domain/repositories/auth_repository.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../core/utils/debug_log.dart';
+import '../../../core/theme/app_dimensions.dart';
 
 enum _QRCodeStyle { n42, classic, ocean, berry }
 
@@ -193,11 +194,11 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
         child: RepaintBoundary(
           key: _qrKey,
           child: Container(
-            margin: const EdgeInsets.all(32),
-            padding: const EdgeInsets.all(24),
+            margin: const EdgeInsets.all(AppDimensions.spacingXXL),
+            padding: const EdgeInsets.all(AppDimensions.spacingXL),
             decoration: BoxDecoration(
               color: cardColor,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -219,7 +220,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                       size: 56,
                       decorationPreset: _avatarDecorationPreset,
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppDimensions.spacing),
                     // 名字和ID
                     Expanded(
                       child: Column(
@@ -237,7 +238,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                               color: textColor,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spacingXS),
                           Text(
                             _userId ?? '',
                             maxLines: 1,
@@ -254,15 +255,17 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimensions.spacingXXL),
 
                 // 二维码
                 if (_userId != null)
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppDimensions.spacing),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
                     ),
                     child: QrImageView(
                       data: _qrData,
@@ -285,12 +288,14 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                     height: 232,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
                     ),
                     child: const Center(child: CircularProgressIndicator()),
                   ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 提示文字
                 Text(
@@ -306,7 +311,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingXL),
 
                 // 操作按钮
                 Row(
@@ -318,7 +323,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                       onTap: _copyUserId,
                       isDark: isDark,
                     ),
-                    const SizedBox(width: 32),
+                    const SizedBox(width: AppDimensions.spacingXXL),
                     _buildActionButton(
                       icon: Icons.share,
                       label: S.of(context)?.commonShare ?? 'Share',
@@ -355,7 +360,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
             ),
             child: Icon(icon, color: AppColors.primary, size: 24),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingS),
           Text(
             label,
             maxLines: 1,
@@ -387,12 +392,14 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  margin: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.spacingM,
+                  ),
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
                     color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                   ),
                 ),
                 ListTile(
@@ -416,7 +423,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                     _showStylePicker();
                   },
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
               ],
             ),
           ),
@@ -428,22 +435,22 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   Color _qrCardColor(bool isDark) {
     switch (_qrStyle) {
       case _QRCodeStyle.n42:
-        return isDark ? const Color(0xFF2C2C2C) : Colors.white;
+        return isDark ? const Color(0xFF2A2A2A) : Colors.white;
       case _QRCodeStyle.classic:
-        return isDark ? const Color(0xFF1E1E1E) : Colors.white;
+        return isDark ? const Color(0xFF181818) : Colors.white;
       case _QRCodeStyle.ocean:
-        return isDark ? const Color(0xFF112A3A) : const Color(0xFFEAF8FF);
+        return isDark ? const Color(0xFF1A252F) : const Color(0xFFE3EFFD);
       case _QRCodeStyle.berry:
-        return isDark ? const Color(0xFF2A1727) : const Color(0xFFFFF1F7);
+        return isDark ? const Color(0xFF2A1727) : const Color(0xFFF7F7F7);
     }
   }
 
   Color get _qrBackgroundColor {
     switch (_qrStyle) {
       case _QRCodeStyle.ocean:
-        return const Color(0xFFF4FCFF);
+        return const Color(0xFFF7F7F7);
       case _QRCodeStyle.berry:
-        return const Color(0xFFFFF8FB);
+        return const Color(0xFFF7F7F7);
       case _QRCodeStyle.n42:
       case _QRCodeStyle.classic:
         return Colors.white;
@@ -533,12 +540,14 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  margin: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.spacingM,
+                  ),
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
                     color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                   ),
                 ),
                 for (final style in _QRCodeStyle.values)
@@ -559,7 +568,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                       setState(() => _qrStyle = style);
                     },
                   ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingS),
               ],
             ),
           ),
