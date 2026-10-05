@@ -24,6 +24,8 @@ dependencies:
   cupertino_icons: ^1.0.6
 
 dependency_overrides:
+  # Keep aligned with n42_chat: connectivity_plus and wakelock_plus now require dbus 0.8.
+  dbus: ^0.8.0
   flutter_secure_storage:
     git:
       url: https://github.com/n42blockchain/n42appv2.git
