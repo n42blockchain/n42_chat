@@ -114,7 +114,7 @@ dependencies:
   # Utils - 工具库
   # ============================================
   # MIT / BSD-3-Clause License
-  equatable: ^3.0.0
+  equatable: ^2.1.0
   # MIME 类型检测
   mime: ^2.0.0
   json_annotation: ^4.8.1
