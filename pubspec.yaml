@@ -106,7 +106,7 @@ dependencies:
   permission_handler: ^13.0.2
   saver_gallery: ^5.1.0
   share_plus: ^13.3.1
-  pro_image_editor: ^14.4.1
+  pro_image_editor: ^14.8.0
   material_ui: ^1.1.1
 
   # ============================================
@@ -137,7 +137,7 @@ dependencies:
   qr_flutter: ^4.1.0
   flutter_markdown: ^0.7.4+3
   markdown: ^7.3.0
-  unorm_dart: ^0.3.2
+  unorm_dart: ^0.3.3
 
   # ============================================
   # ML Kit - 机器学习

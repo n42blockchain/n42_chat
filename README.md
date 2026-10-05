@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.19.0-blue.svg)](https://flutter.dev)
 
+The checked-in example host targets iOS 16.0 and Android API 24 or later. This matches the current `flutter_gemma` native requirements and keeps the generated platform projects reproducible on a fresh checkout.
+
 ## ✨ 功能特性
 
 - 🎨 **微信风格UI** - 熟悉的交互体验，中国用户友好

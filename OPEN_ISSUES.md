@@ -541,3 +541,11 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Evidence: `nested_settings_failure_test.dart`, `settings_write_failure_test.dart`
 - Resolution: account-list and notification-filter reads show a retry state on failure. Filter saves serialize input, restore confirmed rules on failure, and update the running push filter only after storage succeeds. Appearance, notification and filter writes reject platform `false` results and reload SharedPreferences' optimistic cache from durable storage.
 - Verification: fault injection covers both `false` and thrown platform failures, cached-value restoration, successful retry, filter read/write failures and late completion after disposal. If the platform also refuses cache reload, the original write failure is still surfaced; recovery from a persistently unavailable OS store is not claimed.
+
+### QA-007 Example mobile host platform settings — Partially resolved
+
+- Severity: M
+- Cause: the ignored generated example projects did not retain Android desugaring/Java targets or the iOS deployment target required by `flutter_gemma`.
+- Resolution: check in the Android and iOS host projects; set iOS deployment target to 16.0, Android minSdk to 24, Java/Kotlin target to 17, and desugaring to 2.1.4. Keep AGP/Gradle aligned with the main app's supported versions and apply its namespace/compileSdk compatibility rules for older plugins.
+- Verification: Android debug build and emulator install/launch passed. iOS simulator build passed for x86_64. The current ML Kit `MLImage` pod has no arm64 simulator slice, so Apple Silicon simulator build remains blocked. Physical iOS signing also remains unverified because the configured developer team must accept its current program license and create a profile for the example bundle ID.
+- Remaining: update the ML Kit binary graph to support arm64 simulator, then verify Apple Silicon simulator and a provisioned iOS device. The supported iOS floor is 16.0; making `flutter_gemma` optional is not needed for this package's declared mobile support.
