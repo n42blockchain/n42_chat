@@ -145,9 +145,11 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       final bytes = await video.readAsBytes();
       if (bytes.isEmpty || !mounted) return;
       final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filename = VideoNoteUtils.buildFilename(timestamp);
       final note = XFile.fromData(
         bytes,
-        name: VideoNoteUtils.buildFilename(timestamp),
+        path: filename,
+        name: filename,
         mimeType: video.mimeType ?? 'video/mp4',
       );
       await _sendVideo(note);
@@ -311,7 +313,6 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         fallbackMimeType: 'image/jpeg',
       );
       filename = _ensureFilenameMatchesMimeType(filename, mimeType);
-
       if (scheduledAt != null) {
         await _scheduleLocalAttachmentDraft(
           type: MessageType.image,
@@ -937,7 +938,6 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         filePath: filePath,
         scheduledAt: scheduledAt,
       );
-
       if (!mounted) {
         return;
       }

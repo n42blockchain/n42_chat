@@ -12,6 +12,7 @@ import 'package:n42_chat/src/presentation/blocs/moment/moment_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/moment/moment_state.dart';
 import 'package:n42_chat/src/core/theme/app_icons.dart';
 import 'package:n42_chat/src/presentation/pages/discover/discover_page.dart';
+import 'package:n42_chat/src/presentation/pages/discover/channel_discover_page.dart';
 import 'package:n42_chat/src/presentation/pages/discover/listen_page.dart';
 import 'package:n42_chat/src/presentation/pages/discover/nearby_page.dart';
 import 'package:n42_chat/src/presentation/pages/moment/video_feed_page.dart';
@@ -76,8 +77,8 @@ void main() {
       });
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.textContaining('Channel'));
-      await tester.tap(find.textContaining('Channel'));
+      await tester.ensureVisible(find.text('Channels'));
+      await tester.tap(find.text('Channels'));
       await tester.pumpAndSettle();
       expect(
         tester.widget<VideoFeedPage>(find.byType(VideoFeedPage)).creatorActions,
@@ -137,7 +138,7 @@ void main() {
       expect(find.text('Communities'), findsOneWidget);
 
       // 验证有 Channels 菜单项
-      expect(find.textContaining('Channel'), findsOneWidget);
+      expect(find.textContaining('Channel'), findsWidgets);
     });
 
     testWidgets('shows the enabled Listen, Watch, and Nearby entries', (
@@ -150,6 +151,19 @@ void main() {
       expect(find.text('Listen'), findsOneWidget);
       expect(find.text('Watch'), findsOneWidget);
       expect(find.text('Nearby'), findsOneWidget);
+    });
+
+    testWidgets('Channels opens public channel discovery', (tester) async {
+      useTallViewport(tester);
+      await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Discover Channels'));
+      await tester.tap(find.text('Discover Channels'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ChannelDiscoverPage), findsOneWidget);
+      expect(find.text('Sign in to discover public channels'), findsOneWidget);
     });
 
     for (final target in const <(String, Type)>[
@@ -257,7 +271,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final chevronIcons = find.byIcon(AppIcons.chevron);
-      expect(chevronIcons, findsNWidgets(13));
+      expect(chevronIcons, findsNWidgets(14));
     });
   });
 }

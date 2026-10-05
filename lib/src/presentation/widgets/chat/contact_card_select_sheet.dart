@@ -164,41 +164,44 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
                     itemCount: _filteredContacts.length,
                     itemBuilder: (context, index) {
                       final contact = _filteredContacts[index];
-                      return ListTile(
-                        leading: contact.avatarUrl != null
-                            ? CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  contact.avatarUrl!,
+                      return Material(
+                        color: AppColors.surfaceOf(widget.isDark),
+                        child: ListTile(
+                          leading: contact.avatarUrl != null
+                              ? CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                    contact.avatarUrl!,
+                                  ),
+                                )
+                              : CircleAvatar(
+                                  backgroundColor: AppColors.primary,
+                                  child: Text(
+                                    contact.effectiveDisplayName.isNotEmpty
+                                        ? contact.effectiveDisplayName[0]
+                                              .toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
                                 ),
-                              )
-                            : CircleAvatar(
-                                backgroundColor: AppColors.primary,
-                                child: Text(
-                                  contact.effectiveDisplayName.isNotEmpty
-                                      ? contact.effectiveDisplayName[0]
-                                            .toUpperCase()
-                                      : '?',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                        title: Text(
-                          contact.effectiveDisplayName,
-                          style: TextStyle(
-                            color: AppColors.textPrimaryOf(widget.isDark),
+                          title: Text(
+                            contact.effectiveDisplayName,
+                            style: TextStyle(
+                              color: AppColors.textPrimaryOf(widget.isDark),
+                            ),
                           ),
-                        ),
-                        subtitle: Text(
-                          contact.userId,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textTertiaryOf(widget.isDark),
+                          subtitle: Text(
+                            contact.userId,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textTertiaryOf(widget.isDark),
+                            ),
                           ),
+                          onTap: () => Navigator.pop(context, {
+                            'id': contact.userId,
+                            'name': contact.effectiveDisplayName,
+                            'avatar': contact.avatarUrl,
+                          }),
                         ),
-                        onTap: () => Navigator.pop(context, {
-                          'id': contact.userId,
-                          'name': contact.effectiveDisplayName,
-                          'avatar': contact.avatarUrl,
-                        }),
                       );
                     },
                   ),

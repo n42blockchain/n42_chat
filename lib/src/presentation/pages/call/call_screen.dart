@@ -303,6 +303,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: Colors.black,
       body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: _state == CallState.connected ? _toggleControls : null,
         child: Stack(
           children: [

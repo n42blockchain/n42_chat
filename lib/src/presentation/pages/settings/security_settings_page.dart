@@ -43,6 +43,8 @@ import '../../../core/utils/debug_log.dart';
 class SecuritySettingsPage extends StatefulWidget {
   final E2EEManager e2eeManager;
   final KeyBackupService keyBackupService;
+  @visibleForTesting
+  final MatrixAuthDataSource? authDataSource;
   final bool restoreKeysOnOpen;
   final IMatrixAccountDeletionSession Function(bool erase)?
   deletionSessionFactory;
@@ -54,6 +56,7 @@ class SecuritySettingsPage extends StatefulWidget {
     super.key,
     required this.e2eeManager,
     required this.keyBackupService,
+    this.authDataSource,
     this.restoreKeysOnOpen = false,
     this.deletionSessionFactory,
     this.openDeletionFallback,
@@ -70,6 +73,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
   KeyBackupInfo? _backupInfo;
   List<DeviceInfo> _devices = [];
   int _dataLoadVersion = 0;
+
+  MatrixAuthDataSource get _authDataSource =>
+      widget.authDataSource ?? MatrixAuthDataSource();
 
   // 生物识别状态
   bool _isBiometricAvailable = false;
@@ -218,8 +224,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       setState(() => _backupInfo = backupInfo);
 
       // 获取当前用户的设备列表
-      final authDataSource = MatrixAuthDataSource();
-      final matrixDevices = await authDataSource.getDevices();
+      final matrixDevices = await _authDataSource.getDevices();
       final currentDeviceId = widget.e2eeManager.currentDeviceId;
       final userId = widget.e2eeManager.client.userID;
 
@@ -2083,7 +2088,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
 
   void _showRenameDeviceDialog(DeviceInfo device) {
     final controller = TextEditingController(text: device.deviceName);
-    showDialog<void>(
+    final route = DialogRoute<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.settingsRenameDevice ?? 'Rename device'),
@@ -2113,13 +2118,14 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           ),
         ],
       ),
-    ).whenComplete(controller.dispose);
+    );
+    Navigator.of(context, rootNavigator: true).push(route);
+    unawaited(route.completed.whenComplete(controller.dispose));
   }
 
   Future<void> _renameDevice(String deviceId, String newName) async {
     try {
-      final authDataSource = MatrixAuthDataSource();
-      await authDataSource.updateDeviceName(deviceId, newName);
+      await _authDataSource.updateDeviceName(deviceId, newName);
       await _loadData();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -2174,10 +2180,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     _invalidatePendingDataLoads();
     setState(() => _isLoading = true);
     try {
-      final authDataSource = MatrixAuthDataSource();
       // First attempt without auth (may trigger UIA)
       try {
-        await authDataSource.deleteDevice(device.deviceId);
+        await _authDataSource.deleteDevice(device.deviceId);
       } on MatrixException catch (e) {
         if (e.response?.statusCode == 401 &&
             matrixUiaSupportsPassword(e.response?.body)) {
@@ -2215,48 +2220,45 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
 
   Future<void> _showUiaPasswordDialog(DeviceInfo device) async {
     final passwordController = TextEditingController();
-    try {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(
-            S.of(context)?.settingsVerifyIdentity ?? 'Verify identity',
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                S.of(context)?.settingsEnterPasswordToConfirm ??
-                    'Enter your password to confirm this action.',
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: S.of(context)?.settingsPassword ?? 'Password',
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx, false);
-              },
-              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+    final route = DialogRoute<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.settingsVerifyIdentity ?? 'Verify identity'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              S.of(context)?.settingsEnterPasswordToConfirm ??
+                  'Enter your password to confirm this action.',
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx, true);
-              },
-              style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: S.of(context)?.settingsPassword ?? 'Password',
+                border: const OutlineInputBorder(),
+              ),
             ),
           ],
         ),
-      );
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+          ),
+        ],
+      ),
+    );
+    try {
+      final navigator = Navigator.of(context, rootNavigator: true);
+      final confirmed = await navigator.push<bool>(route);
+      await route.completed;
 
       if (confirmed == true) {
         final password = passwordController.text.trim();
@@ -2270,8 +2272,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
               password: password,
               identifier: AuthenticationUserIdentifier(user: userId),
             );
-            final authDataSource = MatrixAuthDataSource();
-            await authDataSource.deleteDevice(device.deviceId, auth: auth);
+            await _authDataSource.deleteDevice(device.deviceId, auth: auth);
             await _loadData();
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(

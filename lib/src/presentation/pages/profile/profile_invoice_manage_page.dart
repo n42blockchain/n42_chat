@@ -406,216 +406,236 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
   }
 
   Future<InvoiceItem?> _showInvoiceEditor({InvoiceItem? invoice}) async {
-    String type = invoice?.type ?? 'personal';
-    final titleController = TextEditingController(text: invoice?.title);
-    final taxNumberController = TextEditingController(text: invoice?.taxNumber);
-    final bankNameController = TextEditingController(text: invoice?.bankName);
-    final bankAccountController = TextEditingController(
-      text: invoice?.bankAccount,
+    return showDialog<InvoiceItem>(
+      context: context,
+      builder: (_) => _InvoiceEditorDialog(invoice: invoice),
     );
-    final companyAddressController = TextEditingController(
+  }
+}
+
+class _InvoiceEditorDialog extends StatefulWidget {
+  const _InvoiceEditorDialog({this.invoice});
+
+  final InvoiceItem? invoice;
+
+  @override
+  State<_InvoiceEditorDialog> createState() => _InvoiceEditorDialogState();
+}
+
+class _InvoiceEditorDialogState extends State<_InvoiceEditorDialog> {
+  late String _type;
+  late bool _isDefault;
+  late final TextEditingController _titleController;
+  late final TextEditingController _taxNumberController;
+  late final TextEditingController _bankNameController;
+  late final TextEditingController _bankAccountController;
+  late final TextEditingController _companyAddressController;
+  late final TextEditingController _companyPhoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    final invoice = widget.invoice;
+    _type = invoice?.type ?? 'personal';
+    _isDefault = invoice?.isDefault ?? false;
+    _titleController = TextEditingController(text: invoice?.title);
+    _taxNumberController = TextEditingController(text: invoice?.taxNumber);
+    _bankNameController = TextEditingController(text: invoice?.bankName);
+    _bankAccountController = TextEditingController(text: invoice?.bankAccount);
+    _companyAddressController = TextEditingController(
       text: invoice?.companyAddress,
     );
-    final companyPhoneController = TextEditingController(
+    _companyPhoneController = TextEditingController(
       text: invoice?.companyPhone,
     );
-    bool isDefault = invoice?.isDefault ?? false;
+  }
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _taxNumberController.dispose();
+    _bankNameController.dispose();
+    _bankAccountController.dispose();
+    _companyAddressController.dispose();
+    _companyPhoneController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final s = S.of(context);
-    try {
-      return await showDialog<InvoiceItem>(
-        context: context,
-        builder: (dialogContext) => StatefulBuilder(
-          builder: (dialogContext, setDialogState) => AlertDialog(
-            title: Text(
-              invoice == null
-                  ? (s?.profileAddInvoice ?? 'Add Invoice')
-                  : (s?.profileEditInvoice ?? 'Edit Invoice'),
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return StatefulBuilder(
+      builder: (dialogContext, setDialogState) => AlertDialog(
+        title: Text(
+          widget.invoice == null
+              ? (s?.profileAddInvoice ?? 'Add Invoice')
+              : (s?.profileEditInvoice ?? 'Edit Invoice'),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      Text('${s?.profileInvoiceType ?? 'Invoice Type'}: '),
-                      ChoiceChip(
-                        label: Text(s?.profilePersonal ?? 'Personal'),
-                        selected: type == 'personal',
-                        onSelected: (selected) {
-                          if (selected) {
-                            setDialogState(() => type = 'personal');
-                          }
-                        },
-                      ),
-                      ChoiceChip(
-                        label: Text(s?.profileCompany ?? 'Company'),
-                        selected: type == 'company',
-                        onSelected: (selected) {
-                          if (selected) {
-                            setDialogState(() => type = 'company');
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      labelText: type == 'company'
-                          ? (s?.profileCompanyName ?? 'Company Name')
-                          : (s?.profilePersonalName ?? 'Personal Name'),
-                      hintText: type == 'company'
-                          ? (s?.profileEnterCompanyName ?? 'Enter company name')
-                          : (s?.profileEnterName ?? 'Enter name'),
-                    ),
-                  ),
-                  if (type == 'company') ...[
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: taxNumberController,
-                      decoration: InputDecoration(
-                        labelText: s?.profileTaxIdNumber ?? 'Tax ID Number',
-                        hintText:
-                            s?.profileEnterTaxIdNumber ?? 'Enter tax ID number',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: bankNameController,
-                      decoration: InputDecoration(
-                        labelText:
-                            s?.profileBankNameOptional ??
-                            'Bank Name (Optional)',
-                        hintText: s?.profileEnterBankName ?? 'Enter bank name',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: bankAccountController,
-                      decoration: InputDecoration(
-                        labelText:
-                            s?.profileBankAccountOptional ??
-                            'Bank Account (Optional)',
-                        hintText:
-                            s?.profileEnterBankAccount ?? 'Enter bank account',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: companyAddressController,
-                      decoration: InputDecoration(
-                        labelText:
-                            s?.profileCompanyAddressOptional ??
-                            'Company Address (Optional)',
-                        hintText:
-                            s?.profileEnterCompanyAddress ??
-                            'Enter company address',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: companyPhoneController,
-                      decoration: InputDecoration(
-                        labelText:
-                            s?.profileCompanyPhoneOptional ??
-                            'Company Phone (Optional)',
-                        hintText:
-                            s?.profileEnterCompanyPhone ??
-                            'Enter company phone',
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 12),
-                  CheckboxListTile(
-                    value: isDefault,
-                    onChanged: (value) {
-                      setDialogState(() {
-                        isDefault = value ?? false;
-                      });
+                  Text('${s?.profileInvoiceType ?? 'Invoice Type'}: '),
+                  ChoiceChip(
+                    label: Text(s?.profilePersonal ?? 'Personal'),
+                    selected: _type == 'personal',
+                    onSelected: (selected) {
+                      if (selected) setDialogState(() => _type = 'personal');
                     },
-                    title: Text(
-                      s?.profileSetAsDefaultInvoice ?? 'Set as default invoice',
-                    ),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
+                  ),
+                  ChoiceChip(
+                    label: Text(s?.profileCompany ?? 'Company'),
+                    selected: _type == 'company',
+                    onSelected: (selected) {
+                      if (selected) setDialogState(() => _type = 'company');
+                    },
                   ),
                 ],
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: Text(s?.commonCancel ?? 'Cancel'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: _type == 'company'
+                      ? (s?.profileCompanyName ?? 'Company Name')
+                      : (s?.profilePersonalName ?? 'Personal Name'),
+                  hintText: _type == 'company'
+                      ? (s?.profileEnterCompanyName ?? 'Enter company name')
+                      : (s?.profileEnterName ?? 'Enter name'),
+                ),
               ),
-              TextButton(
-                onPressed: () {
-                  if (titleController.text.isEmpty) {
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          type == 'company'
-                              ? (s?.profileEnterCompanyName ??
-                                    'Enter company name')
-                              : (s?.profileEnterName ?? 'Enter name'),
-                        ),
-                      ),
-                    );
-                    return;
-                  }
-                  if (type == 'company' && taxNumberController.text.isEmpty) {
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          s?.profileEnterTaxIdNumber ?? 'Enter tax ID number',
-                        ),
-                      ),
-                    );
-                    return;
-                  }
-                  Navigator.pop(
-                    dialogContext,
-                    InvoiceItem(
-                      type: type,
-                      title: titleController.text,
-                      taxNumber: type == 'company'
-                          ? taxNumberController.text
-                          : null,
-                      bankName: type == 'company'
-                          ? bankNameController.text
-                          : null,
-                      bankAccount: type == 'company'
-                          ? bankAccountController.text
-                          : null,
-                      companyAddress: type == 'company'
-                          ? companyAddressController.text
-                          : null,
-                      companyPhone: type == 'company'
-                          ? companyPhoneController.text
-                          : null,
-                      isDefault: isDefault,
-                    ),
-                  );
-                },
-                child: Text(s?.commonSave ?? 'Save'),
+              if (_type == 'company') ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _taxNumberController,
+                  decoration: InputDecoration(
+                    labelText: s?.profileTaxIdNumber ?? 'Tax ID Number',
+                    hintText:
+                        s?.profileEnterTaxIdNumber ?? 'Enter tax ID number',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _bankNameController,
+                  decoration: InputDecoration(
+                    labelText:
+                        s?.profileBankNameOptional ?? 'Bank Name (Optional)',
+                    hintText: s?.profileEnterBankName ?? 'Enter bank name',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _bankAccountController,
+                  decoration: InputDecoration(
+                    labelText:
+                        s?.profileBankAccountOptional ??
+                        'Bank Account (Optional)',
+                    hintText:
+                        s?.profileEnterBankAccount ?? 'Enter bank account',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _companyAddressController,
+                  decoration: InputDecoration(
+                    labelText:
+                        s?.profileCompanyAddressOptional ??
+                        'Company Address (Optional)',
+                    hintText:
+                        s?.profileEnterCompanyAddress ??
+                        'Enter company address',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _companyPhoneController,
+                  decoration: InputDecoration(
+                    labelText:
+                        s?.profileCompanyPhoneOptional ??
+                        'Company Phone (Optional)',
+                    hintText:
+                        s?.profileEnterCompanyPhone ?? 'Enter company phone',
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
+              CheckboxListTile(
+                value: _isDefault,
+                onChanged: (value) =>
+                    setDialogState(() => _isDefault = value ?? false),
+                title: Text(
+                  s?.profileSetAsDefaultInvoice ?? 'Set as default invoice',
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
               ),
             ],
           ),
         ),
-      );
-    } finally {
-      titleController.dispose();
-      taxNumberController.dispose();
-      bankNameController.dispose();
-      bankAccountController.dispose();
-      companyAddressController.dispose();
-      companyPhoneController.dispose();
-    }
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(s?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (_titleController.text.isEmpty) {
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      _type == 'company'
+                          ? (s?.profileEnterCompanyName ?? 'Enter company name')
+                          : (s?.profileEnterName ?? 'Enter name'),
+                    ),
+                  ),
+                );
+                return;
+              }
+              if (_type == 'company' && _taxNumberController.text.isEmpty) {
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      s?.profileEnterTaxIdNumber ?? 'Enter tax ID number',
+                    ),
+                  ),
+                );
+                return;
+              }
+              Navigator.pop(
+                dialogContext,
+                InvoiceItem(
+                  type: _type,
+                  title: _titleController.text,
+                  taxNumber: _type == 'company'
+                      ? _taxNumberController.text
+                      : null,
+                  bankName: _type == 'company'
+                      ? _bankNameController.text
+                      : null,
+                  bankAccount: _type == 'company'
+                      ? _bankAccountController.text
+                      : null,
+                  companyAddress: _type == 'company'
+                      ? _companyAddressController.text
+                      : null,
+                  companyPhone: _type == 'company'
+                      ? _companyPhoneController.text
+                      : null,
+                  isDefault: _isDefault,
+                ),
+              );
+            },
+            child: Text(s?.commonSave ?? 'Save'),
+          ),
+        ],
+      ),
+    );
   }
 }
 

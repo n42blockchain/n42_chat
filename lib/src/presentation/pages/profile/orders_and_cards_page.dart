@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/red_packet_entity.dart';
 import '../../../n42_chat.dart';
+import '../red_packet/red_packet_history_page.dart';
 
 /// Activity and card-pack hub used by the Me tab.
 ///
@@ -15,7 +16,9 @@ import '../../../n42_chat.dart';
 /// empty placeholder. Cards delegate to the wallet host where card ownership
 /// lives, while standalone chat presents an explicit unavailable state.
 class OrdersAndCardsPage extends StatefulWidget {
-  const OrdersAndCardsPage({super.key});
+  final String? userId;
+
+  const OrdersAndCardsPage({super.key, this.userId});
 
   @override
   State<OrdersAndCardsPage> createState() => _OrdersAndCardsPageState();
@@ -86,64 +89,110 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
   }
 
   Widget _buildActivity(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator());
-    if (_activity.isEmpty) {
-      return _buildEmptyTab(
-        context,
-        icon: Icons.receipt_long_outlined,
-        title: S.of(context)?.profileNoOrders ?? 'No activity yet',
-        description:
-            S.of(context)?.profileOrdersDesc ?? 'Sent red packets appear here',
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: _loadActivity,
-      child: ListView.separated(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: _activity.length,
-        separatorBuilder: (_, _) =>
-            Divider(height: 1, indent: 72, color: context.dividerColor),
-        itemBuilder: (context, index) {
-          final packet = _activity[index];
-          return ListTile(
-            leading: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE64340).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+    return Column(
+      children: [
+        ListTile(
+          key: const ValueKey<String>('red_packet_history_entry'),
+          leading: const Icon(Icons.history, color: Color(0xFFE64340)),
+          title: Text(
+            S.of(context)?.redPacketHistory ?? 'Red Packet History',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            final userId = widget.userId ?? N42Chat.currentUser?.userId;
+            if (userId == null || userId.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Sign in to view red packet history'),
+                ),
+              );
+              return;
+            }
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => RedPacketHistoryPage(userId: userId),
               ),
-              child: const Icon(Icons.card_giftcard, color: Color(0xFFE64340)),
-            ),
-            title: Text(
-              packet.greeting.isEmpty ? 'Red Packet' : packet.greeting,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            subtitle: Text(
-              '${_statusLabel(packet.lifecycle)} · '
-              '${packet.claimedCount}/${packet.totalCount} claimed',
-            ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '${packet.totalAmount.toStringAsFixed(2)} ${packet.token}',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+            );
+          },
+        ),
+        Expanded(
+          child: _loading
+              ? const Center(child: CircularProgressIndicator())
+              : _activity.isEmpty
+              ? _buildEmptyTab(
+                  context,
+                  icon: Icons.receipt_long_outlined,
+                  title: S.of(context)?.profileNoOrders ?? 'No activity yet',
+                  description:
+                      S.of(context)?.profileOrdersDesc ??
+                      'Sent red packets appear here',
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadActivity,
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: _activity.length,
+                    separatorBuilder: (_, _) => Divider(
+                      height: 1,
+                      indent: 72,
+                      color: context.dividerColor,
+                    ),
+                    itemBuilder: (context, index) {
+                      final packet = _activity[index];
+                      return ListTile(
+                        leading: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFFE64340,
+                            ).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.card_giftcard,
+                            color: Color(0xFFE64340),
+                          ),
+                        ),
+                        title: Text(
+                          packet.greeting.isEmpty
+                              ? 'Red Packet'
+                              : packet.greeting,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          '${_statusLabel(packet.lifecycle)} · '
+                          '${packet.claimedCount}/${packet.totalCount} claimed',
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '${packet.totalAmount.toStringAsFixed(2)} ${packet.token}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              _dateLabel(packet.createdAt),
+                              style: TextStyle(
+                                color: context.textSecondary,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  _dateLabel(packet.createdAt),
-                  style: TextStyle(color: context.textSecondary, fontSize: 11),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+        ),
+      ],
     );
   }
 

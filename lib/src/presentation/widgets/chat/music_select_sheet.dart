@@ -352,37 +352,40 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                   itemCount: _currentSongs.length,
                   itemBuilder: (context, index) {
                     final song = _currentSongs[index];
-                    return ListTile(
-                      leading: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
+                    return Material(
+                      color: AppColors.surfaceOf(widget.isDark),
+                      child: ListTile(
+                        leading: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.music_note,
+                            color: AppColors.primary,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.music_note,
+                        title: Text(
+                          song['name'] as String,
+                          style: TextStyle(
+                            color: AppColors.textPrimaryOf(widget.isDark),
+                          ),
+                        ),
+                        subtitle: Text(
+                          song['artist'] as String,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondaryOf(widget.isDark),
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.send,
                           color: AppColors.primary,
                         ),
+                        onTap: () => Navigator.pop(context, song),
                       ),
-                      title: Text(
-                        song['name'] as String,
-                        style: TextStyle(
-                          color: AppColors.textPrimaryOf(widget.isDark),
-                        ),
-                      ),
-                      subtitle: Text(
-                        song['artist'] as String,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondaryOf(widget.isDark),
-                        ),
-                      ),
-                      trailing: const Icon(
-                        Icons.send,
-                        color: AppColors.primary,
-                      ),
-                      onTap: () => Navigator.pop(context, song),
                     );
                   },
                 ),

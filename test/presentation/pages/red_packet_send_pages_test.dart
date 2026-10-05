@@ -14,9 +14,9 @@ Widget _buildHarness(Widget page) {
       body: Builder(
         builder: (context) => TextButton(
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => page),
-            );
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute<void>(builder: (_) => page));
           },
           child: const Text('Open'),
         ),
@@ -41,7 +41,10 @@ void main() {
 
     await tester.enterText(find.byType(TextField).first, '12.34');
     await tester.pump();
-    tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed!.call();
+    tester
+        .widget<ElevatedButton>(find.byType(ElevatedButton))
+        .onPressed!
+        .call();
     await tester.pump();
 
     expect(find.byType(SendRedPacketPage), findsOneWidget);
@@ -65,10 +68,93 @@ void main() {
 
     await tester.enterText(find.byType(TextField).first, '12.34');
     await tester.pump();
-    tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed!.call();
+    tester
+        .widget<ElevatedButton>(find.byType(ElevatedButton))
+        .onPressed!
+        .call();
     await tester.pumpAndSettle();
 
     expect(find.byType(SendRedPacketPage), findsNothing);
+  });
+
+  testWidgets('currency changes trim precision and pickers update the form', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildHarness(
+        SendRedPacketPage(
+          receiverName: 'Alice',
+          onSend: (amount, token, greeting, count, isLucky) async => true,
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    final l10n = S.of(tester.element(find.byType(SendRedPacketPage)))!;
+
+    await tester.tap(find.text('CNY').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('BTC').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, '1.12345678');
+    await tester.tap(find.text('BTC').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('CNY').last);
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(find.byType(TextField).first).controller!.text,
+      '1.12',
+    );
+
+    await tester.tap(find.text(l10n.commonRedPacketCover));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Golden'));
+    await tester.pumpAndSettle();
+    expect(find.text('Golden'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField).at(1), 'Hi');
+    await tester.tap(find.byIcon(Icons.emoji_emotions_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('🎉'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(find.byType(TextField).at(1)).controller!.text,
+      'Hi🎉',
+    );
+  });
+
+  testWidgets('lucky group packet rejects a zero packet count', (tester) async {
+    var sendCalled = false;
+    await tester.binding.setSurfaceSize(const Size(800, 1000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      _buildHarness(
+        SendRedPacketPage(
+          receiverName: 'Group',
+          isGroup: true,
+          memberCount: 4,
+          onSend: (amount, token, greeting, count, isLucky) async {
+            sendCalled = true;
+            return true;
+          },
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    final l10n = S.of(tester.element(find.byType(SendRedPacketPage)))!;
+
+    await tester.tap(find.text(l10n.commonLuckyRedPacket));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, '1.00');
+    await tester.enterText(find.byType(TextField).at(2), '0');
+    await tester.ensureVisible(find.byType(ElevatedButton));
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pumpAndSettle();
+
+    expect(sendCalled, isFalse);
+    expect(find.text(l10n.commonRedPacketCountMin), findsOneWidget);
+    expect(find.byType(SendRedPacketPage), findsOneWidget);
   });
 
   testWidgets('failed transfer send keeps form open and resets slider', (

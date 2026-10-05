@@ -25,6 +25,7 @@ import '../space/space_list_page.dart';
 import '../voice_room/voice_room_list_page.dart';
 import 'listen_page.dart';
 import 'nearby_page.dart';
+import 'channel_discover_page.dart';
 
 /// 发现页面（仿微信）
 class DiscoverPage extends StatelessWidget {
@@ -231,7 +232,19 @@ class DiscoverPage extends StatelessWidget {
                 title:
                     l10n?.discoverVideoChannels ??
                     l10n?.channelDiscoverTitle ??
-                    'Channels',
+                    'Video Channels',
+                onTap: () => _openVideoChannels(context),
+              ),
+              _buildDivider(context, isDark),
+              _buildMenuItem(
+                context,
+                isDark: isDark,
+                iconWidget: const Icon(
+                  Icons.groups_2_outlined,
+                  color: Color(0xFF7B68EE),
+                  size: 26,
+                ),
+                title: l10n?.channelDiscoverTitle ?? 'Public Channels',
                 onTap: () => _openChannelDiscover(context),
               ),
             ],
@@ -445,6 +458,12 @@ class DiscoverPage extends StatelessWidget {
   }
 
   void _openChannelDiscover(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const ChannelDiscoverPage()),
+    );
+  }
+
+  void _openVideoChannels(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => const VideoFeedPage(creatorActions: true),

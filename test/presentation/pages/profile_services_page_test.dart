@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/n42_chat.dart';
 import 'package:n42_chat/src/presentation/pages/profile/orders_and_cards_page.dart';
+import 'package:n42_chat/src/presentation/pages/red_packet/red_packet_history_page.dart';
 import 'package:n42_chat/src/presentation/pages/profile/services_page.dart';
 
 Widget _app(Widget child) => MaterialApp(
@@ -41,6 +42,10 @@ void main() {
 
       expect(find.text('Orders & Cards'), findsOneWidget);
       expect(find.text('No orders'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('red_packet_history_entry')),
+        findsOneWidget,
+      );
 
       await tester.tap(find.text('Card Pack'));
       await tester.pumpAndSettle();
@@ -50,4 +55,20 @@ void main() {
       expect(find.text('Card Pack requires the main app'), findsOneWidget);
     },
   );
+
+  testWidgets('activity hub opens sent and received red packet history', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(const OrdersAndCardsPage(userId: '@alice:example.org')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('red_packet_history_entry')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(RedPacketHistoryPage), findsOneWidget);
+    expect(find.text('Sent'), findsOneWidget);
+    expect(find.text('Received'), findsOneWidget);
+  });
 }

@@ -2273,15 +2273,17 @@ class MessageItem extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                S.of(context)?.chatPollParticipantsFormat(totalVoters) ??
-                    '$totalVoters participants',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 11,
-                  height: 1.3,
-                  color: AppColors.textSecondary,
+              Expanded(
+                child: Text(
+                  S.of(context)?.chatPollParticipantsFormat(totalVoters) ??
+                      '$totalVoters participants',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    height: 1.3,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
               if (!pollEnded && message.isFromMe)

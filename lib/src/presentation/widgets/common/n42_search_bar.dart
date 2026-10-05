@@ -78,6 +78,7 @@ class N42SearchBar extends StatefulWidget {
 class _N42SearchBarState extends State<N42SearchBar> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
+  late String _lastReportedText;
   bool _showClear = false;
   bool _isFocused = false;
 
@@ -87,6 +88,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
     _controller =
         widget.controller ?? TextEditingController(text: widget.initialValue);
     _focusNode = widget.focusNode ?? FocusNode();
+    _lastReportedText = _controller.text;
     _showClear = _controller.text.isNotEmpty;
 
     _controller.addListener(_onTextChanged);
@@ -101,6 +103,7 @@ class _N42SearchBarState extends State<N42SearchBar> {
       final value = _controller.value;
       if (oldWidget.controller == null) _controller.dispose();
       _controller = widget.controller ?? TextEditingController.fromValue(value);
+      _lastReportedText = _controller.text;
       _controller.addListener(_onTextChanged);
       _showClear = _controller.text.isNotEmpty;
     }
@@ -123,10 +126,14 @@ class _N42SearchBarState extends State<N42SearchBar> {
   }
 
   void _onTextChanged() {
-    setState(() {
-      _showClear = _controller.text.isNotEmpty;
-    });
-    widget.onChanged?.call(_controller.text);
+    final text = _controller.text;
+    final showClear = text.isNotEmpty;
+    if (_showClear != showClear) {
+      setState(() => _showClear = showClear);
+    }
+    if (text == _lastReportedText) return;
+    _lastReportedText = text;
+    widget.onChanged?.call(text);
   }
 
   void _onFocusChanged() {
