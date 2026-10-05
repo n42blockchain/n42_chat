@@ -49,6 +49,7 @@ def render():
     files, modules, tests, widgets, calls = inventory()
     out = ['# 功能与 UI 入口源码清单', '',
            '由 `python3 tool/audit_feature_entries.py` 生成。统计排除自动生成的 Dart 文件。', '',
+           '旧版 659/343 入口清单已原样保存在 [历史快照](FEATURE_ENTRY_INVENTORY-LEGACY-659-343.md)。', '',
            '本表是静态构造引用索引，不代表按钮可点击、平台可见、消息正确收发或服务端验收通过。'
            '零外部引用是复核候选；同文件调用、构造函数 tear-off 和备用实现可能导致误报。'
            '外部引用也可能来自未启用代码。运行时结论见配套审计报告。', '',
@@ -69,8 +70,11 @@ def render():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='Fail if the checked-in inventory is stale')
+    parser.add_argument('--output', help='Write or check an inventory at this path (relative to the repository root)')
     args = parser.parse_args()
-    destination = ROOT / 'docs/FEATURE_ENTRY_INVENTORY.md'
+    destination = Path(args.output) if args.output else ROOT / 'docs/FEATURE_ENTRY_INVENTORY.md'
+    if not destination.is_absolute():
+        destination = ROOT / destination
     result = render()
     if args.check:
         if not destination.exists() or destination.read_text() != result:
