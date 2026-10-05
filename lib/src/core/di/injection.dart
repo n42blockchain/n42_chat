@@ -164,6 +164,7 @@ final GetIt getIt = GetIt.instance;
 Future<void> configureDependencies(
   N42ChatConfig config, {
   IWalletBridge? walletBridge,
+  MatrixClientManager? clientManagerOverride,
 }) async {
   // 注册配置
   getIt.registerSingleton<N42ChatConfig>(config);
@@ -191,7 +192,7 @@ Future<void> configureDependencies(
   await _registerDataSources();
 
   // 注册服务
-  await _registerServices(config);
+  await _registerServices(config, clientManagerOverride: clientManagerOverride);
 
   // 注册仓库
   _registerRepositories();
@@ -221,9 +222,12 @@ Future<void> _initializeRemarkService() async {
 }
 
 /// 注册服务
-Future<void> _registerServices(N42ChatConfig config) async {
+Future<void> _registerServices(
+  N42ChatConfig config, {
+  MatrixClientManager? clientManagerOverride,
+}) async {
   // Matrix客户端管理器
-  final clientManager = MatrixClientManager.instance;
+  final clientManager = clientManagerOverride ?? MatrixClientManager.instance;
 
   // 尝试初始化 Matrix 客户端（包括 Hive 数据库）
   // 如果失败，允许后续在登录/注册时再次尝试

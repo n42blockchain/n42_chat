@@ -356,11 +356,12 @@ class AuthMethodsService {
 
       // 如果有服务端地址，提交注册结果
       if (homeserver != null) {
-        await _submitPasskeyRegistration(
+        final submitted = await _submitPasskeyRegistration(
           homeserver: homeserver,
           credential: credential,
           accessToken: accessToken,
         );
+        if (!submitted) return null;
       }
 
       return credential;
@@ -372,7 +373,7 @@ class AuthMethodsService {
   }
 
   /// 提交 Passkey 注册结果到服务端
-  Future<void> _submitPasskeyRegistration({
+  Future<bool> _submitPasskeyRegistration({
     required String homeserver,
     required PasskeyCredential credential,
     String? accessToken,
@@ -402,8 +403,10 @@ class AuthMethodsService {
           'AuthMethodsService: Submit registration failed: ${response.statusCode}',
         );
       }
+      return response.statusCode == 200;
     } catch (e) {
       debugLog('AuthMethodsService: _submitPasskeyRegistration failed: $e');
+      return false;
     }
   }
 
