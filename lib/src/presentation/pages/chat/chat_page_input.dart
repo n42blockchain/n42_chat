@@ -249,11 +249,10 @@ extension _ChatPageInputMethods on _ChatPageState {
 
     final result = await showModalBottomSheet<int?>(
       context: context,
-      builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        ),
+      builder: (ctx) => Material(
+        color: context.surfaceColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        clipBehavior: Clip.antiAlias,
         child: SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,

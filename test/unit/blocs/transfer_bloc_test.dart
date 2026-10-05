@@ -1099,7 +1099,7 @@ void main() {
           token: 'ETH',
           memo: 'test',
         );
-        expect(event.props, ['room', '0x1', '1.0', 'ETH', 'test']);
+        expect(event.props, ['room', '0x1', '1.0', 'ETH', 'test', null, null, null, null]);
       });
 
       test('CreatePaymentRequest props include all fields', () {
@@ -1109,7 +1109,7 @@ void main() {
           token: 'USDT',
           memo: 'dinner',
         );
-        expect(event.props, ['room', '5.0', 'USDT', 'dinner']);
+        expect(event.props, ['room', '5.0', 'USDT', 'dinner', null, null, null, null]);
       });
 
       test('ValidateAddress props include address', () {
@@ -1130,7 +1130,7 @@ void main() {
           amount: '10.0',
           token: 'USDT',
         );
-        expect(event.props, ['room', 'req-1', '0x1', '10.0', 'USDT']);
+        expect(event.props, ['room', 'req-1', '0x1', '10.0', 'USDT', null, null, null, null]);
       });
     });
   });

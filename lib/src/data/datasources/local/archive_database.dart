@@ -8,8 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
-import 'package:sqlite3/open.dart';
 import 'package:sqlite3/sqlite3.dart' as raw_sqlite;
 import '../../../core/utils/debug_log.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -515,9 +513,13 @@ class ArchiveDatabase extends _$ArchiveDatabase {
 
   /// 关闭数据库
   static Future<void> closeInstance() async {
-    await _instance?.close();
-    _instance = null;
-    _initCompleter = null;
+    try {
+      await _instance?.close();
+    } finally {
+      // A failed lazy open can also fail close. Allow a later keyed retry.
+      _instance = null;
+      _initCompleter = null;
+    }
   }
 }
 
@@ -538,14 +540,8 @@ Future<LazyDatabase> _openConnection() async {
     }
     final file = File(p.join(dbDir.path, 'archive.db'));
 
-    // Older Android versions need sqlcipher_flutter_libs' sqlite3 override.
-    // On iOS, the host must force-load SQLCipher so another plugin's system
-    // sqlite3 link cannot shadow PRAGMA key and sqlcipher_export.
-    if (Platform.isAndroid) {
-      await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
-      open.overrideForAll(openCipherOnAndroid);
-    }
-
+    // sqlite3 native assets select SQLCipher through the entrypoint's hook
+    // configuration. Always probe the resolved library before touching history.
     // Fail loudly if the process resolved system SQLite instead of SQLCipher.
     if (!_isSqlCipherAvailable()) {
       throw StateError(
@@ -561,8 +557,8 @@ Future<LazyDatabase> _openConnection() async {
     await _migratePlaintextArchiveIfNeeded(file, passphrase);
     _removeMigrationBackupWhenSafe(file, passphrase);
 
-    // Open synchronously because background isolates do not inherit sqlite3
-    // overrides on Android. Archive queries are not latency-critical.
+    // Retain the synchronous archive connection; hook assets also work in
+    // background isolates without process-local loader overrides.
     return NativeDatabase(
       file,
       setup: (db) {
@@ -577,7 +573,7 @@ Future<LazyDatabase> _openConnection() async {
   });
 }
 
-/// Probes cipher_version after applying Android's sqlite3 override.
+/// Probes the actual library selected by sqlite3 native assets.
 bool _isSqlCipherAvailable() {
   raw_sqlite.Database? probe;
   try {
@@ -587,7 +583,7 @@ bool _isSqlCipherAvailable() {
   } catch (_) {
     return false;
   } finally {
-    probe?.dispose();
+    probe?.close();
   }
 }
 
@@ -659,28 +655,11 @@ void _removeMigrationBackupWhenSafe(File file, String passphrase) {
     _shredPlaintextFile(backup);
     debugLog('ArchiveDatabase: removed verified plaintext migration backup');
   } catch (e) {
-    // The backup is the only way back if the encrypted archive turns out to be
-    // unreadable, so it is kept — but a verify failure that repeats on every
-    // launch would otherwise retain a full cleartext database forever with only
-    // a debug log. Once the encrypted archive has been the live database for
-    // longer than the grace period, the plaintext copy is no longer a useful
-    // rollback and its disclosure risk outweighs it.
-    debugLog('ArchiveDatabase: retained migration backup after verify: $e');
-    _shredStaleMigrationBackup(backup);
-  }
-}
-
-/// How long an unverifiable plaintext backup may linger before it is shredded.
-const Duration _kPlaintextBackupGrace = Duration(days: 7);
-
-void _shredStaleMigrationBackup(File backup) {
-  try {
-    final age = DateTime.now().difference(backup.lastModifiedSync());
-    if (age < _kPlaintextBackupGrace) return;
-    _shredPlaintextFile(backup);
-    debugLog('ArchiveDatabase: shredded stale plaintext migration backup');
-  } catch (e) {
-    debugLog('ArchiveDatabase: could not shred stale backup: $e');
+    // A failed verification does not establish that the encrypted copy is
+    // recoverable. Preserve the source regardless of its age for a keyed retry.
+    debugLog(
+      'ArchiveDatabase: retained migration backup after verify (${e.runtimeType})',
+    );
   }
 }
 
@@ -750,7 +729,7 @@ void _verifyEncryptedArchive(File file, String passphrase) {
       throw StateError('Encrypted archive.db failed integrity_check');
     }
   } finally {
-    db?.dispose();
+    db?.close();
   }
 }
 
@@ -796,7 +775,7 @@ Future<void> _migratePlaintextArchiveIfNeeded(
     );
     db.execute("SELECT sqlcipher_export('encrypted');");
     db.execute('DETACH DATABASE encrypted;');
-    db.dispose();
+    db.close();
     db = null;
 
     // Verify the export before it can replace the only readable source.
@@ -807,8 +786,9 @@ Future<void> _migratePlaintextArchiveIfNeeded(
     _replacePlaintextArchive(file, encFile);
     debugLog('ArchiveDatabase: migration to SQLCipher completed');
   } catch (e) {
-    debugLog('ArchiveDatabase: SQLCipher migration failed: $e');
-    db?.dispose();
+    // SQLite exceptions include the ATTACH statement and its key.
+    debugLog('ArchiveDatabase: SQLCipher migration failed (${e.runtimeType})');
+    db?.close();
     // Delete only the incomplete destination. Preserve the source and retry
     // on a later launch rather than silently losing history.
     if (encFile.existsSync()) encFile.deleteSync();

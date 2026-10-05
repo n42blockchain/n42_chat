@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/message_entity.dart';
+import 'message_report_origin.dart';
 
 /// 聊天事件
 abstract class ChatEvent extends Equatable {
@@ -869,11 +870,13 @@ class ClearPendingCommand extends ChatEvent {
 class ReportMessage extends ChatEvent {
   final String messageId;
   final String reason;
+  final MessageReportOrigin? origin;
+  final String? roomId;
 
-  const ReportMessage(this.messageId, this.reason);
+  const ReportMessage(this.messageId, this.reason, {this.origin, this.roomId});
 
   @override
-  List<Object?> get props => [messageId, reason];
+  List<Object?> get props => [messageId, reason, origin, roomId];
 }
 
 /// 关键词过滤配置加载完成（内部事件）

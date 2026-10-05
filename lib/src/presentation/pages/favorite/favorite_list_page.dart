@@ -123,10 +123,7 @@ class _FavoriteListView extends StatelessWidget {
           decoration: BoxDecoration(
             color: context.surfaceColor,
             border: Border(
-              bottom: BorderSide(
-                color: context.dividerColor,
-                width: 0.5,
-              ),
+              bottom: BorderSide(color: context.dividerColor, width: 0.5),
             ),
           ),
           child: ListView.separated(
@@ -257,18 +254,11 @@ class _FavoriteListView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.star_border,
-            size: 64,
-            color: context.textSecondary,
-          ),
+          Icon(Icons.star_border, size: 64, color: context.textSecondary),
           const SizedBox(height: 16),
           Text(
             S.of(context)?.favoriteNoFavorites ?? 'No favorites yet',
-            style: TextStyle(
-              fontSize: 16,
-              color: context.textSecondary,
-            ),
+            style: TextStyle(fontSize: 16, color: context.textSecondary),
           ),
           const SizedBox(height: 8),
           Text(
@@ -282,39 +272,14 @@ class _FavoriteListView extends StatelessWidget {
   }
 
   void _showSearch(BuildContext context) {
-    // 通过 BLoC 搜索
-    final controller = TextEditingController();
     showDialog<void>(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(S.of(context)?.commonSearch ?? 'Search'),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: S.of(context)?.commonSearch ?? 'Search',
-              border: const OutlineInputBorder(),
-            ),
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                context.read<FavoriteBloc>().add(
-                  SearchFavorites(controller.text),
-                );
-              },
-              child: Text(S.of(context)?.commonConfirm ?? 'OK'),
-            ),
-          ],
-        );
-      },
-    ).whenComplete(controller.dispose);
+      builder: (_) => _FavoriteSearchDialog(
+        l10n: S.of(context),
+        onSearch: (query) =>
+            context.read<FavoriteBloc>().add(SearchFavorites(query)),
+      ),
+    );
   }
 
   void _showAddOptions(BuildContext context) {
@@ -347,135 +312,47 @@ class _FavoriteListView extends StatelessWidget {
   }
 
   Future<void> _createNote(BuildContext context) async {
-    final controller = TextEditingController();
     final l10n = S.of(context);
 
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n?.favoriteNewNote ?? 'New Note'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          minLines: 3,
-          maxLines: 6,
-          decoration: InputDecoration(
-            hintText: l10n?.favoriteEnterNoteContent ?? 'Enter note content',
-            border: const OutlineInputBorder(),
+      builder: (_) => _FavoriteNoteDialog(
+        l10n: l10n,
+        onSave: (content) => _saveFavoriteMessage(
+          context,
+          _buildLocalFavoriteMessage(
+            senderName: l10n?.favoriteMyNotes ?? 'My Notes',
+            content: content,
           ),
+          successMessage: l10n?.favoriteNoteAdded ?? 'Note added',
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final content = controller.text.trim();
-              if (content.isEmpty) {
-                return;
-              }
-              Navigator.pop(dialogContext);
-              await _saveFavoriteMessage(
-                context,
-                _buildLocalFavoriteMessage(
-                  senderName: l10n?.favoriteMyNotes ?? 'My Notes',
-                  content: content,
-                ),
-                successMessage: l10n?.favoriteNoteAdded ?? 'Note added',
-              );
-            },
-            child: Text(l10n?.commonConfirm ?? 'OK'),
-          ),
-        ],
       ),
-    ).whenComplete(controller.dispose);
+    );
   }
 
   Future<void> _addLink(BuildContext context) async {
-    final titleController = TextEditingController();
-    final urlController = TextEditingController();
     final l10n = S.of(context);
 
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n?.favoriteLink ?? 'Favorite Link'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              autofocus: true,
-              decoration: InputDecoration(
-                hintText: l10n?.favoriteLinkTitle ?? 'Link title',
-                border: const OutlineInputBorder(),
-              ),
+      builder: (_) => _FavoriteLinkDialog(
+        l10n: l10n,
+        onSave: (title, normalizedUrl) {
+          final content = title.isEmpty
+              ? normalizedUrl
+              : '$title\n$normalizedUrl';
+          return _saveFavoriteMessage(
+            context,
+            _buildLocalFavoriteMessage(
+              senderName: l10n?.commonMe ?? 'Me',
+              content: content,
+              metadata: MessageMetadata(httpUrl: normalizedUrl),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: urlController,
-              keyboardType: TextInputType.url,
-              decoration: InputDecoration(
-                hintText: l10n?.favoriteLinkUrl ?? 'https://',
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n?.commonCancel ?? 'Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final normalizedUrl = _normalizeUrl(urlController.text);
-              if (normalizedUrl == null) {
-                ScaffoldMessenger.of(dialogContext).showSnackBar(
-                  const SnackBar(content: Text('Please enter a valid URL')),
-                );
-                return;
-              }
-
-              final title = titleController.text.trim();
-              final content = title.isEmpty
-                  ? normalizedUrl
-                  : '$title\n$normalizedUrl';
-
-              Navigator.pop(dialogContext);
-              await _saveFavoriteMessage(
-                context,
-                _buildLocalFavoriteMessage(
-                  senderName: l10n?.commonMe ?? 'Me',
-                  content: content,
-                  metadata: MessageMetadata(httpUrl: normalizedUrl),
-                ),
-                successMessage: l10n?.favoriteLinkAdded ?? 'Link added',
-              );
-            },
-            child: Text(l10n?.commonConfirm ?? 'OK'),
-          ),
-        ],
+            successMessage: l10n?.favoriteLinkAdded ?? 'Link added',
+          );
+        },
       ),
-    ).whenComplete(() {
-      titleController.dispose();
-      urlController.dispose();
-    });
-  }
-
-  String? _normalizeUrl(String rawUrl) {
-    final trimmed = rawUrl.trim();
-    if (trimmed.isEmpty) {
-      return null;
-    }
-
-    final candidate = trimmed.contains('://') ? trimmed : 'https://$trimmed';
-    final uri = Uri.tryParse(candidate);
-    if (uri == null || !(uri.isScheme('http') || uri.isScheme('https'))) {
-      return null;
-    }
-    return candidate;
+    );
   }
 
   MessageEntity _buildLocalFavoriteMessage({
@@ -564,4 +441,190 @@ class _FavoriteListView extends StatelessWidget {
           '${time.month}/${time.day}';
     }
   }
+}
+
+class _FavoriteSearchDialog extends StatefulWidget {
+  final S? l10n;
+  final ValueChanged<String> onSearch;
+
+  const _FavoriteSearchDialog({required this.l10n, required this.onSearch});
+
+  @override
+  State<_FavoriteSearchDialog> createState() => _FavoriteSearchDialogState();
+}
+
+class _FavoriteSearchDialogState extends State<_FavoriteSearchDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    return AlertDialog(
+      title: Text(l10n?.commonSearch ?? 'Search'),
+      content: TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          hintText: l10n?.commonSearch ?? 'Search',
+          border: const OutlineInputBorder(),
+        ),
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n?.commonCancel ?? 'Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            final query = _controller.text;
+            Navigator.pop(context);
+            widget.onSearch(query);
+          },
+          child: Text(l10n?.commonConfirm ?? 'OK'),
+        ),
+      ],
+    );
+  }
+}
+
+class _FavoriteNoteDialog extends StatefulWidget {
+  final S? l10n;
+  final Future<void> Function(String content) onSave;
+
+  const _FavoriteNoteDialog({required this.l10n, required this.onSave});
+
+  @override
+  State<_FavoriteNoteDialog> createState() => _FavoriteNoteDialogState();
+}
+
+class _FavoriteNoteDialogState extends State<_FavoriteNoteDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    return AlertDialog(
+      title: Text(l10n?.favoriteNewNote ?? 'New Note'),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        minLines: 3,
+        maxLines: 6,
+        decoration: InputDecoration(
+          hintText: l10n?.favoriteEnterNoteContent ?? 'Enter note content',
+          border: const OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n?.commonCancel ?? 'Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            final content = _controller.text.trim();
+            if (content.isEmpty) return;
+            Navigator.pop(context);
+            await widget.onSave(content);
+          },
+          child: Text(l10n?.commonConfirm ?? 'OK'),
+        ),
+      ],
+    );
+  }
+}
+
+class _FavoriteLinkDialog extends StatefulWidget {
+  final S? l10n;
+  final Future<void> Function(String title, String normalizedUrl) onSave;
+
+  const _FavoriteLinkDialog({required this.l10n, required this.onSave});
+
+  @override
+  State<_FavoriteLinkDialog> createState() => _FavoriteLinkDialogState();
+}
+
+class _FavoriteLinkDialogState extends State<_FavoriteLinkDialog> {
+  final _titleController = TextEditingController();
+  final _urlController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _urlController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    return AlertDialog(
+      title: Text(l10n?.favoriteLink ?? 'Favorite Link'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _titleController,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: l10n?.favoriteLinkTitle ?? 'Link title',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _urlController,
+            keyboardType: TextInputType.url,
+            decoration: InputDecoration(
+              hintText: l10n?.favoriteLinkUrl ?? 'https://',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n?.commonCancel ?? 'Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            final normalizedUrl = _normalizeFavoriteUrl(_urlController.text);
+            if (normalizedUrl == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please enter a valid URL')),
+              );
+              return;
+            }
+            Navigator.pop(context);
+            await widget.onSave(_titleController.text.trim(), normalizedUrl);
+          },
+          child: Text(l10n?.commonConfirm ?? 'OK'),
+        ),
+      ],
+    );
+  }
+}
+
+String? _normalizeFavoriteUrl(String rawUrl) {
+  final trimmed = rawUrl.trim();
+  if (trimmed.isEmpty) return null;
+  final candidate = trimmed.contains('://') ? trimmed : 'https://$trimmed';
+  final uri = Uri.tryParse(candidate);
+  if (uri == null || !(uri.isScheme('http') || uri.isScheme('https'))) {
+    return null;
+  }
+  return candidate;
 }

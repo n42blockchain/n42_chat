@@ -19,7 +19,12 @@ import '../datasources/remote/social_auth_api.dart';
 import '../services/email_change_service.dart';
 
 /// 认证仓库实现
-class AuthRepositoryImpl implements IAuthRepository {
+class AuthRepositoryImpl
+    implements
+        IAuthRepository,
+        IAccountBoundAuthInvalidation,
+        IAccountBoundDeletionLifecycle,
+        IConfirmedAccountDeletionGeneration {
   final MatrixAuthDataSource _authDataSource;
   final SecureStorageDataSource _secureStorage;
   final SocialAuthApi _socialAuthApi;
@@ -37,6 +42,13 @@ class AuthRepositoryImpl implements IAuthRepository {
   bool? get emailChangeRequiresCode => _emailChange.requiresCode;
 
   final _loginStateController = StreamController<bool>.broadcast();
+  final _accountInvalidationController =
+      StreamController<AuthSessionInvalidation>.broadcast();
+  int _matrixMonitorEpoch = 0;
+  AuthSessionInvalidation? _currentMonitorOrigin;
+  AuthSessionInvalidation? _deletionRequestOrigin;
+  (LoginState, AuthSessionInvalidation)? _deletionRequestLogout;
+  AuthSessionInvalidation? _confirmedDeletionOrigin;
 
   // 订阅 Matrix SDK 的登录状态变化，用于检测 token 过期
   StreamSubscription<LoginState>? _matrixLoginStateSubscription;
@@ -48,7 +60,7 @@ class AuthRepositoryImpl implements IAuthRepository {
   // dispose 后禁止再向已关闭的 StreamController 发送事件
   bool _isDisposed = false;
   // 认证窗口内收到的 SDK 登出状态，待流程结束后再统一处理
-  (LoginState, Client?)? _pendingLogoutState;
+  (LoginState, AuthSessionInvalidation)? _pendingLogoutState;
   // pokeText 同步并发计数
   int _activePokeSyncs = 0;
   static const int _maxConcurrentPokeSyncs = 3;
@@ -88,6 +100,59 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   Stream<bool> get loginStateStream => _loginStateController.stream;
+
+  @override
+  Stream<AuthSessionInvalidation> get accountInvalidationStream =>
+      _accountInvalidationController.stream;
+
+  @override
+  AuthSessionInvalidation? get currentAccountGeneration {
+    final origin = _currentMonitorOrigin;
+    return origin != null && origin.isCurrent ? origin : null;
+  }
+
+  @override
+  bool isConfirmedDeletionGeneration(AuthSessionInvalidation generation) =>
+      identical(generation, _confirmedDeletionOrigin) &&
+      generation.isSameGeneration;
+
+  @override
+  Future<void> runAccountDeletionRequest(
+    AuthSessionInvalidation generation,
+    Future<void> Function() request,
+  ) async {
+    if (!identical(generation, _currentMonitorOrigin) ||
+        !generation.isCurrent ||
+        _deletionRequestOrigin != null) {
+      throw StateError('Matrix deletion account changed or request is busy');
+    }
+    _deletionRequestOrigin = generation;
+    try {
+      await request();
+      // The server response is authoritative even if B became active while
+      // the request was in flight. Only A's captured generation is suppressed.
+      _confirmedDeletionOrigin = generation;
+      _deletionRequestLogout = null;
+    } catch (error, stack) {
+      _deletionRequestOrigin = null;
+      final pending = _deletionRequestLogout;
+      _deletionRequestLogout = null;
+      if (pending != null && identical(pending.$2, generation)) {
+        try {
+          await _handleSdkLogout(pending.$1, pending.$2);
+        } catch (cleanupError) {
+          authLog(
+            'Could not resume SDK logout after deletion rejection: $cleanupError',
+          );
+        }
+      }
+      Error.throwWithStackTrace(error, stack);
+    } finally {
+      if (identical(_deletionRequestOrigin, generation)) {
+        _deletionRequestOrigin = null;
+      }
+    }
+  }
 
   @override
   Future<AuthResult> login({
@@ -165,8 +230,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       _isAuthenticating = false;
       _authInProgress?.complete();
       _authInProgress = null;
-      unawaited(_flushPendingLogoutState());
-      _startMonitoringLoginState();
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -193,8 +257,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       _isAuthenticating = false;
       _authInProgress?.complete();
       _authInProgress = null;
-      unawaited(_flushPendingLogoutState());
-      _startMonitoringLoginState();
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -333,8 +396,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       _isAuthenticating = false;
       _authInProgress?.complete();
       _authInProgress = null;
-      unawaited(_flushPendingLogoutState());
-      _startMonitoringLoginState();
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -1059,8 +1121,7 @@ class AuthRepositoryImpl implements IAuthRepository {
       _isAuthenticating = false;
       _authInProgress?.complete();
       _authInProgress = null;
-      unawaited(_flushPendingLogoutState());
-      _startMonitoringLoginState();
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -1394,22 +1455,43 @@ class AuthRepositoryImpl implements IAuthRepository {
   void dispose() {
     _emailChange.reset();
     _isDisposed = true;
+    _matrixMonitorEpoch++;
+    _currentMonitorOrigin = null;
+    _deletionRequestOrigin = null;
+    _deletionRequestLogout = null;
+    _confirmedDeletionOrigin = null;
     _matrixLoginStateSubscription?.cancel();
     _loginStateController.close();
+    _accountInvalidationController.close();
   }
 
-  Future<void> _handleSdkLogout(LoginState loginState) async {
+  Future<void> _handleSdkLogout(
+    LoginState loginState,
+    AuthSessionInvalidation origin,
+  ) async {
+    if (identical(_deletionRequestOrigin, origin)) {
+      if (origin.isSameGeneration) {
+        _deletionRequestLogout = (loginState, origin);
+      }
+      return;
+    }
+    if (!origin.isCurrent) return;
     _emailChange.reset();
     authLog(
       'Matrix SDK reported $loginState (token expired or revoked), clearing local session',
     );
 
-    await _secureStorage.clearSession();
+    await _secureStorage.clearSessionIfMatches(
+      origin.userId,
+      origin.homeserver,
+    );
+    if (!origin.isCurrent) return;
     _cachedProfileData = null;
     _cachedAvatarUrl = null;
     _cachedDisplayName = null;
 
     if (!_isDisposed) {
+      _accountInvalidationController.add(origin);
       _loginStateController.add(false);
     }
   }
@@ -1420,11 +1502,21 @@ class AuthRepositoryImpl implements IAuthRepository {
     if (pending == null) {
       return;
     }
-    if (!identical(pending.$2, _authDataSource.clientManager.client)) {
+    if (!pending.$2.isCurrent) {
       authLog('Ignoring logout from a replaced Matrix client');
       return;
     }
-    await _handleSdkLogout(pending.$1);
+    await _handleSdkLogout(pending.$1, pending.$2);
+  }
+
+  void _resumeMonitoringAfterAuthentication() {
+    // Refresh a replaced client's listener, but keep the exact generation
+    // that observed a pending same-account logout until its scoped clear ends.
+    final pending = _pendingLogoutState;
+    if (pending == null || !pending.$2.isCurrent) {
+      _startMonitoringLoginState();
+    }
+    unawaited(_flushPendingLogoutState());
   }
 
   /// 后台启动同步——不阻塞认证返回，本地缓存数据立即可用。
@@ -1444,11 +1536,51 @@ class AuthRepositoryImpl implements IAuthRepository {
   /// 从而让 AuthBloc 正确导航到登录页面。
   void _startMonitoringLoginState() {
     _matrixLoginStateSubscription?.cancel();
+    _currentMonitorOrigin = null;
+    final epoch = ++_matrixMonitorEpoch;
     final observedClient = _authDataSource.clientManager.client;
+    final observedUserId = observedClient?.userID;
+    final observedHomeserver = observedClient?.homeserver;
+    final observedDeviceId = observedClient?.deviceID;
     final stream = _authDataSource.clientManager.onLoginStateChanged;
-    if (stream == null) return;
+    if (stream == null ||
+        observedClient == null ||
+        observedUserId == null ||
+        observedHomeserver == null) {
+      return;
+    }
+    bool sameOrigin() {
+      if (_isDisposed ||
+          _matrixMonitorEpoch != epoch ||
+          !identical(observedClient, _authDataSource.clientManager.client)) {
+        return false;
+      }
+      // Client.clear() resets these fields before emitting loggedOut. A
+      // non-null different identity means this client was reused for B.
+      return (observedClient.userID == null ||
+              observedClient.userID == observedUserId) &&
+          (observedClient.homeserver == null ||
+              observedClient.homeserver == observedHomeserver) &&
+          (observedClient.deviceID == null ||
+              observedClient.deviceID == observedDeviceId);
+    }
+
+    late final AuthSessionInvalidation origin;
+    origin = AuthSessionInvalidation(
+      userId: observedUserId,
+      homeserver: observedHomeserver,
+      deviceId: observedDeviceId,
+      isSameGeneration: sameOrigin,
+      matchesClient: (client) => identical(client, observedClient),
+      isCurrent: () =>
+          sameOrigin() &&
+          !_isAuthenticating &&
+          !identical(_deletionRequestOrigin, origin) &&
+          !identical(_confirmedDeletionOrigin, origin),
+    );
+    _currentMonitorOrigin = origin;
     _matrixLoginStateSubscription = stream.listen((loginState) async {
-      if (!identical(observedClient, _authDataSource.clientManager.client)) {
+      if (!sameOrigin()) {
         authLog('Ignoring login state from a replaced Matrix client');
         return;
       }
@@ -1456,13 +1588,13 @@ class AuthRepositoryImpl implements IAuthRepository {
       if (_isAuthenticating) {
         if (loginState == LoginState.loggedOut ||
             loginState == LoginState.softLoggedOut) {
-          _pendingLogoutState = (loginState, observedClient);
+          _pendingLogoutState = (loginState, origin);
         }
         return;
       }
       if (loginState == LoginState.loggedOut ||
           loginState == LoginState.softLoggedOut) {
-        await _handleSdkLogout(loginState);
+        await _handleSdkLogout(loginState, origin);
       }
     });
   }

@@ -56,6 +56,12 @@ class TransferEntity extends Equatable {
   /// 代币符号
   final String token;
 
+  /// Optional exact asset identity. Legacy transfers leave these unset.
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
+
   /// 代币名称
   final String? tokenName;
 
@@ -99,6 +105,10 @@ class TransferEntity extends Equatable {
     this.receiverUserId,
     required this.amount,
     required this.token,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
     this.tokenName,
     this.tokenIcon,
     this.transactionHash,
@@ -167,6 +177,10 @@ class TransferEntity extends Equatable {
     receiverUserId,
     amount,
     token,
+    chain,
+    network,
+    assetType,
+    assetId,
     tokenName,
     tokenIcon,
     transactionHash,
@@ -190,6 +204,10 @@ class TransferEntity extends Equatable {
     String? receiverUserId,
     String? amount,
     String? token,
+    String? chain,
+    String? network,
+    String? assetType,
+    String? assetId,
     String? tokenName,
     String? tokenIcon,
     String? transactionHash,
@@ -212,6 +230,10 @@ class TransferEntity extends Equatable {
       receiverUserId: receiverUserId ?? this.receiverUserId,
       amount: amount ?? this.amount,
       token: token ?? this.token,
+      chain: chain ?? this.chain,
+      network: network ?? this.network,
+      assetType: assetType ?? this.assetType,
+      assetId: assetId ?? this.assetId,
       tokenName: tokenName ?? this.tokenName,
       tokenIcon: tokenIcon ?? this.tokenIcon,
       transactionHash: transactionHash ?? this.transactionHash,
@@ -238,6 +260,10 @@ class TransferEntity extends Equatable {
       receiverUserId: json['receiver_user_id'] as String?,
       amount: json['amount'] as String,
       token: json['token'] as String,
+      chain: json['chain'] as String?,
+      network: json['network'] as String?,
+      assetType: json['asset_type'] as String?,
+      assetId: json['asset_id'] as String?,
       tokenName: json['token_name'] as String?,
       tokenIcon: json['token_icon'] as String?,
       transactionHash: json['tx_hash'] as String?,
@@ -269,6 +295,10 @@ class TransferEntity extends Equatable {
       'receiver_user_id': receiverUserId,
       'amount': amount,
       'token': token,
+      if (chain != null) 'chain': chain,
+      if (network != null) 'network': network,
+      if (assetType != null) 'asset_type': assetType,
+      if (assetId != null) 'asset_id': assetId,
       'token_name': tokenName,
       'token_icon': tokenIcon,
       'tx_hash': transactionHash,
@@ -304,6 +334,11 @@ class TransferMessageContent {
   /// 代币符号
   final String token;
 
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
+
   /// 交易哈希
   final String? transactionHash;
 
@@ -319,6 +354,10 @@ class TransferMessageContent {
     required this.receiverAddress,
     required this.amount,
     required this.token,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
     this.transactionHash,
     required this.status,
     this.memo,
@@ -334,6 +373,10 @@ class TransferMessageContent {
       receiverAddress: content['receiver_address'] as String? ?? '',
       amount: content['amount'] as String? ?? '0',
       token: content['token'] as String? ?? '',
+      chain: content['chain'] as String?,
+      network: content['network'] as String?,
+      assetType: content['asset_type'] as String?,
+      assetId: content['asset_id'] as String?,
       transactionHash: content['tx_hash'] as String?,
       status: TransferStatus.values.firstWhere(
         (e) => e.name == content['status'],
@@ -353,6 +396,10 @@ class TransferMessageContent {
       'receiver_address': receiverAddress,
       'amount': amount,
       'token': token,
+      if (chain != null) 'chain': chain,
+      if (network != null) 'network': network,
+      if (assetType != null) 'asset_type': assetType,
+      if (assetId != null) 'asset_id': assetId,
       'tx_hash': transactionHash,
       'status': status.name,
       'memo': memo,
@@ -377,6 +424,11 @@ class PaymentRequestContent {
   /// 代币符号
   final String token;
 
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
+
   /// 备注
   final String? memo;
 
@@ -388,6 +440,10 @@ class PaymentRequestContent {
     required this.receiverAddress,
     required this.amount,
     required this.token,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
     this.memo,
     this.expiresAt,
   });
@@ -407,6 +463,10 @@ class PaymentRequestContent {
       receiverAddress: content['receiver_address'] as String? ?? '',
       amount: content['amount'] as String? ?? '0',
       token: content['token'] as String? ?? '',
+      chain: content['chain'] as String?,
+      network: content['network'] as String?,
+      assetType: content['asset_type'] as String?,
+      assetId: content['asset_id'] as String?,
       memo: content['memo'] as String?,
       expiresAt: content['expires_at'] != null
           ? DateTime.fromMillisecondsSinceEpoch(content['expires_at'] as int)
@@ -423,6 +483,10 @@ class PaymentRequestContent {
       'receiver_address': receiverAddress,
       'amount': amount,
       'token': token,
+      if (chain != null) 'chain': chain,
+      if (network != null) 'network': network,
+      if (assetType != null) 'asset_type': assetType,
+      if (assetId != null) 'asset_id': assetId,
       'memo': memo,
       'expires_at': expiresAt?.millisecondsSinceEpoch,
     };
@@ -455,6 +519,11 @@ class PaymentRequestFulfillmentContent {
   /// 代币符号
   final String token;
 
+  final String? chain;
+  final String? network;
+  final String? assetType;
+  final String? assetId;
+
   /// 交易哈希
   final String? transactionHash;
 
@@ -469,6 +538,10 @@ class PaymentRequestFulfillmentContent {
     required this.receiverAddress,
     required this.amount,
     required this.token,
+    this.chain,
+    this.network,
+    this.assetType,
+    this.assetId,
     this.transactionHash,
     required this.fulfilledAt,
   });
@@ -484,6 +557,10 @@ class PaymentRequestFulfillmentContent {
       receiverAddress: content['receiver_address'] as String? ?? '',
       amount: content['amount'] as String? ?? '0',
       token: content['token'] as String? ?? '',
+      chain: content['chain'] as String?,
+      network: content['network'] as String?,
+      assetType: content['asset_type'] as String?,
+      assetId: content['asset_id'] as String?,
       transactionHash: content['tx_hash'] as String?,
       fulfilledAt: content['fulfilled_at'] != null
           ? DateTime.fromMillisecondsSinceEpoch(
@@ -502,6 +579,10 @@ class PaymentRequestFulfillmentContent {
       'receiver_address': receiverAddress,
       'amount': amount,
       'token': token,
+      if (chain != null) 'chain': chain,
+      if (network != null) 'network': network,
+      if (assetType != null) 'asset_type': assetType,
+      if (assetId != null) 'asset_id': assetId,
       'tx_hash': transactionHash,
       'fulfilled_at': fulfilledAt.millisecondsSinceEpoch,
     };

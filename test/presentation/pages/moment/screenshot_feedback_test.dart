@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geocoding_platform_interface/geocoding_platform_interface.dart'
+    as geocoding_pi;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
@@ -14,14 +16,39 @@ import 'package:n42_chat/src/presentation/widgets/chat/message_status_indicator.
 
 class _Repository extends Mock implements IMomentRepository {}
 
-class _Places extends GeocodingPlatform {
+class _Places extends geocoding_pi.GeocodingPlatformFactory {
   bool fail = false;
+  @override
+  geocoding_pi.Geocoding createGeocoding(
+    geocoding_pi.GeocodingCreationParams params,
+  ) => _PlacesClient(this);
+}
+
+class _PlacesClient extends geocoding_pi.Geocoding {
+  _PlacesClient(this.places)
+    : super.implementation(const geocoding_pi.GeocodingCreationParams());
+
+  final _Places places;
+
+  @override
+  Future<List<Location>> locationFromAddress(
+    String address, {
+    Locale? locale,
+  }) async => const [];
+
+  @override
+  Future<List<Placemark>> placemarkFromAddress(
+    String address, {
+    Locale? locale,
+  }) async => const [];
+
   @override
   Future<List<Placemark>> placemarkFromCoordinates(
     double latitude,
-    double longitude,
-  ) async {
-    if (fail) throw StateError('Offline');
+    double longitude, {
+    Locale? locale,
+  }) async {
+    if (places.fail) throw StateError('Offline');
     return [
       const Placemark(
         street: '123 King St',
@@ -37,10 +64,13 @@ void main() {
   test(
     'location resolves a readable address and retains coordinates offline',
     () async {
-      final original = GeocodingPlatform.instance;
+      final original = geocoding_pi.GeocodingPlatformFactory.instance;
       final places = _Places();
-      GeocodingPlatform.instance = places;
-      addTearDown(() => GeocodingPlatform.instance = original ?? _Places());
+      geocoding_pi.GeocodingPlatformFactory.instance = places;
+      addTearDown(
+        () => geocoding_pi.GeocodingPlatformFactory.instance =
+            original ?? _Places(),
+      );
       final location = await resolveMomentLocation(43.6, -79.4);
       expect(location.displayText, contains('King St'));
       expect(location.displayText, contains('Toronto'));

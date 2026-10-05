@@ -46,7 +46,7 @@ class _N42CallFacade {
         debugLog('N42Chat: TURN servers response: ${turnServers.uris}');
         if (turnServers.uris.isNotEmpty) {
           _callManager!.configureTurn(
-            uris: turnServers.uris,
+            uris: turnServers.uris.map((uri) => uri.toString()).toList(),
             username: turnServers.username,
             password: turnServers.password,
             ttl: turnServers.ttl,
@@ -160,7 +160,7 @@ class _N42CallFacade {
         final fresh = await client.getTurnServer();
         if (fresh.uris.isNotEmpty) {
           _callManager!.configureTurn(
-            uris: fresh.uris,
+            uris: fresh.uris.map((uri) => uri.toString()).toList(),
             username: fresh.username,
             password: fresh.password,
             ttl: fresh.ttl,

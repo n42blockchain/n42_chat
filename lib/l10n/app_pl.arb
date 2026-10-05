@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} pending requests",
   "chatDraftLabel": "Draft",
-  "contactIndexLabel": "Contact index"
+  "contactIndexLabel": "Contact index",
+  "transferAssetUnavailable": "Zasób płatniczy jest niedostępny",
+  "transferPaymentRequestUnavailable": "Żądanie płatności jest niedostępne"
 }

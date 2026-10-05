@@ -327,6 +327,7 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
   }
 
   void _showReportDialog(MessageEntity message) {
+    final origin = MessageReportOrigin.capture();
     final l10n = S.of(context);
     String? selectedReason;
     final reasons = [
@@ -362,9 +363,20 @@ extension _ChatPageMessageMenuMethods on _ChatPageState {
               onPressed: selectedReason == null
                   ? null
                   : () {
+                      if (origin == null ||
+                          !origin.isCurrent ||
+                          message.roomId != widget.conversation.id) {
+                        Navigator.pop(dialogContext);
+                        return;
+                      }
                       Navigator.pop(dialogContext);
                       context.read<ChatBloc>().add(
-                        ReportMessage(message.id, selectedReason!),
+                        ReportMessage(
+                          message.id,
+                          selectedReason!,
+                          origin: origin,
+                          roomId: message.roomId,
+                        ),
                       );
                     },
               child: Text(l10n?.commonConfirm ?? 'OK'),

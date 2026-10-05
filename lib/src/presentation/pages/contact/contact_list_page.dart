@@ -371,8 +371,11 @@ class _ContactListPageState extends State<ContactListPage> {
             'Try other keywords or global search',
         buttonText: S.of(context)!.commonClear,
         onButtonPressed: () {
+          final searchWasAlreadyEmpty = _searchController.text.isEmpty;
           _searchController.clear();
-          _onSearchChanged('');
+          if (searchWasAlreadyEmpty) {
+            context.read<ContactBloc>().add(const ClearSearch());
+          }
           setState(() {});
         },
       );
@@ -903,9 +906,11 @@ class _ContactListPageState extends State<ContactListPage> {
   /// 设置联系人备注
   void _setContactRemark(ContactEntity contact) {
     final controller = TextEditingController(text: contact.remark);
+    final navigator = Navigator.of(context, rootNavigator: true);
 
-    showDialog<void>(
+    final route = DialogRoute<void>(
       context: context,
+      themes: InheritedTheme.capture(from: context, to: navigator.context),
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.commonSetRemark ?? 'Set remark'),
         content: TextField(
@@ -941,7 +946,9 @@ class _ContactListPageState extends State<ContactListPage> {
           ),
         ],
       ),
-    ).whenComplete(controller.dispose);
+    );
+    navigator.push(route);
+    unawaited(route.completed.whenComplete(controller.dispose));
   }
 
   Future<void> _startChatWithContact(ContactEntity contact) async {
@@ -1885,7 +1892,8 @@ class _GroupListPageState extends State<_GroupListPage> {
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
         content: Text(
-          '${S.of(context)?.commonConfirmLeaveGroup ?? "Are you sure you want to leave"} "${group.name}"?',
+          S.of(context)?.commonConfirmLeaveGroup(group.name) ??
+              'Are you sure you want to leave "${group.name}"?',
         ),
         actions: [
           TextButton(
@@ -1913,7 +1921,8 @@ class _GroupListPageState extends State<_GroupListPage> {
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.commonDissolveGroup ?? 'Dissolve Group'),
         content: Text(
-          '${S.of(context)?.commonConfirmDissolveGroup ?? "Are you sure you want to dissolve"} "${group.name}"?',
+          S.of(context)?.commonConfirmDissolveGroup(group.name) ??
+              'Are you sure you want to dissolve "${group.name}"?',
         ),
         actions: [
           TextButton(

@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/n42_chat.dart';
 import 'package:n42_chat/src/domain/repositories/moment_repository.dart';
+import 'package:n42_chat/src/presentation/pages/moment/create_moment_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -66,15 +67,50 @@ void main() {
     await getIt.reset();
   });
 
-  testWidgets('Channels opens Matrix public channel discovery', (tester) async {
-    useTallViewport(tester);
-    await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.textContaining('Channel'));
-    await tester.tap(find.textContaining('Channel'));
-    await tester.pumpAndSettle();
-    expect(find.byType(ChannelDiscoverPage), findsOneWidget);
-  });
+  testWidgets(
+    'Video Channels opens video creation and host broadcast actions',
+    (tester) async {
+      useTallViewport(tester);
+      var broadcasts = 0;
+      N42Chat.setGoLiveHandler((_) async {
+        broadcasts++;
+      });
+      await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Channels'));
+      await tester.tap(find.text('Channels'));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<VideoFeedPage>(find.byType(VideoFeedPage)).creatorActions,
+        isTrue,
+      );
+      expect(find.text('Publish video'), findsOneWidget);
+      await tester.tap(find.text('Go live'));
+      await tester.pumpAndSettle();
+      expect(broadcasts, 1);
+      await tester.tap(find.text('Publish video'));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<CreateMomentPage>(find.byType(CreateMomentPage))
+            .videoOnly,
+        isTrue,
+      );
+      expect(find.text('Add Photos'), findsNothing);
+      expect(find.text('Select video'), findsOneWidget);
+      await tester.enterText(
+        find.byType(TextField),
+        'A caption without a video',
+      );
+      await tester.pump();
+      expect(
+        tester
+            .widget<TextButton>(find.widgetWithText(TextButton, 'Send'))
+            .onPressed,
+        isNull,
+      );
+    },
+  );
 
   group('DiscoverPage', () {
     testWidgets('renders stories hub plus core discover menu items', (
@@ -102,7 +138,7 @@ void main() {
       expect(find.text('Communities'), findsOneWidget);
 
       // 验证有 Channels 菜单项
-      expect(find.textContaining('Channel'), findsOneWidget);
+      expect(find.textContaining('Channel'), findsWidgets);
     });
 
     testWidgets('shows the enabled Listen, Watch, and Nearby entries', (
@@ -115,6 +151,19 @@ void main() {
       expect(find.text('Listen'), findsOneWidget);
       expect(find.text('Watch'), findsOneWidget);
       expect(find.text('Nearby'), findsOneWidget);
+    });
+
+    testWidgets('Channels opens public channel discovery', (tester) async {
+      useTallViewport(tester);
+      await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Discover Channels'));
+      await tester.tap(find.text('Discover Channels'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ChannelDiscoverPage), findsOneWidget);
+      expect(find.text('Sign in to discover public channels'), findsOneWidget);
     });
 
     for (final target in const <(String, Type)>[
@@ -156,13 +205,24 @@ void main() {
     });
 
     testWidgets('tapping Scan triggers navigation', (tester) async {
+      useTallViewport(tester);
       await tester.pumpWidget(buildTestWidget(const DiscoverPage()));
       await tester.pumpAndSettle();
 
-      // 验证 Scan 菜单项可点击（InkWell 包裹）
-      await tester.tap(find.text('Scan'));
-      // 只 pump 一帧验证不报异常，不 pumpAndSettle（ScanQRPage 含平台插件）
-      await tester.pump();
+      await tester.ensureVisible(find.text('Scan'));
+      final scanTapTarget = find.ancestor(
+        of: find.text('Scan'),
+        matching: find.byType(InkWell),
+      );
+      expect(scanTapTarget, findsOneWidget);
+      expect(scanTapTarget.hitTestable(), findsOneWidget);
+      expect(tester.widget<InkWell>(scanTapTarget).onTap, isNotNull);
+      await tester.tap(scanTapTarget);
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(
+        tester.state<NavigatorState>(find.byType(Navigator)).canPop(),
+        isTrue,
+      );
     });
 
     testWidgets('tapping Search navigates to GlobalSearchPage', (tester) async {
@@ -211,7 +271,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final chevronIcons = find.byIcon(AppIcons.chevron);
-      expect(chevronIcons, findsNWidgets(13));
+      expect(chevronIcons, findsNWidgets(14));
     });
   });
 }

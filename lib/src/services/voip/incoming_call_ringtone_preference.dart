@@ -25,7 +25,9 @@ class IncomingCallRingtonePreference {
     this.sourceKey,
   });
 
-  factory IncomingCallRingtonePreference.system({String label = 'Default Ringtone'}) {
+  factory IncomingCallRingtonePreference.system({
+    String label = 'Default Ringtone',
+  }) {
     return IncomingCallRingtonePreference(
       mode: IncomingCallRingtoneMode.system,
       label: label,
@@ -85,17 +87,15 @@ class IncomingCallRingtonePreference {
         sourceKey: sourceKey,
       );
     } catch (e) {
-      debugLog('IncomingCallRingtonePreference: Failed to decode stored value - $e');
+      debugLog(
+        'IncomingCallRingtonePreference: Failed to decode stored value - $e',
+      );
       return IncomingCallRingtonePreference.system(label: raw);
     }
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'mode': mode.name,
-      'label': label,
-      'sourceKey': sourceKey,
-    };
+    return {'mode': mode.name, 'label': label, 'sourceKey': sourceKey};
   }
 
   String encode() => jsonEncode(toJson());
@@ -162,10 +162,14 @@ class IncomingCallRingtonePreference {
 AndroidParams buildIncomingCallAndroidParams({
   required IncomingCallRingtonePreference ringtonePreference,
   String? avatarUrl,
+  String textAccept = 'Answer',
+  String textDecline = 'Decline',
   String incomingCallChannelName = 'Incoming call',
   String missedCallChannelName = 'Missed call',
 }) {
   return AndroidParams(
+    textAccept: textAccept,
+    textDecline: textDecline,
     isCustomNotification: true,
     isShowLogo: true,
     ringtonePath: ringtonePreference.androidRingtonePath,

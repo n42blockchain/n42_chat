@@ -82,14 +82,15 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // 标题
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
                 Text(
-                  S.of(context)?.chatSelectForwardTargetTitle ?? 'Select Forward Target',
+                  S.of(context)?.chatSelectForwardTargetTitle ??
+                      'Select Forward Target',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -119,7 +120,10 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
               onChanged: (value) {
                 setState(() {
@@ -128,7 +132,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
               },
             ),
           ),
-          
+
           // 消息预览
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -159,18 +163,16 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
               ],
             ),
           ),
-          
+
           const Divider(),
-          
+
           // 最近会话列表
-          Expanded(
-            child: _buildRecentChats(),
-          ),
+          Expanded(child: _buildRecentChats()),
         ],
       ),
     );
   }
-  
+
   Widget _buildRecentChats() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -178,68 +180,77 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
 
     final filteredChats = _searchQuery.isEmpty
         ? _conversations
-        : _conversations.where((chat) => 
-            chat.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
-    
+        : _conversations
+              .where(
+                (chat) => chat.name.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+              )
+              .toList();
+
     if (filteredChats.isEmpty) {
       return Center(
         child: Text(
           _conversations.isEmpty
-              ? (S.of(context)?.chatNoForwardableChat ?? 'No chats available for forwarding')
-              : (S.of(context)?.chatNoMatchingChat ?? 'No matching chats found'),
-          style: TextStyle(
-            color: AppColors.textTertiaryOf(widget.isDark),
-          ),
+              ? (S.of(context)?.chatNoForwardableChat ??
+                    'No chats available for forwarding')
+              : (S.of(context)?.chatNoMatchingChat ??
+                    'No matching chats found'),
+          style: TextStyle(color: AppColors.textTertiaryOf(widget.isDark)),
         ),
       );
     }
-    
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: filteredChats.length,
       itemBuilder: (context, index) {
         final chat = filteredChats[index];
         final isGroup = chat.type == ConversationType.group;
-        return ListTile(
-          leading: CircleAvatar(
-            backgroundColor: AppColors.placeholderOf(widget.isDark),
-            backgroundImage: chat.avatarUrl != null && chat.avatarUrl!.isNotEmpty
-                ? NetworkImage(chat.avatarUrl!)
-                : null,
-            child: chat.avatarUrl == null || chat.avatarUrl!.isEmpty
-                ? Icon(
-                    isGroup ? Icons.group : Icons.person,
-                    color: AppColors.textSecondaryOf(widget.isDark),
+        return Material(
+          color: AppColors.surfaceOf(widget.isDark),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: AppColors.placeholderOf(widget.isDark),
+              backgroundImage:
+                  chat.avatarUrl != null && chat.avatarUrl!.isNotEmpty
+                  ? NetworkImage(chat.avatarUrl!)
+                  : null,
+              child: chat.avatarUrl == null || chat.avatarUrl!.isEmpty
+                  ? Icon(
+                      isGroup ? Icons.group : Icons.person,
+                      color: AppColors.textSecondaryOf(widget.isDark),
+                    )
+                  : null,
+            ),
+            title: Text(
+              chat.name,
+              style: TextStyle(color: AppColors.textPrimaryOf(widget.isDark)),
+            ),
+            subtitle: chat.lastMessage != null
+                ? Text(
+                    chat.lastMessage!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textTertiaryOf(widget.isDark),
+                    ),
                   )
                 : null,
+            onTap: _isForwarding
+                ? null
+                : () {
+                    if (_isForwarding) return;
+                    setState(() => _isForwarding = true);
+                    widget.onForwardToChat(chat.id);
+                  },
           ),
-          title: Text(
-            chat.name,
-            style: TextStyle(
-              color: AppColors.textPrimaryOf(widget.isDark),
-            ),
-          ),
-          subtitle: chat.lastMessage != null
-              ? Text(
-                  chat.lastMessage!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textTertiaryOf(widget.isDark),
-                  ),
-                )
-              : null,
-          onTap: _isForwarding ? null : () {
-            if (_isForwarding) return;
-            setState(() => _isForwarding = true);
-            widget.onForwardToChat(chat.id);
-          },
         );
       },
     );
   }
-  
+
   IconData _getMessageIcon(MessageType type) {
     switch (type) {
       case MessageType.text:
@@ -258,7 +269,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
         return Icons.chat_bubble_outline;
     }
   }
-  
+
   String _getMessagePreview(MessageEntity message) {
     switch (message.type) {
       case MessageType.text:

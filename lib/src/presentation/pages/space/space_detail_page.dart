@@ -604,7 +604,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
     SpaceChild child,
     bool isDark,
   ) {
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: ListTile(
         leading: Container(
@@ -680,7 +680,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
     SpaceChild child,
     bool isDark,
   ) {
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: ListTile(
         leading: Container(

@@ -364,6 +364,66 @@ void main() {
     expect((await source.getMoments()).single.id, 'post');
   });
 
+  test('loaded post and comment retain their distinct Matrix identities',
+      () async {
+    final owned = room('own', me);
+    final postEvent = event(MatrixMomentDataSource.momentEventType, me, {
+      'moment_id': 'post-content-id',
+      'content': 'Text',
+    }, id: r'$real-post');
+    final commentEvent = event(
+      MatrixMomentDataSource.momentCommentEventType,
+      friend,
+      {
+        'moment_id': 'post-content-id',
+        'moment_event_id': r'$real-post',
+        'comment_id': 'comment-content-id',
+        'content': 'Reply',
+      },
+      id: r'$real-comment',
+    );
+    when(() => timelines['own']!.events).thenReturn([postEvent, commentEvent]);
+    final source = MatrixMomentDataSource(manager);
+    final post = (await source.getMoments()).single;
+    final comment = (await source.getMomentComments(post.id)).single;
+    expect(post.sourceRoomId, owned.id);
+    expect(post.sourceEventId, r'$real-post');
+    expect(comment.sourceRoomId, owned.id);
+    expect(comment.sourceEventId, r'$real-comment');
+    expect(comment.sourceEventId, isNot(post.sourceEventId));
+  });
+
+  test('duplicate content IDs in different rooms keep separate source events',
+      () async {
+    room('first', me);
+    room('second', me);
+    final first = event(MatrixMomentDataSource.momentEventType, me,
+        {'moment_id': 'duplicate'}, id: r'$first-event');
+    final second = event(MatrixMomentDataSource.momentEventType, me,
+        {'moment_id': 'duplicate'}, id: r'$second-event');
+    when(() => timelines['first']!.events).thenReturn([first]);
+    when(() => timelines['second']!.events).thenReturn([second]);
+    final moments = await MatrixMomentDataSource(manager).getMoments();
+    expect(moments, hasLength(2));
+    expect(
+      moments.map((m) => (m.sourceRoomId, m.sourceEventId)).toSet(),
+      {('first', r'$first-event'), ('second', r'$second-event')},
+    );
+  });
+
+  test('new post returns the Matrix event ID acknowledged by sendEvent',
+      () async {
+    final owned = room('own', me);
+    when(() => owned.sendEvent(any(), type: MatrixMomentDataSource.momentEventType))
+        .thenAnswer((_) async => r'$created-post');
+    final post = await MatrixMomentDataSource(manager).postMoment(
+      content: 'New post',
+    );
+    expect(post.sourceRoomId, owned.id);
+    expect(post.sourceEventId, r'$created-post');
+    expect(post.id, isNot(post.sourceEventId));
+  });
+
   for (final accountChanged in [false, true]) {
     test(
       accountChanged

@@ -147,6 +147,55 @@ void main() {
       expect(service.isInCall, isFalse);
     },
   );
+
+  test('a second outgoing call is rejected while startup is pending', () async {
+    final firstAttempt = service.startCall(
+      roomId: '!room:hs',
+      type: CallType.voice,
+      peerId: '@peer:hs',
+      peerName: 'Peer',
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(service.state, CallState.ringing);
+
+    final secondAttempt = await service.startCall(
+      roomId: '!room:hs',
+      type: CallType.video,
+      peerId: '@other:hs',
+      peerName: 'Other',
+    );
+
+    expect(secondAttempt, isFalse);
+    expect(service.state, CallState.ringing);
+    expect(nativeCalls, isNot(contains('createPeerConnection')));
+    await service.hangup().timeout(const Duration(seconds: 1));
+    turn.complete({'uris': <String>[]});
+    expect(await firstAttempt, isFalse);
+    expect(service.isInCall, isFalse);
+  });
+
+  test('an outgoing call fails cleanly when its room is unavailable', () async {
+    final errors = <String>[];
+    final stateChanges = <CallState>[];
+    when(() => client.getRoomById('!missing:hs')).thenReturn(null);
+    service.onError = errors.add;
+    service.onStateChanged = stateChanges.add;
+
+    final result = await service.startCall(
+      roomId: '!missing:hs',
+      type: CallType.voice,
+      peerId: '@peer:hs',
+      peerName: 'Peer',
+    );
+
+    expect(result, isFalse);
+    expect(errors, ['call_failed']);
+    expect(stateChanges, contains(CallState.failed));
+    expect(service.state, CallState.idle);
+    expect(service.currentSession, isNull);
+    expect(nativeCalls, isNot(contains('createPeerConnection')));
+  });
+
   for (final type in [CallType.voice, CallType.video]) {
     test(
       'outgoing $type concurrent hangups publish one frozen record',
@@ -287,5 +336,99 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 20));
     expect(service.isInCall, false);
     expect(nativeCalls, isNot(contains('createPeerConnection')));
+  });
+
+  test(
+    'rejecting an incoming invite signals busy and releases the session',
+    () async {
+      turn.complete({'uris': <String>[]});
+      timeline.add(
+        Event.fromJson({
+          'event_id': r'$reject-invite',
+          'type': 'm.call.invite',
+          'sender': '@peer:hs',
+          'origin_server_ts': DateTime.now().millisecondsSinceEpoch,
+          'content': {
+            'call_id': 'reject-me',
+            'version': '1',
+            'lifetime': 60000,
+            'offer': {'type': 'offer', 'sdp': 'v=0\r\nm=audio'},
+          },
+        }, room),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(service.state, CallState.incoming);
+      expect(service.currentSession?.callId, 'reject-me');
+
+      await service.rejectCall();
+
+      final rejection = sent.singleWhere(
+        (event) => event['type'] == 'm.call.reject',
+      );
+      expect(rejection['call_id'], 'reject-me');
+      expect(rejection['reason'], 'user_busy');
+      expect(service.state, CallState.idle);
+      expect(service.currentSession, isNull);
+    },
+  );
+
+  test('expired invite is ignored before reserving call resources', () async {
+    timeline.add(
+      Event.fromJson({
+        'event_id': r'$expired-invite',
+        'type': 'm.call.invite',
+        'sender': '@peer:hs',
+        'origin_server_ts': DateTime.now()
+            .subtract(const Duration(minutes: 2))
+            .millisecondsSinceEpoch,
+        'content': {
+          'call_id': 'expired',
+          'version': '1',
+          'lifetime': 1000,
+          'offer': {'type': 'offer', 'sdp': 'v=0\r\nm=audio'},
+        },
+      }, room),
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+
+    expect(service.state, CallState.idle);
+    expect(service.currentSession, isNull);
+    expect(service.isInCall, isFalse);
+    expect(nativeCalls, isNot(contains('createPeerConnection')));
+  });
+
+  test('speaker state rolls back when the platform rejects routing', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(const MethodChannel('FlutterWebRTC.Method'), (
+          call,
+        ) async {
+          if (call.method == 'enableSpeakerphone') {
+            throw PlatformException(code: 'audio_route_failed');
+          }
+          return null;
+        });
+
+    await service.toggleSpeaker();
+
+    expect(service.isSpeakerOn, isFalse);
+  });
+
+  test('audio processing preferences toggle while no call is active', () async {
+    final defaults = service.audioProcessingConfig;
+    expect(defaults.noiseSuppression, isTrue);
+    expect(defaults.echoCancellation, isTrue);
+    expect(defaults.autoGainControl, isTrue);
+
+    await service.toggleNoiseSuppression();
+    await service.toggleEchoCancellation();
+    await service.toggleAutoGainControl();
+
+    expect(service.audioProcessingConfig.noiseSuppression, isFalse);
+    expect(service.audioProcessingConfig.echoCancellation, isFalse);
+    expect(service.audioProcessingConfig.autoGainControl, isFalse);
+
+    await service.toggleNoiseSuppression();
+    await service.toggleEchoCancellation();
+    await service.toggleAutoGainControl();
   });
 }

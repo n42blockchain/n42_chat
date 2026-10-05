@@ -11,10 +11,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
+import '../../blocs/contact/contact_block_origin.dart';
 import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/chat/contact_card_select_sheet.dart';
+import '../../widgets/common/user_report_dialog.dart';
 import 'contact_detail_page.dart';
 import 'contact_permissions_page.dart';
 import '../../../core/utils/debug_log.dart';
@@ -39,6 +41,7 @@ class ContactSettingsPage extends StatefulWidget {
 }
 
 class _ContactSettingsPageState extends State<ContactSettingsPage> {
+  late final ContactBlockOrigin? _blockOrigin;
   late bool _isStarred;
   bool _isBlocked = false;
   bool _isDeleting = false;
@@ -51,6 +54,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   @override
   void initState() {
     super.initState();
+    _blockOrigin = ContactBlockOrigin.capture();
     _isStarred = widget.isStarred;
     _loadStar();
     try {
@@ -129,19 +133,23 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
 
   Future<void> _updateBlock(bool blocked) async {
     if (_isUpdatingBlock) return;
+    final origin = _blockOrigin;
     setState(() => _isUpdatingBlock = true);
     try {
+      if (origin == null || !origin.isCurrent) {
+        throw StateError('Matrix account changed');
+      }
       final repository = getIt<IContactRepository>();
       if (blocked) {
         await repository.ignoreUser(widget.userId);
       } else {
         await repository.unignoreUser(widget.userId);
       }
-      if (!mounted) return;
+      if (!mounted || !origin.isCurrent) return;
       setState(() => _isBlocked = blocked);
       context.read<ContactBloc>().add(const RefreshContacts());
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted || (origin != null && !origin.isCurrent)) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.commonSaveFailed ?? 'Failed to save'),
@@ -535,92 +543,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
   }
 
   void _showReportDialog() {
-    final descController = TextEditingController();
-    String? selectedReason;
-
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: context.surfaceColor,
-          title: Text(
-            S.of(context)?.reportTitle ?? 'Report',
-            style: TextStyle(color: context.textPrimary),
-          ),
-          content: RadioGroup<String>(
-            groupValue: selectedReason,
-            onChanged: (val) => setDialogState(() => selectedReason = val),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ...[
-                  S.of(context)?.reportReasonSpam ?? 'Spam',
-                  S.of(context)?.reportReasonHarassment ?? 'Harassment',
-                  S.of(context)?.reportReasonFraud ?? 'Fraud',
-                  S.of(context)?.reportReasonOther ?? 'Other',
-                ].map(
-                  (reason) => RadioListTile<String>(
-                    title: Text(
-                      reason,
-                      style: TextStyle(color: context.textPrimary),
-                    ),
-                    value: reason,
-                    activeColor: AppColors.primary,
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: descController,
-                  maxLines: 2,
-                  style: TextStyle(color: context.textPrimary),
-                  decoration: InputDecoration(
-                    hintText:
-                        S.of(context)?.reportDescription ??
-                        'Additional description (optional)',
-                    hintStyle: TextStyle(color: context.textSecondary),
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (selectedReason == null) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        S.of(context)?.reportSelectReason ??
-                            'Please select a reason',
-                      ),
-                      duration: const Duration(seconds: 1),
-                    ),
-                  );
-                  return;
-                }
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      S.of(context)?.reportSubmitted ?? 'Report submitted',
-                    ),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-              child: Text(S.of(context)?.commonConfirm ?? 'Submit'),
-            ),
-          ],
-        ),
-      ),
-    ).whenComplete(descController.dispose);
+    showUserReportDialog(context, userId: widget.userId);
   }
 
   void _openEditRemark() {

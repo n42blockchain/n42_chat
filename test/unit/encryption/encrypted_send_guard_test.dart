@@ -71,7 +71,7 @@ void main() {
     final override = Platform.environment['N42_VODOZEMAC_TEST_LIB'];
     final native =
         override ??
-        '${packageRoot}/macos/flutter_vodozemac/flutter_vodozemac.xcframework/macos-arm64_x86_64/flutter_vodozemac.framework/flutter_vodozemac';
+        '${packageRoot}/macos/flutter_vodozemac/flutter_vodozemac.xcframework/macos-arm64_x86_64/libflutter_vodozemac.dylib';
     final directory = await Directory.systemTemp.createTemp('n42-crypto-test-');
     addTearDown(() => directory.delete(recursive: true));
     final suffix = Platform.isMacOS ? 'dylib' : 'so';

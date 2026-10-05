@@ -10,6 +10,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/social_scan_payload_parser.dart';
 import '../../../core/utils/payment_request_uri.dart';
+import '../../../core/utils/payment_asset_match.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../helpers/mini_app_launcher_helper.dart';
@@ -39,8 +40,6 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   bool _permissionCheckInFlight = false;
   Timer? _resumeTimer;
   Future<void> _cameraLifecycle = Future<void>.value();
-
-  static final RegExp _positiveAmountRegExp = RegExp(r'^\d+(?:\.\d+)?$');
 
   @override
   void initState() {
@@ -227,7 +226,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         return;
       }
       // 收款二维码（商户收款码）：识别后展示金额确认并发起付款
-      final payment = PaymentRequestUri.tryParse(data);
+      final payment =
+          PaymentRequestUri.tryParseExact(data) ??
+          PaymentRequestUri.tryParse(data);
       if (payment != null) {
         completedWithExit = await _handlePaymentUri(payment);
         return;
@@ -269,6 +270,39 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   /// 处理扫到的收款二维码：确认金额后通过钱包桥发起付款。
   /// 返回 true 表示已离开扫码页（无需重启扫描）。
   Future<bool> _handlePaymentUri(PaymentRequestData payment) async {
+    final bridge = getIt<IWalletBridge>();
+    final assets = await bridge.getSupportedTokens();
+    if (!mounted) return false;
+    final resolution = resolvePaymentAsset(payment, assets);
+    final exact = payment.hasExactIdentity;
+    if (exact && resolution.status != PaymentAssetResolutionStatus.matched ||
+        !exact &&
+            (resolution.status == PaymentAssetResolutionStatus.invalid ||
+                resolution.status ==
+                    PaymentAssetResolutionStatus.unavailable)) {
+      _showError(
+        S.of(context)?.transferAssetUnavailable ??
+            'Payment asset is unavailable',
+      );
+      return false;
+    }
+    final candidates = exact
+        ? <TokenInfo>[resolution.asset!]
+        : resolution.candidates;
+    if (exact &&
+            createExactPaymentRequestForAsset(
+                  candidates.single,
+                  amount: payment.amount,
+                ) ==
+                null ||
+        _hasDuplicateCandidates(candidates)) {
+      _showError(
+        S.of(context)?.transferAssetUnavailable ??
+            'Payment asset is unavailable',
+      );
+      return false;
+    }
+    TokenInfo? selected = exact ? resolution.asset : null;
     final amountController = TextEditingController(
       text: payment.hasAmount ? payment.amount.trim() : '',
     );
@@ -283,7 +317,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           return StatefulBuilder(
             builder: (ctx, setSheetState) {
               final amountLine = payment.hasAmount
-                  ? '${payment.amount} ${payment.token}'.trim()
+                  ? '${payment.amount} ${selected?.symbol ?? payment.token}'
+                        .trim()
                   : (S.of(ctx)?.transferReceive ?? 'Payment request');
               return SafeArea(
                 child: Padding(
@@ -317,6 +352,35 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                         const SizedBox(height: 8),
                         Text(payment.memo!),
                       ],
+                      if (exact)
+                        Text(
+                          _assetLabel(selected!),
+                          key: const ValueKey('scan_selected_asset'),
+                        )
+                      else ...[
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<TokenInfo>(
+                          key: const ValueKey('scan_asset_selector'),
+                          isExpanded: true,
+                          initialValue: selected,
+                          hint: Text(
+                            S.of(ctx)?.transferPleaseSelectToken ??
+                                'Please select a token',
+                          ),
+                          items: candidates
+                              .map(
+                                (asset) => DropdownMenuItem(
+                                  value: asset,
+                                  child: _assetChoice(asset),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) =>
+                              setSheetState(() => selected = value),
+                        ),
+                        if (selected != null)
+                          Text(_assetLabel(selected!), softWrap: true),
+                      ],
                       if (!payment.hasAmount) ...[
                         const SizedBox(height: 16),
                         TextField(
@@ -326,9 +390,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                           ),
                           decoration: InputDecoration(
                             labelText: S.of(ctx)?.transferAmount ?? 'Amount',
-                            suffixText: payment.token.isNotEmpty
-                                ? payment.token
-                                : null,
+                            suffixText: selected?.symbol,
                             errorText: amountError,
                           ),
                         ),
@@ -349,13 +411,21 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                                 final amount = payment.hasAmount
                                     ? payment.amount.trim()
                                     : amountController.text.trim();
-                                if (!_isPositiveAmount(amount)) {
+                                if (selected == null ||
+                                    !isValidPaymentAmountForDecimals(
+                                      amount,
+                                      selected!.decimals,
+                                    )) {
                                   setSheetState(() {
-                                    amountError =
-                                        S
-                                            .of(ctx)
-                                            ?.transferPleaseEnterValidAmount ??
-                                        'Please enter a valid amount';
+                                    amountError = selected == null
+                                        ? (S
+                                                  .of(ctx)
+                                                  ?.transferPleaseSelectToken ??
+                                              'Please select a token')
+                                        : (S
+                                                  .of(ctx)
+                                                  ?.transferPleaseEnterValidAmount ??
+                                              'Please enter a valid amount');
                                   });
                                   return;
                                 }
@@ -378,15 +448,89 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       amountController.dispose();
     }
 
-    if (amountToPay == null) return false;
+    if (!mounted || amountToPay == null || selected == null) return false;
 
     try {
-      final result = await getIt<IWalletBridge>().requestTransfer(
-        toAddress: payment.receiverAddress,
-        amount: amountToPay,
-        token: payment.token,
-        memo: payment.memo,
-      );
+      final original = selected!;
+      final refreshed = await bridge.getSupportedTokens();
+      if (!mounted) return false;
+      final hasExactAsset =
+          createExactPaymentRequestForAsset(original, amount: amountToPay) !=
+          null;
+      TokenInfo? asset;
+      if (hasExactAsset) {
+        final lookup = exact
+            ? PaymentRequestData(
+                receiverAddress: payment.receiverAddress,
+                amount: amountToPay,
+                chain: payment.chain,
+                network: payment.network,
+                assetType: payment.assetType,
+                assetId: payment.assetId,
+              )
+            : PaymentRequestData(
+                receiverAddress: payment.receiverAddress,
+                amount: amountToPay,
+                chain: original.chain,
+                network: original.network,
+                assetType: original.assetType,
+                assetId: original.assetId,
+              );
+        final current = resolvePaymentAsset(lookup, refreshed);
+        final match = current.asset;
+        if (current.status == PaymentAssetResolutionStatus.matched &&
+            match != null &&
+            match.symbol == original.symbol &&
+            match.receiverAddress == original.receiverAddress &&
+            match.decimals == original.decimals &&
+            createExactPaymentRequestForAsset(match, amount: amountToPay) !=
+                null) {
+          asset = match;
+        }
+      } else if (!exact && payment.chain == null && !_hasIdentity(original)) {
+        final matches = refreshed
+            .where(
+              (item) =>
+                  item.symbol.toLowerCase() == original.symbol.toLowerCase(),
+            )
+            .toList();
+        if (matches.length == 1 &&
+            !_hasIdentity(matches.single) &&
+            matches.single.name == original.name &&
+            matches.single.decimals == original.decimals &&
+            matches.single.receiverAddress == original.receiverAddress &&
+            isValidPaymentAmountForDecimals(
+              amountToPay,
+              matches.single.decimals,
+            )) {
+          asset = matches.single;
+        }
+      }
+      if (asset == null) {
+        _showError(
+          S.of(context)?.transferAssetUnavailable ??
+              'Payment asset is unavailable',
+        );
+        return false;
+      }
+      final result = hasExactAsset
+          ? await requestWalletTransferExact(
+              bridge,
+              toAddress: payment.receiverAddress,
+              amount: amountToPay,
+              token: asset.symbol,
+              memo: payment.memo,
+              chain: asset.chain!,
+              network: asset.network!,
+              assetType: asset.assetType!,
+              assetId: asset.assetId,
+            )
+          : await bridge.requestTransfer(
+              toAddress: payment.receiverAddress,
+              amount: amountToPay,
+              token: asset.symbol,
+              memo: payment.memo,
+            );
       if (!mounted) return true;
       if (result.success) {
         Navigator.of(context).pop();
@@ -400,10 +544,49 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     return false;
   }
 
-  static bool _isPositiveAmount(String amount) {
-    final normalized = amount.trim();
-    if (!_positiveAmountRegExp.hasMatch(normalized)) return false;
-    return normalized.replaceAll('.', '').contains(RegExp(r'[1-9]'));
+  static String _assetLabel(TokenInfo asset) {
+    final identity = [
+      asset.chain,
+      asset.network,
+      asset.assetType,
+    ].whereType<String>().join(' / ');
+    final id = asset.assetId;
+    final suffix = id == null ? '' : ' · $id';
+    return identity.isEmpty
+        ? '${asset.symbol} · ${asset.name}'
+        : '${asset.symbol} · ${asset.name} · $identity$suffix';
+  }
+
+  static Widget _assetChoice(TokenInfo asset) => FittedBox(
+    fit: BoxFit.scaleDown,
+    alignment: Alignment.centerLeft,
+    child: Text(_assetLabel(asset), maxLines: 1),
+  );
+
+  static bool _hasIdentity(TokenInfo asset) =>
+      asset.chain != null ||
+      asset.network != null ||
+      asset.assetType != null ||
+      asset.assetId != null;
+
+  static bool _hasDuplicateCandidates(List<TokenInfo> candidates) {
+    for (var i = 0; i < candidates.length; i++) {
+      for (var j = i + 1; j < candidates.length; j++) {
+        final left = candidates[i];
+        final right = candidates[j];
+        if (left.symbol.toLowerCase() != right.symbol.toLowerCase() ||
+            left.chain != right.chain ||
+            left.network != right.network ||
+            left.assetType != right.assetType) {
+          continue;
+        }
+        if (left.assetId == null && right.assetId == null ||
+            samePaymentAssetId(left.assetId, right.assetId)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   Future<bool> _startChatWithUser(String userId) async {

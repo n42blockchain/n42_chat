@@ -400,16 +400,40 @@ extension ChatBlocActionHandlers on ChatBloc {
     ReportMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final origin = event.origin;
+    if (origin != null &&
+        (!origin.isCurrent || !identical(_clientManager, origin.manager))) {
+      return;
+    }
+    final roomId = _currentRoomId;
+    if (roomId == null || (event.roomId != null && event.roomId != roomId)) {
+      return;
+    }
+    final manager = _clientManager;
+    final client = manager?.client;
+    final account = client?.userID;
+    final homeserver = client?.homeserver;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    bool sameOrigin() =>
+        _currentRoomId == roomId &&
+        (manager == null ||
+            (identical(manager.client, client) &&
+                client?.userID == account &&
+                client?.homeserver == homeserver &&
+                client?.accessToken == token &&
+                client?.deviceID == device));
     try {
       await _messageRepository.reportMessage(
-        _currentRoomId!,
+        roomId,
         event.messageId,
         reason: event.reason,
       );
+      if (!sameOrigin() || (origin != null && !origin.isCurrent)) return;
       // 通过 error 字段发送成功信号（使用特殊前缀区分）
       emit(state.copyWith(error: 'success:report'));
     } catch (e) {
+      if (!sameOrigin() || (origin != null && !origin.isCurrent)) return;
       debugLog('ChatBloc: Failed to report message: $e');
       emit(state.copyWith(error: 'Failed to report message'));
     }

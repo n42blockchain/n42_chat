@@ -64,6 +64,7 @@ import '../../data/repositories/moment_repository_impl.dart';
 import '../../data/repositories/sticker_repository_impl.dart';
 import '../../data/repositories/story_repository_impl.dart';
 import '../../data/repositories/contact_repository_impl.dart';
+import '../../data/repositories/matrix_content_report_repository.dart';
 import '../../data/repositories/conversation_repository_impl.dart';
 import '../../data/repositories/group_repository_impl.dart';
 import '../../data/repositories/message_repository_impl.dart';
@@ -72,6 +73,7 @@ import '../../data/repositories/search_repository_impl.dart';
 import '../../data/repositories/transfer_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/contact_repository.dart';
+import '../../domain/repositories/content_report_repository.dart';
 import '../../domain/repositories/conversation_repository.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../../domain/repositories/message_repository.dart';
@@ -162,6 +164,7 @@ final GetIt getIt = GetIt.instance;
 Future<void> configureDependencies(
   N42ChatConfig config, {
   IWalletBridge? walletBridge,
+  MatrixClientManager? clientManagerOverride,
 }) async {
   // 注册配置
   getIt.registerSingleton<N42ChatConfig>(config);
@@ -189,7 +192,7 @@ Future<void> configureDependencies(
   await _registerDataSources();
 
   // 注册服务
-  await _registerServices(config);
+  await _registerServices(config, clientManagerOverride: clientManagerOverride);
 
   // 注册仓库
   _registerRepositories();
@@ -219,9 +222,12 @@ Future<void> _initializeRemarkService() async {
 }
 
 /// 注册服务
-Future<void> _registerServices(N42ChatConfig config) async {
+Future<void> _registerServices(
+  N42ChatConfig config, {
+  MatrixClientManager? clientManagerOverride,
+}) async {
   // Matrix客户端管理器
-  final clientManager = MatrixClientManager.instance;
+  final clientManager = clientManagerOverride ?? MatrixClientManager.instance;
 
   // 尝试初始化 Matrix 客户端（包括 Hive 数据库）
   // 如果失败，允许后续在登录/注册时再次尝试
@@ -762,7 +768,15 @@ Future<void> _registerDataSources() async {
 
   // Matrix动态数据源
   getIt.registerLazySingleton<MatrixMomentDataSource>(
-    () => MatrixMomentDataSource(getIt<MatrixClientManager>()),
+    () {
+      final auth = getIt<IAuthRepository>();
+      return MatrixMomentDataSource(
+        getIt<MatrixClientManager>(),
+        accountLifecycle: auth is IAccountBoundDeletionLifecycle
+            ? auth as IAccountBoundDeletionLifecycle
+            : null,
+      );
+    },
   );
 
   // Matrix贴纸数据源
@@ -870,6 +884,10 @@ void _registerRepositories() {
           : null,
     );
   }, dispose: (repo) => (repo as AuthRepositoryImpl).dispose());
+
+  getIt.registerLazySingleton<IContentReportRepository>(
+    () => MatrixContentReportRepository(getIt<MatrixClientManager>()),
+  );
 
   // 会话仓库
   getIt.registerLazySingleton<IConversationRepository>(

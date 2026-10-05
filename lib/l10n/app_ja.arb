@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} pending requests",
   "chatDraftLabel": "Draft",
-  "contactIndexLabel": "Contact index"
+  "contactIndexLabel": "Contact index",
+  "transferAssetUnavailable": "支払い資産を利用できません",
+  "transferPaymentRequestUnavailable": "支払いリクエストを利用できません"
 }

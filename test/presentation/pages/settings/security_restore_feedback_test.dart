@@ -130,4 +130,68 @@ void main() {
     expect(find.text(l10n.settingsBackupNotSet), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('backup uploads keys and shows the recovery key', (tester) async {
+    when(() => manager.createRecoveryKey()).thenAnswer((_) async => 'key-123');
+    when(() => backup.backupAllKeys()).thenAnswer((_) async {});
+    when(() => backup.getBackupInfo()).thenAnswer(
+      (_) async => KeyBackupInfo(
+        version: 'v2',
+        algorithm: 'fixture',
+        count: 4,
+        etag: 'new-etag',
+      ),
+    );
+    final l10n = await open(tester, restore: false);
+    await tester.scrollUntilVisible(
+      find.text(l10n.settingsBackupEncryptionKeys),
+      200,
+    );
+    await tester.tap(find.text(l10n.settingsBackupEncryptionKeys));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.settingsBackup));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SelectableText), findsOneWidget);
+    expect(
+      tester.widget<SelectableText>(find.byType(SelectableText)).data,
+      'key-123',
+    );
+    expect(
+      find.widgetWithText(AlertDialog, l10n.settingsRecoveryKey),
+      findsOneWidget,
+    );
+    verify(() => manager.createRecoveryKey()).called(1);
+    verify(() => backup.backupAllKeys()).called(1);
+    verify(() => backup.getBackupInfo()).called(2);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('failed key upload reports failure and clears loading state', (
+    tester,
+  ) async {
+    when(() => manager.createRecoveryKey()).thenAnswer((_) async => null);
+    when(
+      () => backup.backupAllKeys(),
+    ).thenThrow(StateError('backup unavailable'));
+    final l10n = await open(tester, restore: false);
+    await tester.scrollUntilVisible(
+      find.text(l10n.settingsBackupEncryptionKeys),
+      200,
+    );
+    await tester.tap(find.text(l10n.settingsBackupEncryptionKeys));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.settingsBackup));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('${l10n.settingsBackupFailed}: Bad state: backup unavailable'),
+      findsOneWidget,
+    );
+    expect(
+      find.widgetWithText(AlertDialog, l10n.settingsRecoveryKey),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+  });
 }

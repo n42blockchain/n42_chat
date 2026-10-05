@@ -457,7 +457,7 @@ class MatrixSpaceDataSource {
         userId: user.id,
       ),
       avatarUrl: user.avatarUrl?.toString(),
-      role: _powerLevelToGroupRole(user.powerLevel),
+      role: _powerLevelToGroupRole(user.powerLevel.level),
     );
   }
 

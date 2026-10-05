@@ -7,7 +7,8 @@ import '../datasources/local/preferences_datasource.dart';
 import '../datasources/matrix/matrix_moment_datasource.dart';
 
 /// 动态仓库实现
-class MomentRepositoryImpl implements IMomentRepository {
+class MomentRepositoryImpl
+    implements IMomentRepository, IMomentReportRepository {
   final MatrixMomentDataSource _momentDataSource;
   final PreferencesDataSource _storageDataSource;
 
@@ -18,6 +19,17 @@ class MomentRepositoryImpl implements IMomentRepository {
   int _unreadCount = 0;
 
   MomentRepositoryImpl(this._momentDataSource, this._storageDataSource);
+
+  @override
+  Future<void> reportMoment(MomentEntity moment, String reason) =>
+      _momentDataSource.reportMoment(moment, reason);
+
+  @override
+  Future<void> reportComment(
+    MomentEntity moment,
+    MomentComment comment,
+    String reason,
+  ) => _momentDataSource.reportComment(moment, comment, reason);
 
   @override
   Future<List<MomentEntity>> getMoments({

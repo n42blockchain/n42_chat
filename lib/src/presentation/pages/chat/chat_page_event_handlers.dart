@@ -237,8 +237,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         token == null ||
         token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Payment request is unavailable'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.transferPaymentRequestUnavailable ??
+                'Payment request is unavailable',
+          ),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -309,6 +312,10 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       qrCodeData: receiverAddress,
       createdAt: message.timestamp,
       expiresAt: metadata?.paymentRequestExpiresAt,
+      chain: metadata?.paymentChain,
+      network: metadata?.paymentNetwork,
+      assetType: metadata?.paymentAssetType,
+      assetId: metadata?.paymentAssetId,
     );
 
     if (!mounted) return;

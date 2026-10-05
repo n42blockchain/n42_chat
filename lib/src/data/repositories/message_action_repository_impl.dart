@@ -481,6 +481,10 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       'paymentRequestId': m.paymentRequestId,
       'paymentReceiverAddress': m.paymentReceiverAddress,
       'paymentRequestExpiresAt': m.paymentRequestExpiresAt?.toIso8601String(),
+      'paymentChain': m.paymentChain,
+      'paymentNetwork': m.paymentNetwork,
+      'paymentAssetType': m.paymentAssetType,
+      'paymentAssetId': m.paymentAssetId,
       'redPacketId': m.redPacketId,
       'pollQuestion': m.pollQuestion,
       'pollOptions': m.pollOptions,
@@ -531,6 +535,10 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
       transferStatus: json['transferStatus'] as String?,
       txHash: json['txHash'] as String?,
       paymentRequestId: json['paymentRequestId'] as String?,
+      paymentChain: json['paymentChain'] as String?,
+      paymentNetwork: json['paymentNetwork'] as String?,
+      paymentAssetType: json['paymentAssetType'] as String?,
+      paymentAssetId: json['paymentAssetId'] as String?,
       paymentReceiverAddress: json['paymentReceiverAddress'] as String?,
       paymentRequestExpiresAt: json['paymentRequestExpiresAt'] != null
           ? DateTime.tryParse(json['paymentRequestExpiresAt'] as String)

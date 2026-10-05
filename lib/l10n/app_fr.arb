@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} demandes en attente",
   "chatDraftLabel": "Brouillon",
-  "contactIndexLabel": "Index des contacts"
+  "contactIndexLabel": "Index des contacts",
+  "transferAssetUnavailable": "L’actif de paiement est indisponible",
+  "transferPaymentRequestUnavailable": "La demande de paiement est indisponible"
 }

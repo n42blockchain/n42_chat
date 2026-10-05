@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
+import 'package:n42_chat/src/core/notifications/push_notification_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:mocktail/mocktail.dart';
@@ -24,6 +27,19 @@ class FakePusher extends Fake implements matrix.Pusher {
 /// - 后台消息处理边界情况
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  for (final entry in {
+    AuthorizationStatus.authorized: NotificationPermissionStatus.granted,
+    AuthorizationStatus.provisional: NotificationPermissionStatus.granted,
+    AuthorizationStatus.denied: NotificationPermissionStatus.denied,
+    AuthorizationStatus.deniedPermanently: NotificationPermissionStatus.denied,
+    AuthorizationStatus.notDetermined:
+        NotificationPermissionStatus.notDetermined,
+  }.entries) {
+    test('maps Firebase permission ${entry.key}', () {
+      expect(notificationPermissionFromAuthorization(entry.key), entry.value);
+    });
+  }
 
   final List<MethodCall> callkitCalls = [];
 
@@ -350,13 +366,27 @@ void main() {
 
     test('should not register concurrently (lock mechanism)', () async {
       // 并发调用 registerForPush 时第二次应被跳过
+      final tokenCompleter = Completer<String?>();
+      when(() => mockClient.userID).thenReturn('@alice:example.org');
+      when(() => mockClient.deviceID).thenReturn('DEVICE-A');
       when(() => mockClient.isLogged()).thenReturn(true);
+      await service.dispose();
+      service = FirebasePushService(
+        mockClient,
+        pushGatewayUrl: 'https://push.example.com',
+        appId: 'com.test.app',
+        tokenLoader: () => tokenCompleter.future,
+      );
 
-      // 两次调用都应安全完成
       final f1 = service.registerForPush();
+      await Future<void>.delayed(Duration.zero);
+      expect(service.getDiagnosticInfo(), containsPair('isRegistering', true));
+
       final f2 = service.registerForPush();
+      tokenCompleter.complete(null);
       await Future.wait([f1, f2]);
-      // 不抛异常即通过
+
+      expect(service.getDiagnosticInfo(), containsPair('isRegistering', false));
     });
   });
 
@@ -459,25 +489,22 @@ void main() {
       );
     });
 
-    test(
-      'malformed hidden-room state does not black out every room',
-      () async {
-        // The hidden-chats blob is global, so failing closed on corruption
-        // would suppress notifications for EVERY room until the key is
-        // cleared. Corruption is self-healed instead: the bad value is
-        // dropped and unrelated rooms keep notifying.
-        SharedPreferences.setMockInitialValues({
-          'n42_chat_hidden_chats': '{"unexpected":true}',
-        });
+    test('malformed hidden-room state does not black out every room', () async {
+      // The hidden-chats blob is global, so failing closed on corruption
+      // would suppress notifications for EVERY room until the key is
+      // cleared. Corruption is self-healed instead: the bad value is
+      // dropped and unrelated rooms keep notifying.
+      SharedPreferences.setMockInitialValues({
+        'n42_chat_hidden_chats': '{"unexpected":true}',
+      });
 
-        expect(
-          await FirebasePushService.isPrivacyRestrictedRoomForTest(
-            '!room:example.org',
-          ),
-          isFalse,
-        );
-      },
-    );
+      expect(
+        await FirebasePushService.isPrivacyRestrictedRoomForTest(
+          '!room:example.org',
+        ),
+        isFalse,
+      );
+    });
 
     test('self-destruct message body never reaches the notification', () {
       matrix.MatrixEvent event(Map<String, Object?> content) =>

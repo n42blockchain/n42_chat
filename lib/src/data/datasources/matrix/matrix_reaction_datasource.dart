@@ -274,10 +274,10 @@ class MatrixReactionDataSource {
     final powerLevels = room.getState('m.room.power_levels')?.content;
     if (powerLevels == null) return false;
 
-    final userPowerLevel = room.ownPowerLevel;
+    final userPowerLevel = room.ownPowerLevel.level;
     final redactLevel = (powerLevels['redact'] as num?) ?? 50;
 
-    return userPowerLevel >= redactLevel.toInt();
+    return userPowerLevel >= matrix.PowerLevel(redactLevel.toInt()).level;
   }
 
   /// 检查用户是否可以编辑消息

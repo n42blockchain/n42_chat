@@ -6,6 +6,7 @@ import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/auth/auth_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/auth/auth_state.dart';
 import 'package:n42_chat/src/presentation/pages/auth/login_page.dart';
+import 'package:n42_chat/src/presentation/pages/auth/register_page.dart';
 
 class MockAuthRepository extends Mock implements IAuthRepository {}
 
@@ -16,8 +17,9 @@ void main() {
     mockAuthRepository = MockAuthRepository();
 
     // 设置默认行为
-    when(() => mockAuthRepository.loginStateStream)
-        .thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockAuthRepository.loginStateStream,
+    ).thenAnswer((_) => const Stream.empty());
     when(() => mockAuthRepository.isLoggedIn).thenReturn(false);
     when(() => mockAuthRepository.currentUser).thenReturn(null);
   });
@@ -36,7 +38,10 @@ void main() {
       await tester.pumpWidget(buildTestWidget(const LoginPage()));
 
       // 验证登录表单元素存在
-      expect(find.byType(TextFormField), findsNWidgets(3)); // homeserver, username, password
+      expect(
+        find.byType(TextFormField),
+        findsNWidgets(3),
+      ); // homeserver, username, password
       // 找到按钮类型的登录
       expect(find.byType(ElevatedButton), findsOneWidget);
     });
@@ -44,12 +49,12 @@ void main() {
     testWidgets('should navigate to register page', (tester) async {
       await tester.pumpWidget(buildTestWidget(const LoginPage()));
 
-      // 找到注册按钮并点击
-      final registerButton = find.text('注册');
-      if (registerButton.evaluate().isNotEmpty) {
-        await tester.tap(registerButton);
-        await tester.pumpAndSettle();
-      }
+      final registerButton = find.text('Sign Up');
+      expect(registerButton, findsOneWidget);
+      await tester.tap(registerButton);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(RegisterPage), findsOneWidget);
     });
 
     testWidgets('should show forgot password option', (tester) async {
@@ -62,7 +67,8 @@ void main() {
       final resetPassword = find.textContaining('Reset');
 
       // 至少应该有一个找到
-      final found = forgotPasswordCn.evaluate().isNotEmpty ||
+      final found =
+          forgotPasswordCn.evaluate().isNotEmpty ||
           forgotPasswordEn.evaluate().isNotEmpty ||
           resetPassword.evaluate().isNotEmpty;
       expect(found, isTrue);
@@ -133,11 +139,7 @@ void main() {
 
   group('Email Change Flow', () {
     test('should require current password verification', () {
-      const requirements = [
-        'currentPassword',
-        'newEmail',
-        'verificationCode',
-      ];
+      const requirements = ['currentPassword', 'newEmail', 'verificationCode'];
 
       expect(requirements.contains('currentPassword'), isTrue);
     });
@@ -199,7 +201,8 @@ void main() {
       expect(response['matrix_homeserver'], isNotNull);
 
       // Check if all required credentials are present
-      final bool hasAllCredentials = response['matrix_user_id'] != null &&
+      final bool hasAllCredentials =
+          response['matrix_user_id'] != null &&
           response['matrix_access_token'] != null &&
           response['matrix_homeserver'] != null;
 
@@ -241,17 +244,38 @@ void main() {
     });
 
     test('ChangePasswordStatus should have all expected values', () {
-      expect(ChangePasswordStatus.values, contains(ChangePasswordStatus.initial));
-      expect(ChangePasswordStatus.values, contains(ChangePasswordStatus.changing));
-      expect(ChangePasswordStatus.values, contains(ChangePasswordStatus.success));
-      expect(ChangePasswordStatus.values, contains(ChangePasswordStatus.failed));
+      expect(
+        ChangePasswordStatus.values,
+        contains(ChangePasswordStatus.initial),
+      );
+      expect(
+        ChangePasswordStatus.values,
+        contains(ChangePasswordStatus.changing),
+      );
+      expect(
+        ChangePasswordStatus.values,
+        contains(ChangePasswordStatus.success),
+      );
+      expect(
+        ChangePasswordStatus.values,
+        contains(ChangePasswordStatus.failed),
+      );
     });
 
     test('PasswordResetStatus should have all expected values', () {
       expect(PasswordResetStatus.values, contains(PasswordResetStatus.initial));
-      expect(PasswordResetStatus.values, contains(PasswordResetStatus.sendingCode));
-      expect(PasswordResetStatus.values, contains(PasswordResetStatus.codeSent));
-      expect(PasswordResetStatus.values, contains(PasswordResetStatus.resetting));
+      expect(
+        PasswordResetStatus.values,
+        contains(PasswordResetStatus.sendingCode),
+      );
+      expect(
+        PasswordResetStatus.values,
+        contains(PasswordResetStatus.codeSent),
+      );
+      expect(
+        PasswordResetStatus.values,
+        contains(PasswordResetStatus.resetting),
+      );
       expect(PasswordResetStatus.values, contains(PasswordResetStatus.success));
       expect(PasswordResetStatus.values, contains(PasswordResetStatus.failed));
     });

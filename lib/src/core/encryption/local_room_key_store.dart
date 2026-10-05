@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -8,6 +9,22 @@ import 'package:matrix/encryption/utils/stored_inbound_group_session.dart';
 /// Device-local history keys, isolated by homeserver and authenticated user.
 /// No access tokens, passwords, Olm identities or outbound ratchets are retained.
 class LocalRoomKeyStore {
+  static Future<void> _snapshotMutationTail = Future<void>.value();
+
+  Future<void> _withSnapshotMutation(Future<void> Function() action) {
+    final previous = _snapshotMutationTail;
+    final done = Completer<void>();
+    _snapshotMutationTail = done.future;
+    return () async {
+      await previous;
+      try {
+        await action();
+      } finally {
+        done.complete();
+      }
+    }();
+  }
+
   final FlutterSecureStorage storage;
   LocalRoomKeyStore({FlutterSecureStorage? storage})
     : storage =
@@ -49,7 +66,7 @@ class LocalRoomKeyStore {
         .toList();
   }
 
-  Future<void> preserve(Client client) async {
+  Future<void> preserve(Client client) => _withSnapshotMutation(() async {
     final scope = _scope(client);
     if (scope == null) return;
     try {
@@ -94,7 +111,7 @@ class LocalRoomKeyStore {
       // Never include native storage errors or key contents in UI/log output.
       throw LocalRoomKeyPreservationException();
     }
-  }
+  });
 
   Future<void> restore(Client client) async {
     final scope = _scope(client);
@@ -143,9 +160,14 @@ class LocalRoomKeyStore {
     }
   }
 
-  Future<void> deleteForIdentity(Uri homeserver, String userId) async {
+  Future<void> deleteForIdentity(
+    Uri homeserver,
+    String userId, {
+    bool Function()? canDelete,
+  }) => _withSnapshotMutation(() async {
+    if (canDelete?.call() == false) return;
     await storage.delete(key: _identityScope(homeserver, userId));
-  }
+  });
 }
 
 class LocalRoomKeyPreservationException implements Exception {

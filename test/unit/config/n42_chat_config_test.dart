@@ -366,6 +366,21 @@ void main() {
       expect(cleared.pointsApiBaseUrl, isNull);
     });
 
+    test('old implements wallet bridge rejects exact dispatch', () async {
+      final result = await requestWalletTransferExact(
+        _TestWalletBridge(),
+        toAddress: '0xreceiver',
+        amount: '1',
+        token: 'ETH',
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'native',
+      );
+
+      expect(result.success, isFalse);
+      expect(result.errorCode, 'unsupported');
+    });
+
     test('replaces debankUseProxyEndpoint', () {
       expect(
         base.copyWith(debankUseProxyEndpoint: true).debankUseProxyEndpoint,

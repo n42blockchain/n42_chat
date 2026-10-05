@@ -1,24 +1,39 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:matrix/matrix.dart'
     show AuthenticationPassword, AuthenticationUserIdentifier, MatrixException;
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/di/injection.dart';
+import '../../../core/encryption/account_session_index.dart';
 import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/encryption/key_backup_service.dart';
+import '../../../core/encryption/local_room_key_store.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/services/totp_2fa_store.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/utils/matrix_uia_utils.dart';
+import '../../../core/utils/matrix_deletion_uia_coordinator.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../data/services/matrix_account_deletion_operation.dart';
+import '../../../data/services/matrix_account_deletion_session.dart';
+import '../../../data/services/matrix_deletion_account_management.dart';
+import '../../../data/services/matrix_pending_deletion_store.dart';
+import '../../../data/services/matrix_pending_deletion_retry.dart';
+import '../../../domain/repositories/auth_repository.dart';
 import '../../../n42_chat.dart';
 import '../../../services/auth/auth_methods_service.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../widgets/settings/recovery_key_display_dialog.dart';
 import '../../widgets/settings/recovery_key_import_dialog.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_event.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../security/sas_verification_page.dart';
 import 'totp_2fa_setup_page.dart';
@@ -28,13 +43,24 @@ import '../../../core/utils/debug_log.dart';
 class SecuritySettingsPage extends StatefulWidget {
   final E2EEManager e2eeManager;
   final KeyBackupService keyBackupService;
+  @visibleForTesting
+  final MatrixAuthDataSource? authDataSource;
   final bool restoreKeysOnOpen;
+  final IMatrixAccountDeletionSession Function(bool erase)?
+  deletionSessionFactory;
+  final Future<bool> Function(Uri uri)? openDeletionFallback;
+  final Future<Uri?> Function(IMatrixAccountDeletionSession session)?
+  resolveDeletionManagement;
 
   const SecuritySettingsPage({
     super.key,
     required this.e2eeManager,
     required this.keyBackupService,
+    this.authDataSource,
     this.restoreKeysOnOpen = false,
+    this.deletionSessionFactory,
+    this.openDeletionFallback,
+    this.resolveDeletionManagement,
   });
 
   @override
@@ -48,6 +74,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
   List<DeviceInfo> _devices = [];
   int _dataLoadVersion = 0;
 
+  MatrixAuthDataSource get _authDataSource =>
+      widget.authDataSource ?? MatrixAuthDataSource();
+
   // 生物识别状态
   bool _isBiometricAvailable = false;
   bool _isBiometricEnabled = false;
@@ -55,6 +84,41 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
   String? _biometricTypeDescription;
   final BiometricService _biometricService = BiometricService();
   final SecureStorageDataSource _secureStorage = SecureStorageDataSource();
+  final MatrixPendingDeletionStore _pendingDeletionStore =
+      MatrixPendingDeletionStore();
+  IMatrixAccountDeletionSession? _activeDeletion;
+  IMatrixAccountDeletionSession? _retryDeletionSession;
+  bool _deletionBusy = false;
+  List<MatrixPendingDeletionEntry> _pendingDeletion = const [];
+  bool _pendingDeletionLoadFailed = false;
+
+  List<MatrixPendingDeletionEntry> get _visiblePendingDeletion {
+    final flow = _retryDeletionSession;
+    final receipt = flow?.confirmedDeletion;
+    if (flow == null ||
+        receipt == null ||
+        receipt.userId != flow.generation.userId ||
+        receipt.homeserver != flow.generation.homeserver) {
+      return _pendingDeletion;
+    }
+    final pending = MatrixPendingDeletionEntry(
+      userId: flow.generation.userId,
+      homeserver: flow.generation.homeserver,
+      deviceId: flow.generation.deviceId,
+    );
+    if (_pendingDeletion.any((entry) => _samePendingEntry(entry, pending))) {
+      return _pendingDeletion;
+    }
+    return [..._pendingDeletion, pending];
+  }
+
+  bool _samePendingEntry(
+    MatrixPendingDeletionEntry a,
+    MatrixPendingDeletionEntry b,
+  ) =>
+      a.userId == b.userId &&
+      a.homeserver == b.homeserver &&
+      a.deviceId == b.deviceId;
 
   // Passkey 状态
   bool _isPasskeySupported = false;
@@ -72,6 +136,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     _loadData();
     _loadBiometricStatus();
     _loadPasskeyStatus();
+    _loadPendingDeletion();
     if (widget.restoreKeysOnOpen) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _showRestoreDialog();
@@ -86,8 +151,24 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
 
   @override
   void dispose() {
+    _activeDeletion?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> _loadPendingDeletion() async {
+    try {
+      final entries = await _pendingDeletionStore.list();
+      if (!mounted) return;
+      setState(() {
+        _pendingDeletion = entries;
+        _pendingDeletionLoadFailed = false;
+      });
+    } catch (error) {
+      debugLog('SecuritySettings: Cannot read pending Matrix cleanup: $error');
+      if (!mounted) return;
+      setState(() => _pendingDeletionLoadFailed = true);
+    }
   }
 
   Future<void> _loadBiometricStatus() async {
@@ -143,8 +224,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       setState(() => _backupInfo = backupInfo);
 
       // 获取当前用户的设备列表
-      final authDataSource = MatrixAuthDataSource();
-      final matrixDevices = await authDataSource.getDevices();
+      final matrixDevices = await _authDataSource.getDevices();
       final currentDeviceId = widget.e2eeManager.currentDeviceId;
       final userId = widget.e2eeManager.client.userID;
 
@@ -980,69 +1060,74 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           ),
           _buildDivider(),
           _buildListItem(
+            key: const ValueKey('delete_account'),
             icon: Icons.person_remove_outlined,
-            title: 'Delete Account',
-            subtitle: 'Deactivate this account and erase local encrypted data',
+            title: S.of(context)!.settingsDeleteAccountTitle,
+            subtitle: S.of(context)!.settingsDeleteAccountSubtitle,
             onTap: _showDeleteAccountConfirmation,
             isDestructive: true,
           ),
+          if (_visiblePendingDeletion.isNotEmpty ||
+              _pendingDeletionLoadFailed) ...[
+            _buildDivider(),
+            _buildListItem(
+              key: const ValueKey('pending_delete_account'),
+              icon: Icons.pending_actions_outlined,
+              title: S.of(context)!.settingsDeleteAccountPendingTitle,
+              subtitle: _pendingDeletionLoadFailed
+                  ? S.of(context)!.settingsDeleteAccountPendingReadError
+                  : S.of(context)!.settingsDeleteAccountPendingSubtitle,
+              onTap: _pendingDeletionLoadFailed
+                  ? _loadPendingDeletion
+                  : _showPendingDeletion,
+            ),
+          ],
         ],
       ),
     );
   }
 
   Future<void> _showDeleteAccountConfirmation() async {
-    final passwordController = TextEditingController();
-    var eraseLocalData = true;
+    if (_deletionBusy) return;
+    _deletionBusy = true;
+    var password = '';
     var eraseRemoteData = false;
-
+    final l10n = S.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Delete Account'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'This permanently deactivates your Matrix account. If your homeserver requires password verification, you can provide it now or enter it after confirmation.',
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  hintText: 'Password (optional)',
-                  border: OutlineInputBorder(),
+          title: Text(l10n.settingsDeleteAccountTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(l10n.settingsDeleteAccountExplanation),
+                const SizedBox(height: 12),
+                TextField(
+                  onChanged: (value) => password = value,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: l10n.settingsDeleteAccountPasswordOptional,
+                    border: const OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              CheckboxListTile(
-                value: eraseLocalData,
-                onChanged: (value) {
-                  setDialogState(() {
-                    eraseLocalData = value ?? true;
-                  });
-                },
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Also erase local chat data on this device'),
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-              CheckboxListTile(
-                value: eraseRemoteData,
-                onChanged: (value) {
-                  setDialogState(() {
-                    eraseRemoteData = value ?? false;
-                  });
-                },
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Request homeserver data erasure'),
-                subtitle: const Text(
-                  'If supported, the server will purge account data after deactivation.',
+                const SizedBox(height: 12),
+                CheckboxListTile(
+                  key: const ValueKey('delete_server_erase'),
+                  value: eraseRemoteData,
+                  onChanged: (value) {
+                    setDialogState(() {
+                      eraseRemoteData = value ?? false;
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.settingsDeleteAccountServerErase),
+                  subtitle: Text(l10n.settingsDeleteAccountServerEraseDetail),
+                  controlAffinity: ListTileControlAffinity.leading,
                 ),
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -1052,6 +1137,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
               child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
+              key: const ValueKey('confirm_delete_account'),
               onPressed: () {
                 Navigator.pop(ctx, true);
               },
@@ -1063,130 +1149,339 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       ),
     );
 
-    if (confirmed != true) {
-      passwordController.dispose();
+    if (confirmed != true || !mounted) {
+      _deletionBusy = false;
       return;
     }
+    await _runConfirmedDeletion(eraseRemoteData, password);
+  }
 
-    final password = passwordController.text.trim();
-    passwordController.dispose();
-
-    await _deactivateAccount(
-      password: password.isEmpty ? null : password,
-      eraseLocalData: eraseLocalData,
-      eraseRemoteData: eraseRemoteData,
+  IMatrixAccountDeletionSession _captureDeletionSession(bool erase) {
+    final factory = widget.deletionSessionFactory;
+    if (factory != null) return factory(erase);
+    final repository = getIt<IAuthRepository>();
+    if (repository is! IAccountBoundDeletionLifecycle) {
+      throw StateError('Account-bound Matrix deletion is unavailable');
+    }
+    return MatrixAccountDeletionSession.capture(
+      lifecycle: repository as IAccountBoundDeletionLifecycle,
+      manager: getIt<MatrixClientManager>(),
+      storage: getIt<SecureStorageDataSource>(),
+      roomKeys: LocalRoomKeyStore(),
+      accountSessions: AccountSessionIndex(),
+      journal: _pendingDeletionStore,
+      erase: erase,
     );
   }
 
-  Future<void> _deactivateAccount({
-    String? password,
-    required bool eraseLocalData,
-    required bool eraseRemoteData,
-  }) async {
-    setState(() => _isLoading = true);
+  AuthBloc? _deletionAuthBloc() {
     try {
-      final authDataSource = MatrixAuthDataSource();
-      try {
-        await authDataSource.deactivateAccount(
-          password: password,
-          erase: eraseRemoteData,
-        );
-      } on MatrixException catch (e) {
-        if (password == null &&
-            e.response?.statusCode == 401 &&
-            matrixUiaSupportsPassword(e.response?.body)) {
-          if (mounted) {
-            setState(() => _isLoading = false);
-            await _showDeactivatePasswordDialog(
-              eraseLocalData: eraseLocalData,
-              eraseRemoteData: eraseRemoteData,
-            );
-          }
-          return;
-        }
-        rethrow;
-      }
-
-      try {
-        await N42Chat.logout();
-      } catch (_) {
-        // 账号已失效时继续清理本地状态即可。
-      }
-
-      if (eraseLocalData) {
-        await N42Chat.purgeLocalData();
-      }
-
-      if (!mounted) {
-        return;
-      }
-      Navigator.of(context).popUntil((route) => route.isFirst);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Delete account failed: $e')));
-      return;
+      return context.read<AuthBloc?>();
+    } catch (_) {
+      return N42Chat.isInitialized ? N42Chat.authBloc : null;
     }
-    if (!mounted) return;
-    setState(() => _isLoading = false);
   }
 
-  Future<void> _showDeactivatePasswordDialog({
-    required bool eraseLocalData,
-    required bool eraseRemoteData,
-  }) async {
-    final passwordController = TextEditingController();
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.settingsVerifyIdentity ?? 'Verify identity'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              S.of(context)?.settingsEnterPasswordToConfirm ??
-                  'Enter your password to confirm this action.',
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: S.of(context)?.settingsPassword ?? 'Password',
-                border: const OutlineInputBorder(),
+  Future<void> _runConfirmedDeletion(bool erase, String password) async {
+    IMatrixAccountDeletionSession? flow;
+    final authBloc = _deletionAuthBloc();
+    try {
+      flow = _captureDeletionSession(erase);
+      _activeDeletion = flow;
+      final resolver = widget.resolveDeletionManagement;
+      final managementUri = resolver != null
+          ? await resolver(flow)
+          : flow is MatrixAccountDeletionSession
+          ? await const MatrixDeletionAccountManagement().resolve(
+              flow.operation.client,
+            )
+          : null;
+      if (!mounted || !flow.isOriginalGeneration) {
+        flow.cancel();
+        return;
+      }
+      if (managementUri != null) {
+        final launcher =
+            widget.openDeletionFallback ??
+            (Uri uri) => launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (!await launcher(managementUri)) {
+          throw StateError('Cannot open Matrix account management');
+        }
+        if (mounted && flow.isOriginalGeneration) {
+          _showDeletionFeedback(
+            S.of(context)!.settingsDeleteAccountManagementNotConfirmed,
+          );
+        }
+        return;
+      }
+      var result = await flow.start();
+      if (result == DeletionUiaStatus.awaitingAuthentication &&
+          password.isNotEmpty &&
+          flow.nextStages.contains('m.login.password')) {
+        result = await flow.submitPassword(password);
+      }
+      while (result == DeletionUiaStatus.awaitingAuthentication) {
+        if (!mounted || !flow.isOriginalGeneration) {
+          flow.cancel();
+          break;
+        }
+        final stage = await _chooseDeletionStage(flow);
+        if (stage == null || !mounted || !flow.isOriginalGeneration) {
+          flow.cancel();
+          break;
+        }
+        if (stage == 'm.login.password') {
+          final nextPassword = await _askDeletionPassword();
+          if (nextPassword == null || !mounted || !flow.isOriginalGeneration) {
+            flow.cancel();
+            break;
+          }
+          result = await flow.submitPassword(nextPassword);
+        } else {
+          final session = flow.session;
+          if (session == null) throw StateError('Missing Matrix UIA session');
+          final uri = flow.fallbackUri(stage);
+          final launcher =
+              widget.openDeletionFallback ??
+              (Uri uri) => launchUrl(uri, mode: LaunchMode.externalApplication);
+          if (!await launcher(uri)) {
+            throw StateError('Cannot open Matrix authentication fallback');
+          }
+          if (!mounted || !flow.isOriginalGeneration) {
+            flow.cancel();
+            break;
+          }
+          final retry = await _confirmExternalFallbackReturn();
+          if (retry != true || !mounted || !flow.isOriginalGeneration) {
+            flow.cancel();
+            break;
+          }
+          // The browser supplies no completion signal. Only the original
+          // operation/session's next server response can confirm deletion.
+          result = await flow.retryAfterExternalFallback(
+            stage: stage,
+            session: session,
+          );
+        }
+      }
+      if (flow.confirmedDeletion == null) return;
+      _retryDeletionSession = flow;
+      final cleanup = await flow.cleanupConfirmed();
+      if (cleanup == DeletionCleanupStatus.complete) {
+        _retryDeletionSession = null;
+      }
+      await _loadPendingDeletion();
+      if (cleanup == DeletionCleanupStatus.complete &&
+          flow.isOriginalGeneration) {
+        authBloc?.add(AuthAccountDeletionConfirmed(flow.generation));
+        if (mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      } else if (mounted && flow.isOriginalGeneration) {
+        _showDeletionFeedback(
+          S.of(context)!.settingsDeleteAccountPendingDetail,
+        );
+      }
+    } catch (error) {
+      debugLog('SecuritySettings: Matrix deletion flow failed: $error');
+      if (flow?.confirmedDeletion != null) {
+        _retryDeletionSession = flow;
+        await _loadPendingDeletion();
+        if (mounted && flow!.isOriginalGeneration) {
+          _showDeletionFeedback(
+            S.of(context)!.settingsDeleteAccountPendingDetail,
+          );
+        }
+      } else if (mounted && (flow?.isOriginalGeneration ?? true)) {
+        _showDeletionFeedback(
+          S.of(context)!.settingsDeleteAccountRequestFailed,
+        );
+      }
+    } finally {
+      _activeDeletion = null;
+      _deletionBusy = false;
+    }
+  }
+
+  void _showDeletionFeedback(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<String?> _chooseDeletionStage(
+    IMatrixAccountDeletionSession flow,
+  ) => showDialog<String>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      key: const ValueKey('deletion_stage_dialog'),
+      title: Text(S.of(context)!.settingsDeleteAccountChooseStage),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final stage in flow.nextStages)
+            TextButton(
+              key: ValueKey('deletion_fallback_$stage'),
+              onPressed: () => Navigator.pop(dialogContext, stage),
+              child: Text(
+                stage == 'm.login.password'
+                    ? S.of(context)!.settingsDeleteAccountUsePassword
+                    : '${S.of(context)!.settingsDeleteAccountUseBrowser}: $stage',
               ),
             ),
-          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext),
+          child: Text(S.of(context)!.commonCancel),
+        ),
+      ],
+    ),
+  );
+
+  Future<String?> _askDeletionPassword() async {
+    var password = '';
+    final result = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)!.settingsVerifyIdentity),
+        content: TextField(
+          onChanged: (value) => password = value,
+          obscureText: true,
+          decoration: InputDecoration(
+            hintText: S.of(context)!.settingsPassword,
+          ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)!.commonCancel),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+            onPressed: () => Navigator.pop(dialogContext, password),
+            child: Text(S.of(context)!.commonConfirm),
           ),
         ],
       ),
     );
+    return result?.isNotEmpty == true ? result : null;
+  }
 
-    final password = passwordController.text.trim();
-    passwordController.dispose();
+  Future<bool?> _confirmExternalFallbackReturn() => showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(S.of(context)!.settingsDeleteAccountFallbackTitle),
+      content: Text(S.of(context)!.settingsDeleteAccountFallbackExplanation),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext, false),
+          child: Text(S.of(context)!.commonCancel),
+        ),
+        TextButton(
+          key: const ValueKey('deletion_retry_server'),
+          onPressed: () => Navigator.pop(dialogContext, true),
+          child: Text(S.of(context)!.settingsDeleteAccountCheckServer),
+        ),
+      ],
+    ),
+  );
 
-    if (confirmed == true && password.isNotEmpty) {
-      await _deactivateAccount(
-        password: password,
-        eraseLocalData: eraseLocalData,
-        eraseRemoteData: eraseRemoteData,
+  Future<void> _showPendingDeletion() async {
+    if (_deletionBusy) return;
+    _deletionBusy = true;
+    try {
+      await _showPendingDeletionUnlocked();
+    } finally {
+      _deletionBusy = false;
+    }
+  }
+
+  Future<void> _showPendingDeletionUnlocked() async {
+    final flow = _retryDeletionSession;
+    final entry = await showDialog<MatrixPendingDeletionEntry>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(S.of(context)!.settingsDeleteAccountPendingTitle),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final pending in _visiblePendingDeletion)
+                ListTile(
+                  title: Text(pending.userId),
+                  subtitle: Text(pending.homeserver.toString()),
+                  trailing: TextButton(
+                    key: ValueKey('retry_deletion_${pending.userId}'),
+                    onPressed: () => Navigator.pop(dialogContext, pending),
+                    child: Text(S.of(context)!.commonRetry),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(S.of(context)!.commonCancel),
+          ),
+        ],
+      ),
+    );
+    if (entry == null || !mounted) return;
+    try {
+      final recorded = (await _pendingDeletionStore.list()).any(
+        (candidate) => _samePendingEntry(candidate, entry),
       );
+      DeletionCleanupStatus result;
+      if (recorded) {
+        result = await MatrixPendingDeletionRetry(
+          _pendingDeletionStore,
+        ).retry(entry, originalSession: flow);
+      } else if (flow != null &&
+          flow.isOriginalGeneration &&
+          flow.confirmedDeletion?.userId == entry.userId &&
+          flow.confirmedDeletion?.homeserver == entry.homeserver &&
+          flow.generation.userId == entry.userId &&
+          flow.generation.homeserver == entry.homeserver &&
+          flow.generation.deviceId == entry.deviceId) {
+        // The original in-memory server receipt can retry a journal write
+        // that failed before an entry was saved. A replacement generation
+        // cannot use this path or clean the current account.
+        result = await flow.cleanupConfirmed();
+      } else {
+        result = DeletionCleanupStatus.deferredClientClear;
+      }
+      if (result == DeletionCleanupStatus.complete) {
+        if (identical(_retryDeletionSession, flow)) {
+          _retryDeletionSession = null;
+        }
+      }
+      await _loadPendingDeletion();
+      if (!mounted) return;
+      if (result == DeletionCleanupStatus.complete &&
+          flow?.isOriginalGeneration == true) {
+        _deletionAuthBloc()?.add(
+          AuthAccountDeletionConfirmed(flow!.generation),
+        );
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      } else {
+        _showDeletionFeedback(
+          S.of(context)!.settingsDeleteAccountPendingDetail,
+        );
+      }
+    } catch (error) {
+      debugLog('SecuritySettings: Pending deletion retry failed: $error');
+      if (mounted) {
+        _showDeletionFeedback(
+          S.of(context)!.settingsDeleteAccountPendingDetail,
+        );
+      }
     }
   }
 
   Widget _buildListItem({
+    Key? key,
     required IconData icon,
     required String title,
     String? subtitle,
@@ -1196,6 +1491,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     final color = isDestructive ? AppColors.error : context.textPrimary;
 
     return ListTile(
+      key: key,
       leading: Icon(
         icon,
         color: isDestructive ? AppColors.error : AppColors.primary,
@@ -1792,7 +2088,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
 
   void _showRenameDeviceDialog(DeviceInfo device) {
     final controller = TextEditingController(text: device.deviceName);
-    showDialog<void>(
+    final route = DialogRoute<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(S.of(context)?.settingsRenameDevice ?? 'Rename device'),
@@ -1822,13 +2118,14 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           ),
         ],
       ),
-    ).whenComplete(controller.dispose);
+    );
+    Navigator.of(context, rootNavigator: true).push(route);
+    unawaited(route.completed.whenComplete(controller.dispose));
   }
 
   Future<void> _renameDevice(String deviceId, String newName) async {
     try {
-      final authDataSource = MatrixAuthDataSource();
-      await authDataSource.updateDeviceName(deviceId, newName);
+      await _authDataSource.updateDeviceName(deviceId, newName);
       await _loadData();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1883,10 +2180,9 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     _invalidatePendingDataLoads();
     setState(() => _isLoading = true);
     try {
-      final authDataSource = MatrixAuthDataSource();
       // First attempt without auth (may trigger UIA)
       try {
-        await authDataSource.deleteDevice(device.deviceId);
+        await _authDataSource.deleteDevice(device.deviceId);
       } on MatrixException catch (e) {
         if (e.response?.statusCode == 401 &&
             matrixUiaSupportsPassword(e.response?.body)) {
@@ -1924,48 +2220,45 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
 
   Future<void> _showUiaPasswordDialog(DeviceInfo device) async {
     final passwordController = TextEditingController();
-    try {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(
-            S.of(context)?.settingsVerifyIdentity ?? 'Verify identity',
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                S.of(context)?.settingsEnterPasswordToConfirm ??
-                    'Enter your password to confirm this action.',
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: S.of(context)?.settingsPassword ?? 'Password',
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx, false);
-              },
-              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+    final route = DialogRoute<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context)?.settingsVerifyIdentity ?? 'Verify identity'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              S.of(context)?.settingsEnterPasswordToConfirm ??
+                  'Enter your password to confirm this action.',
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx, true);
-              },
-              style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: S.of(context)?.settingsPassword ?? 'Password',
+                border: const OutlineInputBorder(),
+              ),
             ),
           ],
         ),
-      );
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+          ),
+        ],
+      ),
+    );
+    try {
+      final navigator = Navigator.of(context, rootNavigator: true);
+      final confirmed = await navigator.push<bool>(route);
+      await route.completed;
 
       if (confirmed == true) {
         final password = passwordController.text.trim();
@@ -1979,8 +2272,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
               password: password,
               identifier: AuthenticationUserIdentifier(user: userId),
             );
-            final authDataSource = MatrixAuthDataSource();
-            await authDataSource.deleteDevice(device.deviceId, auth: auth);
+            await _authDataSource.deleteDevice(device.deviceId, auth: auth);
             await _loadData();
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(

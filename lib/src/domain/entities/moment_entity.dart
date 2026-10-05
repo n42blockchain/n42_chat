@@ -187,6 +187,10 @@ class MomentComment extends Equatable {
   /// 评论ID
   final String id;
 
+  /// Exact Matrix room/event that carried this comment, when known.
+  final String? sourceRoomId;
+  final String? sourceEventId;
+
   /// 评论者用户ID
   final String userId;
 
@@ -213,6 +217,8 @@ class MomentComment extends Equatable {
 
   const MomentComment({
     required this.id,
+    this.sourceRoomId,
+    this.sourceEventId,
     required this.userId,
     required this.userName,
     this.userAvatarUrl,
@@ -229,6 +235,8 @@ class MomentComment extends Equatable {
   @override
   List<Object?> get props => [
         id,
+        sourceRoomId,
+        sourceEventId,
         userId,
         userName,
         userAvatarUrl,
@@ -241,6 +249,8 @@ class MomentComment extends Equatable {
 
   MomentComment copyWith({
     String? id,
+    String? sourceRoomId,
+    String? sourceEventId,
     String? userId,
     String? userName,
     String? userAvatarUrl,
@@ -252,6 +262,8 @@ class MomentComment extends Equatable {
   }) {
     return MomentComment(
       id: id ?? this.id,
+      sourceRoomId: sourceRoomId ?? this.sourceRoomId,
+      sourceEventId: sourceEventId ?? this.sourceEventId,
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
       userAvatarUrl: userAvatarUrl ?? this.userAvatarUrl,
@@ -270,6 +282,10 @@ class MomentComment extends Equatable {
 class MomentEntity extends Equatable {
   /// 动态ID
   final String id;
+
+  /// Exact Matrix room/event that carried this post, when known.
+  final String? sourceRoomId;
+  final String? sourceEventId;
 
   /// 发布者用户ID
   final String userId;
@@ -315,6 +331,8 @@ class MomentEntity extends Equatable {
 
   const MomentEntity({
     required this.id,
+    this.sourceRoomId,
+    this.sourceEventId,
     required this.userId,
     required this.userName,
     this.userAvatarUrl,
@@ -425,6 +443,8 @@ class MomentEntity extends Equatable {
   @override
   List<Object?> get props => [
         id,
+        sourceRoomId,
+        sourceEventId,
         userId,
         userName,
         userAvatarUrl,
@@ -443,6 +463,8 @@ class MomentEntity extends Equatable {
 
   MomentEntity copyWith({
     String? id,
+    String? sourceRoomId,
+    String? sourceEventId,
     String? userId,
     String? userName,
     String? userAvatarUrl,
@@ -460,6 +482,8 @@ class MomentEntity extends Equatable {
   }) {
     return MomentEntity(
       id: id ?? this.id,
+      sourceRoomId: sourceRoomId ?? this.sourceRoomId,
+      sourceEventId: sourceEventId ?? this.sourceEventId,
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
       userAvatarUrl: userAvatarUrl ?? this.userAvatarUrl,

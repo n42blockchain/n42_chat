@@ -1,4 +1,5 @@
 import '../../../core/utils/payment_request_uri.dart';
+import '../../../core/utils/payment_asset_match.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,11 +41,69 @@ class _TransferPageState extends State<TransferPage> {
   final TextEditingController _memoController = TextEditingController();
 
   TokenInfo? _selectedToken;
+  PaymentRequestData? _scannedPayment;
   bool _isAddressValid = false;
   String? _scanError;
   WalletUserInfo? _recipientInfo;
 
   bool get _isPaymentRequestMode => widget.paymentRequest != null;
+  bool get _hasExactRequest =>
+      widget.paymentRequest?.chain != null ||
+      widget.paymentRequest?.network != null ||
+      widget.paymentRequest?.assetType != null ||
+      widget.paymentRequest?.assetId != null;
+
+  PaymentRequestData? get _paymentData {
+    final request = widget.paymentRequest;
+    if (request != null) {
+      return PaymentRequestData(
+        receiverAddress: request.receiverAddress,
+        amount: request.amount,
+        token: _hasExactRequest ? '' : request.token,
+        chain: request.chain,
+        network: request.network,
+        assetType: request.assetType,
+        assetId: request.assetId,
+      );
+    }
+    return _scannedPayment;
+  }
+
+  List<TokenInfo> _choices(List<TokenInfo> tokens) {
+    final payment = _paymentData;
+    if (payment == null) return tokens;
+    if (_hasExactRequest && !PaymentRequestUri.isValidExactData(payment)) {
+      return [];
+    }
+    final result = resolvePaymentAsset(payment, tokens);
+    if (payment.hasExactIdentity) {
+      final asset = result.asset;
+      return result.status == PaymentAssetResolutionStatus.matched &&
+              asset != null &&
+              (widget.paymentRequest == null ||
+                  asset.symbol == widget.paymentRequest!.token)
+          ? [asset]
+          : [];
+    }
+    return result.candidates;
+  }
+
+  static bool _hasAssetIdentity(TokenInfo token) =>
+      token.chain != null ||
+      token.network != null ||
+      token.assetType != null ||
+      token.assetId != null;
+
+  void _showAssetUnavailable() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          S.of(context)?.transferAssetUnavailable ??
+              'Payment asset is unavailable',
+        ),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -110,7 +169,8 @@ class _TransferPageState extends State<TransferPage> {
       return;
     }
 
-    if (amount.isEmpty || double.tryParse(amount) == null) {
+    if (_selectedToken != null &&
+        !isValidPaymentAmountForDecimals(amount, _selectedToken!.decimals)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -133,6 +193,40 @@ class _TransferPageState extends State<TransferPage> {
       return;
     }
 
+    final selected = _selectedToken!;
+    final tokens = context.read<TransferBloc>().state.tokens;
+    if (!_choices(tokens).any((candidate) => identical(candidate, selected))) {
+      _showAssetUnavailable();
+      return;
+    }
+    final hasIdentity = _hasAssetIdentity(selected);
+    final selectedData = PaymentRequestData(
+      receiverAddress: address,
+      amount: amount,
+      chain: selected.chain,
+      network: selected.network,
+      assetType: selected.assetType,
+      assetId: selected.assetId,
+    );
+    final exactMatch =
+        hasIdentity &&
+        identical(resolvePaymentAsset(selectedData, tokens).asset, selected) &&
+        createExactPaymentRequestForAsset(selected) != null;
+    if (hasIdentity && !exactMatch ||
+        !hasIdentity &&
+            tokens
+                    .where(
+                      (token) =>
+                          token.symbol.toLowerCase() ==
+                          selected.symbol.toLowerCase(),
+                    )
+                    .length !=
+                1 ||
+        _hasExactRequest && !exactMatch) {
+      _showAssetUnavailable();
+      return;
+    }
+
     if (_isPaymentRequestMode) {
       final request = widget.paymentRequest!;
       context.read<TransferBloc>().add(
@@ -142,6 +236,10 @@ class _TransferPageState extends State<TransferPage> {
           receiverAddress: request.receiverAddress,
           amount: request.amount,
           token: request.token,
+          chain: exactMatch ? selected.chain : null,
+          network: exactMatch ? selected.network : null,
+          assetType: exactMatch ? selected.assetType : null,
+          assetId: exactMatch ? selected.assetId : null,
         ),
       );
       return;
@@ -152,8 +250,12 @@ class _TransferPageState extends State<TransferPage> {
         roomId: widget.roomId,
         receiverAddress: address,
         amount: amount,
-        token: _selectedToken!.symbol,
+        token: selected.symbol,
         memo: memo.isNotEmpty ? memo : null,
+        chain: exactMatch ? selected.chain : null,
+        network: exactMatch ? selected.network : null,
+        assetType: exactMatch ? selected.assetType : null,
+        assetId: exactMatch ? selected.assetId : null,
       ),
     );
   }
@@ -222,22 +324,22 @@ class _TransferPageState extends State<TransferPage> {
 
     final tokens = state.tokens;
     final balances = state.balances;
-
-    if (tokens.isNotEmpty) {
-      if (_isPaymentRequestMode) {
-        final requestToken = widget.paymentRequest!.token;
-        TokenInfo? matchedToken;
-        for (final token in tokens) {
-          if (token.symbol == requestToken) {
-            matchedToken = token;
-            break;
-          }
-        }
-        _selectedToken = matchedToken;
-      }
-      if (!_isPaymentRequestMode) {
-        _selectedToken ??= tokens.first;
-      }
+    final choices = _choices(tokens);
+    if (_selectedToken == null ||
+        !choices.any((token) => identical(token, _selectedToken))) {
+      _selectedToken = _isPaymentRequestMode || _scannedPayment != null
+          ? (choices.length == 1 ? choices.single : null)
+          : (choices.isNotEmpty &&
+                    choices
+                            .where(
+                              (token) =>
+                                  token.symbol.toLowerCase() ==
+                                  choices.first.symbol.toLowerCase(),
+                            )
+                            .length ==
+                        1
+                ? choices.first
+                : null);
     }
 
     return SingleChildScrollView(
@@ -343,6 +445,7 @@ class _TransferPageState extends State<TransferPage> {
               ),
               style: TextStyle(fontSize: 14, color: context.textPrimary),
               onChanged: (value) {
+                _scannedPayment = null;
                 _validateAddress(value.trim());
               },
             ),
@@ -370,28 +473,23 @@ class _TransferPageState extends State<TransferPage> {
                   ),
                 );
                 if (!mounted || raw == null || raw.isEmpty) return;
-                final payment = PaymentRequestUri.tryParse(raw);
+                final payment =
+                    PaymentRequestUri.tryParseExact(raw) ??
+                    PaymentRequestUri.tryParse(raw);
                 final tokens = context.read<TransferBloc>().state.tokens;
-                TokenInfo? requestedToken;
-                if (payment != null && payment.token.isNotEmpty) {
-                  final matches = tokens
-                      .where(
-                        (t) =>
-                            t.symbol.toLowerCase() ==
-                            payment.token.toLowerCase(),
-                      )
-                      .toList();
-                  if (matches.length == 1) requestedToken = matches.single;
-                }
-                // This form has no chain selector. Do not silently lose a
-                // requested network or send a payment using another asset.
-                if (payment?.chain != null ||
-                    (payment != null &&
-                        payment.token.isNotEmpty &&
-                        requestedToken == null) ||
+                final choices = payment == null
+                    ? <TokenInfo>[]
+                    : (payment.hasExactIdentity
+                          ? (resolvePaymentAsset(payment, tokens).asset == null
+                                ? <TokenInfo>[]
+                                : [resolvePaymentAsset(payment, tokens).asset!])
+                          : resolvePaymentAsset(payment, tokens).candidates);
+                if ((payment != null && choices.isEmpty) ||
                     (payment == null && Uri.tryParse(raw)?.hasScheme == true)) {
                   setState(() {
-                    _scanError = S.of(context)!.transferEnterValidAddress;
+                    _scanError =
+                        S.of(context)?.transferAssetUnavailable ??
+                        'Payment asset is unavailable';
                   });
                   return;
                 }
@@ -400,7 +498,8 @@ class _TransferPageState extends State<TransferPage> {
                   _scanError = null;
                   _isAddressValid = false;
                   _recipientInfo = null;
-                  if (requestedToken != null) _selectedToken = requestedToken;
+                  _scannedPayment = payment;
+                  _selectedToken = choices.length == 1 ? choices.single : null;
                 });
                 _addressController.text = address;
                 _validateAddress(address);
@@ -467,11 +566,7 @@ class _TransferPageState extends State<TransferPage> {
     Map<String, String> balances,
     bool isDark,
   ) {
-    final visibleTokens = _isPaymentRequestMode && _selectedToken != null
-        ? tokens
-              .where((token) => token.symbol == _selectedToken!.symbol)
-              .toList()
-        : tokens;
+    final visibleTokens = _choices(tokens);
 
     return Container(
       decoration: BoxDecoration(
@@ -482,11 +577,13 @@ class _TransferPageState extends State<TransferPage> {
       child: SingleChildScrollView(
         child: Column(
           children: visibleTokens.map((token) {
-            final isSelected = _selectedToken?.symbol == token.symbol;
-            final balance = balances[token.symbol] ?? '0';
+            final isSelected = identical(_selectedToken, token);
+            final balance = _hasAssetIdentity(token)
+                ? '--'
+                : (balances[token.symbol] ?? '0');
 
             return InkWell(
-              onTap: _isPaymentRequestMode
+              onTap: _hasExactRequest
                   ? null
                   : () {
                       setState(() {
@@ -557,6 +654,25 @@ class _TransferPageState extends State<TransferPage> {
                               color: context.textSecondary,
                             ),
                           ),
+                          if (_hasAssetIdentity(token))
+                            Text(
+                              '${token.chain ?? '?'} / ${token.network ?? '?'} · ${token.assetType ?? '?'}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: context.textSecondary,
+                              ),
+                            ),
+                          if (token.assetId != null)
+                            Text(
+                              token.assetId!,
+                              softWrap: true,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: context.textSecondary,
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -607,7 +723,9 @@ class _TransferPageState extends State<TransferPage> {
 
   Widget _buildAmountInput(Map<String, String> balances, bool isDark) {
     final balance = _selectedToken != null
-        ? balances[_selectedToken!.symbol] ?? '0'
+        ? (_hasAssetIdentity(_selectedToken!)
+              ? '--'
+              : balances[_selectedToken!.symbol] ?? '0')
         : '0';
 
     return Container(
@@ -623,7 +741,10 @@ class _TransferPageState extends State<TransferPage> {
               Expanded(
                 child: TextField(
                   controller: _amountController,
-                  readOnly: _isPaymentRequestMode,
+                  readOnly:
+                      _isPaymentRequestMode ||
+                      (_scannedPayment?.hasExactIdentity == true &&
+                          _scannedPayment!.hasAmount),
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
@@ -671,7 +792,9 @@ class _TransferPageState extends State<TransferPage> {
                   style: TextStyle(fontSize: 13, color: context.textSecondary),
                 ),
               ),
-              if (!_isPaymentRequestMode) ...[
+              if (!_isPaymentRequestMode &&
+                  (_selectedToken == null ||
+                      !_hasAssetIdentity(_selectedToken!))) ...[
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () {

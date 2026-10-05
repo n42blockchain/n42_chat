@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} solicitações pendentes",
   "chatDraftLabel": "Rascunho",
-  "contactIndexLabel": "Índice de contatos"
+  "contactIndexLabel": "Índice de contatos",
+  "transferAssetUnavailable": "O ativo de pagamento não está disponível",
+  "transferPaymentRequestUnavailable": "A solicitação de pagamento não está disponível"
 }

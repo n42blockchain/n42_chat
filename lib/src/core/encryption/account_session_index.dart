@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -8,6 +9,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// The existing single-account database is registered in place on first use.
 class AccountSessionIndex {
   static const _key = 'n42_chat_account_session_index_v1';
+  static Future<void> _mutationTail = Future<void>.value();
+
+  Future<void> _withMutation(Future<void> Function() action) {
+    final previous = _mutationTail;
+    final done = Completer<void>();
+    _mutationTail = done.future;
+    return () async {
+      await previous;
+      try {
+        await action();
+      } finally {
+        done.complete();
+      }
+    }();
+  }
 
   static String identity(Uri server, String user, String device) => sha256
       .convert(
@@ -52,37 +68,47 @@ class AccountSessionIndex {
     return name;
   }
 
-  Future<void> remember(
+  Future<void> remember(Uri server, String user, String device, String name) =>
+      _withMutation(() async {
+        if (!_validName(name)) throw ArgumentError('Invalid account database');
+        final value = await _read();
+        final sessions = Map<String, dynamic>.from(value['sessions'] as Map);
+        final scope = identity(server, user, device);
+        // Never associate two different devices/accounts with one SDK database.
+        if (sessions.entries.any((e) => e.key != scope && e.value == name)) {
+          throw StateError('Account database is already owned');
+        }
+        sessions[scope] = name;
+        if (!await (await SharedPreferences.getInstance()).setString(
+          _key,
+          jsonEncode({'active': name, 'sessions': sessions}),
+        )) {
+          throw StateError('Unable to save account session index');
+        }
+      });
+
+  Future<void> forget(
     Uri server,
     String user,
-    String device,
-    String name,
-  ) async {
-    if (!_validName(name)) throw ArgumentError('Invalid account database');
+    String device, {
+    String? expectedDatabaseName,
+    bool Function()? canForget,
+  }) => _withMutation(() async {
+    if (canForget?.call() == false) return;
     final value = await _read();
-    final sessions = Map<String, dynamic>.from(value['sessions'] as Map);
+    final sessions = value['sessions'] as Map;
     final scope = identity(server, user, device);
-    // Never associate two different devices/accounts with one SDK database.
-    if (sessions.entries.any((e) => e.key != scope && e.value == name)) {
-      throw StateError('Account database is already owned');
+    if (expectedDatabaseName != null &&
+        sessions[scope] != expectedDatabaseName) {
+      return;
     }
-    sessions[scope] = name;
-    if (!await (await SharedPreferences.getInstance()).setString(
-      _key,
-      jsonEncode({'active': name, 'sessions': sessions}),
-    )) {
-      throw StateError('Unable to save account session index');
-    }
-  }
-
-  Future<void> forget(Uri server, String user, String device) async {
-    final value = await _read();
-    (value['sessions'] as Map).remove(identity(server, user, device));
+    if (canForget?.call() == false) return;
+    sessions.remove(scope);
     if (!await (await SharedPreferences.getInstance()).setString(
       _key,
       jsonEncode(value),
     )) {
       throw StateError('Unable to update account session index');
     }
-  }
+  });
 }

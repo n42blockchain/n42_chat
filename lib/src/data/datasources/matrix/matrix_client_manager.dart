@@ -44,6 +44,34 @@ class MatrixClientManager {
   bool _vodozemacInitialized = false;
   Completer<void>? _initCompleter;
   Duration _syncWaitTimeout = const Duration(seconds: 3);
+  Future<void> _clientLifecycleTail = Future<void>.value();
+
+  Future<T> _withClientLifecycle<T>(Future<T> Function() action) {
+    final previous = _clientLifecycleTail;
+    final done = Completer<void>();
+    _clientLifecycleTail = done.future;
+    return () async {
+      await previous;
+      try {
+        return await action();
+      } finally {
+        done.complete();
+      }
+    }();
+  }
+
+  /// Keep a confirmed deletion's SDK clear separate from client disposal and
+  /// reopening of the same database. A replaced client cannot clear its DB.
+  Future<bool> clearCapturedClientForDeletion(
+    Client captured,
+    bool Function() ownsOriginalGeneration,
+  ) => _withClientLifecycle(() async {
+    if (!identical(_client, captured) || !ownsOriginalGeneration()) {
+      return false;
+    }
+    await captured.clear(reason: SessionClearReason.logout);
+    return true;
+  });
 
   static final _heicHeifRegExp = RegExp(
     r'\.(heic|heif)$',
@@ -102,6 +130,22 @@ class MatrixClientManager {
   /// [forceReinit] 强制重新初始化
   /// [config] N42ChatConfig，用于读取安全配置（如 shareE2eeKeysWithAllDevices）
   Future<void> initialize({
+    String? clientName,
+    String? databasePath,
+    bool forceReinit = false,
+    N42ChatConfig? config,
+    PreferencesDataSource? preferencesDataSource,
+  }) => _withClientLifecycle(
+    () => _initializeUnlocked(
+      clientName: clientName,
+      databasePath: databasePath,
+      forceReinit: forceReinit,
+      config: config,
+      preferencesDataSource: preferencesDataSource,
+    ),
+  );
+
+  Future<void> _initializeUnlocked({
     String? clientName,
     String? databasePath,
     bool forceReinit = false,
@@ -975,7 +1019,7 @@ class MatrixClientManager {
         debugLog(
           'MatrixClientManager: Auth endpoint failed, trying legacy endpoint...',
         );
-        return _uploadContentLegacy(
+        return await _uploadContentLegacy(
           content,
           filename: filename,
           contentType: contentType,
@@ -1054,7 +1098,9 @@ class MatrixClientManager {
   // ============================================
 
   /// 释放资源
-  Future<void> dispose() async {
+  Future<void> dispose() => _withClientLifecycle(_disposeUnlocked);
+
+  Future<void> _disposeUnlocked() async {
     stopSync();
 
     if (_client != null) {

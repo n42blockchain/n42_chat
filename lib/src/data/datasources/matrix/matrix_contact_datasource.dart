@@ -323,15 +323,40 @@ class MatrixContactDataSource {
   }
 
   /// 忽略用户
-  Future<void> ignoreUser(String userId) async {
-    if (_client == null) return;
-    await _client!.ignoreUser(userId);
-  }
+  Future<void> ignoreUser(String userId) =>
+      _updateIgnoredUser((client) => client.ignoreUser(userId));
 
   /// 取消忽略用户
-  Future<void> unignoreUser(String userId) async {
-    if (_client == null) return;
-    await _client!.unignoreUser(userId);
+  Future<void> unignoreUser(String userId) =>
+      _updateIgnoredUser((client) => client.unignoreUser(userId));
+
+  Future<void> _updateIgnoredUser(
+    Future<void> Function(matrix.Client) update,
+  ) async {
+    final client = _client;
+    final account = client?.userID;
+    final homeserver = client?.homeserver;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    if (client == null ||
+        account == null ||
+        homeserver == null ||
+        token == null) {
+      throw StateError('Matrix account is unavailable');
+    }
+    bool sameAccount() =>
+        identical(_client, client) &&
+        client.userID == account &&
+        client.homeserver == homeserver &&
+        client.accessToken == token &&
+        client.deviceID == device;
+    try {
+      await update(client);
+    } catch (_) {
+      if (!sameAccount()) throw StateError('Matrix account changed');
+      rethrow;
+    }
+    if (!sameAccount()) throw StateError('Matrix account changed');
   }
 
   /// 检查用户是否被忽略

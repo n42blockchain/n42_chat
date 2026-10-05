@@ -64,4 +64,15 @@ void main() {
       ),
     ).called(1);
   });
+
+  test('moderator power level still permits reporting another user event', () {
+    when(() => client.userID).thenReturn('@me:server.test');
+    when(() => room.ownPowerLevel).thenReturn(matrix.PowerLevel(50));
+    when(
+      () => room.getState(matrix.EventTypes.RoomPowerLevels),
+    ).thenReturn(event);
+    when(() => event.content).thenReturn({'redact': 50});
+
+    expect(datasource.canRedact('!room:server.test', r'$other'), isTrue);
+  });
 }

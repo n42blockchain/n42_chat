@@ -1158,7 +1158,16 @@ class $$MediaFilesTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$MediaFilesTable, MediaFile>(table),
+                  BaseReferences<
+                    _$MediaMetadataDatabase,
+                    $MediaFilesTable,
+                    MediaFile
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),

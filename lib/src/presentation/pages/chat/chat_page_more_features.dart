@@ -10,11 +10,12 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       showModalBottomSheet<void>(
         context: context,
         backgroundColor: Colors.transparent,
-        builder: (context) => Container(
-          decoration: BoxDecoration(
-            color: context.surfaceColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+        builder: (context) => Material(
+          color: context.surfaceColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
           ),
+          clipBehavior: Clip.antiAlias,
           child: SafeArea(
             child: Column(
               mainAxisSize: MainAxisSize.min,

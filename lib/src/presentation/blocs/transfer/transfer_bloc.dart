@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/transfer_entity.dart';
 import '../../../domain/repositories/transfer_repository.dart';
 import '../../../integration/wallet_bridge.dart';
+import '../../../core/utils/payment_asset_match.dart';
+import '../../../core/utils/payment_request_uri.dart';
 import '../bloc_message_keys.dart';
 import 'transfer_event.dart';
 import 'transfer_state.dart';
@@ -14,7 +16,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
   final IWalletBridge _walletBridge;
 
   TransferBloc(this._transferRepository, this._walletBridge)
-      : super(const TransferState.initial()) {
+    : super(const TransferState.initial()) {
     on<LoadWalletInfo>(_onLoadWalletInfo);
     on<LoadTokens>(_onLoadTokens);
     on<LoadTokenBalance>(_onLoadTokenBalance);
@@ -44,18 +46,22 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
         }
       }
 
-      emit(state.copyWith(
-        status: TransferBlocStatus.walletLoaded,
-        isWalletConnected: isConnected,
-        walletAddress: walletAddress,
-        tokens: tokens,
-        balances: balances,
-      ));
+      emit(
+        state.copyWith(
+          status: TransferBlocStatus.walletLoaded,
+          isWalletConnected: isConnected,
+          walletAddress: walletAddress,
+          tokens: tokens,
+          balances: balances,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: TransferBlocStatus.failure,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: TransferBlocStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
 
@@ -72,10 +78,12 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       final tokens = await _transferRepository.getSupportedTokens();
       emit(state.copyWith(tokens: tokens));
     } catch (e) {
-      emit(state.copyWith(
-        status: TransferBlocStatus.failure,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: TransferBlocStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
 
@@ -98,41 +106,87 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     InitiateTransfer event,
     Emitter<TransferState> emit,
   ) async {
-    emit(state.copyWith(
-      status: TransferBlocStatus.processing,
-      processingMessage: BlocMessageKeys.transferProcessing,
-    ));
+    IExactTransferRepository? exactRepository;
+    if (event.hasExactIdentity) {
+      try {
+        exactRepository = requireExactTransferRepository(_transferRepository);
+        _requireExactAsset(
+          receiverAddress: event.receiverAddress,
+          amount: event.amount,
+          token: event.token,
+          chain: event.chain,
+          network: event.network,
+          assetType: event.assetType,
+          assetId: event.assetId,
+        );
+      } catch (error) {
+        emit(
+          state.copyWith(
+            status: TransferBlocStatus.failure,
+            errorMessage: error.toString(),
+          ),
+        );
+        return;
+      }
+    }
+    emit(
+      state.copyWith(
+        status: TransferBlocStatus.processing,
+        processingMessage: BlocMessageKeys.transferProcessing,
+      ),
+    );
 
     try {
-      final transfer = await _transferRepository.initiateTransfer(
-        roomId: event.roomId,
-        receiverAddress: event.receiverAddress,
-        amount: event.amount,
-        token: event.token,
-        memo: event.memo,
-      );
+      final transfer = exactRepository != null
+          ? await exactRepository.initiateTransferExact(
+              roomId: event.roomId,
+              receiverAddress: event.receiverAddress,
+              amount: event.amount,
+              token: event.token,
+              memo: event.memo,
+              chain: event.chain!,
+              network: event.network!,
+              assetType: event.assetType!,
+              assetId: event.assetId,
+            )
+          : await _transferRepository.initiateTransfer(
+              roomId: event.roomId,
+              receiverAddress: event.receiverAddress,
+              amount: event.amount,
+              token: event.token,
+              memo: event.memo,
+            );
 
       if (transfer.isSuccess) {
-        emit(state.copyWith(
-          status: TransferBlocStatus.success,
-          lastTransfer: transfer,
-        ));
+        emit(
+          state.copyWith(
+            status: TransferBlocStatus.success,
+            lastTransfer: transfer,
+          ),
+        );
       } else if (transfer.status == TransferStatus.cancelled) {
-        emit(state.copyWith(
-          status: TransferBlocStatus.failure,
-          errorMessage: BlocMessageKeys.transferCancelled,
-        ));
+        emit(
+          state.copyWith(
+            status: TransferBlocStatus.failure,
+            errorMessage: BlocMessageKeys.transferCancelled,
+          ),
+        );
       } else {
-        emit(state.copyWith(
-          status: TransferBlocStatus.failure,
-          errorMessage: transfer.failureReason ?? BlocMessageKeys.transferFailed,
-        ));
+        emit(
+          state.copyWith(
+            status: TransferBlocStatus.failure,
+            errorMessage:
+                transfer.failureReason ?? BlocMessageKeys.transferFailed,
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: TransferBlocStatus.failure,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: TransferBlocStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
 
@@ -140,17 +194,56 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     CreatePaymentRequest event,
     Emitter<TransferState> emit,
   ) async {
-    emit(state.copyWith(
-      status: TransferBlocStatus.processing,
-      processingMessage: BlocMessageKeys.paymentProcessing,
-    ));
+    IExactTransferRepository? exactRepository;
+    TokenInfo? selectedAsset;
+    if (event.hasExactIdentity) {
+      try {
+        exactRepository = requireExactTransferRepository(_transferRepository);
+        selectedAsset = _requireExactAsset(
+          receiverAddress: 'selected-asset',
+          amount: event.amount,
+          token: event.token,
+          chain: event.chain,
+          network: event.network,
+          assetType: event.assetType,
+          assetId: event.assetId,
+        );
+        if (createExactPaymentRequestForAsset(
+              selectedAsset,
+              amount: event.amount,
+            ) ==
+            null) {
+          throw StateError('Exact payment asset is unavailable or invalid');
+        }
+      } catch (error) {
+        emit(
+          state.copyWith(
+            status: TransferBlocStatus.failure,
+            errorMessage: error.toString(),
+          ),
+        );
+        return;
+      }
+    }
+    emit(
+      state.copyWith(
+        status: TransferBlocStatus.processing,
+        processingMessage: BlocMessageKeys.paymentProcessing,
+      ),
+    );
 
     try {
-      final request = await _transferRepository.createPaymentRequest(
-        amount: event.amount,
-        token: event.token,
-        memo: event.memo,
-      );
+      final request = exactRepository != null
+          ? await exactRepository.createPaymentRequestExact(
+              asset: selectedAsset!,
+              amount: event.amount,
+              memo: event.memo,
+            )
+          : await _transferRepository.createPaymentRequest(
+              amount: event.amount,
+              token: event.token,
+              memo: event.memo,
+            );
 
       // 发送收款请求消息
       await _transferRepository.sendPaymentRequestMessage(
@@ -158,15 +251,19 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
         request: request,
       );
 
-      emit(state.copyWith(
-        status: TransferBlocStatus.paymentCreated,
-        paymentRequest: request,
-      ));
+      emit(
+        state.copyWith(
+          status: TransferBlocStatus.paymentCreated,
+          paymentRequest: request,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: TransferBlocStatus.failure,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: TransferBlocStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
     }
   }
 
@@ -174,37 +271,110 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
     FulfillPaymentRequest event,
     Emitter<TransferState> emit,
   ) async {
-    emit(state.copyWith(
-      status: TransferBlocStatus.processing,
-      processingMessage: BlocMessageKeys.paymentProcessing,
-    ));
+    IExactTransferRepository? exactRepository;
+    if (event.hasExactIdentity) {
+      try {
+        exactRepository = requireExactTransferRepository(_transferRepository);
+        _requireExactAsset(
+          receiverAddress: event.receiverAddress,
+          amount: event.amount,
+          token: event.token,
+          chain: event.chain,
+          network: event.network,
+          assetType: event.assetType,
+          assetId: event.assetId,
+        );
+      } catch (error) {
+        emit(
+          state.copyWith(
+            status: TransferBlocStatus.failure,
+            errorMessage: error.toString(),
+          ),
+        );
+        return;
+      }
+    }
+    emit(
+      state.copyWith(
+        status: TransferBlocStatus.processing,
+        processingMessage: BlocMessageKeys.paymentProcessing,
+      ),
+    );
 
     try {
-      final transfer = await _transferRepository.fulfillPaymentRequest(
-        roomId: event.roomId,
-        requestId: event.requestId,
-        receiverAddress: event.receiverAddress,
-        amount: event.amount,
-        token: event.token,
-      );
+      final transfer = exactRepository != null
+          ? await exactRepository.fulfillPaymentRequestExact(
+              roomId: event.roomId,
+              requestId: event.requestId,
+              receiverAddress: event.receiverAddress,
+              amount: event.amount,
+              token: event.token,
+              chain: event.chain!,
+              network: event.network!,
+              assetType: event.assetType!,
+              assetId: event.assetId,
+            )
+          : await _transferRepository.fulfillPaymentRequest(
+              roomId: event.roomId,
+              requestId: event.requestId,
+              receiverAddress: event.receiverAddress,
+              amount: event.amount,
+              token: event.token,
+            );
 
       if (transfer.isSuccess) {
-        emit(state.copyWith(
-          status: TransferBlocStatus.success,
-          lastTransfer: transfer,
-        ));
+        emit(
+          state.copyWith(
+            status: TransferBlocStatus.success,
+            lastTransfer: transfer,
+          ),
+        );
       } else {
-        emit(state.copyWith(
-          status: TransferBlocStatus.failure,
-          errorMessage: transfer.failureReason ?? BlocMessageKeys.paymentFailed,
-        ));
+        emit(
+          state.copyWith(
+            status: TransferBlocStatus.failure,
+            errorMessage:
+                transfer.failureReason ?? BlocMessageKeys.paymentFailed,
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: TransferBlocStatus.failure,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(
+          status: TransferBlocStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
     }
+  }
+
+  TokenInfo _requireExactAsset({
+    required String receiverAddress,
+    required String amount,
+    required String token,
+    required String? chain,
+    required String? network,
+    required String? assetType,
+    required String? assetId,
+  }) {
+    final resolution = resolvePaymentAsset(
+      PaymentRequestData(
+        receiverAddress: receiverAddress,
+        amount: amount,
+        chain: chain,
+        network: network,
+        assetType: assetType,
+        assetId: assetId,
+      ),
+      state.tokens,
+    );
+    final asset = resolution.asset;
+    if (resolution.status != PaymentAssetResolutionStatus.matched ||
+        asset == null ||
+        asset.symbol != token) {
+      throw StateError('Exact payment asset is unavailable or invalid');
+    }
+    return asset;
   }
 
   Future<void> _onValidateAddress(
@@ -218,12 +388,14 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       userInfo = await _walletBridge.getUserInfoByAddress(event.address);
     }
 
-    emit(state.copyWith(
-      status: TransferBlocStatus.addressValidated,
-      validatedAddress: event.address,
-      isAddressValid: isValid,
-      userInfo: userInfo,
-    ));
+    emit(
+      state.copyWith(
+        status: TransferBlocStatus.addressValidated,
+        validatedAddress: event.address,
+        isAddressValid: isValid,
+        userInfo: userInfo,
+      ),
+    );
   }
 
   void _onClearTransferState(

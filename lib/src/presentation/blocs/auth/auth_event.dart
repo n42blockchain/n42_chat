@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/repositories/auth_repository.dart';
+
 /// 认证事件基类
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
@@ -35,7 +37,23 @@ class AuthLoginRequested extends AuthEvent {
 
 /// 登出请求
 class AuthLogoutRequested extends AuthEvent {
-  const AuthLogoutRequested();
+  final AuthSessionInvalidation? invalidation;
+
+  const AuthLogoutRequested({this.invalidation});
+
+  @override
+  List<Object?> get props => [invalidation];
+}
+
+/// Local transition after the original generation's real server-confirmed
+/// deletion and scoped SDK cleanup. This never invokes ordinary logout.
+class AuthAccountDeletionConfirmed extends AuthEvent {
+  final AuthSessionInvalidation generation;
+
+  const AuthAccountDeletionConfirmed(this.generation);
+
+  @override
+  List<Object?> get props => [generation];
 }
 
 /// 注册请求

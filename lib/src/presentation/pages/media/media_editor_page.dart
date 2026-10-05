@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
+import 'package:material_ui/material_ui.dart' as editor_ui;
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
@@ -19,11 +20,7 @@ class MediaEditorPage extends StatefulWidget {
   /// 文件名（用于标题显示）
   final String? filename;
 
-  const MediaEditorPage({
-    super.key,
-    required this.imageBytes,
-    this.filename,
-  });
+  const MediaEditorPage({super.key, required this.imageBytes, this.filename});
 
   /// 便捷方法：打开编辑器并返回编辑后的图片
   ///
@@ -35,10 +32,8 @@ class MediaEditorPage extends StatefulWidget {
   }) {
     return Navigator.of(context).push<Uint8List>(
       MaterialPageRoute(
-        builder: (_) => MediaEditorPage(
-          imageBytes: imageBytes,
-          filename: filename,
-        ),
+        builder: (_) =>
+            MediaEditorPage(imageBytes: imageBytes, filename: filename),
       ),
     );
   }
@@ -56,12 +51,12 @@ class _MediaEditorPageState extends State<MediaEditorPage> {
   Widget build(BuildContext context) {
     final l10n = S.of(context);
 
-    final editorTheme = ThemeData.dark().copyWith(
-      colorScheme: const ColorScheme.dark(
+    final editorTheme = editor_ui.ThemeData.dark().copyWith(
+      colorScheme: const editor_ui.ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.primary,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: const editor_ui.AppBarThemeData(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
       ),

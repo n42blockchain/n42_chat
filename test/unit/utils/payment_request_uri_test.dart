@@ -98,4 +98,171 @@ void main() {
       expect(PaymentRequestUri.isPaymentUri('n42pay://pay?amount=1'), isFalse);
     });
   });
+
+  group('versioned exact payment URI', () {
+    test(
+      'parses the current host v1 token request without losing amount text',
+      () {
+        final parsed = PaymentRequestUri.tryParseExact(
+          'n42pay://v1/pay?chain=ETH&network=testnet&type=token&to=0xreceiver'
+          '&contract=0xABCDEF0123456789ABCDEF0123456789ABCDEF01'
+          '&amount=9007199254.123456',
+        );
+
+        expect(parsed?.receiverAddress, '0xreceiver');
+        expect(parsed?.chain, 'ETH');
+        expect(parsed?.network, 'testnet');
+        expect(parsed?.assetType, 'token');
+        expect(parsed?.assetId, '0xABCDEF0123456789ABCDEF0123456789ABCDEF01');
+        expect(parsed?.amount, '9007199254.123456');
+        expect(parsed?.token, isEmpty);
+        expect(parsed?.memo, isNull);
+        expect(parsed?.hasExactIdentity, isTrue);
+      },
+    );
+
+    test('encodes only host-accepted keys and round-trips native identity', () {
+      const request = PaymentRequestData(
+        receiverAddress: 'N42Receiver',
+        chain: 'N',
+        network: 'mainnet',
+        assetType: 'native',
+      );
+
+      final encoded = PaymentRequestUri.encode(request);
+      expect(
+        encoded,
+        'n42pay://v1/pay?chain=N&network=mainnet&type=native&to=N42Receiver',
+      );
+      expect(PaymentRequestUri.tryParseExact(encoded), request);
+      expect(PaymentRequestUri.tryParse(encoded), isNull);
+    });
+
+    test(
+      'encodes host token identity with percent-escaped receiver and ID',
+      () {
+        const request = PaymentRequestData(
+          receiverAddress: 'wallet&one',
+          chain: 'SOL',
+          network: 'testnet',
+          assetType: 'token',
+          assetId: 'Mint+One',
+          amount: '0.25',
+        );
+
+        final encoded = PaymentRequestUri.encode(request);
+        expect(encoded, contains('to=wallet%26one'));
+        expect(encoded, contains('contract=Mint%2BOne'));
+        expect(PaymentRequestUri.tryParseExact(encoded), request);
+      },
+    );
+
+    test('rejects unknown versions, keys, repeated keys and malformed escapes', () {
+      for (final uri in [
+        'n42pay://v2/pay?chain=N&network=mainnet&type=native&to=addr',
+        'n42pay://v1/pay?chain=N&network=mainnet&type=native&to=addr&memo=x',
+        'n42pay://v1/pay?chain=N&chain=ETH&network=mainnet&type=native&to=addr',
+        'n42pay://v1/pay?chain=N&%63hain=ETH&network=mainnet&type=native&to=addr',
+        'n42pay://v1/pay?chain=N&network=mainnet&type=native&to=%zz',
+        'n42pay://v1/pay?chain=N&network=mainnet&type=native&to=addr%2',
+        'n42pay://user@v1/pay?chain=N&network=mainnet&type=native&to=addr',
+        'n42pay://v1:44/pay?chain=N&network=mainnet&type=native&to=addr',
+        'n42pay://v1/pay?chain=N&network=mainnet&type=native&to=addr#frag',
+      ]) {
+        expect(PaymentRequestUri.tryParseExact(uri), isNull, reason: uri);
+      }
+    });
+
+    test('rejects partial identity and native-contract confusion', () {
+      for (final uri in [
+        'n42pay://v1/pay?network=mainnet&type=native&to=addr',
+        'n42pay://v1/pay?chain=N&type=native&to=addr',
+        'n42pay://v1/pay?chain=N&network=mainnet&to=addr',
+        'n42pay://v1/pay?chain=N&network=mainnet&type=token&to=addr',
+        'n42pay://v1/pay?chain=N&network=mainnet&type=native&to=addr&contract=mint',
+        'n42pay://v1/pay?chain=N&network=devnet&type=native&to=addr',
+      ]) {
+        expect(PaymentRequestUri.tryParseExact(uri), isNull, reason: uri);
+      }
+    });
+
+    test('rejects malformed, zero, negative and non-decimal v1 amounts', () {
+      for (final amount in [
+        '0',
+        '0.000',
+        '-1',
+        '+1',
+        '1e2',
+        '1,000',
+        '1.',
+        '.5',
+      ]) {
+        expect(
+          PaymentRequestUri.tryParseExact(
+            'n42pay://v1/pay?chain=N&network=mainnet&type=native'
+            '&to=addr&amount=$amount',
+          ),
+          isNull,
+          reason: amount,
+        );
+      }
+    });
+
+    test(
+      'rejects incomplete or extended v1 encoding instead of dropping data',
+      () {
+        expect(
+          () => PaymentRequestUri.encode(
+            const PaymentRequestData(
+              receiverAddress: 'addr',
+              chain: 'ETH',
+              network: 'mainnet',
+            ),
+          ),
+          throwsArgumentError,
+        );
+        expect(
+          () => PaymentRequestUri.encode(
+            const PaymentRequestData(
+              receiverAddress: 'addr',
+              chain: 'ETH',
+              network: 'mainnet',
+              assetType: 'native',
+              token: 'ETH',
+            ),
+          ),
+          throwsArgumentError,
+        );
+      },
+    );
+
+    test('legacy chain-only requests keep their existing route', () {
+      const request = PaymentRequestData(
+        receiverAddress: 'addr',
+        token: 'ETH',
+        chain: 'ETH',
+      );
+      final encoded = PaymentRequestUri.encode(request);
+      expect(encoded, startsWith('n42pay://pay?'));
+      expect(PaymentRequestUri.tryParse(encoded), request);
+      expect(PaymentRequestUri.tryParseExact(encoded), isNull);
+    });
+
+    test('legacy parser rejects v1 and partial identity hints', () {
+      expect(
+        PaymentRequestUri.tryParse(
+          'n42pay://v1/pay?chain=ETH&network=mainnet&type=native&to=addr',
+        ),
+        isNull,
+      );
+      expect(
+        PaymentRequestUri.tryParse('n42pay://pay?to=addr&network=mainnet'),
+        isNull,
+      );
+      expect(
+        PaymentRequestUri.tryParse('n42pay://pay?to=addr&to=other'),
+        isNull,
+      );
+    });
+  });
 }

@@ -23,13 +23,16 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         }
         // 显示错误
         if (state.error != null) {
+          final reportSucceeded = state.error == 'success:report';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                state.error?.contains(
-                          EncryptedSendNotReady.recipientMissingCode,
-                        ) ==
-                        true
+                reportSucceeded
+                    ? (S.of(context)?.chatReportSuccess ?? 'Report submitted')
+                    : state.error?.contains(
+                            EncryptedSendNotReady.recipientMissingCode,
+                          ) ==
+                          true
                     ? S.of(context)!.chatRecipientKeysMissing
                     : encryptionFailure
                     ? (S.of(context)?.chatEncryptionNotReady ??
@@ -40,7 +43,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                           'Friendship is not confirmed. Check Contacts > New Friends before sending.')
                     : state.error!,
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: reportSucceeded
+                  ? AppColors.success
+                  : AppColors.error,
             ),
           );
         }

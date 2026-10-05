@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/ocr_document.dart';
 import 'chat_media_bytes_resolver.dart';
@@ -46,10 +48,14 @@ class ImageTextSessionService {
     while (_sessions.length > capacity) {
       _sessions.remove(_sessions.keys.first);
     }
-    task.catchError((Object error) {
-      if (identical(_sessions[key], task)) _sessions.remove(key);
-      throw error;
-    });
+    unawaited(
+      task.then<void>(
+        (_) {},
+        onError: (Object error, StackTrace stackTrace) {
+          if (identical(_sessions[key], task)) _sessions.remove(key);
+        },
+      ),
+    );
     return task;
   }
 

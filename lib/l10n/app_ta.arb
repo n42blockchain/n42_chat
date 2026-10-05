@@ -2815,5 +2815,7 @@
   },
   "contactPendingCount": "{count} pending requests",
   "chatDraftLabel": "Draft",
-  "contactIndexLabel": "Contact index"
+  "contactIndexLabel": "Contact index",
+  "transferAssetUnavailable": "பணம் செலுத்தும் சொத்து கிடைக்கவில்லை",
+  "transferPaymentRequestUnavailable": "கட்டணக் கோரிக்கை கிடைக்கவில்லை"
 }

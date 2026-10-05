@@ -1651,7 +1651,16 @@ class $$ArchivedMessagesTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$ArchivedMessagesTable, ArchivedMessage>(table),
+                  BaseReferences<
+                    _$ArchiveDatabase,
+                    $ArchivedMessagesTable,
+                    ArchivedMessage
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -1869,7 +1878,18 @@ class $$ArchiveMetadataTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$ArchiveMetadataTable, ArchiveMetadataData>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$ArchiveDatabase,
+                    $ArchiveMetadataTable,
+                    ArchiveMetadataData
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),

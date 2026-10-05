@@ -477,9 +477,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   /// 更新通知模式
   Future<void> _updateNotificationMode(
-    ConversationNotificationMode mode,
-  ) async {
-    final previousMode = _notificationMode;
+    ConversationNotificationMode mode, {
+    required ConversationNotificationMode previousMode,
+  }) async {
     try {
       final repository = getIt<IConversationRepository>();
       await repository.setNotificationMode(widget.conversation.id, mode);
@@ -565,8 +565,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       return;
     }
 
+    final previousMode = _notificationMode;
     setState(() => _notificationMode = selected);
-    await _updateNotificationMode(selected);
+    await _updateNotificationMode(selected, previousMode: previousMode);
   }
 
   /// 更新置顶状态
@@ -1347,83 +1348,92 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     if (!mounted) return;
     final controller = TextEditingController(text: _announcement);
     final canEdit = widget.canChangeSettings;
+    final navigator = Navigator.of(context, rootNavigator: true);
+    final dialogRoute = DialogRoute<void>(
+      context: context,
+      barrierColor:
+          DialogTheme.of(context).barrierColor ??
+          Theme.of(context).dialogTheme.barrierColor ??
+          Colors.black54,
+      barrierDismissible: true,
+      themes: InheritedTheme.capture(from: context, to: navigator.context),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: context.surfaceColor,
+        title: Text(
+          S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
+          style: TextStyle(color: context.textPrimary),
+        ),
+        content: canEdit
+            ? TextField(
+                controller: controller,
+                maxLines: 5,
+                style: TextStyle(color: context.textPrimary),
+                decoration: InputDecoration(
+                  hintText:
+                      S.of(context)?.chatGroupAnnouncementHint ??
+                      'Enter group announcement',
+                  hintStyle: TextStyle(color: context.textSecondary),
+                  border: const OutlineInputBorder(),
+                ),
+              )
+            : Text(
+                _announcement?.isNotEmpty == true
+                    ? _announcement!
+                    : (S.of(context)?.chatGroupAnnouncementEmpty ??
+                          'No announcement'),
+                style: TextStyle(color: context.textPrimary),
+              ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              canEdit
+                  ? (S.of(context)?.commonCancel ?? 'Cancel')
+                  : (S.of(context)?.commonConfirm ?? 'OK'),
+            ),
+          ),
+          if (canEdit)
+            TextButton(
+              onPressed: () async {
+                final announcement = controller.text.trim();
+                Navigator.pop(ctx);
+                try {
+                  final groupRepository = getIt<IGroupRepository>();
+                  await groupRepository.setGroupAnnouncement(
+                    widget.conversation.id,
+                    announcement,
+                  );
+                  if (mounted) {
+                    setState(() => _announcement = announcement);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(S.of(context)?.commonSave ?? 'Saved'),
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          S.of(context)?.chatUpdateFailed ?? 'Update failed',
+                        ),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: Text(S.of(context)?.commonSave ?? 'Save'),
+            ),
+        ],
+      ),
+    );
 
     try {
-      await showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: context.surfaceColor,
-          title: Text(
-            S.of(context)?.commonGroupAnnouncement ?? 'Group Announcement',
-            style: TextStyle(color: context.textPrimary),
-          ),
-          content: canEdit
-              ? TextField(
-                  controller: controller,
-                  maxLines: 5,
-                  style: TextStyle(color: context.textPrimary),
-                  decoration: InputDecoration(
-                    hintText:
-                        S.of(context)?.chatGroupAnnouncementHint ??
-                        'Enter group announcement',
-                    hintStyle: TextStyle(color: context.textSecondary),
-                    border: const OutlineInputBorder(),
-                  ),
-                )
-              : Text(
-                  _announcement?.isNotEmpty == true
-                      ? _announcement!
-                      : (S.of(context)?.chatGroupAnnouncementEmpty ??
-                            'No announcement'),
-                  style: TextStyle(color: context.textPrimary),
-                ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(
-                canEdit
-                    ? (S.of(context)?.commonCancel ?? 'Cancel')
-                    : (S.of(context)?.commonConfirm ?? 'OK'),
-              ),
-            ),
-            if (canEdit)
-              TextButton(
-                onPressed: () async {
-                  final announcement = controller.text.trim();
-                  Navigator.pop(ctx);
-                  try {
-                    final groupRepository = getIt<IGroupRepository>();
-                    await groupRepository.setGroupAnnouncement(
-                      widget.conversation.id,
-                      announcement,
-                    );
-                    if (mounted) {
-                      setState(() => _announcement = announcement);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(S.of(context)?.commonSave ?? 'Saved'),
-                          duration: const Duration(seconds: 1),
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            S.of(context)?.chatUpdateFailed ?? 'Update failed',
-                          ),
-                          backgroundColor: AppColors.error,
-                        ),
-                      );
-                    }
-                  }
-                },
-                child: Text(S.of(context)?.commonSave ?? 'Save'),
-              ),
-          ],
-        ),
-      );
+      await navigator.push<void>(dialogRoute);
+      await dialogRoute.completed;
     } finally {
       controller.dispose();
     }

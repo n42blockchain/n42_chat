@@ -3,6 +3,55 @@ import 'dart:typed_data';
 import '../entities/stored_account_entity.dart';
 import '../entities/user_entity.dart';
 
+/// A Matrix SDK logout tied to the client generation that emitted it.
+/// Call [isCurrent] again when a queued UI action is about to run.
+class AuthSessionInvalidation {
+  final String userId;
+  final Uri homeserver;
+  final String? deviceId;
+  final bool Function() _isCurrent;
+  final bool Function() _isSameGeneration;
+  final bool Function(Object client)? _matchesClient;
+
+  AuthSessionInvalidation({
+    required this.userId,
+    required this.homeserver,
+    required this.deviceId,
+    required bool Function() isCurrent,
+    bool Function()? isSameGeneration,
+    bool Function(Object client)? matchesClient,
+  }) : _isCurrent = isCurrent,
+       _isSameGeneration = isSameGeneration ?? isCurrent,
+       _matchesClient = matchesClient;
+
+  bool get isCurrent => _isCurrent();
+  bool get isSameGeneration => _isSameGeneration();
+  bool matchesClient(Object client) => _matchesClient?.call(client) ?? false;
+}
+
+/// Optional capability; older [IAuthRepository] implementations keep their
+/// existing boolean login-state stream contract.
+abstract interface class IAccountBoundAuthInvalidation {
+  Stream<AuthSessionInvalidation> get accountInvalidationStream;
+}
+
+/// Optional deletion lifecycle. The request wrapper marks the captured SDK
+/// generation only when the server request itself completes successfully.
+abstract interface class IAccountBoundDeletionLifecycle {
+  AuthSessionInvalidation? get currentAccountGeneration;
+
+  Future<void> runAccountDeletionRequest(
+    AuthSessionInvalidation generation,
+    Future<void> Function() request,
+  );
+}
+
+/// Optional proof for a deletion-only UI transition. This is true only after
+/// the captured generation's server request completed successfully.
+abstract interface class IConfirmedAccountDeletionGeneration {
+  bool isConfirmedDeletionGeneration(AuthSessionInvalidation generation);
+}
+
 /// 认证仓库接口
 ///
 /// 定义认证相关的所有操作，由 Data 层实现

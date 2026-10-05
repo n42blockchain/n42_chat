@@ -22,9 +22,19 @@ void main() {
     });
 
     test('breakpoints should be in ascending order', () {
-      expect(ResponsiveUtils.mobileBreakpoint < ResponsiveUtils.tabletBreakpoint, true);
-      expect(ResponsiveUtils.tabletBreakpoint < ResponsiveUtils.desktopBreakpoint, true);
-      expect(ResponsiveUtils.desktopBreakpoint < ResponsiveUtils.largeDesktopBreakpoint, true);
+      expect(
+        ResponsiveUtils.mobileBreakpoint < ResponsiveUtils.tabletBreakpoint,
+        true,
+      );
+      expect(
+        ResponsiveUtils.tabletBreakpoint < ResponsiveUtils.desktopBreakpoint,
+        true,
+      );
+      expect(
+        ResponsiveUtils.desktopBreakpoint <
+            ResponsiveUtils.largeDesktopBreakpoint,
+        true,
+      );
     });
   });
 
@@ -88,7 +98,9 @@ void main() {
       expect(find.text('Desktop'), findsOneWidget);
     });
 
-    testWidgets('should fallback to mobile when tablet is null', (tester) async {
+    testWidgets('should fallback to mobile when tablet is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MediaQuery(
           data: MediaQueryData(size: Size(800, 1200)),
@@ -101,7 +113,9 @@ void main() {
       expect(find.text('Mobile'), findsOneWidget);
     });
 
-    testWidgets('should fallback to tablet when desktop is null', (tester) async {
+    testWidgets('should fallback to tablet when desktop is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MediaQuery(
           data: MediaQueryData(size: Size(1400, 900)),
@@ -123,9 +137,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(1400, 900)),
-            child: ResponsiveContainer(
-              child: Text('Content'),
-            ),
+            child: ResponsiveContainer(child: Text('Content')),
           ),
         ),
       );
@@ -145,15 +157,14 @@ void main() {
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(1400, 900)),
-            child: ResponsiveContainer(
-              maxWidth: 500,
-              child: Text('Content'),
-            ),
+            child: ResponsiveContainer(maxWidth: 500, child: Text('Content')),
           ),
         ),
       );
 
-      final constrainedBox = tester.widget<ConstrainedBox>(find.byType(ConstrainedBox));
+      final constrainedBox = tester.widget<ConstrainedBox>(
+        find.byType(ConstrainedBox),
+      );
       expect(constrainedBox.constraints.maxWidth, 500);
     });
   });
@@ -178,15 +189,15 @@ void main() {
       expect(find.text('Left'), findsNothing);
     });
 
-    testWidgets('should show left panel when right is null on mobile', (tester) async {
+    testWidgets('should show left panel when right is null on mobile', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const Directionality(
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(400, 800)),
-            child: SplitView(
-              leftPanel: Text('Left'),
-            ),
+            child: SplitView(leftPanel: Text('Left')),
           ),
         ),
       );
@@ -212,15 +223,15 @@ void main() {
       expect(find.text('Right'), findsOneWidget);
     });
 
-    testWidgets('should show empty state when right panel is null on desktop', (tester) async {
+    testWidgets('should show empty state when right panel is null on desktop', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const Directionality(
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(1400, 900)),
-            child: SplitView(
-              leftPanel: Text('Left'),
-            ),
+            child: SplitView(leftPanel: Text('Left')),
           ),
         ),
       );
@@ -285,17 +296,20 @@ void main() {
   });
 
   group('ResponsiveUtils helper methods', () {
-    testWidgets('getAdaptivePadding should return correct values', (tester) async {
+    testWidgets('getAdaptivePadding should return correct values', (
+      tester,
+    ) async {
       // Mobile
       await tester.pumpWidget(
         const Directionality(
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(400, 800)),
-            child: _PaddingTestWidget(expectedPadding: 16),
+            child: _PaddingTestWidget(),
           ),
         ),
       );
+      expect(find.text('16.0'), findsOneWidget);
 
       // Tablet
       await tester.pumpWidget(
@@ -303,21 +317,23 @@ void main() {
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(800, 1200)),
-            child: _PaddingTestWidget(expectedPadding: 24),
+            child: _PaddingTestWidget(),
           ),
         ),
       );
+      expect(find.text('24.0'), findsOneWidget);
 
       // Desktop
       await tester.pumpWidget(
         const Directionality(
           textDirection: TextDirection.ltr,
           child: MediaQuery(
-            data: MediaQueryData(size: Size(1400, 900)),
-            child: _PaddingTestWidget(expectedPadding: 32),
+            data: MediaQueryData(size: Size(1100, 900)),
+            child: _PaddingTestWidget(),
           ),
         ),
       );
+      expect(find.text('32.0'), findsOneWidget);
 
       // Large Desktop
       await tester.pumpWidget(
@@ -325,10 +341,11 @@ void main() {
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(2000, 1200)),
-            child: _PaddingTestWidget(expectedPadding: 48),
+            child: _PaddingTestWidget(),
           ),
         ),
       );
+      expect(find.text('48.0'), findsOneWidget);
     });
 
     testWidgets('getGridColumns should return correct values', (tester) async {
@@ -338,10 +355,11 @@ void main() {
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(400, 800)),
-            child: _ColumnsTestWidget(expectedColumns: 2),
+            child: _ColumnsTestWidget(),
           ),
         ),
       );
+      expect(find.text('2'), findsOneWidget);
 
       // Tablet
       await tester.pumpWidget(
@@ -349,45 +367,43 @@ void main() {
           textDirection: TextDirection.ltr,
           child: MediaQuery(
             data: MediaQueryData(size: Size(800, 1200)),
-            child: _ColumnsTestWidget(expectedColumns: 3),
+            child: _ColumnsTestWidget(),
           ),
         ),
       );
+      expect(find.text('3'), findsOneWidget);
 
       // Desktop
       await tester.pumpWidget(
         const Directionality(
           textDirection: TextDirection.ltr,
           child: MediaQuery(
-            data: MediaQueryData(size: Size(1400, 900)),
-            child: _ColumnsTestWidget(expectedColumns: 4),
+            data: MediaQueryData(size: Size(1100, 900)),
+            child: _ColumnsTestWidget(),
           ),
         ),
       );
+      expect(find.text('4'), findsOneWidget);
     });
   });
 }
 
 class _PaddingTestWidget extends StatelessWidget {
-  final double expectedPadding;
-  const _PaddingTestWidget({required this.expectedPadding});
+  const _PaddingTestWidget();
 
   @override
   Widget build(BuildContext context) {
     final padding = ResponsiveUtils.getAdaptivePadding(context);
-    // Test assertion moved outside widget tree
-    return Text('$padding == $expectedPadding');
+    return Text('$padding');
   }
 }
 
 class _ColumnsTestWidget extends StatelessWidget {
-  final int expectedColumns;
-  const _ColumnsTestWidget({required this.expectedColumns});
+  const _ColumnsTestWidget();
 
   @override
   Widget build(BuildContext context) {
     final columns = ResponsiveUtils.getGridColumns(context);
-    // Test assertion moved outside widget tree
-    return Text('$columns == $expectedColumns');
+    return Text('$columns');
   }
 }

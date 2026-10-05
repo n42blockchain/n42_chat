@@ -67,10 +67,7 @@ abstract class ITransferRepository {
   Future<TransferEntity?> getTransfer(String transferId);
 
   /// 获取所有转账记录
-  Future<List<TransferEntity>> getAllTransfers({
-    int? limit,
-    int? offset,
-  });
+  Future<List<TransferEntity>> getAllTransfers({int? limit, int? offset});
 
   // ============================================
   // 钱包信息
@@ -92,3 +89,45 @@ abstract class ITransferRepository {
   bool get isWalletConnected;
 }
 
+/// Optional exact-asset operations. Legacy `implements ITransferRepository`
+/// integrations do not gain required members or an implicit fallback.
+abstract interface class IExactTransferRepository {
+  Future<TransferEntity> initiateTransferExact({
+    required String roomId,
+    required String receiverAddress,
+    required String amount,
+    required String token,
+    String? memo,
+    required String chain,
+    required String network,
+    required String assetType,
+    String? assetId,
+  });
+
+  Future<PaymentRequest> createPaymentRequestExact({
+    required TokenInfo asset,
+    required String amount,
+    String? memo,
+  });
+
+  Future<TransferEntity> fulfillPaymentRequestExact({
+    required String roomId,
+    required String requestId,
+    required String receiverAddress,
+    required String amount,
+    required String token,
+    required String chain,
+    required String network,
+    required String assetType,
+    String? assetId,
+  });
+}
+
+IExactTransferRepository requireExactTransferRepository(
+  ITransferRepository repository,
+) {
+  if (repository is IExactTransferRepository) {
+    return repository as IExactTransferRepository;
+  }
+  throw UnsupportedError('Exact asset transfer not supported');
+}

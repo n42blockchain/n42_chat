@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
@@ -108,6 +109,47 @@ void main() {
       expect(sessions, isEmpty);
     },
   );
+  test('new A snapshot saved during old delete remains available', () async {
+    final values = <String, String>{};
+    final deletionEntered = Completer<void>();
+    final releaseDeletion = Completer<void>();
+    final underlying = _Storage();
+    when(() => underlying.read(key: any(named: 'key'))).thenAnswer((
+      call,
+    ) async {
+      return values[call.namedArguments[#key] as String];
+    });
+    when(
+      () => underlying.write(
+        key: any(named: 'key'),
+        value: any(named: 'value'),
+      ),
+    ).thenAnswer((call) async {
+      values[call.namedArguments[#key] as String] =
+          call.namedArguments[#value] as String;
+    });
+    when(() => underlying.delete(key: any(named: 'key'))).thenAnswer((
+      call,
+    ) async {
+      deletionEntered.complete();
+      await releaseDeletion.future;
+      values.remove(call.namedArguments[#key] as String);
+    });
+    final oldStore = LocalRoomKeyStore(storage: underlying);
+    final newStore = LocalRoomKeyStore(storage: underlying);
+    final deletion = oldStore.deleteForIdentity(
+      Uri.parse('https://hs.test'),
+      '@alice:hs',
+      canDelete: () => true,
+    );
+    await deletionEntered.future;
+    sessions[id(fixture('new-A'))] = fixture('new-A');
+    final saveNew = newStore.preserve(client);
+    await Future<void>.delayed(Duration.zero);
+    releaseDeletion.complete();
+    await Future.wait([deletion, saveNew]);
+    expect(values.values.single, contains('new-A'));
+  });
   test(
     'successive logouts merge history and do not overwrite active sessions',
     () async {
@@ -215,7 +257,7 @@ void main() {
           .toFilePath();
       final native =
           Platform.environment['N42_VODOZEMAC_TEST_LIB'] ??
-          '$root/macos/flutter_vodozemac/flutter_vodozemac.xcframework/macos-arm64_x86_64/flutter_vodozemac.framework/flutter_vodozemac';
+          '$root/macos/flutter_vodozemac/flutter_vodozemac.xcframework/macos-arm64_x86_64/libflutter_vodozemac.dylib';
       final dir = await Directory.systemTemp.createTemp('n42-history-crypto-');
       addTearDown(() => dir.delete(recursive: true));
       await Link(

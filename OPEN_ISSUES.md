@@ -11,6 +11,49 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
+### UGC-001 Matrix reporting still needs room, moment and operational acceptance
+
+- Severity: H
+- Added: 2026-09-28
+- Current state: Task 16D has an optional Matrix user/room report repository with stable-version and account-bound checks. Profile/contact user reports and the group More-menu room report await a homeserver acknowledgement. Pending Cancel, barrier and back dismissal are blocked until the request settles; in-place failures retain the draft. Matrix block/unblock rejects a missing client. The contact settings switch and profile confirmation bind to their opening account generation, client and token; stale completions do not flip the switch, emit an old error into a live profile, or enqueue a contact refresh. Direct/group message reports use the actual room/event IDs and await the Matrix response; their dialog and queued event retain the opening account generation, and stale responses cannot appear as another account's result. The SDK still writes the initiating account's ignored-user account data. Moments post/comment entities now retain optional canonical room/event IDs, and an additive report capability verifies the exact Matrix event and account before submission. Feed/detail/video UI still needs to use that capability. The existing chat report success signal is sticky and awaits final targeted presentation triage. A protocol acknowledgement does not prove moderator receipt or action. Generated new UI strings are English fallbacks outside the source locale until localization is completed.
+- Next step: connect canonical Moments report actions in feed/detail/video with fail-closed draft behavior, then run final Chat tests/localization audit. Separately confirm deployed homeserver support, owned moderation handling and synthetic device acceptance before claiming operational coverage.
+
+### QR-001 Exact-asset payment requests need host integration
+
+- Severity: H
+- Added: 2026-09-27
+- Current state: Task 15B Chat source through `42de7970` implements and tests the optional exact wallet/repository capabilities, strict v1 URI parsing, selected-asset matching and decimal checks, repository/bloc/message identity propagation, and scanner, transfer, merchant/receive QR and payment-message UI. Legacy transfers remain available with unambiguous asset selection. The host has not yet opted into `IExactWalletTransfer`, pinned this Chat source or verified its adapter integration; no live transfer or deployment was tested.
+- Next step: explicitly implement the exact capability in the host bridge, map authoritative asset identity and selected receiver, pin the reviewed immutable Chat commit, and verify host integration. Other external account, UGC deletion and store/compliance issues remain separate and open; this QR source work does not resolve them.
+
+### DEP-001 Latest generator stack — resolved in Task 13A
+
+- Severity: M
+- Added: 2026-09-25; resolved: 2026-09-26
+- Resolution: Matrix 13 / drift 2.35 / sqlite3 3.6 release the old analyzer restriction. Stable build_runner 2.16.1, drift_dev 2.35, mockito 5.8.1 and injectable_generator 3.1.3 now resolve and normal generation succeeds. See `docs/testing/dependency-completion-2026-09-25/task13-storage.md`.
+
+### DEP-003 Secure storage 11 requires verified legacy credential import
+
+- Severity: H
+- Added: 2026-09-26
+- Current state: Task 13B's reviewed Android adapter passed direct APK upgrades from published v9 ESP and v10 RSA/GCM into the maintained 11.2.0 source. Chat now pins that source and the maintained facebook_auth_desktop plugin to immutable app commit `9733aa21eb7e4fa98c2aa8a287ef9588960023c2`; both Chat and example resolve the exact Git packages. Chat analysis and full suite pass. The consuming host still pins the old Chat commit and secure-storage 10, so its namespace migration and native release integration remain open.
+- Next step: Task 14 publishes this Chat integration, pins it from the host, applies both Git source overrides in the host's own dependency graph, configures the wallet/preference namespaces, and validates final host builds and device behavior. See `docs/testing/dependency-completion-2026-09-25/task14-chat-secure-source.md`.
+
+### DEP-004 Host native SQLCipher selection requires integration validation
+
+- Severity: H
+- Added: 2026-09-26
+- Current state: standalone Chat native hooks load SQLCipher 4.19 and real archive/Vodozemac tests pass on macOS. The host's existing Android AAR already contains `libsqlcipher.so`; blindly bundling the standalone hook asset would create a duplicate. The iOS host requires executable SQLCipher symbols. Host builds/device behavior have not been verified by Task 13A.
+- Next step: Task 14 configures entrypoint sqlite3 hooks for Android system library `sqlcipher`, iOS executable, and default SQLCipher asset, retains native linkage, and validates real archive opens/build outputs. Do not hide collisions with arbitrary pickFirst.
+
+### DEP-002 Background missed-call callbacks lack recipient account provenance
+
+- Severity: M
+- Added: 2026-09-26
+- Current state: the client now registers flat recipient MXID and generation fields through Matrix 13 pusher data, requires an exact `getPushers` echo before activating a local secure binding, and snapshots the account across registration awaits/retries. Routine same-account/device/token startup reuses the echoed generation so saved callbacks survive; logout, account switch, token change and expiry invalidate old generations. Background callback routing is retained only when the push fields match that binding; callback records use separate secure keys per account and native call ID. Verified background accepts can wait for account initialization and are rechecked before CallManager consumes them. Unknown, stale or expired bindings fail closed. Account switches, native ID-only callbacks, service recreation, storage failures and concurrent call records have automated coverage.
+- Upstream evidence: CallKit 3.1.6 Android still sends callback Bundle metadata, but its Dart adapter emits only the call ID; timed-out calls are removed from activeCalls and there is no public missed-call lookup API. The previous raw-event API exposed metadata. Separately, the old CallManager-generated missed notification already omitted its room ID.
+- Fixed path: notifications created with a known authenticated account retain minimal routing in secure storage (64 entries per account after cleanup, 24h TTL). Early callback IDs wait up to 90 seconds for account binding. Background records are consumed only by the matching account and current registration generation. No account is inferred from the current session alone.
+- Remaining verification gap: the repository documents a Sygnal gateway URL but does not identify the deployed gateway implementation/version or prove it forwards `default_payload`. The fixed upstream Sygnal composition and Matrix client/server echo are unit-level evidence only. Physical background/terminated Android/iOS notification acceptance remains unverified. Android `event_id_only` may carry only event/room IDs, so type/sender-dependent call recognition is still unavailable for such pushes; the client does not infer `m.call.invite` or decrypt in the background. Legacy native background accepts without recipient provenance fail closed unless the foreground service already created authenticated local call state. Confirm deployed gateway version/configuration and perform authorized two-account native device acceptance before closing DEP-002.
+
 ### GROUP-001 Token gates are not authoritative admission control across join paths
 
 - Severity: H
@@ -184,8 +227,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Severity: M
 - Added: 2026-03-20
 - Evidence: `lib/src/presentation/pages/settings/security_settings_page.dart`, `lib/src/core/utils/matrix_uia_utils.dart`, `lib/src/data/datasources/matrix/matrix_auth_datasource.dart`
-- Current state: account deactivation no longer forces a password up front, but the retry path only handles `m.login.password`. Homeservers that require SSO/passkey or other UIA stages still fail closed.
-- Next step: implement a generic UIA handler for deactivation instead of password-only fallback logic.
+- Current state: account deactivation no longer forces a password up front, but the settings page still retries only `m.login.password` and loses the UIA session. A decoded-challenge coordinator and an account-bound request/local-cleanup operation now exist in isolation; neither is connected to the settings page yet. SDK invalidation now conditionally clears the originating session and guards queued Bloc logout events by client generation. The old page still uses ordinary logout followed by optional global purge, and deletion-triggered SDK logout must be kept out of the ordinary logout path when the page is connected. Homeservers requiring SSO/passkey or other stages still fail closed in the visible flow.
+- Next step: connect the coordinator and operation to account-bound deactivation UI, bind deletion-triggered SDK events to the original generation without ordinary logout, then verify account-scoped cleanup and actual server behavior.
 
 ### SEC-005 iOS background APNs still bypasses client-side notification privacy mode
 

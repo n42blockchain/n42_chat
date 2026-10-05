@@ -187,6 +187,10 @@ class MatrixMetadataExtractor {
         token: event.content['token'] as String?,
         paymentRequestId: event.content['request_id'] as String?,
         paymentReceiverAddress: event.content['receiver_address'] as String?,
+        paymentChain: event.content['chain'] as String?,
+        paymentNetwork: event.content['network'] as String?,
+        paymentAssetType: event.content['asset_type'] as String?,
+        paymentAssetId: event.content['asset_id'] as String?,
         paymentRequestExpiresAt: expiresAtMillis != null
             ? DateTime.fromMillisecondsSinceEpoch(expiresAtMillis.toInt())
             : null,

@@ -28,6 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SecureStorageDataSource _secureStorage;
   final IdHubApi Function(String baseUrl) _idHubApiFactory;
   StreamSubscription<bool>? _loginStateSubscription;
+  StreamSubscription<AuthSessionInvalidation>? _accountInvalidationSubscription;
   bool _logoutInProgress = false;
 
   AuthBloc({
@@ -44,6 +45,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
+    on<AuthAccountDeletionConfirmed>(_onAccountDeletionConfirmed);
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AuthWalletAuthRequested>(_onWalletAuthRequested);
     on<AuthAnonymousRegisterRequested>(_onAnonymousRegisterRequested);
@@ -78,20 +80,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthErrorCleared>(_onErrorCleared);
 
     // 监听登录状态变化
-    _loginStateSubscription = _authRepository.loginStateStream.listen((
-      isLoggedIn,
-    ) {
-      final shouldForceLogout =
-          !isLoggedIn &&
-          !_logoutInProgress &&
-          state.status != AuthStatus.initial &&
-          state.status != AuthStatus.unauthenticated &&
-          state.status != AuthStatus.error;
-      if (shouldForceLogout) {
-        add(const AuthLogoutRequested());
-      }
-    });
+    if (_authRepository case final IAccountBoundAuthInvalidation accountBound) {
+      _accountInvalidationSubscription = accountBound.accountInvalidationStream
+          .listen((origin) {
+            if (origin.isCurrent && _shouldForceLogout()) {
+              add(AuthLogoutRequested(invalidation: origin));
+            }
+          });
+    } else {
+      _loginStateSubscription = _authRepository.loginStateStream.listen((
+        isLoggedIn,
+      ) {
+        if (!isLoggedIn && _shouldForceLogout()) {
+          add(const AuthLogoutRequested());
+        }
+      });
+    }
   }
+
+  bool _shouldForceLogout() =>
+      !_logoutInProgress &&
+      state.status != AuthStatus.initial &&
+      state.status != AuthStatus.unauthenticated &&
+      state.status != AuthStatus.error;
 
   Future<void> _completeAuthenticatedFlow(
     UserEntity user,
@@ -167,30 +178,55 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthLogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    if (_logoutInProgress) {
+    bool originIsCurrent() => event.invalidation?.isCurrent ?? true;
+    if (_logoutInProgress || !originIsCurrent()) {
       return;
     }
     _logoutInProgress = true;
     emit(state.copyWith(status: AuthStatus.loading));
 
-    // 登出前取消推送注册
-    await _unregisterPushNotifications();
-
     try {
+      if (!originIsCurrent()) return;
+      // Check the original client generation before either push or logout
+      // side effects; a queued SDK event may outlive a switch to account B.
+      await _unregisterPushNotifications();
+      if (!originIsCurrent()) return;
       await _authRepository.logout();
+      if (!originIsCurrent()) return;
       await N42Chat.disposeCallManager();
+      if (!originIsCurrent()) return;
       N42Chat.notifyUserChanged();
 
       emit(
         const AuthState.initial().copyWith(status: AuthStatus.unauthenticated),
       );
     } catch (e) {
+      if (!originIsCurrent()) return;
       unawaited(_registerPushNotifications());
       emit(
         state.copyWith(status: AuthStatus.error, errorMessage: e.toString()),
       );
     } finally {
       _logoutInProgress = false;
+    }
+  }
+
+  void _onAccountDeletionConfirmed(
+    AuthAccountDeletionConfirmed event,
+    Emitter<AuthState> emit,
+  ) {
+    final generation = event.generation;
+    if (_authRepository case final IConfirmedAccountDeletionGeneration proof) {
+      if (!generation.isSameGeneration ||
+          !proof.isConfirmedDeletionGeneration(generation) ||
+          state.status != AuthStatus.authenticated ||
+          state.user?.userId != generation.userId) {
+        return;
+      }
+      emit(
+        const AuthState.initial().copyWith(status: AuthStatus.unauthenticated),
+      );
+      N42Chat.notifyUserChanged();
     }
   }
 
@@ -1766,6 +1802,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   @override
   Future<void> close() {
     _loginStateSubscription?.cancel();
+    _accountInvalidationSubscription?.cancel();
     return super.close();
   }
 }

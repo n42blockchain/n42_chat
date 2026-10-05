@@ -1,9 +1,11 @@
 import 'package:n42_chat/src/core/encryption/local_room_key_store.dart';
+import 'package:n42_chat/src/core/encryption/account_session_index.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 import 'package:mocktail/mocktail.dart';
@@ -12,7 +14,12 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_auth_datasource.dart
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/remote/social_auth_api.dart';
 import 'package:n42_chat/src/data/repositories/auth_repository_impl.dart';
+import 'package:n42_chat/src/data/services/matrix_account_deletion_session.dart';
+import 'package:n42_chat/src/data/services/matrix_account_deletion_operation.dart';
+import 'package:n42_chat/src/data/services/matrix_pending_deletion_store.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
+import 'package:n42_chat/src/core/utils/matrix_deletion_uia_coordinator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockAuth extends Mock implements MatrixAuthDataSource {}
 
@@ -426,20 +433,549 @@ void main() {
   });
   for (final state in [LoginState.loggedOut, LoginState.softLoggedOut]) {
     test('SDK $state invalidates the local session after login', () async {
+      final currentClient = MockClient();
+      when(() => currentClient.userID).thenReturn(session['userId']);
+      when(
+        () => currentClient.homeserver,
+      ).thenReturn(Uri.parse(session['homeserver']!));
+      when(() => currentClient.deviceID).thenReturn(session['deviceId']);
+      when(() => manager.client).thenReturn(currentClient);
+      when(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse(session['homeserver']!),
+        ),
+      ).thenAnswer((_) async {});
       await tokenLogin();
       final loggedOut = repository.loginStateStream.firstWhere(
         (value) => !value,
       );
+      final invalidation = repository.accountInvalidationStream.first;
       sdk.add(state);
       expect(await loggedOut, isFalse);
-      verify(storage.clearSession).called(1);
+      expect((await invalidation).userId, session['userId']);
+      verify(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse(session['homeserver']!),
+        ),
+      ).called(1);
     });
   }
+
+  test('SDK expiry invalidates a token session without a device ID', () async {
+    final client = MockClient();
+    when(() => client.userID).thenReturn(session['userId']);
+    when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => client.deviceID).thenReturn(null);
+    when(() => client.accessToken).thenReturn(session['accessToken']);
+    when(() => manager.client).thenReturn(client);
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {});
+    await tokenLogin();
+    final notice = repository.accountInvalidationStream.first;
+    sdk.add(LoginState.softLoggedOut);
+    expect((await notice.timeout(const Duration(seconds: 1))).deviceId, isNull);
+    verify(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).called(1);
+  });
+
+  test('pending SDK expiry survives same-account auth finalization', () async {
+    final client = MockClient();
+    when(() => client.userID).thenReturn(session['userId']);
+    when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => client.deviceID).thenReturn('device');
+    when(() => manager.client).thenReturn(client);
+    when(() => auth.isLoggedIn).thenReturn(true);
+    when(
+      () => client.getAccountData(session['userId']!, 'n42.user.profile'),
+    ).thenAnswer((_) async => <String, Object?>{});
+    final profileEntered = Completer<void>();
+    final profileRelease = Completer<Profile>();
+    when(() => manager.getUserProfile(session['userId']!)).thenAnswer((_) {
+      profileEntered.complete();
+      return profileRelease.future;
+    });
+    final clearEntered = Completer<void>();
+    final clearRelease = Completer<void>();
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {
+      clearEntered.complete();
+      await clearRelease.future;
+    });
+    final notice = repository.accountInvalidationStream.first;
+    final loginFuture = login();
+    await profileEntered.future;
+    sdk.add(LoginState.loggedOut);
+    await Future<void>.delayed(Duration.zero);
+    profileRelease.complete(Profile(userId: session['userId']!));
+    expect((await loginFuture).success, isTrue);
+    await clearEntered.future;
+    clearRelease.complete();
+    expect(
+      (await notice.timeout(const Duration(seconds: 1))).userId,
+      session['userId'],
+    );
+  });
+
+  test('pending SDK expiry cannot invalidate a switched account', () async {
+    final a = MockClient();
+    final b = MockClient();
+    when(() => a.userID).thenReturn(session['userId']);
+    when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => a.deviceID).thenReturn('device');
+    when(() => b.userID).thenReturn('@bob:hs.test');
+    when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => b.deviceID).thenReturn('B-device');
+    when(() => manager.client).thenReturn(a);
+    when(() => auth.isLoggedIn).thenReturn(true);
+    when(
+      () => a.getAccountData(session['userId']!, 'n42.user.profile'),
+    ).thenAnswer((_) async => <String, Object?>{});
+    final profileEntered = Completer<void>();
+    final profileRelease = Completer<Profile>();
+    when(() => manager.getUserProfile(session['userId']!)).thenAnswer((_) {
+      profileEntered.complete();
+      return profileRelease.future;
+    });
+    final clearEntered = Completer<void>();
+    final clearRelease = Completer<void>();
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {
+      clearEntered.complete();
+      await clearRelease.future;
+    });
+    final notices = <AuthSessionInvalidation>[];
+    final subscription = repository.accountInvalidationStream.listen(
+      notices.add,
+    );
+    addTearDown(subscription.cancel);
+    final boolEvents = <bool>[];
+    final boolSubscription = repository.loginStateStream.listen(boolEvents.add);
+    addTearDown(boolSubscription.cancel);
+    final loginFuture = login();
+    await profileEntered.future;
+    sdk.add(LoginState.loggedOut);
+    await Future<void>.delayed(Duration.zero);
+    profileRelease.complete(Profile(userId: session['userId']!));
+    expect((await loginFuture).success, isTrue);
+    await clearEntered.future;
+    when(() => manager.client).thenReturn(b);
+    clearRelease.complete();
+    await Future<void>.delayed(Duration.zero);
+    expect(notices, isEmpty);
+    expect(boolEvents, isNot(contains(false)));
+  });
+
+  test('SDK A logout paused during storage cannot invalidate B', () async {
+    final a = MockClient();
+    final b = MockClient();
+    when(() => a.userID).thenReturn(session['userId']);
+    when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => a.deviceID).thenReturn('device');
+    when(() => b.userID).thenReturn('@bob:hs.test');
+    when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => b.deviceID).thenReturn('B-device');
+    when(() => b.accessToken).thenReturn('B-token');
+    when(() => manager.client).thenReturn(a);
+    final entered = Completer<void>();
+    final release = Completer<void>();
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {
+      entered.complete();
+      await release.future;
+    });
+    final notices = <AuthSessionInvalidation>[];
+    final subscription = repository.accountInvalidationStream.listen(
+      notices.add,
+    );
+    addTearDown(subscription.cancel);
+    final boolEvents = <bool>[];
+    final boolSubscription = repository.loginStateStream.listen(boolEvents.add);
+    addTearDown(boolSubscription.cancel);
+    await tokenLogin();
+    sdk.add(LoginState.loggedOut);
+    await entered.future;
+    when(() => manager.client).thenReturn(b);
+    final switched = await repository.loginWithToken(
+      homeserver: 'https://hs.test',
+      accessToken: 'B-token',
+      userId: '@bob:hs.test',
+      deviceId: 'B-device',
+    );
+    expect(switched.success, isTrue);
+    release.complete();
+    await Future<void>.delayed(Duration.zero);
+    expect(notices, isEmpty);
+    expect(boolEvents, isNot(contains(false)));
+    verifyNever(storage.clearSession);
+  });
+
+  test('SDK A logout is stale after A to B to A monitor generation', () async {
+    final a = MockClient();
+    final b = MockClient();
+    when(() => a.userID).thenReturn(session['userId']);
+    when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => a.deviceID).thenReturn('device');
+    when(() => a.accessToken).thenReturn('A-token');
+    when(() => b.userID).thenReturn('@bob:hs.test');
+    when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => b.deviceID).thenReturn('B-device');
+    when(() => b.accessToken).thenReturn('B-token');
+    when(() => manager.client).thenReturn(a);
+    final entered = Completer<void>();
+    final release = Completer<void>();
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {
+      entered.complete();
+      await release.future;
+    });
+    final notices = <AuthSessionInvalidation>[];
+    final subscription = repository.accountInvalidationStream.listen(
+      notices.add,
+    );
+    addTearDown(subscription.cancel);
+    final boolEvents = <bool>[];
+    final boolSubscription = repository.loginStateStream.listen(boolEvents.add);
+    addTearDown(boolSubscription.cancel);
+    await tokenLogin();
+    sdk.add(LoginState.loggedOut);
+    await entered.future;
+    when(() => manager.client).thenReturn(b);
+    await repository.loginWithToken(
+      homeserver: 'https://hs.test',
+      accessToken: 'B-token',
+      userId: '@bob:hs.test',
+      deviceId: 'B-device',
+    );
+    when(() => manager.client).thenReturn(a);
+    await tokenLogin();
+    release.complete();
+    await Future<void>.delayed(Duration.zero);
+    expect(notices, isEmpty);
+    expect(boolEvents, isNot(contains(false)));
+  });
+
+  test(
+    'SDK clear can null client identity before same-generation event',
+    () async {
+      final a = MockClient();
+      String? user = session['userId'];
+      Uri? homeserver = Uri.parse('https://hs.test');
+      String? device = 'device';
+      when(() => a.userID).thenAnswer((_) => user);
+      when(() => a.homeserver).thenAnswer((_) => homeserver);
+      when(() => a.deviceID).thenAnswer((_) => device);
+      when(() => manager.client).thenReturn(a);
+      when(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse('https://hs.test'),
+        ),
+      ).thenAnswer((_) async {});
+      await tokenLogin();
+      final notice = repository.accountInvalidationStream.first;
+      user = null;
+      homeserver = null;
+      device = null;
+      sdk.add(LoginState.loggedOut);
+      expect((await notice).userId, session['userId']);
+      verify(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse('https://hs.test'),
+        ),
+      ).called(1);
+    },
+  );
+  test('confirmed deletion clear cannot emit an ordinary logout', () async {
+    final client = MockClient();
+    String? user = session['userId'];
+    Uri? homeserver = Uri.parse('https://hs.test');
+    String? device = 'device';
+    when(() => client.userID).thenAnswer((_) => user);
+    when(() => client.homeserver).thenAnswer((_) => homeserver);
+    when(() => client.deviceID).thenAnswer((_) => device);
+    when(() => manager.client).thenReturn(client);
+    when(() => client.clear(reason: SessionClearReason.logout)).thenAnswer((
+      _,
+    ) async {
+      user = null;
+      homeserver = null;
+      device = null;
+      sdk.add(LoginState.loggedOut);
+    });
+    await tokenLogin();
+    final lifecycle = repository as IAccountBoundDeletionLifecycle;
+    final origin = lifecycle.currentAccountGeneration!;
+    final notices = <AuthSessionInvalidation>[];
+    final noticeSubscription = repository.accountInvalidationStream.listen(
+      notices.add,
+    );
+    addTearDown(noticeSubscription.cancel);
+    final boolEvents = <bool>[];
+    final boolSubscription = repository.loginStateStream.listen(boolEvents.add);
+    addTearDown(boolSubscription.cancel);
+    final server = Completer<void>();
+    final request = lifecycle.runAccountDeletionRequest(
+      origin,
+      () => server.future,
+    );
+    sdk.add(LoginState.softLoggedOut);
+    await Future<void>.delayed(Duration.zero);
+    verifyNever(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    );
+    server.complete();
+    await request;
+    await client.clear(reason: SessionClearReason.logout);
+    await Future<void>.delayed(Duration.zero);
+    expect(origin.isSameGeneration, isTrue);
+    expect(origin.isCurrent, isFalse);
+    expect(notices, isEmpty);
+    expect(boolEvents, isNot(contains(false)));
+    verifyNever(storage.clearSession);
+  });
+
+  test(
+    'failed deletion request replays pending same-generation expiry',
+    () async {
+      final client = MockClient();
+      when(() => client.userID).thenReturn(session['userId']);
+      when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => client.deviceID).thenReturn('device');
+      when(() => manager.client).thenReturn(client);
+      when(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse('https://hs.test'),
+        ),
+      ).thenAnswer((_) async {});
+      await tokenLogin();
+      final lifecycle = repository as IAccountBoundDeletionLifecycle;
+      final origin = lifecycle.currentAccountGeneration!;
+      final notice = repository.accountInvalidationStream.first;
+      final server = Completer<void>();
+      final request = lifecycle.runAccountDeletionRequest(
+        origin,
+        () => server.future,
+      );
+      sdk.add(LoginState.loggedOut);
+      await Future<void>.delayed(Duration.zero);
+      verifyNever(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse('https://hs.test'),
+        ),
+      );
+      final rejected = expectLater(request, throwsStateError);
+      server.completeError(StateError('fixture server rejection'));
+      await rejected;
+      expect(
+        (await notice.timeout(const Duration(seconds: 1))).userId,
+        session['userId'],
+      );
+      verify(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse('https://hs.test'),
+        ),
+      ).called(1);
+    },
+  );
+
+  test(
+    'failed A deletion cannot replay its pending logout against B',
+    () async {
+      final a = MockClient();
+      final b = MockClient();
+      when(() => a.userID).thenReturn(session['userId']);
+      when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => a.deviceID).thenReturn('device');
+      when(() => b.userID).thenReturn('@bob:hs.test');
+      when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => b.deviceID).thenReturn('B-device');
+      when(() => b.accessToken).thenReturn('B-token');
+      when(() => manager.client).thenReturn(a);
+      when(
+        () => storage.clearSessionIfMatches(
+          '@bob:hs.test',
+          Uri.parse('https://hs.test'),
+        ),
+      ).thenAnswer((_) async {});
+      await tokenLogin();
+      final lifecycle = repository as IAccountBoundDeletionLifecycle;
+      final oldA = lifecycle.currentAccountGeneration!;
+      final notices = <AuthSessionInvalidation>[];
+      final subscription = repository.accountInvalidationStream.listen(
+        notices.add,
+      );
+      addTearDown(subscription.cancel);
+      final server = Completer<void>();
+      final request = lifecycle.runAccountDeletionRequest(
+        oldA,
+        () => server.future,
+      );
+      sdk.add(LoginState.loggedOut);
+      await Future<void>.delayed(Duration.zero);
+      when(() => manager.client).thenReturn(b);
+      await repository.loginWithToken(
+        homeserver: 'https://hs.test',
+        accessToken: 'B-token',
+        userId: '@bob:hs.test',
+        deviceId: 'B-device',
+      );
+      final rejected = expectLater(request, throwsStateError);
+      server.completeError(StateError('fixture server rejection'));
+      await rejected;
+      expect(oldA.isSameGeneration, isFalse);
+      expect(notices, isEmpty);
+      final bNotice = repository.accountInvalidationStream.first;
+      sdk.add(LoginState.loggedOut);
+      expect(
+        (await bNotice.timeout(const Duration(seconds: 1))).userId,
+        '@bob:hs.test',
+      );
+    },
+  );
+
+  test(
+    'old confirmed A generation does not suppress later A after ABA',
+    () async {
+      final a = MockClient();
+      final b = MockClient();
+      when(() => a.userID).thenReturn(session['userId']);
+      when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => a.deviceID).thenReturn('device');
+      when(() => a.accessToken).thenReturn(session['accessToken']);
+      when(() => b.userID).thenReturn('@bob:hs.test');
+      when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => b.deviceID).thenReturn('B-device');
+      when(() => b.accessToken).thenReturn('B-token');
+      when(() => manager.client).thenReturn(a);
+      when(
+        () => storage.clearSessionIfMatches(
+          session['userId']!,
+          Uri.parse('https://hs.test'),
+        ),
+      ).thenAnswer((_) async {});
+      when(
+        () => storage.clearSessionIfMatches(
+          '@bob:hs.test',
+          Uri.parse('https://hs.test'),
+        ),
+      ).thenAnswer((_) async {});
+      await tokenLogin();
+      final lifecycle = repository as IAccountBoundDeletionLifecycle;
+      final oldA = lifecycle.currentAccountGeneration!;
+      final server = Completer<void>();
+      final request = lifecycle.runAccountDeletionRequest(
+        oldA,
+        () => server.future,
+      );
+      when(() => manager.client).thenReturn(b);
+      await repository.loginWithToken(
+        homeserver: 'https://hs.test',
+        accessToken: 'B-token',
+        userId: '@bob:hs.test',
+        deviceId: 'B-device',
+      );
+      final bNotice = repository.accountInvalidationStream.first;
+      sdk.add(LoginState.loggedOut);
+      expect(
+        (await bNotice.timeout(const Duration(seconds: 1))).userId,
+        '@bob:hs.test',
+      );
+      when(() => manager.client).thenReturn(a);
+      await tokenLogin();
+      server.complete();
+      await request;
+      expect(oldA.isSameGeneration, isFalse);
+      final currentA = lifecycle.currentAccountGeneration!;
+      expect(currentA.isCurrent, isTrue);
+      final notice = repository.accountInvalidationStream.first;
+      sdk.add(LoginState.loggedOut);
+      expect(
+        (await notice.timeout(const Duration(seconds: 1))).userId,
+        session['userId'],
+      );
+    },
+  );
+
+  test('deletion guard invalidates a previously queued SDK notice', () async {
+    final client = MockClient();
+    when(() => client.userID).thenReturn(session['userId']);
+    when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => client.deviceID).thenReturn('device');
+    when(() => manager.client).thenReturn(client);
+    when(
+      () => storage.clearSessionIfMatches(
+        session['userId']!,
+        Uri.parse('https://hs.test'),
+      ),
+    ).thenAnswer((_) async {});
+    await tokenLogin();
+    final lifecycle = repository as IAccountBoundDeletionLifecycle;
+    final queued = repository.accountInvalidationStream.first;
+    sdk.add(LoginState.loggedOut);
+    final origin = await queued.timeout(const Duration(seconds: 1));
+    expect(origin.isCurrent, isTrue);
+    final server = Completer<void>();
+    final request = lifecycle.runAccountDeletionRequest(
+      origin,
+      () => server.future,
+    );
+    expect(origin.isCurrent, isFalse);
+    server.complete();
+    await request;
+    expect(origin.isCurrent, isFalse);
+  });
+
   test(
     'logout from replaced client cannot clear the switched account session',
     () async {
       final oldClient = MockClient();
       final newClient = MockClient();
+      when(() => oldClient.userID).thenReturn(session['userId']);
+      when(() => oldClient.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => oldClient.deviceID).thenReturn('device');
+      when(() => newClient.userID).thenReturn('@bob:hs.test');
+      when(() => newClient.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => newClient.deviceID).thenReturn('B-device');
+      when(() => newClient.accessToken).thenReturn('B-token');
+      when(
+        () => storage.clearSessionIfMatches(
+          '@bob:hs.test',
+          Uri.parse('https://hs.test'),
+        ),
+      ).thenAnswer((_) async {});
       when(() => manager.client).thenReturn(oldClient);
       expect((await tokenLogin()).success, isTrue);
 
@@ -452,7 +988,12 @@ void main() {
           deviceId: any(named: 'deviceId'),
         ),
       ).thenAnswer((_) => replacement.future);
-      final switching = tokenLogin();
+      final switching = repository.loginWithToken(
+        homeserver: 'https://hs.test',
+        accessToken: 'B-token',
+        userId: '@bob:hs.test',
+        deviceId: 'B-device',
+      );
       sdk.add(LoginState.loggedOut);
       await Future<void>.delayed(Duration.zero);
       when(() => manager.client).thenReturn(newClient);
@@ -466,7 +1007,12 @@ void main() {
       );
       sdk.add(LoginState.loggedOut);
       expect(await loggedOut, isFalse);
-      verify(storage.clearSession).called(1);
+      verify(
+        () => storage.clearSessionIfMatches(
+          '@bob:hs.test',
+          Uri.parse('https://hs.test'),
+        ),
+      ).called(1);
     },
   );
   test(
@@ -608,4 +1154,185 @@ void main() {
       AuthErrorType.serverError,
     );
   });
+
+  test(
+    'real lifecycle and session clear unchanged A after confirmation',
+    () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({});
+      final client = MockClient();
+      String? user = session['userId'];
+      Uri? server = Uri.parse('https://hs.test');
+      String? device = 'device';
+      when(() => client.userID).thenAnswer((_) => user);
+      when(() => client.homeserver).thenAnswer((_) => server);
+      when(() => client.deviceID).thenAnswer((_) => device);
+      when(() => client.isLogged()).thenReturn(true);
+      when(() => manager.client).thenReturn(client);
+      when(() => manager.isLoggedIn).thenReturn(true);
+      when(
+        () => client.deactivateAccount(auth: null, erase: true),
+      ).thenAnswer((_) async => IdServerUnbindResult.success);
+      when(() => client.clear(reason: SessionClearReason.logout)).thenAnswer((
+        _,
+      ) async {
+        user = null;
+        server = null;
+        device = null;
+        sdk.add(LoginState.loggedOut);
+      });
+      when(
+        () => manager.clearCapturedClientForDeletion(client, any()),
+      ).thenAnswer((call) async {
+        final owns = call.positionalArguments[1] as bool Function();
+        if (!owns()) return false;
+        await client.clear(reason: SessionClearReason.logout);
+        return true;
+      });
+      await tokenLogin();
+      final flow = MatrixAccountDeletionSession.capture(
+        lifecycle: repository,
+        manager: manager,
+        storage: SecureStorageDataSource(),
+        roomKeys: LocalRoomKeyStore(),
+        accountSessions: AccountSessionIndex(),
+        journal: MatrixPendingDeletionStore(),
+        erase: true,
+      );
+
+      expect(await flow.start(), DeletionUiaStatus.deactivated);
+      expect(await flow.cleanupConfirmed(), DeletionCleanupStatus.complete);
+      expect(await MatrixPendingDeletionStore().list(), isEmpty);
+      verify(() => client.clear(reason: SessionClearReason.logout)).called(1);
+      verifyNever(storage.clearSession);
+    },
+  );
+
+  test('real lifecycle defers old A cleanup after switching to B', () async {
+    FlutterSecureStorage.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({});
+    final a = MockClient();
+    final b = MockClient();
+    when(() => a.userID).thenReturn(session['userId']);
+    when(() => a.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => a.deviceID).thenReturn('device');
+    when(() => a.isLogged()).thenReturn(true);
+    when(() => b.userID).thenReturn('@bob:hs.test');
+    when(() => b.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => b.deviceID).thenReturn('B-device');
+    when(() => manager.client).thenReturn(a);
+    when(() => manager.isLoggedIn).thenReturn(true);
+    final response = Completer<IdServerUnbindResult>();
+    when(
+      () => a.deactivateAccount(auth: null, erase: true),
+    ).thenAnswer((_) => response.future);
+    await tokenLogin();
+    final flow = MatrixAccountDeletionSession.capture(
+      lifecycle: repository,
+      manager: manager,
+      storage: SecureStorageDataSource(),
+      roomKeys: LocalRoomKeyStore(),
+      accountSessions: AccountSessionIndex(),
+      journal: MatrixPendingDeletionStore(),
+      erase: true,
+    );
+    final pending = flow.start();
+    when(() => manager.client).thenReturn(b);
+    response.complete(IdServerUnbindResult.success);
+
+    expect(await pending, DeletionUiaStatus.deactivatedNeedsScopedCleanup);
+    expect(
+      await flow.cleanupConfirmed(),
+      DeletionCleanupStatus.deferredClientClear,
+    );
+    expect(
+      (await MatrixPendingDeletionStore().list()).single.userId,
+      session['userId'],
+    );
+    verifyNever(() => a.clear(reason: SessionClearReason.logout));
+    verifyNever(() => b.clear(reason: SessionClearReason.logout));
+  });
+
+  test(
+    'same account fields on another SDK client cannot bind a request',
+    () async {
+      final a = MockClient();
+      final b = MockClient();
+      for (final client in [a, b]) {
+        when(() => client.userID).thenReturn(session['userId']);
+        when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+        when(() => client.deviceID).thenReturn('device');
+        when(() => client.isLogged()).thenReturn(true);
+      }
+      when(() => manager.client).thenReturn(a);
+      final otherManager = MockManager();
+      when(() => otherManager.client).thenReturn(b);
+      when(() => otherManager.isLoggedIn).thenReturn(true);
+      await tokenLogin();
+
+      expect(
+        () => MatrixAccountDeletionSession.capture(
+          lifecycle: repository,
+          manager: otherManager,
+          storage: SecureStorageDataSource(),
+          roomKeys: LocalRoomKeyStore(),
+          accountSessions: AccountSessionIndex(),
+          journal: MatrixPendingDeletionStore(),
+          erase: true,
+        ),
+        throwsStateError,
+      );
+      verifyNever(() => b.deactivateAccount(auth: null, erase: true));
+    },
+  );
+
+  test(
+    'real null-device token generation can confirm and clear its client',
+    () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({});
+      final client = MockClient();
+      String? user = session['userId'];
+      Uri? server = Uri.parse('https://hs.test');
+      when(() => client.userID).thenAnswer((_) => user);
+      when(() => client.homeserver).thenAnswer((_) => server);
+      when(() => client.deviceID).thenReturn(null);
+      when(() => client.isLogged()).thenReturn(true);
+      when(() => manager.client).thenReturn(client);
+      when(() => manager.isLoggedIn).thenReturn(true);
+      when(
+        () => client.deactivateAccount(auth: null, erase: true),
+      ).thenAnswer((_) async => IdServerUnbindResult.success);
+      when(() => client.clear(reason: SessionClearReason.logout)).thenAnswer((
+        _,
+      ) async {
+        user = null;
+        server = null;
+        sdk.add(LoginState.loggedOut);
+      });
+      when(
+        () => manager.clearCapturedClientForDeletion(client, any()),
+      ).thenAnswer((call) async {
+        final owns = call.positionalArguments[1] as bool Function();
+        if (!owns()) return false;
+        await client.clear(reason: SessionClearReason.logout);
+        return true;
+      });
+      await tokenLogin();
+      final flow = MatrixAccountDeletionSession.capture(
+        lifecycle: repository,
+        manager: manager,
+        storage: SecureStorageDataSource(),
+        roomKeys: LocalRoomKeyStore(),
+        accountSessions: AccountSessionIndex(),
+        journal: MatrixPendingDeletionStore(),
+        erase: true,
+      );
+
+      expect(flow.generation.deviceId, isNull);
+      expect(await flow.start(), DeletionUiaStatus.deactivated);
+      expect(await flow.cleanupConfirmed(), DeletionCleanupStatus.complete);
+      verify(() => client.clear(reason: SessionClearReason.logout)).called(1);
+    },
+  );
 }

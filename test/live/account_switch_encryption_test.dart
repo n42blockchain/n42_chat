@@ -42,7 +42,7 @@ void main() {
       final dir = await Directory.systemTemp.createTemp('n42-live-crypto-');
       addTearDown(() => dir.delete(recursive: true));
       await Link('${dir.path}/libvodozemac_bindings_dart.dylib').create(
-        '$root/macos/flutter_vodozemac/flutter_vodozemac.xcframework/macos-arm64_x86_64/flutter_vodozemac.framework/flutter_vodozemac',
+        '$root/macos/flutter_vodozemac/flutter_vodozemac.xcframework/macos-arm64_x86_64/libflutter_vodozemac.dylib',
       );
       await vod.init(libraryPath: '${dir.path}/');
       sqfliteFfiInit();
@@ -302,6 +302,10 @@ void main() {
       }
     },
     timeout: const Timeout(Duration(minutes: 4)),
-    skip: !Platform.isMacOS || Platform.environment['N42_QA_STATE'] == null,
+    skip: !Platform.isMacOS
+        ? 'Requires macOS with the native crypto library.'
+        : Platform.environment['N42_QA_STATE'] == null
+        ? 'Requires an N42_QA_STATE file with disposable QA accounts.'
+        : null,
   );
 }

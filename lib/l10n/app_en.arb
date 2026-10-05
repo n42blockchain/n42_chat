@@ -841,6 +841,24 @@
   "searchConversationLabel": "Conversation",
   "searchMessageLabel": "Message",
   "settingsSecurityTitle": "Security",
+  "settingsDeleteAccountTitle": "Delete account",
+  "settingsDeleteAccountSubtitle": "Deactivate this Matrix account and clean up its local chat data",
+  "settingsDeleteAccountExplanation": "This requests permanent Matrix account deactivation. After server confirmation, this app removes this account's local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.",
+  "settingsDeleteAccountPasswordOptional": "Matrix password, if requested",
+  "settingsDeleteAccountServerErase": "Request server data erasure",
+  "settingsDeleteAccountServerEraseDetail": "Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.",
+  "settingsDeleteAccountChooseStage": "Verify this Matrix account",
+  "settingsDeleteAccountUsePassword": "Use Matrix password",
+  "settingsDeleteAccountUseBrowser": "Continue in browser",
+  "settingsDeleteAccountFallbackTitle": "Return from Matrix verification",
+  "settingsDeleteAccountFallbackExplanation": "Returning from the browser does not confirm deletion. Check the original request with the Matrix server.",
+  "settingsDeleteAccountCheckServer": "Check with server",
+  "settingsDeleteAccountRequestFailed": "The Matrix server did not confirm account deletion.",
+  "settingsDeleteAccountPendingTitle": "Pending local account cleanup",
+  "settingsDeleteAccountPendingSubtitle": "Review cleanup for a previously deactivated Matrix account",
+  "settingsDeleteAccountPendingReadError": "Unable to read pending cleanup records. Tap to retry.",
+  "settingsDeleteAccountPendingDetail": "The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.",
+  "settingsDeleteAccountManagementNotConfirmed": "Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.",
   "settingsKeyBackup": "Key Backup",
   "settingsBackupEncryptionKeys": "Backup Encryption Keys",
   "settingsKeysBackedUp": "{count} keys backed up",
@@ -2334,6 +2352,12 @@
   "chatSendRedPacketInChat": "Please send red packet in chat",
   "commonSaveFailed": "Save failed",
   "reportSelectReason": "Please select a reason",
+  "reportUnavailable": "Sign in to send a report.",
+  "reportAccountChanged": "Account changed. Open this report again to send it.",
+  "reportUnsupported": "This homeserver does not support user reports.",
+  "reportRoomUnsupported": "This homeserver does not support room reports.",
+  "reportRateLimited": "Too many reports. Please try again later.",
+  "reportCouldNotSend": "Could not send report. Please try again.",
   "gameCenter": "Games",
   "gameHighScore": "Best",
   "gameScore": "Score",
@@ -2837,5 +2861,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "transferAssetUnavailable": "Payment asset is unavailable",
+  "transferPaymentRequestUnavailable": "Payment request is unavailable"
 }

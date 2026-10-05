@@ -384,7 +384,9 @@ void main() {
   test('room permission denial prevents a gate state write', () async {
     when(() => room.canSendEvent('n42.token_gate')).thenReturn(false);
     when(() => client.userID).thenReturn('@me:test');
-    when(() => room.getPowerLevelByUserId('@me:test')).thenReturn(0);
+    when(
+      () => room.getPowerLevelByUserId('@me:test'),
+    ).thenReturn(matrix.PowerLevel(0));
     await expectLater(
       repository.setTokenGate(
         roomId,

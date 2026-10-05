@@ -113,6 +113,18 @@ abstract class IMomentRepository {
   Future<void> refreshMoments();
 }
 
+/// Optional reporting capability; existing moment repository implementers
+/// keep their current method contract.
+abstract interface class IMomentReportRepository {
+  Future<void> reportMoment(MomentEntity moment, String reason);
+
+  Future<void> reportComment(
+    MomentEntity moment,
+    MomentComment comment,
+    String reason,
+  );
+}
+
 /// 动态媒体输入
 class MomentMediaInput {
   /// 文件字节

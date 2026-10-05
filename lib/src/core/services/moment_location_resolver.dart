@@ -8,10 +8,9 @@ Future<MomentLocation> resolveMomentLocation(
   double longitude,
 ) async {
   try {
-    final places = await placemarkFromCoordinates(
-      latitude,
-      longitude,
-    ).timeout(const Duration(seconds: 8));
+    final places = await Geocoding()
+        .placemarkFromCoordinates(latitude, longitude)
+        .timeout(const Duration(seconds: 8));
     if (places.isNotEmpty) {
       final place = places.first;
       final parts = <String>{};
