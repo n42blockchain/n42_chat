@@ -6,12 +6,9 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
   String _smartReplyLanguageTag() =>
       Localizations.localeOf(context).toLanguageTag();
 
-  void _resetAiSmartReplyState({bool clearAnchor = false}) {
+  void _resetAiSmartReplyState() {
     _smartReplySuggestions = const [];
     _isLoadingSmartReplySuggestions = false;
-    if (clearAnchor) {
-      _smartReplyAnchorMessageId = null;
-    }
   }
 
   Widget _buildAiRewriteBar() {
@@ -62,9 +59,8 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
         .catchError((Object e) {
           if (mounted) {
             setState(() => _isRewriting = false);
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('AI rewrite failed: $e')));
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('AI rewrite failed: $e')));
           }
         });
   }
@@ -82,16 +78,17 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
   }
 
   void _openAiAssistant() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const AiAssistantPage()));
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => const AiAssistantPage()));
   }
 
-  /// 群聊消息摘要
-  void _summarizeRecentMessages() {
-    if (!aiServiceAvailable() || _isAiSummarizing) return;
-    final messages = context.read<ChatBloc>().state.messages;
-    final textMessages = messages
+  /// 群聊消息摘要。消息离开设备前，用户必须逐条选择本次授权内容。
+  Future<void> _summarizeRecentMessages() async {
+    if (!aiServiceAvailable() || _isAiSummarizing || _isAiSummaryConsentOpen) {
+      return;
+    }
+    final initialState = context.read<ChatBloc>().state;
+    final candidates = initialState.messages
         .where(
           (m) =>
               m.type == MessageType.text &&
@@ -102,39 +99,103 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
         )
         .take(50)
         .toList()
-        .reversed;
-    if (textMessages.isEmpty) return;
-    final texts = textMessages
+        .reversed
+        .toList();
+    if (candidates.isEmpty) return;
+
+    final manager = MatrixClientManager.instance;
+    final approvedClient = manager.client;
+    final approvedUserId = manager.userId;
+    final approvedRoomId = widget.conversation.id;
+    _isAiSummaryConsentOpen = true;
+    final selectedIds = await showDialog<Set<String>>(
+      context: context,
+      builder: (_) => AiMessageConsentDialog(
+        messages: candidates
+            .map(
+              (message) => AiMessageConsentItem(
+                id: message.id,
+                sender: message.senderName.isEmpty
+                    ? (message.isFromMe ? 'Me' : 'Other')
+                    : message.senderName,
+                content: message.content,
+              ),
+            )
+            .toList(),
+      ),
+    );
+    _isAiSummaryConsentOpen = false;
+    if (!mounted || selectedIds == null || selectedIds.isEmpty) return;
+
+    final currentState = context.read<ChatBloc>().state;
+    final currentMessagesById = {
+      for (final message in currentState.messages) message.id: message,
+    };
+    final selectedMessages = candidates
+        .where((message) => selectedIds.contains(message.id))
+        .toList();
+    final selectionIsUnchanged =
+        selectedMessages.length == selectedIds.length &&
+        selectedMessages.every((message) {
+          final current = currentMessagesById[message.id];
+          return current != null &&
+              current.roomId == message.roomId &&
+              current.content == message.content &&
+              current.senderId == message.senderId &&
+              !current.isSelfDestructing;
+        });
+    if (!selectionIsUnchanged ||
+        manager.userId != approvedUserId ||
+        !identical(manager.client, approvedClient) ||
+        widget.conversation.id != approvedRoomId ||
+        currentState.roomId != approvedRoomId) {
+      return;
+    }
+
+    final texts = selectedMessages
         .map((m) => '${m.senderName}: ${m.content}')
         .join('\n');
     setState(() {
       _isAiSummarizing = true;
       _aiSummaryResult = null;
+      _aiSummaryMessageCount = selectedMessages.length;
     });
-    getIt<AiService>()
-        .summarize(texts)
-        .then((result) {
-          if (mounted) {
-            setState(() {
-              _aiSummaryResult = result;
-              _isAiSummarizing = false;
-            });
-          }
-        })
-        .catchError((Object e) {
-          if (mounted) {
-            setState(() => _isAiSummarizing = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  e is AiServiceException && e.accessDenied
-                      ? S.of(context)!.aiServiceUnavailable
-                      : S.of(context)!.aiSummarizeError,
-                ),
-              ),
-            );
-          }
-        });
+    try {
+      final result = await getIt<AiService>().summarize(texts);
+      if (!mounted) return;
+      final latestState = context.read<ChatBloc>().state;
+      final latestMessagesById = {
+        for (final message in latestState.messages) message.id: message,
+      };
+      final stillAuthorized = selectedMessages.every((message) {
+        final current = latestMessagesById[message.id];
+        return current != null &&
+            current.content == message.content &&
+            current.senderId == message.senderId &&
+            !current.isSelfDestructing;
+      });
+      if (stillAuthorized &&
+          manager.userId == approvedUserId &&
+          identical(manager.client, approvedClient) &&
+          widget.conversation.id == approvedRoomId &&
+          latestState.roomId == approvedRoomId) {
+        setState(() => _aiSummaryResult = result);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e is AiServiceException && e.accessDenied
+                  ? S.of(context)!.aiServiceUnavailable
+                  : S.of(context)!.aiSummarizeError,
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isAiSummarizing = false);
+    }
   }
 
   Widget _buildAiSmartReplyBar() {
@@ -147,116 +208,32 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
       },
       onRefresh: _isLoadingSmartReplySuggestions
           ? null
-          : () => unawaited(_refreshAiSmartReplies(force: true)),
+          : () => unawaited(_refreshAiSmartReplies()),
       onDismiss: _dismissAiSmartReplyBar,
     );
   }
 
-  void _handleSmartReplyStateChanged(ChatState state) {
-    if (!mounted || !aiServiceAvailable()) {
+  void _handleSmartReplyStateChanged() {
+    // Incoming messages never leave the device for AI automatically. The user
+    // must open Quick Reply and choose the exact messages to share.
+    if (!mounted ||
+        _smartReplySuggestions.isEmpty && !_isLoadingSmartReplySuggestions) {
       return;
     }
-
-    if (_inputController.text.trim().isNotEmpty ||
-        _showSearchBar ||
-        _showRewriteBar ||
-        _isMultiSelectMode) {
-      return;
-    }
-
-    final suggestionContext = AiReplySuggestionHelper.buildContext(
-      state.messages,
-    );
-    if (suggestionContext == null) {
-      if (_smartReplySuggestions.isNotEmpty ||
-          _isLoadingSmartReplySuggestions ||
-          _smartReplyAnchorMessageId != null) {
-        setState(() {
-          _resetAiSmartReplyState(clearAnchor: true);
-        });
-      }
-      return;
-    }
-
-    if (_dismissedSmartReplyAnchorMessageId ==
-        suggestionContext.anchorMessageId) {
-      return;
-    }
-
-    if (_smartReplyAnchorMessageId == suggestionContext.anchorMessageId &&
-        (_smartReplySuggestions.isNotEmpty ||
-            _isLoadingSmartReplySuggestions)) {
-      return;
-    }
-
-    unawaited(_refreshAiSmartReplies(state: state));
+    setState(_resetAiSmartReplyState);
   }
 
-  Future<void> _refreshAiSmartReplies({
-    ChatState? state,
-    bool force = false,
-  }) async {
+  Future<void> _refreshAiSmartReplies() async {
     if (!mounted || !aiServiceAvailable()) {
       return;
     }
-
-    final currentState = state ?? context.read<ChatBloc>().state;
-    final suggestionContext = AiReplySuggestionHelper.buildContext(
-      currentState.messages,
-    );
-    if (suggestionContext == null) {
-      if (mounted) {
-        setState(() {
-          _resetAiSmartReplyState(clearAnchor: true);
-        });
-      }
-      return;
-    }
-
-    if (!force &&
-        _dismissedSmartReplyAnchorMessageId ==
-            suggestionContext.anchorMessageId) {
-      return;
-    }
-
     setState(() {
       _isLoadingSmartReplySuggestions = true;
-      _smartReplyAnchorMessageId = suggestionContext.anchorMessageId;
-      if (force) {
-        _dismissedSmartReplyAnchorMessageId = null;
-        _smartReplySuggestions = const [];
-      }
+      _smartReplySuggestions = const [];
     });
-
     try {
-      final replies = await AiReplySuggestionHelper.loadSuggestions(
-        aiService: getIt<AiService>(),
-        context: suggestionContext,
-        language: _smartReplyLanguageTag(),
-      );
+      final replies = await _loadAiSmartReplies();
       if (!mounted) return;
-
-      final latestState = context.read<ChatBloc>().state;
-      final latestContext = AiReplySuggestionHelper.buildContext(
-        latestState.messages,
-      );
-      if (latestContext?.anchorMessageId != suggestionContext.anchorMessageId) {
-        return;
-      }
-      if (_dismissedSmartReplyAnchorMessageId ==
-          suggestionContext.anchorMessageId) {
-        return;
-      }
-      if (_inputController.text.trim().isNotEmpty ||
-          _showSearchBar ||
-          _showRewriteBar ||
-          _isMultiSelectMode) {
-        setState(() {
-          _resetAiSmartReplyState();
-        });
-        return;
-      }
-
       setState(() {
         _smartReplySuggestions = replies;
         _isLoadingSmartReplySuggestions = false;
@@ -274,23 +251,135 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
       return const [];
     }
 
-    final suggestionContext = AiReplySuggestionHelper.buildContext(
-      context.read<ChatBloc>().state.messages,
-    );
-    if (suggestionContext == null) {
+    final initialState = context.read<ChatBloc>().state;
+    final candidates = initialState.messages
+        .where(
+          (message) =>
+              message.type == MessageType.text &&
+              message.content.trim().isNotEmpty &&
+              !message.isSelfDestructing,
+        )
+        .take(6)
+        .toList()
+        .reversed
+        .toList();
+    if (candidates.isEmpty || candidates.last.isFromMe) {
       return const [];
     }
 
-    return AiReplySuggestionHelper.loadSuggestions(
+    final manager = MatrixClientManager.instance;
+    final approvedClient = manager.client;
+    final approvedUserId = manager.userId;
+    final approvedRoomId = widget.conversation.id;
+    final selectedIds = <String>{};
+    final approved = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Share messages with AI?'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                const Text('Select the messages AI may use for this reply.'),
+                for (final message in candidates)
+                  CheckboxListTile(
+                    value: selectedIds.contains(message.id),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(
+                      message.senderName.isEmpty
+                          ? (message.isFromMe ? 'Me' : 'Other')
+                          : message.senderName,
+                    ),
+                    subtitle: Text(
+                      message.content,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onChanged: (selected) => setDialogState(() {
+                      if (selected == true) {
+                        selectedIds.add(message.id);
+                      } else {
+                        selectedIds.remove(message.id);
+                      }
+                    }),
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: selectedIds.contains(candidates.last.id)
+                  ? () => Navigator.pop(dialogContext, true)
+                  : null,
+              child: const Text('Share selected'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (approved != true || selectedIds.isEmpty || !mounted) {
+      return const [];
+    }
+
+    final currentState = context.read<ChatBloc>().state;
+    final currentMessagesById = {
+      for (final message in currentState.messages) message.id: message,
+    };
+    final selectionIsUnchanged = candidates
+        .where((message) => selectedIds.contains(message.id))
+        .every((message) {
+          final current = currentMessagesById[message.id];
+          return current != null &&
+              current.roomId == message.roomId &&
+              current.content == message.content &&
+              current.senderId == message.senderId &&
+              !current.isSelfDestructing;
+        });
+    if (!selectionIsUnchanged ||
+        manager.userId != approvedUserId ||
+        !identical(manager.client, approvedClient) ||
+        widget.conversation.id != approvedRoomId ||
+        currentState.roomId != approvedRoomId) {
+      return const [];
+    }
+    final suggestionContext = AiReplySuggestionHelper.buildContext(
+      currentState.messages,
+      authorizedMessageIds: selectedIds,
+    );
+    if (suggestionContext == null ||
+        suggestionContext.anchorMessageId != candidates.last.id) {
+      return const [];
+    }
+    final replies = await AiReplySuggestionHelper.loadSuggestions(
       aiService: getIt<AiService>(),
       context: suggestionContext,
       language: _smartReplyLanguageTag(),
     );
+    if (!mounted) return const [];
+    final latestState = context.read<ChatBloc>().state;
+    final latestContext = AiReplySuggestionHelper.buildContext(
+      latestState.messages,
+    );
+    // A grant is one request only. Do not display a result after switching
+    // account or conversation, or after the selected conversation advanced.
+    if (manager.userId != approvedUserId ||
+        !identical(manager.client, approvedClient) ||
+        widget.conversation.id != approvedRoomId ||
+        latestState.roomId != approvedRoomId ||
+        latestContext?.anchorMessageId != suggestionContext.anchorMessageId) {
+      return const [];
+    }
+    return replies;
   }
 
   void _dismissAiSmartReplyBar() {
     setState(() {
-      _dismissedSmartReplyAnchorMessageId = _smartReplyAnchorMessageId;
       _resetAiSmartReplyState();
     });
   }

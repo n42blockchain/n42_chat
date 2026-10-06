@@ -4,10 +4,12 @@ import '../../domain/entities/message_entity.dart';
 class AiReplySuggestionContext {
   const AiReplySuggestionContext({
     required this.anchorMessageId,
+    required this.sourceMessageIds,
     required this.messages,
   });
 
   final String anchorMessageId;
+  final List<String> sourceMessageIds;
   final List<AiMessage> messages;
 }
 
@@ -15,9 +17,15 @@ abstract final class AiReplySuggestionHelper {
   static AiReplySuggestionContext? buildContext(
     List<MessageEntity> messages, {
     int limit = 6,
+    Set<String>? authorizedMessageIds,
   }) {
     final recentMessages = messages
         .where(_isEligibleTextMessage)
+        .where(
+          (message) =>
+              authorizedMessageIds == null ||
+              authorizedMessageIds.contains(message.id),
+        )
         .take(limit)
         .toList()
         .reversed
@@ -34,6 +42,7 @@ abstract final class AiReplySuggestionHelper {
 
     return AiReplySuggestionContext(
       anchorMessageId: latestMessage.id,
+      sourceMessageIds: recentMessages.map((message) => message.id).toList(),
       messages: recentMessages.map(_toAiMessage).toList(),
     );
   }

@@ -57,6 +57,7 @@ void main() {
 
       expect(context, isNotNull);
       expect(context!.anchorMessageId, 'm4');
+      expect(context.sourceMessageIds, ['m2', 'm3', 'm4']);
       expect(context.messages, hasLength(3));
       expect(context.messages[0].role, AiRole.user);
       expect(context.messages[0].content, 'Bob: Can you review this?');
@@ -64,6 +65,24 @@ void main() {
       expect(context.messages[1].content, 'Me: Still checking');
       expect(context.messages[2].role, AiRole.user);
       expect(context.messages[2].content, 'Bob: Need an update?');
+    });
+
+    test('includes only messages explicitly selected for AI sharing', () {
+      final context = AiReplySuggestionHelper.buildContext(
+        [
+          _message(id: 'm4', content: 'Latest question', isFromMe: false),
+          _message(id: 'm3', content: 'Private note', isFromMe: true),
+          _message(id: 'm2', content: 'Earlier question', isFromMe: false),
+        ],
+        authorizedMessageIds: {'m2', 'm4'},
+      );
+
+      expect(context, isNotNull);
+      expect(context!.sourceMessageIds, ['m2', 'm4']);
+      expect(context.messages.map((message) => message.content), [
+        'Alice: Earlier question',
+        'Alice: Latest question',
+      ]);
     });
   });
 }

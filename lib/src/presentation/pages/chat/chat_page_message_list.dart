@@ -6,11 +6,12 @@ extension _ChatPageMessageListMethods on _ChatPageState {
   Widget _buildMessageList() {
     return BlocConsumer<ChatBloc, ChatState>(
       listener: (context, state) {
-        if (state.isSending && _pendingEncryptedDraft != null)
+        if (state.isSendingText && _pendingEncryptedDraft != null) {
           _pendingEncryptedDraftStarted = true;
+        }
         final encryptionFailure =
             state.error?.contains(EncryptedSendNotReady.code) == true;
-        if (_pendingEncryptedDraftStarted && !state.isSending) {
+        if (_pendingEncryptedDraftStarted && !state.isSendingText) {
           if ((encryptionFailure ||
                   state.error?.contains(DirectFriendshipNotReady.code) ==
                       true) &&
@@ -135,15 +136,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     if (_aiSummaryResult != null || _isAiSummarizing)
                       AiSummaryBubble(
                         summary: _aiSummaryResult ?? '',
-                        messageCount: state.messages
-                            .where(
-                              (m) =>
-                                  m.type == MessageType.text &&
-                                  !m.isSelfDestructing &&
-                                  m.content.trim().isNotEmpty,
-                            )
-                            .take(50)
-                            .length,
+                        messageCount: _aiSummaryMessageCount,
                         isLoading: _isAiSummarizing,
                         onDismiss: () => setState(() {
                           _aiSummaryResult = null;
@@ -414,8 +407,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             const SizedBox(width: AppDimensions.spacingS),
             Flexible(
               child: Text(
-                S.of(context)?.chatEncryptionNotice ??
-                    'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
+                S.of(context)?.chatEncryptionNotice ?? 'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 12,

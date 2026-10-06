@@ -618,7 +618,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
     if (!_showSearchBar &&
         !_showRewriteBar &&
         _inputController.text.trim().isEmpty) {
-      _handleSmartReplyStateChanged(context.read<ChatBloc>().state);
+      _handleSmartReplyStateChanged();
     }
   }
 

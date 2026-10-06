@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import '../../../data/datasources/matrix/message/encrypted_send_guard.dart';
 import '../../../data/datasources/matrix/message/direct_chat_send_guard.dart';
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -100,6 +102,7 @@ import 'message_item.dart';
 import 'live_location_page.dart';
 import 'thread_detail_page.dart';
 import '../../widgets/chat/quick_reply_sheet.dart';
+import '../../widgets/chat/ai_message_consent_dialog.dart';
 import '../../widgets/chat/scheduled_send_picker.dart';
 import '../settings/quick_replies_page.dart';
 import '../ai/ai_assistant_page.dart';
@@ -293,10 +296,10 @@ class _ChatPageState extends State<_ChatPageContent> {
   // AI 群聊消息摘要状态
   String? _aiSummaryResult;
   bool _isAiSummarizing = false;
+  bool _isAiSummaryConsentOpen = false;
+  int _aiSummaryMessageCount = 0;
   List<String> _smartReplySuggestions = const [];
   bool _isLoadingSmartReplySuggestions = false;
-  String? _smartReplyAnchorMessageId;
-  String? _dismissedSmartReplyAnchorMessageId;
 
   // 缓存解析后的背景装饰：resolveDecoration 对图片背景会做同步 existsSync，
   // 若在每次 build（尤其键盘动画每帧）都调用会有 IO jank。只在背景 key 变化
@@ -764,7 +767,7 @@ class _ChatPageState extends State<_ChatPageContent> {
         });
       }
     } else {
-      _handleSmartReplyStateChanged(context.read<ChatBloc>().state);
+      _handleSmartReplyStateChanged();
     }
 
     // 检测 @ 提醒（仅群聊）
@@ -952,7 +955,7 @@ class _ChatPageState extends State<_ChatPageContent> {
       }
     });
     if (!shouldShowSearchBar && _inputController.text.trim().isEmpty) {
-      _handleSmartReplyStateChanged(context.read<ChatBloc>().state);
+      _handleSmartReplyStateChanged();
     }
   }
 
@@ -1211,8 +1214,7 @@ class _ChatPageState extends State<_ChatPageContent> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                S.of(context)?.chatLocationPermissionDeniedPermanent ??
-                    'Location permission has been permanently denied. Please enable it in settings.',
+                S.of(context)?.chatLocationPermissionDeniedPermanent ?? 'Location permission has been permanently denied. Please enable it in settings.',
               ),
               backgroundColor: AppColors.error,
             ),
@@ -1424,7 +1426,7 @@ class _ChatPageState extends State<_ChatPageContent> {
       BlocListener<ChatBloc, ChatState>(
         listenWhen: (prev, curr) => prev.messages != curr.messages,
         listener: (context, state) {
-          _handleSmartReplyStateChanged(state);
+          _handleSmartReplyStateChanged();
           _announceIncomingMessage(context, state);
         },
       ),
