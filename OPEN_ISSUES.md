@@ -557,3 +557,10 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Resolution: check in the Android and iOS host projects; set iOS deployment target to 16.0, Android minSdk to 24, Java/Kotlin target to 17, and desugaring to 2.1.4. Keep AGP/Gradle aligned with the main app's supported versions and apply its namespace/compileSdk compatibility rules for older plugins. Replace deprecated `flutter_gemma` with `flutter_edge_ai` plus its MediaPipe engine, which keeps local inference optional at runtime and requires iOS 16.
 - Verification: with Flutter 3.47.5 / Dart 3.13.4, the Android debug APK and x86_64 iOS simulator app both built. The full Chat suite passed 7,310 tests, skipped 3, and measured 70.0969% line coverage (97,038 / 138,434 lines). Analysis exited 0 with informational lints only. The current ML Kit `MLImage` pod has no arm64 simulator slice, so Apple Silicon simulator build remains blocked. Physical iOS signing also remains unverified because the configured developer team must accept its current program license and create a profile for the example bundle ID.
 - Remaining: update the ML Kit binary graph to support arm64 simulator, then verify Apple Silicon simulator and a provisioned iOS device. The supported iOS floor is 16.0 because `flutter_edge_ai_mediapipe` requires it; making the local AI feature optional is not needed for this package's declared mobile support.
+
+## DUO-01: Physical camera and display validation pending
+
+- Severity: Medium; verification gap.
+- The adaptive split layout keeps a selected conversation and its unsent draft mounted when a scene changes between wide and compact widths. The scoped layout/responsive suite passed 21 tests on 2026-10-06.
+- Native display transitions, front-camera switching during a live call, and capture protection still require physical iPhone Duo validation in the host app. Independent app windows and a camera accessory on the outer display are not enabled by this change.
+- Next step: install the host build made with the iOS 27.1 SDK and check the above device flows.

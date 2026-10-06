@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../../widgets/common/adaptive_chat_split_layout.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -346,7 +348,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
               currentTitle = l10n?.commonMessages ?? 'Messages';
           }
 
-          if (useSplit) {
+          if (useSplit || _selectedConversation != null) {
             // === iPad / 宽屏分屏模式 ===
             return _buildSplitLayout(
               bgColor: bgColor,
@@ -450,89 +452,80 @@ class _ChatMainPageState extends State<ChatMainPage> {
     return Scaffold(
       key: const ValueKey<String>('chat_main_page'),
       backgroundColor: context.pageBackground,
-      body: Row(
-        children: [
-          // --- 左侧面板：会话列表 + Tab 切换 ---
-          SizedBox(
-            width: ResponsiveUtils.getChatListWidth(context),
-            child: Column(
-              children: [
-                // 左侧面板的 AppBar
-                AppBar(
-                  toolbarHeight: ChatAccountTitle.toolbarHeight(context),
-                  backgroundColor: bgColor,
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
-                  automaticallyImplyLeading: false,
-                  leading: IconButton(
-                    key: const ValueKey<String>('chat_back_to_wallet'),
+      body: AdaptiveChatSplitLayout(
+        showDetail: _selectedConversation != null,
+        dividerColor: context.dividerColor,
+        master: Column(
+          children: [
+            // 左侧面板的 AppBar
+            AppBar(
+              toolbarHeight: ChatAccountTitle.toolbarHeight(context),
+              backgroundColor: bgColor,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              automaticallyImplyLeading: false,
+              leading: IconButton(
+                key: const ValueKey<String>('chat_back_to_wallet'),
+                icon: Icon(
+                  AppIcons.back,
+                  color: textColor,
+                  size: AppDimensions.iconSizeSmall,
+                ),
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                onPressed: _handleBack,
+              ),
+              title: ChatAccountTitle(title: currentTitle),
+              centerTitle: true,
+              actions: [
+                if (_currentIndex == 0)
+                  Builder(
+                    builder: (ctx) => IconButton(
+                      key: const ValueKey<String>('chat_add_menu'),
+                      icon: Icon(
+                        Icons.add_circle_outline,
+                        color: textColor,
+                        size: AppDimensions.iconSizeSmall,
+                      ),
+                      tooltip: S.of(ctx)?.commonAdd ?? 'Add',
+                      onPressed: () => _showAddMenu(ctx),
+                    ),
+                  ),
+                if (_currentIndex == 1)
+                  IconButton(
                     icon: Icon(
-                      AppIcons.back,
+                      Icons.person_add_outlined,
                       color: textColor,
                       size: AppDimensions.iconSizeSmall,
                     ),
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).backButtonTooltip,
-                    onPressed: _handleBack,
+                    tooltip: S.of(context)?.mainAddFriends ?? 'Add Friends',
+                    onPressed: _navigateToAddFriend,
                   ),
-                  title: ChatAccountTitle(title: currentTitle),
-                  centerTitle: true,
-                  actions: [
-                    if (_currentIndex == 0)
-                      Builder(
-                        builder: (ctx) => IconButton(
-                          key: const ValueKey<String>('chat_add_menu'),
-                          icon: Icon(
-                            Icons.add_circle_outline,
-                            color: textColor,
-                            size: AppDimensions.iconSizeSmall,
-                          ),
-                          tooltip: S.of(ctx)?.commonAdd ?? 'Add',
-                          onPressed: () => _showAddMenu(ctx),
-                        ),
-                      ),
-                    if (_currentIndex == 1)
-                      IconButton(
-                        icon: Icon(
-                          Icons.person_add_outlined,
-                          color: textColor,
-                          size: AppDimensions.iconSizeSmall,
-                        ),
-                        tooltip: S.of(context)?.mainAddFriends ?? 'Add Friends',
-                        onPressed: _navigateToAddFriend,
-                      ),
-                    const SizedBox(width: AppDimensions.spacingXS),
-                  ],
-                ),
-                // 左侧面板内容
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _ChatTabContentSplit(
-                        conversationBloc: _conversationBloc,
-                        contactBloc: _contactBloc,
-                        selectedConversation: _selectedConversation,
-                        onConversationTap: _onConversationSelectedForSplit,
-                      ),
-                      ContactListPage(showAppBar: false, groupBloc: _groupBloc),
-                      const _DiscoverTabContent(),
-                      const _ProfileTabContent(),
-                    ],
-                  ),
-                ),
-                // 底部导航栏
-                _buildBottomNavigationBar(totalUnread),
+                const SizedBox(width: AppDimensions.spacingXS),
               ],
             ),
-          ),
-          // 分隔线
-          VerticalDivider(width: 1, color: context.dividerColor),
-          // --- 右侧面板：聊天内容或空状态 ---
-          Expanded(child: _buildRightPanel()),
-        ],
+            // 左侧面板内容
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _ChatTabContentSplit(
+                    conversationBloc: _conversationBloc,
+                    contactBloc: _contactBloc,
+                    selectedConversation: _selectedConversation,
+                    onConversationTap: _onConversationSelectedForSplit,
+                  ),
+                  ContactListPage(showAppBar: false, groupBloc: _groupBloc),
+                  const _DiscoverTabContent(),
+                  const _ProfileTabContent(),
+                ],
+              ),
+            ),
+            // 底部导航栏
+            _buildBottomNavigationBar(totalUnread),
+          ],
+        ),
+        detail: _buildRightPanel(),
       ),
     );
   }
@@ -567,8 +560,17 @@ class _ChatMainPageState extends State<ChatMainPage> {
       child: ChatPage(
         key: ValueKey(_selectedConversation!.id),
         conversation: _selectedConversation!,
-        // 分屏模式下不需要返回按钮
-        onBack: null,
+        // A selected wide-screen conversation stays open when the scene folds.
+        onBack: ResponsiveUtils.useSplitLayout(context)
+            ? null
+            : () {
+                final bloc = _splitChatBloc;
+                setState(() {
+                  _selectedConversation = null;
+                  _splitChatBloc = null;
+                });
+                bloc?.close();
+              },
       ),
     );
   }
