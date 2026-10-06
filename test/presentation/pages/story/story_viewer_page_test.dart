@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/domain/repositories/story_repository.dart';
@@ -26,6 +27,53 @@ StoryEntity makeStory(String id) {
 class _StoryRepository extends Mock implements IStoryRepository {}
 
 void main() {
+  testWidgets(
+    'story navigation uses local coordinates in a displaced Duo pane',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(800, 720);
+      addTearDown(tester.view.reset);
+      final viewed = <String>[];
+      final group = UserStories(
+        userId: '@alice:server',
+        userName: 'Alice',
+        stories: [makeStory('one'), makeStory('two'), makeStory('three')],
+        lastUpdated: DateTime.now(),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          home: Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: 390,
+              child: MediaQuery(
+                data: const MediaQueryData(size: Size(390, 720)),
+                child: StoryViewerPage(
+                  allUserStories: [group],
+                  initialStoryIndex: 1,
+                  onStoryViewed: (story) => viewed.add(story.id),
+                  currentUserId: '@bob:server',
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(viewed, ['two']);
+      await tester.tapAt(const Offset(420, 300));
+      await tester.pump();
+      expect(viewed, ['two', 'one']);
+      await tester.tapAt(const Offset(780, 300));
+      await tester.pump();
+      expect(viewed, ['two', 'one', 'two']);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
   testWidgets('revoked status disappears from an already-open viewer', (
     tester,
   ) async {

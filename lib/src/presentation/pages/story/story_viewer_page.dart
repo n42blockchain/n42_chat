@@ -274,7 +274,7 @@ class _StoryViewerPageState extends State<StoryViewerPage> {
   /// 处理点击事件（左侧/右侧区域）
   void _handleTap(TapUpDetails details) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final tapX = details.globalPosition.dx;
+    final tapX = details.localPosition.dx;
 
     // 左侧 1/3 区域：上一个 Story
     // 右侧 2/3 区域：下一个 Story
