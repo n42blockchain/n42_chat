@@ -145,7 +145,30 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
   ) async {
     try {
       final members = await _groupRepository.getGroupMembers(event.roomId);
-      emit(state.copyWith(members: members));
+      GroupEntity? group;
+      try {
+        group = await _groupRepository.getGroup(event.roomId);
+      } catch (e) {
+        debugLog('Failed to refresh group details after loading members: $e');
+      }
+      final refreshedGroup = group;
+      emit(
+        state.copyWith(
+          members: members,
+          currentGroup: state.currentGroup?.roomId == event.roomId
+              ? refreshedGroup ?? state.currentGroup
+              : state.currentGroup,
+          groups: refreshedGroup == null
+              ? state.groups
+              : state.groups
+                    .map(
+                      (item) => item.roomId == event.roomId
+                          ? refreshedGroup
+                          : item,
+                    )
+                    .toList(growable: false),
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(status: GroupStatus.error, errorMessage: e.toString()),

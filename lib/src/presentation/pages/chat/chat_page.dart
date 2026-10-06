@@ -267,6 +267,7 @@ class _ChatPageState extends State<_ChatPageContent> {
   List<ChatMentionSelection> _composerMentions = const [];
   Future<List<ChatMentionMember>>? _groupMembersFuture;
   List<ChatMentionMember> _groupMembers = const [];
+  int? _groupMemberCountOverride;
 
   // View Once 模式（阅后即焚媒体）
   bool _isViewOnce = false;

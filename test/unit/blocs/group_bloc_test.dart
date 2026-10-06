@@ -103,6 +103,7 @@ void main() {
     when(
       () => mockRepository.watchGroups(),
     ).thenAnswer((_) => const Stream.empty());
+    when(() => mockRepository.getGroup(any())).thenAnswer((_) async => null);
     when(
       () => mockBotWebhookService.dispatch(
         config: any(named: 'config'),
@@ -517,6 +518,40 @@ void main() {
     );
 
     blocTest<GroupBloc, GroupState>(
+      'refreshes the current group and group list member count',
+      build: () {
+        const updatedGroup = GroupEntity(
+          roomId: _roomId1,
+          name: 'Test Group 1',
+          memberCount: 7,
+        );
+        when(
+          () => mockRepository.getGroupMembers(_roomId1),
+        ).thenAnswer((_) async => _testMembers);
+        when(
+          () => mockRepository.getGroup(_roomId1),
+        ).thenAnswer((_) async => updatedGroup);
+        return GroupBloc(mockRepository);
+      },
+      seed: () => const GroupState.initial().copyWith(
+        status: GroupStatus.loaded,
+        currentGroup: _testGroup1,
+        groups: [_testGroup1, _testGroup2],
+      ),
+      act: (bloc) => bloc.add(const LoadGroupMembers(_roomId1)),
+      expect: () => [
+        isA<GroupState>()
+            .having((state) => state.members, 'members', _testMembers)
+            .having(
+              (state) => state.currentGroup?.memberCount,
+              'current count',
+              7,
+            )
+            .having((state) => state.groups.first.memberCount, 'list count', 7),
+      ],
+    );
+
+    blocTest<GroupBloc, GroupState>(
       'emits error when getGroupMembers throws',
       build: () {
         when(
@@ -676,6 +711,52 @@ void main() {
             ),
         // Second emission from the add(LoadGroupMembers) side-effect
         isA<GroupState>().having((s) => s.members, 'members', _testMembers),
+      ],
+    );
+
+    blocTest<GroupBloc, GroupState>(
+      'updates group member count after invitation refresh',
+      build: () {
+        const updatedGroup = GroupEntity(
+          roomId: _roomId1,
+          name: 'Test Group 1',
+          memberCount: 6,
+        );
+        when(
+          () => mockRepository.inviteUsers(_roomId1, ['@carol:server.com']),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockRepository.getGroupMembers(_roomId1),
+        ).thenAnswer((_) async => _testMembers);
+        when(
+          () => mockRepository.getGroup(_roomId1),
+        ).thenAnswer((_) async => updatedGroup);
+        return GroupBloc(mockRepository);
+      },
+      seed: () => const GroupState.initial().copyWith(
+        status: GroupStatus.loaded,
+        currentGroup: _testGroup1,
+        groups: [_testGroup1],
+      ),
+      act: (bloc) =>
+          bloc.add(const InviteMembers(_roomId1, ['@carol:server.com'])),
+      expect: () => [
+        isA<GroupState>().having(
+          (state) => state.currentGroup?.memberCount,
+          'current count before refresh',
+          5,
+        ),
+        isA<GroupState>()
+            .having(
+              (state) => state.currentGroup?.memberCount,
+              'current count',
+              6,
+            )
+            .having(
+              (state) => state.groups.single.memberCount,
+              'list count',
+              6,
+            ),
       ],
     );
 

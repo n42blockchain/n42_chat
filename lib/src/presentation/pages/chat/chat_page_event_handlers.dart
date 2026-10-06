@@ -1076,6 +1076,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       return;
     }
 
+    if (widget.conversation.isGroup) {
+      await _refreshGroupMemberCount();
+      if (!mounted) return;
+    }
+
     if (result is Map && result['action'] == 'search') {
       final initialQuery = result['query'] is String
           ? result['query'] as String
@@ -1135,6 +1140,8 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         final groupRepository = getIt<IGroupRepository>();
         await groupRepository.inviteUsers(widget.conversation.id, selectedIds);
         if (mounted) {
+          await _refreshGroupMemberCount();
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -1165,6 +1172,8 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       final groupRepository = getIt<IGroupRepository>();
       await groupRepository.kickMember(widget.conversation.id, userId);
       if (mounted) {
+        await _refreshGroupMemberCount();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(S.of(context)?.chatMemberRemoved ?? 'Member removed'),
@@ -1182,6 +1191,21 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _refreshGroupMemberCount() async {
+    try {
+      final group = await getIt<IGroupRepository>().getGroup(
+        widget.conversation.id,
+      );
+      if (mounted &&
+          group != null &&
+          group.memberCount != _groupMemberCountOverride) {
+        setState(() => _groupMemberCountOverride = group.memberCount);
+      }
+    } catch (e) {
+      debugLog('Failed to refresh group member count: $e');
     }
   }
 

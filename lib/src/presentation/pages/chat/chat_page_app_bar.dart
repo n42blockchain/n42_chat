@@ -13,6 +13,8 @@ extension _ChatPageAppBarMethods on _ChatPageState {
     final bridgePlatform = BridgeDetectionUtils.detectFromConversation(
       widget.conversation,
     );
+    final memberCount =
+        _groupMemberCountOverride ?? widget.conversation.memberCount;
 
     return N42AppBar(
       titleWidget: BlocBuilder<ChatBloc, ChatState>(
@@ -63,13 +65,9 @@ extension _ChatPageAppBarMethods on _ChatPageState {
               if (widget.conversation.type == ConversationType.group)
                 Text(
                   chatState.isChannel
-                      ? '${widget.conversation.memberCount} ${S.of(context)?.channelSubscribers ?? 'subscribers'}'
-                      : (S
-                                .of(context)
-                                ?.commonMemberCount(
-                                  widget.conversation.memberCount,
-                                ) ??
-                            '${widget.conversation.memberCount} members'),
+                      ? '$memberCount ${S.of(context)?.channelSubscribers ?? 'subscribers'}'
+                      : (S.of(context)?.commonMemberCount(memberCount) ??
+                            '$memberCount members'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.captionSmall.copyWith(
