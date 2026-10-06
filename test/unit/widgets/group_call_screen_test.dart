@@ -118,6 +118,51 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
+  testWidgets('participants remain reachable in narrow and short Duo panes', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(951, 669);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final service = _ManyParticipantService();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GroupCallScreen(liveKitService: service, roomName: 'Duo call'),
+      ),
+    );
+    await tester.pump();
+    final gridFinder = find.byKey(
+      const ValueKey('group-call-participant-grid'),
+    );
+    expect(tester.takeException(), isNull);
+    for (final size in [const Size(320, 678), const Size(669, 456)]) {
+      tester.view.physicalSize = size;
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+      final grid = tester.widget<GridView>(gridFinder);
+      final delegate =
+          grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      if (size.width == 320) expect(delegate.crossAxisCount, 1);
+      await tester.scrollUntilVisible(
+        find.text('Peer 8'),
+        180,
+        scrollable: find.descendant(
+          of: gridFinder,
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.pump();
+      final peer = tester.getRect(find.text('Peer 8'));
+      final viewport = tester.getRect(gridFinder);
+      expect(peer.top, greaterThanOrEqualTo(viewport.top));
+      expect(peer.bottom, lessThanOrEqualTo(viewport.bottom));
+      expect(tester.takeException(), isNull);
+    }
+    expect(find.text('Duo call'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
 }
 
 class _ConnectedCallService extends LiveKitService {
@@ -128,4 +173,14 @@ class _ConnectedCallService extends LiveKitService {
   List<MeetingParticipant> get participants => [
     MeetingParticipant(id: 'local-user', name: 'Local user', isLocal: true),
   ];
+}
+
+class _ManyParticipantService extends LiveKitService {
+  @override
+  MeetingState get state => MeetingState.connected;
+  @override
+  List<MeetingParticipant> get participants => List.generate(
+    9,
+    (index) => MeetingParticipant(id: 'peer-$index', name: 'Peer $index'),
+  );
 }

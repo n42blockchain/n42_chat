@@ -288,20 +288,26 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
       );
     }
 
-    // 网格布局
-    final crossAxisCount = _getGridColumns(visibleParticipants.length);
-
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        childAspectRatio: 16 / 9,
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 2,
-      ),
-      itemCount: visibleParticipants.length,
-      itemBuilder: (context, index) {
-        return _buildParticipantTile(visibleParticipants[index]);
+    // A folded pane can be narrow or short. Keep participant tiles readable
+    // and allow scrolling when the available height cannot fit every row.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final preferredColumns = _getGridColumns(visibleParticipants.length);
+        final fittingColumns = (constraints.maxWidth / 180).floor().clamp(1, 4);
+        final columns = preferredColumns.clamp(1, fittingColumns);
+        return GridView.builder(
+          key: const ValueKey('group-call-participant-grid'),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            childAspectRatio: 16 / 9,
+            crossAxisSpacing: 2,
+            mainAxisSpacing: 2,
+          ),
+          itemCount: visibleParticipants.length,
+          itemBuilder: (context, index) {
+            return _buildParticipantTile(visibleParticipants[index]);
+          },
+        );
       },
     );
   }
@@ -962,9 +968,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       color: Colors.white,
                       size: 22,
                     ),
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).closeButtonTooltip,
+                    tooltip: MaterialLocalizations.of(context)
+                        .closeButtonTooltip,
                     onPressed: () {
                       setState(() {
                         _showParticipantsList = false;

@@ -642,7 +642,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 ? RTCVideoView(
                     widget.webRTCService.localRenderer,
                     objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                    mirror: true,
+                    mirror: widget.webRTCService.isFrontCamera,
                   )
                 : Container(
                     color: _bgColor,
@@ -843,8 +843,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     });
   }
 
-  void _switchCamera() {
-    widget.webRTCService.switchCamera();
+  Future<void> _switchCamera() async {
+    await widget.webRTCService.switchCamera();
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<void> _openCallEnhancementTools() async {

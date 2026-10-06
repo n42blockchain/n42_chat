@@ -14,6 +14,10 @@ class _CallService extends Fake implements WebRTCService {
   int speakerToggles = 0;
   int videoToggles = 0;
   int cameraSwitches = 0;
+  bool frontCamera = true;
+
+  @override
+  bool get isFrontCamera => frontCamera;
   final RTCVideoRenderer localVideoRenderer = RTCVideoRenderer();
   final RTCVideoRenderer remoteVideoRenderer = RTCVideoRenderer();
   final List<CallState> emittedStates = [];
@@ -83,6 +87,7 @@ class _CallService extends Fake implements WebRTCService {
   @override
   Future<void> switchCamera() async {
     cameraSwitches++;
+    frontCamera = !frontCamera;
   }
 
   void emitState(CallState state) {
@@ -258,6 +263,16 @@ void main() {
     final l10n = S.of(tester.element(find.byType(CallScreen)))!;
 
     expect(find.byType(RTCVideoView), findsNWidgets(2));
+    expect(
+      tester.widgetList<RTCVideoView>(find.byType(RTCVideoView)).last.mirror,
+      isTrue,
+    );
+    await tester.tap(find.text(l10n.callSwitchCameraLabel));
+    await tester.pump();
+    expect(
+      tester.widgetList<RTCVideoView>(find.byType(RTCVideoView)).last.mirror,
+      isFalse,
+    );
     expect(find.text(l10n.callMuteLabel), findsOneWidget);
     await tester.pump(const Duration(seconds: 6));
     expect(find.text(l10n.callMuteLabel), findsNothing);
@@ -273,7 +288,8 @@ void main() {
     expect(find.text(l10n.chatCameraOn), findsOneWidget);
 
     await tester.tap(find.text(l10n.callSwitchCameraLabel));
-    expect(service.cameraSwitches, 1);
+    await tester.pump();
+    expect(service.cameraSwitches, 2);
     expect(tester.takeException(), isNull);
   });
 }
