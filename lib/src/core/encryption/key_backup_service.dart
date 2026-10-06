@@ -84,6 +84,19 @@ class KeyBackupService {
   ///
   /// 使用恢复密钥解锁 SSSS 并恢复所有密钥备份
   Future<int> restoreFromRecoveryKey(String recoveryKey) async {
+    final report = await restoreFromRecoveryKeyWithReport(recoveryKey);
+    if (!report.isComplete) {
+      throw KeyBackupException(
+        'Restored ${report.restoredSessions} of ${report.totalSessions} room keys',
+      );
+    }
+    return report.restoredSessions;
+  }
+
+  /// Restore keys while preserving a count of partial failures for the UI.
+  Future<RoomKeyRestoreReport> restoreFromRecoveryKeyWithReport(
+    String recoveryKey,
+  ) async {
     try {
       final encryption = _client.encryption;
       if (encryption == null) {
@@ -105,13 +118,15 @@ class KeyBackupService {
       }
 
       // 4. 从服务端备份主动下载所有房间密钥
-      final restored = await restoreRoomKeyBackup(_client);
+      final report = await restoreRoomKeyBackupWithReport(_client);
 
       // 5. 启用自动密钥上传
-      encryption.keyManager.startAutoUploadKeys();
+      if (report.isComplete) {
+        encryption.keyManager.startAutoUploadKeys();
+      }
 
       debugLog('KeyBackupService: Restored from recovery key successfully');
-      return restored;
+      return report;
     } catch (e) {
       if (e is KeyBackupException) rethrow;
       throw KeyBackupException('Failed to restore from recovery key: $e');

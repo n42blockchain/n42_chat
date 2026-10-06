@@ -223,6 +223,11 @@ void main() {
       when(
         () => keys.loadInboundGroupSession('!room:test', 'session'),
       ).thenAnswer((_) async => null);
+      final partial = await restoreRoomKeyBackupWithReport(client);
+      expect(partial.totalSessions, 1);
+      expect(partial.restoredSessions, 0);
+      expect(partial.isComplete, isFalse);
+      expect(partial.failures.single.roomId, '!room:test');
       await expectLater(restoreRoomKeyBackup(client), throwsStateError);
       final session = _Session();
       when(() => session.isValid).thenReturn(true);

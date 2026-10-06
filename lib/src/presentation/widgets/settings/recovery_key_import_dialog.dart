@@ -5,6 +5,7 @@ import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
 
 /// 恢复密钥导入对话框
 ///
@@ -45,6 +46,9 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final client = MatrixClientManager.instance.client;
+    final accountId = client?.userID ?? 'Unknown account';
+    final homeserver = client?.homeserver?.host ?? 'Unknown homeserver';
     return AlertDialog(
       title: const Row(
         children: [
@@ -62,11 +66,20 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
           children: [
             // 说明文字
             Text(
-              'Enter or paste your recovery key to restore encrypted messages from backup.',
+              'Enter or paste your recovery key to restore room keys for encrypted message history.',
               style: TextStyle(
                 fontSize: 13,
                 color: context.textTertiary,
                 height: 1.4,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacing),
+            Text(
+              'Account: $accountId\nHomeserver: $homeserver',
+              style: TextStyle(
+                fontSize: 12,
+                color: context.textTertiary,
+                height: 1.35,
               ),
             ),
             const SizedBox(height: AppDimensions.spacing),
@@ -167,13 +180,25 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
     });
 
     try {
-      final restoredCount = await widget.keyBackupService
-          .restoreFromRecoveryKey(key);
+      final report = await widget.keyBackupService
+          .restoreFromRecoveryKeyWithReport(key);
 
       if (mounted) {
+        if (!report.isComplete) {
+          setState(() {
+            _isLoading = false;
+            _error =
+                'Restored ${report.restoredSessions} of ${report.totalSessions} keys. '
+                '${report.failures.length} keys failed. Check the account, '
+                'network, and backup, then retry. Some history may remain unreadable.';
+          });
+          return;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Restored $restoredCount keys successfully'),
+            content: Text(
+              'Restored ${report.restoredSessions} of ${report.totalSessions} keys successfully',
+            ),
             duration: const Duration(seconds: 3),
           ),
         );
