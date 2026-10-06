@@ -162,10 +162,15 @@ class MatrixMetadataExtractor {
 
     // 转账信息
     if (event.content['msgtype'] == 'n42.transfer') {
+      final claimedStatus = event.content['status'] as String?;
       return MessageMetadata(
         amount: event.content['amount'] as String?,
         token: event.content['token'] as String?,
-        transferStatus: event.content['status'] as String?,
+        // Matrix content is a sender claim. Until the host supplies a verified
+        // chain receipt, a claimed completion must not render as paid.
+        transferStatus: claimedStatus == 'completed'
+            ? 'pending'
+            : claimedStatus,
         txHash: event.content['tx_hash'] as String?,
       );
     }

@@ -106,7 +106,8 @@ void main() {
           assetId: _contract,
         );
 
-        expect(transfer.isSuccess, isTrue);
+        expect(transfer.status, TransferStatus.processing);
+        expect(transfer.transactionHash, '0xexactTx');
         expect(transfer.senderAddress, '0xselectedSender');
         expect(transfer.amount, '9007199254.123456');
         expect(transfer.chain, 'ETH');
@@ -222,34 +223,31 @@ void main() {
       },
     );
 
-    test('exact fulfillment keeps identity in acknowledgement', () async {
-      final transfer = await repo.fulfillPaymentRequestExact(
-        roomId: '!room:server',
-        requestId: 'req-1',
-        receiverAddress: '0xrecipient',
-        amount: '1.250000',
-        token: 'USDT',
-        chain: 'ETH',
-        network: 'mainnet',
-        assetType: 'token',
-        assetId: _contract,
-      );
-      expect(transfer.isSuccess, isTrue);
-      final ack =
-          verify(
-                () => messages.sendRoomEvent(
-                  roomId: '!room:server',
-                  type: PaymentRequestFulfillmentContent.eventType,
-                  content: captureAny(named: 'content'),
-                ),
-              ).captured.single
-              as Map<String, dynamic>;
-      expect(ack['chain'], 'ETH');
-      expect(ack['network'], 'mainnet');
-      expect(ack['asset_type'], 'token');
-      expect(ack['asset_id'], _contract);
-      expect(ack['amount'], '1.250000');
-    });
+    test(
+      'exact fulfillment stays pending until a chain receipt is verified',
+      () async {
+        final transfer = await repo.fulfillPaymentRequestExact(
+          roomId: '!room:server',
+          requestId: 'req-1',
+          receiverAddress: '0xrecipient',
+          amount: '1.250000',
+          token: 'USDT',
+          chain: 'ETH',
+          network: 'mainnet',
+          assetType: 'token',
+          assetId: _contract,
+        );
+        expect(transfer.status, TransferStatus.processing);
+        expect(transfer.transactionHash, '0xexactTx');
+        verifyNever(
+          () => messages.sendRoomEvent(
+            roomId: any(named: 'roomId'),
+            type: PaymentRequestFulfillmentContent.eventType,
+            content: any(named: 'content'),
+          ),
+        );
+      },
+    );
   });
 
   test(

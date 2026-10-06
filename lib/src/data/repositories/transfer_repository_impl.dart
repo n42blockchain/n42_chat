@@ -161,9 +161,10 @@ class TransferRepositoryImpl
     TransferEntity updatedTransfer;
     if (result.success) {
       updatedTransfer = transfer.copyWith(
-        status: TransferStatus.completed,
+        // Wallet success means the transaction was submitted. Only a chain
+        // receipt verifier may promote this to completed.
+        status: TransferStatus.processing,
         transactionHash: result.transactionHash,
-        completedAt: DateTime.now(),
       );
     } else {
       updatedTransfer = transfer.copyWith(
@@ -232,6 +233,12 @@ class TransferRepositoryImpl
   }) async {
     final transfer = _transfersCache[transferId];
     if (transfer == null) return;
+
+    if (status == TransferStatus.completed) {
+      throw StateError(
+        'A transfer can be completed only after a verified chain receipt.',
+      );
+    }
 
     _transfersCache[transferId] = transfer.copyWith(
       status: status,
@@ -332,11 +339,6 @@ class TransferRepositoryImpl
       memo: '支付请求: $requestId',
     );
 
-    await _sendFulfillmentAcknowledgement(
-      roomId: roomId,
-      requestId: requestId,
-      transfer: transfer,
-    );
     return transfer;
   }
 
@@ -364,46 +366,7 @@ class TransferRepositoryImpl
       assetId: assetId,
     );
 
-    await _sendFulfillmentAcknowledgement(
-      roomId: roomId,
-      requestId: requestId,
-      transfer: transfer,
-    );
     return transfer;
-  }
-
-  Future<void> _sendFulfillmentAcknowledgement({
-    required String roomId,
-    required String requestId,
-    required TransferEntity transfer,
-  }) async {
-    if (transfer.isSuccess) {
-      try {
-        await _messageDataSource.sendRoomEvent(
-          roomId: roomId,
-          type: PaymentRequestFulfillmentContent.eventType,
-          content: PaymentRequestFulfillmentContent(
-            requestId: requestId,
-            transferId: transfer.id,
-            transferEventId: transfer.eventId,
-            payerAddress: transfer.senderAddress,
-            receiverAddress: transfer.receiverAddress,
-            amount: transfer.amount,
-            token: transfer.token,
-            chain: transfer.chain,
-            network: transfer.network,
-            assetType: transfer.assetType,
-            assetId: transfer.assetId,
-            transactionHash: transfer.transactionHash,
-            fulfilledAt: transfer.completedAt ?? DateTime.now(),
-          ).toEventContent(),
-        );
-      } catch (e) {
-        debugLog(
-          'TransferRepository: transfer succeeded but payment ack send failed: $e',
-        );
-      }
-    }
   }
 
   @override

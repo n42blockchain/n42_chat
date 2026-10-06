@@ -27,9 +27,8 @@ void main() {
     mapper = MatrixEventMapper(() => client);
 
     when(() => client.userID).thenReturn('@me:server.test');
-    when(
-      () => client.homeserver,
-    ).thenReturn(Uri.parse('https://matrix.server.test'));
+    when(() => client.homeserver)
+        .thenReturn(Uri.parse('https://matrix.server.test'));
 
     when(() => room.id).thenReturn('!room:server.test');
     when(() => room.unsafeGetUserFromMemoryOrFallback(any())).thenReturn(user);
@@ -56,9 +55,8 @@ void main() {
   });
 
   test('uses latest bundled edit content for display', () {
-    when(
-      () => event.content,
-    ).thenReturn({'msgtype': 'm.text', 'body': 'Original body'});
+    when(() => event.content)
+        .thenReturn({'msgtype': 'm.text', 'body': 'Original body'});
     when(() => event.unsigned).thenReturn({
       'm.relations': {
         'm.replace': {
@@ -94,12 +92,10 @@ void main() {
         'm.in_reply_to': {'event_id': r'$reply-target'},
       },
     });
-    when(
-      () => event.body,
-    ).thenReturn('> <@alice:server.test> Original body\n\n回复内容');
-    when(
-      () => event.inReplyToEventId(includingFallback: false),
-    ).thenReturn(r'$reply-target');
+    when(() => event.body)
+        .thenReturn('> <@alice:server.test> Original body\n\n回复内容');
+    when(() => event.inReplyToEventId(includingFallback: false))
+        .thenReturn(r'$reply-target');
 
     final message = mapper.mapEventToMessage(event, room);
 
@@ -122,9 +118,8 @@ void main() {
     });
     when(() => event.body).thenReturn('线程内容');
     when(() => event.relationshipEventId).thenReturn(r'$thread-root');
-    when(
-      () => event.inReplyToEventId(includingFallback: false),
-    ).thenReturn(null);
+    when(() => event.inReplyToEventId(includingFallback: false))
+        .thenReturn(null);
 
     final message = mapper.mapEventToMessage(event, room);
 
@@ -136,12 +131,10 @@ void main() {
   test('maps a missing Megolm session to an encrypted placeholder', () {
     when(() => event.type).thenReturn(matrix.EventTypes.Encrypted);
     when(() => event.messageType).thenReturn(matrix.MessageTypes.BadEncrypted);
-    when(
-      () => event.body,
-    ).thenReturn('The sender has not sent us the session key.');
-    when(
-      () => event.plaintextBody,
-    ).thenReturn('The sender has not sent us the session key.');
+    when(() => event.body)
+        .thenReturn('The sender has not sent us the session key.');
+    when(() => event.plaintextBody)
+        .thenReturn('The sender has not sent us the session key.');
     when(() => event.formattedText).thenReturn('');
     when(() => event.content).thenReturn({
       'algorithm': 'm.megolm.v1.aes-sha2',
@@ -167,9 +160,8 @@ void main() {
         },
       });
       when(() => event.body).thenReturn('> <@alice:server.test> 原消息\n\n旧回复');
-      when(
-        () => event.inReplyToEventId(includingFallback: false),
-      ).thenReturn(r'$reply-target');
+      when(() => event.inReplyToEventId(includingFallback: false))
+          .thenReturn(r'$reply-target');
       when(() => event.unsigned).thenReturn({
         'm.relations': {
           'm.replace': {
@@ -255,7 +247,7 @@ void main() {
 
     expect(message.type, MessageType.transfer);
     expect(message.content, 'Lunch');
-    expect(message.metadata?.transferStatus, 'completed');
+    expect(message.metadata?.transferStatus, 'pending');
     expect(message.metadata?.txHash, '0xtxhash123');
   });
 }

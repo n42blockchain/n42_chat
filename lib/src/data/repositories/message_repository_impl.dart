@@ -8,7 +8,6 @@ import '../../core/services/message_archive_service.dart';
 import '../../domain/entities/group_album_entity.dart';
 import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
-import '../../domain/entities/transfer_entity.dart';
 import '../../domain/repositories/message_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
 import '../mappers/archived_message_mapper.dart';
@@ -155,10 +154,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     final messages = events
         .map((e) => _messageDataSource.mapEventToMessage(e, room))
         .toList();
-    final resolvedMessages = _applyPaymentRequestFulfillments(
-      messages,
-      timeline.events,
-    );
+    final resolvedMessages = messages;
 
     // 后台归档（fire-and-forget，每房间每会话一次）：把该房间历史写入
     // FTS5 归档库，供跨会话全文搜索使用。archiveRoom 自身有断点
@@ -1334,7 +1330,10 @@ class MessageRepositoryImpl implements IMessageRepository {
         .where((e) => _isDisplayableEvent(e))
         .map((e) => _getCachedOrMapMessage(e, room, now))
         .toList();
-    return _applyPaymentRequestFulfillments(messages, allEvents);
+    // A Matrix room event is a claim by a client, not proof of chain
+    // confirmation. Keep the request pending until a chain receipt verifier is
+    // integrated.
+    return messages;
   }
 
   /// 从缓存获取消息或重新映射
@@ -1385,82 +1384,10 @@ class MessageRepositoryImpl implements IMessageRepository {
   ) {
     for (final event in timeline.events) {
       if (event.eventId == messageId) {
-        return _applyPaymentRequestFulfillmentsToMessage(
-          _messageDataSource.mapEventToMessage(event, room),
-          timeline.events,
-        );
+        return _messageDataSource.mapEventToMessage(event, room);
       }
     }
     return null;
-  }
-
-  List<MessageEntity> _applyPaymentRequestFulfillments(
-    List<MessageEntity> messages,
-    List<matrix.Event> allEvents,
-  ) {
-    final fulfilledRequestIds = _collectFulfilledPaymentRequestIds(allEvents);
-    if (fulfilledRequestIds.isEmpty) {
-      return messages;
-    }
-
-    return messages
-        .map(
-          (message) => _applyPaymentRequestFulfillmentsToMessage(
-            message,
-            allEvents,
-            fulfilledRequestIds: fulfilledRequestIds,
-          ),
-        )
-        .toList();
-  }
-
-  MessageEntity _applyPaymentRequestFulfillmentsToMessage(
-    MessageEntity message,
-    List<matrix.Event> allEvents, {
-    Set<String>? fulfilledRequestIds,
-  }) {
-    if (message.type != MessageType.paymentRequest) {
-      return message;
-    }
-
-    final requestId = message.metadata?.paymentRequestId;
-    if (requestId == null || requestId.isEmpty) {
-      return message;
-    }
-
-    final fulfilled =
-        fulfilledRequestIds ?? _collectFulfilledPaymentRequestIds(allEvents);
-    if (!fulfilled.contains(requestId)) {
-      return message;
-    }
-
-    final metadata =
-        message.metadata?.copyWithTransfer(transferStatus: 'completed') ??
-        const MessageMetadata(transferStatus: 'completed');
-    return message.copyWith(metadata: metadata);
-  }
-
-  Set<String> _collectFulfilledPaymentRequestIds(List<matrix.Event> events) {
-    final fulfilled = <String>{};
-    for (final event in events) {
-      if (event.type != PaymentRequestFulfillmentContent.eventType) {
-        continue;
-      }
-
-      try {
-        final content = PaymentRequestFulfillmentContent.fromEventContent(
-          event.content,
-        );
-        if (content.requestId.isNotEmpty) {
-          fulfilled.add(content.requestId);
-        }
-      } catch (e) {
-        debugLog(
-          'MessageRepositoryImpl: Failed to parse payment fulfillment event: $e',
-        );
-      }
-    }
-    return fulfilled;
   }
 
   /// 清理过期的消息缓存

@@ -75,7 +75,8 @@ void main() {
           memo: 'hello',
         );
 
-        expect(transfer.isSuccess, isTrue);
+        expect(transfer.status, TransferStatus.processing);
+        expect(transfer.transactionHash, '0xtxhash');
         expect(transfer.roomId, '!room-a:server.com');
         expect(transfer.eventId, '\$event1');
 
@@ -88,44 +89,79 @@ void main() {
       },
     );
 
-    test(
-      'does not fail the transfer when chain transfer succeeds but chat message send fails',
-      () async {
-        when(
-          () => mockWalletBridge.requestTransfer(
-            toAddress: any(named: 'toAddress'),
-            amount: any(named: 'amount'),
-            token: any(named: 'token'),
-            memo: any(named: 'memo'),
-          ),
-        ).thenAnswer((_) async => TransferResult.success('0xtxhash'));
-        when(
-          () => mockMessageDataSource.sendCustomMessage(
-            roomId: any(named: 'roomId'),
-            msgType: any(named: 'msgType'),
-            content: any(named: 'content'),
-          ),
-        ).thenThrow(Exception('matrix send failed'));
+    test('does not fail the transfer when chain transfer succeeds but chat message send fails', () async {
+      when(
+        () => mockWalletBridge.requestTransfer(
+          toAddress: any(named: 'toAddress'),
+          amount: any(named: 'amount'),
+          token: any(named: 'token'),
+          memo: any(named: 'memo'),
+        ),
+      ).thenAnswer((_) async => TransferResult.success('0xtxhash'));
+      when(
+        () => mockMessageDataSource.sendCustomMessage(
+          roomId: any(named: 'roomId'),
+          msgType: any(named: 'msgType'),
+          content: any(named: 'content'),
+        ),
+      ).thenThrow(Exception('matrix send failed'));
 
-        final transfer = await repository.initiateTransfer(
-          roomId: '!room-b:server.com',
-          receiverAddress: '0xreceiver',
-          amount: '2',
-          token: 'ETH',
-        );
+      final transfer = await repository.initiateTransfer(
+        roomId: '!room-b:server.com',
+        receiverAddress: '0xreceiver',
+        amount: '2',
+        token: 'ETH',
+      );
 
-        expect(transfer.isSuccess, isTrue);
-        expect(transfer.roomId, '!room-b:server.com');
-        expect(transfer.eventId, isNull);
+      expect(transfer.status, TransferStatus.processing);
+      expect(transfer.transactionHash, '0xtxhash');
+      expect(transfer.roomId, '!room-b:server.com');
+      expect(transfer.eventId, isNull);
 
-        final roomTransfers = await repository.getTransfersByRoom(
-          '!room-b:server.com',
-        );
-        expect(roomTransfers, hasLength(1));
-        expect(roomTransfers.first.id, transfer.id);
-        expect(roomTransfers.first.eventId, isNull);
-      },
-    );
+      final roomTransfers = await repository.getTransfersByRoom(
+        '!room-b:server.com',
+      );
+      expect(roomTransfers, hasLength(1));
+      expect(roomTransfers.first.id, transfer.id);
+      expect(roomTransfers.first.eventId, isNull);
+    });
+
+    test('rejects completion without a verified chain receipt', () async {
+      when(
+        () => mockWalletBridge.requestTransfer(
+          toAddress: any(named: 'toAddress'),
+          amount: any(named: 'amount'),
+          token: any(named: 'token'),
+          memo: any(named: 'memo'),
+        ),
+      ).thenAnswer((_) async => TransferResult.success('0xtxhash'));
+      when(
+        () => mockMessageDataSource.sendCustomMessage(
+          roomId: any(named: 'roomId'),
+          msgType: any(named: 'msgType'),
+          content: any(named: 'content'),
+        ),
+      ).thenAnswer((_) async => '\$event1');
+
+      final transfer = await repository.initiateTransfer(
+        roomId: '!room-c:server.com',
+        receiverAddress: '0xreceiver',
+        amount: '1.5',
+        token: 'ETH',
+      );
+
+      await expectLater(
+        repository.updateTransferStatus(
+          transferId: transfer.id,
+          status: TransferStatus.completed,
+        ),
+        throwsA(isA<StateError>()),
+      );
+      expect(
+        (await repository.getTransfer(transfer.id))!.status,
+        TransferStatus.processing,
+      );
+    });
   });
 
   group('sendPaymentRequestMessage', () {
@@ -183,7 +219,7 @@ void main() {
     });
 
     test(
-      'sends a durable fulfillment acknowledgement after successful payment',
+      'does not mark a submitted transaction as paid before chain confirmation',
       () async {
         when(
           () => mockWalletBridge.requestTransfer(
@@ -200,14 +236,6 @@ void main() {
             content: any(named: 'content'),
           ),
         ).thenAnswer((_) async => '\$transfer-event');
-        when(
-          () => mockMessageDataSource.sendRoomEvent(
-            roomId: any(named: 'roomId'),
-            type: any(named: 'type'),
-            content: any(named: 'content'),
-          ),
-        ).thenAnswer((_) async => '\$ack-event');
-
         final transfer = await repository.fulfillPaymentRequest(
           roomId: '!room-pay:server.com',
           requestId: 'req-42',
@@ -216,27 +244,15 @@ void main() {
           token: 'USDT',
         );
 
-        expect(transfer.isSuccess, isTrue);
-
-        final captured = verify(
+        expect(transfer.status, TransferStatus.processing);
+        expect(transfer.transactionHash, '0xpaidtx');
+        verifyNever(
           () => mockMessageDataSource.sendRoomEvent(
-            roomId: '!room-pay:server.com',
+            roomId: any(named: 'roomId'),
             type: PaymentRequestFulfillmentContent.eventType,
-            content: captureAny(named: 'content'),
+            content: any(named: 'content'),
           ),
-        ).captured;
-
-        expect(captured, hasLength(1));
-        final content = captured.single as Map<String, dynamic>;
-        expect(content['request_id'], 'req-42');
-        expect(content['transfer_id'], transfer.id);
-        expect(content['transfer_event_id'], '\$transfer-event');
-        expect(content['payer_address'], '0xsender');
-        expect(content['receiver_address'], '0xreceiver');
-        expect(content['amount'], '12.5');
-        expect(content['token'], 'USDT');
-        expect(content['tx_hash'], '0xpaidtx');
-        expect(content['fulfilled_at'], isA<int>());
+        );
       },
     );
   });
@@ -348,9 +364,8 @@ void main() {
 
   group('currentWalletAddress', () {
     test('returns address from wallet bridge when connected', () {
-      when(
-        () => mockWalletBridge.walletAddress,
-      ).thenReturn('0xAbCdEf1234567890');
+      when(() => mockWalletBridge.walletAddress)
+          .thenReturn('0xAbCdEf1234567890');
       expect(repository.currentWalletAddress, '0xAbCdEf1234567890');
     });
 

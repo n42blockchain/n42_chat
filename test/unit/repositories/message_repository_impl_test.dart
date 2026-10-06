@@ -66,18 +66,16 @@ void main() {
     when(() => mockRoom.id).thenReturn(testRoomId);
     when(() => mockRoom.client).thenReturn(mockClient);
     when(() => mockClient.encryptionEnabled).thenReturn(false);
-    when(
-      () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
-    ).thenAnswer((_) async => mockTimeline);
+    when(() => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')))
+        .thenAnswer((_) async => mockTimeline);
     when(() => mockRoom.getEventById(any())).thenAnswer((_) async => null);
     when(() => mockTimeline.events).thenReturn(<matrix.Event>[]);
     when(
       () =>
           mockTimeline.requestHistory(historyCount: any(named: 'historyCount')),
     ).thenAnswer((_) async {});
-    when(
-      () => mockStorageDS.getLocallyDeletedMessageIds(any()),
-    ).thenAnswer((_) async => {});
+    when(() => mockStorageDS.getLocallyDeletedMessageIds(any()))
+        .thenAnswer((_) async => {});
   });
 
   tearDown(() async {
@@ -87,15 +85,12 @@ void main() {
 
   group('sendTextMessage', () {
     test('delegates to datasource', () async {
-      when(
-        () => mockMsgDS.sendTextMessage(testRoomId, testText),
-      ).thenAnswer((_) async => testEventId);
-      when(
-        () => mockMsgDS.getMessageById(testRoomId, testEventId),
-      ).thenAnswer((_) async => null);
-      when(
-        () => mockStorageDS.getLocallyDeletedMessageIds(testRoomId),
-      ).thenAnswer((_) async => {});
+      when(() => mockMsgDS.sendTextMessage(testRoomId, testText))
+          .thenAnswer((_) async => testEventId);
+      when(() => mockMsgDS.getMessageById(testRoomId, testEventId))
+          .thenAnswer((_) async => null);
+      when(() => mockStorageDS.getLocallyDeletedMessageIds(testRoomId))
+          .thenAnswer((_) async => {});
 
       // sendTextMessage tries to get the message after sending; if the event
       // hasn't synced yet it falls back. We test the delegation path here.
@@ -106,9 +101,8 @@ void main() {
     });
 
     test('returns null when send fails', () async {
-      when(
-        () => mockMsgDS.sendTextMessage(testRoomId, testText),
-      ).thenAnswer((_) async => null);
+      when(() => mockMsgDS.sendTextMessage(testRoomId, testText))
+          .thenAnswer((_) async => null);
 
       final result = await repository.sendTextMessage(testRoomId, testText);
 
@@ -173,9 +167,8 @@ void main() {
           mentionsRoom: true,
         ),
       ).thenAnswer((_) async => '\$reply-event');
-      when(
-        () => mockRoom.getEventById('\$reply-event'),
-      ).thenAnswer((_) async => null);
+      when(() => mockRoom.getEventById('\$reply-event'))
+          .thenAnswer((_) async => null);
 
       await repository.replyToMessage(
         testRoomId,
@@ -201,9 +194,8 @@ void main() {
 
   group('redactMessage', () {
     test('delegates to datasource and returns success', () async {
-      when(
-        () => mockMsgDS.redactMessage(testRoomId, testEventId),
-      ).thenAnswer((_) async => true);
+      when(() => mockMsgDS.redactMessage(testRoomId, testEventId))
+          .thenAnswer((_) async => true);
 
       final result = await repository.redactMessage(testRoomId, testEventId);
 
@@ -212,9 +204,8 @@ void main() {
     });
 
     test('returns false on failure', () async {
-      when(
-        () => mockMsgDS.redactMessage(testRoomId, testEventId),
-      ).thenAnswer((_) async => false);
+      when(() => mockMsgDS.redactMessage(testRoomId, testEventId))
+          .thenAnswer((_) async => false);
 
       final result = await repository.redactMessage(testRoomId, testEventId);
 
@@ -224,9 +215,8 @@ void main() {
 
   group('deleteFailedMessage', () {
     test('delegates correctly', () async {
-      when(
-        () => mockMsgDS.deleteFailedMessage(testRoomId, testEventId),
-      ).thenAnswer((_) async => true);
+      when(() => mockMsgDS.deleteFailedMessage(testRoomId, testEventId))
+          .thenAnswer((_) async => true);
 
       final result = await repository.deleteFailedMessage(
         testRoomId,
@@ -254,9 +244,8 @@ void main() {
 
         when(() => mockEvent.eventId).thenReturn(testEventId);
         when(() => mockTimeline.events).thenReturn(<matrix.Event>[mockEvent]);
-        when(
-          () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
-        ).thenReturn(mappedMessage);
+        when(() => mockMsgDS.mapEventToMessage(mockEvent, mockRoom))
+            .thenReturn(mappedMessage);
 
         final result = await repository
             .watchMessage(testRoomId, testEventId)
@@ -264,14 +253,13 @@ void main() {
 
         expect(result, isNotNull);
         expect(result!.id, testEventId);
-        verify(
-          () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
-        ).called(1);
+        verify(() => mockMsgDS.mapEventToMessage(mockEvent, mockRoom))
+            .called(1);
       },
     );
 
     test(
-      'emits payment request as paid when fulfillment ack exists in timeline',
+      'keeps payment request pending when an unverified ack exists in timeline',
       () async {
         final paymentEvent = MockEvent();
         final ackEvent = MockEvent();
@@ -294,14 +282,12 @@ void main() {
 
         when(() => paymentEvent.eventId).thenReturn(testEventId);
         when(() => paymentEvent.type).thenReturn(matrix.EventTypes.Message);
-        when(
-          () => paymentEvent.content,
-        ).thenReturn({'msgtype': 'n42.payment_request'});
+        when(() => paymentEvent.content)
+            .thenReturn({'msgtype': 'n42.payment_request'});
 
         when(() => ackEvent.eventId).thenReturn('\$ack1');
-        when(
-          () => ackEvent.type,
-        ).thenReturn(PaymentRequestFulfillmentContent.eventType);
+        when(() => ackEvent.type)
+            .thenReturn(PaymentRequestFulfillmentContent.eventType);
         when(() => ackEvent.content).thenReturn(
           PaymentRequestFulfillmentContent(
             requestId: 'req-42',
@@ -316,19 +302,17 @@ void main() {
           ).toEventContent(),
         );
 
-        when(
-          () => mockTimeline.events,
-        ).thenReturn(<matrix.Event>[paymentEvent, ackEvent]);
-        when(
-          () => mockMsgDS.mapEventToMessage(paymentEvent, mockRoom),
-        ).thenReturn(mappedMessage);
+        when(() => mockTimeline.events)
+            .thenReturn(<matrix.Event>[paymentEvent, ackEvent]);
+        when(() => mockMsgDS.mapEventToMessage(paymentEvent, mockRoom))
+            .thenReturn(mappedMessage);
 
         final result = await repository
             .watchMessage(testRoomId, testEventId)
             .first;
 
         expect(result, isNotNull);
-        expect(result!.metadata?.transferStatus, 'completed');
+        expect(result!.metadata?.transferStatus, isNull);
       },
     );
   });
@@ -340,20 +324,18 @@ void main() {
       await repository.getMessages(testRoomId, limit: 0);
       when(() => mockClient.deviceID).thenReturn('new-device');
       await repository.getMessages(testRoomId, limit: 0);
-      verify(
-        () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
-      ).called(2);
+      verify(() => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')))
+          .called(2);
       verify(() => mockTimeline.cancelSubscriptions()).called(1);
     });
     test('disposed creation cannot overwrite a replacement timeline', () async {
       final pending = Completer<matrix.Timeline>();
       var calls = 0;
-      when(
-        () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
-      ).thenAnswer((_) {
-        calls++;
-        return calls == 1 ? pending.future : Future.value(mockTimeline);
-      });
+      when(() => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')))
+          .thenAnswer((_) {
+            calls++;
+            return calls == 1 ? pending.future : Future.value(mockTimeline);
+          });
       final oldRequest = repository.getMessages(testRoomId, limit: 0);
       await Future<void>.delayed(Duration.zero);
       repository.disposeTimeline(testRoomId);
@@ -370,9 +352,8 @@ void main() {
       () async {
         when(() => mockClient.userID).thenReturn('@alice:matrix.org');
         final pending = Completer<matrix.Timeline>();
-        when(
-          () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
-        ).thenAnswer((_) => pending.future);
+        when(() => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')))
+            .thenAnswer((_) => pending.future);
         final request = repository.getMessages(testRoomId, limit: 0);
         await Future<void>.delayed(Duration.zero);
         when(() => mockClient.userID).thenReturn('@bob:matrix.org');
@@ -403,18 +384,16 @@ void main() {
       when(() => encryption.keyManager).thenReturn(keyManager);
       when(() => mockEvent.eventId).thenReturn(testEventId);
       when(() => mockEvent.type).thenReturn(matrix.EventTypes.Encrypted);
-      when(
-        () => mockEvent.messageType,
-      ).thenReturn(matrix.MessageTypes.BadEncrypted);
+      when(() => mockEvent.messageType)
+          .thenReturn(matrix.MessageTypes.BadEncrypted);
       when(() => mockEvent.content).thenReturn(<String, dynamic>{
         'can_request_session': true,
         'session_id': 'session-1',
         'sender_key': 'sender-key-1',
       });
       when(() => mockTimeline.events).thenReturn(<matrix.Event>[mockEvent]);
-      when(
-        () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
-      ).thenReturn(encryptedMessage);
+      when(() => mockMsgDS.mapEventToMessage(mockEvent, mockRoom))
+          .thenReturn(encryptedMessage);
       when(
         () => keyManager.request(
           mockRoom,
@@ -466,14 +445,13 @@ void main() {
           status: MessageStatus.sent,
         );
 
-        when(
-          () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
-        ).thenAnswer((invocation) async {
-          timelineOnUpdate =
-              invocation.namedArguments[#onUpdate] as void Function();
-          if (!callbackReady.isCompleted) callbackReady.complete();
-          return mockTimeline;
-        });
+        when(() => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')))
+            .thenAnswer((invocation) async {
+              timelineOnUpdate =
+                  invocation.namedArguments[#onUpdate] as void Function();
+              if (!callbackReady.isCompleted) callbackReady.complete();
+              return mockTimeline;
+            });
         when(() => mockEvent.eventId).thenReturn(testEventId);
         when(() => mockEvent.type).thenAnswer(
           (_) => isEncrypted
@@ -511,9 +489,8 @@ void main() {
         final result = await emissions;
         expect(result.first.single.content, contains('session key'));
         expect(result.last.single.content, 'Recovered message');
-        verify(
-          () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
-        ).called(2);
+        verify(() => mockMsgDS.mapEventToMessage(mockEvent, mockRoom))
+            .called(2);
       },
     );
     test(
@@ -543,14 +520,13 @@ void main() {
           status: MessageStatus.sent,
         );
 
-        when(
-          () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
-        ).thenAnswer((invocation) async {
-          timelineOnUpdate =
-              invocation.namedArguments[#onUpdate] as void Function();
-          if (!callbackReady.isCompleted) callbackReady.complete();
-          return mockTimeline;
-        });
+        when(() => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')))
+            .thenAnswer((invocation) async {
+              timelineOnUpdate =
+                  invocation.namedArguments[#onUpdate] as void Function();
+              if (!callbackReady.isCompleted) callbackReady.complete();
+              return mockTimeline;
+            });
         when(() => mockEvent.eventId).thenReturn(testEventId);
         when(() => mockEvent.type).thenAnswer(
           (_) => isEncrypted
@@ -593,9 +569,8 @@ void main() {
           isTrue,
         );
         expect(iterator.current.single.content, 'Recovered message');
-        verify(
-          () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
-        ).called(2);
+        verify(() => mockMsgDS.mapEventToMessage(mockEvent, mockRoom))
+            .called(2);
       },
     );
     test(
@@ -625,14 +600,13 @@ void main() {
           status: MessageStatus.sent,
         );
 
-        when(
-          () => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')),
-        ).thenAnswer((invocation) async {
-          timelineOnUpdate =
-              invocation.namedArguments[#onUpdate] as void Function();
-          if (!callbackReady.isCompleted) callbackReady.complete();
-          return mockTimeline;
-        });
+        when(() => mockRoom.getTimeline(onUpdate: any(named: 'onUpdate')))
+            .thenAnswer((invocation) async {
+              timelineOnUpdate =
+                  invocation.namedArguments[#onUpdate] as void Function();
+              if (!callbackReady.isCompleted) callbackReady.complete();
+              return mockTimeline;
+            });
         when(() => mockEvent.eventId).thenReturn(testEventId);
         when(() => mockEvent.type).thenAnswer(
           (_) => isEncrypted
@@ -677,16 +651,15 @@ void main() {
           isTrue,
         );
         expect(iterator.current!.content, 'Recovered message');
-        verify(
-          () => mockMsgDS.mapEventToMessage(mockEvent, mockRoom),
-        ).called(2);
+        verify(() => mockMsgDS.mapEventToMessage(mockEvent, mockRoom))
+            .called(2);
       },
     );
   });
 
   group('getMessages', () {
     test(
-      'marks payment requests as paid when a fulfillment ack exists',
+      'does not mark payment requests paid from an unverified ack',
       () async {
         final paymentEvent = MockEvent();
         final ackEvent = MockEvent();
@@ -709,14 +682,12 @@ void main() {
 
         when(() => paymentEvent.eventId).thenReturn(testEventId);
         when(() => paymentEvent.type).thenReturn(matrix.EventTypes.Message);
-        when(
-          () => paymentEvent.content,
-        ).thenReturn({'msgtype': 'n42.payment_request'});
+        when(() => paymentEvent.content)
+            .thenReturn({'msgtype': 'n42.payment_request'});
 
         when(() => ackEvent.eventId).thenReturn('\$ack2');
-        when(
-          () => ackEvent.type,
-        ).thenReturn(PaymentRequestFulfillmentContent.eventType);
+        when(() => ackEvent.type)
+            .thenReturn(PaymentRequestFulfillmentContent.eventType);
         when(() => ackEvent.content).thenReturn(
           PaymentRequestFulfillmentContent(
             requestId: 'req-99',
@@ -730,17 +701,15 @@ void main() {
           ).toEventContent(),
         );
 
-        when(
-          () => mockTimeline.events,
-        ).thenReturn(<matrix.Event>[paymentEvent, ackEvent]);
-        when(
-          () => mockMsgDS.mapEventToMessage(paymentEvent, mockRoom),
-        ).thenReturn(mappedMessage);
+        when(() => mockTimeline.events)
+            .thenReturn(<matrix.Event>[paymentEvent, ackEvent]);
+        when(() => mockMsgDS.mapEventToMessage(paymentEvent, mockRoom))
+            .thenReturn(mappedMessage);
 
         final messages = await repository.getMessages(testRoomId, limit: 10);
 
         expect(messages, hasLength(1));
-        expect(messages.single.metadata?.transferStatus, 'completed');
+        expect(messages.single.metadata?.transferStatus, isNull);
       },
     );
   });
