@@ -46,6 +46,33 @@ extension ChatBlocSendHandlers on ChatBloc {
     );
   }
 
+  void _beginMediaSend(Emitter<ChatState> emit) {
+    final activeMediaSends = state.activeMediaSends + 1;
+    emit(
+      state.copyWith(
+        activeMediaSends: activeMediaSends,
+        isSending: true,
+        clearError: true,
+      ),
+    );
+  }
+
+  ChatState _finishMediaSend({String? error}) {
+    final activeMediaSends = (state.activeMediaSends - 1)
+        .clamp(0, 1 << 30)
+        .toInt();
+    return state.copyWith(
+      activeMediaSends: activeMediaSends,
+      isSending: activeMediaSends > 0 || state.isSendingText,
+      error: error,
+      clearError: error == null,
+      clearReplyTarget: error == null,
+      lastMessageSentAt: error == null
+          ? DateTime.now()
+          : state.lastMessageSentAt,
+    );
+  }
+
   /// 发送文本消息
   Future<void> onSendTextMessage(
     SendTextMessage event,
@@ -106,7 +133,9 @@ extension ChatBlocSendHandlers on ChatBloc {
       }
     }
 
-    emit(state.copyWith(isSending: true, clearError: true));
+    emit(
+      state.copyWith(isSending: true, isSendingText: true, clearError: true),
+    );
 
     try {
       // 如果有回复目标，使用回复功能
@@ -120,7 +149,8 @@ extension ChatBlocSendHandlers on ChatBloc {
           mentionsRoom: event.mentionsRoom,
         );
         var newState = state.copyWith(
-          isSending: false,
+          isSending: state.activeMediaSends > 0,
+          isSendingText: false,
           clearReplyTarget: true,
           lastMessageSentAt: DateTime.now(),
         );
@@ -150,7 +180,8 @@ extension ChatBlocSendHandlers on ChatBloc {
           mentionsRoom: event.mentionsRoom,
         );
         var newState = state.copyWith(
-          isSending: false,
+          isSending: state.activeMediaSends > 0,
+          isSendingText: false,
           lastMessageSentAt: DateTime.now(),
         );
         // 记录智能回复原文
@@ -173,7 +204,8 @@ extension ChatBlocSendHandlers on ChatBloc {
     } catch (e) {
       emit(
         state.copyWith(
-          isSending: false,
+          isSending: state.activeMediaSends > 0,
+          isSendingText: false,
           error: _sendFailure(e, 'Failed to send'),
         ),
       );
@@ -189,7 +221,7 @@ extension ChatBlocSendHandlers on ChatBloc {
       return;
     }
 
-    emit(state.copyWith(isSending: true, clearError: true));
+    _beginMediaSend(emit);
 
     try {
       final selfDestructAfter = await _resolveSelfDestructAfter(
@@ -206,13 +238,16 @@ extension ChatBlocSendHandlers on ChatBloc {
         selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Image sent successfully');
-      emit(_buildPostSendState());
+      emit(_finishMediaSend());
     } catch (e, stackTrace) {
       debugLog('ChatBloc: Send image error - $e');
       debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(
         state.copyWith(
-          isSending: false,
+          activeMediaSends: (state.activeMediaSends - 1)
+              .clamp(0, 1 << 30)
+              .toInt(),
+          isSending: state.activeMediaSends > 1 || state.isSendingText,
           error: _sendFailure(e, 'Failed to send image: $e'),
         ),
       );
@@ -228,7 +263,7 @@ extension ChatBlocSendHandlers on ChatBloc {
       return;
     }
 
-    emit(state.copyWith(isSending: true, clearError: true));
+    _beginMediaSend(emit);
 
     try {
       final selfDestructAfter = await _resolveSelfDestructAfter(
@@ -246,13 +281,16 @@ extension ChatBlocSendHandlers on ChatBloc {
         selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Voice sent successfully');
-      emit(_buildPostSendState());
+      emit(_finishMediaSend());
     } catch (e, stackTrace) {
       debugLog('ChatBloc: Send voice error - $e');
       debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(
         state.copyWith(
-          isSending: false,
+          activeMediaSends: (state.activeMediaSends - 1)
+              .clamp(0, 1 << 30)
+              .toInt(),
+          isSending: state.activeMediaSends > 1 || state.isSendingText,
           error: _sendFailure(e, 'Failed to send voice: $e'),
         ),
       );
@@ -266,7 +304,7 @@ extension ChatBlocSendHandlers on ChatBloc {
   ) async {
     if (!_canSendUserMessage(emit, 'file')) return;
 
-    emit(state.copyWith(isSending: true, clearError: true));
+    _beginMediaSend(emit);
 
     try {
       final selfDestructAfter = await _resolveSelfDestructAfter(
@@ -294,11 +332,14 @@ extension ChatBlocSendHandlers on ChatBloc {
       } else {
         throw Exception('No file content available');
       }
-      emit(_buildPostSendState());
+      emit(_finishMediaSend());
     } catch (e) {
       emit(
         state.copyWith(
-          isSending: false,
+          activeMediaSends: (state.activeMediaSends - 1)
+              .clamp(0, 1 << 30)
+              .toInt(),
+          isSending: state.activeMediaSends > 1 || state.isSendingText,
           error: _sendFailure(e, 'Failed to send file'),
         ),
       );
@@ -312,7 +353,7 @@ extension ChatBlocSendHandlers on ChatBloc {
   ) async {
     if (!_canSendUserMessage(emit, 'video')) return;
 
-    emit(state.copyWith(isSending: true, clearError: true));
+    _beginMediaSend(emit);
 
     try {
       final selfDestructAfter = await _resolveSelfDestructAfter(
@@ -330,13 +371,16 @@ extension ChatBlocSendHandlers on ChatBloc {
         selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Video sent successfully');
-      emit(_buildPostSendState());
+      emit(_finishMediaSend());
     } catch (e, stackTrace) {
       debugLog('ChatBloc: Send video error - $e');
       debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(
         state.copyWith(
-          isSending: false,
+          activeMediaSends: (state.activeMediaSends - 1)
+              .clamp(0, 1 << 30)
+              .toInt(),
+          isSending: state.activeMediaSends > 1 || state.isSendingText,
           error: _sendFailure(e, 'Failed to send video: $e'),
         ),
       );

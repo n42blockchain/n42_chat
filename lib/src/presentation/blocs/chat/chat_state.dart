@@ -23,6 +23,12 @@ class ChatState extends Equatable {
   /// 是否正在发送消息
   final bool isSending;
 
+  /// 是否有一条文字消息正在发送。
+  final bool isSendingText;
+
+  /// 正在上传的媒体消息数量。
+  final int activeMediaSends;
+
   /// 错误信息
   final String? error;
 
@@ -96,6 +102,8 @@ class ChatState extends Equatable {
     this.isLoadingMore = false,
     this.hasMore = true,
     this.isSending = false,
+    this.isSendingText = false,
+    this.activeMediaSends = 0,
     this.error,
     this.replyTarget,
     this.editingMessage,
@@ -141,19 +149,21 @@ class ChatState extends Equatable {
   bool get hasPinnedMessages => pinnedMessages.isNotEmpty;
 
   /// 检查消息是否正在翻译
-  bool isTranslating(String messageId) => translatingMessageIds.contains(messageId);
+  bool isTranslating(String messageId) =>
+      translatingMessageIds.contains(messageId);
 
   /// 获取消息的翻译结果
   String? getTranslation(String messageId) => translatedMessages[messageId];
 
   /// 获取检测到的源语言
-  String? getDetectedLanguage(String messageId) => detectedSourceLanguages[messageId];
+  String? getDetectedLanguage(String messageId) =>
+      detectedSourceLanguages[messageId];
 
   /// 当前置顶消息
   MessageEntity? get currentPinnedMessage =>
       pinnedMessages.isNotEmpty && currentPinnedIndex < pinnedMessages.length
-          ? pinnedMessages[currentPinnedIndex]
-          : null;
+      ? pinnedMessages[currentPinnedIndex]
+      : null;
 
   /// 获取正在输入提示文本
   /// Note: This returns a raw value that UI layer should localize
@@ -172,6 +182,8 @@ class ChatState extends Equatable {
     bool? isLoadingMore,
     bool? hasMore,
     bool? isSending,
+    bool? isSendingText,
+    int? activeMediaSends,
     String? error,
     MessageEntity? replyTarget,
     MessageEntity? editingMessage,
@@ -206,24 +218,34 @@ class ChatState extends Equatable {
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       hasMore: hasMore ?? this.hasMore,
       isSending: isSending ?? this.isSending,
+      isSendingText: isSendingText ?? this.isSendingText,
+      activeMediaSends: activeMediaSends ?? this.activeMediaSends,
       error: clearError ? null : (error ?? this.error),
       replyTarget: clearReplyTarget ? null : (replyTarget ?? this.replyTarget),
-      editingMessage: clearEditingMessage ? null : (editingMessage ?? this.editingMessage),
+      editingMessage: clearEditingMessage
+          ? null
+          : (editingMessage ?? this.editingMessage),
       typingUsers: typingUsers ?? this.typingUsers,
       draft: draft ?? this.draft,
       pinnedMessages: pinnedMessages ?? this.pinnedMessages,
       currentPinnedIndex: currentPinnedIndex ?? this.currentPinnedIndex,
       canPinMessages: canPinMessages ?? this.canPinMessages,
       translatedMessages: translatedMessages ?? this.translatedMessages,
-      translatingMessageIds: translatingMessageIds ?? this.translatingMessageIds,
-      detectedSourceLanguages: detectedSourceLanguages ?? this.detectedSourceLanguages,
+      translatingMessageIds:
+          translatingMessageIds ?? this.translatingMessageIds,
+      detectedSourceLanguages:
+          detectedSourceLanguages ?? this.detectedSourceLanguages,
       autoTranslate: autoTranslate ?? this.autoTranslate,
-      defaultTargetLanguage: defaultTargetLanguage ?? this.defaultTargetLanguage,
+      defaultTargetLanguage:
+          defaultTargetLanguage ?? this.defaultTargetLanguage,
       smartReplyTranslate: smartReplyTranslate ?? this.smartReplyTranslate,
-      detectedRecipientLanguage: detectedRecipientLanguage ?? this.detectedRecipientLanguage,
+      detectedRecipientLanguage:
+          detectedRecipientLanguage ?? this.detectedRecipientLanguage,
       smartReplyOriginals: smartReplyOriginals ?? this.smartReplyOriginals,
       contentFilter: contentFilter ?? this.contentFilter,
-      pendingCommand: clearPendingCommand ? null : (pendingCommand ?? this.pendingCommand),
+      pendingCommand: clearPendingCommand
+          ? null
+          : (pendingCommand ?? this.pendingCommand),
       isChannel: isChannel ?? this.isChannel,
       canSendMessages: canSendMessages ?? this.canSendMessages,
       slowModeInterval: slowModeInterval ?? this.slowModeInterval,
@@ -233,34 +255,35 @@ class ChatState extends Equatable {
 
   @override
   List<Object?> get props => [
-        roomId,
-        messages,
-        isLoading,
-        isLoadingMore,
-        hasMore,
-        isSending,
-        error,
-        replyTarget,
-        editingMessage,
-        typingUsers,
-        draft,
-        pinnedMessages,
-        currentPinnedIndex,
-        canPinMessages,
-        translatedMessages,
-        translatingMessageIds,
-        detectedSourceLanguages,
-        autoTranslate,
-        defaultTargetLanguage,
-        smartReplyTranslate,
-        detectedRecipientLanguage,
-        smartReplyOriginals,
-        contentFilter,
-        pendingCommand,
-        isChannel,
-        canSendMessages,
-        slowModeInterval,
-        lastMessageSentAt,
-      ];
+    roomId,
+    messages,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    isSending,
+    isSendingText,
+    activeMediaSends,
+    error,
+    replyTarget,
+    editingMessage,
+    typingUsers,
+    draft,
+    pinnedMessages,
+    currentPinnedIndex,
+    canPinMessages,
+    translatedMessages,
+    translatingMessageIds,
+    detectedSourceLanguages,
+    autoTranslate,
+    defaultTargetLanguage,
+    smartReplyTranslate,
+    detectedRecipientLanguage,
+    smartReplyOriginals,
+    contentFilter,
+    pendingCommand,
+    isChannel,
+    canSendMessages,
+    slowModeInterval,
+    lastMessageSentAt,
+  ];
 }
-

@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:typed_data';
+
 import 'package:n42_chat/src/data/datasources/matrix/message/encrypted_send_guard.dart';
 
 import 'package:bloc_test/bloc_test.dart';
@@ -64,48 +66,36 @@ void main() {
     mockSecureStorage = MockSecureStorage();
 
     // Default stubs for methods called during InitializeChat
-    when(
-      () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
-    ).thenAnswer((_) async => _testMessages);
-    when(
-      () => mockRepository.watchMessages(any()),
-    ).thenAnswer((_) => const Stream.empty());
+    when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
+        .thenAnswer((_) async => _testMessages);
+    when(() => mockRepository.watchMessages(any()))
+        .thenAnswer((_) => const Stream.empty());
     when(() => mockRepository.watchPollResponses(any())).thenReturn(null);
-    when(
-      () => mockRepository.markAsRead(any(), any()),
-    ).thenAnswer((_) async {});
-    when(
-      () => mockRepository.getLocallyDeletedMessageIds(any()),
-    ).thenAnswer((_) async => <String>{});
-    when(
-      () => mockRepository.getPollAggregations(any(), any()),
-    ).thenAnswer((_) async => null);
-    when(
-      () => mockRepository.getReactionAggregations(any(), any()),
-    ).thenAnswer((_) async => null);
+    when(() => mockRepository.markAsRead(any(), any()))
+        .thenAnswer((_) async {});
+    when(() => mockRepository.getLocallyDeletedMessageIds(any()))
+        .thenAnswer((_) async => <String>{});
+    when(() => mockRepository.getPollAggregations(any(), any()))
+        .thenAnswer((_) async => null);
+    when(() => mockRepository.getReactionAggregations(any(), any()))
+        .thenAnswer((_) async => null);
     when(
       () => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')),
     ).thenAnswer((_) async => _testMessages);
 
     // Default stubs for PreferencesDataSource
-    when(
-      () => mockSecureStorage.getMessageDestructionTimes(any()),
-    ).thenAnswer((_) async => <String, DateTime>{});
-    when(
-      () => mockSecureStorage.getScheduledMessages(any()),
-    ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
-    when(
-      () => mockSecureStorage.shouldShowReadReceipts(),
-    ).thenAnswer((_) async => true);
-    when(
-      () => mockSecureStorage.shouldShowTypingIndicator(),
-    ).thenAnswer((_) async => true);
-    when(
-      () => mockSecureStorage.getDueScheduledMessages(),
-    ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
-    when(
-      () => mockSecureStorage.getDefaultSelfDestructSeconds(),
-    ).thenAnswer((_) async => null);
+    when(() => mockSecureStorage.getMessageDestructionTimes(any()))
+        .thenAnswer((_) async => <String, DateTime>{});
+    when(() => mockSecureStorage.getScheduledMessages(any()))
+        .thenAnswer((_) async => <ScheduledMessageDraft>[]);
+    when(() => mockSecureStorage.shouldShowReadReceipts())
+        .thenAnswer((_) async => true);
+    when(() => mockSecureStorage.shouldShowTypingIndicator())
+        .thenAnswer((_) async => true);
+    when(() => mockSecureStorage.getDueScheduledMessages())
+        .thenAnswer((_) async => <ScheduledMessageDraft>[]);
+    when(() => mockSecureStorage.getDefaultSelfDestructSeconds())
+        .thenAnswer((_) async => null);
   });
 
   ChatBloc buildBloc() => ChatBloc(
@@ -156,9 +146,8 @@ void main() {
     });
 
     test('handles empty room gracefully', () async {
-      when(
-        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
-      ).thenAnswer((_) async => []);
+      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
+          .thenAnswer((_) async => []);
 
       final bloc = buildBloc();
       bloc.add(const InitializeChat(_roomId));
@@ -172,9 +161,8 @@ void main() {
     });
 
     test('sets error when repository throws on load', () async {
-      when(
-        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
-      ).thenThrow(Exception('Network error'));
+      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
+          .thenThrow(Exception('Network error'));
 
       final bloc = buildBloc();
       bloc.add(const InitializeChat(_roomId));
@@ -213,9 +201,8 @@ void main() {
       final bloc = await buildInitializedBloc();
 
       // Now make it fail
-      when(
-        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
-      ).thenThrow(Exception('Failed'));
+      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
+          .thenThrow(Exception('Failed'));
 
       bloc.add(const LoadMessages(_roomId));
       await Future<void>.delayed(const Duration(milliseconds: 200));
@@ -240,9 +227,8 @@ void main() {
           status: MessageStatus.sent,
         ),
       );
-      when(
-        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
-      ).thenAnswer((_) async => manyMessages);
+      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
+          .thenAnswer((_) async => manyMessages);
 
       final bloc = buildBloc();
       bloc.add(const InitializeChat(_roomId));
@@ -293,9 +279,8 @@ void main() {
     test(
       'uses default self-destruct timer when message does not override it',
       () async {
-        when(
-          () => mockSecureStorage.getDefaultSelfDestructSeconds(),
-        ).thenAnswer((_) async => 45);
+        when(() => mockSecureStorage.getDefaultSelfDestructSeconds())
+            .thenAnswer((_) async => 45);
         when(
           () => mockRepository.sendTextMessage(
             any(),
@@ -409,28 +394,25 @@ void main() {
       },
     );
 
-    test(
-      'encryption gate failure stays a failure without advancing sent timestamp',
-      () async {
-        when(
-          () => mockRepository.sendTextMessage(
-            any(),
-            any(),
-            selfDestructAfter: any(named: 'selfDestructAfter'),
-            mentionedUserIds: any(named: 'mentionedUserIds'),
-            mentionsRoom: any(named: 'mentionsRoom'),
-          ),
-        ).thenThrow(const EncryptedSendNotReady());
-        final bloc = await buildInitializedBloc();
-        final sentAt = bloc.state.lastMessageSentAt;
-        bloc.add(const SendTextMessage('Keep this draft'));
-        await Future<void>.delayed(const Duration(milliseconds: 200));
-        expect(bloc.state.isSending, isFalse);
-        expect(bloc.state.error, EncryptedSendNotReady.code);
-        expect(bloc.state.lastMessageSentAt, sentAt);
-        await bloc.close();
-      },
-    );
+    test('encryption gate failure stays a failure without advancing sent timestamp', () async {
+      when(
+        () => mockRepository.sendTextMessage(
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenThrow(const EncryptedSendNotReady());
+      final bloc = await buildInitializedBloc();
+      final sentAt = bloc.state.lastMessageSentAt;
+      bloc.add(const SendTextMessage('Keep this draft'));
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(bloc.state.isSending, isFalse);
+      expect(bloc.state.error, EncryptedSendNotReady.code);
+      expect(bloc.state.lastMessageSentAt, sentAt);
+      await bloc.close();
+    });
 
     test('emits error when send fails', () async {
       when(
@@ -479,6 +461,103 @@ void main() {
   // =========================================================================
 
   group('SendImageMessage', () {
+    test('overlapping uploads keep the media count until both finish', () async {
+      final firstUpload = Completer<MessageEntity>();
+      final secondUpload = Completer<MessageEntity>();
+      var calls = 0;
+      when(
+        () => mockRepository.sendImageMessage(
+          any(),
+          imageBytes: any(named: 'imageBytes'),
+          filename: any(named: 'filename'),
+          mimeType: any(named: 'mimeType'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+        ),
+      ).thenAnswer((_) => calls++ == 0 ? firstUpload.future : secondUpload.future);
+
+      final bloc = await buildInitializedBloc();
+      bloc.add(
+        SendImageMessage(
+          imageBytes: Uint8List.fromList([1]),
+          filename: 'first.png',
+        ),
+      );
+      bloc.add(
+        SendImageMessage(
+          imageBytes: Uint8List.fromList([2]),
+          filename: 'second.png',
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(bloc.state.activeMediaSends, 2);
+
+      firstUpload.complete(_testMessages.first);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.activeMediaSends, 1);
+      expect(bloc.state.isSending, isTrue);
+
+      secondUpload.complete(_testMessages.first);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(bloc.state.activeMediaSends, 0);
+      expect(bloc.state.isSending, isFalse);
+      await bloc.close();
+    });
+
+    test('text can send while an image upload is still pending', () async {
+      final imageResult = Completer<MessageEntity>();
+      when(
+        () => mockRepository.sendImageMessage(
+          any(),
+          imageBytes: any(named: 'imageBytes'),
+          filename: any(named: 'filename'),
+          mimeType: any(named: 'mimeType'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+        ),
+      ).thenAnswer((_) => imageResult.future);
+      when(
+        () => mockRepository.sendTextMessage(
+          any(),
+          any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenAnswer((_) async => _testMessages.first);
+
+      final bloc = await buildInitializedBloc();
+      bloc.add(
+        SendImageMessage(
+          imageBytes: Uint8List.fromList([1, 2, 3]),
+          filename: 'slow.png',
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.activeMediaSends, 1);
+      expect(bloc.state.isSending, isTrue);
+
+      bloc.add(const SendTextMessage('Send while uploading'));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      verify(
+        () => mockRepository.sendTextMessage(
+          _roomId,
+          'Send while uploading',
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).called(1);
+      expect(bloc.state.isSendingText, isFalse);
+      expect(bloc.state.activeMediaSends, 1);
+      expect(bloc.state.isSending, isTrue);
+
+      imageResult.complete(_testMessages.first);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(bloc.state.activeMediaSends, 0);
+      expect(bloc.state.isSending, isFalse);
+      await bloc.close();
+    });
+
     test('sends image and calls repository', () async {
       when(
         () => mockRepository.sendImageMessage(
@@ -712,9 +791,8 @@ void main() {
           status: MessageStatus.sent,
         ),
       );
-      when(
-        () => mockRepository.getMessages(any(), limit: any(named: 'limit')),
-      ).thenAnswer((_) async => initialMessages);
+      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
+          .thenAnswer((_) async => initialMessages);
       when(
         () =>
             mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')),
@@ -803,9 +881,8 @@ void main() {
     });
 
     test('skips read receipt when privacy setting is off', () async {
-      when(
-        () => mockSecureStorage.shouldShowReadReceipts(),
-      ).thenAnswer((_) async => false);
+      when(() => mockSecureStorage.shouldShowReadReceipts())
+          .thenAnswer((_) async => false);
 
       final bloc = await buildInitializedBloc();
       clearInteractions(mockRepository);
