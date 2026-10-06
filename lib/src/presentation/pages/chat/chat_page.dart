@@ -298,7 +298,6 @@ class _ChatPageState extends State<_ChatPageContent> {
   bool _isAiSummarizing = false;
   bool _isAiSummaryConsentOpen = false;
   int _aiSummaryMessageCount = 0;
-  final Map<String, WalletTransferReceiptResult> _verifiedTransferResults = {};
   List<String> _smartReplySuggestions = const [];
   bool _isLoadingSmartReplySuggestions = false;
 

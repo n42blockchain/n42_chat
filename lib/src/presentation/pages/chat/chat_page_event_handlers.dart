@@ -343,7 +343,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     final amount = metadata?.amount ?? '--';
     final token = metadata?.token ?? '--';
     final txHash = metadata?.txHash;
-    var receiptResult = _verifiedTransferResults[txHash];
+    WalletTransferReceiptResult? receiptResult;
     var isVerifying = false;
 
     final canVerify =
@@ -380,7 +380,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                 Text('$amount $token'),
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
-                  'Status: ${receiptResult == null ? "broadcast" : _receiptStatusLabel(receiptResult!)}',
+                  'Chain status: ${receiptResult == null ? "Not checked" : _receiptStatusLabel(receiptResult!)}',
                 ),
                 if (receiptResult != null &&
                     receiptResult!.state ==
@@ -419,24 +419,10 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                               metadata,
                             );
                             if (!ctx.mounted) return;
-                            if (txHash != null && mounted) {
-                              setState(() {
-                                if (result.state ==
-                                    WalletTransferReceiptState.confirmed) {
-                                  _verifiedTransferResults[txHash] = result;
-                                } else {
-                                  _verifiedTransferResults.remove(txHash);
-                                }
-                              });
-                            }
                             setModalState(() {
                               receiptResult = result;
                               isVerifying = false;
                             });
-                            if (result.state ==
-                                WalletTransferReceiptState.confirmed) {
-                              Navigator.of(ctx).pop();
-                            }
                           },
                     icon: isVerifying
                         ? const SizedBox.square(
@@ -444,11 +430,23 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.verified_outlined),
-                    label: const Text('Verify on chain'),
+                    label: Text(
+                      receiptResult?.state ==
+                              WalletTransferReceiptState.confirmed
+                          ? 'Verify again'
+                          : 'Verify on chain',
+                    ),
                   ),
                 ] else ...[
                   const Text(
                     'This transfer does not include exact chain and asset details.',
+                  ),
+                ],
+                if (receiptResult != null) ...[
+                  const SizedBox(height: AppDimensions.spacingS),
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: Text(S.of(context)?.commonClose ?? 'Close'),
                   ),
                 ],
               ],
@@ -457,31 +455,36 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         ),
       ),
     );
-    // A new query already updated the local verified state. Closing the sheet
-    // without rechecking preserves the most recent result.
   }
 
   Future<WalletTransferReceiptResult> _verifyTransferReceipt(
     MessageMetadata metadata,
   ) async {
-    final repository = getIt<ITransferRepository>();
-    if (repository is! ITransferReceiptRepository) {
+    try {
+      final repository = getIt<ITransferRepository>();
+      if (repository is! ITransferReceiptRepository) {
+        return const WalletTransferReceiptResult(
+          WalletTransferReceiptState.unsupported,
+        );
+      }
+      return await (repository as ITransferReceiptRepository)
+          .verifyTransferReceipt(
+            WalletTransferReceiptRequest(
+              transactionHash: metadata.txHash!,
+              senderAddress: metadata.transferSenderAddress!,
+              receiverAddress: metadata.transferReceiverAddress!,
+              amount: metadata.amount!,
+              chain: metadata.paymentChain!,
+              network: metadata.paymentNetwork!,
+              assetType: metadata.paymentAssetType!,
+              assetId: metadata.paymentAssetId,
+            ),
+          );
+    } catch (_) {
       return const WalletTransferReceiptResult(
-        WalletTransferReceiptState.unsupported,
+        WalletTransferReceiptState.unavailable,
       );
     }
-    return (repository as ITransferReceiptRepository).verifyTransferReceipt(
-      WalletTransferReceiptRequest(
-        transactionHash: metadata.txHash!,
-        senderAddress: metadata.transferSenderAddress!,
-        receiverAddress: metadata.transferReceiverAddress!,
-        amount: metadata.amount!,
-        chain: metadata.paymentChain!,
-        network: metadata.paymentNetwork!,
-        assetType: metadata.paymentAssetType!,
-        assetId: metadata.paymentAssetId,
-      ),
-    );
   }
 
   String _receiptStatusLabel(

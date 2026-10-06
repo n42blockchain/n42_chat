@@ -162,23 +162,26 @@ class MatrixMetadataExtractor {
 
     // 转账信息
     if (event.content['msgtype'] == 'n42.transfer') {
-      final claimedStatus = event.content['status'] as String?;
+      final claimedStatus = _optionalString(event.content, 'status');
       return MessageMetadata(
-        amount: event.content['amount'] as String?,
-        token: event.content['token'] as String?,
+        amount: _optionalString(event.content, 'amount'),
+        token: _optionalString(event.content, 'token'),
         // Matrix content is a sender claim. Until the host supplies a verified
         // chain receipt, a claimed completion must not render as paid.
         transferStatus: claimedStatus == 'completed'
             ? 'pending'
             : claimedStatus,
-        txHash: event.content['tx_hash'] as String?,
-        transferId: event.content['transfer_id'] as String?,
-        transferSenderAddress: event.content['sender_address'] as String?,
-        transferReceiverAddress: event.content['receiver_address'] as String?,
-        paymentChain: event.content['chain'] as String?,
-        paymentNetwork: event.content['network'] as String?,
-        paymentAssetType: event.content['asset_type'] as String?,
-        paymentAssetId: event.content['asset_id'] as String?,
+        txHash: _optionalString(event.content, 'tx_hash'),
+        transferId: _optionalString(event.content, 'transfer_id'),
+        transferSenderAddress: _optionalString(event.content, 'sender_address'),
+        transferReceiverAddress: _optionalString(
+          event.content,
+          'receiver_address',
+        ),
+        paymentChain: _optionalString(event.content, 'chain'),
+        paymentNetwork: _optionalString(event.content, 'network'),
+        paymentAssetType: _optionalString(event.content, 'asset_type'),
+        paymentAssetId: _optionalString(event.content, 'asset_id'),
       );
     }
 
@@ -534,5 +537,10 @@ class MatrixMetadataExtractor {
       debugLog('MatrixMessageDataSource: Failed to extract poll metadata: $e');
       return null;
     }
+  }
+
+  String? _optionalString(Map<String, dynamic> content, String key) {
+    final value = content[key];
+    return value is String ? value : null;
   }
 }

@@ -270,4 +270,38 @@ void main() {
     expect(message.metadata?.paymentNetwork, 'mainnet');
     expect(message.metadata?.paymentAssetType, 'native');
   });
+
+  test('malformed optional transfer fields do not break message mapping', () {
+    when(() => event.messageType).thenReturn('n42.transfer');
+    when(() => event.body).thenReturn('Transfer');
+    when(() => event.formattedText).thenReturn('');
+    when(() => event.content).thenReturn({
+      'msgtype': 'n42.transfer',
+      'body': 'Transfer',
+      'amount': ['1.25'],
+      'token': 42,
+      'status': 'completed',
+      'tx_hash': {'value': '0x1234'},
+      'sender_address': 123,
+      'receiver_address': ['0xreceiver'],
+      'chain': {'name': 'ETH'},
+      'network': 'mainnet',
+      'asset_type': false,
+      'asset_id': ['0xtoken'],
+    });
+
+    final message = mapper.mapEventToMessage(event, room);
+
+    expect(message.type, MessageType.transfer);
+    expect(message.metadata?.transferStatus, 'pending');
+    expect(message.metadata?.amount, isNull);
+    expect(message.metadata?.token, isNull);
+    expect(message.metadata?.txHash, isNull);
+    expect(message.metadata?.transferSenderAddress, isNull);
+    expect(message.metadata?.transferReceiverAddress, isNull);
+    expect(message.metadata?.paymentChain, isNull);
+    expect(message.metadata?.paymentNetwork, 'mainnet');
+    expect(message.metadata?.paymentAssetType, isNull);
+    expect(message.metadata?.paymentAssetId, isNull);
+  });
 }
