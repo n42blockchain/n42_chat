@@ -675,7 +675,7 @@ class _ChatPageState extends State<_ChatPageContent> {
 
     // 斜杠命令拦截（编辑模式下不拦截）
     final chatBloc = context.read<ChatBloc>();
-    if (chatBloc.state.isSending || _pendingEncryptedDraft != null) return;
+    if (chatBloc.state.isSendingText || _pendingEncryptedDraft != null) return;
     final editingMsg = chatBloc.state.editingMessage;
 
     if (editingMsg == null &&
