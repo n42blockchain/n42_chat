@@ -25,12 +25,12 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: Task 15B Chat source implements and tests the optional exact wallet/repository capabilities, strict v1 URI parsing, selected-asset matching and decimal checks, repository/bloc/message identity propagation, and scanner, transfer, merchant/receive QR and payment-message UI. The N42 host bridge now opts into `IExactWalletTransfer` and its focused wallet bridge suite passes. The host has not yet pinned the updated Chat source; no live transfer or deployment was tested.
 - Next step: pin the reviewed immutable Chat commit and verify the resolved package/mirror in the host. Keep live account and device signing acceptance separate from source integration.
 
-### PAYMENT-RECEIPT-001 Chain confirmation and independent receipt verification are not implemented
+### PAYMENT-RECEIPT-001 Non-EVM receipt verification and independent acceptance remain open
 
 - Severity: H
 - Added: 2026-10-05
-- Current state: A successful wallet submission now remains `processing` with its transaction hash; payment requests do not emit a paid acknowledgement before chain confirmation. Repository status updates reject `completed` without a verified receipt, and Matrix transfer events that claim `completed` render as pending. Exact asset identity is carried for exact transfers, but the host bridge has no receipt-verification capability wired to an authoritative network adapter. A hash alone does not prove inclusion, finality, sender/recipient, amount, or selected asset.
-- Next step: define supported chains and confirmation rules, add a host receipt verifier, bind verification to exact transaction fields, and test pending, confirmed, failed and reorg outcomes. Do not mark payments complete or claim independently verifiable receipts until then. No contract or chain was selected for optional salted commitments; chat and social data must stay off-chain.
+- Current state: Chat carries exact transfer sender, receiver, chain, network, asset, and amount fields from Matrix events into a local verification action. The host wallet bridge now verifies native EVM and standard ERC-20 transactions against its configured RPC, checks the RPC chain ID and exact transfer fields, and requires 12 mainnet or 1 testnet confirmation. A fresh non-confirmed result clears the local verified marker. Missing/ambiguous wallet assets and other chain families remain unsupported. The result is local to the current app session; this is not yet receiver-device acceptance, durable payment settlement, or protection against a later reorg without another check.
+- Next step: validate receipt checks on a separate receiver device and real configured test networks; add reorg/replay and account-switching coverage; define support for other chain families and token standards. Keep settlement state bound to a durable authoritative result before marking payment requests paid. No contract or chain was selected for optional salted commitments; chat and social data must stay off-chain.
 
 ### DEP-001 Latest generator stack — resolved in Task 13A
 

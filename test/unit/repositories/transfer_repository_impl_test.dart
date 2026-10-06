@@ -19,6 +19,9 @@ import 'package:n42_chat/src/integration/wallet_bridge.dart';
 
 class MockIWalletBridge extends Mock implements IWalletBridge {}
 
+class MockReceiptWalletBridge extends Mock
+    implements IWalletBridge, IWalletTransferReceiptVerifier {}
+
 class MockMatrixMessageDataSource extends Mock
     implements MatrixMessageDataSource {}
 
@@ -41,6 +44,40 @@ void main() {
       mockClientManager,
     );
   });
+
+  test(
+    'delegates receipt verification only to wallets with the capability',
+    () async {
+      const request = WalletTransferReceiptRequest(
+        transactionHash: '0x${'a'}',
+        senderAddress: 'sender',
+        receiverAddress: 'receiver',
+        amount: '1',
+        chain: 'ETH',
+        network: 'mainnet',
+        assetType: 'native',
+      );
+      const confirmed = WalletTransferReceiptResult(
+        WalletTransferReceiptState.confirmed,
+        confirmations: 12,
+        requiredConfirmations: 12,
+      );
+      final receiptWallet = MockReceiptWalletBridge();
+      when(() => receiptWallet.verifyTransferReceipt(request))
+          .thenAnswer((_) async => confirmed);
+      final receiptRepository = TransferRepositoryImpl(
+        receiptWallet,
+        mockMessageDataSource,
+        mockClientManager,
+      );
+
+      expect(await receiptRepository.verifyTransferReceipt(request), confirmed);
+      verify(() => receiptWallet.verifyTransferReceipt(request)).called(1);
+
+      final unsupported = await repository.verifyTransferReceipt(request);
+      expect(unsupported.state, WalletTransferReceiptState.unsupported);
+    },
+  );
 
   group('initiateTransfer', () {
     setUp(() {

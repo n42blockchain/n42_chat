@@ -545,6 +545,11 @@ class MessageMetadata extends Equatable {
   /// 交易哈希
   final String? txHash;
 
+  /// Exact wallet identity needed to check an N42 transfer on-chain.
+  final String? transferSenderAddress;
+  final String? transferReceiverAddress;
+  final String? transferId;
+
   /// 收款请求 ID
   final String? paymentRequestId;
 
@@ -680,6 +685,9 @@ class MessageMetadata extends Equatable {
     this.token,
     this.transferStatus,
     this.txHash,
+    this.transferSenderAddress,
+    this.transferReceiverAddress,
+    this.transferId,
     this.paymentRequestId,
     this.paymentReceiverAddress,
     this.paymentRequestExpiresAt,
@@ -762,6 +770,9 @@ class MessageMetadata extends Equatable {
     token,
     transferStatus,
     txHash,
+    transferSenderAddress,
+    transferReceiverAddress,
+    transferId,
     paymentRequestId,
     paymentReceiverAddress,
     paymentRequestExpiresAt,
@@ -839,6 +850,9 @@ class MessageMetadata extends Equatable {
     token: token,
     transferStatus: transferStatus,
     txHash: txHash,
+    transferSenderAddress: transferSenderAddress,
+    transferReceiverAddress: transferReceiverAddress,
+    transferId: transferId,
     paymentRequestId: paymentRequestId,
     paymentReceiverAddress: paymentReceiverAddress,
     paymentRequestExpiresAt: paymentRequestExpiresAt,
@@ -890,6 +904,9 @@ class MessageMetadata extends Equatable {
     token: token,
     transferStatus: transferStatus,
     txHash: txHash,
+    transferSenderAddress: transferSenderAddress,
+    transferReceiverAddress: transferReceiverAddress,
+    transferId: transferId,
     paymentRequestId: paymentRequestId,
     paymentReceiverAddress: paymentReceiverAddress,
     paymentRequestExpiresAt: paymentRequestExpiresAt,
@@ -928,6 +945,9 @@ class MessageMetadata extends Equatable {
     String? token,
     String? transferStatus,
     String? txHash,
+    String? transferSenderAddress,
+    String? transferReceiverAddress,
+    String? transferId,
     String? paymentRequestId,
     String? paymentReceiverAddress,
     DateTime? paymentRequestExpiresAt,
@@ -960,6 +980,10 @@ class MessageMetadata extends Equatable {
     token: token ?? this.token,
     transferStatus: transferStatus ?? this.transferStatus,
     txHash: txHash ?? this.txHash,
+    transferSenderAddress: transferSenderAddress ?? this.transferSenderAddress,
+    transferReceiverAddress:
+        transferReceiverAddress ?? this.transferReceiverAddress,
+    transferId: transferId ?? this.transferId,
     paymentRequestId: paymentRequestId ?? this.paymentRequestId,
     paymentReceiverAddress:
         paymentReceiverAddress ?? this.paymentReceiverAddress,

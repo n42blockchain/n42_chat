@@ -342,65 +342,158 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     final metadata = message.metadata;
     final amount = metadata?.amount ?? '--';
     final token = metadata?.token ?? '--';
-    final status = metadata?.transferStatus ?? 'pending';
     final txHash = metadata?.txHash;
+    var receiptResult = _verifiedTransferResults[txHash];
+    var isVerifying = false;
+
+    final canVerify =
+        metadata != null &&
+        txHash?.isNotEmpty == true &&
+        metadata.transferSenderAddress?.isNotEmpty == true &&
+        metadata.transferReceiverAddress?.isNotEmpty == true &&
+        metadata.paymentChain?.isNotEmpty == true &&
+        metadata.paymentNetwork?.isNotEmpty == true &&
+        metadata.paymentAssetType?.isNotEmpty == true &&
+        metadata.amount?.isNotEmpty == true;
 
     await showModalBottomSheet<void>(
       context: context,
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                S.of(context)?.commonTransfer ?? 'Transfer',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 18,
-                  height: 1.3,
-                  fontWeight: FontWeight.w600,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  S.of(context)?.commonTransfer ?? 'Transfer',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    height: 1.3,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppDimensions.spacing),
-              Text(
-                '$amount $token',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: AppDimensions.spacingS),
-              Text(
-                'Status: $status',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (txHash?.isNotEmpty == true) ...[
+                const SizedBox(height: AppDimensions.spacing),
+                Text('$amount $token'),
                 const SizedBox(height: AppDimensions.spacingS),
-                SelectableText(txHash!),
-                const SizedBox(height: AppDimensions.spacingM),
-                TextButton.icon(
-                  onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: txHash));
-                    if (!ctx.mounted || !mounted) return;
-                    Navigator.of(ctx).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(S.of(context)?.chatCopied ?? 'Copied'),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.copy, size: 18),
-                  label: Text(S.of(context)?.chatCopied ?? 'Copy tx hash'),
+                Text(
+                  'Status: ${receiptResult == null ? "broadcast" : _receiptStatusLabel(receiptResult!)}',
                 ),
+                if (receiptResult != null &&
+                    receiptResult!.state ==
+                        WalletTransferReceiptState.confirmed)
+                  Text(
+                    'Confirmed: ${receiptResult!.confirmations} / '
+                    '${receiptResult!.requiredConfirmations} blocks',
+                  ),
+                if (txHash?.isNotEmpty == true) ...[
+                  const SizedBox(height: AppDimensions.spacingS),
+                  SelectableText(txHash!),
+                  const SizedBox(height: AppDimensions.spacingM),
+                  TextButton.icon(
+                    onPressed: () async {
+                      await Clipboard.setData(ClipboardData(text: txHash));
+                      if (!ctx.mounted || !mounted) return;
+                      Navigator.of(ctx).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(S.of(context)?.chatCopied ?? 'Copied'),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.copy, size: 18),
+                    label: Text(S.of(context)?.chatCopied ?? 'Copy tx hash'),
+                  ),
+                ],
+                if (canVerify) ...[
+                  const SizedBox(height: AppDimensions.spacingS),
+                  FilledButton.icon(
+                    onPressed: isVerifying
+                        ? null
+                        : () async {
+                            setModalState(() => isVerifying = true);
+                            final result = await _verifyTransferReceipt(
+                              metadata,
+                            );
+                            if (!ctx.mounted) return;
+                            if (txHash != null && mounted) {
+                              setState(() {
+                                if (result.state ==
+                                    WalletTransferReceiptState.confirmed) {
+                                  _verifiedTransferResults[txHash] = result;
+                                } else {
+                                  _verifiedTransferResults.remove(txHash);
+                                }
+                              });
+                            }
+                            setModalState(() {
+                              receiptResult = result;
+                              isVerifying = false;
+                            });
+                            if (result.state ==
+                                WalletTransferReceiptState.confirmed) {
+                              Navigator.of(ctx).pop();
+                            }
+                          },
+                    icon: isVerifying
+                        ? const SizedBox.square(
+                            dimension: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.verified_outlined),
+                    label: const Text('Verify on chain'),
+                  ),
+                ] else ...[
+                  const Text(
+                    'This transfer does not include exact chain and asset details.',
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
     );
+    // A new query already updated the local verified state. Closing the sheet
+    // without rechecking preserves the most recent result.
   }
+
+  Future<WalletTransferReceiptResult> _verifyTransferReceipt(
+    MessageMetadata metadata,
+  ) async {
+    final repository = getIt<ITransferRepository>();
+    if (repository is! ITransferReceiptRepository) {
+      return const WalletTransferReceiptResult(
+        WalletTransferReceiptState.unsupported,
+      );
+    }
+    return (repository as ITransferReceiptRepository).verifyTransferReceipt(
+      WalletTransferReceiptRequest(
+        transactionHash: metadata.txHash!,
+        senderAddress: metadata.transferSenderAddress!,
+        receiverAddress: metadata.transferReceiverAddress!,
+        amount: metadata.amount!,
+        chain: metadata.paymentChain!,
+        network: metadata.paymentNetwork!,
+        assetType: metadata.paymentAssetType!,
+        assetId: metadata.paymentAssetId,
+      ),
+    );
+  }
+
+  String _receiptStatusLabel(
+    WalletTransferReceiptResult result,
+  ) => switch (result.state) {
+    WalletTransferReceiptState.pending => 'Pending on chain',
+    WalletTransferReceiptState.confirmed => 'Confirmed',
+    WalletTransferReceiptState.failed => 'Failed on chain',
+    WalletTransferReceiptState.mismatch => 'Transaction details do not match',
+    WalletTransferReceiptState.unsupported => 'Chain verification unsupported',
+    WalletTransferReceiptState.unavailable => 'Verification unavailable',
+  };
 
   /// 名片消息点击 - 跳转到用户资料页添加好友
   void _onContactCardTap(

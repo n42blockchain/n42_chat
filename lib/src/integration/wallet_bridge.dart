@@ -171,6 +171,57 @@ abstract interface class IExactWalletTransfer {
   });
 }
 
+/// Exact fields the receiver must match against an authoritative chain receipt.
+class WalletTransferReceiptRequest {
+  const WalletTransferReceiptRequest({
+    required this.transactionHash,
+    required this.senderAddress,
+    required this.receiverAddress,
+    required this.amount,
+    required this.chain,
+    required this.network,
+    required this.assetType,
+    this.assetId,
+  });
+
+  final String transactionHash;
+  final String senderAddress;
+  final String receiverAddress;
+  final String amount;
+  final String chain;
+  final String network;
+  final String assetType;
+  final String? assetId;
+}
+
+enum WalletTransferReceiptState {
+  pending,
+  confirmed,
+  failed,
+  mismatch,
+  unsupported,
+  unavailable,
+}
+
+class WalletTransferReceiptResult {
+  const WalletTransferReceiptResult(
+    this.state, {
+    this.confirmations = 0,
+    this.requiredConfirmations = 0,
+  });
+
+  final WalletTransferReceiptState state;
+  final int confirmations;
+  final int requiredConfirmations;
+}
+
+/// Optional capability for wallets that can check the exact transfer on-chain.
+abstract interface class IWalletTransferReceiptVerifier {
+  Future<WalletTransferReceiptResult> verifyTransferReceipt(
+    WalletTransferReceiptRequest request,
+  );
+}
+
 /// Dispatch an exact request only when the wallet explicitly supports it.
 Future<TransferResult> requestWalletTransferExact(
   IWalletBridge bridge, {
@@ -456,4 +507,3 @@ class NoOpWalletBridge extends IWalletBridge {
   @override
   Future<WalletUserInfo?> getUserInfoByAddress(String address) async => null;
 }
-

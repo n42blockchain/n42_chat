@@ -172,6 +172,13 @@ class MatrixMetadataExtractor {
             ? 'pending'
             : claimedStatus,
         txHash: event.content['tx_hash'] as String?,
+        transferId: event.content['transfer_id'] as String?,
+        transferSenderAddress: event.content['sender_address'] as String?,
+        transferReceiverAddress: event.content['receiver_address'] as String?,
+        paymentChain: event.content['chain'] as String?,
+        paymentNetwork: event.content['network'] as String?,
+        paymentAssetType: event.content['asset_type'] as String?,
+        paymentAssetId: event.content['asset_id'] as String?,
       );
     }
 

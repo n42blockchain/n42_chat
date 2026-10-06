@@ -123,6 +123,14 @@ abstract interface class IExactTransferRepository {
   });
 }
 
+/// Optional chain verification support. Legacy transfer repositories remain
+/// compatible and return an unsupported result until they opt in.
+abstract interface class ITransferReceiptRepository {
+  Future<WalletTransferReceiptResult> verifyTransferReceipt(
+    WalletTransferReceiptRequest request,
+  );
+}
+
 IExactTransferRepository requireExactTransferRepository(
   ITransferRepository repository,
 ) {

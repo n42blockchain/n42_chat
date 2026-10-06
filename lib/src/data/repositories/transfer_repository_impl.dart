@@ -11,7 +11,10 @@ import '../datasources/matrix/matrix_client_manager.dart';
 
 /// 转账仓库实现
 class TransferRepositoryImpl
-    implements ITransferRepository, IExactTransferRepository {
+    implements
+        ITransferRepository,
+        IExactTransferRepository,
+        ITransferReceiptRepository {
   final IWalletBridge _walletBridge;
   final MatrixMessageDataSource _messageDataSource;
   final MatrixClientManager _clientManager;
@@ -245,6 +248,21 @@ class TransferRepositoryImpl
       transactionHash: transactionHash ?? transfer.transactionHash,
       failureReason: failureReason,
       completedAt: status == TransferStatus.completed ? DateTime.now() : null,
+    );
+  }
+
+  @override
+  Future<WalletTransferReceiptResult> verifyTransferReceipt(
+    WalletTransferReceiptRequest request,
+  ) async {
+    final bridge = _walletBridge;
+    if (bridge is! IWalletTransferReceiptVerifier) {
+      return const WalletTransferReceiptResult(
+        WalletTransferReceiptState.unsupported,
+      );
+    }
+    return (bridge as IWalletTransferReceiptVerifier).verifyTransferReceipt(
+      request,
     );
   }
 
