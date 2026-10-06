@@ -22,8 +22,15 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 - Severity: H
 - Added: 2026-09-27
-- Current state: Task 15B Chat source through `42de7970` implements and tests the optional exact wallet/repository capabilities, strict v1 URI parsing, selected-asset matching and decimal checks, repository/bloc/message identity propagation, and scanner, transfer, merchant/receive QR and payment-message UI. Legacy transfers remain available with unambiguous asset selection. The host has not yet opted into `IExactWalletTransfer`, pinned this Chat source or verified its adapter integration; no live transfer or deployment was tested.
-- Next step: explicitly implement the exact capability in the host bridge, map authoritative asset identity and selected receiver, pin the reviewed immutable Chat commit, and verify host integration. Other external account, UGC deletion and store/compliance issues remain separate and open; this QR source work does not resolve them.
+- Current state: Task 15B Chat source implements and tests the optional exact wallet/repository capabilities, strict v1 URI parsing, selected-asset matching and decimal checks, repository/bloc/message identity propagation, and scanner, transfer, merchant/receive QR and payment-message UI. The N42 host bridge now opts into `IExactWalletTransfer` and its focused wallet bridge suite passes. The host has not yet pinned the updated Chat source; no live transfer or deployment was tested.
+- Next step: pin the reviewed immutable Chat commit and verify the resolved package/mirror in the host. Keep live account and device signing acceptance separate from source integration.
+
+### PAYMENT-RECEIPT-001 Chain confirmation and independent receipt verification are not implemented
+
+- Severity: H
+- Added: 2026-10-05
+- Current state: A successful wallet submission now remains `processing` with its transaction hash; payment requests do not emit a paid acknowledgement before chain confirmation. Repository status updates reject `completed` without a verified receipt, and Matrix transfer events that claim `completed` render as pending. Exact asset identity is carried for exact transfers, but the host bridge has no receipt-verification capability wired to an authoritative network adapter. A hash alone does not prove inclusion, finality, sender/recipient, amount, or selected asset.
+- Next step: define supported chains and confirmation rules, add a host receipt verifier, bind verification to exact transaction fields, and test pending, confirmed, failed and reorg outcomes. Do not mark payments complete or claim independently verifiable receipts until then. No contract or chain was selected for optional salted commitments; chat and social data must stay off-chain.
 
 ### DEP-001 Latest generator stack — resolved in Task 13A
 
@@ -355,7 +362,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Severity: M
 - Added: 2026-03-21
 - Current state: the new AI smart reply suggestions, extensible bot command registry, and webhook automation paths were unit/analyze verified only. They were not exercised against the shared real homeserver or a real external webhook endpoint in this round.
-- Next step: run a live smoke covering AI suggestions in chat, a custom registered slash command, and a member-join webhook delivery against a disposable endpoint.
+- October 5 privacy update: inline smart replies and group summaries require explicit per-message selection. Each grant is checked against the same Matrix user/client, room and unchanged message snapshot; summary content is not sent when the dialog is cancelled or the selection changes. Widget tests cover empty-default selection, selected-only consent and cancel. Provider-backed chat UI and webhook delivery are still unverified.
+- Next step: test account switching and recovery on two phones plus a desktop over constrained network, then run a live smoke covering AI suggestions, a custom registered slash command and a member-join webhook against a disposable endpoint.
 
 ### QA-004 Protected story-music playback was not tested end to end
 
