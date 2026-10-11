@@ -33,7 +33,11 @@ class _AiMessageConsentDialogState extends State<AiMessageConsentDialog> {
       child: ListView(
         shrinkWrap: true,
         children: [
-          const Text('Select the messages AI may use for this summary.'),
+          const Text(
+            'Select the messages AI may use for this summary. '
+            'This one-request approval expires after two minutes. '
+            'It does not permit payments or exports.',
+          ),
           for (final message in widget.messages)
             CheckboxListTile(
               value: _selectedIds.contains(message.id),

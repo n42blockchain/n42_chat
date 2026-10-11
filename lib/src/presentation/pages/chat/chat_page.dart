@@ -109,6 +109,7 @@ import '../ai/ai_assistant_page.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/services/image_text_recognition_service.dart';
 import '../../../core/services/translation_service.dart';
+import '../../helpers/ai_context_window.dart';
 import '../../helpers/ai_reply_suggestion_helper.dart';
 import '../../helpers/chat_mention_helper.dart';
 import '../../helpers/mini_app_launcher_helper.dart';
@@ -300,6 +301,7 @@ class _ChatPageState extends State<_ChatPageContent> {
   int _aiSummaryMessageCount = 0;
   List<String> _smartReplySuggestions = const [];
   bool _isLoadingSmartReplySuggestions = false;
+  AiContextWindow? _smartReplyAuthorization;
 
   // 缓存解析后的背景装饰：resolveDecoration 对图片背景会做同步 existsSync，
   // 若在每次 build（尤其键盘动画每帧）都调用会有 IO jank。只在背景 key 变化

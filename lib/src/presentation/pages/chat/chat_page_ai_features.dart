@@ -7,6 +7,7 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
       Localizations.localeOf(context).toLanguageTag();
 
   void _resetAiSmartReplyState() {
+    _smartReplyAuthorization?.revoke();
     _smartReplySuggestions = const [];
     _isLoadingSmartReplySuggestions = false;
   }
@@ -107,6 +108,7 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
     final approvedClient = manager.client;
     final approvedUserId = manager.userId;
     final approvedRoomId = widget.conversation.id;
+    final authorizationWindow = AiContextWindow();
     _isAiSummaryConsentOpen = true;
     final selectedIds = await showDialog<Set<String>>(
       context: context,
@@ -144,7 +146,8 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
               current.senderId == message.senderId &&
               !current.isSelfDestructing;
         });
-    if (!selectionIsUnchanged ||
+    if (!authorizationWindow.isValid ||
+        !selectionIsUnchanged ||
         manager.userId != approvedUserId ||
         !identical(manager.client, approvedClient) ||
         widget.conversation.id != approvedRoomId ||
@@ -174,7 +177,8 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
             current.senderId == message.senderId &&
             !current.isSelfDestructing;
       });
-      if (stillAuthorized &&
+      if (authorizationWindow.isValid &&
+          stillAuthorized &&
           manager.userId == approvedUserId &&
           identical(manager.client, approvedClient) &&
           widget.conversation.id == approvedRoomId &&
@@ -182,7 +186,11 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
         setState(() => _aiSummaryResult = result);
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted &&
+          authorizationWindow.isValid &&
+          manager.userId == approvedUserId &&
+          identical(manager.client, approvedClient) &&
+          widget.conversation.id == approvedRoomId) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -224,29 +232,42 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
   }
 
   Future<void> _refreshAiSmartReplies() async {
-    if (!mounted || !aiServiceAvailable()) {
+    if (!mounted || !aiServiceAvailable() || _isLoadingSmartReplySuggestions) {
       return;
     }
     setState(() {
       _isLoadingSmartReplySuggestions = true;
       _smartReplySuggestions = const [];
     });
+    final authorizationWindow = AiContextWindow();
+    _smartReplyAuthorization = authorizationWindow;
     try {
-      final replies = await _loadAiSmartReplies();
-      if (!mounted) return;
+      final replies = await _loadAiSmartReplies(authorizationWindow);
+      if (!mounted || !authorizationWindow.isValid) {
+        if (mounted &&
+            identical(_smartReplyAuthorization, authorizationWindow)) {
+          setState(_resetAiSmartReplyState);
+        }
+        return;
+      }
       setState(() {
         _smartReplySuggestions = replies;
         _isLoadingSmartReplySuggestions = false;
       });
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted ||
+          !identical(_smartReplyAuthorization, authorizationWindow)) {
+        return;
+      }
       setState(() {
         _resetAiSmartReplyState();
       });
     }
   }
 
-  Future<List<String>> _loadAiSmartReplies() async {
+  Future<List<String>> _loadAiSmartReplies(
+    AiContextWindow authorizationWindow,
+  ) async {
     if (!aiServiceAvailable()) {
       return const [];
     }
@@ -282,7 +303,12 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
             child: ListView(
               shrinkWrap: true,
               children: [
-                const Text('Select the messages AI may use for this reply.'),
+                const Text(
+                  'Select the messages AI may use for this reply. '
+                  'This one-request approval expires after two minutes. '
+                  'Closing Quick Reply cancels pending results. '
+                  'It does not permit payments or exports.',
+                ),
                 for (final message in candidates)
                   CheckboxListTile(
                     value: selectedIds.contains(message.id),
@@ -341,7 +367,8 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
               current.senderId == message.senderId &&
               !current.isSelfDestructing;
         });
-    if (!selectionIsUnchanged ||
+    if (!authorizationWindow.isValid ||
+        !selectionIsUnchanged ||
         manager.userId != approvedUserId ||
         !identical(manager.client, approvedClient) ||
         widget.conversation.id != approvedRoomId ||
@@ -368,7 +395,22 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
     );
     // A grant is one request only. Do not display a result after switching
     // account or conversation, or after the selected conversation advanced.
-    if (manager.userId != approvedUserId ||
+    final latestMessagesById = {
+      for (final message in latestState.messages) message.id: message,
+    };
+    final selectedStillUnchanged = candidates
+        .where((message) => selectedIds.contains(message.id))
+        .every((message) {
+          final current = latestMessagesById[message.id];
+          return current != null &&
+              current.roomId == message.roomId &&
+              current.content == message.content &&
+              current.senderId == message.senderId &&
+              !current.isSelfDestructing;
+        });
+    if (!authorizationWindow.isValid ||
+        !selectedStillUnchanged ||
+        manager.userId != approvedUserId ||
         !identical(manager.client, approvedClient) ||
         widget.conversation.id != approvedRoomId ||
         latestState.roomId != approvedRoomId ||

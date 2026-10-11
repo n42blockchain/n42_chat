@@ -884,23 +884,33 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
   }
 
-  void _onQuickReplyPressed() {
-    showQuickReplySheet(
-      context: context,
-      onSelect: (content) {
-        _sendMessage(content);
-      },
-      onManage: () {
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => QuickRepliesPage(
-              storageDataSource: getIt<PreferencesDataSource>(),
+  Future<void> _onQuickReplyPressed() async {
+    if (_isLoadingSmartReplySuggestions) return;
+    final authorizationWindow = AiContextWindow();
+    _smartReplyAuthorization?.revoke();
+    _smartReplyAuthorization = authorizationWindow;
+    try {
+      await showQuickReplySheet(
+        context: context,
+        onSelect: (content) {
+          _sendMessage(content);
+        },
+        onManage: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => QuickRepliesPage(
+                storageDataSource: getIt<PreferencesDataSource>(),
+              ),
             ),
-          ),
-        );
-      },
-      storageDataSource: getIt<PreferencesDataSource>(),
-      smartReplyLoader: aiServiceAvailable() ? _loadAiSmartReplies : null,
-    );
+          );
+        },
+        storageDataSource: getIt<PreferencesDataSource>(),
+        smartReplyLoader: aiServiceAvailable()
+            ? () => _loadAiSmartReplies(authorizationWindow)
+            : null,
+      );
+    } finally {
+      authorizationWindow.revoke();
+    }
   }
 }
