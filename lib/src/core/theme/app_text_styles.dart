@@ -26,26 +26,29 @@ abstract class AppTextStyles {
 
   /// 大标题 - 22sp（页面级 hero 标题）
   static const TextStyle headlineLarge = TextStyle(
+    letterSpacing: 0.35,
     fontSize: 22,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-    height: 1.3,
+    height: 28 / 22,
   );
 
   /// 中标题 - 18sp（卡片/分组标题）
   static const TextStyle headlineMedium = TextStyle(
-    fontSize: 18,
+    letterSpacing: 0.38,
+    fontSize: 20,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-    height: 1.3,
+    height: 25 / 20,
   );
 
   /// 小标题 - 17sp w600（导航栏标题，比 bodyLarge 17sp w400 更粗）
   static const TextStyle headlineSmall = TextStyle(
+    letterSpacing: -0.41,
     fontSize: 17,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-    height: 1.3,
+    height: 22 / 17,
   );
 
   // ============================================
@@ -54,26 +57,29 @@ abstract class AppTextStyles {
 
   /// 大正文 - 17sp（默认 iOS 系统字号；适合阅读密集场景）
   static const TextStyle bodyLarge = TextStyle(
+    letterSpacing: -0.41,
     fontSize: 17,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 22 / 17,
   );
 
   /// 中正文 - 15sp（默认 UI 字号）
   static const TextStyle bodyMedium = TextStyle(
+    letterSpacing: -0.23,
     fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 20 / 15,
   );
 
   /// 小正文 - 13sp（次级 UI 文字）
   static const TextStyle bodySmall = TextStyle(
+    letterSpacing: -0.08,
     fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 18 / 13,
   );
 
   // ============================================
@@ -82,27 +88,29 @@ abstract class AppTextStyles {
 
   /// 辅助文字 - 12sp（时间戳、说明文字）
   static const TextStyle caption = TextStyle(
+    letterSpacing: 0,
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
-    height: 1.3,
+    height: 16 / 12,
   );
 
   /// 超小辅助文字 - 11sp（不再 10sp——低于 iOS/Material 可读阈）
   static const TextStyle captionSmall = TextStyle(
+    letterSpacing: 0.07,
     fontSize: 11,
     fontWeight: FontWeight.w400,
     color: AppColors.textTertiary,
-    height: 1.3,
+    height: 13 / 11,
   );
 
   /// 大写小标签 - 11sp（分组段头、状态标签）
   static const TextStyle overline = TextStyle(
+    letterSpacing: 0.07,
     fontSize: 11,
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
-    height: 1.4,
-    letterSpacing: 0.5,
+    height: 13 / 11,
   );
 
   // ============================================
@@ -111,18 +119,20 @@ abstract class AppTextStyles {
 
   /// 列表标题
   static const TextStyle listTitle = TextStyle(
-    fontSize: 16,
+    letterSpacing: -0.41,
+    fontSize: 17,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.3,
+    height: 22 / 17,
   );
 
   /// 列表副标题
   static const TextStyle listSubtitle = TextStyle(
+    letterSpacing: -0.08,
     fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
-    height: 1.3,
+    height: 18 / 13,
   );
 
   // ============================================
@@ -131,50 +141,56 @@ abstract class AppTextStyles {
 
   /// 会话列表 - 名称
   static const TextStyle conversationName = TextStyle(
-    fontSize: 16,
+    letterSpacing: -0.41,
+    fontSize: 17,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
-    height: 1.3,
+    height: 22 / 17,
   );
 
   /// 会话列表 - 最后消息
   static const TextStyle conversationLastMessage = TextStyle(
+    letterSpacing: -0.08,
     fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
-    height: 1.3,
+    height: 18 / 13,
   );
 
   /// 会话列表 - 时间
   static const TextStyle conversationTime = TextStyle(
+    letterSpacing: 0,
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.textTertiary,
-    height: 1.3,
+    height: 16 / 12,
   );
 
   /// 消息文字（颜色由气泡决定，调用方需 copyWith(color)）
   static const TextStyle messageText = TextStyle(
-    fontSize: 16,
+    letterSpacing: -0.41,
+    fontSize: 17,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 22 / 17,
   );
 
   /// 消息时间分隔
   static const TextStyle messageTimeSeparator = TextStyle(
+    letterSpacing: 0,
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.textTertiary,
-    height: 1.3,
+    height: 16 / 12,
   );
 
   /// 系统消息
   static const TextStyle systemMessage = TextStyle(
+    letterSpacing: 0,
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.textTertiary,
-    height: 1.4,
+    height: 16 / 12,
   );
 
   // ============================================
@@ -183,28 +199,29 @@ abstract class AppTextStyles {
 
   /// 主按钮文字
   static const TextStyle buttonPrimary = TextStyle(
-    fontSize: 16,
+    letterSpacing: -0.41,
+    fontSize: 17,
     fontWeight: FontWeight.w500,
     color: Colors.white,
-    height: 1.4,
-    letterSpacing: 0.2,
+    height: 22 / 17,
   );
 
   /// 次要按钮文字
   static const TextStyle buttonSecondary = TextStyle(
-    fontSize: 16,
+    letterSpacing: -0.41,
+    fontSize: 17,
     fontWeight: FontWeight.w500,
     color: AppColors.primary,
-    height: 1.4,
-    letterSpacing: 0.2,
+    height: 22 / 17,
   );
 
   /// 文字按钮
   static const TextStyle buttonText = TextStyle(
+    letterSpacing: -0.23,
     fontSize: 15,
     fontWeight: FontWeight.w400,
     color: AppColors.primary,
-    height: 1.4,
+    height: 20 / 15,
   );
 
   // ============================================
@@ -213,26 +230,29 @@ abstract class AppTextStyles {
 
   /// 输入框文字
   static const TextStyle input = TextStyle(
-    fontSize: 16,
+    letterSpacing: -0.41,
+    fontSize: 17,
     fontWeight: FontWeight.w400,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 22 / 17,
   );
 
   /// 输入框提示
   static const TextStyle inputHint = TextStyle(
-    fontSize: 16,
+    letterSpacing: -0.41,
+    fontSize: 17,
     fontWeight: FontWeight.w400,
     color: AppColors.textTertiary,
-    height: 1.4,
+    height: 22 / 17,
   );
 
   /// 表单错误提示
   static const TextStyle errorText = TextStyle(
+    letterSpacing: 0,
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.error,
-    height: 1.3,
+    height: 16 / 12,
   );
 
   // ============================================
@@ -241,10 +261,11 @@ abstract class AppTextStyles {
 
   /// 徽章数字
   static const TextStyle badge = TextStyle(
+    letterSpacing: 0.07,
     fontSize: 11,
     fontWeight: FontWeight.w500,
     color: Colors.white,
-    height: 1.2,
+    height: 13 / 11,
   );
 
   // ============================================
@@ -253,19 +274,20 @@ abstract class AppTextStyles {
 
   /// 索引字母
   static const TextStyle indexLetter = TextStyle(
+    letterSpacing: 0.07,
     fontSize: 11,
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
-    height: 1.2,
+    height: 13 / 11,
   );
 
   /// 分组标题
   static const TextStyle sectionHeader = TextStyle(
+    letterSpacing: -0.08,
     fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
-    height: 1.3,
-    letterSpacing: 0.2,
+    height: 18 / 13,
   );
 }
 

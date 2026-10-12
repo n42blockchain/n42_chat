@@ -623,137 +623,6 @@ double _fontPreferenceScale(FontSize fontSize) {
   }
 }
 
-double _chatBaseTextScale(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  return screenWidth >= 600 ? 0.97 : 0.94;
-}
-
-double _chatTextScale(BuildContext context, FontSize fontSize) {
-  final mediaQuery = MediaQuery.of(context);
-  final inheritedScale = mediaQuery.textScaler.scale(16) / 16;
-  final adjustedScale =
-      inheritedScale *
-      _chatBaseTextScale(context) *
-      _fontPreferenceScale(fontSize);
-  return adjustedScale.clamp(0.88, 1.18);
-}
-
-ThemeData _buildChatScopedTheme(ThemeData baseTheme) {
-  final isDark = baseTheme.brightness == Brightness.dark;
-  final textTheme = baseTheme.textTheme;
-  final chromeColor = isDark
-      ? const Color(0xFF181818)
-      : const Color(0xFFF7F7F7);
-  final cardColor = isDark ? const Color(0xFF1A252F) : Colors.white;
-  final dividerColor = isDark
-      ? const Color(0xFF2B3140)
-      : const Color(0xFFE8EEF0);
-  final appBarTitleStyle =
-      (baseTheme.appBarTheme.titleTextStyle ?? textTheme.titleLarge)?.copyWith(
-        fontWeight: FontWeight.w600,
-        height: 1.2,
-        letterSpacing: -0.2,
-      );
-
-  return baseTheme.copyWith(
-    scaffoldBackgroundColor: chromeColor,
-    cardColor: cardColor,
-    appBarTheme: baseTheme.appBarTheme.copyWith(
-      centerTitle: true,
-      backgroundColor: chromeColor,
-      foregroundColor: isDark ? Colors.white : const Color(0xFF181818),
-      surfaceTintColor: Colors.transparent,
-      titleTextStyle: appBarTitleStyle,
-    ),
-    popupMenuTheme: PopupMenuThemeData(
-      color: cardColor,
-      surfaceTintColor: Colors.transparent,
-      elevation: isDark ? 6 : 10,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      textStyle: textTheme.bodyMedium?.copyWith(height: 1.25),
-    ),
-    bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: cardColor,
-      modalBackgroundColor: cardColor,
-      surfaceTintColor: Colors.transparent,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-    ),
-    dialogTheme: DialogThemeData(
-      backgroundColor: cardColor,
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-    ),
-    inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
-      filled: true,
-      fillColor: isDark ? const Color(0xFF1A252F) : const Color(0xFFF7F7F7),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        borderSide: BorderSide(
-          color: baseTheme.colorScheme.primary.withValues(alpha: 0.35),
-        ),
-      ),
-    ),
-    listTileTheme: baseTheme.listTileTheme.copyWith(
-      tileColor: cardColor,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacing,
-        vertical: 2,
-      ),
-      minVerticalPadding: 8,
-    ),
-    dividerTheme: baseTheme.dividerTheme.copyWith(
-      color: dividerColor,
-      thickness: 0.6,
-      space: 0,
-    ),
-    textTheme: textTheme.copyWith(
-      titleLarge: textTheme.titleLarge?.copyWith(
-        fontWeight: FontWeight.w600,
-        height: 1.2,
-        letterSpacing: -0.2,
-      ),
-      titleMedium: textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w600,
-        height: 1.24,
-        letterSpacing: -0.15,
-      ),
-      titleSmall: textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.w600,
-        height: 1.24,
-        letterSpacing: -0.1,
-      ),
-      bodyLarge: textTheme.bodyLarge?.copyWith(
-        height: 1.34,
-        letterSpacing: -0.05,
-      ),
-      bodyMedium: textTheme.bodyMedium?.copyWith(
-        height: 1.34,
-        letterSpacing: -0.05,
-      ),
-      bodySmall: textTheme.bodySmall?.copyWith(
-        height: 1.3,
-        letterSpacing: -0.02,
-      ),
-      labelLarge: textTheme.labelLarge?.copyWith(
-        fontWeight: FontWeight.w600,
-        height: 1.2,
-        letterSpacing: -0.05,
-      ),
-    ),
-  );
-}
-
 Widget _wrapChatPresentation(
   BuildContext context, {
   required Widget child,
@@ -764,12 +633,17 @@ Widget _wrapChatPresentation(
   final parentTheme = Theme.of(context);
   final useDark = N42Chat.isDarkMode(context);
   final fallbackTheme = useDark
-      ? ThemeData.dark(useMaterial3: true)
-      : ThemeData.light(useMaterial3: true);
+      ? N42ChatTheme.wechatDark().toThemeData()
+      : N42ChatTheme.wechatLight().toThemeData();
   final baseTheme =
       parentTheme.brightness == (useDark ? Brightness.dark : Brightness.light)
       ? parentTheme
       : fallbackTheme.copyWith(
+          colorScheme: fallbackTheme.colorScheme.copyWith(
+            primary: parentTheme.colorScheme.primary,
+            secondary: parentTheme.colorScheme.secondary,
+          ),
+          primaryColor: parentTheme.colorScheme.primary,
           textTheme: parentTheme.textTheme,
           primaryTextTheme: parentTheme.primaryTextTheme,
           iconTheme: parentTheme.iconTheme,
@@ -778,13 +652,15 @@ Widget _wrapChatPresentation(
           materialTapTargetSize: parentTheme.materialTapTargetSize,
           pageTransitionsTheme: parentTheme.pageTransitionsTheme,
         );
-  final scopedTheme = _buildChatScopedTheme(baseTheme);
+  final scaler = ChatPreferenceTextScaler(
+    mediaQuery.textScaler,
+    _fontPreferenceScale(fontSize),
+  );
+  final scopedTheme = buildChatAppearanceTheme(baseTheme, textScaler: scaler);
   Widget wrappedChild = Theme(
     data: scopedTheme,
     child: MediaQuery(
-      data: mediaQuery.copyWith(
-        textScaler: TextScaler.linear(_chatTextScale(context, fontSize)),
-      ),
+      data: mediaQuery.copyWith(textScaler: scaler),
       child: child,
     ),
   );

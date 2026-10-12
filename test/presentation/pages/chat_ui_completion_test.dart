@@ -113,7 +113,7 @@ void main() {
       );
       expect(
         tester.getSize(find.byType(N42SearchBar)).height,
-        greaterThanOrEqualTo(48),
+        greaterThanOrEqualTo(44),
       );
       await tester.tap(find.text('Search'));
       expect(taps, 0);
@@ -154,7 +154,7 @@ void main() {
           '128 unread',
         );
         final tab = find.byKey(const ValueKey('chat_tab_1'));
-        expect(tester.getSize(tab).height, greaterThanOrEqualTo(48));
+        expect(tester.getSize(tab).height, greaterThanOrEqualTo(44));
         await tester.tap(tab);
         expect(selected, 1);
         await tester.pumpWidget(scene(0));
@@ -217,7 +217,7 @@ void main() {
         final attachment = find.byKey(
           const ValueKey('chat_input_attachment_toggle'),
         );
-        expect(tester.getSize(attachment).width, greaterThanOrEqualTo(48));
+        expect(tester.getSize(attachment).width, greaterThanOrEqualTo(44));
         final input = find.descendant(
           of: find.byType(ChatInputBar),
           matching: find.byType(TextField),
@@ -230,8 +230,8 @@ void main() {
               matching: find.byType(InkWell),
             )
             .first;
-        expect(tester.getSize(send).width, greaterThanOrEqualTo(48));
-        expect(tester.getSize(send).height, greaterThanOrEqualTo(48));
+        expect(tester.getSize(send).width, greaterThanOrEqualTo(44));
+        expect(tester.getSize(send).height, greaterThanOrEqualTo(44));
         await review.capture(tester, key, 'composer-${brightness.name}');
         await tester.tap(send);
         expect(sent, 'Hello');

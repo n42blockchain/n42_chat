@@ -2,6 +2,7 @@
 // （material 不再转出），pageTransitionsTheme 用到它，故显式引入。
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'app_colors.dart';
 import 'app_dimensions.dart';
@@ -148,7 +149,7 @@ class N42ChatTheme {
     this.avatarRadius = 4.0,
     this.messageBubbleRadius = 4.0,
     this.cardRadius = 8.0,
-    this.buttonRadius = 4.0,
+    this.buttonRadius = 12.0,
     this.listItemHeight = 64.0,
     this.avatarSize = 48.0,
     this.avatarSizeSmall = 40.0,
@@ -162,43 +163,43 @@ class N42ChatTheme {
 
   /// 微信浅色主题
   factory N42ChatTheme.wechatLight() => const N42ChatTheme(
-        primaryColor: AppColors.primary,
-        backgroundColor: AppColors.background,
-        surfaceColor: AppColors.surface,
-        navBarColor: AppColors.navBar,
-        bottomNavBarColor: AppColors.bottomNavBar,
-        dividerColor: AppColors.divider,
-        textPrimaryColor: AppColors.textPrimary,
-        textSecondaryColor: AppColors.textSecondary,
-        textTertiaryColor: AppColors.textTertiary,
-        messageBubbleSentColor: AppColors.bubbleSelf,
-        messageBubbleReceivedColor: AppColors.bubbleOther,
-        messageTextSentColor: AppColors.messageTextSent,
-        messageTextReceivedColor: AppColors.messageTextReceived,
-        badgeColor: AppColors.badge,
-        inputBackgroundColor: AppColors.inputBackground,
-        isDark: false,
-      );
+    primaryColor: AppColors.primary,
+    backgroundColor: AppColors.background,
+    surfaceColor: AppColors.surface,
+    navBarColor: AppColors.navBar,
+    bottomNavBarColor: AppColors.bottomNavBar,
+    dividerColor: AppColors.divider,
+    textPrimaryColor: AppColors.textPrimary,
+    textSecondaryColor: AppColors.textSecondary,
+    textTertiaryColor: AppColors.textTertiary,
+    messageBubbleSentColor: AppColors.bubbleSelf,
+    messageBubbleReceivedColor: AppColors.bubbleOther,
+    messageTextSentColor: AppColors.messageTextSent,
+    messageTextReceivedColor: AppColors.messageTextReceived,
+    badgeColor: AppColors.badge,
+    inputBackgroundColor: AppColors.inputBackground,
+    isDark: false,
+  );
 
   /// 微信深色主题
   factory N42ChatTheme.wechatDark() => const N42ChatTheme(
-        primaryColor: AppColors.primary,
-        backgroundColor: AppColors.backgroundDark,
-        surfaceColor: AppColors.surfaceDark,
-        navBarColor: AppColors.navBarDark,
-        bottomNavBarColor: AppColors.bottomNavBarDark,
-        dividerColor: AppColors.dividerDark,
-        textPrimaryColor: AppColors.textPrimaryDark,
-        textSecondaryColor: AppColors.textSecondaryDark,
-        textTertiaryColor: AppColors.textTertiaryDark,
-        messageBubbleSentColor: AppColors.bubbleSelfDark,
-        messageBubbleReceivedColor: AppColors.bubbleOtherDark,
-        messageTextSentColor: AppColors.messageTextSent,
-        messageTextReceivedColor: AppColors.messageTextReceivedDark,
-        badgeColor: AppColors.badge,
-        inputBackgroundColor: AppColors.surfaceDark,
-        isDark: true,
-      );
+    primaryColor: AppColors.primaryDark,
+    backgroundColor: AppColors.backgroundDark,
+    surfaceColor: AppColors.surfaceDark,
+    navBarColor: AppColors.navBarDark,
+    bottomNavBarColor: AppColors.bottomNavBarDark,
+    dividerColor: AppColors.dividerDark,
+    textPrimaryColor: AppColors.textPrimaryDark,
+    textSecondaryColor: AppColors.textSecondaryDark,
+    textTertiaryColor: AppColors.textTertiaryDark,
+    messageBubbleSentColor: AppColors.bubbleSelfDark,
+    messageBubbleReceivedColor: AppColors.bubbleOtherDark,
+    messageTextSentColor: AppColors.messageTextSent,
+    messageTextReceivedColor: AppColors.messageTextReceivedDark,
+    badgeColor: AppColors.badge,
+    inputBackgroundColor: AppColors.surfaceDark,
+    isDark: true,
+  );
 
   /// 从Material主题生成
   factory N42ChatTheme.fromMaterialTheme(ThemeData theme) {
@@ -208,7 +209,8 @@ class N42ChatTheme {
       backgroundColor: theme.scaffoldBackgroundColor,
       surfaceColor: theme.cardColor,
       navBarColor: theme.appBarTheme.backgroundColor ?? theme.primaryColor,
-      bottomNavBarColor: theme.bottomNavigationBarTheme.backgroundColor ??
+      bottomNavBarColor:
+          theme.bottomNavigationBarTheme.backgroundColor ??
           theme.scaffoldBackgroundColor,
       dividerColor: theme.dividerColor,
       textPrimaryColor:
@@ -217,14 +219,18 @@ class N42ChatTheme {
           theme.textTheme.bodySmall?.color ?? AppColors.textSecondary,
       textTertiaryColor: AppColors.textTertiary,
       // 气泡固定走微信绿专用色,不随品牌主色(靛蓝)漂移
-      messageBubbleSentColor:
-          isDark ? AppColors.bubbleSelfDark : AppColors.bubbleSelf,
+      messageBubbleSentColor: isDark
+          ? AppColors.bubbleSelfDark
+          : AppColors.bubbleSelf,
       messageBubbleReceivedColor: theme.cardColor,
       messageTextSentColor: isDark ? Colors.white : AppColors.messageTextSent,
-      messageTextReceivedColor:
-          isDark ? Colors.white : AppColors.messageTextReceived,
+      messageTextReceivedColor: isDark
+          ? Colors.white
+          : AppColors.messageTextReceived,
       badgeColor: theme.colorScheme.error,
-      inputBackgroundColor: isDark ? theme.cardColor : AppColors.inputBackground,
+      inputBackgroundColor: isDark
+          ? theme.cardColor
+          : AppColors.inputBackground,
       isDark: isDark,
     );
   }
@@ -262,6 +268,13 @@ class N42ChatTheme {
     );
 
     return ThemeData(
+      fontFamily:
+          defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS
+          ? 'CupertinoSystemText'
+          : null,
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      visualDensity: VisualDensity.standard,
       useMaterial3: true,
       brightness: isDark ? Brightness.dark : Brightness.light,
       primaryColor: primaryColor,
@@ -285,7 +298,9 @@ class N42ChatTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        titleTextStyle: titleTextStyle ??
+        toolbarHeight: appBarHeight,
+        titleTextStyle:
+            titleTextStyle ??
             AppTextStyles.headlineSmall.copyWith(color: textPrimaryColor),
       ),
 
@@ -304,26 +319,32 @@ class N42ChatTheme {
       ),
 
       textTheme: TextTheme(
-        headlineLarge:
-            AppTextStyles.headlineLarge.copyWith(color: textPrimaryColor),
-        headlineMedium:
-            AppTextStyles.headlineMedium.copyWith(color: textPrimaryColor),
-        headlineSmall:
-            AppTextStyles.headlineSmall.copyWith(color: textPrimaryColor),
-        titleLarge:
-            AppTextStyles.headlineSmall.copyWith(color: textPrimaryColor),
-        titleMedium:
-            AppTextStyles.bodyLarge.medium.copyWith(color: textPrimaryColor),
-        titleSmall:
-            AppTextStyles.bodyMedium.medium.copyWith(color: textPrimaryColor),
+        headlineLarge: AppTextStyles.headlineLarge.copyWith(
+          color: textPrimaryColor,
+        ),
+        headlineMedium: AppTextStyles.headlineMedium.copyWith(
+          color: textPrimaryColor,
+        ),
+        headlineSmall: AppTextStyles.headlineSmall.copyWith(
+          color: textPrimaryColor,
+        ),
+        titleLarge: AppTextStyles.headlineSmall.copyWith(
+          color: textPrimaryColor,
+        ),
+        titleMedium: AppTextStyles.bodyLarge.medium.copyWith(
+          color: textPrimaryColor,
+        ),
+        titleSmall: AppTextStyles.bodyMedium.medium.copyWith(
+          color: textPrimaryColor,
+        ),
         bodyLarge: AppTextStyles.bodyLarge.copyWith(color: textPrimaryColor),
         bodyMedium: AppTextStyles.bodyMedium.copyWith(color: textPrimaryColor),
         bodySmall: AppTextStyles.bodySmall.copyWith(color: textSecondaryColor),
         labelLarge: AppTextStyles.buttonPrimary,
-        labelMedium:
-            AppTextStyles.caption.copyWith(color: textSecondaryColor),
-        labelSmall:
-            AppTextStyles.captionSmall.copyWith(color: textTertiaryColor),
+        labelMedium: AppTextStyles.caption.copyWith(color: textSecondaryColor),
+        labelSmall: AppTextStyles.captionSmall.copyWith(
+          color: textTertiaryColor,
+        ),
       ),
 
       // 主按钮（实心绿）
@@ -339,7 +360,7 @@ class N42ChatTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(buttonRadius),
           ),
-          minimumSize: const Size(double.infinity, 48),
+          minimumSize: const Size(44, 44),
           elevation: 0,
         ),
       ),
@@ -353,7 +374,7 @@ class N42ChatTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(buttonRadius),
           ),
-          minimumSize: const Size(0, 48),
+          minimumSize: const Size(44, 44),
         ),
       ),
 
@@ -362,6 +383,7 @@ class N42ChatTheme {
         style: TextButton.styleFrom(
           foregroundColor: primaryColor,
           textStyle: AppTextStyles.buttonText,
+          minimumSize: const Size(44, 44),
         ),
       ),
 
@@ -369,6 +391,7 @@ class N42ChatTheme {
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
           foregroundColor: textPrimaryColor,
+          minimumSize: const Size(44, 44),
         ),
       ),
 
@@ -393,13 +416,16 @@ class N42ChatTheme {
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
         hintStyle: AppTextStyles.inputHint,
-        labelStyle: AppTextStyles.bodyMedium.copyWith(color: textSecondaryColor),
+        labelStyle: AppTextStyles.bodyMedium.copyWith(
+          color: textSecondaryColor,
+        ),
         errorStyle: AppTextStyles.errorText,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 12,
         ),
-        isDense: true,
+        isDense: false,
+        constraints: const BoxConstraints(minHeight: 44),
       ),
 
       listTileTheme: ListTileThemeData(
@@ -477,9 +503,7 @@ class N42ChatTheme {
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return isDark
-                ? AppColors.textDisabledDark
-                : AppColors.textDisabled;
+            return isDark ? AppColors.textDisabledDark : AppColors.textDisabled;
           }
           return states.contains(WidgetState.selected)
               ? primaryColor
@@ -487,9 +511,7 @@ class N42ChatTheme {
         }),
         checkColor: const WidgetStatePropertyAll(Colors.white),
         side: BorderSide(color: textTertiaryColor, width: 1.5),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
       ),
 
       radioTheme: RadioThemeData(
@@ -636,4 +658,3 @@ class N42ChatTheme {
     );
   }
 }
-

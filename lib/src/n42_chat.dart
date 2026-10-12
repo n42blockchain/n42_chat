@@ -48,6 +48,8 @@ import 'presentation/pages/settings/change_email_page.dart' as chat_settings;
 import 'core/utils/debug_log.dart';
 import 'core/utils/livekit_call_utils.dart';
 import 'core/theme/app_dimensions.dart';
+import 'core/theme/chat_appearance.dart';
+import 'core/theme/n42_chat_theme.dart';
 
 part 'presentation/widgets/n42_chat_widgets.dart';
 part 'core/services/n42_theme_manager.dart';

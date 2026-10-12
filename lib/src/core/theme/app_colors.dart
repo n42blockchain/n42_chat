@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
-/// 微信风格颜色配置
-///
-/// 所有颜色常量都按照微信设计规范定义
+/// Default Apple semantic palette. Host-aware components use Theme colors;
+/// constants remain available for const/decorative content.
 abstract class AppColors {
   AppColors._();
+
+  /// Resolve interactive accents from the host, including saved custom presets.
+  static Color primaryOf(BuildContext context) =>
+      Theme.of(context).colorScheme.primary;
 
   // ============================================
   // 主色调 - 品牌靛蓝 (AI-native, 与主 App 对齐 #5B6CFF)
@@ -13,86 +16,86 @@ abstract class AppColors {
   // ============================================
 
   /// 主色 - 品牌靛蓝
-  static const Color primary = Color(0xFF5B6CFF);
+  static const Color primary = Color(0x007AFF);
 
   /// 主色 - 浅色变体
-  static const Color primaryLight = Color(0xFF8290FF);
+  static const Color primaryLight = Color(0x409CFF);
 
   /// 主色 - 深色变体
-  static const Color primaryDark = Color(0xFF4856E6);
+  static const Color primaryDark = Color(0x0A84FF);
 
   /// 主色 - 透明变体
-  static const Color primaryWithOpacity = Color(0x1A5B6CFF);
+  static const Color primaryWithOpacity = Color(0x1A007AFF);
 
   // ============================================
   // 背景色
   // ============================================
 
   /// 页面背景色 - 浅色模式
-  static const Color background = Color(0xFFEDEDED);
+  static const Color background = Color(0xF2F2F7);
 
   /// 页面背景色 - 深色模式
-  static const Color backgroundDark = Color(0xFF111111);
+  static const Color backgroundDark = Color(0x000000);
 
   /// 卡片/列表项背景色 - 浅色
-  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surface = Color(0xFFFFFF);
 
   /// 卡片/列表项背景色 - 深色
-  static const Color surfaceDark = Color(0xFF1E1E1E);
+  static const Color surfaceDark = Color(0x1C1C1E);
 
   // ============================================
   // 导航栏
   // ============================================
 
   /// 导航栏背景 - 浅色
-  static const Color navBar = Color(0xFFF7F7F7);
+  static const Color navBar = Color(0xF2F2F7);
 
   /// 导航栏背景 - 深色
-  static const Color navBarDark = Color(0xFF2C2C2C);
+  static const Color navBarDark = Color(0x000000);
 
   /// 底部导航栏背景 - 浅色
-  static const Color bottomNavBar = Color(0xFFF7F7F7);
+  static const Color bottomNavBar = Color(0xF2F2F7);
 
   /// 底部导航栏背景 - 深色
-  static const Color bottomNavBarDark = Color(0xFF1E1E1E);
+  static const Color bottomNavBarDark = Color(0x1C1C1E);
 
   // ============================================
   // 分割线
   // ============================================
 
   /// 分割线 - 浅色
-  static const Color divider = Color(0xFFE5E5E5);
+  static const Color divider = Color(0xC6C6C8);
 
   /// 分割线 - 深色
-  static const Color dividerDark = Color(0xFF3D3D3D);
+  static const Color dividerDark = Color(0x38383A);
 
   /// 细分割线 - 浅色
-  static const Color dividerThin = Color(0xFFF0F0F0);
+  static const Color dividerThin = Color(0xC6C6C8);
 
   /// 细分割线 - 深色
-  static const Color dividerThinDark = Color(0xFF2A2A2A);
+  static const Color dividerThinDark = Color(0x38383A);
 
   // ============================================
   // 文字颜色
   // ============================================
 
   /// 主要文字 - 浅色模式
-  static const Color textPrimary = Color(0xFF181818);
+  static const Color textPrimary = Color(0x000000);
 
   /// 主要文字 - 深色模式
-  static const Color textPrimaryDark = Color(0xFFE5E5E5);
+  static const Color textPrimaryDark = Color(0xFFFFFF);
 
   /// 次要文字 - 浅色模式
-  static const Color textSecondary = Color(0xFF888888);
+  static const Color textSecondary = Color(0x8A8A8E);
 
   /// 次要文字 - 深色模式
-  static const Color textSecondaryDark = Color(0xFFAAAAAA);
+  static const Color textSecondaryDark = Color(0x98989D);
 
   /// 辅助文字 - 浅色模式
-  static const Color textTertiary = Color(0xFFB2B2B2);
+  static const Color textTertiary = Color(0xC4C4C6);
 
   /// 辅助文字 - 深色模式（比 textSecondaryDark 浅一档，避免与之同色失去层次）
-  static const Color textTertiaryDark = Color(0xFF6B6B6B);
+  static const Color textTertiaryDark = Color(0x48484A);
 
   /// 禁用文字 - 浅色
   static const Color textDisabled = Color(0xFFCCCCCC);
@@ -101,7 +104,7 @@ abstract class AppColors {
   static const Color textDisabledDark = Color(0xFF555555);
 
   /// 链接颜色（textLink 是别名，新代码请用 link）
-  static const Color link = Color(0xFF576B95);
+  static const Color link = Color(0x007AFF);
   @Deprecated('Use AppColors.link')
   static const Color textLink = link;
 
@@ -110,19 +113,19 @@ abstract class AppColors {
   // ============================================
 
   /// 发送消息气泡 - 浅色 (微信绿)
-  static const Color bubbleSelf = Color(0xFF95EC69);
+  static const Color bubbleSelf = Color(0x007AFF);
 
   /// 发送消息气泡 - 深色
-  static const Color bubbleSelfDark = Color(0xFF3EB575);
+  static const Color bubbleSelfDark = Color(0x0A84FF);
 
   /// 接收消息气泡 - 浅色
   static const Color bubbleOther = Color(0xFFFFFFFF);
 
   /// 接收消息气泡 - 深色（比 backgroundDark 浅一档，保证可视边界）
-  static const Color bubbleOtherDark = Color(0xFF262626);
+  static const Color bubbleOtherDark = Color(0x1C1C1E);
 
   /// 消息文字 - 发送方（深浅都用黑——亮绿气泡上黑字最清晰）
-  static const Color messageTextSent = Color(0xFF000000);
+  static const Color messageTextSent = Color(0xFFFFFF);
 
   /// 消息文字 - 接收方（白底黑字 / 深底白字由 messageTextReceived* 切换）
   static const Color messageTextReceived = Color(0xFF181818);
@@ -155,22 +158,22 @@ abstract class AppColors {
   // ============================================
 
   /// 错误/危险
-  static const Color error = Color(0xFFFA5151);
+  static const Color error = Color(0xFF3B30);
 
   /// 错误背景（浅色淡红，用于 SnackBar / 错误提示框等）
-  static const Color errorBg = Color(0x14FA5151);
+  static const Color errorBg = Color(0x14FF3B30);
 
   /// 警告
-  static const Color warning = Color(0xFFFF9900);
+  static const Color warning = Color(0xFF9500);
 
   /// 警告背景
-  static const Color warningBg = Color(0x14FF9900);
+  static const Color warningBg = Color(0x14FF9500);
 
   /// 成功（对齐设计系统 success 绿 #1FB67A，§1.1；微信绿仅保留给聊天气泡）
-  static const Color success = Color(0xFF1FB67A);
+  static const Color success = Color(0x34C759);
 
   /// 成功背景
-  static const Color successBg = Color(0x141FB67A);
+  static const Color successBg = Color(0x1434C759);
 
   /// 信息
   static const Color info = Color(0xFF10AEFF);
@@ -183,7 +186,7 @@ abstract class AppColors {
   // ============================================
 
   /// 红点徽章
-  static const Color badge = Color(0xFFFA5151);
+  static const Color badge = Color(0xFF3B30);
 
   /// 免打扰标识
   static const Color muted = Color(0xFFCCCCCC);
@@ -193,22 +196,22 @@ abstract class AppColors {
   // ============================================
 
   /// 输入框背景
-  static const Color inputBackground = Color(0xFFF7F7F7);
+  static const Color inputBackground = Color(0xF2F2F7);
 
   /// 输入框边框
-  static const Color inputBorder = Color(0xFFE5E5E5);
+  static const Color inputBorder = Color(0xC6C6C8);
 
   /// 输入框焦点边框 (品牌强调)
-  static const Color inputFocusBorder = Color(0xFF5B6CFF);
+  static const Color inputFocusBorder = Color(0x007AFF);
 
   /// 搜索框背景
   static const Color searchBackground = Color(0xFFEDEDED);
 
   /// 输入栏背景 - 浅色
-  static const Color inputBar = Color(0xFFF7F7F7);
+  static const Color inputBar = Color(0xF2F2F7);
 
   /// 输入栏背景 - 深色
-  static const Color inputBarDark = Color(0xFF2C2C2C);
+  static const Color inputBarDark = Color(0x1C1C1E);
 
   // ============================================
   // 遮罩/覆盖层
@@ -276,7 +279,8 @@ abstract class AppColors {
   static Color surfaceOf(bool isDark) => isDark ? surfaceDark : surface;
 
   /// 主文字：浅 #181818 / 深 #E5E5E5
-  static Color textPrimaryOf(bool isDark) => isDark ? textPrimaryDark : textPrimary;
+  static Color textPrimaryOf(bool isDark) =>
+      isDark ? textPrimaryDark : textPrimary;
 
   /// 次要文字：浅 #888888 / 深 #AAAAAA
   static Color textSecondaryOf(bool isDark) =>
@@ -294,7 +298,8 @@ abstract class AppColors {
       isDark ? dividerThinDark : dividerThin;
 
   /// 输入 / 填充背景：浅 #F7F7F7 / 深 #2C2C2C
-  static Color inputBgOf(bool isDark) => isDark ? inputBarDark : inputBackground;
+  static Color inputBgOf(bool isDark) =>
+      isDark ? inputBarDark : inputBackground;
 
   /// 占位 / 图片加载底 / 中性填充：浅 #E5E5E5 / 深 #2A2A2A
   static Color placeholderOf(bool isDark) =>
@@ -324,8 +329,8 @@ abstract class AppColorPalettes {
   /// 同一名称总是返回相同的颜色
   static Color getAvatarColor(String name) {
     if (name.isEmpty) return avatarColors[0];
-    final index = name.codeUnits.fold<int>(0, (sum, c) => sum + c) % avatarColors.length;
+    final index =
+        name.codeUnits.fold<int>(0, (sum, c) => sum + c) % avatarColors.length;
     return avatarColors[index];
   }
 }
-

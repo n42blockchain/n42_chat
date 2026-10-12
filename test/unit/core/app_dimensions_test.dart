@@ -111,12 +111,27 @@ void main() {
       expect(AppDimensions.avatarSizeProfile, 72.0);
     });
 
-    test('avatar size decreases: Profile > Conversation > Chat > Small > XSmall', () {
-      expect(AppDimensions.avatarSizeProfile, greaterThan(AppDimensions.avatarSizeConversation));
-      expect(AppDimensions.avatarSizeConversation, greaterThan(AppDimensions.avatarSizeChat));
-      expect(AppDimensions.avatarSizeChat, greaterThan(AppDimensions.avatarSizeSmall));
-      expect(AppDimensions.avatarSizeSmall, greaterThan(AppDimensions.avatarSizeXSmall));
-    });
+    test(
+      'avatar size decreases: Profile > Conversation > Chat > Small > XSmall',
+      () {
+        expect(
+          AppDimensions.avatarSizeProfile,
+          greaterThan(AppDimensions.avatarSizeConversation),
+        );
+        expect(
+          AppDimensions.avatarSizeConversation,
+          greaterThan(AppDimensions.avatarSizeChat),
+        );
+        expect(
+          AppDimensions.avatarSizeChat,
+          greaterThan(AppDimensions.avatarSizeSmall),
+        );
+        expect(
+          AppDimensions.avatarSizeSmall,
+          greaterThan(AppDimensions.avatarSizeXSmall),
+        );
+      },
+    );
   });
 
   // ─────────────────────────────────────────────────
@@ -165,11 +180,14 @@ void main() {
 
   group('AppDimensions input constants', () {
     test('inputMinHeight is less than inputMaxHeight', () {
-      expect(AppDimensions.inputMinHeight, lessThan(AppDimensions.inputMaxHeight));
+      expect(
+        AppDimensions.inputMinHeight,
+        lessThan(AppDimensions.inputMaxHeight),
+      );
     });
 
-    test('inputMinHeight is 36.0', () {
-      expect(AppDimensions.inputMinHeight, 36.0);
+    test('inputMinHeight is 44.0', () {
+      expect(AppDimensions.inputMinHeight, 44.0);
     });
 
     test('inputMaxHeight is 120.0', () {
@@ -195,8 +213,14 @@ void main() {
     });
 
     test('animationFast < animationNormal < animationSlow', () {
-      expect(AppDimensions.animationFast, lessThan(AppDimensions.animationNormal));
-      expect(AppDimensions.animationNormal, lessThan(AppDimensions.animationSlow));
+      expect(
+        AppDimensions.animationFast,
+        lessThan(AppDimensions.animationNormal),
+      );
+      expect(
+        AppDimensions.animationNormal,
+        lessThan(AppDimensions.animationSlow),
+      );
     });
   });
 

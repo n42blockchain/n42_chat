@@ -102,13 +102,15 @@ class N42BottomNavBar extends StatelessWidget {
 
   Widget _buildNavItem(BuildContext context, N42BottomNavItem item, int index) {
     final isSelected = currentIndex == index;
-    final color = isSelected ? AppColors.primary : context.textSecondary;
+    final color = isSelected
+        ? AppColors.primaryOf(context)
+        : context.textSecondary;
 
     // InkWell 提供反馈 + 整 cell 命中（带 splashColor / hoverColor）。
     return InkWell(
       onTap: () => onTap(index),
-      splashColor: AppColors.primary.withValues(alpha: 0.10),
-      highlightColor: AppColors.primary.withValues(alpha: 0.05),
+      splashColor: AppColors.primaryOf(context).withValues(alpha: 0.10),
+      highlightColor: AppColors.primaryOf(context).withValues(alpha: 0.05),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
