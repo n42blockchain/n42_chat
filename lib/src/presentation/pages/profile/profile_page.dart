@@ -542,9 +542,11 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: Text(
                   title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, height: 1.3, color: textColor),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontSize: 17,
+                    height: 22 / 17,
+                    color: textColor,
+                  ),
                 ),
               ),
               if (badge != null)

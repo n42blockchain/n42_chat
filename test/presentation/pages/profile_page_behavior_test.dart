@@ -73,6 +73,12 @@ void main() {
         for (final title in ['Services', 'Favorites', 'Moments']) {
           final text = tester.widget<Text>(find.text(title));
           expect(text.style?.color?.a, 1, reason: '$title must be visible');
+          expect(text.style?.fontSize, 17);
+          expect(
+            text.maxLines,
+            isNull,
+            reason: 'Menu labels must wrap at accessibility sizes',
+          );
         }
         expect(tester.takeException(), isNull);
       },
