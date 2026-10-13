@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
+import 'package:n42_chat/src/core/theme/n42_chat_theme.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/n42_chat.dart';
 import 'package:n42_chat/src/presentation/pages/profile/profile_page.dart';
@@ -21,9 +22,16 @@ void main() {
 
   tearDown(() => getIt.reset());
 
-  Future<void> open(WidgetTester tester, {bool showAppBar = true}) async {
+  Future<void> open(
+    WidgetTester tester, {
+    bool showAppBar = true,
+    bool dark = false,
+  }) async {
     await tester.pumpWidget(
       MaterialApp(
+        theme: dark
+            ? N42ChatTheme.wechatDark().toThemeData()
+            : N42ChatTheme.wechatLight().toThemeData(),
         locale: const Locale('en'),
         localizationsDelegates: S.localizationsDelegates,
         supportedLocales: S.supportedLocales,
@@ -57,4 +65,17 @@ void main() {
     expect(find.byType(AppBar), findsNothing);
     expect(tester.takeException(), isNull);
   });
+  for (final dark in [false, true]) {
+    testWidgets(
+      'profile menu labels remain opaque in ${dark ? "dark" : "light"} mode',
+      (tester) async {
+        await open(tester, dark: dark);
+        for (final title in ['Services', 'Favorites', 'Moments']) {
+          final text = tester.widget<Text>(find.text(title));
+          expect(text.style?.color?.a, 1, reason: '$title must be visible');
+        }
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 }

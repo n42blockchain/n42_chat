@@ -567,3 +567,9 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Evidence: `chat_appearance_test.dart`, `conversation_tile_a11y_test.dart`, `responsive_utils_test.dart`, Story presentation tests.
 - Current state: default semantic colors and type metrics now follow Apple; the chat scope preserves host themes and no longer caps OS text scaling at 1.18. Shared buttons/navigation retain custom host accents. Nonlinear scaling composition and 772 local widget/presentation/theme regression tests pass. Analyzer exits 0 with 336 infos and no warnings/errors. Complete VoiceOver and authenticated screen acceptance at accessibility sizes on iOS/Android hardware has not been performed; the user has no physical Duo. Some decorative content uses fixed semantic colors rather than a custom accent.
 - Next step: review authenticated conversation/group-call/settings flows with VoiceOver and large system text on hardware. Record hardware and simulator results separately.
+
+### UI-002 Physical-device Apple palette acceptance
+- Severity: High. Build 73022 showed missing profile/menu text and transparent surfaces on iPhone 13 Pro Max.
+- Cause: 35 six-digit RGB Color literals had zero alpha. Fixed with explicit opaque ARGB throughout the semantic palette.
+- Verification: 13 theme/profile checks passed, including opaque menu labels in light/dark themes. iOS and Android post-fix installation/screenshot verification pending.
+- Next step: install the corrected release on connected hardware and validate profile, conversation, settings, palette and navigation screens before closing.
