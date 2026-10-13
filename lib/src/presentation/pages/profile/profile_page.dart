@@ -33,6 +33,7 @@ import '../moment/moment_list_page.dart';
 import '../sticker/sticker_store_page.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/utils/friendly_display_name.dart';
+import '../../../core/utils/platform_utils.dart';
 
 /// 我的页面
 class ProfilePage extends StatefulWidget {
@@ -243,16 +244,22 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              _buildDivider(context),
-              _buildMenuItem(
-                context,
-                icon: Icons.account_balance_outlined,
-                iconColor: const Color(0xFF2ECC71),
-                title: 'Buy / Sell crypto',
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const FiatRampPage()),
+              // Fiat on/off-ramp is Android-only: Apple App Review rejects
+              // in-app crypto buying/selling flows on iOS/iPadOS.
+              if (PlatformUtils.isAndroid) ...[
+                _buildDivider(context),
+                _buildMenuItem(
+                  context,
+                  icon: Icons.account_balance_outlined,
+                  iconColor: const Color(0xFF2ECC71),
+                  title: 'Buy / Sell crypto',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const FiatRampPage(),
+                    ),
+                  ),
                 ),
-              ),
+              ],
               _buildDivider(context),
               _buildMenuItem(
                 context,
