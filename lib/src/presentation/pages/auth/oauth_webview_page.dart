@@ -62,7 +62,7 @@ class _OAuthWebViewPageState extends State<OAuthWebViewPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onNavigationRequest: (request) {
-            if (_isRedirect(request.url)) {
+            if (request.isMainFrame && _isRedirect(request.url)) {
               _finish(request.url);
               return NavigationDecision.prevent;
             }
