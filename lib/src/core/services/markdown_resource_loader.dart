@@ -19,15 +19,25 @@ Uri? markdownResourceUri(String raw) {
 
 /// Fetch only after explicit per-resource consent; never forward app credentials.
 class MarkdownResourceLoader {
-  final http.Client _client;
-  MarkdownResourceLoader({http.Client? client})
-    : _client = client ?? http.Client();
+  final http.Client Function() _clientFactory;
+  final Duration timeout;
+  final Set<http.Client> _active = {};
+  bool _disposed = false;
+  MarkdownResourceLoader({
+    http.Client? client,
+    http.Client Function()? clientFactory,
+    this.timeout = const Duration(seconds: 15),
+  }) : assert(client == null || clientFactory == null),
+       _clientFactory = clientFactory ?? (() => client ?? http.Client());
   Future<Uint8List> load(Uri uri) async {
+    if (_disposed) throw StateError('Image loader disposed');
     if (markdownResourceUri(uri.toString()) == null) {
       throw const FormatException('Unsafe resource URL');
     }
+    final client = _clientFactory();
+    _active.add(client);
     Future<Uint8List> read() async {
-      final response = await _client.send(
+      final response = await client.send(
         http.Request('GET', uri)..followRedirects = false,
       );
       if (response.statusCode != 200 ||
@@ -44,14 +54,19 @@ class MarkdownResourceLoader {
       return bytes.takeBytes();
     }
 
-    return read().timeout(
-      const Duration(seconds: 15),
-      onTimeout: () {
-        _client.close();
-        throw const FormatException('Image timed out');
-      },
-    );
+    try {
+      return await read().timeout(timeout);
+    } finally {
+      client.close();
+      _active.remove(client);
+    }
   }
 
-  void dispose() => _client.close();
+  void dispose() {
+    _disposed = true;
+    for (final client in _active) {
+      client.close();
+    }
+    _active.clear();
+  }
 }

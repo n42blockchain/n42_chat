@@ -84,6 +84,22 @@ void main() {
     service = MiniAppSecurityService(config: config, now: () => now);
   });
   tearDown(() => service.dispose());
+  test('launch expiry is rechecked after asynchronous nonce storage', () async {
+    final url = await link();
+    final delayed = MiniAppSecurityService(
+      config: config,
+      now: () => now,
+      preferences: () async {
+        now = now.add(const Duration(minutes: 6));
+        return SharedPreferences.getInstance();
+      },
+    );
+    addTearDown(delayed.dispose);
+    await expectLater(
+      delayed.authorizeLaunch(app, url),
+      throwsA(isA<MiniAppSecurityException>()),
+    );
+  });
   test(
     'unconfigured host allows bundled base but not unsigned business links',
     () async {
@@ -108,7 +124,7 @@ void main() {
       );
       expect(service.blockedReason(app), contains('Update'));
       await service.acceptPolicy(
-        await sign(policy(revision: 3, denied: ['1.1.0'])),
+        await sign(policy(revision: 3, denied: [MiniAppSecurityService.sdkVersion])),
       );
       expect(service.blockedReason(app), contains('Update'));
       await service.acceptPolicy(

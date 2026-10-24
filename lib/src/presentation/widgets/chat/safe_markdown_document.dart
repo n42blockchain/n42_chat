@@ -106,8 +106,23 @@ class _SafeMarkdownDocumentState extends State<SafeMarkdownDocument> {
                       ),
                     );
                     if (accepted == true && context.mounted) {
-                      await (widget.openLink?.call(uri) ??
-                          launchUrl(uri, mode: LaunchMode.externalApplication));
+                      try {
+                        final opened =
+                            await (widget.openLink?.call(uri) ??
+                                launchUrl(
+                                  uri,
+                                  mode: LaunchMode.externalApplication,
+                                ));
+                        if (!opened) throw StateError('Link unavailable');
+                      } catch (_) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Unable to open this link.'),
+                            ),
+                          );
+                        }
+                      }
                     }
                   },
                 ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -36,6 +37,50 @@ void main() {
       ]) {
         expect(markdownResourceUri(value), isNull);
       }
+    },
+  );
+
+  test('image retry creates a fresh transport after a timeout', () async {
+    var clients = 0;
+    final stalled = Completer<http.Response>();
+    final loader = MarkdownResourceLoader(
+      timeout: const Duration(milliseconds: 10),
+      clientFactory: () {
+        final attempt = ++clients;
+        return MockClient(
+          (_) async =>
+              attempt == 1 ? stalled.future : http.Response.bytes([1, 2], 200),
+        );
+      },
+    );
+    await expectLater(
+      loader.load(Uri.parse('https://image.test/a')),
+      throwsA(isA<TimeoutException>()),
+    );
+    expect(await loader.load(Uri.parse('https://image.test/a')), [1, 2]);
+    expect(clients, 2);
+    loader.dispose();
+    stalled.complete(http.Response('', 200));
+  });
+  testWidgets(
+    'failed external launch is reported without an unhandled future',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SafeMarkdownDocument(
+              data: '[Docs](https://docs.example.test/read)',
+              openLink: (_) async => throw StateError('No handler'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Docs'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(find.text('Unable to open this link.'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     },
   );
   testWidgets(

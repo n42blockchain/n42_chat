@@ -35,7 +35,7 @@ class MiniAppSecurityException implements Exception {
 /// A bounded, fail-closed gate shared by the launcher and every native call.
 /// An unconfigured host supports only the bundled manifest's base entry points.
 class MiniAppSecurityService {
-  static const sdkVersion = '1.1.0';
+  static const sdkVersion = '1.1.1';
   static const refreshInterval = Duration(minutes: 5);
   static const maxPolicyAge = Duration(minutes: 15);
   static const _storageKey = 'n42.miniapp.security.v1';
@@ -272,6 +272,7 @@ class MiniAppSecurityService {
     // A policy may have changed while signature verification/storage was in flight.
     final after = blockedReason(app);
     if (after != null) throw MiniAppSecurityException(after);
+    _validateTime(claims, const Duration(minutes: 5));
     return target;
   }
 

@@ -49,7 +49,6 @@ class NfcUriReader {
     : _providedManager = manager;
   Completer<String?>? _pending;
   NfcManager? _activeManager;
-  bool _handling = false;
   Future<String?> read() async {
     if (_pending != null) throw StateError('NFC scan is already active.');
     if (_providedManager == null &&
@@ -64,6 +63,7 @@ class NfcUriReader {
     }
     final manager = _providedManager ?? NfcManager.instance;
     final pending = Completer<String?>();
+    var handling = false;
     _pending = pending;
     unawaited(pending.future.then<void>((_) {}, onError: (Object _) {}));
     _activeManager = manager;
@@ -80,10 +80,12 @@ class NfcUriReader {
           if (!pending.isCompleted) pending.complete(null);
         },
         onDiscovered: (tag) async {
-          if (_handling || pending.isCompleted || !identical(_pending, pending)) {
+          if (handling ||
+              pending.isCompleted ||
+              !identical(_pending, pending)) {
             return;
           }
-          _handling = true;
+          handling = true;
           try {
             final ndef = readTag == null ? Ndef.from(tag) : null;
             final message = readTag != null
@@ -108,7 +110,7 @@ class NfcUriReader {
               );
             }
           } finally {
-            _handling = false;
+            handling = false;
           }
         },
       );

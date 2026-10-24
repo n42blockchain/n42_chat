@@ -1,6 +1,6 @@
 # Mini App security policy and signed launch protocol v1
 
-SDK security version: `1.1.0`. This is the native bridge version, not a page-supplied JavaScript version or the host app store version.
+SDK security version: `1.1.1`. This is the native bridge version, not a page-supplied JavaScript version or the host app store version.
 
 ## Trust and behavior
 

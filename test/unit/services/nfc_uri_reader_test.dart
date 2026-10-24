@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -105,5 +106,35 @@ void main() {
     manager.availability = NfcAvailability.disabled;
     await expectLater(reader.read(), throwsStateError);
     expect(manager.stops, greaterThanOrEqualTo(2));
+  });
+  test('cancelled tag read cannot block the next native session', () async {
+    final manager = _Manager();
+    final oldRead = Completer<NdefMessage?>();
+    var reads = 0;
+    final reader = NfcUriReader(
+      manager: manager,
+      readTag: (_) {
+        if (++reads == 1) return oldRead.future;
+        return Future.value(
+          NdefMessage(records: [record('https://shop.n42.world')]),
+        );
+      },
+    );
+    final old = reader.read();
+    await Future<void>.delayed(Duration.zero);
+    manager.discovered!(const NfcTag(data: {}));
+    await reader.cancel();
+    expect(await old, isNull);
+    final next = reader.read();
+    await Future<void>.delayed(Duration.zero);
+    manager.discovered!(const NfcTag(data: {}));
+    expect(
+      await next.timeout(const Duration(seconds: 1)),
+      'https://shop.n42.world',
+    );
+    oldRead.complete(
+      NdefMessage(records: [record('https://old.example.test')]),
+    );
+    await Future<void>.delayed(Duration.zero);
   });
 }
