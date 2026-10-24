@@ -6,16 +6,12 @@ import 'package:path_provider/path_provider.dart';
 
 import 'media_lifecycle_service.dart';
 import 'media_telemetry.dart';
+import 'streaming_attachment_decryptor.dart';
+import 'attachment_size_policy.dart';
 import '../utils/debug_log.dart';
 
 /// 下载任务状态
-enum DownloadStatus {
-  pending,
-  downloading,
-  completed,
-  failed,
-  cancelled,
-}
+enum DownloadStatus { pending, downloading, completed, failed, cancelled }
 
 /// 下载任务
 class DownloadTask {
@@ -24,6 +20,9 @@ class DownloadTask {
   final String savePath;
   final String? fileName;
   final Map<String, String>? headers;
+  final String? encryptKey;
+  final String? encryptIv;
+  final String? encryptSha256;
   double progress;
   DownloadStatus status;
   int totalBytes;
@@ -40,6 +39,9 @@ class DownloadTask {
     required this.savePath,
     this.fileName,
     this.headers,
+    this.encryptKey,
+    this.encryptIv,
+    this.encryptSha256,
     this.progress = 0.0,
     this.status = DownloadStatus.pending,
     this.totalBytes = 0,
@@ -63,8 +65,13 @@ class DownloadService {
   int _taskIdCounter = 0;
 
   /// 所有活跃的下载任务
-  List<DownloadTask> get activeTasks =>
-      _tasks.values.where((t) => t.status == DownloadStatus.downloading || t.status == DownloadStatus.pending).toList();
+  List<DownloadTask> get activeTasks => _tasks.values
+      .where(
+        (t) =>
+            t.status == DownloadStatus.downloading ||
+            t.status == DownloadStatus.pending,
+      )
+      .toList();
 
   /// 下载文件
   ///
@@ -87,6 +94,9 @@ class DownloadService {
     String? fileName,
     Map<String, String>? headers,
     Map<String, String>? metadata,
+    String? encryptKey,
+    String? encryptIv,
+    String? encryptSha256,
   }) async {
     final taskId = 'download_${_taskIdCounter++}';
     final task = DownloadTask(
@@ -96,6 +106,9 @@ class DownloadService {
       fileName: fileName,
       headers: headers == null ? null : Map<String, String>.from(headers),
       metadata: metadata,
+      encryptKey: encryptKey,
+      encryptIv: encryptIv,
+      encryptSha256: encryptSha256,
     );
 
     _tasks[taskId] = task;
@@ -121,15 +134,16 @@ class DownloadService {
       return task;
     }
 
-    return watchTask(taskId).firstWhere(
-      (updatedTask) => _isTerminalStatus(updatedTask.status),
-    );
+    return watchTask(taskId)
+        .firstWhere((updatedTask) => _isTerminalStatus(updatedTask.status));
   }
 
   /// 取消下载任务
   void cancelTask(String taskId) {
     final task = _tasks[taskId];
-    if (task != null && task.status == DownloadStatus.downloading) {
+    if (task != null &&
+        (task.status == DownloadStatus.downloading ||
+            task.status == DownloadStatus.pending)) {
       task.status = DownloadStatus.cancelled;
       // 关闭 HTTP client 以中断正在进行的网络流。
       // _activeCount 由 _executeDownload 的 finally 块统一管理，
@@ -175,8 +189,22 @@ class DownloadService {
     final client = http.Client();
     _activeClients[task.id] = client;
 
+    Directory? temporary;
     try {
-      final request = http.Request('GET', Uri.parse(task.url));
+      final encrypted =
+          task.encryptKey != null ||
+          task.encryptIv != null ||
+          task.encryptSha256 != null;
+      if (encrypted &&
+          (task.encryptKey == null ||
+              task.encryptIv == null ||
+              task.encryptSha256 == null)) {
+        throw const FormatException(
+          'Incomplete attachment encryption metadata',
+        );
+      }
+      final request = http.Request('GET', Uri.parse(task.url))
+        ..followRedirects = false;
       if (task.headers != null && task.headers!.isNotEmpty) {
         request.headers.addAll(task.headers!);
       }
@@ -189,7 +217,12 @@ class DownloadService {
       task.totalBytes = response.contentLength ?? 0;
       final file = File(task.savePath);
       await file.parent.create(recursive: true);
-      final sink = file.openWrite();
+      if (task.totalBytes > AttachmentSizePolicy.maximumLimit) {
+        throw const FormatException('Attachment exceeds the download limit');
+      }
+      temporary = await file.parent.createTemp('.n42-download-');
+      final downloaded = File('${temporary.path}/download');
+      final sink = await downloaded.open(mode: FileMode.write);
 
       try {
         await for (final chunk in response.stream) {
@@ -197,7 +230,13 @@ class DownloadService {
             return;
           }
 
-          sink.add(chunk);
+          if (task.receivedBytes + chunk.length >
+              AttachmentSizePolicy.maximumLimit) {
+            throw const FormatException(
+              'Attachment exceeds the download limit',
+            );
+          }
+          await sink.writeFrom(chunk);
           task.receivedBytes += chunk.length;
           if (task.totalBytes > 0) {
             task.progress = task.receivedBytes / task.totalBytes;
@@ -211,6 +250,31 @@ class DownloadService {
         await sink.close();
       }
 
+      if (task.status == DownloadStatus.cancelled) return;
+      if (task.totalBytes > 0 && task.receivedBytes != task.totalBytes) {
+        throw const FormatException('Attachment download was truncated');
+      }
+      File result = downloaded;
+      if (encrypted) {
+        result = File('${temporary.path}/plaintext');
+        await MediaTelemetry.trace(
+          MediaStage.decrypt,
+          () => StreamingAttachmentDecryptor().decrypt(
+            source: downloaded,
+            destination: result,
+            key: task.encryptKey!,
+            iv: task.encryptIv!,
+            sha256: task.encryptSha256!,
+            maxBytes: AttachmentSizePolicy.maximumLimit,
+            isActive: () => task.status != DownloadStatus.cancelled,
+          ),
+          bytes: task.receivedBytes,
+        );
+      }
+      if (task.status == DownloadStatus.cancelled) return;
+      await result.rename(task.savePath);
+      await temporary.delete(recursive: true);
+      temporary = null;
       task.status = DownloadStatus.completed;
       task.progress = 1.0;
       // 更新 totalBytes 为实际接收字节数（如果服务器未提供 Content-Length）
@@ -255,6 +319,11 @@ class DownloadService {
         bytes: task.receivedBytes,
       );
       client.close();
+      try {
+        await temporary?.delete(recursive: true);
+      } catch (_) {
+        /* Best effort after cancellation. */
+      }
       _activeClients.remove(task.id);
       _activeCount--;
       _processQueue();
@@ -264,7 +333,8 @@ class DownloadService {
   void _processQueue() {
     // 找到等待中的任务并启动
     for (final task in _tasks.values) {
-      if (task.status == DownloadStatus.pending && _activeCount < _maxConcurrent) {
+      if (task.status == DownloadStatus.pending &&
+          _activeCount < _maxConcurrent) {
         _activeCount++;
         _executeDownload(task);
       }
@@ -314,6 +384,15 @@ class DownloadService {
 
   /// 释放资源
   void dispose() {
+    for (final task in _tasks.values) {
+      if (!_isTerminalStatus(task.status)) {
+        task.status = DownloadStatus.cancelled;
+      }
+    }
+    for (final client in _activeClients.values) {
+      client.close();
+    }
+    _activeClients.clear();
     for (final controller in _taskControllers.values) {
       controller.close();
     }

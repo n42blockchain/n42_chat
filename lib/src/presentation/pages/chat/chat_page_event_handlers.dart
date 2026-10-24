@@ -249,9 +249,8 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     }
 
     if (paymentStatus == PaymentRequestLifecycleStatus.paid) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Payment already sent')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Payment already sent')));
       return;
     }
 
@@ -646,7 +645,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     final isPdf =
         fileName.toLowerCase().endsWith('.pdf') ||
         mimeType == 'application/pdf';
-    if (isPdf && fileUrl != null) {
+    final hasEncryption =
+        message.metadata?.encryptKey != null ||
+        message.metadata?.encryptIv != null ||
+        message.metadata?.encryptSha256 != null;
+    if (isPdf && fileUrl != null && !hasEncryption) {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => PdfViewerPage(
@@ -692,7 +695,12 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             try {
               final downloadService = getIt<DownloadService>();
               final downloadDir = await DownloadService.getDownloadDirectory();
-              final savePath = '$downloadDir/$fileName';
+              final safeName = fileName.split(RegExp(r'[/\\]')).last;
+              final directory = Directory(downloadDir);
+              await directory.create(recursive: true);
+              final target = await directory.createTemp('attachment-');
+              final savePath =
+                  '${target.path}/${safeName.isEmpty || safeName == "." || safeName == ".." ? "attachment" : safeName}';
 
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
@@ -707,6 +715,9 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                 savePath: savePath,
                 fileName: fileName,
                 headers: _buildAuthHeaders(fileUrl),
+                encryptKey: message.metadata?.encryptKey,
+                encryptIv: message.metadata?.encryptIv,
+                encryptSha256: message.metadata?.encryptSha256,
               );
               final task = await downloadService.waitForTaskCompletion(taskId);
               if (task.status != DownloadStatus.completed) {
@@ -719,7 +730,31 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                     content: Text(
                       S.of(context)?.downloadComplete ?? 'Download complete',
                     ),
-                    duration: const Duration(seconds: 2),
+                    action: SnackBarAction(
+                      label: 'Open / Save',
+                      onPressed: () async {
+                        try {
+                          final box = context.findRenderObject() as RenderBox?;
+                          await SharePlus.instance.share(
+                            ShareParams(
+                              files: [XFile(savePath)],
+                              sharePositionOrigin: box == null
+                                  ? null
+                                  : box.localToGlobal(Offset.zero) & box.size,
+                            ),
+                          );
+                        } catch (_) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Unable to open this file.'),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    duration: const Duration(seconds: 8),
                   ),
                 );
               }
