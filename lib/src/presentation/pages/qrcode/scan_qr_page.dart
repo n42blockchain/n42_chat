@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+
 import 'dart:async';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/services/nfc_uri_reader.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/social_scan_payload_parser.dart';
@@ -31,6 +33,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   final TextEditingController _inputController = TextEditingController();
   bool _isProcessing = false;
   bool _isPickingImage = false;
+  bool _isReadingNfc = false;
+  final _nfcReader = NfcUriReader();
   bool _showManualInput = false;
   bool _hasPermission = false;
   bool _isCheckingPermission = true;
@@ -59,6 +63,10 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       });
     } else {
       unawaited(_setCameraRunning(false));
+      if (state == AppLifecycleState.paused ||
+          state == AppLifecycleState.detached) {
+        unawaited(_nfcReader.cancel());
+      }
     }
   }
 
@@ -73,6 +81,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
           if (!_hasPermission ||
               _isProcessing ||
               _isPickingImage ||
+              _isReadingNfc ||
               WidgetsBinding.instance.lifecycleState !=
                   AppLifecycleState.resumed ||
               ModalRoute.of(context)?.isCurrent == false) {
@@ -95,6 +104,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     _resumeTimer?.cancel();
     _scannerController?.dispose();
     _inputController.dispose();
+    unawaited(_nfcReader.cancel());
     super.dispose();
   }
 
@@ -159,7 +169,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   }
 
   void _onDetect(BarcodeCapture capture) {
-    if (_isProcessing || _isPickingImage) return;
+    if (_isProcessing || _isPickingImage || _isReadingNfc) return;
 
     final List<Barcode> barcodes = capture.barcodes;
     for (final barcode in barcodes) {
@@ -171,8 +181,34 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _readNfc() async {
+    if (_isProcessing || _isPickingImage || _isReadingNfc) return;
+    setState(() {
+      _isReadingNfc = true;
+      _scanError = null;
+    });
+    await _setCameraRunning(false);
+    try {
+      final value = await _nfcReader.read();
+      if (!mounted) return;
+      setState(() => _isReadingNfc = false);
+      if (value != null) await _processQRCode(value);
+    } catch (_) {
+      if (mounted) {
+        _showError(
+          'NFC unavailable or tag not supported. Enable NFC, try another tag, or use QR.',
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isReadingNfc = false);
+        await _setCameraRunning(true);
+      }
+    }
+  }
+
   Future<void> _pickQrImage() async {
-    if (_isProcessing || _isPickingImage) return;
+    if (_isProcessing || _isPickingImage || _isReadingNfc) return;
     setState(() => _isPickingImage = true);
     await _setCameraRunning(false);
     try {
@@ -209,7 +245,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   }
 
   Future<void> _processQRCode(String data, {bool fromGallery = false}) async {
-    if (_isProcessing || (_isPickingImage && !fromGallery)) return;
+    if (_isProcessing || _isReadingNfc || (_isPickingImage && !fromGallery)) return;
     var completedWithExit = false;
     setState(() {
       _isProcessing = true;
@@ -249,7 +285,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
             context,
             app: payload.miniApp!,
             roomId: '',
-            initialUrl: payload.miniAppLaunchUrl,
+            initialUrl: payload.miniAppLaunchUrl ?? payload.miniApp!.url,
           );
           break;
       }
@@ -614,9 +650,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
   }
 
   void _showMyQRCode() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const MyQRCodePage()));
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => const MyQRCodePage()));
   }
 
   void _toggleManualInput() {
@@ -663,9 +698,26 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            key: const ValueKey('scan_nfc_button'),
+            tooltip: _isReadingNfc ? 'Cancel NFC' : 'Read NFC tag',
+            icon: Icon(
+              _isReadingNfc ? Icons.close : Icons.nfc,
+              color: Colors.white,
+            ),
+            onPressed: _isProcessing || _isPickingImage
+                ? null
+                : _isReadingNfc
+                ? () => _nfcReader.cancel()
+                : _readNfc,
+          ),
           TextButton(
             key: const ValueKey('scan_gallery_button'),
-            onPressed: _isCheckingPermission || _isProcessing || _isPickingImage
+            onPressed:
+                _isCheckingPermission ||
+                    _isProcessing ||
+                    _isPickingImage ||
+                    _isReadingNfc
                 ? null
                 : _pickQrImage,
             style: TextButton.styleFrom(
@@ -686,6 +738,14 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       ),
       body: Column(
         children: [
+          if (_isReadingNfc)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Hold your phone near the service tag.',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           if (_scanError != null)
             Semantics(
               liveRegion: true,
