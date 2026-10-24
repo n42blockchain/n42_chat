@@ -145,13 +145,13 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: member-join welcome messages and webhook callbacks now share the same room bot config, but they still execute from the client-side `GroupBloc`. If no logged-in client is online and subscribed, those automations do not fire.
 - Next step: move room automation triggers to a durable server-side worker/bot account, or introduce a background sync service with explicit delivery guarantees.
 
-### MEDIA-002 Encrypted-room file uploads require bounded in-memory encryption
+### MEDIA-002 Large encrypted attachments above 1 GiB and device acceptance remain open
 
 - Severity: H
 - Added: 2026-03-20
 - Evidence: `lib/src/presentation/pages/chat/chat_page_media_actions.dart`, `lib/src/data/datasources/matrix/message/matrix_media_sender.dart`
-- Current state: the September 18 repair converts picker paths/streams to SDK-encrypted attachments with a 50 MB bound (AppConstants.maxFileSize), including a streaming byte count that does not trust declared size. Larger attachments fail closed rather than uploading plaintext. Large-file support therefore does not meet the `>2GB` requirement for encrypted rooms.
-- Next step: implement a streaming encrypted upload path that preserves Matrix attachment encryption semantics instead of falling back to whole-file bytes or unencrypted upload.
+- Current state: October 23 adds Matrix v2 AES-256-CTR/SHA-256 disk-stream encryption for paths/streams in <=64 KiB working blocks, actual size/session checks and temporary ciphertext cleanup. Effective limit is the smaller of host configuration (capped at 1 GiB) and the advertised server limit; unknown server capacity falls back to 50 MiB. Byte-backed and scheduled attachments remain capped at 50 MiB. A real 64 MiB stream and independent decryption verify local behavior. Images/video and thumbnails use SDK encryption without plaintext fallback. Generic file downloads now stream ciphertext to temporary storage, verify SHA-256, decrypt in bounded blocks, and publish the final file only after validation; failed checks do not publish plaintext.
+- Remaining: validate large transfers against the deployed Matrix server and mobile disk/memory/network behavior. The historic `>2GB` requirement is not met. Server quotas, byte-backed gallery video limits and scheduled attachment storage are not expanded by this change.
 
 ### MEDIA-003 Built-in document preview is still incomplete for office formats
 
@@ -587,13 +587,13 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 
 - Severity: M
 - Added: 2026-10-23
-- Current state: Markdown images/automatic link opening are blocked; document fetches are bounded to 2 MiB, reject redirects, and verify encrypted media before rendering. Large Markdown is paged in bounded character chunks; tables/code fences can cross a page boundary. Added opt-in content-free send/upload/download/decrypt/preview events with operation/event IDs. SDK-internal encrypted upload is measured at outer send scope, not as independently observed upload/decrypt stages. No transcoding stage is present in the changed client path.
+- Current state: Markdown image requests and link opening require per-resource user action; document fetches are bounded to 2 MiB, reject redirects, and verify encrypted media before rendering. Large Markdown is paged in bounded character chunks; tables/code fences can cross a page boundary. Added opt-in content-free send/upload/download/decrypt/preview events with operation/event IDs. SDK-internal encrypted upload is measured at outer send scope, not as independently observed upload/decrypt stages. No transcoding stage is present in the changed client path.
 - Verification: 100 Markdown security samples; native Matrix decrypt/hash validation; 200 synthetic PNG/JPEG/GIF/BMP files decoded by the host Flutter engine. These do not prove video/HDR/P3 color accuracy, device peak memory, wire traffic, 1 MiB mobile preview P95 <300ms or production processing failure rate <0.1%. The telemetry sink has not been connected to a production collector.
-- Next step: use consented camera/video and malformed input corpora, mobile profile/release builds, real Matrix test rooms and server-side logs. Export telemetry with an independent expected-stage inventory to measure missing events. Reproduce via `tool/weekly_benchmark/` and `docs/testing/weekly-2026-10-23/EXTERNAL_ACCEPTANCE.md`; do not increase the existing encrypted-upload bound (MEDIA-002) based on host measurements.
+- Next step: use consented camera/video and malformed input corpora, mobile profile/release builds, real Matrix test rooms and server-side logs. Export telemetry with an independent expected-stage inventory to measure missing events. Reproduce via `tool/weekly_benchmark/` and `docs/testing/weekly-2026-10-23/EXTERNAL_ACCEPTANCE.md`; validate negotiated large transfers separately (MEDIA-002).
 
 ### EXPERIMENT-001 NFC versus QR business pilot has no field evidence
 
 - Severity: M
 - Added: 2026-10-23
-- Current state: signed URLs reuse the Mini App gate and scanned external entries display the registered provider/domain before opening. A deidentified comparison protocol and metric summarizer are available. No NFC hardware/read integration, signed short-link issuer, merchant admin controls or 3–5 actual pilots were supplied/deployed. Client signature checks cannot detect replacement with another valid physical merchant tag.
+- Current state: signed URLs reuse the Mini App gate and scanned external entries display the registered provider/domain before opening. A deidentified comparison protocol and metric summarizer are available. Native iOS/Android NDEF URI reading is integrated with cancel/timeout/duplicate guards and provider confirmation. Physical-tag acceptance, signed short-link issuing, merchant admin controls and real pilots remain unverified or undeployed. Client signature checks cannot detect replacement with another valid physical merchant tag.
 - Next step: recruit real merchants/events, implement audited/strongly authenticated target changes, register and inspect physical tags, compare NFC/QR/link completion and entry time, wait seven days for reuse, and obtain at least two distinct merchant continuation decisions. Keep identities/visits off public chains. Do not count tool fixtures as pilot success.
