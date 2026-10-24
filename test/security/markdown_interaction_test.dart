@@ -1,3 +1,5 @@
+import 'package:n42_chat/src/core/services/text_document_loader.dart';
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -58,6 +60,28 @@ void main() {
       throwsA(isA<TimeoutException>()),
     );
     expect(await loader.load(Uri.parse('https://image.test/a')), [1, 2]);
+    expect(clients, 2);
+    loader.dispose();
+    stalled.complete(http.Response('', 200));
+  });
+  test('document retry uses a fresh transport after timeout', () async {
+    var clients = 0;
+    final stalled = Completer<http.Response>();
+    final loader = TextDocumentLoader(
+      timeout: const Duration(milliseconds: 10),
+      clientFactory: () {
+        final attempt = ++clients;
+        return MockClient(
+          (_) async =>
+              attempt == 1 ? stalled.future : http.Response('recovered', 200),
+        );
+      },
+    );
+    await expectLater(
+      loader.load('https://docs.test/a.md'),
+      throwsA(isA<TimeoutException>()),
+    );
+    expect(await loader.load('https://docs.test/a.md'), 'recovered');
     expect(clients, 2);
     loader.dispose();
     stalled.complete(http.Response('', 200));

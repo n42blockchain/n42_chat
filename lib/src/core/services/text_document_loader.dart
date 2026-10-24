@@ -11,9 +11,17 @@ import 'media_telemetry.dart';
 /// Bounded, authenticated document fetch. Redirects never receive credentials.
 class TextDocumentLoader {
   static const maxBytes = 2 * 1024 * 1024;
-  final http.Client _client;
+  final http.Client Function() _clientFactory;
+  final Duration timeout;
+  final Set<http.Client> _active = {};
+  bool _disposed = false;
   final String operationId = MediaTelemetry.newOperationId();
-  TextDocumentLoader({http.Client? client}) : _client = client ?? http.Client();
+  TextDocumentLoader({
+    http.Client? client,
+    http.Client Function()? clientFactory,
+    this.timeout = const Duration(seconds: 30),
+  }) : assert(client == null || clientFactory == null),
+       _clientFactory = clientFactory ?? (() => client ?? http.Client());
 
   Future<String> load(
     String url, {
@@ -22,6 +30,9 @@ class TextDocumentLoader {
     String? encryptIv,
     String? encryptSha256,
   }) async {
+    if (_disposed) throw StateError('Document loader disposed');
+    final client = _clientFactory();
+    _active.add(client);
     final measurement = MediaTelemetry.start(
       MediaStage.download,
       operationId: operationId,
@@ -43,7 +54,7 @@ class TextDocumentLoader {
       Future<Uint8List> read() async {
         final request = http.Request('GET', uri)..followRedirects = false;
         if (headers != null) request.headers.addAll(headers);
-        final response = await _client.send(request);
+        final response = await client.send(request);
         if (response.statusCode != 200) {
           throw const FormatException('Document download failed.');
         }
@@ -61,13 +72,7 @@ class TextDocumentLoader {
         return builder.takeBytes();
       }
 
-      var bytes = await read().timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          _client.close();
-          throw const FormatException('Document download timed out.');
-        },
-      );
+      var bytes = await read().timeout(timeout);
       measurement.finish(MediaOutcome.succeeded, bytes: length);
       if (encrypted) {
         final decrypt = MediaTelemetry.start(
@@ -99,8 +104,17 @@ class TextDocumentLoader {
     } catch (_) {
       measurement.finish(MediaOutcome.failed, bytes: length);
       rethrow;
+    } finally {
+      client.close();
+      _active.remove(client);
     }
   }
 
-  void dispose() => _client.close();
+  void dispose() {
+    _disposed = true;
+    for (final client in _active) {
+      client.close();
+    }
+    _active.clear();
+  }
 }

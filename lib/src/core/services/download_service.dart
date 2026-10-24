@@ -289,6 +289,7 @@ class DownloadService {
             isActive: isActive,
           ),
           bytes: task.receivedBytes,
+          nullIsFailure: false,
         );
       }
       if (!isActive()) return;

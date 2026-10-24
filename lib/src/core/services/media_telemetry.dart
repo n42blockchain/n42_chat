@@ -46,13 +46,16 @@ class MediaTelemetry {
     MediaStage stage,
     Future<T> Function() action, {
     int bytes = 0,
+    bool nullIsFailure = true,
   }) {
     final measurement = start(stage);
     return runZoned(() async {
       try {
         final result = await action();
         measurement.finish(
-          result == null ? MediaOutcome.failed : MediaOutcome.succeeded,
+          result == null && nullIsFailure
+              ? MediaOutcome.failed
+              : MediaOutcome.succeeded,
           bytes: bytes,
         );
         return result;

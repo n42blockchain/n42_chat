@@ -3,6 +3,19 @@ import 'package:n42_chat/src/core/services/media_telemetry.dart';
 
 void main() {
   tearDown(() => MediaTelemetry.onEvent = null);
+  test(
+    'successful void decryption is not classified as a null failure',
+    () async {
+      final events = <MediaStageEvent>[];
+      MediaTelemetry.onEvent = events.add;
+      await MediaTelemetry.trace<void>(
+        MediaStage.decrypt,
+        () async {},
+        nullIsFailure: false,
+      );
+      expect(events.single.outcome, MediaOutcome.succeeded);
+    },
+  );
   test('terminal events are emitted once with bounded fields', () {
     final events = <MediaStageEvent>[];
     MediaTelemetry.onEvent = events.add;
