@@ -94,8 +94,9 @@ class MiniAppSecurityService {
         const Duration(seconds: 10),
       )) {
         if (downloadTime.elapsed > const Duration(seconds: 10) ||
-            bytes.length + chunk.length > 65536)
+            bytes.length + chunk.length > 65536) {
           throw const FormatException();
+        }
         bytes.addAll(chunk);
       }
       await acceptPolicy(utf8.decode(bytes));
@@ -166,8 +167,9 @@ class MiniAppSecurityService {
         )) {
       return 'This Mini App is not registered.';
     }
-    if (normalizeTrustedMiniAppUri(app.url) == null)
+    if (normalizeTrustedMiniAppUri(app.url) == null) {
       return 'Invalid mini app URL';
+    }
     if (config.policyUrl != null || _policy != null) {
       final policy = _policy;
       if (policy == null ||
@@ -213,8 +215,9 @@ class MiniAppSecurityService {
             candidate.path == '/' &&
             base.path.isEmpty &&
             !candidate.hasQuery &&
-            !candidate.hasFragment))
+            !candidate.hasFragment)) {
       return base;
+    }
     final params = Map<String, String>.from(candidate.queryParameters);
     final envelope = params.remove('n42_launch');
     if (envelope == null) {
@@ -252,17 +255,20 @@ class MiniAppSecurityService {
         ? <String, dynamic>{}
         : jsonDecode(saved) as Map<String, dynamic>;
     used.removeWhere((_, expiry) => expiry is int && expiry <= now);
-    if (used.containsKey(nonce))
+    if (used.containsKey(nonce)) {
       throw const MiniAppSecurityException('This link has already been used.');
-    if (used.length >= 1024)
+    }
+    if (used.length >= 1024) {
       throw const MiniAppSecurityException(
         'Too many links. Please try again later.',
       );
+    }
     used[nonce] = claims['exp'];
-    if (!await prefs.setString(storage, jsonEncode(used)))
+    if (!await prefs.setString(storage, jsonEncode(used))) {
       throw const MiniAppSecurityException(
         'Unable to verify this link safely.',
       );
+    }
     // A policy may have changed while signature verification/storage was in flight.
     final after = blockedReason(app);
     if (after != null) throw MiniAppSecurityException(after);

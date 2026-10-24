@@ -239,12 +239,13 @@ void main() {
         now: () => now,
         client: MockClient((request) async {
           expect(request.followRedirects, isFalse);
-          if (mode == 0)
+          if (mode == 0) {
             return http.Response(
               '',
               302,
               headers: {'location': 'https://evil.test'},
             );
+          }
           return http.Response(signed, 200);
         }),
       );

@@ -445,8 +445,9 @@ class MiniAppBridgeService {
   ) async {
     if (id == null ||
         !await _isTrustedSource(controller) ||
-        !id.startsWith('_n42_${_documentNonce}_'))
+        !id.startsWith('_n42_${_documentNonce}_')) {
       return;
+    }
     // Validate callback id: only allow safe alphanumeric + underscore ids
     // to prevent JS injection via crafted callback identifiers.
     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(id)) {

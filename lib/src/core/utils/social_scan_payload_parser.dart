@@ -32,8 +32,9 @@ SocialScanPayload? parseSocialScanPayload(String raw) {
   final value = raw.trim();
   if (value.isEmpty ||
       value.length > 8192 ||
-      RegExp(r'[\x00-\x1f\x7f]').hasMatch(value))
+      RegExp(r'[\x00-\x1f\x7f]').hasMatch(value)) {
     return null;
+  }
 
   final userId = _extractMatrixUserId(value);
   if (userId != null) {
