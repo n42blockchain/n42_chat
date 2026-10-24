@@ -1,4 +1,6 @@
 import '../../../../core/services/media_telemetry.dart';
+import '../../../../core/services/attachment_size_policy.dart';
+import '../../../../core/services/streaming_attachment_encryptor.dart';
 import 'direct_chat_send_guard.dart';
 import 'encrypted_send_guard.dart';
 
@@ -19,7 +21,12 @@ class MatrixMediaSender {
   final MatrixClientManager _clientManager;
   final MatrixMediaUploader _uploader;
 
-  MatrixMediaSender(this._clientManager, this._uploader);
+  final int maxAttachmentBytes;
+  MatrixMediaSender(
+    this._clientManager,
+    this._uploader, {
+    this.maxAttachmentBytes = AttachmentSizePolicy.conservativeLimit,
+  });
 
   matrix.Client? get _client => _clientManager.client;
 
@@ -79,6 +86,23 @@ class MatrixMediaSender {
         actualMimeType = 'image/heic';
       } else if (lowerFilename.endsWith('.heif')) {
         actualMimeType = 'image/heif';
+      }
+
+      if (room.encrypted) {
+        if (!_client!.fileEncryptionEnabled) {
+          throw StateError('Attachment encryption is unavailable');
+        }
+        return await room.sendFileEvent(
+          matrix.MatrixImageFile(
+            bytes: imageBytes,
+            name: filename,
+            mimeType: actualMimeType,
+          ),
+          extraContent: {
+            if (selfDestructAfter != null && selfDestructAfter > 0)
+              'n42.self_destruct': {'after': selfDestructAfter},
+          },
+        );
       }
 
       debugLog('MIME type: $actualMimeType');
@@ -334,7 +358,31 @@ class MatrixMediaSender {
 
       final actualMimeType = mimeType ?? 'video/mp4';
 
-      // 总是使用手动上传方式，因为SDK方法不支持缩略图上传
+      if (room.encrypted) {
+        if (!_client!.fileEncryptionEnabled) {
+          throw StateError('Attachment encryption is unavailable');
+        }
+        return await room.sendFileEvent(
+          matrix.MatrixVideoFile(
+            bytes: videoBytes,
+            name: filename,
+            mimeType: actualMimeType,
+          ),
+          thumbnail: thumbnailBytes == null || thumbnailBytes.isEmpty
+              ? null
+              : matrix.MatrixImageFile(
+                  bytes: thumbnailBytes,
+                  name: 'thumbnail.jpg',
+                  mimeType: 'image/jpeg',
+                ),
+          extraContent: {
+            if (selfDestructAfter != null && selfDestructAfter > 0)
+              'n42.self_destruct': {'after': selfDestructAfter},
+          },
+        );
+      }
+
+      // Unencrypted rooms retain the existing upload transport.
       debugLog('Using manual upload for video with thumbnail support...');
 
       // 手动上传视频
@@ -453,38 +501,82 @@ class MatrixMediaSender {
           fileBytes?.length ??
           (filePath != null ? await File(filePath).length() : null);
 
-      if (room.encrypted) {
-        if (!_client!.fileEncryptionEnabled) {
-          throw StateError('Attachment encryption is unavailable');
-        }
-        // The SDK encrypts byte-backed attachments. Never upload a plaintext
-        // path/stream merely because the file picker did not return bytes.
-        if (fileBytes == null && (filePath != null || fileStream != null)) {
-          if (effectiveSize != null &&
-              effectiveSize > AppConstants.maxFileSize) {
-            throw StateError('File exceeds the 50 MB attachment limit');
+      final client = _client!;
+      final userId = client.userID;
+      final token = client.accessToken;
+      bool isActive() =>
+          identical(_client, client) &&
+          client.userID == userId &&
+          client.accessToken == token &&
+          client.isLogged();
+      final limit = await AttachmentSizePolicy.effectiveLimit(
+        client,
+        configuredLimit: maxAttachmentBytes,
+      );
+      if (effectiveSize != null &&
+          (effectiveSize <= 0 || effectiveSize > limit)) {
+        throw StateError(
+          'File exceeds the ${(limit / (1024 * 1024)).toStringAsFixed(1)} MiB upload limit.',
+        );
+      }
+      if (fileBytes != null &&
+          (fileBytes.length > limit || effectiveSize != fileBytes.length)) {
+        throw StateError(
+          'Attachment size changed or exceeds the upload limit.',
+        );
+      }
+      if (room.encrypted && !client.fileEncryptionEnabled) {
+        throw StateError('Attachment encryption is unavailable');
+      }
+      if (room.encrypted && (filePath != null || fileStream != null)) {
+        await EncryptedSendGuard.prepare(room);
+        final encrypted = await StreamingAttachmentEncryptor().encrypt(
+          filePath != null ? File(filePath).openRead() : fileStream!,
+          maxBytes: limit,
+          expectedBytes: effectiveSize,
+          isActive: isActive,
+        );
+        try {
+          if (!isActive() || !room.encrypted) {
+            throw StateError('Attachment session ended.');
           }
-          final bytes = BytesBuilder(copy: false);
-          final source = filePath != null
-              ? File(filePath).openRead()
-              : fileStream!;
-          await for (final chunk in source) {
-            if (bytes.length + chunk.length > AppConstants.maxFileSize) {
-              throw StateError('File exceeds the 50 MB attachment limit');
-            }
-            bytes.add(chunk);
+          final mxc = await _uploader.uploadFileAuthenticated(
+            encrypted.file.path,
+            contentLength: encrypted.size,
+            contentType: 'application/octet-stream',
+          );
+          if (mxc == null || !isActive()) {
+            throw StateError('Encrypted upload could not be completed.');
           }
-          fileBytes = bytes.takeBytes();
+          await EncryptedSendGuard.prepare(room);
+          if (!isActive() || !room.encrypted) {
+            throw StateError('Attachment session ended.');
+          }
+          return await room.sendEvent({
+            'msgtype': 'm.file',
+            'body': filename,
+            'filename': filename,
+            'file': encrypted.descriptor(mxc),
+            'info': {'mimetype': actualMimeType, 'size': encrypted.size},
+            if (selfDestructAfter != null)
+              'n42.self_destruct': {'seconds': selfDestructAfter},
+          });
+        } finally {
+          await encrypted.dispose();
         }
-        if (fileBytes != null && fileBytes.length > AppConstants.maxFileSize) {
-          throw StateError('File exceeds the 50 MB attachment limit');
-        }
-        filePath = null;
-        fileStream = null;
+      }
+      // Byte-backed callers keep the existing memory bound. Large attachments
+      // must supply a file path/stream so they never allocate the entire file.
+      if (fileBytes != null && fileBytes.length > AppConstants.maxFileSize) {
+        throw StateError('Large attachments require a file source.');
       }
 
       await EncryptedSendGuard.prepare(room);
+      if (!isActive()) throw StateError('Attachment session ended.');
       if (filePath != null || fileStream != null) {
+        if (room.encrypted) {
+          throw StateError('Room encryption changed. Retry the attachment.');
+        }
         Uri? mxcUri;
         if (filePath != null) {
           mxcUri = await _uploader.uploadFileAuthenticated(

@@ -154,6 +154,7 @@ import '../services/points_tracking_service.dart';
 import '../../presentation/blocs/points/points_bloc.dart';
 import '../utils/debug_log.dart';
 import '../theme/chat_background_presets.dart';
+
 import 'package:path_provider/path_provider.dart';
 
 /// 全局GetIt实例
@@ -745,7 +746,10 @@ Future<void> _registerDataSources() async {
 
   // Matrix消息数据源
   getIt.registerLazySingleton<MatrixMessageDataSource>(
-    () => MatrixMessageDataSource(getIt<MatrixClientManager>()),
+    () => MatrixMessageDataSource(
+      getIt<MatrixClientManager>(),
+      maxAttachmentBytes: getIt<N42ChatConfig>().maxFileSize,
+    ),
   );
 
   // Matrix联系人数据源

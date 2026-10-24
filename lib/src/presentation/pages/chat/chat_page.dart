@@ -1,3 +1,5 @@
+import '../../../core/services/attachment_size_policy.dart';
+
 import 'dart:async';
 
 import '../../../data/datasources/matrix/message/encrypted_send_guard.dart';

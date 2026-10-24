@@ -1,6 +1,9 @@
 import 'package:flutter/services.dart';
+
 import 'direct_chat_send_guard.dart';
+
 import 'dart:typed_data';
+
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../domain/entities/message_entity.dart';
@@ -18,8 +21,16 @@ class MatrixMessageSender {
   final MatrixClientManager _clientManager;
   late final MatrixMediaSender _mediaSender;
 
-  MatrixMessageSender(this._clientManager, MatrixMediaUploader uploader) {
-    _mediaSender = MatrixMediaSender(_clientManager, uploader);
+  MatrixMessageSender(
+    this._clientManager,
+    MatrixMediaUploader uploader, {
+    int maxAttachmentBytes = 50 * 1024 * 1024,
+  }) {
+    _mediaSender = MatrixMediaSender(
+      _clientManager,
+      uploader,
+      maxAttachmentBytes: maxAttachmentBytes,
+    );
   }
 
   matrix.Client? get _client => _clientManager.client;

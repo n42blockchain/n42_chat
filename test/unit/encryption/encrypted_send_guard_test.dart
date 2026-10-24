@@ -1,10 +1,15 @@
+import 'package:cryptography/cryptography.dart' as crypto;
+
 import 'dart:async';
 import 'dart:typed_data';
+
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/matrix/message/matrix_media_sender.dart';
 import 'package:n42_chat/src/data/datasources/matrix/message/matrix_media_uploader.dart';
+
 import 'dart:io';
 import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart';
 import 'package:matrix/encryption/encryption.dart';
@@ -53,12 +58,12 @@ void main() {
     test(
       'native encryption send guard',
       () {},
-      skip:
-          'Set N42_VODOZEMAC_TEST_LIB to the native vodozemac library on this host.',
+      skip: 'Set N42_VODOZEMAC_TEST_LIB to the native vodozemac library on this host.',
     );
     return;
   }
   setUpAll(() async {
+    registerFallbackValue(Uint8List(0));
     final configFile = File('.dart_tool/package_config.json').absolute;
     final config =
         jsonDecode(await configFile.readAsString()) as Map<String, dynamic>;
@@ -75,9 +80,8 @@ void main() {
     final directory = await Directory.systemTemp.createTemp('n42-crypto-test-');
     addTearDown(() => directory.delete(recursive: true));
     final suffix = Platform.isMacOS ? 'dylib' : 'so';
-    await Link(
-      '${directory.path}/libvodozemac_bindings_dart.$suffix',
-    ).create(native);
+    await Link('${directory.path}/libvodozemac_bindings_dart.$suffix')
+        .create(native);
     await vod.init(libraryPath: '${directory.path}/');
   });
   late _Client client;
@@ -131,9 +135,8 @@ void main() {
         list.outdated = false;
       }
     });
-    when(
-      () => client.sendToDeviceEncrypted(any(), any(), any()),
-    ).thenAnswer((_) async {});
+    when(() => client.sendToDeviceEncrypted(any(), any(), any()))
+        .thenAnswer((_) async {});
     when(() => client.getRoomById('!room:hs')).thenReturn(room);
     when(() => room.client).thenReturn(client);
     when(() => room.encrypted).thenReturn(true);
@@ -151,15 +154,13 @@ void main() {
     when(() => encryption.keyManager).thenReturn(keys);
     when(() => encryption.olmManager).thenReturn(olm);
     when(() => olm.olmSessions).thenReturn(sessions);
-    when(
-      () => olm.getOlmSessionsForDevicesFromDatabase(any()),
-    ).thenAnswer((_) async {});
+    when(() => olm.getOlmSessionsForDevicesFromDatabase(any()))
+        .thenAnswer((_) async {});
     when(() => olm.startOutgoingOlmSessions(any())).thenAnswer((_) async {});
     when(() => keys.loadOutboundGroupSession(any())).thenAnswer((_) async {});
     when(() => keys.getOutboundGroupSession(any())).thenReturn(outbound);
-    when(
-      () => keys.prepareOutboundGroupSession(any()),
-    ).thenAnswer((_) async {});
+    when(() => keys.prepareOutboundGroupSession(any()))
+        .thenAnswer((_) async {});
     when(
       () => keys.clearOrUseOutboundGroupSession(any(), wipe: true, use: false),
     ).thenAnswer((_) async => true);
@@ -171,25 +172,51 @@ void main() {
   });
   for (final source in ['path', 'stream']) {
     test(
-      'encrypted picker $source reaches SDK without plaintext upload',
+      'encrypted picker $source uploads ciphertext and publishes its descriptor',
       () async {
         final manager = _Manager();
         final uploader = _Uploader();
         when(() => manager.client).thenReturn(client);
         when(() => client.fileEncryptionEnabled).thenReturn(true);
         final payload = Uint8List.fromList([1, 2, 3, 4]);
-        registerFallbackValue(
-          MatrixFile(bytes: Uint8List(0), name: 'fallback'),
-        );
+        String? encryptedPath;
+        List<int>? uploaded;
         when(
-          () => room.sendFileEvent(
+          () => uploader.uploadFileAuthenticated(
             any(),
-            extraContent: any(named: 'extraContent'),
+            contentLength: any(named: 'contentLength'),
+            contentType: 'application/octet-stream',
           ),
         ).thenAnswer((call) async {
-          final file = call.positionalArguments.first as MatrixFile;
-          expect(file.bytes, payload);
-          expect(file.name, 'video.bin');
+          encryptedPath = call.positionalArguments.first as String;
+          uploaded = await File(encryptedPath!).readAsBytes();
+          expect(uploaded, isNot(payload));
+          expect(call.namedArguments[#contentLength], payload.length);
+          return Uri.parse('mxc://hs/encrypted');
+        });
+        when(() => room.sendEvent(any())).thenAnswer((call) async {
+          final content =
+              call.positionalArguments.first as Map<String, dynamic>;
+          expect(content.containsKey('url'), isFalse);
+          final descriptor = content['file'] as Map<String, dynamic>;
+          expect(descriptor['url'], 'mxc://hs/encrypted');
+          final key = descriptor['key'] as Map<String, dynamic>;
+          final plain =
+              await crypto.AesCtr.with256bits(
+                macAlgorithm: crypto.MacAlgorithm.empty,
+              ).decrypt(
+                crypto.SecretBox(
+                  uploaded!,
+                  nonce: base64.decode(
+                    base64.normalize(descriptor['iv'] as String),
+                  ),
+                  mac: crypto.Mac.empty,
+                ),
+                secretKey: crypto.SecretKey(
+                  base64Url.decode(base64Url.normalize(key['k'] as String)),
+                ),
+              );
+          expect(plain, payload);
           return 'event';
         });
         final directory = await Directory.systemTemp.createTemp(
@@ -209,14 +236,18 @@ void main() {
           ),
           'event',
         );
-        verifyZeroInteractions(uploader);
-        // A failed encrypted upload must never retry via plaintext media upload.
+        expect(await File(encryptedPath!).exists(), isFalse);
+        verify(() => room.sendEvent(any())).called(1);
         when(
-          () => room.sendFileEvent(
+          () => uploader.uploadFileAuthenticated(
             any(),
-            extraContent: any(named: 'extraContent'),
+            contentLength: any(named: 'contentLength'),
+            contentType: 'application/octet-stream',
           ),
-        ).thenThrow(StateError('upload failed'));
+        ).thenAnswer((call) async {
+          encryptedPath = call.positionalArguments.first as String;
+          throw StateError('upload failed');
+        });
         await expectLater(
           sender.sendFileMessage(
             '!room:hs',
@@ -225,7 +256,15 @@ void main() {
           ),
           throwsStateError,
         );
-        verifyZeroInteractions(uploader);
+        expect(await File(encryptedPath!).exists(), isFalse);
+        verifyNever(() => room.sendEvent(any()));
+        verifyNever(
+          () => uploader.uploadContentAuthenticated(
+            any(),
+            filename: any(named: 'filename'),
+            contentType: any(named: 'contentType'),
+          ),
+        );
       },
     );
   }
@@ -233,9 +272,8 @@ void main() {
     'simultaneous sends share one readiness and distribution operation',
     () async {
       final release = Completer<void>();
-      when(
-        () => client.sendToDeviceEncrypted(any(), any(), any()),
-      ).thenAnswer((_) => release.future);
+      when(() => client.sendToDeviceEncrypted(any(), any(), any()))
+          .thenAnswer((_) => release.future);
       final first = EncryptedSendGuard.prepare(room);
       final second = EncryptedSendGuard.prepare(room);
       await Future<void>.delayed(Duration.zero);
@@ -295,9 +333,8 @@ void main() {
     'key delivery is awaited before allowing encrypted publication',
     () async {
       final sent = Completer<void>();
-      when(
-        () => client.sendToDeviceEncrypted(any(), any(), any()),
-      ).thenAnswer((_) => sent.future);
+      when(() => client.sendToDeviceEncrypted(any(), any(), any()))
+          .thenAnswer((_) => sent.future);
       var ready = false;
       final result = EncryptedSendGuard.prepare(room).then((_) => ready = true);
       await Future<void>.delayed(Duration.zero);
@@ -387,9 +424,8 @@ void main() {
       when(() => otherOwn.blocked).thenReturn(false);
       when(() => otherOwn.isValid).thenReturn(true);
       when(() => otherOwn.encryptToDevice).thenReturn(false);
-      when(
-        () => room.getUserDeviceKeys(),
-      ).thenAnswer((_) async => [self, otherOwn, peer]);
+      when(() => room.getUserDeviceKeys())
+          .thenAnswer((_) async => [self, otherOwn, peer]);
 
       await expectLater(
         EncryptedSendGuard.prepare(room),
@@ -410,38 +446,33 @@ void main() {
       verifyNever(() => keys.prepareOutboundGroupSession(any()));
     },
   );
-  test(
-    'new peer devices rotate the old session instead of SDK best-effort re-sharing',
-    () async {
-      when(() => outbound.devices).thenReturn({
-        '@me:hs': {'ME': false},
-        '@peer:hs': {'OLD': false},
-      });
-      await EncryptedSendGuard.prepare(room);
-      verifyInOrder([
-        () => keys.clearOrUseOutboundGroupSession(
-          '!room:hs',
-          wipe: true,
-          use: false,
-        ),
-        () => keys.prepareOutboundGroupSession('!room:hs'),
-        () => client.sendToDeviceEncrypted(any(), EventTypes.RoomKey, any()),
-      ]);
-    },
-  );
+  test('new peer devices rotate the old session instead of SDK best-effort re-sharing', () async {
+    when(() => outbound.devices).thenReturn({
+      '@me:hs': {'ME': false},
+      '@peer:hs': {'OLD': false},
+    });
+    await EncryptedSendGuard.prepare(room);
+    verifyInOrder([
+      () => keys.clearOrUseOutboundGroupSession(
+        '!room:hs',
+        wipe: true,
+        use: false,
+      ),
+      () => keys.prepareOutboundGroupSession('!room:hs'),
+      () => client.sendToDeviceEncrypted(any(), EventTypes.RoomKey, any()),
+    ]);
+  });
   test(
     'network failure does not mark session delivered and retry re-sends keys',
     () async {
-      when(
-        () => client.sendToDeviceEncrypted(any(), any(), any()),
-      ).thenThrow(StateError('Network down'));
+      when(() => client.sendToDeviceEncrypted(any(), any(), any()))
+          .thenThrow(StateError('Network down'));
       await expectLater(
         EncryptedSendGuard.prepare(room),
         throwsA(isA<EncryptedSendNotReady>()),
       );
-      when(
-        () => client.sendToDeviceEncrypted(any(), any(), any()),
-      ).thenAnswer((_) async {});
+      when(() => client.sendToDeviceEncrypted(any(), any(), any()))
+          .thenAnswer((_) async {});
       await EncryptedSendGuard.prepare(room);
       verify(
         () => client.sendToDeviceEncrypted(any(), EventTypes.RoomKey, any()),
@@ -463,26 +494,22 @@ void main() {
       verifyNever(() => keys.prepareOutboundGroupSession(any()));
     },
   );
-  test(
-    'SDK standard policy supports accounts without cross-signing but still rejects blocked devices',
-    () {
-      final device = _SignedDevice(
-        MatrixDeviceKeys.fromJson({
-          'user_id': '@peer:hs',
-          'device_id': 'PEER',
-          'algorithms': <String>[],
-          'keys': {'ed25519:PEER': 'test-public-key'},
-        }),
-        client,
-      );
-      when(() => client.shareKeysWith).thenReturn(ShareKeysWith.crossVerified);
-      expect(device.encryptToDevice, isFalse);
-      when(
-        () => client.shareKeysWith,
-      ).thenReturn(ShareKeysWith.crossVerifiedIfEnabled);
-      expect(device.encryptToDevice, isTrue);
-      device.blocked = true;
-      expect(device.encryptToDevice, isFalse);
-    },
-  );
+  test('SDK standard policy supports accounts without cross-signing but still rejects blocked devices', () {
+    final device = _SignedDevice(
+      MatrixDeviceKeys.fromJson({
+        'user_id': '@peer:hs',
+        'device_id': 'PEER',
+        'algorithms': <String>[],
+        'keys': {'ed25519:PEER': 'test-public-key'},
+      }),
+      client,
+    );
+    when(() => client.shareKeysWith).thenReturn(ShareKeysWith.crossVerified);
+    expect(device.encryptToDevice, isFalse);
+    when(() => client.shareKeysWith)
+        .thenReturn(ShareKeysWith.crossVerifiedIfEnabled);
+    expect(device.encryptToDevice, isTrue);
+    device.blocked = true;
+    expect(device.encryptToDevice, isFalse);
+  });
 }

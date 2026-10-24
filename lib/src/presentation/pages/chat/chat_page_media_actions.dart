@@ -15,8 +15,6 @@ class _PersistedScheduledAttachment {
 
 /// 媒体操作相关方法（图片、视频、文件、语音的选择与发送）
 extension _ChatPageMediaActionsMethods on _ChatPageState {
-  static const int _maxEncryptedRoomFileBytes = 64 * 1024 * 1024;
-
   static const PermissionRequestOption _recentMediaPermission =
       PermissionRequestOption(
         androidPermission: AndroidPermission(
@@ -1094,10 +1092,24 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       return;
     }
 
-    if (widget.conversation.isEncrypted &&
-        fileSize > _maxEncryptedRoomFileBytes) {
-      throw Exception(
-        'Encrypted rooms currently support secure file uploads up to 64MB',
+    final limit = await AttachmentSizePolicy.effectiveLimit(
+      getIt.isRegistered<MatrixClientManager>()
+          ? getIt<MatrixClientManager>().client
+          : null,
+      configuredLimit:
+          N42Chat.config?.maxFileSize ?? AttachmentSizePolicy.conservativeLimit,
+    );
+    if (!mounted) return;
+    if (fileSize <= 0 || fileSize > limit) {
+      throw StateError(
+        'File exceeds the ${(limit / (1024 * 1024)).toStringAsFixed(1)} MiB upload limit.',
+      );
+    }
+
+    if (scheduledAt != null &&
+        fileSize > AttachmentSizePolicy.conservativeLimit) {
+      throw StateError(
+        'Scheduled attachments support up to 50 MiB. Send this file now instead.',
       );
     }
 
@@ -1116,30 +1128,6 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
 
     final chatBloc = context.read<ChatBloc>();
-
-    if (widget.conversation.isEncrypted) {
-      final secureBytes = await _resolveFileBytes(
-        fileBytes: fileBytes,
-        filePath: filePath,
-        fileStream: fileStream,
-      );
-      if (!mounted) {
-        return;
-      }
-      if (secureBytes == null || secureBytes.isEmpty) {
-        throw Exception('No readable file source available');
-      }
-
-      chatBloc.add(
-        SendFileMessage(
-          fileBytes: secureBytes,
-          filename: filename,
-          mimeType: mimeType,
-          fileSize: fileSize,
-        ),
-      );
-      return;
-    }
 
     if (filePath != null && filePath.isNotEmpty) {
       chatBloc.add(

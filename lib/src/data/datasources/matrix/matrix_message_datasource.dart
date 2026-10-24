@@ -33,10 +33,17 @@ class MatrixMessageDataSource {
   late final MatrixThreadHandler _threadHandler;
   late final MatrixRoomMedia _roomMedia;
 
-  MatrixMessageDataSource(this._clientManager) {
+  MatrixMessageDataSource(
+    this._clientManager, {
+    int maxAttachmentBytes = 50 * 1024 * 1024,
+  }) {
     _uploader = MatrixMediaUploader(_clientManager);
     _eventMapper = MatrixEventMapper(() => _client);
-    _sender = MatrixMessageSender(_clientManager, _uploader);
+    _sender = MatrixMessageSender(
+      _clientManager,
+      _uploader,
+      maxAttachmentBytes: maxAttachmentBytes,
+    );
     _operations = MatrixMessageOperations(_clientManager);
     _pollHandler = MatrixPollHandler(_clientManager);
     _threadHandler = MatrixThreadHandler(_clientManager, _eventMapper);
