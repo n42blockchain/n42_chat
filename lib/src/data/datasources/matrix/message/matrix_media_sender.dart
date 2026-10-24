@@ -68,7 +68,16 @@ class MatrixMediaSender {
         throw Exception('未登录或客户端未初始化');
       }
 
-      final room = await prepareRoomForSending(_client, roomId);
+      final client = _client!;
+      final userId = client.userID;
+      final token = client.accessToken;
+      bool isActive() =>
+          identical(_client, client) &&
+          client.userID == userId &&
+          client.accessToken == token &&
+          client.isLogged();
+      final room = await prepareRoomForSending(client, roomId);
+      if (!isActive()) throw StateError('Attachment session ended.');
       if (room == null) {
         throw Exception('房间不存在: $roomId');
       }
@@ -89,7 +98,7 @@ class MatrixMediaSender {
       }
 
       if (room.encrypted) {
-        if (!_client!.fileEncryptionEnabled) {
+        if (!client.fileEncryptionEnabled) {
           throw StateError('Attachment encryption is unavailable');
         }
         return await room.sendFileEvent(
@@ -123,6 +132,7 @@ class MatrixMediaSender {
         );
         debugLog('SDK upload successful: $mxcUri');
       } catch (sdkUploadError) {
+        if (!isActive() || room.encrypted) rethrow;
         debugLog('SDK uploadContent failed: $sdkUploadError');
         // 尝试手动上传
         debugLog('Trying manual upload...');
@@ -140,6 +150,9 @@ class MatrixMediaSender {
       debugLog('Upload successful: $mxcUri');
 
       // 发送消息事件
+      if (!isActive() || room.encrypted) {
+        throw StateError('Attachment session or encryption changed.');
+      }
       final content = <String, dynamic>{
         'msgtype': 'm.image',
         'body': filename,
@@ -351,7 +364,16 @@ class MatrixMediaSender {
         throw Exception('未登录');
       }
 
-      final room = await prepareRoomForSending(_client, roomId);
+      final client = _client!;
+      final userId = client.userID;
+      final token = client.accessToken;
+      bool isActive() =>
+          identical(_client, client) &&
+          client.userID == userId &&
+          client.accessToken == token &&
+          client.isLogged();
+      final room = await prepareRoomForSending(client, roomId);
+      if (!isActive()) throw StateError('Attachment session ended.');
       if (room == null) {
         throw Exception('房间不存在: $roomId');
       }
@@ -359,7 +381,7 @@ class MatrixMediaSender {
       final actualMimeType = mimeType ?? 'video/mp4';
 
       if (room.encrypted) {
-        if (!_client!.fileEncryptionEnabled) {
+        if (!client.fileEncryptionEnabled) {
           throw StateError('Attachment encryption is unavailable');
         }
         return await room.sendFileEvent(
@@ -397,6 +419,9 @@ class MatrixMediaSender {
       }
 
       // 上传缩略图（如果有）
+      if (!isActive() || room.encrypted) {
+        throw StateError('Attachment session or encryption changed.');
+      }
       Uri? thumbnailUri;
       if (thumbnailBytes != null && thumbnailBytes.isNotEmpty) {
         thumbnailUri = await _uploader.uploadContentAuthenticated(
@@ -406,6 +431,9 @@ class MatrixMediaSender {
         );
       }
 
+      if (!isActive() || room.encrypted) {
+        throw StateError('Attachment session or encryption changed.');
+      }
       final content = <String, dynamic>{
         'msgtype': 'm.video',
         'body': filename,
@@ -490,7 +518,16 @@ class MatrixMediaSender {
         throw Exception('未登录');
       }
 
-      final room = await resolveRoomForSending(_client, roomId);
+      final client = _client!;
+      final userId = client.userID;
+      final token = client.accessToken;
+      bool isActive() =>
+          identical(_client, client) &&
+          client.userID == userId &&
+          client.accessToken == token &&
+          client.isLogged();
+      final room = await resolveRoomForSending(client, roomId);
+      if (!isActive()) throw StateError('Attachment session ended.');
       if (room == null) {
         throw Exception('房间不存在: $roomId');
       }
@@ -501,14 +538,6 @@ class MatrixMediaSender {
           fileBytes?.length ??
           (filePath != null ? await File(filePath).length() : null);
 
-      final client = _client!;
-      final userId = client.userID;
-      final token = client.accessToken;
-      bool isActive() =>
-          identical(_client, client) &&
-          client.userID == userId &&
-          client.accessToken == token &&
-          client.isLogged();
       final limit = await AttachmentSizePolicy.effectiveLimit(
         client,
         configuredLimit: maxAttachmentBytes,
@@ -525,6 +554,7 @@ class MatrixMediaSender {
           'Attachment size changed or exceeds the upload limit.',
         );
       }
+      if (!isActive()) throw StateError('Attachment session ended.');
       if (room.encrypted && !client.fileEncryptionEnabled) {
         throw StateError('Attachment encryption is unavailable');
       }
@@ -598,6 +628,9 @@ class MatrixMediaSender {
           throw Exception('上传文件失败：无法获取 MXC URI');
         }
 
+        if (!isActive() || room.encrypted) {
+          throw StateError('Attachment session or encryption changed.');
+        }
         final content = <String, dynamic>{
           'msgtype': 'm.file',
           'body': filename,
@@ -641,7 +674,7 @@ class MatrixMediaSender {
         debugLog('=== sendFileMessage completed successfully (SDK method) ===');
         return result;
       } catch (sdkError, sdkStack) {
-        if (room.encrypted) rethrow;
+        if (!isActive() || room.encrypted) rethrow;
         debugLog('SDK sendFileEvent for file failed: $sdkError');
         debugLog('Stack: $sdkStack');
         debugLog('Falling back to manual upload...');
@@ -658,6 +691,9 @@ class MatrixMediaSender {
         throw Exception('上传文件失败：无法获取 MXC URI');
       }
 
+      if (!isActive() || room.encrypted) {
+        throw StateError('Attachment session or encryption changed.');
+      }
       final content = <String, dynamic>{
         'msgtype': 'm.file',
         'body': filename,

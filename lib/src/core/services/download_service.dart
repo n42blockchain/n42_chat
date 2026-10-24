@@ -57,6 +57,12 @@ class DownloadTask {
 /// 最大并发数: 3
 class DownloadService {
   static const int _maxConcurrent = 3;
+  final http.Client Function() _clientFactory;
+  DownloadService({http.Client Function()? clientFactory})
+    : _clientFactory = clientFactory ?? http.Client.new;
+  final Set<String> _running = {};
+  final Set<String> _cancelledAttempts = {};
+  bool _disposed = false;
 
   final Map<String, DownloadTask> _tasks = {};
   final Map<String, StreamController<DownloadTask>> _taskControllers = {};
@@ -98,6 +104,7 @@ class DownloadService {
     String? encryptIv,
     String? encryptSha256,
   }) async {
+    if (_disposed) throw StateError('Download service disposed');
     final taskId = 'download_${_taskIdCounter++}';
     final task = DownloadTask(
       id: taskId,
@@ -148,8 +155,8 @@ class DownloadService {
       // 关闭 HTTP client 以中断正在进行的网络流。
       // _activeCount 由 _executeDownload 的 finally 块统一管理，
       // 此处不再重复递减。
+      if (_running.contains(taskId)) _cancelledAttempts.add(taskId);
       _activeClients[taskId]?.close();
-      _activeClients.remove(taskId);
       _notifyTask(task);
     }
   }
@@ -171,6 +178,7 @@ class DownloadService {
   }
 
   void _startDownload(DownloadTask task) {
+    if (_disposed || _running.contains(task.id)) return;
     if (_activeCount >= _maxConcurrent) {
       task.status = DownloadStatus.pending;
       _notifyTask(task);
@@ -178,6 +186,7 @@ class DownloadService {
     }
 
     _activeCount++;
+    _running.add(task.id);
     _executeDownload(task);
   }
 
@@ -186,9 +195,14 @@ class DownloadService {
     task.status = DownloadStatus.downloading;
     _notifyTask(task);
 
-    final client = http.Client();
+    final client = _clientFactory();
     _activeClients[task.id] = client;
 
+    bool isActive() =>
+        !_disposed &&
+        !_cancelledAttempts.contains(task.id) &&
+        identical(_tasks[task.id], task) &&
+        task.status == DownloadStatus.downloading;
     Directory? temporary;
     try {
       final encrypted =
@@ -208,7 +222,10 @@ class DownloadService {
       if (task.headers != null && task.headers!.isNotEmpty) {
         request.headers.addAll(task.headers!);
       }
-      final response = await client.send(request);
+      final response = await client
+          .send(request)
+          .timeout(const Duration(seconds: 30));
+      if (!isActive()) return;
 
       if (response.statusCode != 200) {
         throw HttpException('HTTP ${response.statusCode}');
@@ -225,8 +242,10 @@ class DownloadService {
       final sink = await downloaded.open(mode: FileMode.write);
 
       try {
-        await for (final chunk in response.stream) {
-          if (task.status == DownloadStatus.cancelled) {
+        await for (final chunk in response.stream.timeout(
+          const Duration(seconds: 30),
+        )) {
+          if (!isActive()) {
             return;
           }
 
@@ -237,6 +256,7 @@ class DownloadService {
             );
           }
           await sink.writeFrom(chunk);
+          if (!isActive()) return;
           task.receivedBytes += chunk.length;
           if (task.totalBytes > 0) {
             task.progress = task.receivedBytes / task.totalBytes;
@@ -250,7 +270,7 @@ class DownloadService {
         await sink.close();
       }
 
-      if (task.status == DownloadStatus.cancelled) return;
+      if (!isActive()) return;
       if (task.totalBytes > 0 && task.receivedBytes != task.totalBytes) {
         throw const FormatException('Attachment download was truncated');
       }
@@ -266,16 +286,21 @@ class DownloadService {
             iv: task.encryptIv!,
             sha256: task.encryptSha256!,
             maxBytes: AttachmentSizePolicy.maximumLimit,
-            isActive: () => task.status != DownloadStatus.cancelled,
+            isActive: isActive,
           ),
           bytes: task.receivedBytes,
         );
       }
-      if (task.status == DownloadStatus.cancelled) return;
-      await result.rename(task.savePath);
-      await temporary.delete(recursive: true);
-      temporary = null;
+      if (!isActive()) return;
+      // Commit publication synchronously with the last cancellation check.
+      result.renameSync(task.savePath);
       task.status = DownloadStatus.completed;
+      try {
+        await temporary.delete(recursive: true);
+        temporary = null;
+      } catch (_) {
+        /* Retry cleanup in finally. */
+      }
       task.progress = 1.0;
       // 更新 totalBytes 为实际接收字节数（如果服务器未提供 Content-Length）
       if (task.totalBytes == 0) {
@@ -304,7 +329,7 @@ class DownloadService {
         debugLog('DownloadService: Failed to register media: $e');
       }
     } catch (e) {
-      if (task.status != DownloadStatus.cancelled) {
+      if (isActive()) {
         task.status = DownloadStatus.failed;
         task.error = e.toString();
         _notifyTask(task);
@@ -313,7 +338,9 @@ class DownloadService {
       measurement.finish(
         task.status == DownloadStatus.completed
             ? MediaOutcome.succeeded
-            : task.status == DownloadStatus.cancelled
+            : _cancelledAttempts.contains(task.id) ||
+                  _disposed ||
+                  !identical(_tasks[task.id], task)
             ? MediaOutcome.cancelled
             : MediaOutcome.failed,
         bytes: task.receivedBytes,
@@ -325,6 +352,8 @@ class DownloadService {
         /* Best effort after cancellation. */
       }
       _activeClients.remove(task.id);
+      _running.remove(task.id);
+      _cancelledAttempts.remove(task.id);
       _activeCount--;
       _processQueue();
     }
@@ -333,10 +362,11 @@ class DownloadService {
   void _processQueue() {
     // 找到等待中的任务并启动
     for (final task in _tasks.values) {
-      if (task.status == DownloadStatus.pending &&
+      if (!_disposed &&
+          task.status == DownloadStatus.pending &&
+          !_running.contains(task.id) &&
           _activeCount < _maxConcurrent) {
-        _activeCount++;
-        _executeDownload(task);
+        _startDownload(task);
       }
     }
   }
@@ -384,9 +414,11 @@ class DownloadService {
 
   /// 释放资源
   void dispose() {
+    _disposed = true;
     for (final task in _tasks.values) {
       if (!_isTerminalStatus(task.status)) {
         task.status = DownloadStatus.cancelled;
+        _notifyTask(task);
       }
     }
     for (final client in _activeClients.values) {

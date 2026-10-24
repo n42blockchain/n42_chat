@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+
 import 'dart:convert';
 
 import 'package:cryptography/cryptography.dart' as crypto;
@@ -125,5 +129,69 @@ void main() {
     );
     expect(requests, 1);
     expect(File(savePath).existsSync(), isFalse);
+  });
+  test(
+    'immediate retry waits for cancelled attempt and ignores its late response',
+    () async {
+      final first = Completer<http.StreamedResponse>();
+      var requests = 0;
+      final service = DownloadService(
+        clientFactory: () => MockClient.streaming((request, body) async {
+          requests++;
+          if (requests == 1) return first.future;
+          return http.StreamedResponse(
+            Stream.value([2, 3]),
+            200,
+            contentLength: 2,
+          );
+        }),
+      );
+      final path = '${tempDir.path}/retry.bin';
+      final id = await service.download(
+        url: 'https://fixture.test/file',
+        savePath: path,
+      );
+      await Future<void>.delayed(Duration.zero);
+      service.cancelTask(id);
+      service.resumeTask(id);
+      final completed = service.waitForTaskCompletion(id);
+      await Future<void>.delayed(Duration.zero);
+      expect(requests, 1);
+      first.complete(
+        http.StreamedResponse(Stream.value([9]), 200, contentLength: 1),
+      );
+      expect((await completed).status, DownloadStatus.completed);
+      expect(requests, 2);
+      expect(await File(path).readAsBytes(), [2, 3]);
+      service.dispose();
+      await expectLater(
+        service.download(url: 'https://fixture.test/file', savePath: path),
+        throwsStateError,
+      );
+    },
+  );
+
+  test('disposing completes queued waiters as cancelled', () async {
+    final pending = Completer<http.StreamedResponse>();
+    final service = DownloadService(
+      clientFactory: () => MockClient.streaming((_, _) => pending.future),
+    );
+    final ids = <String>[];
+    for (var i = 0; i < 4; i++) {
+      ids.add(
+        await service.download(
+          url: 'https://fixture.test/file',
+          savePath: '${tempDir.path}/$i',
+        ),
+      );
+    }
+    final waits = ids.map(service.waitForTaskCompletion).toList();
+    service.dispose();
+    for (final wait in waits) {
+      expect((await wait).status, DownloadStatus.cancelled);
+    }
+    pending.complete(http.StreamedResponse(Stream.value([1]), 200));
+    await Future<void>.delayed(Duration.zero);
+    expect(tempDir.listSync(), isEmpty);
   });
 }

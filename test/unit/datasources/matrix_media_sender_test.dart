@@ -128,4 +128,67 @@ void main() {
       );
     }
   }
+  for (final kind in ['file', 'image', 'video']) {
+    for (final changed in ['account', 'encryption']) {
+      test(
+        '$kind does not publish after $changed changes during upload',
+        () async {
+          when(() => room.encrypted).thenReturn(false);
+          when(() => client.accessToken).thenReturn('first');
+          Future<Uri> uploaded() async {
+            if (changed == 'account') {
+              when(() => client.accessToken).thenReturn('second');
+            } else {
+              when(() => room.encrypted).thenReturn(true);
+            }
+            return Uri.parse('mxc://fixture/file');
+          }
+
+          when(
+            () => uploader.uploadFileAuthenticated(
+              any(),
+              contentLength: any(named: 'contentLength'),
+              filename: any(named: 'filename'),
+              contentType: any(named: 'contentType'),
+            ),
+          ).thenAnswer((_) => uploaded());
+          when(
+            () => uploader.uploadContentAuthenticated(
+              any(),
+              filename: any(named: 'filename'),
+              contentType: any(named: 'contentType'),
+            ),
+          ).thenAnswer((_) => uploaded());
+          when(
+            () => client.uploadContent(
+              any(),
+              filename: any(named: 'filename'),
+              contentType: any(named: 'contentType'),
+            ),
+          ).thenAnswer((_) => uploaded());
+          final bytes = Uint8List.fromList([1, 2]);
+          final operation = switch (kind) {
+            'image' => sender.sendImageMessage(
+              '!room:test',
+              imageBytes: bytes,
+              filename: 'photo.png',
+            ),
+            'video' => sender.sendVideoMessage(
+              '!room:test',
+              videoBytes: bytes,
+              filename: 'clip.mp4',
+            ),
+            _ => sender.sendFileMessage(
+              '!room:test',
+              filePath: '/tmp/mock-source',
+              fileSize: 2,
+              filename: 'file.bin',
+            ),
+          };
+          await expectLater(operation, throwsStateError);
+          verifyNever(() => room.sendEvent(any()));
+        },
+      );
+    }
+  }
 }
