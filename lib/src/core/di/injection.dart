@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/room_join_service.dart';
+import '../services/mini_app_security_service.dart';
 import '../services/giphy_service.dart';
 import '../services/tenor_service.dart';
 import '../services/gif_service.dart';
@@ -168,6 +169,10 @@ Future<void> configureDependencies(
 }) async {
   // 注册配置
   getIt.registerSingleton<N42ChatConfig>(config);
+  getIt.registerLazySingleton<MiniAppSecurityService>(
+    () => MiniAppSecurityService(config: config.miniAppSecurity),
+    dispose: (service) => service.dispose(),
+  );
 
   // 注入应用文档目录，供自定义聊天背景把相对文件名解析为绝对路径
   // （存相对名而非绝对路径，避免 iOS 更新后容器 UUID 变化导致背景丢失）。

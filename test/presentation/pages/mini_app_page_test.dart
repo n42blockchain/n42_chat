@@ -22,10 +22,7 @@ void main() {
         localizationsDelegates: S.localizationsDelegates,
         supportedLocales: S.supportedLocales,
         locale: const Locale('en'),
-        home: MiniAppPage(
-          app: _buildApp('notaurl'),
-          roomId: '!room:server',
-        ),
+        home: MiniAppPage(app: _buildApp('notaurl'), roomId: '!room:server'),
       ),
     );
     await tester.pump();
@@ -50,4 +47,31 @@ void main() {
 
     expect(find.text('Invalid mini app URL'), findsOneWidget);
   });
+  testWidgets(
+    'unsigned business launch shows recovery message before creating WebView',
+    (tester) async {
+      final app = BuiltInMiniApps.all.first;
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          home: MiniAppPage(
+            app: app,
+            roomId: '!room:server',
+            initialUrl: '${app.url}/offer?item=1',
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(
+        find.text(
+          'This link is not signed. Open the Mini App from Apps instead.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Retry'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 }

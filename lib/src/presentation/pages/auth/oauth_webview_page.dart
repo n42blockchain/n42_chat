@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/utils/debug_log.dart';
+import '../../../core/utils/secure_uri.dart';
 
 /// 通用 WebView OAuth 授权页（Discord/GitHub OAuth2 + Telegram Login Widget 共用）。
 ///
-/// 打开 [authorizeUrl]，监听导航；一旦跳转到以 [redirectPrefix] 开头的地址，
+/// 打开 [authorizeUrl]，监听导航；一旦跳转到与 [redirectPrefix] 的 scheme/host/port/path 精确匹配的地址，
 /// 拦截该次导航、把完整回调 [Uri]（含 query 与 fragment）通过 `Navigator.pop`
 /// 返回给调用方。调用方自行解析：
 /// - OAuth2 Authorization Code：读 `uri.queryParameters['code']`；
@@ -65,7 +66,10 @@ class _OAuthWebViewPageState extends State<OAuthWebViewPage> {
               _finish(request.url);
               return NavigationDecision.prevent;
             }
-            return NavigationDecision.navigate;
+            final uri = parseSecureUri(request.url);
+            return uri != null
+                ? NavigationDecision.navigate
+                : NavigationDecision.prevent;
           },
           onUrlChange: (change) {
             final url = change.url;
@@ -90,7 +94,7 @@ class _OAuthWebViewPageState extends State<OAuthWebViewPage> {
   }
 
   bool _isRedirect(String url) {
-    return url.startsWith(widget.redirectPrefix);
+    return matchesOAuthRedirect(url, widget.redirectPrefix);
   }
 
   void _finish(String url) {
@@ -119,8 +123,7 @@ class _OAuthWebViewPageState extends State<OAuthWebViewPage> {
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
-          if (_loading)
-            const LinearProgressIndicator(minHeight: 2),
+          if (_loading) const LinearProgressIndicator(minHeight: 2),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import '../services/mini_app_bridge_service.dart';
+import 'secure_uri.dart' show parseSecureUri;
 import '../../domain/entities/mini_app_entity.dart';
 
 enum SocialScanPayloadType { matrixUser, miniApp }
@@ -29,7 +30,10 @@ class SocialScanPayload {
 
 SocialScanPayload? parseSocialScanPayload(String raw) {
   final value = raw.trim();
-  if (value.isEmpty) return null;
+  if (value.isEmpty ||
+      value.length > 8192 ||
+      RegExp(r'[\x00-\x1f\x7f]').hasMatch(value))
+    return null;
 
   final userId = _extractMatrixUserId(value);
   if (userId != null) {
@@ -63,7 +67,7 @@ String? _extractMatrixUserId(String data) {
     return directUserId;
   }
 
-  final uri = Uri.tryParse(data);
+  final uri = parseSecureUri(data);
   if (uri == null) return null;
 
   if (uri.host == 'matrix.to') {
@@ -101,7 +105,8 @@ _BuiltInMiniAppMatch? _extractBuiltInMiniApp(String data) {
     'n42chat:miniapp:',
   ]) {
     if (data.startsWith(prefix)) {
-      final id = data.substring(prefix.length).trim().split('?').first;
+      final id = data.substring(prefix.length);
+      if (!RegExp(r'^[a-z0-9_]+$').hasMatch(id)) return null;
       final app = _findBuiltInMiniAppById(id);
       if (app != null) {
         return _BuiltInMiniAppMatch(app: app);

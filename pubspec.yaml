@@ -124,6 +124,7 @@ dependencies:
   logger: ^2.7.0
   # Cryptography - 加密工具
   crypto: ^3.0.7
+  cryptography: ^2.9.0
   pointycastle: ^4.0.0
   
   # ============================================

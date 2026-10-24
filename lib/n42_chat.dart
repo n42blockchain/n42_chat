@@ -102,3 +102,5 @@ export 'src/presentation/widgets/widgets.dart';
 // 国际化导出 (隐藏S类以避免与主应用冲突)
 // ============================================
 export 'l10n/app_localizations.dart' hide S;
+
+export 'src/core/services/mini_app_security_service.dart';

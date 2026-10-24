@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:convert';
 import 'dart:io';
 
@@ -729,8 +730,12 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
 
     setLoading(true);
     try {
-      // state 用于抗 CSRF（当前仅本地校验形态占位，后端换 token 不依赖它）。
-      final state = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+      // Bind the callback to this authorization attempt with 256 random bits.
+      final random = Random.secure();
+      final state = List.generate(
+        32,
+        (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+      ).join();
       final authorizeUrl = Uri.parse(authorizeBase)
           .replace(
             queryParameters: {
@@ -751,6 +756,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         title: title,
       );
 
+      if (result != null && result.queryParameters['state'] != state) {
+        throw const FormatException('Invalid OAuth state. Please try again.');
+      }
       final code = result?.queryParameters['code'];
       if (code == null || code.isEmpty) {
         // 用户取消或未拿到 code

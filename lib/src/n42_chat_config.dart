@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/theme/n42_chat_theme.dart';
+import 'core/services/mini_app_security_service.dart';
 import 'integration/api_hub_bridge.dart';
 import 'integration/wallet_bridge.dart';
 
@@ -97,6 +98,8 @@ class PushProtocolConfig {
 /// ```
 @immutable
 class N42ChatConfig {
+  final MiniAppSecurityConfig miniAppSecurity;
+
   /// 默认Matrix服务器地址
   ///
   /// 用户登录时的默认服务器，可以在登录页面修改
@@ -524,6 +527,7 @@ class N42ChatConfig {
   final String? pointsApiBaseUrl;
 
   const N42ChatConfig({
+    this.miniAppSecurity = const MiniAppSecurityConfig(),
     this.defaultHomeserver = 'https://m.si46.world',
     this.enableEncryption = true,
     this.enablePushNotifications = true,
@@ -618,6 +622,7 @@ class N42ChatConfig {
 
   /// 复制并修改配置
   N42ChatConfig copyWith({
+    MiniAppSecurityConfig? miniAppSecurity,
     String? defaultHomeserver,
     bool? enableEncryption,
     bool? enablePushNotifications,
@@ -710,6 +715,7 @@ class N42ChatConfig {
     Object? pointsApiBaseUrl = _copyWithUndefined,
   }) {
     return N42ChatConfig(
+      miniAppSecurity: miniAppSecurity ?? this.miniAppSecurity,
       defaultHomeserver: defaultHomeserver ?? this.defaultHomeserver,
       enableEncryption: enableEncryption ?? this.enableEncryption,
       enablePushNotifications:

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -8,6 +9,9 @@ import '../../domain/entities/mini_app_entity.dart';
 import '../../integration/wallet_bridge.dart';
 import '../theme/app_colors.dart';
 import '../utils/debug_log.dart';
+import '../utils/secure_uri.dart';
+import 'mini_app_security_service.dart';
+export '../utils/secure_uri.dart' show normalizeTrustedMiniAppUri;
 import '../theme/app_dimensions.dart';
 
 /// Mini App <-> Native 通信消息
@@ -15,13 +19,15 @@ class _BridgeMessage {
   final String method;
   final String? id;
   final Map<String, dynamic>? params;
+  final String? nonce;
 
-  _BridgeMessage({required this.method, this.id, this.params});
+  _BridgeMessage({required this.method, this.id, this.params, this.nonce});
 
   factory _BridgeMessage.fromJson(String raw) {
     final map = jsonDecode(raw) as Map<String, dynamic>;
     return _BridgeMessage(
       method: map['method'] as String,
+      nonce: map['nonce'] as String?,
       id: map['id']?.toString(),
       params: map['params'] as Map<String, dynamic>?,
     );
@@ -69,18 +75,6 @@ MiniAppChatAction parseMiniAppChatAction(
   }
 }
 
-Uri? normalizeTrustedMiniAppUri(String? rawUrl) {
-  final normalized = rawUrl?.trim();
-  if (normalized == null || normalized.isEmpty) return null;
-
-  final uri = Uri.tryParse(normalized);
-  if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
-    return null;
-  }
-
-  return uri;
-}
-
 bool isTrustedMiniAppNavigationUrl({
   required String? appUrl,
   required String? candidateUrl,
@@ -112,6 +106,15 @@ class MiniAppBridgeService {
   final IWalletBridge _walletBridge;
   final String _roomId;
   final MiniAppEntity? _app;
+  final bool Function()? isSessionAllowed;
+  String _documentNonce = '';
+  void invalidateDocument() {
+    final random = Random.secure();
+    _documentNonce = List.generate(
+      32,
+      (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+    ).join();
+  }
 
   /// 外部回调：Mini App 要发送消息到聊天室
   final void Function(String text)? onSendMessage;
@@ -124,10 +127,13 @@ class MiniAppBridgeService {
     required String roomId,
     MiniAppEntity? app,
     this.onSendMessage,
+    this.isSessionAllowed,
     this.onClose,
   }) : _walletBridge = walletBridge,
        _roomId = roomId,
-       _app = app;
+       _app = app {
+    invalidateDocument();
+  }
 
   /// 检查 Mini App 是否拥有指定权限
   bool _hasPermission(MiniAppPermission permission) {
@@ -169,13 +175,14 @@ class MiniAppBridgeService {
 
   // ─── Promise 响应追踪 ───
   var _pendingCallbacks = {};
-  function _nextId() { return '_n42_' + Date.now() + '_' + Math.random().toString(36).slice(2); }
+  var _bridgeNonce = '$_documentNonce';
+  function _nextId() { return '_n42_' + _bridgeNonce + '_' + Date.now() + '_' + Math.random().toString(36).slice(2); }
 
   function _makeWalletCall(method, params) {
     return new Promise(function(resolve, reject) {
       var id = _nextId();
       _pendingCallbacks[id] = {resolve: resolve, reject: reject};
-      N42WalletChannel.postMessage(JSON.stringify({method: method, id: id, params: params || {}}));
+      N42WalletChannel.postMessage(JSON.stringify({method: method, id: id, nonce: _bridgeNonce, params: params || {}}));
     });
   }
 
@@ -190,7 +197,7 @@ class MiniAppBridgeService {
 
   // ─── Public API ───
   window.n42 = {
-    version: '1.0',
+    version: '${MiniAppSecurityService.sdkVersion}',
     chainCount: 236,
 
     wallet: {
@@ -212,11 +219,11 @@ class MiniAppBridgeService {
       },
       sendMessage: function(text) {
         if (!_canChatSend || typeof text !== 'string' || !text.trim()) return false;
-        N42ChatChannel.postMessage(JSON.stringify({method: 'sendMessage', params: {text: text}}));
+        N42ChatChannel.postMessage(JSON.stringify({method: 'sendMessage', nonce: _bridgeNonce, params: {text: text}}));
         return true;
       },
       close: function() {
-        N42ChatChannel.postMessage(JSON.stringify({method: 'close'}));
+        N42ChatChannel.postMessage(JSON.stringify({method: 'close', nonce: _bridgeNonce}));
         return true;
       },
     },
@@ -244,7 +251,8 @@ class MiniAppBridgeService {
     _BridgeMessage? message;
     try {
       message = _BridgeMessage.fromJson(msg.message);
-      if (!await _isTrustedSource(controller)) {
+      if (!await _isTrustedSource(controller) ||
+          message.nonce != _documentNonce) {
         await _resolveCallback(
           controller,
           message.id,
@@ -327,7 +335,10 @@ class MiniAppBridgeService {
             context,
             message.params,
           );
-          if (confirmed) {
+          if (confirmed &&
+              context.mounted &&
+              await _isTrustedSource(controller) &&
+              message.nonce == _documentNonce) {
             try {
               final toAddress = message.params?['to'] as String? ?? '';
               final amount = message.params?['amount'] as String? ?? '0';
@@ -401,7 +412,9 @@ class MiniAppBridgeService {
     JavaScriptMessage msg,
   ) async {
     try {
-      if (!await _isTrustedSource(controller)) {
+      final message = _BridgeMessage.fromJson(msg.message);
+      if (!await _isTrustedSource(controller) ||
+          message.nonce != _documentNonce) {
         debugLog('MiniAppBridge: rejected chat message from untrusted origin');
         return;
       }
@@ -430,7 +443,10 @@ class MiniAppBridgeService {
     bool success,
     String dataJson,
   ) async {
-    if (id == null) return;
+    if (id == null ||
+        !await _isTrustedSource(controller) ||
+        !id.startsWith('_n42_${_documentNonce}_'))
+      return;
     // Validate callback id: only allow safe alphanumeric + underscore ids
     // to prevent JS injection via crafted callback identifiers.
     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(id)) {
@@ -460,7 +476,9 @@ class MiniAppBridgeService {
 
   Future<bool> _isTrustedSource(WebViewController controller) async {
     try {
+      if (isSessionAllowed?.call() == false) return false;
       final currentUrl = await controller.currentUrl();
+      if (isSessionAllowed?.call() == false) return false;
       return isTrustedMiniAppNavigationUrl(
         appUrl: _app?.url,
         candidateUrl: currentUrl,

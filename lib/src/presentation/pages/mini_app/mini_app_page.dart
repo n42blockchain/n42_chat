@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../core/services/mini_app_security_service.dart';
+import '../../../core/utils/secure_uri.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
@@ -42,7 +46,12 @@ class MiniAppPage extends StatefulWidget {
 
 class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   WebViewController? _webController;
-  late final MiniAppBridgeService _bridge;
+  MiniAppBridgeService? _bridge;
+  late final MiniAppSecurityService _security;
+  late final bool _ownsSecurity;
+  Timer? _securityTimer;
+  Uri? _authorizedUri;
+  bool _initializing = false;
   bool _isLoading = true;
   String? _errorMessage;
   int _loadProgress = 0;
@@ -51,12 +60,23 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initWebView();
+    _ownsSecurity = !getIt.isRegistered<MiniAppSecurityService>();
+    _security = _ownsSecurity
+        ? MiniAppSecurityService()
+        : getIt<MiniAppSecurityService>();
+    _securityTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => _checkSecurity(),
+    );
+    unawaited(_initWebView());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _securityTimer?.cancel();
+    _bridge?.invalidateDocument();
+    if (_ownsSecurity) _security.dispose();
     // 通知 Mini App 即将销毁
     unawaited(
       _runJavaScriptSafely(
@@ -76,6 +96,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
           ),
         );
       case AppLifecycleState.resumed:
+        unawaited(_security.refresh().then((_) => _checkSecurity()));
         unawaited(
           _runJavaScriptSafely(
             'if(window.n42&&window.n42.lifecycle.onResume)window.n42.lifecycle.onResume();',
@@ -86,100 +107,138 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
     }
   }
 
-  void _initWebView() {
-    final initialUri = _resolveInitialUri();
-    if (initialUri == null) {
+  void _checkSecurity() {
+    if (!mounted) return;
+    final reason = _security.blockedReason(widget.app);
+    if (reason != null) {
+      _bridge?.invalidateDocument();
       setState(() {
+        _errorMessage = reason;
         _isLoading = false;
-        _errorMessage = 'Invalid mini app URL';
       });
-      return;
     }
+  }
 
-    _bridge = MiniAppBridgeService(
-      walletBridge: getIt<IWalletBridge>(),
-      roomId: widget.roomId,
-      app: widget.app,
-      onSendMessage: _onBridgeSendMessage,
-      onClose: () {
-        if (mounted && Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
-      },
-    );
+  Future<void> _initWebView() async {
+    if (_initializing) return;
+    _initializing = true;
+    try {
+      var initialUri = _resolveInitialUri();
+      if (initialUri == null) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Invalid mini app URL';
+        });
+        return;
+      }
 
-    final controller = WebViewController();
-    controller
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (_) {
-            if (!mounted) return;
-            setState(() {
-              _isLoading = true;
-              _errorMessage = null;
-            });
-          },
-          onPageFinished: (_) async {
-            final currentUrl = await controller.currentUrl();
-            if (!isTrustedMiniAppNavigationUrl(
-              appUrl: widget.app.url,
-              candidateUrl: currentUrl,
-            )) {
-              debugLog(
-                'MiniAppPage: blocked bridge injection for untrusted URL: $currentUrl',
-              );
+      initialUri =
+          _authorizedUri ??
+          await _security.authorizeLaunch(widget.app, widget.initialUrl);
+      await _security.refresh();
+      final reason = _security.blockedReason(widget.app);
+      if (reason != null) throw MiniAppSecurityException(reason);
+      if (!mounted) return;
+      _authorizedUri = initialUri;
+      _bridge?.invalidateDocument();
+      _bridge = MiniAppBridgeService(
+        walletBridge: getIt<IWalletBridge>(),
+        roomId: widget.roomId,
+        app: widget.app,
+        isSessionAllowed: () =>
+            mounted &&
+            _errorMessage == null &&
+            _security.blockedReason(widget.app) == null,
+        onSendMessage: _onBridgeSendMessage,
+        onClose: () {
+          if (mounted && Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        },
+      );
+
+      final controller = WebViewController();
+      controller
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(Colors.white)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageStarted: (_) {
+              _bridge?.invalidateDocument();
               if (!mounted) return;
               setState(() {
-                _isLoading = false;
-                _errorMessage = 'Blocked untrusted mini app origin';
+                _isLoading = true;
+                _errorMessage = null;
               });
-              return;
-            }
+            },
+            onPageFinished: (_) async {
+              final currentUrl = await controller.currentUrl();
+              if (_security.blockedReason(widget.app) != null ||
+                  !isTrustedMiniAppNavigationUrl(
+                    appUrl: widget.app.url,
+                    candidateUrl: currentUrl,
+                  )) {
+                debugLog('MiniAppPage: blocked bridge injection');
+                if (!mounted) return;
+                setState(() {
+                  _isLoading = false;
+                  _errorMessage = 'Blocked untrusted mini app origin';
+                });
+                return;
+              }
 
-            await _runJavaScriptSafely(_bridge.initScript);
-            if (mounted) {
-              setState(() {
-                _isLoading = false;
-                _loadProgress = 100;
-              });
-            }
-          },
-          onProgress: (progress) {
-            if (!mounted) return;
-            setState(() => _loadProgress = progress);
-          },
-          onWebResourceError: (error) {
-            if (mounted) {
-              setState(() {
-                _isLoading = false;
-                _errorMessage = error.description;
-              });
-            }
-          },
-          onNavigationRequest: (request) {
-            if (isTrustedMiniAppNavigationUrl(
-              appUrl: widget.app.url,
-              candidateUrl: request.url,
-            )) {
-              return NavigationDecision.navigate;
-            }
+              await _runJavaScriptSafely(_bridge!.initScript);
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                  _loadProgress = 100;
+                });
+              }
+            },
+            onProgress: (progress) {
+              if (!mounted) return;
+              setState(() => _loadProgress = progress);
+            },
+            onWebResourceError: (error) {
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                  _errorMessage = error.description;
+                });
+              }
+            },
+            onNavigationRequest: (request) {
+              if (_security.blockedReason(widget.app) == null &&
+                  isTrustedMiniAppNavigationUrl(
+                    appUrl: widget.app.url,
+                    candidateUrl: request.url,
+                  )) {
+                return NavigationDecision.navigate;
+              }
 
-            debugLog(
-              'MiniAppPage: blocked navigation outside trusted origin: ${request.url}',
-            );
-            return NavigationDecision.prevent;
-          },
-        ),
-      );
-    _webController = controller;
+              debugLog('MiniAppPage: blocked untrusted navigation');
+              return NavigationDecision.prevent;
+            },
+          ),
+        );
+      _webController = controller;
 
-    // 注册 JS Channel（必须在 loadRequest 之前）
-    _bridge.registerChannels(controller, context);
+      // 注册 JS Channel（必须在 loadRequest 之前）
+      _bridge!.registerChannels(controller, context);
 
-    // 加载 Mini App URL
-    unawaited(_loadInitialUrl(initialUri));
+      // 加载 Mini App URL
+      await _loadInitialUrl(initialUri);
+    } catch (error) {
+      if (mounted)
+        setState(() {
+          _isLoading = false;
+          _errorMessage = error is MiniAppSecurityException
+              ? error.message
+              : 'Unable to verify Mini App security. Please try again.';
+        });
+    } finally {
+      _initializing = false;
+    }
   }
 
   Uri? _resolveInitialUri() {
@@ -238,13 +297,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
       _loadProgress = 0;
     });
 
-    final controller = _webController;
-    if (controller != null) {
-      controller.reload();
-      return;
-    }
-
-    _initWebView();
+    unawaited(_initWebView());
   }
 
   @override
@@ -345,6 +398,15 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (parseSecureUri(_security.config.upgradeUrl) != null)
+              TextButton(
+                onPressed: () => launchUrl(
+                  Uri.parse(_security.config.upgradeUrl!),
+                  mode: LaunchMode.externalApplication,
+                ),
+                child: const Text('Update N42'),
+              ),
+
             Icon(
               Icons.cloud_off_outlined,
               size: 64,
