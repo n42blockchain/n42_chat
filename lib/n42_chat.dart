@@ -104,3 +104,4 @@ export 'src/presentation/widgets/widgets.dart';
 export 'l10n/app_localizations.dart' hide S;
 
 export 'src/core/services/mini_app_security_service.dart';
+export 'src/core/services/media_telemetry.dart';

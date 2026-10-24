@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import 'media_lifecycle_service.dart';
+import 'media_telemetry.dart';
 import '../utils/debug_log.dart';
 
 /// 下载任务状态
@@ -167,6 +168,7 @@ class DownloadService {
   }
 
   Future<void> _executeDownload(DownloadTask task) async {
+    final measurement = MediaTelemetry.start(MediaStage.download);
     task.status = DownloadStatus.downloading;
     _notifyTask(task);
 
@@ -244,6 +246,14 @@ class DownloadService {
         _notifyTask(task);
       }
     } finally {
+      measurement.finish(
+        task.status == DownloadStatus.completed
+            ? MediaOutcome.succeeded
+            : task.status == DownloadStatus.cancelled
+            ? MediaOutcome.cancelled
+            : MediaOutcome.failed,
+        bytes: task.receivedBytes,
+      );
       client.close();
       _activeClients.remove(task.id);
       _activeCount--;

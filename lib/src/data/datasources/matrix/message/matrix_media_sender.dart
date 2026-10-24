@@ -1,7 +1,10 @@
+import '../../../../core/services/media_telemetry.dart';
 import 'direct_chat_send_guard.dart';
 import 'encrypted_send_guard.dart';
+
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../matrix_client_manager.dart';
@@ -24,6 +27,24 @@ class MatrixMediaSender {
   ///
   /// 简化的实现：直接使用 SDK 的 uploadContent + sendEvent
   Future<String?> sendImageMessage(
+    String roomId, {
+    required Uint8List imageBytes,
+    required String filename,
+    String? mimeType,
+    int? selfDestructAfter,
+  }) => MediaTelemetry.trace(
+    MediaStage.send,
+    () => _sendImageMessage(
+      roomId,
+      imageBytes: imageBytes,
+      filename: filename,
+      mimeType: mimeType,
+      selfDestructAfter: selfDestructAfter,
+    ),
+    bytes: imageBytes.length,
+  );
+
+  Future<String?> _sendImageMessage(
     String roomId, {
     required Uint8List imageBytes,
     required String filename,
@@ -67,10 +88,14 @@ class MatrixMediaSender {
       Uri? mxcUri;
 
       try {
-        mxcUri = await _client!.uploadContent(
-          imageBytes,
-          filename: filename,
-          contentType: actualMimeType,
+        mxcUri = await MediaTelemetry.trace(
+          MediaStage.upload,
+          () => _client!.uploadContent(
+            imageBytes,
+            filename: filename,
+            contentType: actualMimeType,
+          ),
+          bytes: imageBytes.length,
         );
         debugLog('SDK upload successful: $mxcUri');
       } catch (sdkUploadError) {
@@ -118,6 +143,26 @@ class MatrixMediaSender {
   ///
   /// 使用 Matrix SDK 内置方法或手动上传
   Future<String?> sendVoiceMessage(
+    String roomId, {
+    required Uint8List audioBytes,
+    required String filename,
+    required int duration,
+    String? mimeType,
+    int? selfDestructAfter,
+  }) => MediaTelemetry.trace(
+    MediaStage.send,
+    () => _sendVoiceMessage(
+      roomId,
+      audioBytes: audioBytes,
+      filename: filename,
+      duration: duration,
+      mimeType: mimeType,
+      selfDestructAfter: selfDestructAfter,
+    ),
+    bytes: audioBytes.length,
+  );
+
+  Future<String?> _sendVoiceMessage(
     String roomId, {
     required Uint8List audioBytes,
     required String filename,
@@ -248,6 +293,26 @@ class MatrixMediaSender {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+  }) => MediaTelemetry.trace(
+    MediaStage.send,
+    () => _sendVideoMessage(
+      roomId,
+      videoBytes: videoBytes,
+      filename: filename,
+      mimeType: mimeType,
+      thumbnailBytes: thumbnailBytes,
+      selfDestructAfter: selfDestructAfter,
+    ),
+    bytes: videoBytes.length,
+  );
+
+  Future<String?> _sendVideoMessage(
+    String roomId, {
+    required Uint8List videoBytes,
+    required String filename,
+    String? mimeType,
+    Uint8List? thumbnailBytes,
+    int? selfDestructAfter,
   }) async {
     debugLog('=== MatrixMessageDataSource.sendVideoMessage start ===');
     debugLog('roomId: $roomId');
@@ -331,6 +396,30 @@ class MatrixMediaSender {
   ///
   /// 使用 Matrix SDK 内置方法或手动上传
   Future<String?> sendFileMessage(
+    String roomId, {
+    Uint8List? fileBytes,
+    required String filename,
+    String? mimeType,
+    int? selfDestructAfter,
+    String? filePath,
+    Stream<List<int>>? fileStream,
+    int? fileSize,
+  }) => MediaTelemetry.trace(
+    MediaStage.send,
+    () => _sendFileMessage(
+      roomId,
+      fileBytes: fileBytes,
+      filename: filename,
+      mimeType: mimeType,
+      selfDestructAfter: selfDestructAfter,
+      filePath: filePath,
+      fileStream: fileStream,
+      fileSize: fileSize,
+    ),
+    bytes: fileSize ?? fileBytes?.length ?? 0,
+  );
+
+  Future<String?> _sendFileMessage(
     String roomId, {
     Uint8List? fileBytes,
     required String filename,

@@ -1,4 +1,7 @@
 import 'dart:convert';
+
+import '../../../../core/services/media_telemetry.dart';
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -84,6 +87,20 @@ class MatrixMediaUploader {
   /// 这是一个 workaround，因为 Matrix SDK 0.32.x 没有正确实现
   /// MSC3916 的认证媒体上传端点 (_matrix/client/v1/media/upload)
   Future<Uri?> uploadContentAuthenticated(
+    Uint8List content, {
+    String? filename,
+    String? contentType,
+  }) => MediaTelemetry.trace(
+    MediaStage.upload,
+    () => _uploadContentAuthenticated(
+      content,
+      filename: filename,
+      contentType: contentType,
+    ),
+    bytes: content.length,
+  );
+
+  Future<Uri?> _uploadContentAuthenticated(
     Uint8List content, {
     String? filename,
     String? contentType,
@@ -220,6 +237,22 @@ class MatrixMediaUploader {
     required int contentLength,
     String? filename,
     String? contentType,
+  }) => MediaTelemetry.trace(
+    MediaStage.upload,
+    () => _uploadFileAuthenticated(
+      filePath,
+      contentLength: contentLength,
+      filename: filename,
+      contentType: contentType,
+    ),
+    bytes: contentLength,
+  );
+
+  Future<Uri?> _uploadFileAuthenticated(
+    String filePath, {
+    required int contentLength,
+    String? filename,
+    String? contentType,
   }) async {
     return _uploadStreamWithReplay(
       streamFactory: () => File(filePath).openRead(),
@@ -231,6 +264,22 @@ class MatrixMediaUploader {
   }
 
   Future<Uri?> uploadStreamAuthenticated(
+    Stream<List<int>> contentStream, {
+    required int contentLength,
+    String? filename,
+    String? contentType,
+  }) => MediaTelemetry.trace(
+    MediaStage.upload,
+    () => _uploadStreamAuthenticated(
+      contentStream,
+      contentLength: contentLength,
+      filename: filename,
+      contentType: contentType,
+    ),
+    bytes: contentLength,
+  );
+
+  Future<Uri?> _uploadStreamAuthenticated(
     Stream<List<int>> contentStream, {
     required int contentLength,
     String? filename,
