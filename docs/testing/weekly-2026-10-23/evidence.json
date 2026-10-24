@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-23",
+  "flutter": "3.47.5",
+  "dart": "3.13.4",
+  "codeCommit": "189ed356250d93db1f3aea3e05751a60afbb989e",
+  "chatFull": {
+    "passed": 7690,
+    "skipped": 4,
+    "failed": 0
+  },
+  "analyze": {
+    "exitCode": 0,
+    "errors": 0,
+    "warnings": 0,
+    "infos": 306
+  },
+  "targetedPassed": 470,
+  "providerConfirmationPassed": 3,
+  "imageSamples": 200,
+  "reportTests": 4,
+  "logs": {
+    "chat_full": {
+      "localLog": "/tmp/n42-weekly-chat-full-final.log",
+      "sha256": "c36b05caa600f164f4a36a20a6bcd16b752a6ba713503f2845d20690088a0b5a"
+    },
+    "chat_analyze": {
+      "localLog": "/tmp/n42-weekly-chat-analyze-acceptance.log",
+      "sha256": "e6a23b65c1d323b621374e6a5555da4f6eb30cbb1f4399fbea1036f77ed12627"
+    },
+    "targeted": {
+      "localLog": "/tmp/n42-weekly-targeted-tests.log",
+      "sha256": "32f91b9e7e8d0a82c8e62aaeeed13592e99ac8016a804857c47d89cfa168a009"
+    },
+    "image_decode": {
+      "localLog": "/tmp/n42-weekly-decode.log",
+      "sha256": "db8cc390a04b46ca771e97f41ded2c5c8a394497dc333378b6ec46596a86af48"
+    },
+    "reports": {
+      "localLog": "/tmp/n42-weekly-report-tests.log",
+      "sha256": "e6ec182765cd965f2837d8eeaef5a64af48a104f245cd1a0b7281559194c57c1"
+    },
+    "old_baseline": {
+      "localLog": "/tmp/n42-weekly-baseline-tests.log",
+      "sha256": "a650d37e24d45cac7c1103859d439e353d66b300b0005035058c4114058448c6"
+    }
+  }
+}

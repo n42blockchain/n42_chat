@@ -573,3 +573,27 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Cause: 35 six-digit RGB Color literals had zero alpha. Fixed with explicit opaque ARGB throughout the semantic palette.
 - Verification: 603 presentation/theme checks and 32 host theme/settings/viewport checks passed. Chat analyzer exits 0 with 301 infos and no errors/warnings. iPhone 13 Pro Max installed 2.5.1 (73024); stable dark/light profile, messages, contacts, discover and settings screenshots confirm text and surfaces restored. Redmi Android 16 installed signed 2.5.1 (2026072777), retaining application data; version read-back and wallet launch screenshot pass. Chat menu screenshot acceptance awaits local navigation because mirroring has not produced frames. iPhone 17 Pro Max remains locked or unavailable over USB. Private screenshots stay outside Git.
 - Next step: install the corrected release on connected hardware and validate profile, conversation, settings, palette and navigation screens before closing.
+
+
+### SEC-006 Mini App policy deployment and device acceptance remain open
+
+- Severity: H
+- Added: 2026-10-23
+- Current state: native bridge SDK 1.1.0 enforces canonical URLs, registered manifests, signed expiring business launches, persistent local nonce checks, signed min-version/denylist policies and per-document native-channel nonces. OAuth callback matching is exact and random state is checked. No production policy endpoint/public keys/upgrade URL were supplied or deployed. Unconfigured hosts permit bundled base entries only; business links require signatures. New signed-link failures and upgrade messages currently use English fallback (QA-006).
+- Verification: 240 malformed URL cases, 220 legitimate synthetic navigation cases, policy tampering/replay/expiry tests, native-channel stale-document/race/revocation checks and blocked-launch UI tests. These are local regression evidence only.
+- Next step: deploy the issuer and policy endpoint with strong publish authentication/audit, ship pinned public keys/environment audience/upgrade URL, independently enforce nonce and business authorization on the backend, then execute iOS/Android/external-browser acceptance. Measure <=30-minute revocation and <0.5% legitimate rejection with actual deployment/traffic. Local preference persistence is not cross-device replay prevention. Protocol: `docs/security/mini-app-policy-v1.md`.
+
+### MEDIA-006 Device media performance and complete stage observability remain unverified
+
+- Severity: M
+- Added: 2026-10-23
+- Current state: Markdown images/automatic link opening are blocked; document fetches are bounded to 2 MiB, reject redirects, and verify encrypted media before rendering. Large Markdown is paged in bounded character chunks; tables/code fences can cross a page boundary. Added opt-in content-free send/upload/download/decrypt/preview events with operation/event IDs. SDK-internal encrypted upload is measured at outer send scope, not as independently observed upload/decrypt stages. No transcoding stage is present in the changed client path.
+- Verification: 100 Markdown security samples; native Matrix decrypt/hash validation; 200 synthetic PNG/JPEG/GIF/BMP files decoded by the host Flutter engine. These do not prove video/HDR/P3 color accuracy, device peak memory, wire traffic, 1 MiB mobile preview P95 <300ms or production processing failure rate <0.1%. The telemetry sink has not been connected to a production collector.
+- Next step: use consented camera/video and malformed input corpora, mobile profile/release builds, real Matrix test rooms and server-side logs. Export telemetry with an independent expected-stage inventory to measure missing events. Reproduce via `tool/weekly_benchmark/` and `docs/testing/weekly-2026-10-23/EXTERNAL_ACCEPTANCE.md`; do not increase the existing encrypted-upload bound (MEDIA-002) based on host measurements.
+
+### EXPERIMENT-001 NFC versus QR business pilot has no field evidence
+
+- Severity: M
+- Added: 2026-10-23
+- Current state: signed URLs reuse the Mini App gate and scanned external entries display the registered provider/domain before opening. A deidentified comparison protocol and metric summarizer are available. No NFC hardware/read integration, signed short-link issuer, merchant admin controls or 3–5 actual pilots were supplied/deployed. Client signature checks cannot detect replacement with another valid physical merchant tag.
+- Next step: recruit real merchants/events, implement audited/strongly authenticated target changes, register and inspect physical tags, compare NFC/QR/link completion and entry time, wait seven days for reuse, and obtain at least two distinct merchant continuation decisions. Keep identities/visits off public chains. Do not count tool fixtures as pilot success.
