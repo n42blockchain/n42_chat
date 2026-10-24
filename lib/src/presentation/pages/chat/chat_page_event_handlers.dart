@@ -670,6 +670,9 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             fileName: fileName,
             url: fileUrl!,
             headers: _buildAuthHeaders(fileUrl),
+            encryptKey: message.metadata?.encryptKey,
+            encryptIv: message.metadata?.encryptIv,
+            encryptSha256: message.metadata?.encryptSha256,
           ),
         ),
       );
