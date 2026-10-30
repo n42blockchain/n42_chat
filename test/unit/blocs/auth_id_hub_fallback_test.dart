@@ -25,7 +25,7 @@ class _MockWalletBridge extends Mock implements IWalletBridge {}
 
 class _FakeIdHubApi extends IdHubApi {
   _FakeIdHubApi({required this.challenge, required this.response})
-    : super(baseUrl: 'https://id-test.n42.ai');
+    : super(baseUrl: 'https://id-test.n42.world');
 
   final IdHubChallenge challenge;
   final IdHubWalletResponse response;
@@ -45,7 +45,7 @@ class _FakeIdHubApi extends IdHubApi {
 }
 
 class _ThrowingIdHubApi extends IdHubApi {
-  _ThrowingIdHubApi() : super(baseUrl: 'https://id-test.n42.ai');
+  _ThrowingIdHubApi() : super(baseUrl: 'https://id-test.n42.world');
 
   @override
   Future<IdHubChallenge> createWalletChallenge({
@@ -162,7 +162,7 @@ void main() {
     setUp: () {
       getIt.registerSingleton(
         const N42ChatConfig(
-          idHubUrl: 'https://id-test.n42.ai',
+          idHubUrl: 'https://id-test.n42.world',
           enableIdHubLogin: true,
         ),
       );
@@ -225,7 +225,7 @@ void main() {
     setUp: () {
       getIt.registerSingleton(
         const N42ChatConfig(
-          idHubUrl: 'https://id-test.n42.ai',
+          idHubUrl: 'https://id-test.n42.world',
           enableIdHubLogin: true,
         ),
       );
@@ -289,7 +289,7 @@ void main() {
     setUp: () {
       getIt.registerSingleton(
         const N42ChatConfig(
-          idHubUrl: 'https://id-test.n42.ai',
+          idHubUrl: 'https://id-test.n42.world',
           enableIdHubLogin: true,
         ),
       );
@@ -369,7 +369,7 @@ void main() {
     setUp: () {
       getIt.registerSingleton(
         const N42ChatConfig(
-          idHubUrl: 'https://id-test.n42.ai',
+          idHubUrl: 'https://id-test.n42.world',
           enableIdHubLogin: true,
         ),
       );
@@ -413,7 +413,7 @@ void main() {
     setUp: () {
       getIt.registerSingleton(
         const N42ChatConfig(
-          idHubUrl: 'https://id-test.n42.ai',
+          idHubUrl: 'https://id-test.n42.world',
           enableIdHubLogin: true,
         ),
       );

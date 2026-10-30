@@ -41,7 +41,7 @@ void main() {
           onRequest: (options, handler) {
             expect(
               options.path,
-              'https://api.n42.ai/proxy/v1/market/simple_price',
+              'https://api.n42.world/proxy/v1/market/simple_price',
             );
             expect(options.queryParameters['ids'], 'bitcoin');
             expect(options.queryParameters['vs_currencies'], 'usd');
@@ -65,7 +65,7 @@ void main() {
 
       final processor = BotCommandProcessor(
         walletBridge: NoOpWalletBridge(),
-        priceApiBase: 'https://api.n42.ai/proxy/v1/market',
+        priceApiBase: 'https://api.n42.world/proxy/v1/market',
         authToken: 'proxy-token',
         useProxyEndpoint: true,
         dio: dio,
@@ -93,7 +93,7 @@ void main() {
 
       final processor = BotCommandProcessor(
         walletBridge: NoOpWalletBridge(),
-        priceApiBase: 'https://api.n42.ai/proxy/v1/market',
+        priceApiBase: 'https://api.n42.world/proxy/v1/market',
         authToken: 'proxy-token',
         useProxyEndpoint: true,
         dio: dio,

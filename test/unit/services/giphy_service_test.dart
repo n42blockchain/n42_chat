@@ -187,7 +187,7 @@ void main() {
         final proxyService = GiphyService(
           config: const GiphyConfig(
             apiKey: '',
-            baseUrl: 'https://api.n42.ai/proxy/v1/giphy',
+            baseUrl: 'https://api.n42.world/proxy/v1/giphy',
             authToken: 'proxy-token',
             useProxyEndpoint: true,
           ),

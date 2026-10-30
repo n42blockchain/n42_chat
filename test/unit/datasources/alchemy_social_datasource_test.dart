@@ -29,7 +29,7 @@ void main() {
 
       final datasource = AlchemySocialDatasource(
         apiKey: '',
-        baseUrl: 'https://api.n42.ai/proxy/v1/alchemy/eth-mainnet',
+        baseUrl: 'https://api.n42.world/proxy/v1/alchemy/eth-mainnet',
         authToken: 'proxy-token',
         useProxyEndpoint: true,
         httpClient: client,
@@ -63,7 +63,7 @@ void main() {
 
       final datasource = AlchemySocialDatasource(
         apiKey: '',
-        baseUrl: 'https://api.n42.ai/proxy/v1/alchemy/eth-mainnet',
+        baseUrl: 'https://api.n42.world/proxy/v1/alchemy/eth-mainnet',
         authToken: 'proxy-token',
         useProxyEndpoint: true,
         httpClient: client,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,9 +14,11 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/social_scan_payload_parser.dart';
 import '../../../core/utils/payment_request_uri.dart';
 import '../../../core/utils/payment_asset_match.dart';
-import '../../../domain/repositories/contact_repository.dart';
 import '../../../integration/wallet_bridge.dart';
+import '../../blocs/contact/contact_bloc.dart';
+import '../../blocs/contact/contact_event.dart';
 import '../../helpers/mini_app_launcher_helper.dart';
+import '../contact/contact_detail_page.dart';
 import 'my_qrcode_page.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -278,7 +281,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
 
       switch (payload.type) {
         case SocialScanPayloadType.matrixUser:
-          completedWithExit = await _startChatWithUser(payload.userId!);
+          completedWithExit = _openContactPreview(payload.userId!);
           break;
         case SocialScanPayloadType.miniApp:
           await MiniAppLauncherHelper.openApp<void>(
@@ -625,22 +628,33 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     return false;
   }
 
-  Future<bool> _startChatWithUser(String userId) async {
-    try {
-      final roomId = await getIt<IContactRepository>().startDirectChat(userId);
-
-      if (mounted) {
-        Navigator.of(context).pop({'roomId': roomId, 'userId': userId});
-        return true;
-      }
-    } catch (e) {
-      if (!mounted) return false;
-      _showError(
-        S.of(context)?.qrcodeCannotAddFriend(e.toString()) ??
-            'Cannot add friend: $e',
-      );
-    }
-    return false;
+  /// Opens the same identity/relationship preview as the search flow, so the
+  /// user explicitly decides whether to send a friend request. Scanning a
+  /// code must never send the request on its own.
+  bool _openContactPreview(String userId) {
+    if (!mounted) return false;
+    final bloc = context.read<ContactBloc?>();
+    // Replace the scanner so callers receive no result and take no action.
+    unawaited(
+      Navigator.of(context).pushReplacement<void, Object?>(
+        MaterialPageRoute<void>(
+          builder: (_) {
+            final page = ContactDetailPage(userId: userId, displayName: userId);
+            if (bloc != null) {
+              return BlocProvider.value(value: bloc, child: page);
+            }
+            if (getIt.isRegistered<ContactBloc>()) {
+              return BlocProvider(
+                create: (_) => getIt<ContactBloc>()..add(const LoadContacts()),
+                child: page,
+              );
+            }
+            return page;
+          },
+        ),
+      ),
+    );
+    return true;
   }
 
   void _showError(String message) {
