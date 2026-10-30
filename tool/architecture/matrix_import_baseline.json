@@ -1,7 +1,4 @@
 [
-  "lib/src/presentation/blocs/chat/chat_bloc.dart",
-  "lib/src/presentation/blocs/chat/message_report_origin.dart",
-  "lib/src/presentation/blocs/contact/contact_block_origin.dart",
   "lib/src/presentation/pages/chat/whiteboard_page.dart",
   "lib/src/presentation/pages/contact/common_groups_page.dart",
   "lib/src/presentation/pages/discover/channel_discover_page.dart",
@@ -10,6 +7,5 @@
   "lib/src/presentation/pages/security/sas_verification_page.dart",
   "lib/src/presentation/pages/settings/privacy_security_page.dart",
   "lib/src/presentation/pages/settings/security_settings_page.dart",
-  "lib/src/presentation/widgets/common/sync_progress_overlay.dart",
   "lib/src/presentation/widgets/common/user_report_dialog.dart"
 ]

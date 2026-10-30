@@ -6,7 +6,7 @@ import 'dart:math' show min;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
+import '../../../domain/entities/chat_sync_phase.dart';
 import 'package:mime/mime.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -75,7 +75,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   static const int _baseRetryDelayMs = 2000;
 
   /// 同步状态订阅
-  StreamSubscription<SyncStatusUpdate>? _syncStatusSubscription;
+  StreamSubscription<ChatSyncPhase>? _syncStatusSubscription;
 
   /// 重试定时器
   Timer? _retryTimer;

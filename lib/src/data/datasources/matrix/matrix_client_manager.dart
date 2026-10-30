@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import '../../../domain/entities/chat_sync_phase.dart';
 import '../../../core/encryption/account_session_index.dart';
 import '../../../core/encryption/session_preserving_client.dart';
 import '../../../core/encryption/token_device_session.dart';
@@ -109,6 +110,15 @@ class MatrixClientManager {
 
   /// 同步状态流
   Stream<SyncStatusUpdate>? get onSyncStatus => _client?.onSyncStatus.stream;
+
+  Stream<ChatSyncPhase>? get onChatSyncPhase =>
+      onSyncStatus?.map((update) => switch (update.status) {
+        SyncStatus.waitingForResponse => ChatSyncPhase.waiting,
+        SyncStatus.processing => ChatSyncPhase.processing,
+        SyncStatus.cleaningUp => ChatSyncPhase.cleaningUp,
+        SyncStatus.finished => ChatSyncPhase.finished,
+        SyncStatus.error => ChatSyncPhase.error,
+      });
 
   /// 登录状态变化流
   Stream<LoginState>? get onLoginStateChanged =>

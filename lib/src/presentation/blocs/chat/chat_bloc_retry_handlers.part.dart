@@ -5,13 +5,13 @@ extension ChatBlocRetryHandlers on ChatBloc {
   /// 设置同步状态监听，连接恢复后自动重试失败消息
   void setupAutoRetry() {
     _syncStatusSubscription?.cancel();
-    final syncStream = _clientManager?.onSyncStatus;
+    final syncStream = _clientManager?.onChatSyncPhase;
     if (syncStream == null) return;
 
     _syncStatusSubscription = syncStream.listen((status) {
       if (isClosed) return;
 
-      if (status.status == SyncStatus.finished) {
+      if (status == ChatSyncPhase.finished) {
         if (!_isConnected) {
           _isConnected = true;
           add(const ConnectionStatusChanged(true));
@@ -20,7 +20,7 @@ extension ChatBlocRetryHandlers on ChatBloc {
         if (_pendingRetryMessages.isNotEmpty) {
           add(const RetryPendingMessages());
         }
-      } else if (status.status == SyncStatus.error) {
+      } else if (status == ChatSyncPhase.error) {
         if (_isConnected) {
           _isConnected = false;
           add(const ConnectionStatusChanged(false));

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
+import '../../../domain/entities/chat_sync_phase.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -26,7 +26,7 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
   bool _visible = false;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-  StreamSubscription<SyncStatusUpdate>? _syncSub;
+  StreamSubscription<ChatSyncPhase>? _syncSub;
 
   @override
   void initState() {
@@ -52,7 +52,7 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
 
   void _checkSyncState() {
     final clientManager = MatrixClientManager.instance;
-    final onSyncStatus = clientManager.onSyncStatus;
+    final onSyncStatus = clientManager.onChatSyncPhase;
     if (onSyncStatus == null) return;
 
     // 若 prevBatch 为 null，说明尚未完成首次同步
@@ -66,7 +66,7 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
 
       _syncSub = onSyncStatus.listen((status) {
         if (!mounted) return;
-        if (status.status == SyncStatus.finished && _isSyncing) {
+        if (status == ChatSyncPhase.finished && _isSyncing) {
           _hideSyncOverlay();
         }
       });
