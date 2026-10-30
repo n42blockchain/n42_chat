@@ -20,6 +20,8 @@ import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/payment_request_status_utils.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/services/local_calendar_suggestion.dart';
+import '../../widgets/chat/local_calendar_suggestion_button.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
@@ -548,11 +550,26 @@ class MessageItem extends StatelessWidget {
         ? AppColors.sentText(isDark) // 黑色
         : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
 
-    final textWidget = _buildRichTextWithAddresses(
+    final richText = _buildRichTextWithAddresses(
       message.content,
       textColor,
       context,
     );
+
+    final suggestedTime = localCalendarSuggestion(message);
+    final textWidget = suggestedTime == null
+        ? richText
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              richText,
+              LocalCalendarSuggestionButton(
+                key: ObjectKey(message),
+                startsAt: suggestedTime,
+              ),
+            ],
+          );
 
     // 检测消息中的 URL，用于显示预览
     final urlMatch = _urlRegex.firstMatch(message.content);

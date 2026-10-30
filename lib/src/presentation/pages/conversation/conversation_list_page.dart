@@ -335,6 +335,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                     ConversationFilter.all => l10n.commonAll,
                     ConversationFilter.unread => l10n.chatFilterUnread,
                     ConversationFilter.groups => l10n.searchGroups,
+                    ConversationFilter.mentions => l10n.chatCatchUpMentions,
                   }),
                   selected: _filter == filter,
                   onSelected: (_) => setState(() => _filter = filter),

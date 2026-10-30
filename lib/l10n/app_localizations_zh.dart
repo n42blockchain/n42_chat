@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -5905,6 +5906,36 @@ class SZh extends S {
 
   @override
   String get transferPaymentRequestUnavailable => '收款请求不可用';
+
+  @override
+  String get chatCatchUp => '群聊追赶';
+
+  @override
+  String get chatCatchUpMentions => '提及我的';
+
+  @override
+  String get chatCatchUpReplies => '回复我的';
+
+  @override
+  String get chatCatchUpPinned => '置顶消息';
+
+  @override
+  String get chatCatchUpScope => '提及和回复仅筛选已加载消息，包含已读消息。加载更早消息可查找更早的回复。';
+
+  @override
+  String get chatCatchUpLoadMore => '加载更早消息';
+
+  @override
+  String get chatActionPreview => '确认日历建议';
+
+  @override
+  String get chatActionPrivacy => '确认后，仅将下方标题和时间交给日历应用。请核对时区。日历账户可能同步此日程。';
+
+  @override
+  String get chatActionTitle => '聊天日程';
+
+  @override
+  String get chatActionSuggestion => '日历建议';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -11722,4 +11753,34 @@ class SZhTw extends SZh {
 
   @override
   String get transferPaymentRequestUnavailable => '收款請求無法使用';
+
+  @override
+  String get chatCatchUp => '群聊追趕';
+
+  @override
+  String get chatCatchUpMentions => '提及我的';
+
+  @override
+  String get chatCatchUpReplies => '回覆我的';
+
+  @override
+  String get chatCatchUpPinned => '置頂訊息';
+
+  @override
+  String get chatCatchUpScope => '提及和回覆僅篩選已載入訊息，包含已讀訊息。載入更早訊息可尋找更早的回覆。';
+
+  @override
+  String get chatCatchUpLoadMore => '載入更早訊息';
+
+  @override
+  String get chatActionPreview => '確認日曆建議';
+
+  @override
+  String get chatActionPrivacy => '確認後，僅將下方標題和時間交給日曆應用程式。請核對時區。日曆帳戶可能同步此行程。';
+
+  @override
+  String get chatActionTitle => '聊天行程';
+
+  @override
+  String get chatActionSuggestion => '日曆建議';
 }

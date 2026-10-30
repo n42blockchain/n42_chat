@@ -43,9 +43,8 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                       child: Icon(
                         BridgePlatformRegistry.getInfo(bridgePlatform).icon,
                         size: 16,
-                        color: BridgePlatformRegistry.getInfo(
-                          bridgePlatform,
-                        ).brandColor,
+                        color: BridgePlatformRegistry.getInfo(bridgePlatform)
+                            .brandColor,
                       ),
                     ),
                   Flexible(
@@ -84,6 +83,25 @@ extension _ChatPageAppBarMethods on _ChatPageState {
       showBackButton: widget.onBack != null,
       onBackPressed: widget.onBack ?? () => Navigator.of(context).pop(),
       actions: [
+        if (widget.conversation.isGroup)
+          IconButton(
+            icon: const Icon(Icons.mark_chat_unread_outlined),
+            tooltip: S.of(context)!.chatCatchUp,
+            onPressed: () async {
+              final id = await showModalBottomSheet<String>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => BlocProvider.value(
+                  value: context.read<ChatBloc>(),
+                  child: ChatCatchUpSheet(
+                    roomId: widget.conversation.id,
+                    userId: _currentUserId,
+                  ),
+                ),
+              );
+              if (mounted && id != null) await _scrollToMessage(id);
+            },
+          ),
         // 私聊显示通话按钮
         if (!widget.conversation.isGroup) ...[
           IconButton(

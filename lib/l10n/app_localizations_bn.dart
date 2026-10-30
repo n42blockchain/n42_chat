@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -6056,4 +6057,36 @@ class SBn extends S {
 
   @override
   String get transferPaymentRequestUnavailable => 'পেমেন্টের অনুরোধ উপলব্ধ নেই';
+
+  @override
+  String get chatCatchUp => 'Catch up';
+
+  @override
+  String get chatCatchUpMentions => 'Mentions';
+
+  @override
+  String get chatCatchUpReplies => 'Replies to me';
+
+  @override
+  String get chatCatchUpPinned => 'Pinned messages';
+
+  @override
+  String get chatCatchUpScope =>
+      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+
+  @override
+  String get chatCatchUpLoadMore => 'Load older messages';
+
+  @override
+  String get chatActionPreview => 'Review calendar suggestion';
+
+  @override
+  String get chatActionPrivacy =>
+      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+
+  @override
+  String get chatActionTitle => 'Chat event';
+
+  @override
+  String get chatActionSuggestion => 'Calendar suggestion';
 }

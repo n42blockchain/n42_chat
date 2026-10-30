@@ -2863,5 +2863,15 @@
     }
   },
   "transferAssetUnavailable": "Payment asset is unavailable",
-  "transferPaymentRequestUnavailable": "Payment request is unavailable"
+  "transferPaymentRequestUnavailable": "Payment request is unavailable",
+  "chatCatchUp": "Catch up",
+  "chatCatchUpMentions": "Mentions",
+  "chatCatchUpReplies": "Replies to me",
+  "chatCatchUpPinned": "Pinned messages",
+  "chatCatchUpScope": "Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.",
+  "chatCatchUpLoadMore": "Load older messages",
+  "chatActionPreview": "Review calendar suggestion",
+  "chatActionPrivacy": "Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.",
+  "chatActionTitle": "Chat event",
+  "chatActionSuggestion": "Calendar suggestion"
 }

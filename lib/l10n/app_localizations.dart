@@ -11170,6 +11170,66 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Payment request is unavailable'**
   String get transferPaymentRequestUnavailable;
+
+  /// No description provided for @chatCatchUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Catch up'**
+  String get chatCatchUp;
+
+  /// No description provided for @chatCatchUpMentions.
+  ///
+  /// In en, this message translates to:
+  /// **'Mentions'**
+  String get chatCatchUpMentions;
+
+  /// No description provided for @chatCatchUpReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'Replies to me'**
+  String get chatCatchUpReplies;
+
+  /// No description provided for @chatCatchUpPinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned messages'**
+  String get chatCatchUpPinned;
+
+  /// No description provided for @chatCatchUpScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.'**
+  String get chatCatchUpScope;
+
+  /// No description provided for @chatCatchUpLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load older messages'**
+  String get chatCatchUpLoadMore;
+
+  /// No description provided for @chatActionPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review calendar suggestion'**
+  String get chatActionPreview;
+
+  /// No description provided for @chatActionPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.'**
+  String get chatActionPrivacy;
+
+  /// No description provided for @chatActionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat event'**
+  String get chatActionTitle;
+
+  /// No description provided for @chatActionSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar suggestion'**
+  String get chatActionSuggestion;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

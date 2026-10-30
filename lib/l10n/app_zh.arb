@@ -2205,5 +2205,15 @@
   "chatDraftLabel": "草稿",
   "contactIndexLabel": "联系人索引",
   "transferAssetUnavailable": "支付资产不可用",
-  "transferPaymentRequestUnavailable": "收款请求不可用"
+  "transferPaymentRequestUnavailable": "收款请求不可用",
+  "chatCatchUp": "群聊追赶",
+  "chatCatchUpMentions": "提及我的",
+  "chatCatchUpReplies": "回复我的",
+  "chatCatchUpPinned": "置顶消息",
+  "chatCatchUpScope": "提及和回复仅筛选已加载消息，包含已读消息。加载更早消息可查找更早的回复。",
+  "chatCatchUpLoadMore": "加载更早消息",
+  "chatActionPreview": "确认日历建议",
+  "chatActionPrivacy": "确认后，仅将下方标题和时间交给日历应用。请核对时区。日历账户可能同步此日程。",
+  "chatActionTitle": "聊天日程",
+  "chatActionSuggestion": "日历建议"
 }
