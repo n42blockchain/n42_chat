@@ -1,0 +1,42 @@
+{
+  "chat_commit": null,
+  "host_commit": null,
+  "ios_build": null,
+  "android_build": null,
+  "test_environment": null,
+  "run_at": null,
+  "metrics": {
+    "devices": null,
+    "group_members": null,
+    "mixed_messages": null,
+    "key_recovery_attempts": null,
+    "key_recovery_successes": null,
+    "lost_messages": null,
+    "duplicate_messages": null,
+    "plaintext_log_leaks": null,
+    "revoked_device_new_keys": null,
+    "automatic_wallet_executions": null
+  },
+  "scenarios": {
+    "offline_reconnect": {
+      "status": "not_run",
+      "evidence": null
+    },
+    "device_revocation": {
+      "status": "not_run",
+      "evidence": null
+    },
+    "key_recovery": {
+      "status": "not_run",
+      "evidence": null
+    },
+    "push_delivery": {
+      "status": "not_run",
+      "evidence": null
+    },
+    "wallet_confirmation": {
+      "status": "not_run",
+      "evidence": null
+    }
+  }
+}

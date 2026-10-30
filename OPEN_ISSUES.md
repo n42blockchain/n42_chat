@@ -597,3 +597,24 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Added: 2026-10-23
 - Current state: signed URLs reuse the Mini App gate and scanned external entries display the registered provider/domain before opening. A deidentified comparison protocol and metric summarizer are available. Native iOS/Android NDEF URI reading is integrated with cancel/timeout/duplicate guards and provider confirmation. Physical-tag acceptance, signed short-link issuing, merchant admin controls and real pilots remain unverified or undeployed. Client signature checks cannot detect replacement with another valid physical merchant tag.
 - Next step: recruit real merchants/events, implement audited/strongly authenticated target changes, register and inspect physical tags, compare NFC/QR/link completion and entry time, wait seven days for reuse, and obtain at least two distinct merchant continuation decisions. Keep identities/visits off public chains. Do not count tool fixtures as pilot success.
+
+### CATCHUP-001 Complete unread replies and controlled history sharing remain open
+
+- Severity: H
+- Added: 2026-10-30
+- Current state: conversation filtering uses server highlight counts; the group catch-up sheet filters loaded, decrypted messages and resolves replies only when the original own event is loaded. Permanent pins already use Matrix state without expiry. Controlled, recipient-specific history re-encryption and a durable audit/reconciliation protocol are not implemented; normal forwarding is not an equivalent. Group Status was not implemented in this iteration.
+- Next step: follow `docs/plans/2026-10-30-chat-catch-up.md`, build the account-bound unread index and controlled sharing protocol, then run the 20–30-user experiment. Do not claim complete unread coverage or selective history disclosure protection from these local filters.
+
+### CATCHUP-002 Device, production and action accuracy acceptance remain unverified
+
+- Severity: H
+- Added: 2026-10-30
+- Current state: local calendar suggestions recognize only one explicit ISO timestamp with time zone and require preview/confirmation before opening the existing native editor. They pass no chat body or participants. Apple Suggested Actions, natural-language dates, Reminder/Maps integration and multilingual accuracy are not implemented. New UI strings cover English and Simplified/Traditional Chinese; other locales use generated English fallbacks. No new production build, three-device recovery/revocation/push experiment, log inspection or user accuracy study was performed. Evidence template metrics remain null. SDK boundary CI records 13 existing presentation imports; it does not remove their coupling.
+- Next step: run the acceptance matrix and measurements in `docs/testing/weekly-2026-10-30/`, verify native editor cancel/save on iOS and Android, translate remaining locales and incrementally remove the recorded SDK dependencies.
+
+### CATCHUP-003 Existing chat core screenshot baselines fail on this toolchain
+
+- Severity: M
+- Added: 2026-10-30
+- Current state: full regression has 7,732 passing, 4 skipped and 2 failing light/dark chat core golden tests. Both failures reproduce in an untouched `a4951b13` worktree with Flutter 3.47.5. The catch-up suite passes. No golden tolerance or existing baseline was changed.
+- Next step: compare the recorded screenshots on the project's designated golden-rendering environment before refreshing baselines. See `docs/testing/weekly-2026-10-30/baseline-golden.log.gz`.
