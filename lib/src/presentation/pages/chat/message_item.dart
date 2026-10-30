@@ -22,6 +22,7 @@ import '../../../core/utils/payment_request_status_utils.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/services/local_calendar_suggestion.dart';
 import '../../widgets/chat/local_calendar_suggestion_button.dart';
+import '../../widgets/chat/device_action_suggestions.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
@@ -556,14 +557,18 @@ class MessageItem extends StatelessWidget {
       context,
     );
 
+    final textWithActions = Column(
+      crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min,
+      children: [richText, DeviceActionSuggestions(key: ObjectKey(message), message: message)],
+    );
     final suggestedTime = localCalendarSuggestion(message);
     final textWidget = suggestedTime == null
-        ? richText
+        ? textWithActions
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              richText,
+              textWithActions,
               LocalCalendarSuggestionButton(
                 key: ObjectKey(message),
                 startsAt: suggestedTime,

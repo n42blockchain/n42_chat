@@ -5936,6 +5936,80 @@ class SZh extends S {
 
   @override
   String get chatActionSuggestion => '日历建议';
+
+  @override
+  String get chatUnreadAttention => '未读提及与回复';
+
+  @override
+  String get chatScanAgain => '重新扫描';
+
+  @override
+  String get chatUnreadScope => '按服务器顺序扫描至已读标记。打开会话即可阅读，刷新可重新扫描。';
+
+  @override
+  String get chatScanIncomplete => '尚未完整：历史、解密或已读标记不可用，请同步后重试。';
+
+  @override
+  String get chatHistoryShare => '补发选定历史';
+
+  @override
+  String get chatHistoryExplanation =>
+      '仅管理员可用。选择普通文本和已入群成员的现有加密私聊。补发会在群内留下可见审计消息。';
+
+  @override
+  String get chatHistoryEnable => '启用补发';
+
+  @override
+  String get chatHistoryDisable => '停用补发';
+
+  @override
+  String get chatHistoryPolicy => '群历史补发策略';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      '仅管理员可补发。启用时也将群历史可见性限制为入群之后。请设置下方文本消息限制并确认。';
+
+  @override
+  String get chatHistoryPolicySaved => '策略已保存';
+
+  @override
+  String get chatHistoryRecipient => '接收人的加密私聊';
+
+  @override
+  String get chatHistoryReview => '预览选定消息';
+
+  @override
+  String get chatHistoryMessages => '条消息';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      '请确认接收人、每条正文和时间再补发。失败或结果未知时内容可能已发出，请先核对结果。';
+
+  @override
+  String get chatHistoryCompleted => '选定历史已发送，群内审计已确认';
+
+  @override
+  String get chatHistoryPending => '待核对：请先核对，再确认继续。发送结果未知的内容不会重发。';
+
+  @override
+  String get chatHistoryReconcile => '核对发送结果';
+
+  @override
+  String get chatHistoryFailed =>
+      '未能完成。请检查管理员权限、群策略、加密、接收人成员身份和选定内容。若已开始发送，请核对结果。';
+
+  @override
+  String get chatDeviceActions => '设备端操作';
+
+  @override
+  String get chatDeviceActionsReview =>
+      '确认后，仅将此消息交给系统的设备端操作建议。选择建议可打开日历、提醒事项或地图。';
+
+  @override
+  String get chatHistoryMaxMessages => '消息上限（1–50）';
+
+  @override
+  String get chatHistoryMaxHours => '回溯小时数（1–720）';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -11783,4 +11857,78 @@ class SZhTw extends SZh {
 
   @override
   String get chatActionSuggestion => '日曆建議';
+
+  @override
+  String get chatUnreadAttention => '未讀提及與回覆';
+
+  @override
+  String get chatScanAgain => '重新掃描';
+
+  @override
+  String get chatUnreadScope => '依伺服器順序掃描至已讀標記。開啟會話即可閱讀，重新整理可再次掃描。';
+
+  @override
+  String get chatScanIncomplete => '尚未完整：歷史、解密或已讀標記無法使用，請同步後重試。';
+
+  @override
+  String get chatHistoryShare => '補發選定歷史';
+
+  @override
+  String get chatHistoryExplanation =>
+      '僅管理員可用。選擇一般文字與已入群成員的現有加密私聊。補發會在群內留下可見稽核訊息。';
+
+  @override
+  String get chatHistoryEnable => '啟用補發';
+
+  @override
+  String get chatHistoryDisable => '停用補發';
+
+  @override
+  String get chatHistoryPolicy => '群歷史補發原則';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      '僅管理員可補發。啟用時也將群歷史可見性限制為入群之後。請設定下方文字訊息限制並確認。';
+
+  @override
+  String get chatHistoryPolicySaved => '原則已儲存';
+
+  @override
+  String get chatHistoryRecipient => '接收人的加密私聊';
+
+  @override
+  String get chatHistoryReview => '預覽選定訊息';
+
+  @override
+  String get chatHistoryMessages => '則訊息';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      '請確認接收人、每則文字與時間後再補發。失敗或結果未知時內容可能已送出，請先核對結果。';
+
+  @override
+  String get chatHistoryCompleted => '選定歷史已送出，群內稽核已確認';
+
+  @override
+  String get chatHistoryPending => '待核對：請先核對，再確認繼續。傳送結果未知的內容不會重發。';
+
+  @override
+  String get chatHistoryReconcile => '核對傳送結果';
+
+  @override
+  String get chatHistoryFailed =>
+      '無法完成。請檢查管理員權限、群原則、加密、接收人成員身分及選定內容。若已開始傳送，請核對結果。';
+
+  @override
+  String get chatDeviceActions => '裝置端操作';
+
+  @override
+  String get chatDeviceActionsReview =>
+      '確認後，僅將此訊息交給系統的裝置端操作建議。選擇建議可開啟日曆、提醒事項或地圖。';
+
+  @override
+  String get chatHistoryMaxMessages => '訊息上限（1–50）';
+
+  @override
+  String get chatHistoryMaxHours => '回溯小時數（1–720）';
 }

@@ -10,10 +10,12 @@ import '../../blocs/chat/chat_state.dart';
 class ChatCatchUpSheet extends StatefulWidget {
   final String roomId;
   final String? userId;
+  final VoidCallback? onShareHistory;
   const ChatCatchUpSheet({
     super.key,
     required this.roomId,
     required this.userId,
+    this.onShareHistory,
   });
   @override
   State<ChatCatchUpSheet> createState() => _ChatCatchUpSheetState();
@@ -36,6 +38,11 @@ class _ChatCatchUpSheetState extends State<ChatCatchUpSheet> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
+            if (widget.onShareHistory != null)
+              TextButton(
+                onPressed: widget.onShareHistory,
+                child: Text(l10n.chatHistoryShare),
+              ),
             Wrap(
               spacing: 8,
               children: CatchUpFilter.values

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../../core/utils/debug_log.dart';
 
 /// 安全存储数据源
@@ -436,6 +437,9 @@ class SecureStorageDataSource {
   // ============================================
 
   /// 通用读取
+  /// Transaction journals must distinguish absent data from storage failures.
+  Future<String?> readStrict(String key) => _storage.read(key: key);
+
   Future<String?> read(String key) async {
     try {
       return await _storage.read(key: key);

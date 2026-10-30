@@ -5970,4 +5970,82 @@ class SKo extends S {
 
   @override
   String get chatActionSuggestion => 'Calendar suggestion';
+
+  @override
+  String get chatUnreadAttention => 'Unread mentions and replies';
+
+  @override
+  String get chatScanAgain => 'Scan again';
+
+  @override
+  String get chatUnreadScope =>
+      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+
+  @override
+  String get chatScanIncomplete =>
+      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+
+  @override
+  String get chatHistoryShare => 'Share selected history';
+
+  @override
+  String get chatHistoryExplanation =>
+      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+
+  @override
+  String get chatHistoryEnable => 'Enable sharing';
+
+  @override
+  String get chatHistoryDisable => 'Disable sharing';
+
+  @override
+  String get chatHistoryPolicy => 'Group history sharing policy';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+
+  @override
+  String get chatHistoryPolicySaved => 'Policy saved';
+
+  @override
+  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+
+  @override
+  String get chatHistoryReview => 'Review selected messages';
+
+  @override
+  String get chatHistoryMessages => 'messages';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+
+  @override
+  String get chatHistoryCompleted =>
+      'Selected history sent and group audit confirmed';
+
+  @override
+  String get chatHistoryPending =>
+      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+
+  @override
+  String get chatHistoryReconcile => 'Reconcile send result';
+
+  @override
+  String get chatHistoryFailed =>
+      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+
+  @override
+  String get chatDeviceActions => 'On-device actions';
+
+  @override
+  String get chatDeviceActionsReview =>
+      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+
+  @override
+  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+
+  @override
+  String get chatHistoryMaxHours => 'History window in hours (1–720)';
 }

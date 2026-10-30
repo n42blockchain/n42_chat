@@ -11230,6 +11230,144 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Calendar suggestion'**
   String get chatActionSuggestion;
+
+  /// No description provided for @chatUnreadAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread mentions and replies'**
+  String get chatUnreadAttention;
+
+  /// No description provided for @chatScanAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan again'**
+  String get chatScanAgain;
+
+  /// No description provided for @chatUnreadScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.'**
+  String get chatUnreadScope;
+
+  /// No description provided for @chatScanIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Incomplete: history, decryption or read marker unavailable. Try again after sync.'**
+  String get chatScanIncomplete;
+
+  /// No description provided for @chatHistoryShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share selected history'**
+  String get chatHistoryShare;
+
+  /// No description provided for @chatHistoryExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.'**
+  String get chatHistoryExplanation;
+
+  /// No description provided for @chatHistoryEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable sharing'**
+  String get chatHistoryEnable;
+
+  /// No description provided for @chatHistoryDisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable sharing'**
+  String get chatHistoryDisable;
+
+  /// No description provided for @chatHistoryPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Group history sharing policy'**
+  String get chatHistoryPolicy;
+
+  /// No description provided for @chatHistoryPolicyDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.'**
+  String get chatHistoryPolicyDetail;
+
+  /// No description provided for @chatHistoryPolicySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy saved'**
+  String get chatHistoryPolicySaved;
+
+  /// No description provided for @chatHistoryRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted recipient conversation'**
+  String get chatHistoryRecipient;
+
+  /// No description provided for @chatHistoryReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review selected messages'**
+  String get chatHistoryReview;
+
+  /// No description provided for @chatHistoryMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'messages'**
+  String get chatHistoryMessages;
+
+  /// No description provided for @chatHistoryConfirmDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.'**
+  String get chatHistoryConfirmDetail;
+
+  /// No description provided for @chatHistoryCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected history sent and group audit confirmed'**
+  String get chatHistoryCompleted;
+
+  /// No description provided for @chatHistoryPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.'**
+  String get chatHistoryPending;
+
+  /// No description provided for @chatHistoryReconcile.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconcile send result'**
+  String get chatHistoryReconcile;
+
+  /// No description provided for @chatHistoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.'**
+  String get chatHistoryFailed;
+
+  /// No description provided for @chatDeviceActions.
+  ///
+  /// In en, this message translates to:
+  /// **'On-device actions'**
+  String get chatDeviceActions;
+
+  /// No description provided for @chatDeviceActionsReview.
+  ///
+  /// In en, this message translates to:
+  /// **'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.'**
+  String get chatDeviceActionsReview;
+
+  /// No description provided for @chatHistoryMaxMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Message limit (1–50)'**
+  String get chatHistoryMaxMessages;
+
+  /// No description provided for @chatHistoryMaxHours.
+  ///
+  /// In en, this message translates to:
+  /// **'History window in hours (1–720)'**
+  String get chatHistoryMaxHours;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

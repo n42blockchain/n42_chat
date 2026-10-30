@@ -96,6 +96,14 @@ extension _ChatPageAppBarMethods on _ChatPageState {
                   child: ChatCatchUpSheet(
                     roomId: widget.conversation.id,
                     userId: _currentUserId,
+                    onShareHistory: getIt.isRegistered<IChatCatchUpRepository>() ? () {
+                      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => HistorySharePage(
+                        roomId: widget.conversation.id,
+                        messages: context.read<ChatBloc>().state.messages,
+                        repository: getIt<IChatCatchUpRepository>(),
+                        conversations: getIt<IConversationRepository>(),
+                      )));
+                    } : null,
                   ),
                 ),
               );

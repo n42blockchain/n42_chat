@@ -1,3 +1,5 @@
+import '../../../domain/repositories/chat_catch_up_repository.dart';
+import 'unread_attention_page.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -335,10 +337,18 @@ class _ConversationListPageState extends State<ConversationListPage> {
                     ConversationFilter.all => l10n.commonAll,
                     ConversationFilter.unread => l10n.chatFilterUnread,
                     ConversationFilter.groups => l10n.searchGroups,
-                    ConversationFilter.mentions => l10n.chatCatchUpMentions,
+                    ConversationFilter.mentions => l10n.chatUnreadAttention,
                   }),
                   selected: _filter == filter,
-                  onSelected: (_) => setState(() => _filter = filter),
+                  onSelected: (_) {
+                    if (filter == ConversationFilter.mentions && getIt.isRegistered<IChatCatchUpRepository>()) {
+                      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => UnreadAttentionPage(
+                        repository: getIt<IChatCatchUpRepository>(),
+                        conversations: context.read<ConversationBloc>().state.conversations,
+                        onOpen: (room) => _onConversationTap(room),
+                      )));
+                    } else { setState(() => _filter = filter); }
+                  },
                   materialTapTargetSize: MaterialTapTargetSize.padded,
                 ),
               ),

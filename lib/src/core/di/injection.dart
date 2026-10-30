@@ -1,3 +1,5 @@
+import '../../domain/repositories/chat_catch_up_repository.dart';
+import '../../data/services/matrix_history_sharing.dart';
 import 'dart:async';
 
 import 'package:get_it/get_it.dart';
@@ -897,6 +899,11 @@ void _registerRepositories() {
   getIt.registerLazySingleton<IContentReportRepository>(
     () => MatrixContentReportRepository(getIt<MatrixClientManager>()),
   );
+
+  getIt.registerLazySingleton<IChatCatchUpRepository>(() => MatrixHistorySharing(
+    getIt<MatrixClientManager>(), getIt<IAuthRepository>() as IAccountBoundDeletionLifecycle,
+    getIt<SecureStorageDataSource>(),
+  ), dispose: (repo) => (repo as MatrixHistorySharing).dispose());
 
   // 会话仓库
   getIt.registerLazySingleton<IConversationRepository>(
