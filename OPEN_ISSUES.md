@@ -598,23 +598,23 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Current state: signed URLs reuse the Mini App gate and scanned external entries display the registered provider/domain before opening. A deidentified comparison protocol and metric summarizer are available. Native iOS/Android NDEF URI reading is integrated with cancel/timeout/duplicate guards and provider confirmation. Physical-tag acceptance, signed short-link issuing, merchant admin controls and real pilots remain unverified or undeployed. Client signature checks cannot detect replacement with another valid physical merchant tag.
 - Next step: recruit real merchants/events, implement audited/strongly authenticated target changes, register and inspect physical tags, compare NFC/QR/link completion and entry time, wait seven days for reuse, and obtain at least two distinct merchant continuation decisions. Keep identities/visits off public chains. Do not count tool fixtures as pilot success.
 
-### CATCHUP-001 Complete unread replies and controlled history sharing remain open
-
-- Severity: H
-- Added: 2026-10-30
-- Current state: conversation filtering uses server highlight counts; the group catch-up sheet filters loaded, decrypted messages and resolves replies only when the original own event is loaded. Permanent pins already use Matrix state without expiry. Controlled, recipient-specific history re-encryption and a durable audit/reconciliation protocol are not implemented; normal forwarding is not an equivalent. Group Status was not implemented in this iteration.
-- Next step: follow `docs/plans/2026-10-30-chat-catch-up.md`, build the account-bound unread index and controlled sharing protocol, then run the 20–30-user experiment. Do not claim complete unread coverage or selective history disclosure protection from these local filters.
-
-### CATCHUP-002 Device, production and action accuracy acceptance remain unverified
-
-- Severity: H
-- Added: 2026-10-30
-- Current state: local calendar suggestions recognize only one explicit ISO timestamp with time zone and require preview/confirmation before opening the existing native editor. They pass no chat body or participants. Apple Suggested Actions, natural-language dates, Reminder/Maps integration and multilingual accuracy are not implemented. New UI strings cover English and Simplified/Traditional Chinese; other locales use generated English fallbacks. No new production build, three-device recovery/revocation/push experiment, log inspection or user accuracy study was performed. Evidence template metrics remain null. SDK boundary CI records 13 existing presentation imports; it does not remove their coupling.
-- Next step: run the acceptance matrix and measurements in `docs/testing/weekly-2026-10-30/`, verify native editor cancel/save on iOS and Android, translate remaining locales and incrementally remove the recorded SDK dependencies.
-
-### CATCHUP-003 Existing chat core screenshot baselines fail on this toolchain
+### CATCHUP-001 Runtime acceptance of unread attention and selective history sharing
 
 - Severity: M
-- Added: 2026-10-30
-- Current state: full regression has 7,732 passing, 4 skipped and 2 failing light/dark chat core golden tests. Both failures reproduce in an untouched `a4951b13` worktree with Flutter 3.47.5. The catch-up suite passes. No golden tolerance or existing baseline was changed.
-- Next step: compare the recorded screenshots on the project's designated golden-rendering environment before refreshing baselines. See `docs/testing/weekly-2026-10-30/baseline-golden.log.gz`.
+- Updated: 2026-10-30 follow-up
+- Implemented: server-ordered pagination to the exact read marker, original-event identity lookup for direct replies, explicit incomplete state, cancellation and account/read-marker/head checks. This scans beyond the local timeline and handles empty pagination chunks. The result is a refreshable snapshot, not a claim of background indexing across every session. Administrator-controlled sharing is default-off, limits time/count/size, requires joined-only source history and an encrypted two-person target with no additional invitations, previews canonical text and revalidates before publication. It rotates the target outbound key, sends ciphertext only, and records requested/completed audit messages in the source group. Secure account-scoped metadata and per-step transaction IDs survive restarts; unknown sends are reconciled without retransmitting. Known pre-publication failures remain retryable. Plain text only; quote/relation, payment, attachment, redacted and ephemeral events are rejected.
+- Verification: mocked protocol tests cover send/audit order, policy/role/account invalidation, extra invitees, storage and encryption failures, 10,000-event scans, empty pages, missing markers, crash recovery and timeout reconciliation; widget tests require canonical preview before confirmation. No real Matrix room was contacted by these tests.
+- Next step: device/controlled homeserver acceptance is explicitly skipped at the user's request for this round. Validate delivery, revocation and audit visibility before production claims. P2 group Status remains a separate backlog item from the weekly research; this follow-up closes the prior response's unread/history code gaps.
+
+### CATCHUP-002 Signed-system and empirical acceptance remain unverified
+
+- Severity: M
+- Updated: 2026-10-30 follow-up
+- Implemented: Apple Suggested Actions is verified against the installed iOS 27.1 SDK and Apple's official API/entitlement documentation. The host registers an iOS 27+ SwiftUI platform view and adds the entitlement. Chat first requests user confirmation, passes only the chosen non-ephemeral text, timestamp, event ID and sender-is-user flag, and never supplies wallet methods or preceding history. Unsupported hosts/platforms retain the local explicit-time calendar rule. Native editor creation is separate from saving an event. Android natural-language Reminder/Maps parity remains a later extension; its existing explicit-time calendar fallback is preserved. Sync phases and account action capture now use SDK-neutral domain contracts, reducing direct presentation SDK imports from 13 to 9; remaining protocol-specific pages have not been rewritten.
+- Verification boundary: native Swift typechecking and automated privacy/confirmation tests are code-level evidence. Device acceptance is skipped by explicit user instruction; no signing/profile acceptance, production release, user accuracy experiment, three-device recovery/revocation test, server log audit or live transfer was performed. Evidence-template metrics stay null. New UI strings have English and Simplified/Traditional Chinese coverage; other locales retain English fallback.
+- Next step: validate the new entitlement with distribution signing, run authorized system-action/user studies and finish remaining translations before claiming full release acceptance.
+
+### CATCHUP-003 Chat core screenshot baselines — resolved
+
+- Resolved: 2026-10-30 follow-up.
+- The untouched baseline reproduced 4 light-theme and 6 dark-theme changed pixels. ImageIO comparison found maximum channel deltas of 2/3, confined to antialiasing at icon edges. Baselines were regenerated with Flutter 3.47.5 and strict comparisons pass; no tolerance was added. See follow-up verification records.
