@@ -29,3 +29,5 @@
 - 旧截图基线的数值比较与最终严格 golden 测试均记录于附件。没有放宽截图容差。
 
 日志位于 `follow-up/`，其中 full-tests 是最终全量结果；changed-analyze 为定向分析。宿主原生编译、集成回归与最终 pin 记录在宿主 `docs/testing/chat-catch-up-follow-up-2026-10-30.md`。
+
+宿主补充：完整 iOS 模拟器构建成功，SuggestedActions 在产物中为 `LC_LOAD_WEAK_DYLIB`，最低部署版本 16.0。现有 MLImage 配置让宿主仅输出 x86_64，而安装的运行时均为 arm64，故 iOS 27.1 安装/启动探针未通过；没有改动 OCR 依赖，也没有宣称原生建议运行验收成功。
