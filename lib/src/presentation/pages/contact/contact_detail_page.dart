@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import '../../../core/di/injection.dart';
 import '../../../core/services/contact_call_service.dart';
 import '../../../domain/repositories/contact_repository.dart';
@@ -70,6 +71,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   bool _isStarred = false;
   bool _isFriend = false;
   bool _isAddingFriend = false;
+  bool _requestConfirmationOpen = false;
   bool _requestSent = false;
   bool _loadingRelationship = false;
   bool _relationshipFailed = false;
@@ -146,8 +148,9 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       final service =
           widget.callService ??
           ContactCallService(getIt<IContactRepository>(), () async {
-            if (N42Chat.callManager?.isInitialized != true)
+            if (N42Chat.callManager?.isInitialized != true) {
               await N42Chat.initializeCallManager();
+            }
             return N42Chat.callManager;
           });
       final started = await service.start(
@@ -158,10 +161,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       );
       if (!started) throw StateError('Call was not started');
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.of(context)?.callFailed ?? 'Call failed')),
         );
+      }
     } finally {
       _startingCall = false;
     }
@@ -201,8 +205,9 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
   }
 
   Future<void> _loadStandaloneRelationship() async {
-    if (_loadingRelationship || !getIt.isRegistered<IContactRepository>())
+    if (_loadingRelationship || !getIt.isRegistered<IContactRepository>()) {
       return;
+    }
     setState(() {
       _loadingRelationship = true;
       _relationshipFailed = false;
@@ -410,9 +415,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               children: [
                 _buildMenuItem(
                   title: S.of(context)?.contactFriendInfo ?? 'Friend Info',
-                  subtitle:
-                      S.of(context)?.contactFriendInfoDesc ??
-                      'Add friend\'s remark, phone, tags, notes, photos and set permissions.',
+                  subtitle: S.of(context)?.contactFriendInfoDesc ?? 'Add friend\'s remark, phone, tags, notes, photos and set permissions.',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _openFriendInfo(),
@@ -708,9 +711,8 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
               child: Text(
                 l10n.contactRequestHint,
                 textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: context.textSecondary),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: context.textSecondary),
               ),
             ),
         ],
@@ -720,12 +722,32 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
 
   /// 添加好友
   Future<void> _addFriend() async {
-    if (_isAddingFriend || _requestSent) return;
-    setState(() {
-      _isAddingFriend = true;
-    });
+    if (_isAddingFriend || _requestSent || _requestConfirmationOpen) return;
+    _requestConfirmationOpen = true;
 
     try {
+      final l10n = S.of(context)!;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n.contactAddToContacts),
+          content: Text(
+            '${widget.displayName}\n${widget.userId}\n\n${l10n.contactRequestHint}',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.commonCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.commonSend),
+            ),
+          ],
+        ),
+      );
+      if (!mounted || confirmed != true) return;
+      setState(() => _isAddingFriend = true);
       final repository = getIt<IContactRepository>();
       await repository.startDirectChat(widget.userId);
       final contact = await repository.getContactById(widget.userId);
@@ -765,6 +787,7 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         );
       }
     } finally {
+      _requestConfirmationOpen = false;
       if (mounted) {
         setState(() {
           _isAddingFriend = false;

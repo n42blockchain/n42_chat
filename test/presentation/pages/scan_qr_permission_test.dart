@@ -1,3 +1,6 @@
+import 'package:n42_chat/src/domain/repositories/contact_repository.dart';
+import 'package:n42_chat/src/presentation/pages/contact/contact_detail_page.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -10,6 +13,8 @@ import 'package:n42_chat/src/presentation/pages/qrcode/scan_qr_page.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/integration/wallet_bridge.dart';
+
+class _Contacts extends Mock implements IContactRepository {}
 
 class _ExactWallet extends Mock
     implements IWalletBridge, IExactWalletTransfer {}
@@ -213,6 +218,27 @@ void main() {
     await tester.pump();
   }
 
+  testWidgets(
+    'scanning a user opens identity preview without creating a friend request',
+    (tester) async {
+      final contacts = _Contacts();
+      when(() => contacts.getContactById(any())).thenAnswer((_) async => null);
+      when(() => contacts.getPendingFriendRequests())
+          .thenAnswer((_) async => []);
+      getIt.registerSingleton<IContactRepository>(contacts);
+      addTearDown(() async => getIt.unregister<IContactRepository>());
+      await scanGallery(tester, 'https://matrix.to/#/@alice:example.org');
+      await tester.pumpAndSettle();
+      expect(find.byType(ContactDetailPage), findsOneWidget);
+      expect(
+        tester.widget<ContactDetailPage>(find.byType(ContactDetailPage)).userId,
+        '@alice:example.org',
+      );
+      verifyNever(() => contacts.startDirectChat(any()));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('v1 gallery QR confirms selected exact asset before transfer', (
     tester,
   ) async {
@@ -221,15 +247,13 @@ void main() {
     camera.capture = const BarcodeCapture(
       barcodes: [
         Barcode(
-          rawValue:
-              'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1.250000',
+          rawValue: 'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1.250000',
         ),
       ],
     );
     final wallet = _ExactWallet();
-    when(
-      () => wallet.getSupportedTokens(),
-    ).thenAnswer((_) async => [_exactAsset]);
+    when(() => wallet.getSupportedTokens())
+        .thenAnswer((_) async => [_exactAsset]);
     when(
       () => wallet.requestTransferExact(
         toAddress: any(named: 'toAddress'),
@@ -276,20 +300,17 @@ void main() {
   for (final scenario in [
     (
       name: 'wrong network',
-      uri:
-          'n42pay://v1/pay?chain=ETH&network=testnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1',
+      uri: 'n42pay://v1/pay?chain=ETH&network=testnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1',
       assets: const [_exactAsset],
     ),
     (
       name: 'duplicate identity',
-      uri:
-          'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1',
+      uri: 'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1',
       assets: const [_exactAsset, _exactAsset],
     ),
     (
       name: 'excess precision',
-      uri:
-          'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1.0000001',
+      uri: 'n42pay://v1/pay?chain=ETH&network=mainnet&type=token&to=0xrecipient&contract=0xabcdef0123456789abcdef0123456789abcdef01&amount=1.0000001',
       assets: const [_exactAsset],
     ),
   ]) {
@@ -302,9 +323,8 @@ void main() {
         barcodes: [Barcode(rawValue: scenario.uri)],
       );
       final wallet = _ExactWallet();
-      when(
-        () => wallet.getSupportedTokens(),
-      ).thenAnswer((_) async => scenario.assets);
+      when(() => wallet.getSupportedTokens())
+          .thenAnswer((_) async => scenario.assets);
       getIt.registerSingleton<IWalletBridge>(wallet);
       await open(tester);
       await tester.pumpAndSettle();
@@ -331,9 +351,8 @@ void main() {
     tester,
   ) async {
     final wallet = _ExactWallet();
-    when(
-      () => wallet.getSupportedTokens(),
-    ).thenAnswer((_) async => const [_exactAsset, _otherAsset]);
+    when(() => wallet.getSupportedTokens())
+        .thenAnswer((_) async => const [_exactAsset, _otherAsset]);
     when(
       () => wallet.requestTransferExact(
         toAddress: any(named: 'toAddress'),
@@ -400,9 +419,8 @@ void main() {
     tester,
   ) async {
     final wallet = _ExactWallet();
-    when(
-      () => wallet.getSupportedTokens(),
-    ).thenAnswer((_) async => const [_noReceiverAsset]);
+    when(() => wallet.getSupportedTokens())
+        .thenAnswer((_) async => const [_noReceiverAsset]);
     getIt.registerSingleton<IWalletBridge>(wallet);
     await scanGallery(
       tester,
@@ -491,9 +509,8 @@ void main() {
     tester,
   ) async {
     final wallet = _ExactWallet();
-    when(
-      () => wallet.getSupportedTokens(),
-    ).thenAnswer((_) async => const [_exactAsset, _exactAsset]);
+    when(() => wallet.getSupportedTokens())
+        .thenAnswer((_) async => const [_exactAsset, _exactAsset]);
     getIt.registerSingleton<IWalletBridge>(wallet);
     await scanGallery(
       tester,
@@ -507,9 +524,8 @@ void main() {
     tester,
   ) async {
     final wallet = _ExactWallet();
-    when(
-      () => wallet.getSupportedTokens(),
-    ).thenAnswer((_) async => const [_exactAsset, _collisionAsset]);
+    when(() => wallet.getSupportedTokens())
+        .thenAnswer((_) async => const [_exactAsset, _collisionAsset]);
     getIt.registerSingleton<IWalletBridge>(wallet);
     await scanGallery(
       tester,
