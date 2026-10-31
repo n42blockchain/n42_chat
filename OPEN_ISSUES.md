@@ -281,6 +281,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-009 TestFlight registration, friendship and historical-key acceptance
 
+- 2026-10-31 friend-scan follow-up: scanning a Matrix user now opens the identity/relationship preview without creating a room or invitation. Adding an unknown contact requires an explicit localized request confirmation; canceling sends nothing. The standalone scanner/profile widget suites pass 38 tests, including scan-without-request, cancellation and exactly one confirmed request. Real iOS/Android two-account scan, invitation delivery and accept/reject acceptance remain unverified; the user deferred physical-device acceptance. Verify these paths on the updated host Chat pin before closing QA-009.
+
 - September 20 feedback: build 2692 was confirmed; the actual workflow is explicit logout/relogin, not retained-session switching. A read-only device-key check found xian07 had one published device and xian01 had none. Missing recipient keys now have a specific actionable error, without bypassing verification or sending plaintext. Conversation previews synchronously retry available keys, refresh on key events and invalidate room caches across account identity changes. The extended live SDK test passed preview agreement, retained-device bidirectional messages/history/restart and missing-peer-key rejection after logout. A second live run also confirmed a fresh device after explicit logout/relogin receives a newly encrypted peer message without restoring old keys; both disposable accounts were deactivated in each run. Feedback-phone/native acceptance remains open; old overwritten keys are not reconstructed.
 
 

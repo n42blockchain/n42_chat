@@ -59,15 +59,12 @@ void main() {
     when(() => mockContactBloc.state).thenReturn(
       const ContactState(status: ContactStatus.loaded, contacts: [contact]),
     );
-    when(
-      () => mockContactBloc.stream,
-    ).thenAnswer((_) => contactStateController.stream);
-    when(
-      () => mockPreferencesDataSource.setContactRemark(any(), any()),
-    ).thenAnswer((_) async {});
-    when(
-      () => mockPreferencesDataSource.getContactRemarks(),
-    ).thenAnswer((_) async => <String, String>{});
+    when(() => mockContactBloc.stream)
+        .thenAnswer((_) => contactStateController.stream);
+    when(() => mockPreferencesDataSource.setContactRemark(any(), any()))
+        .thenAnswer((_) async {});
+    when(() => mockPreferencesDataSource.getContactRemarks())
+        .thenAnswer((_) async => <String, String>{});
 
     if (getIt.isRegistered<PreferencesDataSource>()) {
       getIt.unregister<PreferencesDataSource>();
@@ -87,9 +84,8 @@ void main() {
     'shared card resolves existing friendship before contacts hydrate',
     (tester) async {
       final repository = MockContactRepository();
-      when(
-        () => repository.getContactById(userId),
-      ).thenAnswer((_) async => contact);
+      when(() => repository.getContactById(userId))
+          .thenAnswer((_) async => contact);
       when(() => mockContactBloc.state).thenReturn(const ContactState());
       getIt.registerSingleton<IContactRepository>(repository);
       addTearDown(() async {
@@ -117,12 +113,10 @@ void main() {
       (tester) async {
         final repository = MockContactRepository();
         final lookup = Completer<ContactEntity?>();
-        when(
-          () => repository.getContactById(userId),
-        ).thenAnswer((_) => lookup.future);
-        when(
-          () => repository.getPendingFriendRequests(),
-        ).thenAnswer((_) async => []);
+        when(() => repository.getContactById(userId))
+            .thenAnswer((_) => lookup.future);
+        when(() => repository.getPendingFriendRequests())
+            .thenAnswer((_) async => []);
         when(() => mockContactBloc.state).thenReturn(const ContactState());
         getIt.registerSingleton<IContactRepository>(repository);
         addTearDown(() async => getIt.unregister<IContactRepository>());
@@ -164,12 +158,47 @@ void main() {
   }
 
   testWidgets(
+    'friend request requires explicit send and cancellation makes no request',
+    (tester) async {
+      final repository = MockContactRepository();
+      when(() => repository.getContactById(userId))
+          .thenAnswer((_) async => null);
+      when(() => repository.getPendingFriendRequests())
+          .thenAnswer((_) async => []);
+      when(() => repository.startDirectChat(userId))
+          .thenAnswer((_) async => '!request:server.com');
+      getIt.registerSingleton<IContactRepository>(repository);
+      addTearDown(() async => getIt.unregister<IContactRepository>());
+      await tester.pumpWidget(
+        _buildTestWidget(
+          const ContactDetailPage(userId: userId, displayName: 'Alice'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final action = find.byKey(const ValueKey('contact_relationship_action'));
+      await tester.ensureVisible(action);
+      await tester.tap(action);
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+      verifyNever(() => repository.startDirectChat(any()));
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      verifyNever(() => repository.startDirectChat(any()));
+      await tester.tap(action);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Send'));
+      await tester.pumpAndSettle();
+      verify(() => repository.startDirectChat(userId)).called(1);
+      expect(find.text('Request sent'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'standalone relationship failure offers retry and resolves existing friend',
     (tester) async {
       final repository = MockContactRepository();
-      when(
-        () => repository.getContactById(userId),
-      ).thenThrow(StateError('offline'));
+      when(() => repository.getContactById(userId))
+          .thenThrow(StateError('offline'));
       getIt.registerSingleton<IContactRepository>(repository);
       addTearDown(() async {
         await getIt.unregister<IContactRepository>();
@@ -183,9 +212,8 @@ void main() {
       final action = find.byKey(const ValueKey('contact_relationship_action'));
       await tester.ensureVisible(action);
       expect(find.text('Retry'), findsOneWidget);
-      when(
-        () => repository.getContactById(userId),
-      ).thenAnswer((_) async => contact);
+      when(() => repository.getContactById(userId))
+          .thenAnswer((_) async => contact);
       await tester.tap(action);
       await tester.pumpAndSettle();
       expect(action, findsNothing);
@@ -289,9 +317,8 @@ void main() {
     testWidgets('known friend keeps message actions during $status', (
       tester,
     ) async {
-      when(
-        () => mockContactBloc.state,
-      ).thenReturn(ContactState(status: status, contacts: [contact]));
+      when(() => mockContactBloc.state)
+          .thenReturn(ContactState(status: status, contacts: [contact]));
       await tester.pumpWidget(
         _buildTestWidget(
           const ContactDetailPage(userId: userId, displayName: 'Alice'),
