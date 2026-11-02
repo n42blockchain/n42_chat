@@ -426,6 +426,14 @@ class MatrixClientManager {
     }
   }
 
+  /// Throws unless [uri] is HTTPS or a loopback/emulator development host.
+  static void _requireTransportSecurity(Uri uri) {
+    if (uri.scheme == 'https') return;
+    const devHosts = {'localhost', '127.0.0.1', '::1', '10.0.2.2'};
+    if (uri.scheme == 'http' && devHosts.contains(uri.host)) return;
+    throw StateError('Refusing to log in over an insecure homeserver URL');
+  }
+
   Future<LoginResponse> _loginWithPassword({
     required String homeserver,
     required String username,
@@ -438,6 +446,9 @@ class MatrixClientManager {
       // 设置homeserver（6.0 返回 record tuple，这里只需确认连接成功）
       final homeserverUri = Uri.parse(homeserver);
       final (_, _, _, _) = await _client!.checkHomeserver(homeserverUri);
+      // Refuse to send the password over cleartext HTTP to a remote host,
+      // including when .well-known discovery downgraded the base URL.
+      _requireTransportSecurity(_client!.homeserver ?? homeserverUri);
 
       // 检测是否为邮箱格式（包含 @ 且 @ 后有域名部分）
       final isEmail =
