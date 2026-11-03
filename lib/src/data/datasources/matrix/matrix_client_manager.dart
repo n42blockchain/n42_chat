@@ -427,7 +427,7 @@ class MatrixClientManager {
   }
 
   /// Throws unless [uri] is HTTPS or a loopback/emulator development host.
-  static void _requireTransportSecurity(Uri uri) {
+  static void requireTransportSecurity(Uri uri) {
     if (uri.scheme == 'https') return;
     const devHosts = {'localhost', '127.0.0.1', '::1', '10.0.2.2'};
     if (uri.scheme == 'http' && devHosts.contains(uri.host)) return;
@@ -448,7 +448,7 @@ class MatrixClientManager {
       final (_, _, _, _) = await _client!.checkHomeserver(homeserverUri);
       // Refuse to send the password over cleartext HTTP to a remote host,
       // including when .well-known discovery downgraded the base URL.
-      _requireTransportSecurity(_client!.homeserver ?? homeserverUri);
+      requireTransportSecurity(_client!.homeserver ?? homeserverUri);
 
       // 检测是否为邮箱格式（包含 @ 且 @ 后有域名部分）
       final isEmail =
