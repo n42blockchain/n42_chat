@@ -277,6 +277,21 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: the deployed Hub reports Matrix provisioning disabled, so positive Hub-to-Matrix login cannot yet establish a chat session. The hardened client now permits legacy fallback only when Hub challenge creation fails before signing. Cancellation or any failure after a Hub challenge is signed stops with one clear error and never asks for a second signature. The Hub server code also rejects Chat challenge creation with `matrix-unavailable` before signing when provisioning is disabled.
 - Next step: configure the production Hub with the Synapse shared-registration secret and Matrix password secret, deploy it, then run the positive Hub-to-Matrix login on a real device.
 
+### BUILD-001 Non-ASCII pubspec text breaks Git resolution on Chinese-locale Windows
+
+- Severity: M
+- Added: 2026-11-02
+- Evidence: in a host that depends on Chat by Git ref, `flutter pub get` and `flutter pub outdated` on Windows with code page 936 report `Expected n42_chat version 0.1.0 at commit ..., found 0.0.0.` Pub decodes `git show <rev>:pubspec.yaml` with the system code page; a UTF-8 lead byte at the end of a Chinese line consumes the following newline, so `version:` and several dependencies (for example `google_mlkit_face_detection`, `pinput`, `quick_actions`) are swallowed into the preceding scalar or comment. Linux, macOS and local path dependencies read the file as UTF-8 and are not affected.
+- Current state: hosts on that Windows setup cannot resolve the Chat Git dependency. Replacing the bytes of non-ASCII `git show` output (local verification only) makes the host lockfile resolve unchanged.
+- Next step: keep `pubspec.yaml` ASCII-only (English description and comments), then let hosts pick it up with their next reviewed Chat pin.
+
+### DEPS-001 `flutter_edge_ai` deprecates `createModel` ahead of removal
+
+- Severity: L
+- Added: 2026-11-02
+- Current state: after the in-constraint upgrade to `flutter_edge_ai` 2.5.5, analysis reports `createModel` as deprecated and removed in 2.6.0, which the `^2.0.0` constraint would allow.
+- Next step: switch `LocalLlmService` to `FlutterEdgeAi.getActiveModel()` or cap the constraint below 2.6.0 before the next upgrade.
+
 ## Verification Gaps
 
 ### QA-009 TestFlight registration, friendship and historical-key acceptance
