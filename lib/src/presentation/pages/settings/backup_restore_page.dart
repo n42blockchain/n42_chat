@@ -205,6 +205,7 @@ class _BackupSectionState extends State<_BackupSection> {
                             password: _usePassword
                                 ? _passwordController.text
                                 : null,
+                            allowPlaintext: !_usePassword,
                           ),
                         );
                       },

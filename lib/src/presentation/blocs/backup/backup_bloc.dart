@@ -50,6 +50,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
         includeMedia: event.includeMedia,
         includeKeys: event.includeKeys,
         password: event.password,
+        allowPlaintext: event.allowPlaintext,
         onProgress: (progress) {
           // BLoC 不能在回调中 emit，进度通过日志跟踪
           debugLog('Backup progress: ${(progress * 100).toInt()}%');

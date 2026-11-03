@@ -85,7 +85,7 @@ void main() {
           'images': true,
         });
 
-        final result = await service.createBackup(includeKeys: true);
+        final result = await service.createBackup(includeKeys: true, allowPlaintext: true);
         final file = File(result.filePath);
         final data =
             jsonDecode(await file.readAsString()) as Map<String, dynamic>;
@@ -114,7 +114,7 @@ void main() {
       'verifyBackup rejects tampered backups when checksum no longer matches',
       () async {
         final service = buildService();
-        final result = await service.createBackup();
+        final result = await service.createBackup(allowPlaintext: true);
         final file = File(result.filePath);
         final data =
             jsonDecode(await file.readAsString()) as Map<String, dynamic>;

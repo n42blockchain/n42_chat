@@ -216,14 +216,26 @@ class ChatBackupService {
     return backupDir;
   }
 
+  /// Plaintext backups hold message history (and keys when requested), so
+  /// writing one must be an explicit choice by the caller.
+  static void _requirePasswordOrOptIn(String? password, bool allowPlaintext) {
+    if ((password == null || password.isEmpty) && !allowPlaintext) {
+      throw StateError(
+        'Refusing to write an unencrypted backup without allowPlaintext',
+      );
+    }
+  }
+
   /// 创建备份
   Future<BackupResult> createBackup({
     List<String>? roomIds,
     bool includeMedia = false,
     bool includeKeys = false,
     String? password,
+    bool allowPlaintext = false,
     void Function(double progress)? onProgress,
   }) async {
+    _requirePasswordOrOptIn(password, allowPlaintext);
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
@@ -452,8 +464,10 @@ class ChatBackupService {
   Future<BackupResult> createIncrementalBackup({
     List<String>? roomIds,
     String? password,
+    bool allowPlaintext = false,
     void Function(double progress)? onProgress,
   }) async {
+    _requirePasswordOrOptIn(password, allowPlaintext);
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();

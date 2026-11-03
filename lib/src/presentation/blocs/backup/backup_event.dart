@@ -19,16 +19,19 @@ class CreateBackup extends BackupEvent {
   final bool includeMedia;
   final bool includeKeys;
   final String? password;
+  final bool allowPlaintext;
 
   const CreateBackup({
     this.roomIds,
     this.includeMedia = false,
     this.includeKeys = false,
     this.password,
+    this.allowPlaintext = false,
   });
 
   @override
-  List<Object?> get props => [roomIds, includeMedia, includeKeys, password];
+  List<Object?> get props =>
+      [roomIds, includeMedia, includeKeys, password, allowPlaintext];
 }
 
 /// 删除备份

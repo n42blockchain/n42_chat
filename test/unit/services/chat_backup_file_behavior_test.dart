@@ -56,8 +56,8 @@ void main() {
       '${incremental ? 'incremental' : 'full'} consecutive backups preserve both files',
       () async {
         Future<BackupResult> create() => incremental
-            ? service.createIncrementalBackup()
-            : service.createBackup();
+            ? service.createIncrementalBackup(allowPlaintext: true)
+            : service.createBackup(allowPlaintext: true);
         final first = await create();
         final originalBytes = await File(first.filePath).readAsBytes();
         final second = await create();
@@ -75,7 +75,10 @@ void main() {
     'full backup progress finishes only after a verifiable file exists',
     () async {
       final progress = <double>[];
-      final result = await service.createBackup(onProgress: progress.add);
+      final result = await service.createBackup(
+        allowPlaintext: true,
+        onProgress: progress.add,
+      );
       expect(progress, [0.1, 0.85, 1.0]);
       expect(result.messageCount, 0);
       expect(result.roomCount, 0);
