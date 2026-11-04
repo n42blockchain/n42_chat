@@ -1947,70 +1947,63 @@ class SZh extends S {
   String get settingsSecurityTitle => '安全';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => '删除账户';
 
   @override
-  String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+  String get settingsDeleteAccountSubtitle => '停用此 Matrix 账户并清理其本地聊天数据';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      '此操作会请求永久停用 Matrix 账户。服务器确认后，本应用会在安全的情况下移除此账户的本地聊天会话和加密密钥。其他账户及钱包将保留。联邦网络和服务器保留规则可能限制数据擦除。';
 
   @override
-  String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+  String get settingsDeleteAccountPasswordOptional => 'Matrix 密码（如有要求）';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase => '请求擦除服务器数据';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      '请求此主服务器在支持的情况下擦除账户数据。其他服务器持有的副本或按保留规则保存的数据可能仍然存在。';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage => '验证此 Matrix 账户';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => '使用 Matrix 密码';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => '在浏览器中继续';
 
   @override
-  String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+  String get settingsDeleteAccountFallbackTitle => '从 Matrix 验证返回';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      '从浏览器返回不代表删除已确认。请向 Matrix 服务器核对此次原始请求。';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => '向服务器核对';
 
   @override
-  String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+  String get settingsDeleteAccountRequestFailed => 'Matrix 服务器未确认账户删除。';
 
   @override
-  String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+  String get settingsDeleteAccountPendingTitle => '本地账户数据待清理';
 
   @override
-  String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+  String get settingsDeleteAccountPendingSubtitle => '查看先前已停用 Matrix 账户的清理情况';
 
   @override
-  String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+  String get settingsDeleteAccountPendingReadError => '无法读取待清理记录。点击重试。';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Matrix 账户已停用，但本地数据仍待清理。其他账户仍可使用。';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      '已在浏览器中打开账户管理。本应用尚未确认删除，因此聊天会话仍可使用。';
 
   @override
   String get settingsKeyBackup => '密鑰備份';
@@ -2866,7 +2859,7 @@ class SZh extends S {
   String get qrcodeCameraPermissionRestricted => '此設備上的相機訪問受限';
 
   @override
-  String get authPasskeyLabel => 'Passkey';
+  String get authPasskeyLabel => '通行密钥';
 
   @override
   String get authGoogleLabel => 'Google';
@@ -2875,7 +2868,7 @@ class SZh extends S {
   String get authAppleLabel => 'Apple';
 
   @override
-  String get authSsoLabel => 'SSO';
+  String get authSsoLabel => '单点登录';
 
   @override
   String get authSsoNotConfigured => '该服务器未配置SSO登录提供商';
@@ -4179,7 +4172,7 @@ class SZh extends S {
   String get tokenGateMinBalance => '最低餘額';
 
   @override
-  String get tokenGateTokenId => 'Token ID (ERC-1155)';
+  String get tokenGateTokenId => '代币 ID（ERC-1155）';
 
   @override
   String get tokenGateChainId => '鏈 ID';
@@ -4898,25 +4891,22 @@ class SZh extends S {
   String get reportSelectReason => '請選擇投訴原因';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => '登录后即可举报。';
 
   @override
-  String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+  String get reportAccountChanged => '账户已切换。请重新打开此举报页面后发送。';
 
   @override
-  String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+  String get reportUnsupported => '此主服务器不支持举报用户。';
 
   @override
-  String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+  String get reportRoomUnsupported => '此主服务器不支持举报房间。';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => '举报过于频繁，请稍后重试。';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend => '无法发送举报，请重试。';
 
   @override
   String get gameCenter => '遊戲中心';
@@ -5534,7 +5524,7 @@ class SZh extends S {
   String get nftPickerContract => '合約地址';
 
   @override
-  String get nftPickerTokenId => 'Token ID';
+  String get nftPickerTokenId => '代币 ID';
 
   @override
   String get nftPickerVerifyOwnership => '驗證所有權並預覽';
@@ -7954,6 +7944,65 @@ class SZhTw extends SZh {
   String get settingsSecurityTitle => '安全';
 
   @override
+  String get settingsDeleteAccountTitle => '刪除帳戶';
+
+  @override
+  String get settingsDeleteAccountSubtitle => '停用此 Matrix 帳戶並清理其本機聊天資料';
+
+  @override
+  String get settingsDeleteAccountExplanation =>
+      '此操作會要求永久停用 Matrix 帳戶。伺服器確認後，本應用程式會在安全的情況下移除此帳戶的本機聊天工作階段與加密金鑰。其他帳戶及錢包將保留。聯邦網路與伺服器保留規則可能限制資料清除。';
+
+  @override
+  String get settingsDeleteAccountPasswordOptional => 'Matrix 密碼（如有要求）';
+
+  @override
+  String get settingsDeleteAccountServerErase => '要求清除伺服器資料';
+
+  @override
+  String get settingsDeleteAccountServerEraseDetail =>
+      '要求此主伺服器在支援的情況下清除帳戶資料。其他伺服器持有的副本或依保留規則儲存的資料可能仍然存在。';
+
+  @override
+  String get settingsDeleteAccountChooseStage => '驗證此 Matrix 帳戶';
+
+  @override
+  String get settingsDeleteAccountUsePassword => '使用 Matrix 密碼';
+
+  @override
+  String get settingsDeleteAccountUseBrowser => '在瀏覽器中繼續';
+
+  @override
+  String get settingsDeleteAccountFallbackTitle => '從 Matrix 驗證返回';
+
+  @override
+  String get settingsDeleteAccountFallbackExplanation =>
+      '從瀏覽器返回不代表刪除已確認。請向 Matrix 伺服器核對此次原始要求。';
+
+  @override
+  String get settingsDeleteAccountCheckServer => '向伺服器核對';
+
+  @override
+  String get settingsDeleteAccountRequestFailed => 'Matrix 伺服器未確認帳戶刪除。';
+
+  @override
+  String get settingsDeleteAccountPendingTitle => '本機帳戶資料待清理';
+
+  @override
+  String get settingsDeleteAccountPendingSubtitle => '查看先前已停用 Matrix 帳戶的清理情況';
+
+  @override
+  String get settingsDeleteAccountPendingReadError => '無法讀取待清理紀錄。點一下重試。';
+
+  @override
+  String get settingsDeleteAccountPendingDetail =>
+      'Matrix 帳戶已停用，但本機資料仍待清理。其他帳戶仍可使用。';
+
+  @override
+  String get settingsDeleteAccountManagementNotConfirmed =>
+      '已在瀏覽器中開啟帳戶管理。本應用程式尚未確認刪除，因此聊天工作階段仍可使用。';
+
+  @override
   String get settingsKeyBackup => '密鑰備份';
 
   @override
@@ -8807,7 +8856,7 @@ class SZhTw extends SZh {
   String get qrcodeCameraPermissionRestricted => '此設備上的相機訪問受限';
 
   @override
-  String get authPasskeyLabel => 'Passkey';
+  String get authPasskeyLabel => '通行金鑰';
 
   @override
   String get authGoogleLabel => 'Google';
@@ -8816,7 +8865,7 @@ class SZhTw extends SZh {
   String get authAppleLabel => 'Apple';
 
   @override
-  String get authSsoLabel => 'SSO';
+  String get authSsoLabel => '單一登入';
 
   @override
   String get authSsoNotConfigured => '該服務器未配置SSO登錄提供商';
@@ -10120,7 +10169,7 @@ class SZhTw extends SZh {
   String get tokenGateMinBalance => '最低餘額';
 
   @override
-  String get tokenGateTokenId => 'Token ID (ERC-1155)';
+  String get tokenGateTokenId => '代幣 ID（ERC-1155）';
 
   @override
   String get tokenGateChainId => '鏈 ID';
@@ -10839,6 +10888,24 @@ class SZhTw extends SZh {
   String get reportSelectReason => '請選擇投訴原因';
 
   @override
+  String get reportUnavailable => '登入後即可檢舉。';
+
+  @override
+  String get reportAccountChanged => '帳戶已切換。請重新開啟此檢舉頁面後傳送。';
+
+  @override
+  String get reportUnsupported => '此主伺服器不支援檢舉使用者。';
+
+  @override
+  String get reportRoomUnsupported => '此主伺服器不支援檢舉聊天室。';
+
+  @override
+  String get reportRateLimited => '檢舉過於頻繁，請稍後重試。';
+
+  @override
+  String get reportCouldNotSend => '無法傳送檢舉，請重試。';
+
+  @override
   String get gameCenter => '遊戲中心';
 
   @override
@@ -11454,7 +11521,7 @@ class SZhTw extends SZh {
   String get nftPickerContract => '合約地址';
 
   @override
-  String get nftPickerTokenId => 'Token ID';
+  String get nftPickerTokenId => '代幣 ID';
 
   @override
   String get nftPickerVerifyOwnership => '驗證所有權並預覽';

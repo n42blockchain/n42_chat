@@ -1929,7 +1929,7 @@ class SPl extends S {
       'Wiecej stylow wkrotce dostepnych';
 
   @override
-  String get profileBio => 'Bio';
+  String get profileBio => 'O mnie';
 
   @override
   String get profileHomeServer => 'Serwer';
@@ -2003,70 +2003,70 @@ class SPl extends S {
   String get settingsSecurityTitle => 'Bezpieczenstwo';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'Usuń konto';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'Dezaktywuj to konto Matrix i usuń jego lokalne dane czatu';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Ta operacja żąda trwałej dezaktywacji konta Matrix. Po potwierdzeniu przez serwer aplikacja usunie lokalną sesję czatu i klucze szyfrowania tego konta, gdy będzie to bezpieczne. Inne konta i portfel pozostaną zachowane. Federacja i zasady przechowywania danych na serwerze mogą ograniczać ich usunięcie.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'Hasło Matrix, jeśli jest wymagane';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase =>
+      'Poproś o usunięcie danych z serwera';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'Poproś ten serwer macierzysty o usunięcie danych konta, jeśli jest to obsługiwane. Kopie na innych serwerach lub wymagane zasadami przechowywania mogą pozostać.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage => 'Zweryfikuj to konto Matrix';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Użyj hasła Matrix';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'Kontynuuj w przeglądarce';
 
   @override
-  String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+  String get settingsDeleteAccountFallbackTitle => 'Wróć po weryfikacji Matrix';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'Powrót z przeglądarki nie potwierdza usunięcia. Sprawdź pierwotne żądanie na serwerze Matrix.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'Sprawdź na serwerze';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Serwer Matrix nie potwierdził usunięcia konta.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'Oczekujące lokalne czyszczenie konta';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'Sprawdź czyszczenie wcześniej dezaktywowanego konta Matrix';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'Nie można odczytać zapisów oczekującego czyszczenia. Dotknij, aby ponowić.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Konto Matrix zostało dezaktywowane, ale lokalne czyszczenie jeszcze trwa. Inne konta pozostają dostępne.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'Zarządzanie kontem otwarto w przeglądarce. Usunięcie nie zostało potwierdzone w aplikacji, więc sesja czatu pozostaje dostępna.';
 
   @override
   String get settingsKeyBackup => 'Kopia zapasowa kluczy';
@@ -5045,25 +5045,27 @@ class SPl extends S {
   String get reportSelectReason => 'Wybierz powód';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'Zaloguj się, aby wysłać zgłoszenie.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'Konto zostało zmienione. Otwórz zgłoszenie ponownie, aby je wysłać.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'Ten serwer macierzysty nie obsługuje zgłoszeń dotyczących użytkowników.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'Ten serwer macierzysty nie obsługuje zgłoszeń dotyczących pokoi.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited =>
+      'Zbyt wiele zgłoszeń. Spróbuj ponownie później.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend =>
+      'Nie udało się wysłać zgłoszenia. Spróbuj ponownie.';
 
   @override
   String get gameCenter => 'Gry';
@@ -5960,31 +5962,31 @@ class SPl extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'Bezpieczne połączenie nie jest gotowe. Wiadomości nie wysłano. Sprawdź połączenie i weryfikację urządzeń na obu kontach, a następnie spróbuj ponownie.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'Oczekiwanie na akceptację';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'Znajomość nie została potwierdzona. Przed wysłaniem sprawdź „Kontakty > Nowi znajomi”.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return 'Zdjęcia: $count';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Opublikuj film';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Rozpocznij transmisję';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Wybierz film';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'Transmisja na żywo jest niedostępna';
 
   @override
   String get qrcodeAlbum => 'Album';
@@ -5993,101 +5995,101 @@ class SPl extends S {
   String get settingsSwitchAccount => 'Przełącz konto';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'Nieprzeczytane';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'Brak rozmów dla tego filtra';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'Dodaj konto';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'Bieżące konto';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'Przełączanie konta…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'Nie można przełączyć konta. Spróbuj ponownie lub dodaj konto, aby zalogować się ponownie.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'Przełączaj konta tutaj, aby wiadomości i bezpieczne sesje każdego konta pozostały oddzielone.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'Nie ma jeszcze zapisanych kont';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'Prośba wysłana';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'Otrzymane prośby';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'Wysłane prośby';
 
   @override
   String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+      'Po zaakceptowaniu prośby możesz rozmawiać i dzwonić.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'Wróć do połączenia';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'Wysyłanie';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'Wysłano';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'Dostarczono';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'Przeczytano';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'Nie wysłano. Dotknij, aby ponowić.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'Wiadomość jest niedostępna na tym urządzeniu. Dotknij, aby sprawdzić opcje odzyskiwania.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'Znajomi oznaczeni gwiazdką';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'Ten znajomy nie ma dostępnej szyfrowanej sesji. Poproś go o zalogowanie i otwarcie aplikacji, a potem spróbuj ponownie. Przy zmianie konta używaj przełączania kont zamiast wylogowywania.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'Zmieniasz konto? Użyj przełączania kont, aby zachować wiadomości i bezpieczne sesje. Wylogowanie unieważnia dostęp tego urządzenia i może uniemożliwić odczyt przychodzących szyfrowanych wiadomości.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'Podsumowania AI są obecnie niedostępne. Spróbuj ponownie po przywróceniu dostępu do usługi.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'Podsumuj ostatnie wiadomości: $count';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return 'Dołączono: $joined · Zaproszono: $invited';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return 'Oczekujące prośby: $count';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'Wersja robocza';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'Indeks kontaktów';
 
   @override
   String get transferAssetUnavailable => 'Zasób płatniczy jest niedostępny';
@@ -6097,112 +6099,112 @@ class SPl extends S {
       'Żądanie płatności jest niedostępne';
 
   @override
-  String get chatCatchUp => 'Catch up';
+  String get chatCatchUp => 'Nadrób rozmowę';
 
   @override
-  String get chatCatchUpMentions => 'Mentions';
+  String get chatCatchUpMentions => 'Wzmianki';
 
   @override
-  String get chatCatchUpReplies => 'Replies to me';
+  String get chatCatchUpReplies => 'Odpowiedzi do mnie';
 
   @override
-  String get chatCatchUpPinned => 'Pinned messages';
+  String get chatCatchUpPinned => 'Przypięte wiadomości';
 
   @override
   String get chatCatchUpScope =>
-      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+      'Wzmianki i odpowiedzi są wyszukiwane w załadowanych wiadomościach, także przeczytanych. Załaduj starsze wiadomości, aby znaleźć wcześniejsze odpowiedzi.';
 
   @override
-  String get chatCatchUpLoadMore => 'Load older messages';
+  String get chatCatchUpLoadMore => 'Załaduj starsze wiadomości';
 
   @override
-  String get chatActionPreview => 'Review calendar suggestion';
+  String get chatActionPreview => 'Sprawdź propozycję kalendarza';
 
   @override
   String get chatActionPrivacy =>
-      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+      'Po potwierdzeniu do aplikacji kalendarza zostaną przekazane tylko poniższy tytuł i czas. Sprawdź strefę czasową. Twoje konto kalendarza może zsynchronizować to wydarzenie.';
 
   @override
-  String get chatActionTitle => 'Chat event';
+  String get chatActionTitle => 'Wydarzenie z czatu';
 
   @override
-  String get chatActionSuggestion => 'Calendar suggestion';
+  String get chatActionSuggestion => 'Propozycja kalendarza';
 
   @override
-  String get chatUnreadAttention => 'Unread mentions and replies';
+  String get chatUnreadAttention => 'Nieprzeczytane wzmianki i odpowiedzi';
 
   @override
-  String get chatScanAgain => 'Scan again';
+  String get chatScanAgain => 'Skanuj ponownie';
 
   @override
   String get chatUnreadScope =>
-      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+      'Przeszukuje historię serwera do Twojego znacznika odczytu. Otwórz rozmowę, aby ją przeczytać; odśwież, aby odbudować wyniki.';
 
   @override
   String get chatScanIncomplete =>
-      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+      'Niepełne dane: historia, odszyfrowanie lub znacznik odczytu są niedostępne. Spróbuj po synchronizacji.';
 
   @override
-  String get chatHistoryShare => 'Share selected history';
+  String get chatHistoryShare => 'Udostępnij wybraną historię';
 
   @override
   String get chatHistoryExplanation =>
-      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+      'Tylko dla administratorów. Wybierz zwykły tekst i istniejący szyfrowany czat bezpośredni z osobą, która dołączyła do grupy. Udostępnienie tworzy widoczne wiadomości audytu w grupie.';
 
   @override
-  String get chatHistoryEnable => 'Enable sharing';
+  String get chatHistoryEnable => 'Włącz udostępnianie';
 
   @override
-  String get chatHistoryDisable => 'Disable sharing';
+  String get chatHistoryDisable => 'Wyłącz udostępnianie';
 
   @override
-  String get chatHistoryPolicy => 'Group history sharing policy';
+  String get chatHistoryPolicy => 'Zasady udostępniania historii grupy';
 
   @override
   String get chatHistoryPolicyDetail =>
-      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+      'Tylko administratorzy mogą udostępniać historię. Włączenie ogranicza też widoczność historii grupy do zdarzeń po dołączeniu. Ustaw poniżej limity wiadomości tekstowych i potwierdź.';
 
   @override
-  String get chatHistoryPolicySaved => 'Policy saved';
+  String get chatHistoryPolicySaved => 'Zapisano zasady';
 
   @override
-  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+  String get chatHistoryRecipient => 'Szyfrowana rozmowa z odbiorcą';
 
   @override
-  String get chatHistoryReview => 'Review selected messages';
+  String get chatHistoryReview => 'Sprawdź wybrane wiadomości';
 
   @override
-  String get chatHistoryMessages => 'messages';
+  String get chatHistoryMessages => 'wiadomości';
 
   @override
   String get chatHistoryConfirmDetail =>
-      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+      'Przed udostępnieniem sprawdź odbiorcę, każdą wiadomość i jej czas. Nieudany lub nieznany wynik może oznaczać, że treść już wysłano: uzgodnij wynik przed kontynuowaniem.';
 
   @override
   String get chatHistoryCompleted =>
-      'Selected history sent and group audit confirmed';
+      'Wybraną historię wysłano i potwierdzono audyt w grupie';
 
   @override
   String get chatHistoryPending =>
-      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+      'Oczekiwanie: uzgodnij wynik, a następnie potwierdź ponownie, aby kontynuować. Wysyłki o nieznanym wyniku nigdy nie są ponawiane.';
 
   @override
-  String get chatHistoryReconcile => 'Reconcile send result';
+  String get chatHistoryReconcile => 'Uzgodnij wynik wysyłki';
 
   @override
   String get chatHistoryFailed =>
-      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+      'Nie można ukończyć. Sprawdź uprawnienia administratora, zasady grupy, szyfrowanie, członkostwo odbiorcy i wybór wiadomości. Jeśli rozpoczęto wysyłkę, uzgodnij jej wynik.';
 
   @override
-  String get chatDeviceActions => 'On-device actions';
+  String get chatDeviceActions => 'Działania na urządzeniu';
 
   @override
   String get chatDeviceActionsReview =>
-      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+      'Po potwierdzeniu tylko ta wiadomość jest przekazywana systemowym sugestiom działań na urządzeniu. Wybierz działanie, aby otworzyć Kalendarz, Przypomnienia lub Mapy.';
 
   @override
-  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+  String get chatHistoryMaxMessages => 'Limit wiadomości (1–50)';
 
   @override
-  String get chatHistoryMaxHours => 'History window in hours (1–720)';
+  String get chatHistoryMaxHours => 'Zakres historii w godzinach (1–720)';
 }

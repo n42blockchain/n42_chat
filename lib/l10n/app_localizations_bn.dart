@@ -1992,70 +1992,72 @@ class SBn extends S {
   String get settingsSecurityTitle => 'নিরাপত্তা';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'অ্যাকাউন্ট মুছুন';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'এই Matrix অ্যাকাউন্ট নিষ্ক্রিয় করুন এবং এর স্থানীয় চ্যাট ডেটা পরিষ্কার করুন';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'এটি Matrix অ্যাকাউন্ট স্থায়ীভাবে নিষ্ক্রিয় করার অনুরোধ করে। সার্ভারের নিশ্চিতকরণের পর, নিরাপদ হলে অ্যাপটি এই অ্যাকাউন্টের স্থানীয় চ্যাট সেশন ও এনক্রিপশন কী মুছে দেয়। অন্য অ্যাকাউন্ট ও আপনার ওয়ালেট রাখা হয়। ফেডারেশন ও সার্ভারের সংরক্ষণ নীতি ডেটা মুছে ফেলা সীমিত করতে পারে।';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'চাওয়া হলে Matrix পাসওয়ার্ড';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase =>
+      'সার্ভারের ডেটা মোছার অনুরোধ করুন';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'সমর্থিত হলে এই হোমসার্ভারকে অ্যাকাউন্টের ডেটা মুছতে বলুন। অন্য সার্ভারে থাকা অনুলিপি বা সংরক্ষণ নীতির কারণে রাখা ডেটা থেকে যেতে পারে।';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage =>
+      'এই Matrix অ্যাকাউন্ট যাচাই করুন';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword =>
+      'Matrix পাসওয়ার্ড ব্যবহার করুন';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'ব্রাউজারে চালিয়ে যান';
 
   @override
-  String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+  String get settingsDeleteAccountFallbackTitle => 'Matrix যাচাই থেকে ফিরুন';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'ব্রাউজার থেকে ফিরে আসা মানেই মুছে ফেলার নিশ্চিতকরণ নয়। Matrix সার্ভারে মূল অনুরোধ যাচাই করুন।';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'সার্ভারে যাচাই করুন';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Matrix সার্ভার অ্যাকাউন্ট মোছার বিষয়টি নিশ্চিত করেনি।';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'স্থানীয় অ্যাকাউন্ট পরিষ্কার করা বাকি';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'আগে নিষ্ক্রিয় করা Matrix অ্যাকাউন্টের পরিষ্কার করার অবস্থা দেখুন';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'অপেক্ষমাণ পরিষ্কারের রেকর্ড পড়া যায়নি। আবার চেষ্টা করতে ট্যাপ করুন।';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Matrix অ্যাকাউন্ট নিষ্ক্রিয় হয়েছে, কিন্তু স্থানীয় পরিষ্কার এখনও বাকি। অন্য অ্যাকাউন্টগুলো ব্যবহার করা যাবে।';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'আপনার ব্রাউজারে অ্যাকাউন্ট ব্যবস্থাপনা খোলা হয়েছে। এই অ্যাপে মুছে ফেলা নিশ্চিত হয়নি, তাই আপনার চ্যাট সেশন এখনও ব্যবহার করা যাবে।';
 
   @override
   String get settingsKeyBackup => 'কী ব্যাকআপ';
@@ -2250,7 +2252,7 @@ class SBn extends S {
 
   @override
   String chatPokedSomeone(String name, String suffix) {
-    return 'poked $name$suffix';
+    return '$name$suffix-কে খোঁচা দিয়েছে';
   }
 
   @override
@@ -5011,25 +5013,26 @@ class SBn extends S {
   String get reportSelectReason => 'একটি কারণ নির্বাচন করুন';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'রিপোর্ট পাঠাতে সাইন ইন করুন।';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'অ্যাকাউন্ট বদলেছে। পাঠাতে এই রিপোর্টটি আবার খুলুন।';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'এই হোমসার্ভার ব্যবহারকারী সম্পর্কে রিপোর্ট সমর্থন করে না।';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'এই হোমসার্ভার রুম সম্পর্কে রিপোর্ট সমর্থন করে না।';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited =>
+      'অতিরিক্ত রিপোর্ট হয়েছে। পরে আবার চেষ্টা করুন।';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend => 'রিপোর্ট পাঠানো যায়নি। আবার চেষ্টা করুন।';
 
   @override
   String get gameCenter => 'গেমস';
@@ -5923,31 +5926,31 @@ class SBn extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'নিরাপদ সংযোগ প্রস্তুত নয়। বার্তা পাঠানো হয়নি। উভয় অ্যাকাউন্টের সংযোগ ও ডিভাইস যাচাই পরীক্ষা করে আবার চেষ্টা করুন।';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'গ্রহণের অপেক্ষায়';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'বন্ধুত্ব নিশ্চিত হয়নি। পাঠানোর আগে পরিচিতি > নতুন বন্ধু দেখুন।';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return '$countটি ছবি';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'ভিডিও প্রকাশ করুন';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'লাইভ করুন';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'ভিডিও বাছুন';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'লাইভ সম্প্রচার উপলভ্য নয়';
 
   @override
   String get qrcodeAlbum => 'অ্যালবাম';
@@ -5956,101 +5959,101 @@ class SBn extends S {
   String get settingsSwitchAccount => 'অ্যাকাউন্ট বদলান';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'না-পড়া';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'এই ফিল্টারে কোনো কথোপকথন নেই';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'অ্যাকাউন্ট যোগ করুন';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'বর্তমান অ্যাকাউন্ট';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'অ্যাকাউন্ট বদলানো হচ্ছে…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'অ্যাকাউন্ট বদলানো যায়নি। আবার চেষ্টা করুন অথবা অ্যাকাউন্ট যোগ করে আবার সাইন ইন করুন।';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'প্রতিটি অ্যাকাউন্টের বার্তা ও নিরাপদ সেশন আলাদা রাখতে এখানে অ্যাকাউন্ট বদলান।';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'এখনও কোনো সংরক্ষিত অ্যাকাউন্ট নেই';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'অনুরোধ পাঠানো হয়েছে';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'পাওয়া অনুরোধ';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'পাঠানো অনুরোধ';
 
   @override
   String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+      'অনুরোধ গৃহীত হলে আপনি চ্যাট ও কল করতে পারবেন।';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'কলে ফিরুন';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'পাঠানো হচ্ছে';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'পাঠানো হয়েছে';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'পৌঁছেছে';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'পড়া হয়েছে';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'পাঠানো হয়নি। আবার চেষ্টা করতে ট্যাপ করুন।';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'এই ডিভাইসে বার্তা পাওয়া যাচ্ছে না। পুনরুদ্ধারের বিকল্প দেখতে ট্যাপ করুন।';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'তারকাচিহ্নিত বন্ধু';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'এই বন্ধুর কোনো উপলভ্য এনক্রিপ্টেড সেশন নেই। তাঁকে সাইন ইন করে অ্যাপ খুলতে বলুন, তারপর আবার চেষ্টা করুন। অ্যাকাউন্ট বদলানোর সময় লগ আউটের বদলে অ্যাকাউন্ট বদলান ব্যবহার করুন।';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'অ্যাকাউন্ট বদলাচ্ছেন? বার্তা ও নিরাপদ সেশন রাখতে অ্যাকাউন্ট বদলান ব্যবহার করুন। লগ আউট করলে এই ডিভাইসের অনুমতি প্রত্যাহার হয় এবং আসা এনক্রিপ্টেড বার্তা অনুপলভ্য হতে পারে।';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'AI সারাংশ এখন পাওয়া যাচ্ছে না। পরিষেবায় প্রবেশাধিকার ফিরে এলে আবার চেষ্টা করুন।';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'সাম্প্রতিক $countটি বার্তার সারাংশ করুন';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return '$joined জন যোগ দিয়েছেন · $invited জন আমন্ত্রিত';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return '$countটি অনুরোধ অপেক্ষমাণ';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'খসড়া';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'পরিচিতির সূচি';
 
   @override
   String get transferAssetUnavailable => 'পেমেন্টের সম্পদ উপলব্ধ নেই';
@@ -6059,112 +6062,112 @@ class SBn extends S {
   String get transferPaymentRequestUnavailable => 'পেমেন্টের অনুরোধ উপলব্ধ নেই';
 
   @override
-  String get chatCatchUp => 'Catch up';
+  String get chatCatchUp => 'বাদ পড়া কথা দেখুন';
 
   @override
-  String get chatCatchUpMentions => 'Mentions';
+  String get chatCatchUpMentions => 'উল্লেখ';
 
   @override
-  String get chatCatchUpReplies => 'Replies to me';
+  String get chatCatchUpReplies => 'আমাকে দেওয়া উত্তর';
 
   @override
-  String get chatCatchUpPinned => 'Pinned messages';
+  String get chatCatchUpPinned => 'পিন করা বার্তা';
 
   @override
   String get chatCatchUpScope =>
-      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+      'উল্লেখ ও উত্তরের জন্য লোড হওয়া বার্তা ব্যবহার করা হয়, পড়া বার্তাও এর অন্তর্ভুক্ত। আগের উত্তর খুঁজতে পুরোনো বার্তা লোড করুন।';
 
   @override
-  String get chatCatchUpLoadMore => 'Load older messages';
+  String get chatCatchUpLoadMore => 'পুরোনো বার্তা লোড করুন';
 
   @override
-  String get chatActionPreview => 'Review calendar suggestion';
+  String get chatActionPreview => 'ক্যালেন্ডারের পরামর্শ পর্যালোচনা করুন';
 
   @override
   String get chatActionPrivacy =>
-      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+      'নিশ্চিত করার পর শুধু নিচের শিরোনাম ও সময় আপনার ক্যালেন্ডার অ্যাপে দেওয়া হবে। সময় অঞ্চল যাচাই করুন। আপনার ক্যালেন্ডার অ্যাকাউন্ট এই ইভেন্ট সিঙ্ক করতে পারে।';
 
   @override
-  String get chatActionTitle => 'Chat event';
+  String get chatActionTitle => 'চ্যাট ইভেন্ট';
 
   @override
-  String get chatActionSuggestion => 'Calendar suggestion';
+  String get chatActionSuggestion => 'ক্যালেন্ডারের পরামর্শ';
 
   @override
-  String get chatUnreadAttention => 'Unread mentions and replies';
+  String get chatUnreadAttention => 'না-পড়া উল্লেখ ও উত্তর';
 
   @override
-  String get chatScanAgain => 'Scan again';
+  String get chatScanAgain => 'আবার স্ক্যান করুন';
 
   @override
   String get chatUnreadScope =>
-      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+      'সার্ভারের ইতিহাস আপনার পঠিত চিহ্ন পর্যন্ত স্ক্যান করে। পড়তে কথোপকথন খুলুন; ফলাফল আবার তৈরি করতে রিফ্রেশ করুন।';
 
   @override
   String get chatScanIncomplete =>
-      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+      'অসম্পূর্ণ: ইতিহাস, ডিক্রিপশন বা পঠিত চিহ্ন পাওয়া যায়নি। সিঙ্কের পর আবার চেষ্টা করুন।';
 
   @override
-  String get chatHistoryShare => 'Share selected history';
+  String get chatHistoryShare => 'বাছাই করা ইতিহাস শেয়ার করুন';
 
   @override
   String get chatHistoryExplanation =>
-      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+      'শুধু প্রশাসকদের জন্য। সাধারণ পাঠ্য এবং গ্রুপে যোগ দেওয়া সদস্যের সঙ্গে আগে থেকেই থাকা এনক্রিপ্টেড সরাসরি চ্যাট বাছুন। শেয়ার করলে গ্রুপে দৃশ্যমান অডিট বার্তা তৈরি হয়।';
 
   @override
-  String get chatHistoryEnable => 'Enable sharing';
+  String get chatHistoryEnable => 'শেয়ার চালু করুন';
 
   @override
-  String get chatHistoryDisable => 'Disable sharing';
+  String get chatHistoryDisable => 'শেয়ার বন্ধ করুন';
 
   @override
-  String get chatHistoryPolicy => 'Group history sharing policy';
+  String get chatHistoryPolicy => 'গ্রুপের ইতিহাস শেয়ারের নীতি';
 
   @override
   String get chatHistoryPolicyDetail =>
-      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+      'শুধু প্রশাসকেরা শেয়ার করতে পারেন। এটি চালু করলে গ্রুপের ইতিহাসও যোগ দেওয়ার পরের ঘটনায় সীমিত হবে। নিচের পাঠ্য বার্তার সীমা ঠিক করে নিশ্চিত করুন।';
 
   @override
-  String get chatHistoryPolicySaved => 'Policy saved';
+  String get chatHistoryPolicySaved => 'নীতি সংরক্ষিত হয়েছে';
 
   @override
-  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+  String get chatHistoryRecipient => 'এনক্রিপ্টেড প্রাপকের কথোপকথন';
 
   @override
-  String get chatHistoryReview => 'Review selected messages';
+  String get chatHistoryReview => 'বাছাই করা বার্তা পর্যালোচনা করুন';
 
   @override
-  String get chatHistoryMessages => 'messages';
+  String get chatHistoryMessages => 'বার্তা';
 
   @override
   String get chatHistoryConfirmDetail =>
-      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+      'শেয়ারের আগে এই প্রাপক, প্রতিটি বার্তা ও সময় নিশ্চিত করুন। ব্যর্থ বা অজানা ফলাফলেও বিষয়বস্তু পাঠানো হয়ে থাকতে পারে: চালিয়ে যাওয়ার আগে ফলাফল মিলিয়ে নিন।';
 
   @override
   String get chatHistoryCompleted =>
-      'Selected history sent and group audit confirmed';
+      'বাছাই করা ইতিহাস পাঠানো হয়েছে এবং গ্রুপের অডিট নিশ্চিত হয়েছে';
 
   @override
   String get chatHistoryPending =>
-      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+      'অপেক্ষমাণ: ফলাফল মিলিয়ে নিয়ে চালিয়ে যেতে আবার নিশ্চিত করুন। অজানা ফলাফলের পাঠানো বার্তা কখনো আবার পাঠানো হয় না।';
 
   @override
-  String get chatHistoryReconcile => 'Reconcile send result';
+  String get chatHistoryReconcile => 'পাঠানোর ফলাফল মিলিয়ে নিন';
 
   @override
   String get chatHistoryFailed =>
-      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+      'সম্পন্ন করা যায়নি। প্রশাসকের অনুমতি, গ্রুপের নীতি, এনক্রিপশন, প্রাপকের সদস্যপদ ও বাছাই করা বিষয় যাচাই করুন। পাঠানো শুরু হলে ফলাফল মিলিয়ে নিন।';
 
   @override
-  String get chatDeviceActions => 'On-device actions';
+  String get chatDeviceActions => 'ডিভাইসে সম্পাদিত কাজ';
 
   @override
   String get chatDeviceActionsReview =>
-      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+      'নিশ্চিত করার পর কেবল এই বার্তাটি সিস্টেমের ডিভাইসভিত্তিক কাজের পরামর্শে দেওয়া হয়। ক্যালেন্ডার, রিমাইন্ডার বা মানচিত্র খুলতে একটি কাজ বাছুন।';
 
   @override
-  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+  String get chatHistoryMaxMessages => 'বার্তার সীমা (১–৫০)';
 
   @override
-  String get chatHistoryMaxHours => 'History window in hours (1–720)';
+  String get chatHistoryMaxHours => 'ইতিহাসের সময়সীমা, ঘণ্টায় (১–৭২০)';
 }

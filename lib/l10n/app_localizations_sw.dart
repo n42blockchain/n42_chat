@@ -119,7 +119,7 @@ class SSw extends S {
   String get commonForward => 'Mbele';
 
   @override
-  String get commonUnfavorite => 'Unfav';
+  String get commonUnfavorite => 'Ondoa kwenye vipendwa';
 
   @override
   String get commonFavorite => 'Kipendwa';
@@ -502,7 +502,7 @@ class SSw extends S {
   String get authLoginNow => 'Ingia sasa';
 
   @override
-  String get profileAvatar => 'Avatar';
+  String get profileAvatar => 'Picha ya wasifu';
 
   @override
   String get profileStatus => 'Hali';
@@ -1280,7 +1280,7 @@ class SSw extends S {
   String get commonMyQrCode => 'Msimbo wangu wa QR';
 
   @override
-  String get profilePoke => 'Poke';
+  String get profilePoke => 'Gusa';
 
   @override
   String get profileRingtone => 'Mlio wa simu';
@@ -1999,70 +1999,72 @@ class SSw extends S {
   String get settingsSecurityTitle => 'Usalama';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'Futa akaunti';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'Zima akaunti hii ya Matrix na usafishe data yake ya gumzo iliyo kwenye kifaa';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Hatua hii inaomba akaunti ya Matrix izimwe kabisa. Baada ya uthibitisho wa seva, programu itaondoa kipindi cha gumzo na funguo za usimbaji fiche za akaunti hii kwenye kifaa wakati ni salama kufanya hivyo. Akaunti nyingine na pochi yako vitahifadhiwa. Muungano wa seva na sera za uhifadhi zinaweza kuzuia ufutaji wa data.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'Nenosiri la Matrix, likihitajika';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase =>
+      'Omba kufutwa kwa data kwenye seva';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'Omba seva hii ya nyumbani ifute data ya akaunti inapowezekana. Nakala zilizo kwenye seva nyingine au zinazohitajika na sera za uhifadhi zinaweza kubaki.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage =>
+      'Thibitisha akaunti hii ya Matrix';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Tumia nenosiri la Matrix';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'Endelea kwenye kivinjari';
 
   @override
   String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+      'Rudi kutoka uthibitishaji wa Matrix';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'Kurudi kutoka kivinjari hakuthibitishi ufutaji. Angalia ombi la awali kwenye seva ya Matrix.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'Angalia kwenye seva';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Seva ya Matrix haijathibitisha kufutwa kwa akaunti.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'Usafishaji wa akaunti kwenye kifaa unasubiri';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'Kagua usafishaji wa akaunti ya Matrix iliyozimwa hapo awali';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'Imeshindwa kusoma rekodi za usafishaji unaosubiri. Gusa ili kujaribu tena.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Akaunti ya Matrix imezimwa, lakini usafishaji kwenye kifaa bado unasubiri. Akaunti nyingine zinaendelea kupatikana.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'Usimamizi wa akaunti umefunguliwa kwenye kivinjari chako. Ufutaji haujathibitishwa katika programu hii, hivyo kipindi chako cha gumzo kinaendelea kupatikana.';
 
   @override
   String get settingsKeyBackup => 'Hifadhi Nakala muhimu';
@@ -2104,7 +2106,7 @@ class SSw extends S {
   String get settingsUnverified => 'Haijathibitishwa';
 
   @override
-  String get settingsAdvanced => 'Advanced';
+  String get settingsAdvanced => 'Mipangilio ya kina';
 
   @override
   String get settingsCrossSigning => 'Kusaini Mtambuka';
@@ -3463,7 +3465,7 @@ class SSw extends S {
   String get chatLatitude => 'Latitudo';
 
   @override
-  String get chatLongitude => 'Longitude';
+  String get chatLongitude => 'Longitudo';
 
   @override
   String get groupDescriptionUpdated => 'Maelezo ya kikundi yamesasishwa';
@@ -4214,7 +4216,7 @@ class SSw extends S {
   String get voiceRoomListeners => 'Wasikilizaji';
 
   @override
-  String get voiceRoomLive => 'LIVE';
+  String get voiceRoomLive => 'MOJA KWA MOJA';
 
   @override
   String get voiceRoomEnded => 'Imeisha';
@@ -4337,7 +4339,7 @@ class SSw extends S {
   String get tokenGateRuleErc721 => 'NFT (ERC-721)';
 
   @override
-  String get tokenGateRuleErc1155 => 'Multi-Token (ERC-1155)';
+  String get tokenGateRuleErc1155 => 'Tokeni nyingi (ERC-1155)';
 
   @override
   String get tokenGateRuleNative => 'Ishara ya asili';
@@ -4426,7 +4428,7 @@ class SSw extends S {
   String get solidColors => 'Rangi Imara';
 
   @override
-  String get gradients => 'Gradients';
+  String get gradients => 'Mipito ya rangi';
 
   @override
   String get defaultBackground => 'Chaguomsingi';
@@ -5039,25 +5041,25 @@ class SSw extends S {
   String get reportSelectReason => 'Tafadhali chagua sababu';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'Ingia ili kutuma ripoti.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'Akaunti imebadilika. Fungua ripoti hii tena ili kuituma.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'Seva hii ya nyumbani haitumii ripoti kuhusu watumiaji.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'Seva hii ya nyumbani haitumii ripoti kuhusu vyumba.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => 'Ripoti ni nyingi mno. Jaribu tena baadaye.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend => 'Imeshindwa kutuma ripoti. Jaribu tena.';
 
   @override
   String get gameCenter => 'Michezo';
@@ -5144,7 +5146,7 @@ class SSw extends S {
   String get storyMyStory => 'Hadithi Yangu';
 
   @override
-  String get storageSmartCleanup => 'Smart Cleanup';
+  String get storageSmartCleanup => 'Usafishaji mahiri';
 
   @override
   String get storageOldMediaFiles => 'Faili za Midia ya Zamani';
@@ -5955,31 +5957,31 @@ class SSw extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'Muunganisho salama hauko tayari. Ujumbe haujatumwa. Angalia muunganisho na uthibitishaji wa vifaa kwenye akaunti zote mbili, kisha jaribu tena.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'Inasubiri kukubaliwa';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'Urafiki haujathibitishwa. Angalia Anwani > Marafiki Wapya kabla ya kutuma.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return 'Picha $count';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Chapisha video';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Anza matangazo ya moja kwa moja';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Chagua video';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'Matangazo ya moja kwa moja hayapatikani';
 
   @override
   String get qrcodeAlbum => 'Albamu';
@@ -5988,101 +5990,101 @@ class SSw extends S {
   String get settingsSwitchAccount => 'Badili akaunti';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'Haijasomwa';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'Hakuna mazungumzo katika kichujio hiki';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'Ongeza akaunti';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'Akaunti ya sasa';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'Inabadilisha akaunti…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'Imeshindwa kubadilisha akaunti. Jaribu tena, au ongeza akaunti ili uingie tena.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'Badilisha akaunti hapa ili ujumbe na kipindi salama cha kila akaunti vibaki tofauti.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'Hakuna akaunti zilizohifadhiwa bado';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'Ombi limetumwa';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'Maombi yaliyopokelewa';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'Maombi yaliyotumwa';
 
   @override
   String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+      'Unaweza kuzungumza na kupiga simu baada ya ombi kukubaliwa.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'Rudi kwenye simu';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'Inatuma';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'Imetumwa';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'Imewasilishwa';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'Imesomwa';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'Haijatumwa. Gusa ili kujaribu tena.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'Ujumbe haupatikani kwenye kifaa hiki. Gusa ili kuangalia chaguo za kurejesha.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'Marafiki wenye nyota';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'Rafiki huyu hana kipindi kinachopatikana kilichosimbwa fiche. Mwombe aingie na kufungua programu, kisha jaribu tena. Tumia Badilisha Akaunti badala ya kutoka unapobadilisha akaunti.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'Unabadilisha akaunti? Tumia Badilisha Akaunti ili kuhifadhi ujumbe na vipindi salama. Kutoka hubatilisha ufikiaji wa kifaa hiki na kunaweza kufanya ujumbe unaoingia uliosimbwa fiche usipatikane.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'Muhtasari wa AI haupatikani kwa sasa. Jaribu tena baada ya ufikiaji wa huduma kurejeshwa.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'Fupisha ujumbe $count wa karibuni';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return '$joined wamejiunga · $invited wamealikwa';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return 'Maombi $count yanasubiri';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'Rasimu';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'Faharasa ya anwani';
 
   @override
   String get transferAssetUnavailable => 'Mali ya malipo haipatikani';
@@ -6091,112 +6093,113 @@ class SSw extends S {
   String get transferPaymentRequestUnavailable => 'Ombi la malipo halipatikani';
 
   @override
-  String get chatCatchUp => 'Catch up';
+  String get chatCatchUp => 'Fuatilia yaliyopita';
 
   @override
-  String get chatCatchUpMentions => 'Mentions';
+  String get chatCatchUpMentions => 'Mitajo';
 
   @override
-  String get chatCatchUpReplies => 'Replies to me';
+  String get chatCatchUpReplies => 'Majibu kwangu';
 
   @override
-  String get chatCatchUpPinned => 'Pinned messages';
+  String get chatCatchUpPinned => 'Ujumbe uliobandikwa';
 
   @override
   String get chatCatchUpScope =>
-      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+      'Mitajo na majibu hutafutwa katika ujumbe uliopakiwa, pamoja na uliosomwa. Pakia ujumbe wa zamani zaidi ili kupata majibu ya awali.';
 
   @override
-  String get chatCatchUpLoadMore => 'Load older messages';
+  String get chatCatchUpLoadMore => 'Pakia ujumbe wa zamani';
 
   @override
-  String get chatActionPreview => 'Review calendar suggestion';
+  String get chatActionPreview => 'Kagua pendekezo la kalenda';
 
   @override
   String get chatActionPrivacy =>
-      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+      'Baada ya uthibitisho, kichwa na muda vilivyo hapa chini pekee vitashirikiwa na programu yako ya kalenda. Angalia ukanda wa saa. Akaunti yako ya kalenda inaweza kusawazisha tukio hili.';
 
   @override
-  String get chatActionTitle => 'Chat event';
+  String get chatActionTitle => 'Tukio la gumzo';
 
   @override
-  String get chatActionSuggestion => 'Calendar suggestion';
+  String get chatActionSuggestion => 'Pendekezo la kalenda';
 
   @override
-  String get chatUnreadAttention => 'Unread mentions and replies';
+  String get chatUnreadAttention => 'Mitajo na majibu ambayo hayajasomwa';
 
   @override
-  String get chatScanAgain => 'Scan again';
+  String get chatScanAgain => 'Changanua tena';
 
   @override
   String get chatUnreadScope =>
-      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+      'Huchanganua historia ya seva hadi alama yako ya kusoma. Fungua mazungumzo ili uyasome; onyesha upya ili kutengeneza matokeo tena.';
 
   @override
   String get chatScanIncomplete =>
-      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+      'Haijakamilika: historia, kufungua usimbaji fiche au alama ya kusoma haipatikani. Jaribu tena baada ya usawazishaji.';
 
   @override
-  String get chatHistoryShare => 'Share selected history';
+  String get chatHistoryShare => 'Shiriki historia iliyochaguliwa';
 
   @override
   String get chatHistoryExplanation =>
-      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+      'Kwa wasimamizi pekee. Chagua maandishi ya kawaida na gumzo la moja kwa moja lililosimbwa fiche ambalo tayari lipo na mshiriki aliyejiunga na kikundi. Kushiriki huunda ujumbe wa ukaguzi unaoonekana kwenye kikundi.';
 
   @override
-  String get chatHistoryEnable => 'Enable sharing';
+  String get chatHistoryEnable => 'Washa kushiriki';
 
   @override
-  String get chatHistoryDisable => 'Disable sharing';
+  String get chatHistoryDisable => 'Zima kushiriki';
 
   @override
-  String get chatHistoryPolicy => 'Group history sharing policy';
+  String get chatHistoryPolicy => 'Sera ya kushiriki historia ya kikundi';
 
   @override
   String get chatHistoryPolicyDetail =>
-      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+      'Wasimamizi pekee ndio wanaweza kushiriki. Kuwasha pia huzuia kuonekana kwa historia ya kikundi kwa matukio baada ya kujiunga pekee. Weka mipaka ya ujumbe wa maandishi hapa chini na uthibitishe.';
 
   @override
-  String get chatHistoryPolicySaved => 'Policy saved';
+  String get chatHistoryPolicySaved => 'Sera imehifadhiwa';
 
   @override
-  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+  String get chatHistoryRecipient =>
+      'Mazungumzo yaliyosimbwa fiche na mpokeaji';
 
   @override
-  String get chatHistoryReview => 'Review selected messages';
+  String get chatHistoryReview => 'Kagua ujumbe uliochaguliwa';
 
   @override
-  String get chatHistoryMessages => 'messages';
+  String get chatHistoryMessages => 'ujumbe';
 
   @override
   String get chatHistoryConfirmDetail =>
-      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+      'Thibitisha mpokeaji huyu, kila ujumbe na muda wake kabla ya kushiriki. Matokeo yaliyoshindwa au yasiyojulikana yanaweza kuwa tayari yametuma maudhui: hakiki matokeo kabla ya kuendelea.';
 
   @override
   String get chatHistoryCompleted =>
-      'Selected history sent and group audit confirmed';
+      'Historia iliyochaguliwa imetumwa na ukaguzi wa kikundi umethibitishwa';
 
   @override
   String get chatHistoryPending =>
-      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+      'Inasubiri: hakiki matokeo, kisha thibitisha tena ili kuendelea. Utumaji wenye matokeo yasiyojulikana haurudiwi kamwe.';
 
   @override
-  String get chatHistoryReconcile => 'Reconcile send result';
+  String get chatHistoryReconcile => 'Hakiki matokeo ya utumaji';
 
   @override
   String get chatHistoryFailed =>
-      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+      'Imeshindwa kukamilisha. Angalia ruhusa za msimamizi, sera ya kikundi, usimbaji fiche, uanachama wa mpokeaji na chaguo la ujumbe. Ikiwa utumaji umeanza, hakiki matokeo yake.';
 
   @override
-  String get chatDeviceActions => 'On-device actions';
+  String get chatDeviceActions => 'Vitendo kwenye kifaa';
 
   @override
   String get chatDeviceActionsReview =>
-      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+      'Baada ya uthibitisho, ujumbe huu pekee hutolewa kwa mapendekezo ya vitendo ya mfumo yanayochakatwa kwenye kifaa. Chagua kitendo cha kufungua Kalenda, Vikumbusho au Ramani.';
 
   @override
-  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+  String get chatHistoryMaxMessages => 'Kikomo cha ujumbe (1–50)';
 
   @override
-  String get chatHistoryMaxHours => 'History window in hours (1–720)';
+  String get chatHistoryMaxHours => 'Kipindi cha historia kwa saa (1–720)';
 }

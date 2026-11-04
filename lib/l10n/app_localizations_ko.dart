@@ -1952,70 +1952,67 @@ class SKo extends S {
   String get settingsSecurityTitle => '보안';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => '계정 삭제';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      '이 Matrix 계정을 비활성화하고 기기의 로컬 채팅 데이터를 정리합니다';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Matrix 계정의 영구 비활성화를 요청합니다. 서버에서 확인한 후 안전하게 처리할 수 있을 때 이 계정의 로컬 채팅 세션과 암호화 키를 삭제합니다. 다른 계정과 지갑은 유지됩니다. 연합 서버 및 서버 보존 정책으로 인해 데이터 삭제가 제한될 수 있습니다.';
 
   @override
-  String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+  String get settingsDeleteAccountPasswordOptional => '요청 시 Matrix 비밀번호';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase => '서버 데이터 삭제 요청';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      '지원되는 경우 이 홈서버에 계정 데이터 삭제를 요청합니다. 다른 서버의 복사본이나 보존 의무가 있는 데이터는 남을 수 있습니다.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage => '이 Matrix 계정 확인';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Matrix 비밀번호 사용';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => '브라우저에서 계속';
 
   @override
-  String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+  String get settingsDeleteAccountFallbackTitle => 'Matrix 확인에서 돌아오기';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      '브라우저에서 돌아오는 것만으로 삭제가 확인되지는 않습니다. Matrix 서버에서 원래 요청을 확인하세요.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => '서버에서 확인';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Matrix 서버에서 계정 삭제를 확인하지 않았습니다.';
 
   @override
-  String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+  String get settingsDeleteAccountPendingTitle => '로컬 계정 정리 대기 중';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      '이전에 비활성화한 Matrix 계정의 정리 상태 확인';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      '대기 중인 정리 기록을 읽지 못했습니다. 탭하여 다시 시도하세요.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Matrix 계정은 비활성화되었지만 로컬 정리는 아직 대기 중입니다. 다른 계정은 계속 사용할 수 있습니다.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      '브라우저에서 계정 관리를 열었습니다. 이 앱에서는 삭제가 확인되지 않았으므로 채팅 세션을 계속 사용할 수 있습니다.';
 
   @override
   String get settingsKeyBackup => '키 백업';
@@ -4916,25 +4913,22 @@ class SKo extends S {
   String get reportSelectReason => '이유를 선택해주세요.';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => '신고하려면 로그인하세요.';
 
   @override
-  String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+  String get reportAccountChanged => '계정이 변경되었습니다. 이 신고를 다시 열어 전송하세요.';
 
   @override
-  String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+  String get reportUnsupported => '이 홈서버는 사용자 신고를 지원하지 않습니다.';
 
   @override
-  String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+  String get reportRoomUnsupported => '이 홈서버는 대화방 신고를 지원하지 않습니다.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => '신고 요청이 너무 많습니다. 나중에 다시 시도하세요.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend => '신고를 보내지 못했습니다. 다시 시도하세요.';
 
   @override
   String get gameCenter => '게임';
@@ -5804,31 +5798,31 @@ class SKo extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      '보안 연결이 준비되지 않았습니다. 메시지를 보내지 않았습니다. 두 계정의 연결과 기기 인증을 확인한 후 다시 시도하세요.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => '수락 대기 중';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      '친구 관계가 확인되지 않았습니다. 보내기 전에 연락처 > 새 친구를 확인하세요.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return '사진 $count장';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => '동영상 게시';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => '라이브 시작';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => '동영상 선택';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => '라이브 방송을 사용할 수 없습니다';
 
   @override
   String get qrcodeAlbum => '앨범';
@@ -5837,101 +5831,100 @@ class SKo extends S {
   String get settingsSwitchAccount => '계정 전환';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => '읽지 않음';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => '이 필터에 해당하는 대화가 없습니다';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => '계정 추가';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => '현재 계정';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => '계정 전환 중…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      '계정을 전환하지 못했습니다. 다시 시도하거나 계정을 추가하여 다시 로그인하세요.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      '각 계정의 메시지와 보안 세션을 별도로 유지하려면 여기에서 계정을 전환하세요.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => '저장된 계정이 아직 없습니다';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => '요청 전송됨';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => '받은 요청';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => '보낸 요청';
 
   @override
-  String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+  String get contactRequestHint => '요청이 수락되면 채팅과 통화를 할 수 있습니다.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => '통화로 돌아가기';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => '전송 중';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => '전송됨';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => '전달됨';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => '읽음';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => '전송하지 못했습니다. 탭하여 다시 시도하세요.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      '이 기기에서 메시지를 사용할 수 없습니다. 탭하여 복구 방법을 확인하세요.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => '즐겨찾는 친구';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      '이 친구에게 사용 가능한 암호화 세션이 없습니다. 로그인하고 앱을 열도록 요청한 후 다시 시도하세요. 계정을 변경할 때 로그아웃 대신 계정 전환을 사용하세요.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      '계정을 변경하시나요? 메시지와 보안 세션을 유지하려면 계정 전환을 사용하세요. 로그아웃하면 이 기기의 권한이 취소되어 수신 암호화 메시지를 사용할 수 없게 될 수 있습니다.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      '현재 AI 요약을 사용할 수 없습니다. 서비스 접근이 복구된 후 다시 시도하세요.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return '최근 메시지 $count개 요약';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return '참여 $joined명 · 초대 $invited명';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return '대기 중인 요청 $count개';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => '초안';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => '연락처 색인';
 
   @override
   String get transferAssetUnavailable => '결제 자산을 사용할 수 없습니다';
@@ -5940,112 +5933,111 @@ class SKo extends S {
   String get transferPaymentRequestUnavailable => '결제 요청을 사용할 수 없습니다';
 
   @override
-  String get chatCatchUp => 'Catch up';
+  String get chatCatchUp => '놓친 내용 확인';
 
   @override
-  String get chatCatchUpMentions => 'Mentions';
+  String get chatCatchUpMentions => '멘션';
 
   @override
-  String get chatCatchUpReplies => 'Replies to me';
+  String get chatCatchUpReplies => '나에게 온 답장';
 
   @override
-  String get chatCatchUpPinned => 'Pinned messages';
+  String get chatCatchUpPinned => '고정된 메시지';
 
   @override
   String get chatCatchUpScope =>
-      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+      '멘션과 답장은 읽은 메시지를 포함한 로드된 메시지를 사용합니다. 이전 답장을 찾으려면 오래된 메시지를 불러오세요.';
 
   @override
-  String get chatCatchUpLoadMore => 'Load older messages';
+  String get chatCatchUpLoadMore => '오래된 메시지 불러오기';
 
   @override
-  String get chatActionPreview => 'Review calendar suggestion';
+  String get chatActionPreview => '캘린더 제안 검토';
 
   @override
   String get chatActionPrivacy =>
-      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+      '확인 후 아래 제목과 시간만 캘린더 앱과 공유합니다. 시간대를 확인하세요. 캘린더 계정에서 이 일정을 동기화할 수 있습니다.';
 
   @override
-  String get chatActionTitle => 'Chat event';
+  String get chatActionTitle => '채팅 일정';
 
   @override
-  String get chatActionSuggestion => 'Calendar suggestion';
+  String get chatActionSuggestion => '캘린더 제안';
 
   @override
-  String get chatUnreadAttention => 'Unread mentions and replies';
+  String get chatUnreadAttention => '읽지 않은 멘션과 답장';
 
   @override
-  String get chatScanAgain => 'Scan again';
+  String get chatScanAgain => '다시 스캔';
 
   @override
   String get chatUnreadScope =>
-      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+      '서버 기록을 읽음 표시 위치까지 스캔합니다. 대화를 열어 읽고 새로고침하면 결과가 다시 생성됩니다.';
 
   @override
   String get chatScanIncomplete =>
-      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+      '미완료: 기록, 복호화 또는 읽음 표시 위치를 사용할 수 없습니다. 동기화 후 다시 시도하세요.';
 
   @override
-  String get chatHistoryShare => 'Share selected history';
+  String get chatHistoryShare => '선택한 기록 공유';
 
   @override
   String get chatHistoryExplanation =>
-      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+      '관리자만 사용할 수 있습니다. 일반 텍스트와 이미 그룹에 참여한 멤버와의 기존 암호화 개인 대화를 선택하세요. 공유하면 그룹에 감사 메시지가 표시됩니다.';
 
   @override
-  String get chatHistoryEnable => 'Enable sharing';
+  String get chatHistoryEnable => '공유 활성화';
 
   @override
-  String get chatHistoryDisable => 'Disable sharing';
+  String get chatHistoryDisable => '공유 비활성화';
 
   @override
-  String get chatHistoryPolicy => 'Group history sharing policy';
+  String get chatHistoryPolicy => '그룹 기록 공유 정책';
 
   @override
   String get chatHistoryPolicyDetail =>
-      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+      '관리자만 공유할 수 있습니다. 활성화하면 그룹 기록도 참여 이후 이벤트만 볼 수 있도록 제한됩니다. 아래 텍스트 메시지 제한을 설정하고 확인하세요.';
 
   @override
-  String get chatHistoryPolicySaved => 'Policy saved';
+  String get chatHistoryPolicySaved => '정책 저장됨';
 
   @override
-  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+  String get chatHistoryRecipient => '암호화된 수신자 대화';
 
   @override
-  String get chatHistoryReview => 'Review selected messages';
+  String get chatHistoryReview => '선택한 메시지 검토';
 
   @override
-  String get chatHistoryMessages => 'messages';
+  String get chatHistoryMessages => '메시지';
 
   @override
   String get chatHistoryConfirmDetail =>
-      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+      '공유 전에 수신자, 각 메시지와 시간을 확인하세요. 실패하거나 결과를 알 수 없어도 내용이 이미 전송되었을 수 있습니다. 계속하기 전에 전송 결과를 대조하세요.';
 
   @override
-  String get chatHistoryCompleted =>
-      'Selected history sent and group audit confirmed';
+  String get chatHistoryCompleted => '선택한 기록을 전송하고 그룹 감사 기록을 확인했습니다';
 
   @override
   String get chatHistoryPending =>
-      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+      '대기 중: 결과를 대조한 뒤 다시 확인하여 계속하세요. 결과를 알 수 없는 전송은 다시 보내지 않습니다.';
 
   @override
-  String get chatHistoryReconcile => 'Reconcile send result';
+  String get chatHistoryReconcile => '전송 결과 대조';
 
   @override
   String get chatHistoryFailed =>
-      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+      '완료하지 못했습니다. 관리자 권한, 그룹 정책, 암호화, 수신자의 참여 상태와 선택 내용을 확인하세요. 전송을 시작했다면 결과를 대조하세요.';
 
   @override
-  String get chatDeviceActions => 'On-device actions';
+  String get chatDeviceActions => '기기 내 작업';
 
   @override
   String get chatDeviceActionsReview =>
-      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+      '확인 후 이 메시지만 시스템의 기기 내 작업 제안 기능에 전달합니다. 작업을 선택하여 캘린더, 미리 알림 또는 지도를 여세요.';
 
   @override
-  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+  String get chatHistoryMaxMessages => '메시지 수 제한(1~50)';
 
   @override
-  String get chatHistoryMaxHours => 'History window in hours (1–720)';
+  String get chatHistoryMaxHours => '기록 시간 범위(1~720시간)';
 }

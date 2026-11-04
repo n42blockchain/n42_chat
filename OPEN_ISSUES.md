@@ -434,6 +434,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-006 Direct UI literals still need module-by-module translation review
 
+- 2026-11-04 resource completion: all 25 non-English catalogs now include the 57 missing English-template keys; Simplified/Traditional Chinese include their 24 missing deletion/report labels. Existing substantive English fallback labels were also translated, with brands/native homographs retained after review. Localization code regenerated; structural audit checks no missing/empty/extra keys or placeholder loss. Verification: 16 localization/accessibility/catch-up tests pass; analyzer has no errors or warnings. This resolves the resource gap, not every direct literal candidate below or native-speaker/device acceptance.
+
+
 - September 20: six feedback labels plus pending-request count, draft and contact-index labels have English, Simplified/Traditional Chinese, German, French, Spanish, Italian, Portuguese and Brazilian Portuguese translations. Other locales retain explicit English fallbacks pending translation review. Localization code was regenerated.
 
 
@@ -613,9 +616,9 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Severity: M
 - Updated: 2026-10-30 follow-up
 - Implemented: Apple Suggested Actions is verified against the installed iOS 27.1 SDK and Apple's official API/entitlement documentation. The host registers an iOS 27+ SwiftUI platform view and adds the entitlement. Chat first requests user confirmation, passes only the chosen non-ephemeral text, timestamp, event ID and sender-is-user flag, and never supplies wallet methods or preceding history. Unsupported hosts/platforms retain the local explicit-time calendar rule. Native editor creation is separate from saving an event. Android natural-language Reminder/Maps parity remains a later extension; its existing explicit-time calendar fallback is preserved. Sync phases and account action capture now use SDK-neutral domain contracts, reducing direct presentation SDK imports from 13 to 9; remaining protocol-specific pages have not been rewritten.
-- Verification boundary: native Swift typechecking and automated privacy/confirmation tests are code-level evidence. Device acceptance is skipped by explicit user instruction; no signing/profile acceptance, production release, user accuracy experiment, three-device recovery/revocation test, server log audit or live transfer was performed. Evidence-template metrics stay null. New UI strings have English and Simplified/Traditional Chinese coverage; other locales retain English fallback.
+- Verification boundary: native Swift typechecking and automated privacy/confirmation tests are code-level evidence. Device acceptance is skipped by explicit user instruction; no signing/profile acceptance, production release, user accuracy experiment, three-device recovery/revocation test, server log audit or live transfer was performed. Evidence-template metrics stay null. The 2026-11-04 localization completion provides translated resources in all supported locales and regenerates localization code. Model semantic cross-review preserves deletion, privacy and unknown-send boundaries; native-speaker and device acceptance remain separate.
 - Host simulator finding: the full host compiles successfully but its existing MLImage dependency forces x86_64 simulator output; all installed runtimes are arm64. Installation on the fresh iOS 27.1 simulator fails with an architecture mismatch. No startup or Suggested Actions runtime success is claimed. The isolated test simulator was removed after the probe; physical-device acceptance remains skipped as requested.
-- Next step: validate the new entitlement with distribution signing, run authorized system-action/user studies and finish remaining translations before claiming full release acceptance.
+- Next step: validate the new entitlement with distribution signing, run authorized system-action/user studies and native-language/device layout acceptance before claiming full release acceptance.
 
 ### CATCHUP-003 Chat core screenshot baselines — resolved
 

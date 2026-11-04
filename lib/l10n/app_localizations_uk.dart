@@ -546,7 +546,7 @@ class SUk extends S {
   String get conversationUnpin => 'Відкріпити';
 
   @override
-  String get conversationPin => 'Pin';
+  String get conversationPin => 'Закріпити';
 
   @override
   String get conversationDeleteConversation => 'Видалити розмову';
@@ -1999,70 +1999,72 @@ class SUk extends S {
   String get settingsSecurityTitle => 'Безпека';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'Видалити обліковий запис';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'Деактивувати цей обліковий запис Matrix та очистити його локальні дані чату';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Буде надіслано запит на остаточну деактивацію облікового запису Matrix. Після підтвердження сервера застосунок видалить локальний сеанс чату й ключі шифрування цього запису, коли це буде безпечно. Інші облікові записи та гаманець збережуться. Федерація й правила зберігання сервера можуть обмежувати видалення даних.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'Пароль Matrix, якщо потрібен';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase =>
+      'Запросити видалення даних на сервері';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'Попросити цей домашній сервер видалити дані облікового запису, якщо така можливість підтримується. Копії на інших серверах або дані, які підлягають обов’язковому зберіганню, можуть залишитися.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage =>
+      'Підтвердьте цей обліковий запис Matrix';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Використати пароль Matrix';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'Продовжити в браузері';
 
   @override
   String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+      'Повернутися після перевірки Matrix';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'Повернення з браузера не підтверджує видалення. Перевірте початковий запит на сервері Matrix.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'Перевірити на сервері';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Сервер Matrix не підтвердив видалення облікового запису.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'Очікується локальне очищення облікового запису';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'Перевірити очищення раніше деактивованого облікового запису Matrix';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'Не вдалося прочитати записи про очікуване очищення. Натисніть, щоб повторити.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Обліковий запис Matrix деактивовано, але локальне очищення ще не завершено. Інші облікові записи залишаються доступними.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'Керування обліковим записом відкрито в браузері. Застосунок не отримав підтвердження видалення, тому сеанс чату залишається доступним.';
 
   @override
   String get settingsKeyBackup => 'Резервне копіювання ключів';
@@ -3643,7 +3645,7 @@ class SUk extends S {
   String get profileStatusCoffee => 'кава';
 
   @override
-  String get profileStatusBubbleTea => 'Bubble Tea';
+  String get profileStatusBubbleTea => 'Бульбашковий чай';
 
   @override
   String get profileStatusEating => 'прийом їжі';
@@ -4336,7 +4338,7 @@ class SUk extends S {
   String get tokenGateRuleErc721 => 'NFT (ERC-721)';
 
   @override
-  String get tokenGateRuleErc1155 => 'Multi-Token (ERC-1155)';
+  String get tokenGateRuleErc1155 => 'Мультитокен (ERC-1155)';
 
   @override
   String get tokenGateRuleNative => 'Рідний токен';
@@ -4751,7 +4753,7 @@ class SUk extends S {
   String get aiSummarizeError => 'Не вдалося підсумувати';
 
   @override
-  String get aiRewrite => 'AI Rewrite';
+  String get aiRewrite => 'Переписати за допомогою ШІ';
 
   @override
   String get aiRewriteFormal => 'Формальний';
@@ -5041,25 +5043,26 @@ class SUk extends S {
   String get reportSelectReason => 'Виберіть причину';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'Увійдіть, щоб надіслати скаргу.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'Обліковий запис змінився. Знову відкрийте скаргу для надсилання.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'Цей домашній сервер не підтримує скарги на користувачів.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'Цей домашній сервер не підтримує скарги на кімнати.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => 'Забагато скарг. Спробуйте пізніше.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend =>
+      'Не вдалося надіслати скаргу. Повторіть спробу.';
 
   @override
   String get gameCenter => 'Ігри';
@@ -5685,7 +5688,7 @@ class SUk extends S {
   String get nftPickerTabPopular => 'Популярний';
 
   @override
-  String get nftPickerTabCustom => 'Custom';
+  String get nftPickerTabCustom => 'Власний';
 
   @override
   String get nftPickerChain => 'ланцюг';
@@ -5717,7 +5720,7 @@ class SUk extends S {
       'Введіть адресу контракту та ідентифікатор токена';
 
   @override
-  String get nftPickerInfoTitle => 'NFT Avatar — Verified On-Chain';
+  String get nftPickerInfoTitle => 'NFT-аватар — перевірено в блокчейні';
 
   @override
   String get nftPickerInfoDesc =>
@@ -5955,31 +5958,31 @@ class SUk extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'Захищене з’єднання не готове. Повідомлення не надіслано. Перевірте з’єднання й верифікацію пристроїв в обох записах, потім повторіть спробу.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'Очікування прийняття';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'Дружбу не підтверджено. Перед надсиланням перевірте «Контакти > Нові друзі».';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return 'Фото: $count';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Опублікувати відео';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Почати трансляцію';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Вибрати відео';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'Прямі трансляції недоступні';
 
   @override
   String get qrcodeAlbum => 'Альбом';
@@ -5988,101 +5991,101 @@ class SUk extends S {
   String get settingsSwitchAccount => 'Змінити обліковий запис';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'Непрочитані';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'Немає розмов для цього фільтра';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'Додати обліковий запис';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'Поточний обліковий запис';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'Перемикання облікового запису…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'Не вдалося перемкнути обліковий запис. Повторіть спробу або додайте його для повторного входу.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'Перемикайте облікові записи тут, щоб повідомлення та захищений сеанс кожного запису зберігалися окремо.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'Збережених облікових записів ще немає';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'Запит надіслано';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'Отримані запити';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'Надіслані запити';
 
   @override
   String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+      'Після прийняття запиту ви зможете спілкуватися й телефонувати.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'Повернутися до дзвінка';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'Надсилається';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'Надіслано';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'Доставлено';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'Прочитано';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'Не надіслано. Натисніть, щоб повторити.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'Повідомлення недоступне на цьому пристрої. Натисніть, щоб перевірити варіанти відновлення.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'Обрані друзі';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'Цей друг не має доступного зашифрованого сеансу. Попросіть його увійти й відкрити застосунок, а потім повторіть спробу. Для зміни запису використовуйте «Перемкнути обліковий запис» замість виходу.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'Змінюєте обліковий запис? Використовуйте перемикання, щоб зберегти повідомлення та захищені сеанси. Вихід відкликає доступ цього пристрою і може зробити вхідні зашифровані повідомлення недоступними.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'Підсумки ШІ зараз недоступні. Повторіть спробу після відновлення доступу до сервісу.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'Підсумувати останні повідомлення: $count';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return 'Приєдналися: $joined · Запрошено: $invited';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return 'Запити, що очікують: $count';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'Чернетка';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'Покажчик контактів';
 
   @override
   String get transferAssetUnavailable => 'Платіжний актив недоступний';
@@ -6091,112 +6094,112 @@ class SUk extends S {
   String get transferPaymentRequestUnavailable => 'Запит на оплату недоступний';
 
   @override
-  String get chatCatchUp => 'Catch up';
+  String get chatCatchUp => 'Наздогнати розмову';
 
   @override
-  String get chatCatchUpMentions => 'Mentions';
+  String get chatCatchUpMentions => 'Згадки';
 
   @override
-  String get chatCatchUpReplies => 'Replies to me';
+  String get chatCatchUpReplies => 'Відповіді мені';
 
   @override
-  String get chatCatchUpPinned => 'Pinned messages';
+  String get chatCatchUpPinned => 'Закріплені повідомлення';
 
   @override
   String get chatCatchUpScope =>
-      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+      'Згадки й відповіді шукаються серед завантажених повідомлень, зокрема прочитаних. Завантажте старіші повідомлення, щоб знайти попередні відповіді.';
 
   @override
-  String get chatCatchUpLoadMore => 'Load older messages';
+  String get chatCatchUpLoadMore => 'Завантажити старіші повідомлення';
 
   @override
-  String get chatActionPreview => 'Review calendar suggestion';
+  String get chatActionPreview => 'Перевірити пропозицію для календаря';
 
   @override
   String get chatActionPrivacy =>
-      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+      'Лише наведені нижче назва й час будуть передані застосунку календаря після підтвердження. Перевірте часовий пояс. Ваш обліковий запис календаря може синхронізувати цю подію.';
 
   @override
-  String get chatActionTitle => 'Chat event';
+  String get chatActionTitle => 'Подія з чату';
 
   @override
-  String get chatActionSuggestion => 'Calendar suggestion';
+  String get chatActionSuggestion => 'Пропозиція для календаря';
 
   @override
-  String get chatUnreadAttention => 'Unread mentions and replies';
+  String get chatUnreadAttention => 'Непрочитані згадки й відповіді';
 
   @override
-  String get chatScanAgain => 'Scan again';
+  String get chatScanAgain => 'Сканувати знову';
 
   @override
   String get chatUnreadScope =>
-      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+      'Історія на сервері переглядається до вашої позначки прочитання. Відкрийте розмову, щоб прочитати її; оновіть для повторного пошуку.';
 
   @override
   String get chatScanIncomplete =>
-      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+      'Неповні дані: історія, розшифрування або позначка прочитання недоступні. Повторіть після синхронізації.';
 
   @override
-  String get chatHistoryShare => 'Share selected history';
+  String get chatHistoryShare => 'Поділитися вибраною історією';
 
   @override
   String get chatHistoryExplanation =>
-      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+      'Лише для адміністраторів. Виберіть звичайний текст і наявний зашифрований особистий чат з учасником, який приєднався до групи. Надсилання створить видимі повідомлення аудиту в групі.';
 
   @override
-  String get chatHistoryEnable => 'Enable sharing';
+  String get chatHistoryEnable => 'Дозволити надсилання історії';
 
   @override
-  String get chatHistoryDisable => 'Disable sharing';
+  String get chatHistoryDisable => 'Заборонити надсилання історії';
 
   @override
-  String get chatHistoryPolicy => 'Group history sharing policy';
+  String get chatHistoryPolicy => 'Правила надсилання історії групи';
 
   @override
   String get chatHistoryPolicyDetail =>
-      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+      'Історією можуть ділитися лише адміністратори. Увімкнення також обмежить видимість історії групи подіями після приєднання. Установіть нижче обмеження текстових повідомлень і підтвердьте.';
 
   @override
-  String get chatHistoryPolicySaved => 'Policy saved';
+  String get chatHistoryPolicySaved => 'Правила збережено';
 
   @override
-  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+  String get chatHistoryRecipient => 'Зашифрована розмова з одержувачем';
 
   @override
-  String get chatHistoryReview => 'Review selected messages';
+  String get chatHistoryReview => 'Перевірити вибрані повідомлення';
 
   @override
-  String get chatHistoryMessages => 'messages';
+  String get chatHistoryMessages => 'повідомлення';
 
   @override
   String get chatHistoryConfirmDetail =>
-      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+      'Перед надсиланням перевірте одержувача, кожне повідомлення та його час. У разі помилки або невідомого результату вміст уже міг бути надісланий: звірте результат перед продовженням.';
 
   @override
   String get chatHistoryCompleted =>
-      'Selected history sent and group audit confirmed';
+      'Вибрану історію надіслано, аудит у групі підтверджено';
 
   @override
   String get chatHistoryPending =>
-      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+      'Очікування: звірте результат і знову підтвердьте, щоб продовжити. Надсилання з невідомим результатом ніколи не повторюються.';
 
   @override
-  String get chatHistoryReconcile => 'Reconcile send result';
+  String get chatHistoryReconcile => 'Звірити результат надсилання';
 
   @override
   String get chatHistoryFailed =>
-      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+      'Не вдалося завершити. Перевірте права адміністратора, правила групи, шифрування, членство одержувача та вибір повідомлень. Якщо надсилання почалося, звірте його результат.';
 
   @override
-  String get chatDeviceActions => 'On-device actions';
+  String get chatDeviceActions => 'Дії на пристрої';
 
   @override
   String get chatDeviceActionsReview =>
-      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+      'Після підтвердження лише це повідомлення передається системним пропозиціям дій на пристрої. Виберіть дію, щоб відкрити Календар, Нагадування або Карти.';
 
   @override
-  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+  String get chatHistoryMaxMessages => 'Ліміт повідомлень (1–50)';
 
   @override
-  String get chatHistoryMaxHours => 'History window in hours (1–720)';
+  String get chatHistoryMaxHours => 'Глибина історії в годинах (1–720)';
 }

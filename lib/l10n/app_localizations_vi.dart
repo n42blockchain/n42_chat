@@ -1978,70 +1978,72 @@ class SVi extends S {
   String get settingsSecurityTitle => 'Bao mat';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'Xóa tài khoản';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'Vô hiệu hóa tài khoản Matrix này và dọn dữ liệu trò chuyện cục bộ của tài khoản';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Thao tác này yêu cầu vô hiệu hóa vĩnh viễn tài khoản Matrix. Sau khi máy chủ xác nhận, ứng dụng sẽ xóa phiên trò chuyện cục bộ và khóa mã hóa của tài khoản này khi an toàn. Các tài khoản khác và ví của bạn được giữ lại. Liên kết máy chủ và chính sách lưu giữ có thể hạn chế việc xóa dữ liệu.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'Mật khẩu Matrix, nếu được yêu cầu';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase =>
+      'Yêu cầu xóa dữ liệu trên máy chủ';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'Yêu cầu máy chủ chủ quản này xóa dữ liệu tài khoản nếu được hỗ trợ. Các bản sao trên máy chủ khác hoặc dữ liệu phải lưu giữ có thể vẫn còn.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage =>
+      'Xác minh tài khoản Matrix này';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Dùng mật khẩu Matrix';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'Tiếp tục trong trình duyệt';
 
   @override
   String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+      'Quay lại từ bước xác minh Matrix';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'Quay lại từ trình duyệt không xác nhận việc xóa. Hãy kiểm tra yêu cầu ban đầu với máy chủ Matrix.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'Kiểm tra với máy chủ';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Máy chủ Matrix chưa xác nhận việc xóa tài khoản.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'Đang chờ dọn tài khoản cục bộ';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'Xem lại việc dọn tài khoản Matrix đã bị vô hiệu hóa';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'Không thể đọc bản ghi dọn dữ liệu đang chờ. Nhấn để thử lại.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Tài khoản Matrix đã bị vô hiệu hóa nhưng việc dọn dữ liệu cục bộ vẫn đang chờ. Các tài khoản khác vẫn dùng được.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'Trang quản lý tài khoản đã mở trong trình duyệt. Việc xóa chưa được xác nhận trong ứng dụng này nên phiên trò chuyện của bạn vẫn dùng được.';
 
   @override
   String get settingsKeyBackup => 'Sao luu khoa';
@@ -5001,25 +5003,25 @@ class SVi extends S {
   String get reportSelectReason => 'Vui lòng chọn một lý do';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'Đăng nhập để gửi báo cáo.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'Tài khoản đã thay đổi. Mở lại báo cáo này để gửi.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'Máy chủ chủ quản này không hỗ trợ báo cáo người dùng.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'Máy chủ chủ quản này không hỗ trợ báo cáo phòng.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => 'Có quá nhiều báo cáo. Vui lòng thử lại sau.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend => 'Không thể gửi báo cáo. Vui lòng thử lại.';
 
   @override
   String get gameCenter => 'Trò chơi';
@@ -5911,31 +5913,31 @@ class SVi extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'Kết nối bảo mật chưa sẵn sàng. Tin nhắn chưa được gửi. Kiểm tra kết nối và xác minh thiết bị của cả hai tài khoản rồi thử lại.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'Đang chờ chấp nhận';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'Quan hệ bạn bè chưa được xác nhận. Kiểm tra Danh bạ > Bạn mới trước khi gửi.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return '$count ảnh';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Đăng video';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Phát trực tiếp';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Chọn video';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'Không thể phát trực tiếp';
 
   @override
   String get qrcodeAlbum => 'Album';
@@ -5944,101 +5946,101 @@ class SVi extends S {
   String get settingsSwitchAccount => 'Chuyển tài khoản';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'Chưa đọc';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'Không có cuộc trò chuyện trong bộ lọc này';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'Thêm tài khoản';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'Tài khoản hiện tại';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'Đang chuyển tài khoản…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'Không thể chuyển tài khoản. Hãy thử lại hoặc thêm tài khoản để đăng nhập lại.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'Chuyển tài khoản tại đây để giữ riêng tin nhắn và phiên bảo mật của từng tài khoản.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'Chưa có tài khoản đã lưu';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'Đã gửi yêu cầu';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'Yêu cầu đã nhận';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'Yêu cầu đã gửi';
 
   @override
   String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+      'Bạn có thể trò chuyện và gọi sau khi yêu cầu được chấp nhận.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'Quay lại cuộc gọi';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'Đang gửi';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'Đã gửi';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'Đã chuyển đến';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'Đã đọc';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'Chưa gửi. Nhấn để thử lại.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'Tin nhắn không có trên thiết bị này. Nhấn để xem các tùy chọn khôi phục.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'Bạn được gắn sao';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'Người bạn này chưa có phiên mã hóa khả dụng. Yêu cầu họ đăng nhập và mở ứng dụng rồi thử lại. Dùng Chuyển tài khoản thay vì đăng xuất khi đổi tài khoản.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'Bạn muốn đổi tài khoản? Dùng Chuyển tài khoản để giữ tin nhắn và phiên bảo mật. Đăng xuất sẽ thu hồi quyền của thiết bị này và có thể khiến tin nhắn mã hóa đến không còn khả dụng.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'Tính năng tóm tắt AI hiện không khả dụng. Vui lòng thử lại sau khi quyền truy cập dịch vụ được khôi phục.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'Tóm tắt $count tin nhắn gần đây';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return '$joined đã tham gia · $invited được mời';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return '$count yêu cầu đang chờ';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'Bản nháp';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'Mục lục danh bạ';
 
   @override
   String get transferAssetUnavailable => 'Tài sản thanh toán không khả dụng';
@@ -6048,112 +6050,112 @@ class SVi extends S {
       'Yêu cầu thanh toán không khả dụng';
 
   @override
-  String get chatCatchUp => 'Catch up';
+  String get chatCatchUp => 'Xem nội dung bỏ lỡ';
 
   @override
-  String get chatCatchUpMentions => 'Mentions';
+  String get chatCatchUpMentions => 'Lượt nhắc';
 
   @override
-  String get chatCatchUpReplies => 'Replies to me';
+  String get chatCatchUpReplies => 'Trả lời tôi';
 
   @override
-  String get chatCatchUpPinned => 'Pinned messages';
+  String get chatCatchUpPinned => 'Tin nhắn được ghim';
 
   @override
   String get chatCatchUpScope =>
-      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+      'Lượt nhắc và trả lời sử dụng các tin nhắn đã tải, bao gồm tin đã đọc. Tải tin nhắn cũ để tìm các trả lời trước đó.';
 
   @override
-  String get chatCatchUpLoadMore => 'Load older messages';
+  String get chatCatchUpLoadMore => 'Tải tin nhắn cũ';
 
   @override
-  String get chatActionPreview => 'Review calendar suggestion';
+  String get chatActionPreview => 'Xem lại đề xuất lịch';
 
   @override
   String get chatActionPrivacy =>
-      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+      'Sau khi xác nhận, chỉ tiêu đề và thời gian bên dưới được chia sẻ với ứng dụng lịch. Hãy kiểm tra múi giờ. Tài khoản lịch có thể đồng bộ sự kiện này.';
 
   @override
-  String get chatActionTitle => 'Chat event';
+  String get chatActionTitle => 'Sự kiện trò chuyện';
 
   @override
-  String get chatActionSuggestion => 'Calendar suggestion';
+  String get chatActionSuggestion => 'Đề xuất lịch';
 
   @override
-  String get chatUnreadAttention => 'Unread mentions and replies';
+  String get chatUnreadAttention => 'Lượt nhắc và trả lời chưa đọc';
 
   @override
-  String get chatScanAgain => 'Scan again';
+  String get chatScanAgain => 'Quét lại';
 
   @override
   String get chatUnreadScope =>
-      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+      'Quét lịch sử máy chủ đến dấu đã đọc của bạn. Mở cuộc trò chuyện để đọc; làm mới để tạo lại kết quả.';
 
   @override
   String get chatScanIncomplete =>
-      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+      'Chưa hoàn tất: không có lịch sử, khả năng giải mã hoặc dấu đã đọc. Hãy thử lại sau khi đồng bộ.';
 
   @override
-  String get chatHistoryShare => 'Share selected history';
+  String get chatHistoryShare => 'Chia sẻ lịch sử đã chọn';
 
   @override
   String get chatHistoryExplanation =>
-      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+      'Chỉ dành cho quản trị viên. Chọn văn bản thuần và cuộc trò chuyện riêng đã mã hóa có sẵn với thành viên đã tham gia nhóm. Việc chia sẻ tạo thông báo kiểm toán hiển thị trong nhóm.';
 
   @override
-  String get chatHistoryEnable => 'Enable sharing';
+  String get chatHistoryEnable => 'Bật chia sẻ';
 
   @override
-  String get chatHistoryDisable => 'Disable sharing';
+  String get chatHistoryDisable => 'Tắt chia sẻ';
 
   @override
-  String get chatHistoryPolicy => 'Group history sharing policy';
+  String get chatHistoryPolicy => 'Chính sách chia sẻ lịch sử nhóm';
 
   @override
   String get chatHistoryPolicyDetail =>
-      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+      'Chỉ quản trị viên được chia sẻ. Khi bật, lịch sử nhóm cũng bị giới hạn chỉ hiển thị sự kiện sau khi tham gia. Đặt giới hạn tin nhắn văn bản bên dưới rồi xác nhận.';
 
   @override
-  String get chatHistoryPolicySaved => 'Policy saved';
+  String get chatHistoryPolicySaved => 'Đã lưu chính sách';
 
   @override
-  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+  String get chatHistoryRecipient => 'Cuộc trò chuyện người nhận đã mã hóa';
 
   @override
-  String get chatHistoryReview => 'Review selected messages';
+  String get chatHistoryReview => 'Xem lại tin nhắn đã chọn';
 
   @override
-  String get chatHistoryMessages => 'messages';
+  String get chatHistoryMessages => 'tin nhắn';
 
   @override
   String get chatHistoryConfirmDetail =>
-      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+      'Xác nhận người nhận, từng tin nhắn và thời gian trước khi chia sẻ. Dù thất bại hoặc không rõ kết quả, nội dung có thể đã được gửi: hãy đối chiếu kết quả trước khi tiếp tục.';
 
   @override
   String get chatHistoryCompleted =>
-      'Selected history sent and group audit confirmed';
+      'Đã gửi lịch sử được chọn và xác nhận bản ghi kiểm toán nhóm';
 
   @override
   String get chatHistoryPending =>
-      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+      'Đang chờ: đối chiếu kết quả rồi xác nhận lại để tiếp tục. Không gửi lại các lần gửi có kết quả chưa rõ.';
 
   @override
-  String get chatHistoryReconcile => 'Reconcile send result';
+  String get chatHistoryReconcile => 'Đối chiếu kết quả gửi';
 
   @override
   String get chatHistoryFailed =>
-      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+      'Không thể hoàn tất. Kiểm tra quyền quản trị, chính sách nhóm, mã hóa, tư cách thành viên của người nhận và lựa chọn tin nhắn. Nếu đã bắt đầu gửi, hãy đối chiếu kết quả.';
 
   @override
-  String get chatDeviceActions => 'On-device actions';
+  String get chatDeviceActions => 'Thao tác trên thiết bị';
 
   @override
   String get chatDeviceActionsReview =>
-      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+      'Sau khi xác nhận, chỉ tin nhắn này được cung cấp cho tính năng đề xuất thao tác trên thiết bị của hệ thống. Chọn thao tác để mở Lịch, Lời nhắc hoặc Bản đồ.';
 
   @override
-  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+  String get chatHistoryMaxMessages => 'Giới hạn tin nhắn (1–50)';
 
   @override
-  String get chatHistoryMaxHours => 'History window in hours (1–720)';
+  String get chatHistoryMaxHours => 'Khoảng thời gian lịch sử theo giờ (1–720)';
 }

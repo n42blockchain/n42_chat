@@ -695,7 +695,7 @@ class SCs extends S {
   String get groupOwner => 'vlastník';
 
   @override
-  String get groupAdmin => 'Admin';
+  String get groupAdmin => 'Správce';
 
   @override
   String get groupInvite => 'Pozvat';
@@ -1213,7 +1213,7 @@ class SCs extends S {
   String get chatGoogleSearch => 'Vyhledávání Google';
 
   @override
-  String get chatBingSearch => 'Bing Search';
+  String get chatBingSearch => 'Vyhledávání Bing';
 
   @override
   String get chatCalling => 'Volání...';
@@ -1818,7 +1818,7 @@ class SCs extends S {
   String get commonGroupOwner => 'vlastník';
 
   @override
-  String get commonGroupAdmin => 'Admin';
+  String get commonGroupAdmin => 'Správce';
 
   @override
   String get groupSearchMembers => 'Hledat členy';
@@ -1852,7 +1852,7 @@ class SCs extends S {
   String get chatSingleChoice => 'Svobodný';
 
   @override
-  String get chatMultiChoice => 'Multi';
+  String get chatMultiChoice => 'Více možností';
 
   @override
   String get chatEnded => 'Skončilo';
@@ -1919,7 +1919,7 @@ class SCs extends S {
   String get qrcodeMoreStylesFeatureComingSoon => 'Další styly již brzy';
 
   @override
-  String get profileBio => 'Bio';
+  String get profileBio => 'O mně';
 
   @override
   String get profileHomeServer => 'Server';
@@ -1993,70 +1993,71 @@ class SCs extends S {
   String get settingsSecurityTitle => 'Bezpečnost';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'Smazat účet';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'Deaktivovat tento účet Matrix a vyčistit jeho místní data chatu';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Tato akce žádá o trvalou deaktivaci účtu Matrix. Po potvrzení serverem aplikace odstraní místní relaci chatu a šifrovací klíče tohoto účtu, jakmile to bude bezpečné. Ostatní účty a peněženka zůstanou zachovány. Federace a pravidla uchovávání dat serveru mohou omezovat jejich smazání.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'Heslo Matrix, je-li vyžadováno';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase =>
+      'Požádat o smazání dat na serveru';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'Požádat tento domovský server o smazání dat účtu, pokud je podporováno. Kopie na jiných serverech nebo vyžadované pravidly uchovávání mohou zůstat.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage => 'Ověřte tento účet Matrix';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Použít heslo Matrix';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'Pokračovat v prohlížeči';
 
   @override
   String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+      'Vrátit se po ověření Matrix';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'Návrat z prohlížeče nepotvrzuje smazání. Zkontrolujte původní požadavek na serveru Matrix.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'Ověřit na serveru';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Server Matrix nepotvrdil smazání účtu.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'Čeká se na místní vyčištění účtu';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'Zkontrolovat vyčištění dříve deaktivovaného účtu Matrix';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'Záznamy čekajícího vyčištění nelze načíst. Klepnutím to zkuste znovu.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Účet Matrix byl deaktivován, ale místní vyčištění stále čeká. Ostatní účty jsou nadále dostupné.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'Správa účtu byla otevřena v prohlížeči. Smazání nebylo v aplikaci potvrzeno, proto zůstává relace chatu dostupná.';
 
   @override
   String get settingsKeyBackup => 'Záloha klíčů';
@@ -2530,7 +2531,7 @@ class SCs extends S {
   String get chatSingleChoiceLabel => 'Svobodný';
 
   @override
-  String get chatMultiChoiceLabel => 'Multi';
+  String get chatMultiChoiceLabel => 'Více možností';
 
   @override
   String get chatAnonymousPollSwitch => 'Anonymní hlasování';
@@ -3012,7 +3013,7 @@ class SCs extends S {
       'V této skupině zatím nejsou žádné fotky ani videa';
 
   @override
-  String get groupDocuments => 'Docs';
+  String get groupDocuments => 'Dokumenty';
 
   @override
   String get groupNoFiles => 'Žádné soubory';
@@ -3634,7 +3635,7 @@ class SCs extends S {
   String get profileStatusCoffee => 'Káva';
 
   @override
-  String get profileStatusBubbleTea => 'Bubble Tea';
+  String get profileStatusBubbleTea => 'Bublinkový čaj';
 
   @override
   String get profileStatusEating => 'Stravování';
@@ -4075,7 +4076,7 @@ class SCs extends S {
   }
 
   @override
-  String get callInCallChat => 'In-Call Chat';
+  String get callInCallChat => 'Chat během hovoru';
 
   @override
   String callMessagesCount(int count) {
@@ -4273,7 +4274,7 @@ class SCs extends S {
   String get ensNotFound => 'Název ENS nebyl nalezen';
 
   @override
-  String get tokenGateTitle => 'Token Gate';
+  String get tokenGateTitle => 'Přístup podle tokenů';
 
   @override
   String get tokenGateEnable => 'Povolit Token Gate';
@@ -4321,7 +4322,7 @@ class SCs extends S {
   String get tokenGateRuleErc721 => 'NFT (ERC-721)';
 
   @override
-  String get tokenGateRuleErc1155 => 'Multi-Token (ERC-1155)';
+  String get tokenGateRuleErc1155 => 'Více tokenů (ERC-1155)';
 
   @override
   String get tokenGateRuleNative => 'Nativní token';
@@ -4346,7 +4347,7 @@ class SCs extends S {
   String get tokenGateChain => 'řetěz';
 
   @override
-  String get tokenGateTokenStandard => 'Token Standard';
+  String get tokenGateTokenStandard => 'Standard tokenu';
 
   @override
   String get tokenGateDenialMessage => 'Zpráva o odmítnutí';
@@ -4446,7 +4447,7 @@ class SCs extends S {
   String get totalUsage => 'Celkové využití';
 
   @override
-  String get cache => 'Cache';
+  String get cache => 'Mezipaměť';
 
   @override
   String get other => 'Jiné';
@@ -5025,25 +5026,26 @@ class SCs extends S {
   String get reportSelectReason => 'Vyberte prosím důvod';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'Pro odeslání hlášení se přihlaste.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'Účet se změnil. Pro odeslání znovu otevřete toto hlášení.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'Tento domovský server nepodporuje hlášení uživatelů.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'Tento domovský server nepodporuje hlášení místností.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => 'Příliš mnoho hlášení. Zkuste to později.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend =>
+      'Hlášení se nepodařilo odeslat. Zkuste to znovu.';
 
   @override
   String get gameCenter => 'Hry';
@@ -5540,7 +5542,7 @@ class SCs extends S {
   String get chatTimerOff => 'Vypnuto';
 
   @override
-  String get onChainNotificationsTitle => 'On-chain Events';
+  String get onChainNotificationsTitle => 'Události na blockchainu';
 
   @override
   String get onChainMarkAllRead => 'Označte vše jako přečtené';
@@ -5710,7 +5712,7 @@ class SCs extends S {
       'Připojte svou peněženku N42 a automaticky zjistěte své NFT ve více než 236 řetězcích.';
 
   @override
-  String get profileBindNftAvatar => 'Bind NFT Avatar';
+  String get profileBindNftAvatar => 'Propojit NFT avatar';
 
   @override
   String get profileChangeAvatar => 'Změňte avatara';
@@ -5935,31 +5937,31 @@ class SCs extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'Zabezpečené spojení není připraveno. Zpráva nebyla odeslána. Zkontrolujte spojení a ověření zařízení u obou účtů a zkuste to znovu.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'Čeká na přijetí';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'Přátelství nebylo potvrzeno. Před odesláním zkontrolujte „Kontakty > Noví přátelé“.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return 'Fotografie: $count';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Zveřejnit video';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Spustit živé vysílání';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Vybrat video';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'Živé vysílání není dostupné';
 
   @override
   String get qrcodeAlbum => 'Album';
@@ -5968,101 +5970,101 @@ class SCs extends S {
   String get settingsSwitchAccount => 'Přepnout účet';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'Nepřečtené';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'Pro tento filtr nejsou žádné konverzace';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'Přidat účet';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'Aktuální účet';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'Přepínání účtu…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'Účet nelze přepnout. Zkuste to znovu nebo účet přidejte a znovu se přihlaste.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'Přepínejte účty zde, aby zprávy a zabezpečené relace jednotlivých účtů zůstaly oddělené.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'Zatím nejsou uloženy žádné účty';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'Žádost odeslána';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'Přijaté žádosti';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'Odeslané žádosti';
 
   @override
   String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+      'Po přijetí žádosti můžete chatovat a volat.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'Vrátit se k hovoru';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'Odesílání';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'Odesláno';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'Doručeno';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'Přečteno';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'Neodesláno. Klepnutím opakujte.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'Zpráva na tomto zařízení není dostupná. Klepnutím zkontrolujte možnosti obnovení.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'Přátelé s hvězdičkou';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'Tento přítel nemá dostupnou šifrovanou relaci. Požádejte ho o přihlášení a otevření aplikace a zkuste to znovu. Při změně účtu používejte přepnutí účtu místo odhlášení.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'Měníte účet? Použijte přepnutí účtu a zachovejte zprávy a zabezpečené relace. Odhlášení odvolá přístup tohoto zařízení a může znemožnit čtení příchozích šifrovaných zpráv.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'Souhrny AI nyní nejsou dostupné. Zkuste to po obnovení přístupu ke službě.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'Shrnout poslední zprávy: $count';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return 'Připojeno: $joined · Pozváno: $invited';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return 'Čekající žádosti: $count';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'Koncept';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'Rejstřík kontaktů';
 
   @override
   String get transferAssetUnavailable => 'Platební aktivum není dostupné';
@@ -6072,112 +6074,112 @@ class SCs extends S {
       'Žádost o platbu není dostupná';
 
   @override
-  String get chatCatchUp => 'Catch up';
+  String get chatCatchUp => 'Dohnat konverzaci';
 
   @override
-  String get chatCatchUpMentions => 'Mentions';
+  String get chatCatchUpMentions => 'Zmínky';
 
   @override
-  String get chatCatchUpReplies => 'Replies to me';
+  String get chatCatchUpReplies => 'Odpovědi mně';
 
   @override
-  String get chatCatchUpPinned => 'Pinned messages';
+  String get chatCatchUpPinned => 'Připnuté zprávy';
 
   @override
   String get chatCatchUpScope =>
-      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+      'Zmínky a odpovědi se hledají v načtených zprávách včetně přečtených. Načtěte starší zprávy, chcete-li najít dřívější odpovědi.';
 
   @override
-  String get chatCatchUpLoadMore => 'Load older messages';
+  String get chatCatchUpLoadMore => 'Načíst starší zprávy';
 
   @override
-  String get chatActionPreview => 'Review calendar suggestion';
+  String get chatActionPreview => 'Zkontrolovat návrh do kalendáře';
 
   @override
   String get chatActionPrivacy =>
-      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+      'Po potvrzení se do aplikace kalendáře předá pouze níže uvedený název a čas. Zkontrolujte časové pásmo. Váš kalendářový účet může tuto událost synchronizovat.';
 
   @override
-  String get chatActionTitle => 'Chat event';
+  String get chatActionTitle => 'Událost z chatu';
 
   @override
-  String get chatActionSuggestion => 'Calendar suggestion';
+  String get chatActionSuggestion => 'Návrh do kalendáře';
 
   @override
-  String get chatUnreadAttention => 'Unread mentions and replies';
+  String get chatUnreadAttention => 'Nepřečtené zmínky a odpovědi';
 
   @override
-  String get chatScanAgain => 'Scan again';
+  String get chatScanAgain => 'Znovu prohledat';
 
   @override
   String get chatUnreadScope =>
-      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+      'Prohledává historii serveru po vaši značku přečtení. Otevřete konverzaci a přečtěte si ji; obnovením znovu sestavíte výsledky.';
 
   @override
   String get chatScanIncomplete =>
-      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+      'Neúplné: historie, dešifrování nebo značka přečtení nejsou dostupné. Zkuste to po synchronizaci.';
 
   @override
-  String get chatHistoryShare => 'Share selected history';
+  String get chatHistoryShare => 'Sdílet vybranou historii';
 
   @override
   String get chatHistoryExplanation =>
-      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+      'Pouze pro správce. Vyberte prostý text a existující šifrovaný přímý chat s členem, který se připojil ke skupině. Sdílení vytvoří ve skupině viditelné auditní zprávy.';
 
   @override
-  String get chatHistoryEnable => 'Enable sharing';
+  String get chatHistoryEnable => 'Povolit sdílení';
 
   @override
-  String get chatHistoryDisable => 'Disable sharing';
+  String get chatHistoryDisable => 'Zakázat sdílení';
 
   @override
-  String get chatHistoryPolicy => 'Group history sharing policy';
+  String get chatHistoryPolicy => 'Pravidla sdílení historie skupiny';
 
   @override
   String get chatHistoryPolicyDetail =>
-      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+      'Sdílet mohou pouze správci. Zapnutí také omezí viditelnost historie skupiny na události po připojení. Níže nastavte limity textových zpráv a potvrďte.';
 
   @override
-  String get chatHistoryPolicySaved => 'Policy saved';
+  String get chatHistoryPolicySaved => 'Pravidla uložena';
 
   @override
-  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+  String get chatHistoryRecipient => 'Šifrovaná konverzace s příjemcem';
 
   @override
-  String get chatHistoryReview => 'Review selected messages';
+  String get chatHistoryReview => 'Zkontrolovat vybrané zprávy';
 
   @override
-  String get chatHistoryMessages => 'messages';
+  String get chatHistoryMessages => 'zprávy';
 
   @override
   String get chatHistoryConfirmDetail =>
-      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+      'Před sdílením ověřte příjemce, každou zprávu a její čas. Neúspěšný či neznámý výsledek může znamenat, že obsah už byl odeslán: před pokračováním ověřte výsledek.';
 
   @override
   String get chatHistoryCompleted =>
-      'Selected history sent and group audit confirmed';
+      'Vybraná historie odeslána a audit ve skupině potvrzen';
 
   @override
   String get chatHistoryPending =>
-      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+      'Čeká se: ověřte výsledek a znovu potvrďte pokračování. Odeslání s neznámým výsledkem se nikdy neopakuje.';
 
   @override
-  String get chatHistoryReconcile => 'Reconcile send result';
+  String get chatHistoryReconcile => 'Ověřit výsledek odeslání';
 
   @override
   String get chatHistoryFailed =>
-      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+      'Nelze dokončit. Zkontrolujte oprávnění správce, pravidla skupiny, šifrování, členství příjemce a výběr zpráv. Pokud odesílání začalo, ověřte jeho výsledek.';
 
   @override
-  String get chatDeviceActions => 'On-device actions';
+  String get chatDeviceActions => 'Akce v zařízení';
 
   @override
   String get chatDeviceActionsReview =>
-      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+      'Po potvrzení se pouze tato zpráva předá systémovým návrhům akcí v zařízení. Vyberte akci pro otevření Kalendáře, Připomínek nebo Map.';
 
   @override
-  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+  String get chatHistoryMaxMessages => 'Limit zpráv (1–50)';
 
   @override
-  String get chatHistoryMaxHours => 'History window in hours (1–720)';
+  String get chatHistoryMaxHours => 'Rozsah historie v hodinách (1–720)';
 }
