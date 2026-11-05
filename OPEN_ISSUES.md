@@ -42,7 +42,7 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 - Severity: H
 - Added: 2026-09-26
-- Current state: Task 13B's reviewed Android adapter passed direct APK upgrades from published v9 ESP and v10 RSA/GCM into the maintained 11.2.0 source. Chat now pins that source and the maintained facebook_auth_desktop plugin to immutable app commit `9733aa21eb7e4fa98c2aa8a287ef9588960023c2`; both Chat and example resolve the exact Git packages. Chat analysis and full suite pass. The consuming host still pins the old Chat commit and secure-storage 10, so its namespace migration and native release integration remain open.
+- Current state: Task 13B's reviewed Android adapter passed direct APK upgrades from published v9 ESP and v10 RSA/GCM into the maintained 11.2.0 source. Chat now pins that source and the maintained facebook_auth_desktop plugin to immutable app commit `9733aa21eb7e4fa98c2aa8a287ef9588960023c2`; both Chat and example resolve the exact Git packages. Chat analysis and full suite pass. The 2026-11-05 upgrade also validates Matrix 15 / Vodozemac 0.9, legacy pickle continuation and real SQLite schema-11 → 12 migration/reopen. The wallet host is integrating the pinned secure-storage 11 fork; final native release and installed-account device migration remain open.
 - Next step: Task 14 publishes this Chat integration, pins it from the host, applies both Git source overrides in the host's own dependency graph, configures the wallet/preference namespaces, and validates final host builds and device behavior. See `docs/testing/dependency-completion-2026-09-25/task14-chat-secure-source.md`.
 
 ### DEP-004 Host native SQLCipher selection requires integration validation

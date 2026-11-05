@@ -16,7 +16,7 @@ dependencies:
     path: ../
 
   # Matrix SDK for server testing
-  matrix: ^13.0.0
+  matrix: ^15.0.0
   path: ^1.9.1
   path_provider: ^2.1.5
   sqflite: ^2.4.1
