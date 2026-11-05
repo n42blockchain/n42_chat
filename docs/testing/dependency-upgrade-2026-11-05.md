@@ -8,3 +8,9 @@
 - Whole analyzer: exit 0; 308 existing info diagnostics, no errors/warnings.
 - Added real SQLite schema-11 → schema-12 migration checks for both outdated flags, retained direct trust, key lists, last sent Olm message, account/session/history bytes, and reopen idempotence.
 - Local automated acceptance does not prove physical-device push, existing installed account migration, or live multi-device homeserver acceptance. See OPEN_ISSUES.md.
+
+Final acceptance on Equatable 3: 7,753 executed tests passed, 4 intentionally
+skipped; JSON runner success=true. A fixed-duration gallery deletion wait failed
+once under concurrent load. The test now waits for actual persistence/deletion;
+its complete 11-case file and the subsequent full suite both pass. No production
+photo behavior was removed. The first full Equatable 2 suite also passed.
