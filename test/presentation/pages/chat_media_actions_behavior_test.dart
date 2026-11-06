@@ -526,8 +526,9 @@ void main() {
     expect(message.videoBytes, Uint8List.fromList([4, 5, 6]));
   });
 
-  for (final relogin in [false, true]) {
-  testWidgets('scheduled original image keeps login origin: relogin=$relogin', (
+  for (final outcome in ['saved', 'failed', 'reloginBefore', 'reloginAfter', 'disposed']) {
+  final relogin = outcome == 'reloginBefore';
+  testWidgets('scheduled original image waits for persistence: $outcome', (
     tester,
   ) async {
     imagePicker.images = [
@@ -541,6 +542,7 @@ void main() {
       schedulingAuth = auth;
       when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
     });
+    when(() => chat.isClosed).thenReturn(false);
     final sentEvents = <ChatEvent>[];
     when(() => chat.add(any())).thenAnswer((invocation) {
       sentEvents.add(invocation.positionalArguments.single as ChatEvent);
@@ -597,10 +599,22 @@ void main() {
     expect(localPath, isNot(contains(':')));
     expect(persistedFile.readAsBytesSync(), [7, 8, 9, 10]);
     expect(persistedFile.lengthSync(), 4);
-    expect(
-      find.text('Scheduled original image: ${scheduled.text}'),
-      findsOneWidget,
-    );
+    expect(find.text('Scheduled original image: ${scheduled.text}'), findsNothing);
+    if (outcome == 'reloginAfter') {
+      when(() => schedulingAuth.currentAccountGeneration).thenReturn(null);
+    }
+    if (outcome == 'disposed') await tester.pumpWidget(const SizedBox());
+    scheduled.completion!.complete(outcome != 'failed');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('Scheduled original image: ${scheduled.text}'),
+      outcome == 'saved' ? findsOneWidget : findsNothing);
+    expect(persistedFile.existsSync(), isTrue);
+    expect(sentEvents.whereType<SendScheduledMessage>(), hasLength(1));
+    if (outcome == 'failed') {
+      expect(find.textContaining('save not confirmed'), findsOneWidget);
+    }
+
     expect(imagePicker.multiImageCalls, 1);
     expect(tester.takeException(), isNull);
   });
