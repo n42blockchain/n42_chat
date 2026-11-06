@@ -26,6 +26,34 @@ class Api extends IdHubApi {
   bool fail = false;
   int completed = 0;
   String? receivedToken;
+  int browserPolls = 0;
+  String? browserProvider;
+  @override
+  Future<IdHubBrowserChallenge> startBrowserLogin(String provider) async {
+    browserProvider = provider;
+    return IdHubBrowserChallenge(
+      flowId: 'f' * 43,
+      completionSecret: 's' * 43,
+      browserUrl: Uri.parse(
+        'https://n42.world/v1/auth/n42/browser/login?ticket=' + 't' * 43,
+      ),
+      expiresIn: const Duration(seconds: 10),
+    );
+  }
+
+  @override
+  Future<IdHubWalletResponse?> pollBrowserLogin(
+    IdHubBrowserChallenge flow,
+  ) async {
+    browserPolls++;
+    return IdHubWalletResponse.success(
+      did: 'did:plc:alice',
+      matrixHomeserver: 'https://matrix.example',
+      matrixUserId: '@alice:matrix.example',
+      matrixAccessToken: 'matrix-token',
+    );
+  }
+
   @override
   Future<IdHubNativeChallenge> startNativeLogin(
     String provider,
@@ -234,4 +262,50 @@ void main() {
       await bloc.close();
     },
   );
+  for (final provider in ['apple', 'facebook']) {
+    test(
+      'Android $provider uses browser handoff without native OIDC SDK',
+      () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        when(
+          () => repo.loginWithToken(
+            homeserver: 'https://matrix.example',
+            accessToken: 'matrix-token',
+            userId: '@alice:matrix.example',
+            deviceId: '',
+          ),
+        ).thenAnswer((_) async => AuthResult.failure('test-only'));
+        var opened = false;
+        final bloc = AuthBloc(
+          authRepository: repo,
+          biometricService: Bio(),
+          secureStorage: Storage(),
+          idHubApiFactory: (_) => api,
+          nativeSocialProof: (_, _) async =>
+              throw StateError('Native SDK must not run'),
+          browserLoginLauncher: (uri) async {
+            expect(uri.host, 'n42.world');
+            opened = true;
+            return true;
+          },
+        );
+        final done = wait(bloc);
+        bloc.add(
+          provider == 'apple'
+              ? const AuthAppleLoginRequested(
+                  homeserver: 'https://legacy.example',
+                )
+              : const AuthFacebookLoginRequested(
+                  homeserver: 'https://legacy.example',
+                ),
+        );
+        await done;
+        expect(opened, true);
+        expect(api.browserProvider, provider);
+        expect(api.browserPolls, 1);
+        expect(api.completed, 0);
+        await bloc.close();
+      },
+    );
+  }
 }

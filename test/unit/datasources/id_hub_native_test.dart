@@ -187,4 +187,39 @@ void main() {
       api.close();
     },
   );
+  test('browser launch validates exact trusted origin and keeps completion secret off URL', () async {
+    var url = 'https://n42.world/v1/auth/n42/browser/login?ticket=' + 't' * 43;
+    final api = IdHubApi(
+      baseUrl: 'https://id.n42.world',
+      client: MockClient((r) async {
+        expect(r.followRedirects, false);
+        if (r.url.path.endsWith('/browser/complete'))
+          return http.Response(' {"status":"pending"}', 202);
+        return http.Response(
+          jsonEncode({
+            'flow_id': 'f' * 43,
+            'completion_secret': 's' * 43,
+            'browser_url': url,
+            'expires_in': 600,
+          }),
+          200,
+        );
+      }),
+    );
+    final flow = await api.startBrowserLogin('apple');
+    expect(flow.browserUrl.toString(), isNot(contains(flow.completionSecret)));
+    expect(await api.pollBrowserLogin(flow), isNull);
+    for (final invalid in [
+      'https://evil.test/v1/auth/n42/browser/login?ticket=' + 't' * 43,
+      url + '&completion_secret=bad',
+      url + '#fragment',
+    ]) {
+      url = invalid;
+      await expectLater(
+        api.startBrowserLogin('facebook'),
+        throwsFormatException,
+      );
+    }
+    api.close();
+  });
 }

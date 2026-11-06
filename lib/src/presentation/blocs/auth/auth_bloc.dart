@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/services/biometric_service.dart';
@@ -30,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final IdHubApi Function(String baseUrl) _idHubApiFactory;
   final Future<SocialLoginResult?> Function(String provider, String nonce)?
   _nativeSocialProof;
+  final Future<bool> Function(Uri)? _browserLoginLauncher;
   bool _nativeSocialLoginBusy = false;
   int _nativeSocialEpoch = 0;
   StreamSubscription<bool>? _loginStateSubscription;
@@ -43,7 +45,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     IdHubApi Function(String baseUrl)? idHubApiFactory,
     Future<SocialLoginResult?> Function(String provider, String nonce)?
     nativeSocialProof,
-  }) : _nativeSocialProof = nativeSocialProof,
+    Future<bool> Function(Uri)? browserLoginLauncher,
+  }) : _browserLoginLauncher = browserLoginLauncher,
+       _nativeSocialProof = nativeSocialProof,
        _authRepository = authRepository,
        _biometricService = biometricService ?? BiometricService(),
        _secureStorage = secureStorage ?? SecureStorageDataSource(),
@@ -903,53 +907,84 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // requires the separate authorization-code path; never send it as an ID token.
       final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
       final isAndroid = defaultTargetPlatform == TargetPlatform.android;
-      if (kIsWeb || (!isIOS && !(provider == 'google' && isAndroid))) {
+      if (kIsWeb || (!isIOS && !isAndroid)) {
         throw StateError('Native OIDC login is not supported on this platform');
       }
       api = _idHubApiFactory(url);
-      final challenge = await api.startNativeLogin(
-        provider,
-        isIOS ? 'ios' : 'android',
-      );
-      if (emit.isDone ||
-          isClosed ||
-          epoch != _nativeSocialEpoch ||
-          _authRepository.currentUser?.userId != startingUser)
-        return true;
-      final service = AuthMethodsService();
-      final proof = _nativeSocialProof != null
-          ? await _nativeSocialProof(provider, challenge.nonce)
-          : provider == 'google'
-          ? await service.signInWithGoogle(requireServerCode: true)
-          : provider == 'apple'
-          ? await service.signInWithApple(serverNonce: challenge.nonce)
-          : await service.signInWithFacebook(serverNonce: challenge.nonce);
-      if (emit.isDone ||
-          isClosed ||
-          epoch != _nativeSocialEpoch ||
-          _authRepository.currentUser?.userId != startingUser)
-        return true;
-      if (proof == null) {
-        emit(
-          state.copyWith(
-            status: AuthStatus.unauthenticated,
-            errorMessage: BlocMessageKeys.authLoginCancelled,
-          ),
+      IdHubWalletResponse credentials;
+      if (isAndroid && provider != 'google') {
+        final flow = await api.startBrowserLogin(provider);
+        if (emit.isDone ||
+            isClosed ||
+            epoch != _nativeSocialEpoch ||
+            _authRepository.currentUser?.userId != startingUser)
+          return true;
+        final launched =
+            await (_browserLoginLauncher?.call(flow.browserUrl) ??
+                launchUrl(
+                  flow.browserUrl,
+                  mode: LaunchMode.externalApplication,
+                ));
+        if (!launched) throw StateError('Browser login could not open');
+        final deadline = DateTime.now().add(flow.expiresIn);
+        IdHubWalletResponse? completed;
+        while (DateTime.now().isBefore(deadline)) {
+          if (emit.isDone ||
+              isClosed ||
+              epoch != _nativeSocialEpoch ||
+              _authRepository.currentUser?.userId != startingUser)
+            return true;
+          completed = await api.pollBrowserLogin(flow);
+          if (completed != null) break;
+          await Future<void>.delayed(const Duration(seconds: 2));
+        }
+        if (completed == null) throw StateError('Browser login expired');
+        credentials = completed;
+      } else {
+        final challenge = await api.startNativeLogin(
+          provider,
+          isIOS ? 'ios' : 'android',
         );
-        return true;
+        if (emit.isDone ||
+            isClosed ||
+            epoch != _nativeSocialEpoch ||
+            _authRepository.currentUser?.userId != startingUser)
+          return true;
+        final service = AuthMethodsService();
+        final proof = _nativeSocialProof != null
+            ? await _nativeSocialProof(provider, challenge.nonce)
+            : provider == 'google'
+            ? await service.signInWithGoogle(requireServerCode: true)
+            : provider == 'apple'
+            ? await service.signInWithApple(serverNonce: challenge.nonce)
+            : await service.signInWithFacebook(serverNonce: challenge.nonce);
+        if (emit.isDone ||
+            isClosed ||
+            epoch != _nativeSocialEpoch ||
+            _authRepository.currentUser?.userId != startingUser)
+          return true;
+        if (proof == null) {
+          emit(
+            state.copyWith(
+              status: AuthStatus.unauthenticated,
+              errorMessage: BlocMessageKeys.authLoginCancelled,
+            ),
+          );
+          return true;
+        }
+        final code = proof.extra?['serverAuthCode'];
+        if (proof.provider != provider ||
+            (provider == 'google'
+                ? code is! String || code.isEmpty
+                : proof.idToken == null || proof.idToken!.isEmpty)) {
+          throw const FormatException('Missing provider identity token');
+        }
+        credentials = await api.completeNativeLogin(
+          challenge,
+          provider == 'google' ? '' : proof.idToken!,
+          serverAuthCode: provider == 'google' ? code as String : null,
+        );
       }
-      final code = proof.extra?['serverAuthCode'];
-      if (proof.provider != provider ||
-          (provider == 'google'
-              ? code is! String || code.isEmpty
-              : proof.idToken == null || proof.idToken!.isEmpty)) {
-        throw const FormatException('Missing provider identity token');
-      }
-      final credentials = await api.completeNativeLogin(
-        challenge,
-        provider == 'google' ? '' : proof.idToken!,
-        serverAuthCode: provider == 'google' ? code as String : null,
-      );
       if (emit.isDone ||
           isClosed ||
           epoch != _nativeSocialEpoch ||

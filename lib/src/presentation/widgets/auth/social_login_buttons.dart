@@ -145,6 +145,16 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       });
     }
 
+    final nativeAuthConfig = getIt.isRegistered<N42ChatConfig>()
+        ? getIt<N42ChatConfig>()
+        : null;
+    if (!kIsWeb &&
+        Platform.isAndroid &&
+        (nativeAuthConfig?.n42NativeAuthUrl?.isNotEmpty ?? false) &&
+        mounted) {
+      setState(() => _isAppleAvailable = true);
+    }
+
     // 检查 Apple 登录可用性
     if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
       try {

@@ -175,6 +175,61 @@ class IdHubApi {
       if (serverAuthCode == null) 'identity_token': identityToken,
       if (serverAuthCode != null) 'server_auth_code': serverAuthCode,
     });
+    return _matrixFromSession(result);
+  }
+
+  Future<IdHubBrowserChallenge> startBrowserLogin(String provider) async {
+    if (!['google', 'apple', 'facebook'].contains(provider))
+      throw ArgumentError('Invalid browser provider');
+    final data = await _nativePost('/browser/start', {'provider': provider});
+    final flow = data['flow_id'],
+        secret = data['completion_secret'],
+        url = data['browser_url'],
+        ttl = data['expires_in'];
+    final valid = RegExp(r'^[A-Za-z0-9_-]{43}$');
+    if (flow is! String ||
+        !valid.hasMatch(flow) ||
+        secret is! String ||
+        !valid.hasMatch(secret) ||
+        url is! String ||
+        ttl is! int ||
+        ttl <= 0 ||
+        ttl > 600)
+      throw const FormatException('Invalid browser login challenge');
+    final uri = Uri.tryParse(url);
+    if (uri == null ||
+        uri.scheme != 'https' ||
+        uri.host != 'n42.world' ||
+        uri.userInfo.isNotEmpty ||
+        (uri.hasPort && uri.port != 443) ||
+        uri.path != '/v1/auth/n42/browser/login' ||
+        uri.hasFragment ||
+        uri.queryParametersAll.length != 1 ||
+        uri.queryParametersAll['ticket']?.length != 1 ||
+        !valid.hasMatch(uri.queryParameters['ticket'] ?? ''))
+      throw const FormatException('Invalid browser authorization URL');
+    return IdHubBrowserChallenge(
+      flowId: flow,
+      completionSecret: secret,
+      browserUrl: uri,
+      expiresIn: Duration(seconds: ttl),
+    );
+  }
+
+  Future<IdHubWalletResponse?> pollBrowserLogin(
+    IdHubBrowserChallenge flow,
+  ) async {
+    final result = await _nativePost('/browser/complete', {
+      'flow_id': flow.flowId,
+      'completion_secret': flow.completionSecret,
+    }, allowPending: true);
+    if (result['status'] == 'pending') return null;
+    return _matrixFromSession(result);
+  }
+
+  Future<IdHubWalletResponse> _matrixFromSession(
+    Map<String, dynamic> result,
+  ) async {
     final session = result['session'];
     if (result['status'] != 'complete' ||
         session is! Map<String, dynamic> ||
@@ -226,6 +281,7 @@ class IdHubApi {
     String path,
     Map<String, Object?> body, {
     String? token,
+    bool allowPending = false,
   }) async {
     final request = http.Request('POST', Uri.parse('$baseUrl/v1/auth/n42$path'))
       ..followRedirects = false
@@ -235,7 +291,8 @@ class IdHubApi {
     final response = await http.Response.fromStream(
       await _client.send(request).timeout(_requestTimeout),
     ).timeout(_requestTimeout);
-    if (response.statusCode != 200)
+    if (response.statusCode != 200 &&
+        !(allowPending && response.statusCode == 202))
       throw IdHubException('N42 login request failed', response.statusCode);
     return _decodeObject(response);
   }
@@ -386,5 +443,18 @@ class IdHubNativeChallenge {
     required this.flowId,
     required this.completionSecret,
     required this.nonce,
+  });
+}
+
+class IdHubBrowserChallenge {
+  final String flowId;
+  final String completionSecret;
+  final Uri browserUrl;
+  final Duration expiresIn;
+  const IdHubBrowserChallenge({
+    required this.flowId,
+    required this.completionSecret,
+    required this.browserUrl,
+    required this.expiresIn,
   });
 }
