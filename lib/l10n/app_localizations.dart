@@ -11398,6 +11398,36 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Disable notifications for this chat on all devices'**
   String get chatNotifyMutedDescription;
+
+  /// No description provided for @scheduledMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled messages'**
+  String get scheduledMessagesTitle;
+
+  /// No description provided for @scheduledMessagesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No scheduled messages yet'**
+  String get scheduledMessagesEmpty;
+
+  /// No description provided for @scheduledMessagesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press Send, Photos, Files, a GIF or a sticker to schedule a message.'**
+  String get scheduledMessagesHint;
+
+  /// No description provided for @scheduledMessageCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled message cancelled'**
+  String get scheduledMessageCancelled;
+
+  /// No description provided for @scheduledMessageCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {time}'**
+  String scheduledMessageCreatedAt(String time);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

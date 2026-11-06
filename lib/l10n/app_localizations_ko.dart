@@ -6055,4 +6055,22 @@ class SKo extends S {
 
   @override
   String get chatNotifyMutedDescription => '모든 기기에서 이 채팅의 알림 끄기';
+
+  @override
+  String get scheduledMessagesTitle => '예약 메시지';
+
+  @override
+  String get scheduledMessagesEmpty => '예약된 메시지가 없습니다';
+
+  @override
+  String get scheduledMessagesHint =>
+      '보내기, 사진, 파일, GIF 또는 스티커를 길게 눌러 메시지를 예약하세요.';
+
+  @override
+  String get scheduledMessageCancelled => '예약 메시지가 취소되었습니다';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return '작성: $time';
+  }
 }

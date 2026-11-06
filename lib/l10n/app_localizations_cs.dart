@@ -6200,4 +6200,22 @@ class SCs extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Vypnout oznámení tohoto chatu na všech zařízeních';
+
+  @override
+  String get scheduledMessagesTitle => 'Naplánované zprávy';
+
+  @override
+  String get scheduledMessagesEmpty => 'Zatím žádné naplánované zprávy';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Zprávu naplánujete dlouhým stisknutím tlačítka Odeslat, Fotky, Soubory, GIFu nebo nálepky.';
+
+  @override
+  String get scheduledMessageCancelled => 'Naplánovaná zpráva byla zrušena';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Vytvořeno $time';
+  }
 }

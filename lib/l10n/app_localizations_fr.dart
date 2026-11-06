@@ -6256,4 +6256,22 @@ class SFr extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Désactiver les notifications de cette discussion sur tous les appareils';
+
+  @override
+  String get scheduledMessagesTitle => 'Messages programmés';
+
+  @override
+  String get scheduledMessagesEmpty => 'Aucun message programmé pour le moment';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Appuyez longuement sur Envoyer, Photos, Fichiers, un GIF ou un sticker pour programmer un message.';
+
+  @override
+  String get scheduledMessageCancelled => 'Message programmé annulé';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Créé le $time';
+  }
 }

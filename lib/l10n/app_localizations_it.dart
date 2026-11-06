@@ -6217,4 +6217,22 @@ class SIt extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Disattiva le notifiche di questa chat su tutti i dispositivi';
+
+  @override
+  String get scheduledMessagesTitle => 'Messaggi programmati';
+
+  @override
+  String get scheduledMessagesEmpty => 'Nessun messaggio programmato';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Tieni premuto Invia, Foto, File, una GIF o un adesivo per programmare un messaggio.';
+
+  @override
+  String get scheduledMessageCancelled => 'Messaggio programmato annullato';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Creato: $time';
+  }
 }

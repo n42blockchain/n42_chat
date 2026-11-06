@@ -6220,4 +6220,22 @@ class SSw extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Zima arifa za gumzo hili kwenye vifaa vyote';
+
+  @override
+  String get scheduledMessagesTitle => 'Ujumbe ulioratibiwa';
+
+  @override
+  String get scheduledMessagesEmpty => 'Bado hakuna ujumbe ulioratibiwa';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Bonyeza kwa muda Tuma, Picha, Faili, GIF au kibandiko ili kuratibu ujumbe.';
+
+  @override
+  String get scheduledMessageCancelled => 'Ujumbe ulioratibiwa umeghairiwa';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Uliundwa $time';
+  }
 }

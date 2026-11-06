@@ -4,6 +4,10 @@ import 'package:n42_chat/l10n/app_localizations.dart';
 // Update these accessors after regenerating the localization classes.
 // This test loads every supported locale and reads each non-parameter label.
 final _labels = <(String, String Function(S))>[
+  ('scheduledMessagesTitle', (s) => s.scheduledMessagesTitle),
+  ('scheduledMessagesEmpty', (s) => s.scheduledMessagesEmpty),
+  ('scheduledMessagesHint', (s) => s.scheduledMessagesHint),
+  ('scheduledMessageCancelled', (s) => s.scheduledMessageCancelled),
   ('chatCatchUp', (s) => s.chatCatchUp),
   ('chatCatchUpMentions', (s) => s.chatCatchUpMentions),
   ('chatCatchUpReplies', (s) => s.chatCatchUpReplies),
@@ -1812,6 +1816,7 @@ final _labels = <(String, String Function(S))>[
 ];
 
 final _formattedLabels = <(String, List<String> Function(S))>[
+  ('scheduledMessageCreatedAt', (s) => [s.scheduledMessageCreatedAt('2030-01-01 12:00')]),
   ('authLoginFailed', (s) => [s.authLoginFailed('fixture')]),
   (
     'commonStartRecordingFailed',
@@ -2422,13 +2427,14 @@ final _formattedLabels = <(String, List<String> Function(S))>[
 
 void main() {
   test('all supported locales provide readable labels', () async {
-    expect(_labels, hasLength(1690));
-    expect(_formattedLabels, hasLength(181));
+    expect(_labels, hasLength(1694));
+    expect(_formattedLabels, hasLength(182));
     expect(_labels.map((entry) => entry.$1).toSet(), hasLength(_labels.length));
     final emptyLabels = <String>[];
 
     for (final locale in S.supportedLocales) {
       final strings = await S.delegate.load(locale);
+      expect(strings.scheduledMessageCreatedAt('2030-01-01 12:00'), contains('2030-01-01 12:00'));
       for (final (key, read) in _labels) {
         if (read(strings).trim().isEmpty) {
           emptyLabels.add('$locale:$key');

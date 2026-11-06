@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Сповіщати про кожне нове повідомлення в цьому чаті",
   "chatNotifyMentions": "Лише згадки",
   "chatNotifyMentionsDescription": "Сповіщати лише коли вас згадують або використовують @room",
-  "chatNotifyMutedDescription": "Вимкнути сповіщення цього чату на всіх пристроях"
+  "chatNotifyMutedDescription": "Вимкнути сповіщення цього чату на всіх пристроях",
+  "scheduledMessagesTitle": "Заплановані повідомлення",
+  "scheduledMessagesEmpty": "Ще немає запланованих повідомлень",
+  "scheduledMessagesHint": "Натисніть і утримуйте «Надіслати», «Фото», «Файли», GIF або наліпку, щоб запланувати повідомлення.",
+  "scheduledMessageCancelled": "Заплановане повідомлення скасовано",
+  "scheduledMessageCreatedAt": "Створено: {time}"
 }

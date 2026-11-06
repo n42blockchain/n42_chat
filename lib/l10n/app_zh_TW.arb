@@ -2267,5 +2267,10 @@
   "chatNotifyAllDescription": "此聊天中的每則新訊息都通知",
   "chatNotifyMentions": "僅提及我",
   "chatNotifyMentionsDescription": "僅在有人提及你或使用 @room 時通知",
-  "chatNotifyMutedDescription": "在所有裝置上關閉此聊天的通知"
+  "chatNotifyMutedDescription": "在所有裝置上關閉此聊天的通知",
+  "scheduledMessagesTitle": "排程訊息",
+  "scheduledMessagesEmpty": "尚無排程訊息",
+  "scheduledMessagesHint": "長按傳送、照片、檔案、GIF 或貼圖，即可設定排程傳送。",
+  "scheduledMessageCancelled": "已取消排程訊息",
+  "scheduledMessageCreatedAt": "建立於 {time}"
 }

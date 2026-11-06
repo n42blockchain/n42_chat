@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Notifier chaque nouveau message dans cette discussion",
   "chatNotifyMentions": "Mentions uniquement",
   "chatNotifyMentionsDescription": "Notifier uniquement lorsque vous êtes mentionné ou que @room est utilisé",
-  "chatNotifyMutedDescription": "Désactiver les notifications de cette discussion sur tous les appareils"
+  "chatNotifyMutedDescription": "Désactiver les notifications de cette discussion sur tous les appareils",
+  "scheduledMessagesTitle": "Messages programmés",
+  "scheduledMessagesEmpty": "Aucun message programmé pour le moment",
+  "scheduledMessagesHint": "Appuyez longuement sur Envoyer, Photos, Fichiers, un GIF ou un sticker pour programmer un message.",
+  "scheduledMessageCancelled": "Message programmé annulé",
+  "scheduledMessageCreatedAt": "Créé le {time}"
 }

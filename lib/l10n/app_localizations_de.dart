@@ -6238,4 +6238,22 @@ class SDe extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Benachrichtigungen für diesen Chat auf allen Geräten deaktivieren';
+
+  @override
+  String get scheduledMessagesTitle => 'Geplante Nachrichten';
+
+  @override
+  String get scheduledMessagesEmpty => 'Noch keine geplanten Nachrichten';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Halte Senden, Fotos, Dateien, ein GIF oder einen Sticker gedrückt, um eine Nachricht zu planen.';
+
+  @override
+  String get scheduledMessageCancelled => 'Geplante Nachricht abgebrochen';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Erstellt: $time';
+  }
 }

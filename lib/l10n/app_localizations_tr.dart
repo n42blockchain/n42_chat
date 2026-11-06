@@ -6190,4 +6190,22 @@ class STr extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Bu sohbetin bildirimlerini tüm cihazlarda kapat';
+
+  @override
+  String get scheduledMessagesTitle => 'Zamanlanmış mesajlar';
+
+  @override
+  String get scheduledMessagesEmpty => 'Henüz zamanlanmış mesaj yok';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Mesaj zamanlamak için Gönder, Fotoğraflar, Dosyalar, bir GIF veya çıkartmaya uzun basın.';
+
+  @override
+  String get scheduledMessageCancelled => 'Zamanlanmış mesaj iptal edildi';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Oluşturulma: $time';
+  }
 }

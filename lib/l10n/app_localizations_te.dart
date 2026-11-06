@@ -6233,4 +6233,23 @@ class STe extends S {
   @override
   String get chatNotifyMutedDescription =>
       'అన్ని పరికరాల్లో ఈ చాట్ నోటిఫికేషన్‌లను ఆపివేయండి';
+
+  @override
+  String get scheduledMessagesTitle => 'షెడ్యూల్ చేసిన సందేశాలు';
+
+  @override
+  String get scheduledMessagesEmpty => 'ఇంకా షెడ్యూల్ చేసిన సందేశాలు లేవు';
+
+  @override
+  String get scheduledMessagesHint =>
+      'సందేశాన్ని షెడ్యూల్ చేయడానికి పంపు, ఫోటోలు, ఫైల్‌లు, GIF లేదా స్టిక్కర్‌ను ఎక్కువసేపు నొక్కండి.';
+
+  @override
+  String get scheduledMessageCancelled =>
+      'షెడ్యూల్ చేసిన సందేశం రద్దు చేయబడింది';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'సృష్టించిన సమయం: $time';
+  }
 }

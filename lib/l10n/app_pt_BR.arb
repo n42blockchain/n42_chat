@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Notificar cada nova mensagem nesta conversa",
   "chatNotifyMentions": "Apenas menções",
   "chatNotifyMentionsDescription": "Notificar apenas quando você for mencionado ou @room for usado",
-  "chatNotifyMutedDescription": "Desativar as notificações desta conversa em todos os dispositivos"
+  "chatNotifyMutedDescription": "Desativar as notificações desta conversa em todos os dispositivos",
+  "scheduledMessagesTitle": "Mensagens agendadas",
+  "scheduledMessagesEmpty": "Ainda não há mensagens agendadas",
+  "scheduledMessagesHint": "Mantenha pressionado Enviar, Fotos, Arquivos, um GIF ou uma figurinha para agendar uma mensagem.",
+  "scheduledMessageCancelled": "Mensagem agendada cancelada",
+  "scheduledMessageCreatedAt": "Criado em {time}"
 }

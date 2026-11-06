@@ -6220,4 +6220,22 @@ class SUk extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Вимкнути сповіщення цього чату на всіх пристроях';
+
+  @override
+  String get scheduledMessagesTitle => 'Заплановані повідомлення';
+
+  @override
+  String get scheduledMessagesEmpty => 'Ще немає запланованих повідомлень';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Натисніть і утримуйте «Надіслати», «Фото», «Файли», GIF або наліпку, щоб запланувати повідомлення.';
+
+  @override
+  String get scheduledMessageCancelled => 'Заплановане повідомлення скасовано';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Створено: $time';
+  }
 }

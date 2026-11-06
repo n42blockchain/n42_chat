@@ -6159,4 +6159,22 @@ class SEn extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Disable notifications for this chat on all devices';
+
+  @override
+  String get scheduledMessagesTitle => 'Scheduled messages';
+
+  @override
+  String get scheduledMessagesEmpty => 'No scheduled messages yet';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Long press Send, Photos, Files, a GIF or a sticker to schedule a message.';
+
+  @override
+  String get scheduledMessageCancelled => 'Scheduled message cancelled';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Created $time';
+  }
 }

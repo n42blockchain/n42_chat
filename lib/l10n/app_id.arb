@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Beri notifikasi untuk setiap pesan baru dalam obrolan ini",
   "chatNotifyMentions": "Hanya Sebutan",
   "chatNotifyMentionsDescription": "Beri notifikasi hanya saat Anda disebut atau @room digunakan",
-  "chatNotifyMutedDescription": "Nonaktifkan notifikasi obrolan ini di semua perangkat"
+  "chatNotifyMutedDescription": "Nonaktifkan notifikasi obrolan ini di semua perangkat",
+  "scheduledMessagesTitle": "Pesan terjadwal",
+  "scheduledMessagesEmpty": "Belum ada pesan terjadwal",
+  "scheduledMessagesHint": "Tekan lama Kirim, Foto, File, GIF, atau stiker untuk menjadwalkan pesan.",
+  "scheduledMessageCancelled": "Pesan terjadwal dibatalkan",
+  "scheduledMessageCreatedAt": "Dibuat {time}"
 }

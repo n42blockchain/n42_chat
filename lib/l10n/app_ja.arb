@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "このチャットの新しいメッセージをすべて通知",
   "chatNotifyMentions": "メンションのみ",
   "chatNotifyMentionsDescription": "自分へのメンションまたは @room が使われた場合のみ通知",
-  "chatNotifyMutedDescription": "すべてのデバイスでこのチャットの通知を無効にする"
+  "chatNotifyMutedDescription": "すべてのデバイスでこのチャットの通知を無効にする",
+  "scheduledMessagesTitle": "送信予約メッセージ",
+  "scheduledMessagesEmpty": "送信予約メッセージはありません",
+  "scheduledMessagesHint": "送信、写真、ファイル、GIF、スタンプを長押しすると、送信を予約できます。",
+  "scheduledMessageCancelled": "メッセージの送信予約をキャンセルしました",
+  "scheduledMessageCreatedAt": "作成日時：{time}"
 }

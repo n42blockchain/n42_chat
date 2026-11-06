@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Upozornit na každou novou zprávu v tomto chatu",
   "chatNotifyMentions": "Pouze zmínky",
   "chatNotifyMentionsDescription": "Upozornit pouze při zmínce o vás nebo použití @room",
-  "chatNotifyMutedDescription": "Vypnout oznámení tohoto chatu na všech zařízeních"
+  "chatNotifyMutedDescription": "Vypnout oznámení tohoto chatu na všech zařízeních",
+  "scheduledMessagesTitle": "Naplánované zprávy",
+  "scheduledMessagesEmpty": "Zatím žádné naplánované zprávy",
+  "scheduledMessagesHint": "Zprávu naplánujete dlouhým stisknutím tlačítka Odeslat, Fotky, Soubory, GIFu nebo nálepky.",
+  "scheduledMessageCancelled": "Naplánovaná zpráva byla zrušena",
+  "scheduledMessageCreatedAt": "Vytvořeno {time}"
 }

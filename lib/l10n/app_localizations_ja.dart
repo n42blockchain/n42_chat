@@ -6053,4 +6053,21 @@ class SJa extends S {
 
   @override
   String get chatNotifyMutedDescription => 'すべてのデバイスでこのチャットの通知を無効にする';
+
+  @override
+  String get scheduledMessagesTitle => '送信予約メッセージ';
+
+  @override
+  String get scheduledMessagesEmpty => '送信予約メッセージはありません';
+
+  @override
+  String get scheduledMessagesHint => '送信、写真、ファイル、GIF、スタンプを長押しすると、送信を予約できます。';
+
+  @override
+  String get scheduledMessageCancelled => 'メッセージの送信予約をキャンセルしました';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return '作成日時：$time';
+  }
 }

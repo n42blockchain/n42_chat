@@ -6185,4 +6185,22 @@ class SMr extends S {
   @override
   String get chatNotifyMutedDescription =>
       'सर्व डिव्हाइसवर या चॅटच्या सूचना बंद करा';
+
+  @override
+  String get scheduledMessagesTitle => 'नियोजित संदेश';
+
+  @override
+  String get scheduledMessagesEmpty => 'अद्याप कोणतेही नियोजित संदेश नाहीत';
+
+  @override
+  String get scheduledMessagesHint =>
+      'संदेशाची वेळ ठरवण्यासाठी पाठवा, फोटो, फाइल्स, GIF किंवा स्टिकर दीर्घकाळ दाबा.';
+
+  @override
+  String get scheduledMessageCancelled => 'नियोजित संदेश रद्द केला';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'तयार केले: $time';
+  }
 }

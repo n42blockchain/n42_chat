@@ -6253,4 +6253,23 @@ class STa extends S {
   @override
   String get chatNotifyMutedDescription =>
       'அனைத்து சாதனங்களிலும் இந்த அரட்டையின் அறிவிப்புகளை முடக்கவும்';
+
+  @override
+  String get scheduledMessagesTitle => 'திட்டமிடப்பட்ட செய்திகள்';
+
+  @override
+  String get scheduledMessagesEmpty => 'இன்னும் திட்டமிடப்பட்ட செய்திகள் இல்லை';
+
+  @override
+  String get scheduledMessagesHint =>
+      'செய்தியைத் திட்டமிட அனுப்பு, படங்கள், கோப்புகள், GIF அல்லது ஸ்டிக்கரை நீண்ட நேரம் அழுத்தவும்.';
+
+  @override
+  String get scheduledMessageCancelled =>
+      'திட்டமிடப்பட்ட செய்தி ரத்துசெய்யப்பட்டது';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'உருவாக்கப்பட்டது: $time';
+  }
 }

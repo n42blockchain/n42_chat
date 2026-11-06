@@ -6202,4 +6202,22 @@ class SUr extends S {
   @override
   String get chatNotifyMutedDescription =>
       'تمام آلات پر اس چیٹ کی اطلاعات بند کریں';
+
+  @override
+  String get scheduledMessagesTitle => 'طے شدہ پیغامات';
+
+  @override
+  String get scheduledMessagesEmpty => 'ابھی کوئی طے شدہ پیغام نہیں ہے';
+
+  @override
+  String get scheduledMessagesHint =>
+      'پیغام کا وقت طے کرنے کے لیے بھیجیں، تصاویر، فائلیں، GIF یا اسٹیکر کو دیر تک دبائیں۔';
+
+  @override
+  String get scheduledMessageCancelled => 'طے شدہ پیغام منسوخ کر دیا گیا';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'بنایا گیا: $time';
+  }
 }

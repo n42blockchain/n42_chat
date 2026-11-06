@@ -6160,4 +6160,22 @@ class SAr extends S {
   @override
   String get chatNotifyMutedDescription =>
       'إيقاف إشعارات هذه المحادثة على جميع الأجهزة';
+
+  @override
+  String get scheduledMessagesTitle => 'الرسائل المجدولة';
+
+  @override
+  String get scheduledMessagesEmpty => 'لا توجد رسائل مجدولة بعد';
+
+  @override
+  String get scheduledMessagesHint =>
+      'اضغط مطولًا على إرسال أو الصور أو الملفات أو صورة GIF أو ملصق لجدولة رسالة.';
+
+  @override
+  String get scheduledMessageCancelled => 'تم إلغاء الرسالة المجدولة';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'أُنشئت في $time';
+  }
 }

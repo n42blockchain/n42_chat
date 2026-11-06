@@ -6015,6 +6015,23 @@ class SZh extends S {
 
   @override
   String get chatNotifyMutedDescription => '在所有设备上关闭此聊天的通知';
+
+  @override
+  String get scheduledMessagesTitle => '定时消息';
+
+  @override
+  String get scheduledMessagesEmpty => '暂无定时消息';
+
+  @override
+  String get scheduledMessagesHint => '长按发送、照片、文件、GIF 或贴纸，即可设置定时发送。';
+
+  @override
+  String get scheduledMessageCancelled => '已取消定时消息';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return '创建于 $time';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12028,4 +12045,21 @@ class SZhTw extends SZh {
 
   @override
   String get chatNotifyMutedDescription => '在所有裝置上關閉此聊天的通知';
+
+  @override
+  String get scheduledMessagesTitle => '排程訊息';
+
+  @override
+  String get scheduledMessagesEmpty => '尚無排程訊息';
+
+  @override
+  String get scheduledMessagesHint => '長按傳送、照片、檔案、GIF 或貼圖，即可設定排程傳送。';
+
+  @override
+  String get scheduledMessageCancelled => '已取消排程訊息';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return '建立於 $time';
+  }
 }

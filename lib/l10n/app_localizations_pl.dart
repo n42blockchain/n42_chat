@@ -6225,4 +6225,24 @@ class SPl extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Wyłącz powiadomienia tego czatu na wszystkich urządzeniach';
+
+  @override
+  String get scheduledMessagesTitle => 'Zaplanowane wiadomości';
+
+  @override
+  String get scheduledMessagesEmpty =>
+      'Nie ma jeszcze zaplanowanych wiadomości';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Przytrzymaj Wyślij, Zdjęcia, Pliki, GIF lub naklejkę, aby zaplanować wiadomość.';
+
+  @override
+  String get scheduledMessageCancelled =>
+      'Zaplanowana wiadomość została anulowana';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Utworzono: $time';
+  }
 }

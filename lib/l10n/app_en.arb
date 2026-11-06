@@ -2901,5 +2901,17 @@
   "chatNotifyAllDescription": "Notify for every new message in this chat",
   "chatNotifyMentions": "Mentions Only",
   "chatNotifyMentionsDescription": "Only notify when you are mentioned or @room is used",
-  "chatNotifyMutedDescription": "Disable notifications for this chat on all devices"
+  "chatNotifyMutedDescription": "Disable notifications for this chat on all devices",
+  "scheduledMessagesTitle": "Scheduled messages",
+  "scheduledMessagesEmpty": "No scheduled messages yet",
+  "scheduledMessagesHint": "Long press Send, Photos, Files, a GIF or a sticker to schedule a message.",
+  "scheduledMessageCancelled": "Scheduled message cancelled",
+  "scheduledMessageCreatedAt": "Created {time}",
+  "@scheduledMessageCreatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

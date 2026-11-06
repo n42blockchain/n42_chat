@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "اس چیٹ کے ہر نئے پیغام کی اطلاع دیں",
   "chatNotifyMentions": "صرف تذکرے",
   "chatNotifyMentionsDescription": "صرف آپ کا تذکرہ ہونے یا @room استعمال ہونے پر اطلاع دیں",
-  "chatNotifyMutedDescription": "تمام آلات پر اس چیٹ کی اطلاعات بند کریں"
+  "chatNotifyMutedDescription": "تمام آلات پر اس چیٹ کی اطلاعات بند کریں",
+  "scheduledMessagesTitle": "طے شدہ پیغامات",
+  "scheduledMessagesEmpty": "ابھی کوئی طے شدہ پیغام نہیں ہے",
+  "scheduledMessagesHint": "پیغام کا وقت طے کرنے کے لیے بھیجیں، تصاویر، فائلیں، GIF یا اسٹیکر کو دیر تک دبائیں۔",
+  "scheduledMessageCancelled": "طے شدہ پیغام منسوخ کر دیا گیا",
+  "scheduledMessageCreatedAt": "بنایا گیا: {time}"
 }

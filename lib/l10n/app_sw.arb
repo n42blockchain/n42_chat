@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Arifu kuhusu kila ujumbe mpya katika gumzo hili",
   "chatNotifyMentions": "Kutajwa tu",
   "chatNotifyMentionsDescription": "Arifu tu unapotajwa au @room inapotumiwa",
-  "chatNotifyMutedDescription": "Zima arifa za gumzo hili kwenye vifaa vyote"
+  "chatNotifyMutedDescription": "Zima arifa za gumzo hili kwenye vifaa vyote",
+  "scheduledMessagesTitle": "Ujumbe ulioratibiwa",
+  "scheduledMessagesEmpty": "Bado hakuna ujumbe ulioratibiwa",
+  "scheduledMessagesHint": "Bonyeza kwa muda Tuma, Picha, Faili, GIF au kibandiko ili kuratibu ujumbe.",
+  "scheduledMessageCancelled": "Ujumbe ulioratibiwa umeghairiwa",
+  "scheduledMessageCreatedAt": "Uliundwa {time}"
 }

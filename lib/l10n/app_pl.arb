@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Powiadamiaj o każdej nowej wiadomości na tym czacie",
   "chatNotifyMentions": "Tylko wzmianki",
   "chatNotifyMentionsDescription": "Powiadamiaj tylko o wzmiankach o Tobie lub użyciu @room",
-  "chatNotifyMutedDescription": "Wyłącz powiadomienia tego czatu na wszystkich urządzeniach"
+  "chatNotifyMutedDescription": "Wyłącz powiadomienia tego czatu na wszystkich urządzeniach",
+  "scheduledMessagesTitle": "Zaplanowane wiadomości",
+  "scheduledMessagesEmpty": "Nie ma jeszcze zaplanowanych wiadomości",
+  "scheduledMessagesHint": "Przytrzymaj Wyślij, Zdjęcia, Pliki, GIF lub naklejkę, aby zaplanować wiadomość.",
+  "scheduledMessageCancelled": "Zaplanowana wiadomość została anulowana",
+  "scheduledMessageCreatedAt": "Utworzono: {time}"
 }

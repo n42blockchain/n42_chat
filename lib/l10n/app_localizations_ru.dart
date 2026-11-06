@@ -6218,4 +6218,22 @@ class SRu extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Отключить уведомления этого чата на всех устройствах';
+
+  @override
+  String get scheduledMessagesTitle => 'Запланированные сообщения';
+
+  @override
+  String get scheduledMessagesEmpty => 'Пока нет запланированных сообщений';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Нажмите и удерживайте «Отправить», «Фото», «Файлы», GIF или стикер, чтобы запланировать сообщение.';
+
+  @override
+  String get scheduledMessageCancelled => 'Запланированное сообщение отменено';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Создано: $time';
+  }
 }

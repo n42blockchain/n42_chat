@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -77,10 +78,26 @@ void main() {
         );
   });
   tearDown(() async => getIt.reset());
-  Future<void> pump(WidgetTester tester, {ChatBloc? bloc}) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    ChatBloc? bloc,
+    Locale? locale,
+    double scale = 1,
+    bool use24Hours = false,
+  }) async {
     const page = ScheduledMessagesPage(roomId: 'room', roomName: 'Room');
     await tester.pumpWidget(
       MaterialApp(
+        locale: locale,
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(scale),
+            alwaysUse24HourFormat: use24Hours,
+          ),
+          child: child!,
+        ),
         home: bloc == null
             ? page
             : BlocProvider<ChatBloc>.value(value: bloc, child: page),
@@ -175,7 +192,9 @@ void main() {
     owner = '@b:test';
     pending.complete([
       ScheduledMessageDraft(
-        messageId: 'private', type: MessageType.text, createdAt: DateTime(2026),
+        messageId: 'private',
+        type: MessageType.text,
+        createdAt: DateTime(2026),
         text: 'A private draft',
         scheduledAt: DateTime(2030),
       ),
@@ -232,5 +251,55 @@ void main() {
     );
     expect(find.text('Keep until confirmed'), findsNothing);
     expect(find.text('Scheduled message cancelled'), findsNothing);
+  });
+  for (final language in ['en', 'zh', 'de', 'ar']) {
+    testWidgets(
+      'localized narrow large-text draft and cancellation: $language',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 800);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        when(
+          () => prefs.removeScheduledMessage(
+            'room',
+            'draft',
+            ownerUserId: '@me:test',
+          ),
+        ).thenAnswer((_) async {});
+        await pump(
+          tester,
+          locale: Locale(language),
+          scale: 2,
+          use24Hours: true,
+        );
+        final context = tester.element(find.byType(ScheduledMessagesPage));
+        final l10n = S.of(context)!;
+        expect(find.text(l10n.scheduledMessagesTitle), findsOneWidget);
+        expect(find.text(l10n.searchMessageLabel), findsOneWidget);
+        expect(find.textContaining('00:00'), findsWidgets);
+        expect(
+          Directionality.of(context),
+          language == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+        );
+        expect(tester.takeException(), isNull);
+        await tester.tap(find.text(l10n.commonCancel));
+        await tester.pumpAndSettle();
+        expect(find.text(l10n.scheduledMessageCancelled), findsOneWidget);
+        expect(find.text(l10n.scheduledMessagesEmpty), findsOneWidget);
+        await tester.scrollUntilVisible(
+          find.text(l10n.scheduledMessagesHint),
+          100,
+        );
+        expect(find.text(l10n.scheduledMessagesHint), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('English clock honors 12-hour preference', (tester) async {
+    await pump(tester, locale: const Locale('en'));
+    expect(find.textContaining('12:00 AM'), findsWidgets);
+    expect(tester.takeException(), isNull);
   });
 }

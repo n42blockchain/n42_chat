@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Thông báo cho mỗi tin nhắn mới trong cuộc trò chuyện này",
   "chatNotifyMentions": "Chỉ lượt nhắc",
   "chatNotifyMentionsDescription": "Chỉ thông báo khi bạn được nhắc đến hoặc khi dùng @room",
-  "chatNotifyMutedDescription": "Tắt thông báo của cuộc trò chuyện này trên mọi thiết bị"
+  "chatNotifyMutedDescription": "Tắt thông báo của cuộc trò chuyện này trên mọi thiết bị",
+  "scheduledMessagesTitle": "Tin nhắn đã lên lịch",
+  "scheduledMessagesEmpty": "Chưa có tin nhắn đã lên lịch",
+  "scheduledMessagesHint": "Nhấn giữ Gửi, Ảnh, Tệp, GIF hoặc nhãn dán để lên lịch gửi tin nhắn.",
+  "scheduledMessageCancelled": "Đã hủy tin nhắn đã lên lịch",
+  "scheduledMessageCreatedAt": "Đã tạo lúc {time}"
 }

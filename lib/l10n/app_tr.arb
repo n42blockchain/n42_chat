@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "Bu sohbetteki her yeni mesaj için bildirim gönder",
   "chatNotifyMentions": "Yalnızca Bahsetmeler",
   "chatNotifyMentionsDescription": "Yalnızca sizden bahsedildiğinde veya @room kullanıldığında bildirim gönder",
-  "chatNotifyMutedDescription": "Bu sohbetin bildirimlerini tüm cihazlarda kapat"
+  "chatNotifyMutedDescription": "Bu sohbetin bildirimlerini tüm cihazlarda kapat",
+  "scheduledMessagesTitle": "Zamanlanmış mesajlar",
+  "scheduledMessagesEmpty": "Henüz zamanlanmış mesaj yok",
+  "scheduledMessagesHint": "Mesaj zamanlamak için Gönder, Fotoğraflar, Dosyalar, bir GIF veya çıkartmaya uzun basın.",
+  "scheduledMessageCancelled": "Zamanlanmış mesaj iptal edildi",
+  "scheduledMessageCreatedAt": "Oluşturulma: {time}"
 }

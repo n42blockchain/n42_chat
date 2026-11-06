@@ -6200,4 +6200,22 @@ class SId extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Nonaktifkan notifikasi obrolan ini di semua perangkat';
+
+  @override
+  String get scheduledMessagesTitle => 'Pesan terjadwal';
+
+  @override
+  String get scheduledMessagesEmpty => 'Belum ada pesan terjadwal';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Tekan lama Kirim, Foto, File, GIF, atau stiker untuk menjadwalkan pesan.';
+
+  @override
+  String get scheduledMessageCancelled => 'Pesan terjadwal dibatalkan';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Dibuat $time';
+  }
 }

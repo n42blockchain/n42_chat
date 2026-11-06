@@ -6186,4 +6186,22 @@ class SHi extends S {
   @override
   String get chatNotifyMutedDescription =>
       'सभी डिवाइस पर इस चैट की सूचनाएँ बंद करें';
+
+  @override
+  String get scheduledMessagesTitle => 'निर्धारित संदेश';
+
+  @override
+  String get scheduledMessagesEmpty => 'अभी कोई निर्धारित संदेश नहीं है';
+
+  @override
+  String get scheduledMessagesHint =>
+      'संदेश का समय तय करने के लिए भेजें, फ़ोटो, फ़ाइलें, GIF या स्टिकर को देर तक दबाएँ।';
+
+  @override
+  String get scheduledMessageCancelled => 'निर्धारित संदेश रद्द कर दिया गया';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'बनाया गया: $time';
+  }
 }

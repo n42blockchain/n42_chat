@@ -6176,4 +6176,22 @@ class SVi extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Tắt thông báo của cuộc trò chuyện này trên mọi thiết bị';
+
+  @override
+  String get scheduledMessagesTitle => 'Tin nhắn đã lên lịch';
+
+  @override
+  String get scheduledMessagesEmpty => 'Chưa có tin nhắn đã lên lịch';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Nhấn giữ Gửi, Ảnh, Tệp, GIF hoặc nhãn dán để lên lịch gửi tin nhắn.';
+
+  @override
+  String get scheduledMessageCancelled => 'Đã hủy tin nhắn đã lên lịch';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Đã tạo lúc $time';
+  }
 }

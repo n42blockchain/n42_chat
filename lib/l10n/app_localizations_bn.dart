@@ -6188,4 +6188,22 @@ class SBn extends S {
   @override
   String get chatNotifyMutedDescription =>
       'সব ডিভাইসে এই চ্যাটের বিজ্ঞপ্তি বন্ধ করুন';
+
+  @override
+  String get scheduledMessagesTitle => 'নির্ধারিত বার্তা';
+
+  @override
+  String get scheduledMessagesEmpty => 'এখনও কোনো নির্ধারিত বার্তা নেই';
+
+  @override
+  String get scheduledMessagesHint =>
+      'বার্তা পাঠানোর সময় নির্ধারণ করতে পাঠান, ছবি, ফাইল, GIF বা স্টিকারে দীর্ঘক্ষণ চাপ দিন।';
+
+  @override
+  String get scheduledMessageCancelled => 'নির্ধারিত বার্তা বাতিল করা হয়েছে';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'তৈরি হয়েছে $time';
+  }
 }

@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "إرسال إشعار بكل رسالة جديدة في هذه المحادثة",
   "chatNotifyMentions": "الإشارات فقط",
   "chatNotifyMentionsDescription": "إرسال إشعار فقط عند الإشارة إليك أو استخدام @room",
-  "chatNotifyMutedDescription": "إيقاف إشعارات هذه المحادثة على جميع الأجهزة"
+  "chatNotifyMutedDescription": "إيقاف إشعارات هذه المحادثة على جميع الأجهزة",
+  "scheduledMessagesTitle": "الرسائل المجدولة",
+  "scheduledMessagesEmpty": "لا توجد رسائل مجدولة بعد",
+  "scheduledMessagesHint": "اضغط مطولًا على إرسال أو الصور أو الملفات أو صورة GIF أو ملصق لجدولة رسالة.",
+  "scheduledMessageCancelled": "تم إلغاء الرسالة المجدولة",
+  "scheduledMessageCreatedAt": "أُنشئت في {time}"
 }

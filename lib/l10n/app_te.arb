@@ -2879,5 +2879,10 @@
   "chatNotifyAllDescription": "ఈ చాట్‌లోని ప్రతి కొత్త సందేశానికి తెలియజేయండి",
   "chatNotifyMentions": "ప్రస్తావనలు మాత్రమే",
   "chatNotifyMentionsDescription": "మిమ్మల్ని ప్రస్తావించినప్పుడు లేదా @room ఉపయోగించినప్పుడు మాత్రమే తెలియజేయండి",
-  "chatNotifyMutedDescription": "అన్ని పరికరాల్లో ఈ చాట్ నోటిఫికేషన్‌లను ఆపివేయండి"
+  "chatNotifyMutedDescription": "అన్ని పరికరాల్లో ఈ చాట్ నోటిఫికేషన్‌లను ఆపివేయండి",
+  "scheduledMessagesTitle": "షెడ్యూల్ చేసిన సందేశాలు",
+  "scheduledMessagesEmpty": "ఇంకా షెడ్యూల్ చేసిన సందేశాలు లేవు",
+  "scheduledMessagesHint": "సందేశాన్ని షెడ్యూల్ చేయడానికి పంపు, ఫోటోలు, ఫైల్‌లు, GIF లేదా స్టిక్కర్‌ను ఎక్కువసేపు నొక్కండి.",
+  "scheduledMessageCancelled": "షెడ్యూల్ చేసిన సందేశం రద్దు చేయబడింది",
+  "scheduledMessageCreatedAt": "సృష్టించిన సమయం: {time}"
 }

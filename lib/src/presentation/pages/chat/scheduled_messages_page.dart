@@ -156,7 +156,12 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             .toList();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Scheduled message cancelled')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.scheduledMessageCancelled ??
+                'Scheduled message cancelled',
+          ),
+        ),
       );
     } catch (e) {
       if (_origin?.isCurrent != true ||
@@ -186,7 +191,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
-          'Scheduled Messages',
+          S.of(context)?.scheduledMessagesTitle ?? 'Scheduled messages',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -209,6 +214,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             : (_drafts.isEmpty
                   ? _buildEmptyState()
                   : ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(AppDimensions.spacing),
                       itemCount: _drafts.length,
                       separatorBuilder: (context, index) =>
@@ -224,6 +230,8 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
 
   Widget _buildEmptyState() {
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       children: [
         SizedBox(height: MediaQuery.of(context).size.height * 0.18),
         Icon(
@@ -234,9 +242,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         const SizedBox(height: AppDimensions.spacing),
         Center(
           child: Text(
-            'No scheduled messages yet',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            S.of(context)?.scheduledMessagesEmpty ??
+                'No scheduled messages yet',
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -251,10 +259,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             horizontal: AppDimensions.spacingXXL,
           ),
           child: Text(
-            'Long press Send, Photos, Files, a GIF, or a sticker to schedule follow-ups and reminders.',
+            S.of(context)?.scheduledMessagesHint ?? 'Long press Send, Photos, Files, a GIF or a sticker to schedule a message.',
             textAlign: TextAlign.center,
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
+
             style: TextStyle(
               fontSize: 13,
               height: 1.4,
@@ -293,16 +300,19 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
                   ),
                 ),
               ),
-              TextButton(
-                onPressed: _cancelling.contains(draft.messageId)
-                    ? null
-                    : () => _cancelDraft(draft),
-                child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
-              ),
             ],
           ),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: TextButton(
+              onPressed: _cancelling.contains(draft.messageId)
+                  ? null
+                  : () => _cancelDraft(draft),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+          ),
           const SizedBox(height: 10),
-          _buildChip(label: draft.typeLabel),
+          _buildChip(label: _localizedType(draft)),
           const SizedBox(height: 10),
           Text(
             draft.text,
@@ -318,20 +328,32 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
               runSpacing: 8,
               children: [
                 if (draft.pollOptions.isNotEmpty)
-                  _buildChip(label: '${draft.pollOptions.length} options'),
+                  _buildChip(
+                    label:
+                        '${S.of(context)?.chatPollOptionsLabel ?? 'Poll Options'}: ${_formatCount(draft.pollOptions.length)}',
+                  ),
                 if (draft.mentionsRoom) _buildChip(label: '@all'),
                 if (draft.mentionedUserIds.isNotEmpty)
                   _buildChip(
-                    label: '@${draft.mentionedUserIds.length} members',
+                    label:
+                        '@${S.of(context)?.commonGroupMembers(draft.mentionedUserIds.length) ?? 'Members (${draft.mentionedUserIds.length})'}',
                   ),
                 if (draft.selfDestructAfter != null)
-                  _buildChip(label: 'Auto-delete ${draft.selfDestructAfter}s'),
+                  _buildChip(
+                    label:
+                        '${S.of(context)?.chatSelfDestructTimer ?? 'Self-destruct'}: ${S.of(context)?.secondsRemaining(draft.selfDestructAfter!) ?? '${draft.selfDestructAfter}s'}',
+                  ),
               ],
             ),
           ],
           const SizedBox(height: 10),
           Text(
-            'Created ${DateFormat('yyyy-MM-dd HH:mm').format(draft.createdAt)}',
+            S
+                    .of(context)
+                    ?.scheduledMessageCreatedAt(
+                      _formatScheduledAt(draft.createdAt),
+                    ) ??
+                'Created ${_formatScheduledAt(draft.createdAt)}',
             style: TextStyle(fontSize: 12, color: secondaryColor),
           ),
         ],
@@ -368,21 +390,32 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     );
   }
 
-  String _formatScheduledAt(DateTime scheduledAt) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final scheduledDay = DateTime(
-      scheduledAt.year,
-      scheduledAt.month,
-      scheduledAt.day,
-    );
+  String _localizedType(ScheduledMessageDraft draft) {
+    final l10n = S.of(context);
+    if (l10n == null) return draft.typeLabel;
+    if (draft.isGif) return 'GIF';
+    return switch (draft.type) {
+      MessageType.image => l10n.contactPhotos,
+      MessageType.video => l10n.video,
+      MessageType.file => l10n.commonFileLabel,
+      MessageType.poll => l10n.commonPoll,
+      MessageType.sticker => l10n.profileStickers,
+      _ => l10n.searchMessageLabel,
+    };
+  }
 
-    if (scheduledDay == today) {
-      return 'Today ${DateFormat('HH:mm').format(scheduledAt)}';
-    }
-    if (scheduledDay == today.add(const Duration(days: 1))) {
-      return 'Tomorrow ${DateFormat('HH:mm').format(scheduledAt)}';
-    }
-    return DateFormat('yyyy-MM-dd HH:mm').format(scheduledAt);
+  String _formatCount(int value) =>
+      NumberFormat.decimalPattern(Localizations.localeOf(context).toString())
+          .format(value);
+
+  String _formatScheduledAt(DateTime value) {
+    final local = value.toLocal();
+    final material = MaterialLocalizations.of(context);
+    final date = material.formatFullDate(local);
+    final time = material.formatTimeOfDay(
+      TimeOfDay.fromDateTime(local),
+      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+    );
+    return '$date $time';
   }
 }

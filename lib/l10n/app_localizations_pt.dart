@@ -6222,6 +6222,24 @@ class SPt extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Desativar as notificações desta conversa em todos os dispositivos';
+
+  @override
+  String get scheduledMessagesTitle => 'Mensagens agendadas';
+
+  @override
+  String get scheduledMessagesEmpty => 'Ainda não há mensagens agendadas';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Mantenha premido Enviar, Fotografias, Ficheiros, um GIF ou um autocolante para agendar uma mensagem.';
+
+  @override
+  String get scheduledMessageCancelled => 'Mensagem agendada cancelada';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Criado em $time';
+  }
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12443,4 +12461,22 @@ class SPtBr extends SPt {
   @override
   String get chatNotifyMutedDescription =>
       'Desativar as notificações desta conversa em todos os dispositivos';
+
+  @override
+  String get scheduledMessagesTitle => 'Mensagens agendadas';
+
+  @override
+  String get scheduledMessagesEmpty => 'Ainda não há mensagens agendadas';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Mantenha pressionado Enviar, Fotos, Arquivos, um GIF ou uma figurinha para agendar uma mensagem.';
+
+  @override
+  String get scheduledMessageCancelled => 'Mensagem agendada cancelada';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Criado em $time';
+  }
 }

@@ -6231,4 +6231,22 @@ class SEs extends S {
   @override
   String get chatNotifyMutedDescription =>
       'Desactivar las notificaciones de este chat en todos los dispositivos';
+
+  @override
+  String get scheduledMessagesTitle => 'Mensajes programados';
+
+  @override
+  String get scheduledMessagesEmpty => 'Aún no hay mensajes programados';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Mantén pulsado Enviar, Fotos, Archivos, un GIF o un sticker para programar un mensaje.';
+
+  @override
+  String get scheduledMessageCancelled => 'Mensaje programado cancelado';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Creado: $time';
+  }
 }

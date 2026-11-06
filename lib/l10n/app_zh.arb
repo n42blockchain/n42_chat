@@ -2267,5 +2267,10 @@
   "chatNotifyAllDescription": "此聊天中每条新消息都通知",
   "chatNotifyMentions": "仅提及我",
   "chatNotifyMentionsDescription": "仅在有人提及你或使用 @room 时通知",
-  "chatNotifyMutedDescription": "在所有设备上关闭此聊天的通知"
+  "chatNotifyMutedDescription": "在所有设备上关闭此聊天的通知",
+  "scheduledMessagesTitle": "定时消息",
+  "scheduledMessagesEmpty": "暂无定时消息",
+  "scheduledMessagesHint": "长按发送、照片、文件、GIF 或贴纸，即可设置定时发送。",
+  "scheduledMessageCancelled": "已取消定时消息",
+  "scheduledMessageCreatedAt": "创建于 {time}"
 }
