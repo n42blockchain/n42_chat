@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:n42_chat/src/data/services/scheduled_draft_operation.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -302,4 +303,22 @@ void main() {
     expect(find.textContaining('12:00 AM'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('standalone cancellation cannot race an active sender', (tester) async {
+    final sending = ScheduledDraftOperation.tryAcquire(ownerUserId: '@me:test', roomId: 'room', messageId: 'draft')!;
+    addTearDown(sending.release);
+    await pump(tester);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Keep until confirmed'), findsOneWidget);
+    expect(find.text('Scheduled message cancelled'), findsNothing);
+    verifyNever(() => prefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
+    sending.release();
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    when(() => prefs.removeScheduledMessage('room', 'draft', ownerUserId: '@me:test')).thenAnswer((_) async {});
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Scheduled message cancelled'), findsOneWidget);
+  });
+
 }

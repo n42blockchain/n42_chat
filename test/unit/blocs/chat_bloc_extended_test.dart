@@ -801,6 +801,93 @@ void main() {
   });
 
   group('Scheduled rich messages', () {
+    for (final firstFails in [false, true]) {
+      test(
+        'two BLoCs share send/cancel lease and release it: failure=$firstFails',
+        () async {
+          final draft = ScheduledMessageDraft(
+            messageId: 'shared',
+            roomId: _roomId,
+            text: 'Shared',
+            type: MessageType.text,
+            createdAt: DateTime(2026),
+            scheduledAt: DateTime(2020),
+          );
+          final firstSend = Completer<MessageEntity?>();
+          final started = Completer<void>();
+          var stored = true;
+          var sends = 0;
+          when(
+            () => mockPrefs.getDueScheduledMessages(
+              ownerUserId: any(named: 'ownerUserId'),
+            ),
+          ).thenAnswer((_) async => [draft]);
+          final first = buildBloc();
+          final second = buildBloc();
+          await initBloc(first);
+          await initBloc(second);
+          when(
+            () => mockPrefs.getScheduledMessages(
+              _roomId,
+              ownerUserId: any(named: 'ownerUserId'),
+            ),
+          ).thenAnswer((_) async => stored ? [draft] : []);
+          when(
+            () => mockPrefs.removeScheduledMessage(
+              _roomId,
+              'shared',
+              ownerUserId: any(named: 'ownerUserId'),
+            ),
+          ).thenAnswer((_) async {
+            stored = false;
+          });
+          when(
+            () => mockRepo.sendTextMessage(
+              _roomId,
+              'Shared',
+              transactionId: any(named: 'transactionId'),
+              selfDestructAfter: null,
+              mentionedUserIds: const [],
+              mentionsRoom: false,
+            ),
+          ).thenAnswer((_) {
+            sends++;
+            if (sends == 1) {
+              started.complete();
+              return firstSend.future;
+            }
+            return Future.value(_msg);
+          });
+          first.add(const SendDueScheduledMessages());
+          await started.future;
+          second.add(const SendDueScheduledMessages());
+          final cancellation = Completer<bool>();
+          second.add(
+            CancelScheduledMessage(
+              'shared',
+              roomId: _roomId,
+              completion: cancellation,
+            ),
+          );
+          expect(await cancellation.future, isFalse);
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          expect(sends, 1);
+          expect(stored, isTrue);
+          if (firstFails) {
+            firstSend.completeError(StateError('offline'));
+          } else {
+            firstSend.complete(_msg);
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          second.add(const SendDueScheduledMessages());
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          expect(sends, firstFails ? 2 : 1);
+          expect(stored, isFalse);
+          await first.close();
+          await second.close();
+        },
+      );
+    }
     for (final stale in [true, false]) {
       test(
         'queued creation and cancellation validate origin: stale=$stale',

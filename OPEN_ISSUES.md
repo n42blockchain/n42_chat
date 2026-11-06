@@ -171,6 +171,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- 2026-11-06 shared-operation follow-up: scheduled sends and cancellation now acquire the same non-blocking account/room/draft lease across BLoCs and standalone pages in one isolate. It spans transport and persistence awaits, and releases in finally; old/double release cannot release a newer lease. Two-BLoC tests prove one concurrent send, rejected in-flight cancellation, preserved draft and retry after failure; a standalone-page test rejects cancellation while a sender holds the lease and allows retry afterward. Account/room/draft separation is tested. 71 focused tests pass; source analysis has no errors/warnings, seven existing style infos. This supersedes the same-isolate cross-BLoC/standalone cancellation gap below; durable multi-isolate/process coordination, server outcomes, legacy recovery and device acceptance remain open.
+
+
 - 2026-11-06 queued UI follow-up: scheduled creation/cancellation now carries an opaque page-origin capability. Production BLoC rejects absent/stale/wrong-manager origins; the standalone scheduled page also rejects stale same-user login generations. The Chat page captures its origin at initialization, so pickers cannot rebind an old intent to a new session. Invalid attachment scheduling throws before a success notice and cleans up a newly persisted attachment if its origin expires during persistence. 251 BLoC/event/page/media-interaction tests pass, including positive and stale origins, old page cancellation and an image picker interrupted by login invalidation. This supersedes the queued-UI/standalone-page gaps below. Legacy draft recovery, multiple processes/devices, server deduplication and cancellation races with already-dispatched SDK operations remain open; no live/device acceptance claim.
 
 

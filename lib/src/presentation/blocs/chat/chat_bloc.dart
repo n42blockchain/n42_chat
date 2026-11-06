@@ -26,6 +26,7 @@ import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../data/services/account_action_capture.dart';
+import '../../../data/services/scheduled_draft_operation.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
@@ -62,7 +63,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   // 定时发送检查定时器
   Timer? _scheduledMessageTimer;
-  final Set<(String, String, String)> _scheduledDraftOperations = {};
 
   // 输入状态过期刷新定时器
   Timer? _typingUsersTimer;

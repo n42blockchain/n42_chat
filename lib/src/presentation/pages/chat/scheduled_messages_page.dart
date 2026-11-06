@@ -11,6 +11,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../data/services/scheduled_draft_operation.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
@@ -110,6 +111,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     if (!_cancelling.add(draft.messageId)) return;
     setState(() {});
     final owner = _ownerUserId;
+    ScheduledDraftOperation? operation;
     try {
       if (_origin?.isCurrent != true ||
           owner == null ||
@@ -137,6 +139,12 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         );
         if (!cancelled) throw StateError('Cancellation was not confirmed');
       } else {
+        operation = ScheduledDraftOperation.tryAcquire(
+          ownerUserId: owner,
+          roomId: widget.roomId,
+          messageId: draft.messageId,
+        );
+        if (operation == null) throw StateError('Scheduled message is busy');
         await _preferences.removeScheduledMessage(
           widget.roomId,
           draft.messageId,
@@ -177,6 +185,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         ),
       );
     } finally {
+      operation?.release();
       _cancelling.remove(draft.messageId);
       if (mounted) setState(() {});
     }

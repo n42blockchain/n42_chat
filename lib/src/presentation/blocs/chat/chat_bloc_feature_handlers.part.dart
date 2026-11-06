@@ -250,7 +250,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   ) async {
     final roomId = event.roomId ?? _currentRoomId;
     var cancelled = false;
-    (String, String, String)? operation;
+    ScheduledDraftOperation? operation;
     try {
       if (roomId == null || roomId.isEmpty) return;
       if (event.origin == null
@@ -264,9 +264,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           (event.ownerUserId != null && event.ownerUserId != account.userId)) {
         return;
       }
-      final key = (account.userId, roomId, event.messageId);
-      if (!_scheduledDraftOperations.add(key)) return;
-      operation = key;
+      operation = ScheduledDraftOperation.tryAcquire(
+        ownerUserId: account.userId,
+        roomId: roomId,
+        messageId: event.messageId,
+      );
+      if (operation == null) return;
       final draft = await _findScheduledDraft(roomId, event.messageId, account);
       if (!await _scheduledAccountIsCurrent(account)) return;
       if (draft != null) {
@@ -286,7 +289,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     } catch (e) {
       debugLog('ChatBloc: Failed to cancel scheduled message: $e');
     } finally {
-      if (operation != null) _scheduledDraftOperations.remove(operation);
+      operation?.release();
       final completion = event.completion;
       if (completion != null && !completion.isCompleted) {
         completion.complete(cancelled);
@@ -320,8 +323,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           continue;
         }
 
-        final operation = (account.userId, roomId, draft.messageId);
-        if (!_scheduledDraftOperations.add(operation)) continue;
+        final operation = ScheduledDraftOperation.tryAcquire(
+          ownerUserId: account.userId,
+          roomId: roomId,
+          messageId: draft.messageId,
+        );
+        if (operation == null) continue;
         try {
           // The due list may predate a completed cancellation.
           final current = await _findScheduledDraft(
@@ -348,7 +355,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             );
           }
         } finally {
-          _scheduledDraftOperations.remove(operation);
+          operation.release();
         }
       }
     } catch (e) {
