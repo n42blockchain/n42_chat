@@ -213,9 +213,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     final preview =
         String.fromCharCodes(previewRunes.take(8000)) +
         (previewRunes.length > 8000 ? '…' : '');
-    final route = DialogRoute<void>(
+    final route = DialogRoute<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: Text(
           S.of(context)?.scheduledRecoveryCopy ?? 'Save recovery copy',
         ),
@@ -237,6 +238,11 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         ),
         actions: [
           TextButton(
+            key: const ValueKey('scheduled-recovery-delete'),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(S.of(context)?.commonDelete ?? 'Delete'),
+          ),
+          TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(MaterialLocalizations.of(context).closeButtonLabel),
           ),
@@ -244,8 +250,46 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
       ),
     );
     _recoveryRoute = route;
-    await Navigator.of(context).push(route);
+    final delete = await Navigator.of(context).push(route);
     if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+    if (delete == true && mounted && _origin?.isCurrent == true) {
+      await _deleteRecoveryCopy(raw);
+    }
+  }
+
+  Future<void> _deleteRecoveryCopy(String raw) async {
+    final owner = _ownerUserId;
+    if (owner == null || !mounted || _origin?.isCurrent != true) return;
+    final route = DialogRoute<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        scrollable: true,
+        title: Text(S.of(context)?.commonDelete ?? 'Delete'),
+        content: Text('${S.of(context)?.scheduledRecoveryCopies ?? 'Recovery copies'}\n\n${String.fromCharCodes(raw.runes.take(100))}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            key: const ValueKey('scheduled-recovery-delete-confirm'),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(S.of(context)?.commonDelete ?? 'Delete'),
+          ),
+        ],
+      ),
+    );
+    _recoveryRoute = route;
+    final confirmed = await Navigator.of(context).push(route);
+    if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+    if (confirmed != true || !mounted || _origin?.isCurrent != true ||
+        owner != await _messages.getCurrentUserId() || !mounted || _origin?.isCurrent != true) {
+      return;
+    }
+    await _preferences.deleteScheduledRecoveryCopy(
+      ownerUserId: owner, expectedRaw: raw,
+      isCurrent: () => mounted && _origin?.isCurrent == true,
+    );
   }
 
   Future<void> _openRecoveryCopies() async {

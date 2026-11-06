@@ -273,6 +273,43 @@ void main() {
     expect(find.text('private copy'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+  for (final action in ['confirm', 'cancel', 'logout', 'failure']) {
+    testWidgets('copy deletion requires confirmation: $action', (tester) async {
+      final events = StreamController<bool>.broadcast(sync: true);
+      addTearDown(events.close);
+      when(() => auth.loginStateStream).thenAnswer((_) => events.stream);
+      when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => const [ScheduledRecoveryCopy(id: 'one', raw: 'reviewed copy', isIntact: true)]);
+      when(() => prefs.deleteScheduledRecoveryCopy(ownerUserId: '@me:test', expectedRaw: 'reviewed copy', isCurrent: any(named: 'isCurrent'))).thenAnswer((invocation) async {
+        expect((invocation.namedArguments[#isCurrent] as bool Function())(), isTrue);
+        if (action == 'failure') throw StateError('storage unavailable');
+      });
+      await pump(tester);
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-history')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-one')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-delete')));
+      await tester.pumpAndSettle();
+      verifyNever(() => prefs.deleteScheduledRecoveryCopy(ownerUserId: any(named: 'ownerUserId'), expectedRaw: any(named: 'expectedRaw'), isCurrent: any(named: 'isCurrent')));
+      if (action == 'logout') {
+        when(() => auth.currentAccountGeneration).thenReturn(null);
+        events.add(false);
+      } else if (action == 'cancel') {
+        await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Cancel')));
+      } else {
+        await tester.tap(find.byKey(const ValueKey('scheduled-recovery-delete-confirm')));
+      }
+      await tester.pumpAndSettle();
+      if (action == 'confirm' || action == 'failure') {
+        verify(() => prefs.deleteScheduledRecoveryCopy(ownerUserId: '@me:test', expectedRaw: 'reviewed copy', isCurrent: any(named: 'isCurrent'))).called(1);
+      } else {
+        verifyNever(() => prefs.deleteScheduledRecoveryCopy(ownerUserId: any(named: 'ownerUserId'), expectedRaw: any(named: 'expectedRaw'), isCurrent: any(named: 'isCurrent')));
+      }
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('empty recovery history does not create a backup', (tester) async {
     when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => []);
     await pump(tester);

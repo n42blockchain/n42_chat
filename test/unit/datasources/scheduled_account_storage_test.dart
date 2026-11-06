@@ -223,6 +223,41 @@ void main() {
     expect(prefs.getString(key), raw);
   });
 
+  test('reviewed copy deletion preserves queue and rejects stale or foreign requests', () async {
+    final store = PreferencesDataSource();
+    const owner = '@delete:test';
+    final key = 'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    final prefs = await SharedPreferences.getInstance();
+    for (final raw in ['first', 'second']) {
+      await prefs.setString(key, raw);
+      await store.saveScheduledRecoveryCopy(ownerUserId: owner, isCurrent: () => true);
+    }
+    var checks = 0;
+    await expectLater(store.deleteScheduledRecoveryCopy(ownerUserId: owner, expectedRaw: 'first', isCurrent: () => ++checks == 1), throwsStateError);
+    await expectLater(store.deleteScheduledRecoveryCopy(ownerUserId: '@other:test', expectedRaw: 'first', isCurrent: () => true), throwsStateError);
+    await store.deleteScheduledRecoveryCopy(ownerUserId: owner, expectedRaw: 'first', isCurrent: () => true);
+    expect(prefs.getString(key), 'second');
+    expect((await store.getScheduledRecoveryCopies(ownerUserId: owner, isCurrent: () => true)).single.raw, 'second');
+    final backup = '${key}_recovery_${sha256.convert(utf8.encode('second'))}';
+    await prefs.setString(backup, 'changed bytes');
+    await expectLater(store.deleteScheduledRecoveryCopy(ownerUserId: owner, expectedRaw: 'second', isCurrent: () => true), throwsStateError);
+    expect(prefs.getString(backup), 'changed bytes');
+  });
+  test('rejected copy deletion reloads and preserves the copy', () async {
+    final platform = _RejectRecoveryStore();
+    SharedPreferences.resetStatic();
+    SharedPreferencesStorePlatform.instance = platform;
+    final store = PreferencesDataSource();
+    const owner = '@delete:test';
+    final key = 'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, 'reviewed');
+    await store.saveScheduledRecoveryCopy(ownerUserId: owner, isCurrent: () => true);
+    platform.rejectRemove = true;
+    await expectLater(store.deleteScheduledRecoveryCopy(ownerUserId: owner, expectedRaw: 'reviewed', isCurrent: () => true), throwsStateError);
+    expect((await store.getScheduledRecoveryCopies(ownerUserId: owner, isCurrent: () => true)).single.raw, 'reviewed');
+  });
+
   test('saved copies reopen without active queue and stay account-scoped', () async {
     final store = PreferencesDataSource();
     const owner = '@a:test';

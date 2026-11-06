@@ -844,6 +844,26 @@ class PreferencesDataSource {
     }));
   });
 
+  /// Remove only the reviewed intact copy, never the active queue or legacy data.
+  Future<void> deleteScheduledRecoveryCopy({
+    required String ownerUserId,
+    required String expectedRaw,
+    required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final key = '${_scheduledKey(ownerUserId)}_recovery_${sha256.convert(utf8.encode(expectedRaw))}';
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    if (p.get(key) != expectedRaw) throw StateError('Scheduled recovery copy changed');
+    try {
+      if (!await p.remove(key)) throw StateError('Recovery copy deletion was not saved');
+    } catch (_) {
+      try { await p.reload(); } catch (_) {}
+      rethrow;
+    }
+  });
+
   /// Preserve the exact account-owned queue before any manual recovery.
   /// Recovery copies are never read by the dispatcher. Keep the account prefix
   /// so attachment cleanup also preserves files referenced by these copies.
