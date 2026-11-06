@@ -478,6 +478,51 @@ void main() {
     await latestStream.close();
   });
 
+  for (final stage in ['settings', 'receipt', 'error', 'null receipt', 'new target']) {
+    test('reply context protects $stage', () async {
+      final bloc = await buildInitializedBloc();
+      final settings = Completer<int?>();
+      final result = Completer<MessageEntity?>();
+      final started = Completer<void>();
+      when(() => mockSecureStorage.getDefaultSelfDestructSeconds()).thenAnswer((_) {
+        if (stage == 'settings') { started.complete(); return settings.future; }
+        return Future.value(null);
+      });
+      when(() => mockRepository.replyToMessage(any(), any(), any(),
+        selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'), mentionsRoom: any(named: 'mentionsRoom')))
+          .thenAnswer((_) { if (!started.isCompleted) started.complete(); return result.future; });
+      final original = _testMessages.first;
+      final newer = _testMessages.last;
+      bloc.add(SetReplyTarget(original));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      bloc.add(ReplyToMessage(replyToMessageId: original.id, text: 'reply'));
+      await started.future.timeout(const Duration(seconds: 3));
+      final stale = stage == 'settings' || stage == 'receipt' || stage == 'error';
+      if (stale) {
+        bloc.add(const InitializeChat('!other:server.com'));
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        bloc.add(const InitializeChat(_roomId));
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+      }
+      if (stage != 'null receipt') bloc.add(SetReplyTarget(newer));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      if (stage == 'settings') { settings.complete(null); result.complete(original); }
+      else if (stage == 'error') { result.completeError(StateError('old failure')); }
+      else { result.complete(stage == 'null receipt' ? null : original); }
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.replyTarget, stage == 'null receipt' ? original : newer);
+      expect(bloc.state.error, stage == 'null receipt' ? 'Failed to reply' : null);
+      expect(bloc.state.isSending, isFalse);
+      if (stage == 'settings') {
+        verifyNever(() => mockRepository.replyToMessage(any(), any(), any(),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'), mentionsRoom: any(named: 'mentionsRoom')));
+      }
+      await bloc.close();
+    });
+  }
+
   group('text send context across awaits', () {
     for (final returnToOrigin in [false, true]) {
       test('settings wait rejects room switch, return=$returnToOrigin', () async {

@@ -157,7 +157,13 @@ extension ChatBlocActionHandlers on ChatBloc {
     ReplyToMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
+    final mentionedUserIds = event.mentionedUserIds == null
+        ? null
+        : List<String>.of(event.mentionedUserIds!);
 
     emit(state.copyWith(isSending: true, clearError: true));
 
@@ -165,17 +171,27 @@ extension ChatBlocActionHandlers on ChatBloc {
       final selfDestructAfter = await _resolveSelfDestructAfter(
         event.selfDestructAfter,
       );
-      await _messageRepository.replyToMessage(
-        _currentRoomId!,
+      if (!isCurrent()) return;
+      final receipt = await _messageRepository.replyToMessage(
+        roomId,
         event.replyToMessageId,
         event.text,
         selfDestructAfter: selfDestructAfter,
-        mentionedUserIds: event.mentionedUserIds,
+        mentionedUserIds: mentionedUserIds,
         mentionsRoom: event.mentionsRoom,
       );
-      emit(state.copyWith(isSending: false, clearReplyTarget: true));
+      if (!isCurrent()) return;
+      if (receipt == null || receipt.id.trim().isEmpty) {
+        throw StateError('Reply acknowledgement unavailable');
+      }
+      emit(state.copyWith(
+        isSending: false,
+        clearReplyTarget: state.replyTarget?.id == event.replyToMessageId,
+      ));
     } catch (e) {
-      emit(state.copyWith(isSending: false, error: 'Failed to reply'));
+      if (isCurrent()) {
+        emit(state.copyWith(isSending: false, error: 'Failed to reply'));
+      }
     }
   }
 
