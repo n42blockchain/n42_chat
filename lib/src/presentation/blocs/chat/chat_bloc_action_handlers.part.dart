@@ -38,35 +38,50 @@ extension ChatBlocActionHandlers on ChatBloc {
     RedactMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
-    // 保存原始消息列表，用于失败时回滚
-    final originalMessages = List<MessageEntity>.unmodifiable(state.messages);
+    // Roll back only this operation, preserving messages received in the meantime.
+    MessageEntity? originalMessage;
+    MessageEntity? optimisticMessage;
 
     // 立即在本地将消息标记为已撤回（乐观更新）
     // 使消息立即显示为"已撤回"提示，而不是消失
     final optimisticMessages = state.messages.map((m) {
       if (m.id == event.messageId) {
-        return m.copyWith(type: MessageType.redacted, content: '');
+        originalMessage = m;
+        optimisticMessage = m.copyWith(type: MessageType.redacted, content: '');
+        return optimisticMessage!;
       }
       return m;
     }).toList();
     emit(state.copyWith(messages: optimisticMessages));
 
     try {
-      await _messageRepository.redactMessage(
-        _currentRoomId!,
+      final success = await _messageRepository.redactMessage(
+        roomId,
         event.messageId,
         reason: event.reason,
       );
+      if (!success) throw StateError('Redaction rejected');
       // 服务器确认后无需额外操作：
       // Matrix sync 会将该事件重新推回，onMessagesUpdated 中会以
       // MessageType.redacted 合并，与当前状态一致，不会产生闪烁。
     } catch (e) {
-      // 服务器撤回失败：回滚乐观更新，恢复原始消息列表
+      if (!isCurrent()) return;
+      // Never undo a newer sync result or another operation.
       debugLog('ChatBloc: Failed to redact message ${event.messageId}: $e');
       emit(
-        state.copyWith(messages: originalMessages, error: 'Failed to recall'),
+        state.copyWith(
+          messages: state.messages.map((message) {
+            return originalMessage != null && identical(message, optimisticMessage)
+                ? originalMessage!
+                : message;
+          }).toList(),
+          error: 'Failed to recall',
+        ),
       );
     }
   }

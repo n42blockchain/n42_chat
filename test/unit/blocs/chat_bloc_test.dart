@@ -1419,6 +1419,44 @@ void main() {
   // =========================================================================
 
   group('RedactMessage', () {
+    for (final mode in ['new message', 'server update', 'room switch', 'false result']) {
+      test('late redaction failure preserves $mode', () async {
+        final pending = Completer<bool>();
+        final started = Completer<void>();
+        when(() => mockRepository.redactMessage(any(), any(), reason: any(named: 'reason')))
+            .thenAnswer((_) { started.complete(); return pending.future; });
+        final bloc = await buildInitializedBloc();
+        final original = bloc.state.messages.first;
+        bloc.add(RedactMessage(original.id));
+        await started.future.timeout(const Duration(seconds: 3));
+        final extra = _testMessages.last.copyWith(id: r'$new', content: 'new arrival');
+        if (mode == 'room switch') {
+          bloc.add(const InitializeChat('!other:server.com'));
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+          bloc.add(MessagesUpdated([extra]));
+        } else if (mode == 'server update') {
+          bloc.add(MessagesUpdated([original.copyWith(type: MessageType.redacted, content: ''), extra]));
+        } else {
+          bloc.add(MessagesUpdated([...bloc.state.messages, extra]));
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        if (mode == 'false result') { pending.complete(false); }
+        else { pending.completeError(StateError('rejected')); }
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(bloc.state.messages.any((m) => m.id == extra.id), isTrue);
+        if (mode == 'room switch') {
+          expect(bloc.state.messages, [extra]);
+          expect(bloc.state.error, isNull);
+        } else {
+          final result = bloc.state.messages.firstWhere((m) => m.id == original.id);
+          expect(result.content, mode == 'server update' ? '' : original.content);
+          expect(result.type, mode == 'server update' ? MessageType.redacted : MessageType.text);
+          expect(bloc.state.error, 'Failed to recall');
+        }
+        await bloc.close();
+      });
+    }
+
     test('optimistically marks message as redacted on success', () async {
       when(
         () => mockRepository.redactMessage(
