@@ -6070,4 +6070,7 @@ class SJa extends S {
   String scheduledMessageCreatedAt(String time) {
     return '作成日時：$time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => '配信が確認されていません';
 }

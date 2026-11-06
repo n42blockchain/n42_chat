@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Henüz zamanlanmış mesaj yok",
   "scheduledMessagesHint": "Mesaj zamanlamak için Gönder, Fotoğraflar, Dosyalar, bir GIF veya çıkartmaya uzun basın.",
   "scheduledMessageCancelled": "Zamanlanmış mesaj iptal edildi",
-  "scheduledMessageCreatedAt": "Oluşturulma: {time}"
+  "scheduledMessageCreatedAt": "Oluşturulma: {time}",
+  "scheduledDeliveryUnconfirmed": "Teslimat doğrulanmadı"
 }

@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "예약된 메시지가 없습니다",
   "scheduledMessagesHint": "보내기, 사진, 파일, GIF 또는 스티커를 길게 눌러 메시지를 예약하세요.",
   "scheduledMessageCancelled": "예약 메시지가 취소되었습니다",
-  "scheduledMessageCreatedAt": "작성: {time}"
+  "scheduledMessageCreatedAt": "작성: {time}",
+  "scheduledDeliveryUnconfirmed": "전달이 확인되지 않았습니다"
 }

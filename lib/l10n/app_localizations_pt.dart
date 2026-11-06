@@ -6240,6 +6240,9 @@ class SPt extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Criado em $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Entrega não confirmada';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12479,4 +12482,7 @@ class SPtBr extends SPt {
   String scheduledMessageCreatedAt(String time) {
     return 'Criado em $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Entrega não confirmada';
 }

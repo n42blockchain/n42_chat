@@ -6236,4 +6236,7 @@ class SRu extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Создано: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Доставка не подтверждена';
 }

@@ -6235,4 +6235,7 @@ class SIt extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Creato: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Consegna non confermata';
 }

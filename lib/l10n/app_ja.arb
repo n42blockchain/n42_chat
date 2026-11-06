@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "送信予約メッセージはありません",
   "scheduledMessagesHint": "送信、写真、ファイル、GIF、スタンプを長押しすると、送信を予約できます。",
   "scheduledMessageCancelled": "メッセージの送信予約をキャンセルしました",
-  "scheduledMessageCreatedAt": "作成日時：{time}"
+  "scheduledMessageCreatedAt": "作成日時：{time}",
+  "scheduledDeliveryUnconfirmed": "配信が確認されていません"
 }

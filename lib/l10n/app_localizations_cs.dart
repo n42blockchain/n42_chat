@@ -6218,4 +6218,7 @@ class SCs extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Vytvořeno $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Doručení nebylo potvrzeno';
 }

@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "ఇంకా షెడ్యూల్ చేసిన సందేశాలు లేవు",
   "scheduledMessagesHint": "సందేశాన్ని షెడ్యూల్ చేయడానికి పంపు, ఫోటోలు, ఫైల్‌లు, GIF లేదా స్టిక్కర్‌ను ఎక్కువసేపు నొక్కండి.",
   "scheduledMessageCancelled": "షెడ్యూల్ చేసిన సందేశం రద్దు చేయబడింది",
-  "scheduledMessageCreatedAt": "సృష్టించిన సమయం: {time}"
+  "scheduledMessageCreatedAt": "సృష్టించిన సమయం: {time}",
+  "scheduledDeliveryUnconfirmed": "డెలివరీ నిర్ధారించబడలేదు"
 }

@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Belum ada pesan terjadwal",
   "scheduledMessagesHint": "Tekan lama Kirim, Foto, File, GIF, atau stiker untuk menjadwalkan pesan.",
   "scheduledMessageCancelled": "Pesan terjadwal dibatalkan",
-  "scheduledMessageCreatedAt": "Dibuat {time}"
+  "scheduledMessageCreatedAt": "Dibuat {time}",
+  "scheduledDeliveryUnconfirmed": "Pengiriman belum dikonfirmasi"
 }

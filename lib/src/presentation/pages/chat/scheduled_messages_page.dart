@@ -367,6 +367,14 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           ),
           const SizedBox(height: 10),
           _buildChip(label: _localizedType(draft)),
+          if (draft.deliveryUnconfirmed) ...[
+            const SizedBox(height: 10),
+            Text(
+              S.of(context)?.scheduledDeliveryUnconfirmed ??
+                  'Delivery not confirmed',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ],
           const SizedBox(height: 10),
           Text(
             draft.text,

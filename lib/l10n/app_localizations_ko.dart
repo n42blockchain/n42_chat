@@ -6073,4 +6073,7 @@ class SKo extends S {
   String scheduledMessageCreatedAt(String time) {
     return '작성: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => '전달이 확인되지 않았습니다';
 }

@@ -6274,4 +6274,7 @@ class SFr extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Créé le $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Livraison non confirmée';
 }

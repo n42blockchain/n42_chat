@@ -2272,5 +2272,6 @@
   "scheduledMessagesEmpty": "尚無排程訊息",
   "scheduledMessagesHint": "長按傳送、照片、檔案、GIF 或貼圖，即可設定排程傳送。",
   "scheduledMessageCancelled": "已取消排程訊息",
-  "scheduledMessageCreatedAt": "建立於 {time}"
+  "scheduledMessageCreatedAt": "建立於 {time}",
+  "scheduledDeliveryUnconfirmed": "傳送結果尚未確認"
 }

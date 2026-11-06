@@ -888,6 +888,32 @@ class PreferencesDataSource {
     }
   });
 
+  /// Record a failed/unconfirmed attempt without recreating a cancelled draft.
+  Future<bool> markScheduledDeliveryUnconfirmed({
+    required String ownerUserId,
+    required String roomId,
+    required String messageId,
+  }) => _withScheduledStore(() async {
+    final p = await prefs;
+    await p.reload();
+    final key = _scheduledKey(ownerUserId);
+    final raw = p.getString(key);
+    if (raw == null) return false;
+    final data = jsonDecode(raw) as Map<String, dynamic>;
+    final messages = data[roomId] as List<dynamic>?;
+    if (messages == null) return false;
+    final index = messages.indexWhere(
+      (item) => (item as Map)['messageId'] == messageId,
+    );
+    if (index < 0) return false;
+    messages[index] = {
+      ...Map<String, dynamic>.from(messages[index] as Map),
+      'deliveryUnconfirmed': true,
+    };
+    await saveStringPreference(p, key, jsonEncode(data));
+    return true;
+  });
+
   /// 获取房间的所有定时消息
   Future<List<ScheduledMessageDraft>> getScheduledMessages(
     String roomId, {

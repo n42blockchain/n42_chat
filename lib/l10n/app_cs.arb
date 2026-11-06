@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Zatím žádné naplánované zprávy",
   "scheduledMessagesHint": "Zprávu naplánujete dlouhým stisknutím tlačítka Odeslat, Fotky, Soubory, GIFu nebo nálepky.",
   "scheduledMessageCancelled": "Naplánovaná zpráva byla zrušena",
-  "scheduledMessageCreatedAt": "Vytvořeno {time}"
+  "scheduledMessageCreatedAt": "Vytvořeno {time}",
+  "scheduledDeliveryUnconfirmed": "Doručení nebylo potvrzeno"
 }

@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Ainda não há mensagens agendadas",
   "scheduledMessagesHint": "Mantenha pressionado Enviar, Fotos, Arquivos, um GIF ou uma figurinha para agendar uma mensagem.",
   "scheduledMessageCancelled": "Mensagem agendada cancelada",
-  "scheduledMessageCreatedAt": "Criado em {time}"
+  "scheduledMessageCreatedAt": "Criado em {time}",
+  "scheduledDeliveryUnconfirmed": "Entrega não confirmada"
 }

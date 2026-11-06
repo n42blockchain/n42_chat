@@ -6206,4 +6206,7 @@ class SBn extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'তৈরি হয়েছে $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'ডেলিভারি নিশ্চিত করা হয়নি';
 }

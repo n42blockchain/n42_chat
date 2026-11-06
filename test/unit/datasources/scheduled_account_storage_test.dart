@@ -5,6 +5,26 @@ import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart'
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('unconfirmed attempts persist without changing payload, identity or other accounts', () async {
+    final storage = PreferencesDataSource();
+    for (final user in ['@a:test', '@b:test']) {
+      await storage.saveScheduledMessage(roomId: 'room', ownerUserId: user,
+        messageId: 'draft', text: 'keep', scheduledAt: DateTime(2020), payload: {'filename': 'keep.txt'});
+    }
+    final before = (await storage.getScheduledMessages('room', ownerUserId: '@a:test')).single;
+    expect(await storage.markScheduledDeliveryUnconfirmed(ownerUserId: '@a:test', roomId: 'room', messageId: 'draft'), true);
+    final restored = (await PreferencesDataSource().getScheduledMessages('room', ownerUserId: '@a:test')).single;
+    expect(restored.deliveryUnconfirmed, true);
+    expect(restored.transactionId, before.transactionId);
+    expect(restored.createdAt, before.createdAt);
+    expect(restored.payload, before.payload);
+    expect(restored.copyWith(roomId: 'room').deliveryUnconfirmed, true);
+    expect((await storage.getScheduledMessages('room', ownerUserId: '@b:test')).single.deliveryUnconfirmed, false);
+    await storage.removeScheduledMessage('room', 'draft', ownerUserId: '@a:test');
+    expect(await storage.markScheduledDeliveryUnconfirmed(ownerUserId: '@a:test', roomId: 'room', messageId: 'draft'), false);
+    expect(await storage.getScheduledMessages('room', ownerUserId: '@a:test'), isEmpty);
+  });
+
   for (final malformed in ['{', '{"room":[42]}']) {
     test(
       'room read reports corruption and preserves stored bytes: $malformed',

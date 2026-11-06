@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Ще немає запланованих повідомлень",
   "scheduledMessagesHint": "Натисніть і утримуйте «Надіслати», «Фото», «Файли», GIF або наліпку, щоб запланувати повідомлення.",
   "scheduledMessageCancelled": "Заплановане повідомлення скасовано",
-  "scheduledMessageCreatedAt": "Створено: {time}"
+  "scheduledMessageCreatedAt": "Створено: {time}",
+  "scheduledDeliveryUnconfirmed": "Доставку не підтверджено"
 }

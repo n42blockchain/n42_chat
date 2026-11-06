@@ -6252,4 +6252,7 @@ class STe extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'సృష్టించిన సమయం: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'డెలివరీ నిర్ధారించబడలేదు';
 }

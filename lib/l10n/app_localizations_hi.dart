@@ -6204,4 +6204,7 @@ class SHi extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'बनाया गया: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'डिलीवरी की पुष्टि नहीं हुई';
 }

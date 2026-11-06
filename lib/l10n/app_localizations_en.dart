@@ -6177,4 +6177,7 @@ class SEn extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Created $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Delivery not confirmed';
 }

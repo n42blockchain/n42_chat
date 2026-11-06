@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "এখনও কোনো নির্ধারিত বার্তা নেই",
   "scheduledMessagesHint": "বার্তা পাঠানোর সময় নির্ধারণ করতে পাঠান, ছবি, ফাইল, GIF বা স্টিকারে দীর্ঘক্ষণ চাপ দিন।",
   "scheduledMessageCancelled": "নির্ধারিত বার্তা বাতিল করা হয়েছে",
-  "scheduledMessageCreatedAt": "তৈরি হয়েছে {time}"
+  "scheduledMessageCreatedAt": "তৈরি হয়েছে {time}",
+  "scheduledDeliveryUnconfirmed": "ডেলিভারি নিশ্চিত করা হয়নি"
 }

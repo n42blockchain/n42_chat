@@ -6032,6 +6032,9 @@ class SZh extends S {
   String scheduledMessageCreatedAt(String time) {
     return '创建于 $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => '发送结果未确认';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12062,4 +12065,7 @@ class SZhTw extends SZh {
   String scheduledMessageCreatedAt(String time) {
     return '建立於 $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => '傳送結果尚未確認';
 }

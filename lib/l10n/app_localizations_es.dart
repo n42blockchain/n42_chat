@@ -6249,4 +6249,7 @@ class SEs extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Creado: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Entrega no confirmada';
 }

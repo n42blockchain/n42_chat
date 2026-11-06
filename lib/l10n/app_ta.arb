@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "இன்னும் திட்டமிடப்பட்ட செய்திகள் இல்லை",
   "scheduledMessagesHint": "செய்தியைத் திட்டமிட அனுப்பு, படங்கள், கோப்புகள், GIF அல்லது ஸ்டிக்கரை நீண்ட நேரம் அழுத்தவும்.",
   "scheduledMessageCancelled": "திட்டமிடப்பட்ட செய்தி ரத்துசெய்யப்பட்டது",
-  "scheduledMessageCreatedAt": "உருவாக்கப்பட்டது: {time}"
+  "scheduledMessageCreatedAt": "உருவாக்கப்பட்டது: {time}",
+  "scheduledDeliveryUnconfirmed": "விநியோகம் உறுதிப்படுத்தப்படவில்லை"
 }

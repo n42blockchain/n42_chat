@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "अद्याप कोणतेही नियोजित संदेश नाहीत",
   "scheduledMessagesHint": "संदेशाची वेळ ठरवण्यासाठी पाठवा, फोटो, फाइल्स, GIF किंवा स्टिकर दीर्घकाळ दाबा.",
   "scheduledMessageCancelled": "नियोजित संदेश रद्द केला",
-  "scheduledMessageCreatedAt": "तयार केले: {time}"
+  "scheduledMessageCreatedAt": "तयार केले: {time}",
+  "scheduledDeliveryUnconfirmed": "वितरणाची पुष्टी झालेली नाही"
 }

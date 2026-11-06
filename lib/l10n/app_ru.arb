@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Пока нет запланированных сообщений",
   "scheduledMessagesHint": "Нажмите и удерживайте «Отправить», «Фото», «Файлы», GIF или стикер, чтобы запланировать сообщение.",
   "scheduledMessageCancelled": "Запланированное сообщение отменено",
-  "scheduledMessageCreatedAt": "Создано: {time}"
+  "scheduledMessageCreatedAt": "Создано: {time}",
+  "scheduledDeliveryUnconfirmed": "Доставка не подтверждена"
 }

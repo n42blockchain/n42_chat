@@ -6194,4 +6194,7 @@ class SVi extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Đã tạo lúc $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Chưa xác nhận gửi thành công';
 }

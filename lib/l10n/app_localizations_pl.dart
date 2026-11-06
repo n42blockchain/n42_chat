@@ -6245,4 +6245,7 @@ class SPl extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Utworzono: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Dostarczenie niepotwierdzone';
 }

@@ -6272,4 +6272,8 @@ class STa extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'உருவாக்கப்பட்டது: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed =>
+      'விநியோகம் உறுதிப்படுத்தப்படவில்லை';
 }

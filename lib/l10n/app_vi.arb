@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Chưa có tin nhắn đã lên lịch",
   "scheduledMessagesHint": "Nhấn giữ Gửi, Ảnh, Tệp, GIF hoặc nhãn dán để lên lịch gửi tin nhắn.",
   "scheduledMessageCancelled": "Đã hủy tin nhắn đã lên lịch",
-  "scheduledMessageCreatedAt": "Đã tạo lúc {time}"
+  "scheduledMessageCreatedAt": "Đã tạo lúc {time}",
+  "scheduledDeliveryUnconfirmed": "Chưa xác nhận gửi thành công"
 }

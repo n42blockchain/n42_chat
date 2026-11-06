@@ -10,6 +10,7 @@ class ScheduledMessageDraft extends Equatable {
   String get transactionId =>
       'n42_scheduled_${sha256.convert(utf8.encode(jsonEncode([roomId, messageId])))}';
 
+  final bool deliveryUnconfirmed;
   final String messageId;
   final String? roomId;
   final String text;
@@ -22,6 +23,7 @@ class ScheduledMessageDraft extends Equatable {
   final Map<String, dynamic> payload;
 
   const ScheduledMessageDraft({
+    this.deliveryUnconfirmed = false,
     required this.messageId,
     required this.text,
     required this.type,
@@ -39,6 +41,7 @@ class ScheduledMessageDraft extends Equatable {
     final rawType = json['type'] as String?;
 
     return ScheduledMessageDraft(
+      deliveryUnconfirmed: json['deliveryUnconfirmed'] == true,
       messageId: json['messageId'] as String? ?? '',
       roomId: json['roomId'] as String?,
       text: json['text'] as String? ?? '',
@@ -65,6 +68,7 @@ class ScheduledMessageDraft extends Equatable {
   }
 
   Map<String, dynamic> toJson() => {
+    'deliveryUnconfirmed': deliveryUnconfirmed,
     'messageId': messageId,
     'text': text,
     'type': type.name,
@@ -79,9 +83,11 @@ class ScheduledMessageDraft extends Equatable {
 
   ScheduledMessageDraft copyWith({
     String? roomId,
+    bool? deliveryUnconfirmed,
     Map<String, dynamic>? payload,
   }) {
     return ScheduledMessageDraft(
+      deliveryUnconfirmed: deliveryUnconfirmed ?? this.deliveryUnconfirmed,
       messageId: messageId,
       roomId: roomId ?? this.roomId,
       text: text,
@@ -189,6 +195,7 @@ class ScheduledMessageDraft extends Equatable {
 
   @override
   List<Object?> get props => [
+    deliveryUnconfirmed,
     messageId,
     roomId,
     text,

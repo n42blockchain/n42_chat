@@ -6238,4 +6238,7 @@ class SUk extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Створено: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Доставку не підтверджено';
 }

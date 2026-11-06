@@ -6178,4 +6178,7 @@ class SAr extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'أُنشئت في $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'لم يتم تأكيد التسليم';
 }

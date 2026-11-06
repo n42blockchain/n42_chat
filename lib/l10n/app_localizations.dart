@@ -11428,6 +11428,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Created {time}'**
   String scheduledMessageCreatedAt(String time);
+
+  /// No description provided for @scheduledDeliveryUnconfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery not confirmed'**
+  String get scheduledDeliveryUnconfirmed;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

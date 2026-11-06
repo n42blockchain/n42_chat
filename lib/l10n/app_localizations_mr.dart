@@ -6203,4 +6203,7 @@ class SMr extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'तयार केले: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'वितरणाची पुष्टी झालेली नाही';
 }

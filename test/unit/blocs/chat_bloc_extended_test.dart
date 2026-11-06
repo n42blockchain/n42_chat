@@ -1165,6 +1165,7 @@ void main() {
     });
 
     test('unconfirmed scheduled delivery retains the draft', () async {
+      when(() => mockPrefs.markScheduledDeliveryUnconfirmed(ownerUserId: any(named: 'ownerUserId'), roomId: _roomId, messageId: 'unconfirmed')).thenAnswer((_) async => true);
       final draft = ScheduledMessageDraft(messageId: 'unconfirmed', roomId: _roomId, text: 'Keep me', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));
       final bloc = buildBloc();
       await initBloc(bloc);
@@ -1175,6 +1176,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 50));
       verify(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: draft.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).called(1);
       verifyNever(() => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
+      verify(() => mockPrefs.markScheduledDeliveryUnconfirmed(ownerUserId: any(named: 'ownerUserId'), roomId: _roomId, messageId: 'unconfirmed')).called(1);
       await bloc.close();
     });
 
@@ -1197,6 +1199,7 @@ void main() {
       }
       expect(removed, isTrue);
       expect(sentIds, [draft.transactionId, draft.transactionId]);
+      verifyNever(() => mockPrefs.markScheduledDeliveryUnconfirmed(ownerUserId: any(named: 'ownerUserId'), roomId: _roomId, messageId: draft.messageId));
     });
 
     test(

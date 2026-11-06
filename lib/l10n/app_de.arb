@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Noch keine geplanten Nachrichten",
   "scheduledMessagesHint": "Halte Senden, Fotos, Dateien, ein GIF oder einen Sticker gedrückt, um eine Nachricht zu planen.",
   "scheduledMessageCancelled": "Geplante Nachricht abgebrochen",
-  "scheduledMessageCreatedAt": "Erstellt: {time}"
+  "scheduledMessageCreatedAt": "Erstellt: {time}",
+  "scheduledDeliveryUnconfirmed": "Zustellung nicht bestätigt"
 }

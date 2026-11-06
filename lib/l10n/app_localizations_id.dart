@@ -6218,4 +6218,7 @@ class SId extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Dibuat $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Pengiriman belum dikonfirmasi';
 }

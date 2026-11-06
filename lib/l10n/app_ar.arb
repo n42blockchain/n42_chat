@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "لا توجد رسائل مجدولة بعد",
   "scheduledMessagesHint": "اضغط مطولًا على إرسال أو الصور أو الملفات أو صورة GIF أو ملصق لجدولة رسالة.",
   "scheduledMessageCancelled": "تم إلغاء الرسالة المجدولة",
-  "scheduledMessageCreatedAt": "أُنشئت في {time}"
+  "scheduledMessageCreatedAt": "أُنشئت في {time}",
+  "scheduledDeliveryUnconfirmed": "لم يتم تأكيد التسليم"
 }

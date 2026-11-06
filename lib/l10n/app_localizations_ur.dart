@@ -6220,4 +6220,7 @@ class SUr extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'بنایا گیا: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'ترسیل کی تصدیق نہیں ہوئی';
 }

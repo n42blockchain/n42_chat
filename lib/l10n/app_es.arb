@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Aún no hay mensajes programados",
   "scheduledMessagesHint": "Mantén pulsado Enviar, Fotos, Archivos, un GIF o un sticker para programar un mensaje.",
   "scheduledMessageCancelled": "Mensaje programado cancelado",
-  "scheduledMessageCreatedAt": "Creado: {time}"
+  "scheduledMessageCreatedAt": "Creado: {time}",
+  "scheduledDeliveryUnconfirmed": "Entrega no confirmada"
 }

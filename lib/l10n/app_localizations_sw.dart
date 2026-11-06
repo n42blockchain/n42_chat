@@ -6238,4 +6238,7 @@ class SSw extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Uliundwa $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Uwasilishaji haujathibitishwa';
 }

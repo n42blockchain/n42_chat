@@ -334,6 +334,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           messageId: draft.messageId,
         );
         if (operation == null) continue;
+        var accepted = false;
         try {
           // The due list may predate a completed cancellation.
           final current = await _findScheduledDraft(
@@ -343,6 +344,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           );
           if (current == null) continue;
           await _sendScheduledDraft(current, account);
+          accepted = true;
 
           await _removeScheduledDraftRecord(current, emit, account);
 
@@ -351,6 +353,20 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           debugLog(
             'ChatBloc: Failed to send scheduled message ${draft.messageId}: $e',
           );
+
+          if (!accepted && await _scheduledAccountIsCurrent(account)) {
+            try {
+              await _secureStorage.markScheduledDeliveryUnconfirmed(
+                ownerUserId: account.userId,
+                roomId: roomId,
+                messageId: draft.messageId,
+              );
+            } catch (storageError) {
+              debugLog(
+                'ChatBloc: Could not persist scheduled attempt status: ${storageError.runtimeType}',
+              );
+            }
+          }
 
           // Unreadable local files can be temporary (permissions, storage or
           // restoration). A failed send is never authorization to discard the

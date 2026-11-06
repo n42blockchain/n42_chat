@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "Bado hakuna ujumbe ulioratibiwa",
   "scheduledMessagesHint": "Bonyeza kwa muda Tuma, Picha, Faili, GIF au kibandiko ili kuratibu ujumbe.",
   "scheduledMessageCancelled": "Ujumbe ulioratibiwa umeghairiwa",
-  "scheduledMessageCreatedAt": "Uliundwa {time}"
+  "scheduledMessageCreatedAt": "Uliundwa {time}",
+  "scheduledDeliveryUnconfirmed": "Uwasilishaji haujathibitishwa"
 }

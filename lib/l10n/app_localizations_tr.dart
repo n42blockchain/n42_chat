@@ -6208,4 +6208,7 @@ class STr extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Oluşturulma: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Teslimat doğrulanmadı';
 }

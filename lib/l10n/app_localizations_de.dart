@@ -6256,4 +6256,7 @@ class SDe extends S {
   String scheduledMessageCreatedAt(String time) {
     return 'Erstellt: $time';
   }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Zustellung nicht bestätigt';
 }

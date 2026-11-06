@@ -2884,5 +2884,6 @@
   "scheduledMessagesEmpty": "ابھی کوئی طے شدہ پیغام نہیں ہے",
   "scheduledMessagesHint": "پیغام کا وقت طے کرنے کے لیے بھیجیں، تصاویر، فائلیں، GIF یا اسٹیکر کو دیر تک دبائیں۔",
   "scheduledMessageCancelled": "طے شدہ پیغام منسوخ کر دیا گیا",
-  "scheduledMessageCreatedAt": "بنایا گیا: {time}"
+  "scheduledMessageCreatedAt": "بنایا گیا: {time}",
+  "scheduledDeliveryUnconfirmed": "ترسیل کی تصدیق نہیں ہوئی"
 }
