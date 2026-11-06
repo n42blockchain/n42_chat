@@ -210,6 +210,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 - GIF composer follow-up (2026-11-06): the host supplies an acknowledgement callback before the GIF sheet closes. Failure/cancel retains the existing search and results; successful persistence closes with no selection result, preventing a second host dispatch. Pending schedule attempts exclude immediate selection and repeated long press. Disposal before acknowledgement is guarded. Legacy callers without the callback still receive immediate/scheduled results. 63 page/GIF tests plus the final 12-test compatibility/lifecycle suite pass; scoped analysis is clean. Distributed delivery, unknown persistence and device/provider acceptance remain open.
 
+- Recoverable attachment follow-up (2026-11-06): failed scheduled sends no longer automatically delete drafts when the local file is missing, empty or inaccessible. Empty files are rejected before repository dispatch. Drafts remain retryable or explicitly cancellable; restored bytes use the same transaction ID and successful acknowledgement still removes the record. Both missing/empty recovery tests fail against prior source (draft removed) and pass after the fix; 60 BLoC regressions pass. Analyzer has six existing infos, no errors/warnings. Remaining: persistent failure presentation/backoff, safe orphan reconciliation, and ownership/reference checks before the existing post-success/cancellation file deletion (currently deletes the payload path without checking other draft references). Do not treat file unavailability as delivery proof.
+
 ### CALL-001 Background blur / replacement still lacks a real video processor path
 
 - Severity: M

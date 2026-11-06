@@ -1651,6 +1651,47 @@ void main() {
       await bloc.close();
     });
 
+    for (final initialFile in ['missing', 'empty']) {
+      test('retains $initialFile attachment draft and sends after restoration', () async {
+        final directory = await Directory.systemTemp.createTemp('n42_restore_draft');
+        addTearDown(() async { if (await directory.exists()) await directory.delete(recursive: true); });
+        final file = File('${directory.path}/restored.pdf');
+        if (initialFile == 'empty') await file.writeAsBytes([]);
+        final draft = ScheduledMessageDraft(
+          messageId: 'recoverable', roomId: _roomId, text: 'restored.pdf', type: MessageType.file,
+          scheduledAt: DateTime(2020), createdAt: DateTime(2019),
+          payload: {'localPath': file.path, 'filename': 'restored.pdf', 'mimeType': 'application/pdf', 'fileSize': 3},
+        );
+        var pending = true;
+        var sends = 0;
+        when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => pending ? [draft] : []);
+        when(() => mockPrefs.removeScheduledMessage(_roomId, draft.messageId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async { pending = false; });
+        when(() => mockRepo.sendFileMessage(
+          _roomId, transactionId: draft.transactionId,
+          filename: 'restored.pdf', mimeType: 'application/pdf', fileSize: 3,
+          fileBytes: any(named: 'fileBytes'), selfDestructAfter: null,
+        )).thenAnswer((invocation) async {
+          sends++;
+          expect(invocation.namedArguments[#fileBytes], [1, 2, 3]);
+          return _msg.copyWith(type: MessageType.file);
+        });
+        final bloc = buildBloc();
+        await initBloc(bloc);
+        when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => pending ? [draft] : []);
+        bloc.add(const SendDueScheduledMessages());
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        expect(pending, isTrue);
+        expect(sends, 0);
+        verifyNever(() => mockPrefs.removeScheduledMessage(_roomId, draft.messageId, ownerUserId: any(named: 'ownerUserId')));
+        await file.writeAsBytes([1, 2, 3]);
+        bloc.add(const SendDueScheduledMessages());
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        expect(sends, 1);
+        expect(pending, isFalse);
+        await bloc.close();
+      });
+    }
+
     test('sends due scheduled local file through repository', () async {
       final tempDir = await Directory.systemTemp.createTemp(
         'n42_scheduled_file_test',

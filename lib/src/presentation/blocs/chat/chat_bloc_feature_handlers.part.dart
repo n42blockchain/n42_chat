@@ -352,13 +352,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             'ChatBloc: Failed to send scheduled message ${draft.messageId}: $e',
           );
 
-          if (await _scheduledAccountIsCurrent(account) &&
-              await _shouldDiscardFailedScheduledDraft(draft)) {
-            await _removeScheduledDraftRecord(draft, emit, account);
-            debugLog(
-              'ChatBloc: Discarded scheduled draft with unreadable local attachment - ${draft.messageId}',
-            );
-          }
+          // Unreadable local files can be temporary (permissions, storage or
+          // restoration). A failed send is never authorization to discard the
+          // draft; retain it for retry or explicit user cancellation.
         } finally {
           operation.release();
         }
@@ -632,32 +628,11 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     if (!await file.exists()) {
       throw FileSystemException('Scheduled attachment file not found', path);
     }
+    if (await file.length() == 0) {
+      throw FileSystemException('Scheduled attachment file is empty', path);
+    }
 
     return file;
-  }
-
-  Future<bool> _shouldDiscardFailedScheduledDraft(
-    ScheduledMessageDraft draft,
-  ) async {
-    if (!draft.hasLocalAttachment) {
-      return false;
-    }
-
-    final path = draft.localAttachmentPath;
-    if (path == null || path.isEmpty) {
-      return true;
-    }
-
-    try {
-      final file = File(path);
-      if (!await file.exists()) {
-        return true;
-      }
-
-      return await file.length() <= 0;
-    } catch (_) {
-      return true;
-    }
   }
 
   Future<ScheduledMessageDraft?> _findScheduledDraft(
