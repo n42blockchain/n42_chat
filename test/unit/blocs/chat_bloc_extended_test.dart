@@ -1456,7 +1456,8 @@ void main() {
       await bloc.close();
     });
 
-    test('sends due scheduled poll through repository', () async {
+    for (final quiz in [false, true]) {
+    test('sends due scheduled poll through repository quiz=$quiz', () async {
       when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer(
         (_) async => [
           ScheduledMessageDraft(
@@ -1470,6 +1471,8 @@ void main() {
               'options': ['Sushi', 'Pizza'],
               'maxSelections': 1,
               'isAnonymous': true,
+              if (quiz) 'quizCorrectIndex': 1,
+              if (quiz) 'quizExplanation': 'Because pizza',
             },
           ),
         ],
@@ -1482,6 +1485,8 @@ void main() {
           options: any(named: 'options'),
           maxSelections: any(named: 'maxSelections'),
           isAnonymous: any(named: 'isAnonymous'),
+          quizCorrectIndex: quiz ? 1 : null,
+          quizExplanation: quiz ? 'Because pizza' : null,
         ),
       ).thenAnswer((_) async => _msg.copyWith(type: MessageType.poll));
       when(
@@ -1504,6 +1509,8 @@ void main() {
           options: ['Sushi', 'Pizza'],
           maxSelections: 1,
           isAnonymous: true,
+          quizCorrectIndex: quiz ? 1 : null,
+          quizExplanation: quiz ? 'Because pizza' : null,
         ),
       ).called(1);
       verify(
@@ -1512,6 +1519,8 @@ void main() {
 
       await bloc.close();
     });
+
+    }
 
     test('sends due scheduled gif through repository', () async {
       when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer(

@@ -965,22 +965,26 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     }
   }
 
-  void _queueScheduledRichDraft({
+  Future<bool> _queueScheduledRichDraft({
     required String? ownerUserId,
     required String text,
     required MessageType type,
     required DateTime scheduledAt,
     Map<String, dynamic> payload = const {},
-  }) {
+  }) async {
     final roomId = widget.conversation.id;
     if (ownerUserId == null ||
         ownerUserId.isEmpty ||
         _scheduledOrigin?.isCurrent != true) {
-      return;
+      return false;
     }
-    context.read<ChatBloc>().add(
+    final bloc = context.read<ChatBloc>();
+    if (bloc.isClosed) return false;
+    final completion = Completer<bool>();
+    bloc.add(
       SendScheduledMessage(
         origin: _scheduledOrigin,
+        completion: completion,
         ownerUserId: ownerUserId,
         roomId: roomId,
         text: text,
@@ -989,9 +993,11 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         scheduledAt: scheduledAt,
       ),
     );
+    final saved = await completion.future;
+    return saved && mounted && _scheduledOrigin?.isCurrent == true;
   }
 
-  Future<void> _pickAndQueueScheduledRichDraft({
+  Future<bool> _pickAndQueueScheduledRichDraft({
     required String text,
     required MessageType type,
     Map<String, dynamic> payload = const {},
@@ -999,10 +1005,10 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     final ownerUserId = _currentUserId;
     final scheduledAt = await showScheduledSendPicker(context);
     if (!mounted || scheduledAt == null) {
-      return;
+      return false;
     }
 
-    _queueScheduledRichDraft(
+    return _queueScheduledRichDraft(
       ownerUserId: ownerUserId,
       text: text,
       type: type,
@@ -1039,7 +1045,19 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const PollCreateSheet(),
+      builder: (context) => PollCreateSheet(
+        onSchedule: (result) => _pickAndQueueScheduledRichDraft(
+          text: result.question,
+          type: MessageType.poll,
+          payload: {
+            'options': result.options,
+            'maxSelections': result.maxSelections,
+            'isAnonymous': result.isAnonymous,
+            'quizCorrectIndex': result.quizCorrectIndex,
+            'quizExplanation': result.quizExplanation,
+          },
+        ),
+      ),
     );
 
     if (result != null && mounted) {
@@ -1051,6 +1069,8 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
             'options': result.options,
             'maxSelections': result.maxSelections,
             'isAnonymous': result.isAnonymous,
+            'quizCorrectIndex': result.quizCorrectIndex,
+            'quizExplanation': result.quizExplanation,
           },
         );
         return;
@@ -1095,7 +1115,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       final payload = selection.scheduledPayload;
 
       if (selection.scheduledAt != null) {
-        _queueScheduledRichDraft(
+        await _queueScheduledRichDraft(
           ownerUserId: ownerUserId,
           text: selection.title.trim().isEmpty ? 'GIF' : selection.title,
           type: MessageType.image,
@@ -1170,12 +1190,12 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
   }
 
   Future<void> _onStickerLongPressed(Sticker sticker, String packId) async {
-    await _pickAndQueueScheduledRichDraft(
+    final saved = await _pickAndQueueScheduledRichDraft(
       text: sticker.name ?? sticker.emoji ?? 'Sticker',
       type: MessageType.sticker,
       payload: _buildStickerPayload(sticker, packId),
     );
-    _hideStickerPicker();
+    if (saved) _hideStickerPicker();
   }
 
   /// 打开贴纸商店

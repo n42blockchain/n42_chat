@@ -431,6 +431,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             options: draft.pollOptions,
             maxSelections: draft.pollMaxSelections,
             isAnonymous: draft.payload['isAnonymous'] as bool? ?? false,
+            quizCorrectIndex: draft.payload['quizCorrectIndex'] as int?,
+            quizExplanation: draft.payload['quizExplanation'] as String?,
           ),
         );
         return;

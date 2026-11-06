@@ -32,8 +32,9 @@ class PollComposerResult {
 
 class PollCreateSheet extends StatefulWidget {
   final bool allowScheduling;
+  final Future<bool> Function(PollComposerResult result)? onSchedule;
 
-  const PollCreateSheet({super.key, this.allowScheduling = true});
+  const PollCreateSheet({super.key, this.allowScheduling = true, this.onSchedule});
 
   @override
   State<PollCreateSheet> createState() => _PollCreateSheetState();
@@ -47,6 +48,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
   ];
   int _maxSelections = 1; // 1 = 单选, 0 = 多选（不限）
   bool _isAnonymous = false;
+  bool _scheduling = false;
   bool _isQuiz = false;
   int _correctControllerIndex = 0; // 正确选项（按控制器序号）
   final _explanationController = TextEditingController();
@@ -84,7 +86,8 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
     }
   }
 
-  void _submit(PollComposerAction action) {
+  Future<void> _submit(PollComposerAction action) async {
+    if (_scheduling) return;
     final question = _questionController.text.trim();
     if (question.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -134,18 +137,27 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
       quizExplanation = exp.isEmpty ? null : exp;
     }
 
-    Navigator.pop(
-      context,
-      PollComposerResult(
-        question: question,
-        options: options,
-        maxSelections: _maxSelections,
-        isAnonymous: _isAnonymous,
-        action: action,
-        quizCorrectIndex: quizCorrectIndex,
-        quizExplanation: quizExplanation,
-      ),
+    final result = PollComposerResult(
+      question: question,
+      options: options,
+      maxSelections: _maxSelections,
+      isAnonymous: _isAnonymous,
+      action: action,
+      quizCorrectIndex: quizCorrectIndex,
+      quizExplanation: quizExplanation,
     );
+    if (action == PollComposerAction.schedule && widget.onSchedule != null) {
+      FocusScope.of(context).unfocus();
+      setState(() => _scheduling = true);
+      try {
+        final saved = await widget.onSchedule!(result);
+        if (mounted && saved) Navigator.pop(context);
+      } finally {
+        if (mounted) setState(() => _scheduling = false);
+      }
+      return;
+    }
+    Navigator.pop(context, result);
   }
 
   @override
@@ -159,7 +171,9 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
         color: AppColors.surfaceOf(isDark),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: Column(
+      child: AbsorbPointer(
+        absorbing: _scheduling,
+        child: Column(
         children: [
           // 顶部栏
           Container(
@@ -189,11 +203,11 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                     ),
                     if (widget.allowScheduling)
                       TextButton(
-                        onPressed: () => _submit(PollComposerAction.schedule),
-                        child: const Text('Schedule'),
+                        onPressed: _scheduling ? null : () => _submit(PollComposerAction.schedule),
+                        child: Text(S.of(context)?.scheduledSendTitle ?? 'Schedule message'),
                       ),
                     TextButton(
-                      onPressed: () => _submit(PollComposerAction.sendNow),
+                      onPressed: _scheduling ? null : () => _submit(PollComposerAction.sendNow),
                       child: Text(S.of(context)?.chatSubmitPoll ?? 'Submit'),
                     ),
                   ],
@@ -514,6 +528,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

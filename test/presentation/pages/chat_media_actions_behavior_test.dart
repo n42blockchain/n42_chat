@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:n42_chat/src/domain/repositories/sticker_repository.dart';
+import 'package:n42_chat/src/presentation/widgets/chat/sticker_picker.dart';
+import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
@@ -46,6 +49,8 @@ import 'package:n42_chat/src/presentation/widgets/chat/poll_create_sheet.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/open_red_packet_dialog.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _Stickers extends Mock implements IStickerRepository {}
 
 class _Chat extends MockBloc<ChatEvent, ChatState> implements ChatBloc {}
 
@@ -876,6 +881,96 @@ void main() {
     expect(messages.single.content, '```dart\nvoid main() {}\n```');
     expect(messages.single.type, MessageType.codeBlock);
   });
+
+  for (final outcome in ['saved', 'failed', 'cancel']) {
+    testWidgets('scheduled sticker keeps picker until saved: $outcome', (tester) async {
+      final chat = await pumpChat(tester, configureAuth: (auth) {
+        when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+      });
+      when(() => chat.isClosed).thenReturn(false);
+      final events = <SendScheduledMessage>[];
+      when(() => chat.add(any())).thenAnswer((invocation) {
+        final event = invocation.positionalArguments.single;
+        if (event is SendScheduledMessage) events.add(event);
+      });
+      final stickers = _Stickers();
+      when(() => stickers.getRecentStickers(limit: any(named: 'limit'))).thenAnswer((_) async => []);
+      when(() => stickers.getInstalledPacks()).thenAnswer((_) async => const [StickerPack(id: 'pack', name: 'Test', stickers: [])]);
+      getIt.registerSingleton<IStickerRepository>(stickers);
+      await openAttachmentPanel(tester);
+      tester.widget<ChatMorePanel>(find.byType(ChatMorePanel)).onStickerPressed!();
+      await tester.pumpAndSettle();
+      final picker = tester.widget<StickerPicker>(find.byType(StickerPicker));
+      final operation = picker.onStickerLongPressed!(const Sticker(id: 'hello', url: 'mxc://test/hello', name: 'Hello'), 'pack');
+      await tester.pumpAndSettle();
+      if (outcome == 'cancel') {
+        Navigator.of(tester.element(find.text('In 1 hour'))).pop();
+      } else {
+        await tester.tap(find.text('In 1 hour'));
+        await tester.pumpAndSettle();
+        expect(events, hasLength(1));
+        expect(find.byType(StickerPicker), findsOneWidget);
+        events.single.completion!.complete(outcome == 'saved');
+      }
+      await tester.pumpAndSettle();
+      await operation;
+      expect(find.byType(StickerPicker), outcome == 'saved' ? findsNothing : findsOneWidget);
+      if (outcome == 'cancel') expect(events, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final outcome in ['saved', 'failed', 'cancel']) {
+    testWidgets('scheduled quiz composer preserves draft until saved: $outcome', (tester) async {
+      final chat = await pumpChat(tester, configureAuth: (auth) {
+        when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+      });
+      when(() => chat.isClosed).thenReturn(false);
+      final events = <SendScheduledMessage>[];
+      when(() => chat.add(any())).thenAnswer((invocation) {
+        final event = invocation.positionalArguments.single;
+        if (event is SendScheduledMessage) events.add(event);
+      });
+      await openAttachmentPanel(tester);
+      tester.widget<ChatMorePanel>(find.byType(ChatMorePanel)).onPollPressed!();
+      await tester.pumpAndSettle();
+      final fields = find.descendant(of: find.byType(PollCreateSheet), matching: find.byType(TextField));
+      final questionController = tester.widget<TextField>(fields.at(0)).controller!;
+      await tester.enterText(fields.at(0), 'Best color?');
+      await tester.enterText(fields.at(1), 'Blue');
+      await tester.enterText(fields.at(2), 'Green');
+      await tester.scrollUntilVisible(find.text('Quiz mode'), 250, scrollable: find.descendant(of: find.byType(PollCreateSheet), matching: find.byType(Scrollable)).first);
+      final quizSwitch = find.descendant(of: find.ancestor(of: find.text('Quiz mode'), matching: find.byType(Row)).first, matching: find.byType(Switch));
+      await tester.ensureVisible(quizSwitch);
+      await tester.pumpAndSettle();
+      await tester.tap(quizSwitch);
+      await tester.pumpAndSettle();
+      final explanation = find.byWidgetPredicate((widget) => widget is TextField && widget.decoration?.hintText == 'Answer explanation (optional)');
+      await tester.ensureVisible(explanation);
+      await tester.pumpAndSettle();
+      await tester.enterText(explanation, 'Blue is correct');
+      await tester.ensureVisible(find.text('Schedule message'));
+      await tester.tap(find.text('Schedule message'));
+      await tester.pumpAndSettle();
+      if (outcome == 'cancel') {
+        Navigator.of(tester.element(find.text('In 1 hour'))).pop();
+        await tester.pumpAndSettle();
+        expect(events, isEmpty);
+      } else {
+        await tester.tap(find.text('In 1 hour'));
+        await tester.pumpAndSettle();
+        expect(events, hasLength(1));
+        expect(events.single.payload!['quizCorrectIndex'], 0);
+        expect(events.single.payload!['quizExplanation'], 'Blue is correct');
+        expect(find.byType(PollCreateSheet), findsOneWidget);
+        events.single.completion!.complete(outcome == 'saved');
+        await tester.pumpAndSettle();
+      }
+      expect(find.byType(PollCreateSheet), outcome == 'saved' ? findsNothing : findsOneWidget);
+      if (outcome != 'saved') expect(questionController.text, 'Best color?');
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('poll composer sends a trimmed poll to the chat bloc', (
     tester,

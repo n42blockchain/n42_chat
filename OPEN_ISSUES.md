@@ -206,6 +206,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 - Attachment creation follow-up (2026-11-06): the common image/video/file scheduling path now awaits durable draft acknowledgement before returning to success notices. Post-await login/disposal checks suppress stale UI; uncertain persistence retains the file. A closed controller is rejected before enqueue and its unreferenced new file is removed. Edited-image scheduling failures no longer fall back to scheduling the original image. 106 page/file-lifecycle/BLoC regressions pass, including original-image delayed acknowledgement, rejection, relogin and disposal; source analysis is clean. Retained files after uncertain writes still need safe orphan reconciliation against persisted account queues; no arbitrary deletion or storage-failure exactly-once claim.
 
+- Rich composer follow-up (2026-11-06): poll scheduling now keeps the form until persistence succeeds; cancelled date selection or rejected saves retain its contents, and pending submission locks edits/repeated actions. The scheduling button uses the existing localized title. Sticker scheduling retains the panel on cancellation/rejection and closes it only on acknowledged persistence. The shared rich-draft helper (also used by GIF) now waits for completion and checks page/login origin. Scheduled quiz answer index/explanation now survive both composer payload and due-send repository dispatch. 115 page/BLoC/GIF lifecycle tests pass; six existing analyzer infos, no errors/warnings. GIF picker selection restoration on save failure and device acceptance are not established by this batch.
+
 ### CALL-001 Background blur / replacement still lacks a real video processor path
 
 - Severity: M
