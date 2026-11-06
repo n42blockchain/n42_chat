@@ -6231,4 +6231,11 @@ class SId extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Salinan pemulihan';
+
+  @override
+  String get scheduledRecoveryReset => 'Reset antrean yang rusak';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Salinan persis telah disimpan di perangkat ini. Reset semua pesan terjadwal untuk akun ini? Sebagian mungkin sudah terkirim. Salinan dan lampiran tetap disimpan. Tidak ada yang dikirim ulang.';
 }

@@ -6262,4 +6262,11 @@ class SEs extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Copias de recuperación';
+
+  @override
+  String get scheduledRecoveryReset => 'Restablecer cola dañada';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Se ha guardado una copia exacta en este dispositivo. ¿Restablecer todos los mensajes programados de esta cuenta? Algunos podrían haberse enviado ya. Se conservarán las copias y los adjuntos. No se reenviará nada.';
 }

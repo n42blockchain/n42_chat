@@ -6258,4 +6258,11 @@ class SPl extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Kopie do odzyskania';
+
+  @override
+  String get scheduledRecoveryReset => 'Zresetuj uszkodzoną kolejkę';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Dokładna kopia jest zapisana na tym urządzeniu. Zresetować wszystkie zaplanowane wiadomości tego konta? Niektóre mogły już zostać wysłane. Kopie i załączniki zostaną zachowane. Nic nie zostanie wysłane ponownie.';
 }

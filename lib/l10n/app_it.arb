@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "Consegna non confermata",
   "scheduledRecoveryCopy": "Salva copia di recupero",
   "scheduledRecoveryCopyHint": "Salvata su questo dispositivo senza modificare o inviare messaggi. L’anteprima mostra fino a 8.000 caratteri.",
-  "scheduledRecoveryCopies": "Copie di recupero"
+  "scheduledRecoveryCopies": "Copie di recupero",
+  "scheduledRecoveryReset": "Reimposta coda danneggiata",
+  "scheduledRecoveryResetHint": "Una copia esatta è salvata su questo dispositivo. Reimpostare tutti i messaggi programmati di questo account? Alcuni potrebbero essere già stati inviati. Copie e allegati vengono conservati. Nulla sarà reinviato."
 }

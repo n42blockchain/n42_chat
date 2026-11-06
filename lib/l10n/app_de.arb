@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "Zustellung nicht bestätigt",
   "scheduledRecoveryCopy": "Wiederherstellungskopie speichern",
   "scheduledRecoveryCopyHint": "Auf diesem Gerät gespeichert, ohne Nachrichten zu ändern oder zu senden. Die Vorschau zeigt bis zu 8.000 Zeichen.",
-  "scheduledRecoveryCopies": "Wiederherstellungskopien"
+  "scheduledRecoveryCopies": "Wiederherstellungskopien",
+  "scheduledRecoveryReset": "Beschädigte Warteschlange zurücksetzen",
+  "scheduledRecoveryResetHint": "Eine exakte Kopie ist auf diesem Gerät gespeichert. Alle geplanten Nachrichten dieses Kontos zurücksetzen? Einige wurden möglicherweise bereits gesendet. Kopien und Anhänge bleiben erhalten. Nichts wird erneut gesendet."
 }

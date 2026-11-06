@@ -139,6 +139,61 @@ void main() {
   });
 
   for (final language in ['en', 'ar']) {
+    for (final confirm in [false, true]) {
+      testWidgets('corrupt reset requires explicit confirmation $language confirm=$confirm', (tester) async {
+        var reset = false;
+        when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test')).thenAnswer((_) async {
+          if (!reset) throw const FormatException('damaged');
+          return [];
+        });
+        when(() => prefs.saveScheduledRecoveryCopy(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => '{original damaged bytes');
+        when(() => prefs.resetCorruptScheduledMessages(ownerUserId: '@me:test', expectedRaw: '{original damaged bytes', isCurrent: any(named: 'isCurrent'))).thenAnswer((call) async {
+          expect((call.namedArguments[#isCurrent] as bool Function())(), true);
+          reset = true;
+        });
+        tester.view.physicalSize = const Size(320, 480);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await pump(tester, locale: Locale(language), scale: 2);
+        final strings = S.of(tester.element(find.byType(ScheduledMessagesPage)))!;
+        final resetButton = find.byKey(const ValueKey('scheduled-recovery-reset'));
+        await tester.ensureVisible(resetButton);
+        await tester.pumpAndSettle();
+        await tester.tap(resetButton);
+        await tester.pumpAndSettle();
+        expect(reset, false);
+        expect(find.text(strings.scheduledRecoveryResetHint), findsOneWidget);
+        await tester.tap(confirm ? find.byKey(const ValueKey('scheduled-recovery-reset-confirm')) : find.text(strings.commonCancel));
+        await tester.pumpAndSettle();
+        expect(reset, confirm);
+        expect(find.text(strings.scheduledMessagesEmpty), confirm ? findsOneWidget : findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+  for (final failedCopy in [false, true]) {
+    testWidgets('reset never mutates on ${failedCopy ? 'copy failure' : 'account change during confirmation'}', (tester) async {
+      when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test')).thenThrow(const FormatException('damaged'));
+      when(() => prefs.saveScheduledRecoveryCopy(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async {
+        if (failedCopy) throw StateError('disk');
+        return '{damaged';
+      });
+      await pump(tester);
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-reset')));
+      await tester.pumpAndSettle();
+      if (!failedCopy) {
+        when(() => auth.currentAccountGeneration).thenReturn(null);
+        await tester.tap(find.byKey(const ValueKey('scheduled-recovery-reset-confirm')));
+        await tester.pumpAndSettle();
+      }
+      verifyNever(() => prefs.resetCorruptScheduledMessages(ownerUserId: any(named: 'ownerUserId'), expectedRaw: any(named: 'expectedRaw'), isCurrent: any(named: 'isCurrent')));
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final language in ['en', 'ar']) {
     testWidgets('recovery history reopens saved content on healthy page: $language', (tester) async {
       final events = StreamController<bool>.broadcast(sync: true);
       addTearDown(events.close);

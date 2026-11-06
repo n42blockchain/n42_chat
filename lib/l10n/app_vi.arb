@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "Chưa xác nhận gửi thành công",
   "scheduledRecoveryCopy": "Lưu bản sao khôi phục",
   "scheduledRecoveryCopyHint": "Đã lưu trên thiết bị này mà không thay đổi hoặc gửi tin nhắn. Bản xem trước hiển thị tối đa 8.000 ký tự.",
-  "scheduledRecoveryCopies": "Bản sao khôi phục"
+  "scheduledRecoveryCopies": "Bản sao khôi phục",
+  "scheduledRecoveryReset": "Đặt lại hàng đợi bị hỏng",
+  "scheduledRecoveryResetHint": "Đã lưu bản sao nguyên vẹn trên thiết bị này. Đặt lại tất cả tin nhắn đã lên lịch của tài khoản này? Một số có thể đã được gửi. Bản sao và tệp đính kèm được giữ lại. Không gửi lại tin nhắn nào."
 }

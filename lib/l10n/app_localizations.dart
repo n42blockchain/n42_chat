@@ -11452,6 +11452,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Recovery copies'**
   String get scheduledRecoveryCopies;
+
+  /// No description provided for @scheduledRecoveryReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset damaged queue'**
+  String get scheduledRecoveryReset;
+
+  /// No description provided for @scheduledRecoveryResetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.'**
+  String get scheduledRecoveryResetHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

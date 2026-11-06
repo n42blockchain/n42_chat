@@ -6253,6 +6253,13 @@ class SPt extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Cópias de recuperação';
+
+  @override
+  String get scheduledRecoveryReset => 'Repor fila danificada';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Foi guardada uma cópia exata neste dispositivo. Repor todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12505,4 +12512,11 @@ class SPtBr extends SPt {
 
   @override
   String get scheduledRecoveryCopies => 'Cópias de recuperação';
+
+  @override
+  String get scheduledRecoveryReset => 'Redefinir fila danificada';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Uma cópia exata foi salva neste dispositivo. Redefinir todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado.';
 }

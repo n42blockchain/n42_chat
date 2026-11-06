@@ -130,6 +130,84 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     }
   }
 
+  Future<void> _resetCorruptQueue() async {
+    if (_savingRecovery || _origin?.isCurrent != true) return;
+    setState(() => _savingRecovery = true);
+    try {
+      final owner = await _messages.getCurrentUserId();
+      if (!mounted ||
+          owner == null ||
+          owner.isEmpty ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      final raw = await _preferences.saveScheduledRecoveryCopy(
+        ownerUserId: owner,
+        isCurrent: () => mounted && _origin?.isCurrent == true,
+      );
+      if (!mounted ||
+          raw == null ||
+          _origin?.isCurrent != true ||
+          owner != await _messages.getCurrentUserId() ||
+          !mounted ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      final route = DialogRoute<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          scrollable: true,
+          title: Text(
+            S.of(context)?.scheduledRecoveryReset ?? 'Reset damaged queue',
+          ),
+          content: Text(
+            S.of(context)?.scheduledRecoveryResetHint ?? 'An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
+            ),
+            TextButton(
+              key: const ValueKey('scheduled-recovery-reset-confirm'),
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(S.of(context)?.commonConfirm ?? 'Confirm'),
+            ),
+          ],
+        ),
+      );
+      _recoveryRoute = route;
+      final confirmed = await Navigator.of(context).push(route);
+      if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+      if (!mounted ||
+          confirmed != true ||
+          _origin?.isCurrent != true ||
+          owner != await _messages.getCurrentUserId() ||
+          !mounted ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      await _preferences.resetCorruptScheduledMessages(
+        ownerUserId: owner,
+        expectedRaw: raw,
+        isCurrent: () => mounted && _origin?.isCurrent == true,
+      );
+      if (mounted && _origin?.isCurrent == true) await _loadDrafts();
+    } catch (_) {
+      if (mounted && _origin?.isCurrent == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.commonFailedToSave ?? 'Failed to save',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _savingRecovery = false);
+    }
+  }
+
   Future<void> _showRecoveryPreview(String raw) async {
     final previewRunes = raw.runes.take(8001).toList(growable: false);
     final preview =
@@ -497,6 +575,16 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             icon: const Icon(Icons.save_outlined),
             label: Text(
               S.of(context)?.scheduledRecoveryCopy ?? 'Save recovery copy',
+            ),
+          ),
+        ),
+        Center(
+          child: TextButton.icon(
+            key: const ValueKey('scheduled-recovery-reset'),
+            onPressed: _savingRecovery ? null : _resetCorruptQueue,
+            icon: const Icon(Icons.restart_alt),
+            label: Text(
+              S.of(context)?.scheduledRecoveryReset ?? 'Reset damaged queue',
             ),
           ),
         ),

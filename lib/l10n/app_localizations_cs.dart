@@ -6231,4 +6231,11 @@ class SCs extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Kopie pro obnovu';
+
+  @override
+  String get scheduledRecoveryReset => 'Obnovit poškozenou frontu';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Přesná kopie je uložena v tomto zařízení. Resetovat všechny naplánované zprávy tohoto účtu? Některé již mohly být odeslány. Kopie a přílohy zůstanou zachovány. Nic nebude odesláno znovu.';
 }

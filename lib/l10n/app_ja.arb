@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "配信が確認されていません",
   "scheduledRecoveryCopy": "復元用コピーを保存",
   "scheduledRecoveryCopyHint": "メッセージを変更・送信せず、この端末に保存しました。プレビューは最大8,000文字です。",
-  "scheduledRecoveryCopies": "復元用コピー"
+  "scheduledRecoveryCopies": "復元用コピー",
+  "scheduledRecoveryReset": "破損したキューをリセット",
+  "scheduledRecoveryResetHint": "完全なコピーをこの端末に保存しました。このアカウントの予約メッセージをすべてリセットしますか？一部は送信済みの可能性があります。コピーと添付ファイルは保持され、再送信は行いません。"
 }

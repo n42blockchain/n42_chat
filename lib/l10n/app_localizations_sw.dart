@@ -6251,4 +6251,11 @@ class SSw extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Nakala za urejeshaji';
+
+  @override
+  String get scheduledRecoveryReset => 'Weka upya foleni iliyoharibika';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Nakala kamili imehifadhiwa kwenye kifaa hiki. Ungependa kuweka upya ujumbe wote ulioratibiwa wa akaunti hii? Baadhi huenda tayari umetumwa. Nakala na viambatisho vitahifadhiwa. Hakuna ujumbe utakaotumwa tena.';
 }

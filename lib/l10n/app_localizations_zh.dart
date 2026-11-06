@@ -6045,6 +6045,13 @@ class SZh extends S {
 
   @override
   String get scheduledRecoveryCopies => '恢复副本';
+
+  @override
+  String get scheduledRecoveryReset => '重置损坏队列';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      '完整副本已保存在此设备。要重置此账号的所有定时消息吗？部分消息可能已发送。副本和附件将保留，不会重新发送任何消息。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12088,4 +12095,11 @@ class SZhTw extends SZh {
 
   @override
   String get scheduledRecoveryCopies => '復原副本';
+
+  @override
+  String get scheduledRecoveryReset => '重設損壞佇列';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      '完整副本已儲存在此裝置。要重設此帳號的所有排程訊息嗎？部分訊息可能已傳送。副本和附件將保留，不會重新傳送任何訊息。';
 }

@@ -6233,4 +6233,11 @@ class SUr extends S {
 
   @override
   String get scheduledRecoveryCopies => 'بحالی کی نقول';
+
+  @override
+  String get scheduledRecoveryReset => 'خراب قطار ری سیٹ کریں';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'اس آلے پر مکمل نقل محفوظ ہے۔ کیا اس اکاؤنٹ کے تمام شیڈول شدہ پیغامات ری سیٹ کریں؟ کچھ پیغامات شاید پہلے ہی بھیجے جا چکے ہوں۔ نقول اور منسلکات محفوظ رہیں گے۔ کچھ بھی دوبارہ نہیں بھیجا جائے گا۔';
 }

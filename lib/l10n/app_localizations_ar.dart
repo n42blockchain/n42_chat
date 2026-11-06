@@ -6191,4 +6191,11 @@ class SAr extends S {
 
   @override
   String get scheduledRecoveryCopies => 'نسخ الاسترداد';
+
+  @override
+  String get scheduledRecoveryReset => 'إعادة ضبط قائمة الانتظار التالفة';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'حُفظت نسخة مطابقة على هذا الجهاز. هل تريد إعادة ضبط جميع الرسائل المجدولة لهذا الحساب؟ ربما أُرسلت بعض الرسائل بالفعل. ستُحفظ النسخ والمرفقات، ولن تُعاد إرسال أي رسالة.';
 }

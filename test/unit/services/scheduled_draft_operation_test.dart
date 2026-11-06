@@ -2,6 +2,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/data/services/scheduled_draft_operation.dart';
 
 void main() {
+  test('account recovery excludes only its owner and old releases cannot unlock newer leases', () {
+    final recovery = ScheduledDraftOperation.tryAcquireRecovery('recover')!;
+    expect(ScheduledDraftOperation.tryAcquireRecovery('recover'), isNull);
+    expect(ScheduledDraftOperation.tryAcquire(ownerUserId: 'recover', roomId: 'room', messageId: 'draft'), isNull);
+    final other = ScheduledDraftOperation.tryAcquire(ownerUserId: 'other', roomId: 'room', messageId: 'draft')!;
+    other.release(); recovery.release();
+    final newer = ScheduledDraftOperation.tryAcquireRecovery('recover')!;
+    recovery.release();
+    expect(ScheduledDraftOperation.tryAcquireRecovery('recover'), isNull);
+    newer.release();
+    final send = ScheduledDraftOperation.tryAcquire(ownerUserId: 'recover', roomId: 'room', messageId: 'draft')!;
+    expect(ScheduledDraftOperation.tryAcquireRecovery('recover'), isNull);
+    send.rememberAcceptance('accepted'); send.release();
+    final afterReceipt = ScheduledDraftOperation.tryAcquireRecovery('recover')!;
+    expect(ScheduledDraftOperation.acceptedReceipt(ownerUserId: 'recover', roomId: 'room', messageId: 'draft'), 'accepted');
+    afterReceipt.release();
+    final cleanup = ScheduledDraftOperation.tryAcquire(ownerUserId: 'recover', roomId: 'room', messageId: 'draft')!;
+    cleanup.confirmCleanup(); cleanup.release();
+  });
+
   test('receipts survive release and stay scoped until confirmed cleanup', () {
     final first = ScheduledDraftOperation.tryAcquire(
       ownerUserId: 'receipt-owner',

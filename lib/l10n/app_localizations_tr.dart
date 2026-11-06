@@ -6221,4 +6221,11 @@ class STr extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Kurtarma kopyaları';
+
+  @override
+  String get scheduledRecoveryReset => 'Bozuk kuyruğu sıfırla';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Bu cihaza birebir kopya kaydedildi. Bu hesabın tüm zamanlanmış mesajları sıfırlansın mı? Bazıları zaten gönderilmiş olabilir. Kopyalar ve ekler korunur. Hiçbir şey yeniden gönderilmez.';
 }

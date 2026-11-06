@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "Dostarczenie niepotwierdzone",
   "scheduledRecoveryCopy": "Zapisz kopię do odzyskania",
   "scheduledRecoveryCopyHint": "Zapisano na tym urządzeniu bez zmiany ani wysyłania wiadomości. Podgląd pokazuje do 8 000 znaków.",
-  "scheduledRecoveryCopies": "Kopie do odzyskania"
+  "scheduledRecoveryCopies": "Kopie do odzyskania",
+  "scheduledRecoveryReset": "Zresetuj uszkodzoną kolejkę",
+  "scheduledRecoveryResetHint": "Dokładna kopia jest zapisana na tym urządzeniu. Zresetować wszystkie zaplanowane wiadomości tego konta? Niektóre mogły już zostać wysłane. Kopie i załączniki zostaną zachowane. Nic nie zostanie wysłane ponownie."
 }

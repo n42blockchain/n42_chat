@@ -3,6 +3,7 @@
 /// Cross-isolate/process delivery still requires durable coordination.
 class ScheduledDraftOperation {
   static final Set<(String, String, String)> _active = {};
+  static final Set<String> _accountRecovery = {};
   // Retain receipts across controller disposal and lease release. Only a
   // confirmed local cleanup can discard them. This is not restart durability.
   static final Map<(String, String, String), String> _receipts = {};
@@ -30,11 +31,25 @@ class ScheduledDraftOperation {
 
   ScheduledDraftOperation._(this._key);
 
+  /// Recovery excludes active transports/cancellations across this account.
+  /// Existing in-memory receipts are retained, never treated as cancelled.
+  static ScheduledAccountRecovery? tryAcquireRecovery(String ownerUserId) {
+    if (_accountRecovery.contains(ownerUserId) ||
+        _active.any((key) => key.$1 == ownerUserId)) {
+      return null;
+    }
+    _accountRecovery.add(ownerUserId);
+    return ScheduledAccountRecovery._(
+      () => _accountRecovery.remove(ownerUserId),
+    );
+  }
+
   static ScheduledDraftOperation? tryAcquire({
     required String ownerUserId,
     required String roomId,
     required String messageId,
   }) {
+    if (_accountRecovery.contains(ownerUserId)) return null;
     final key = (ownerUserId, roomId, messageId);
     if (!_active.add(key)) return null;
     return ScheduledDraftOperation._(key);
@@ -44,5 +59,18 @@ class ScheduledDraftOperation {
     if (_released) return;
     _released = true;
     _active.remove(_key);
+  }
+}
+
+/// Same-isolate account-wide exclusion for explicit queue recovery.
+class ScheduledAccountRecovery {
+  final void Function() _release;
+  bool _released = false;
+  ScheduledAccountRecovery._(this._release);
+
+  void release() {
+    if (_released) return;
+    _released = true;
+    _release();
   }
 }

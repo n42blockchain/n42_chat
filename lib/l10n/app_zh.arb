@@ -2276,5 +2276,7 @@
   "scheduledDeliveryUnconfirmed": "发送结果未确认",
   "scheduledRecoveryCopy": "保存恢复副本",
   "scheduledRecoveryCopyHint": "副本保存在此设备，不会更改或发送消息。预览最多显示 8,000 个字符。",
-  "scheduledRecoveryCopies": "恢复副本"
+  "scheduledRecoveryCopies": "恢复副本",
+  "scheduledRecoveryReset": "重置损坏队列",
+  "scheduledRecoveryResetHint": "完整副本已保存在此设备。要重置此账号的所有定时消息吗？部分消息可能已发送。副本和附件将保留，不会重新发送任何消息。"
 }

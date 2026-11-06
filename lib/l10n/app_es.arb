@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "Entrega no confirmada",
   "scheduledRecoveryCopy": "Guardar copia de recuperación",
   "scheduledRecoveryCopyHint": "Guardada en este dispositivo sin modificar ni enviar mensajes. La vista previa muestra hasta 8.000 caracteres.",
-  "scheduledRecoveryCopies": "Copias de recuperación"
+  "scheduledRecoveryCopies": "Copias de recuperación",
+  "scheduledRecoveryReset": "Restablecer cola dañada",
+  "scheduledRecoveryResetHint": "Se ha guardado una copia exacta en este dispositivo. ¿Restablecer todos los mensajes programados de esta cuenta? Algunos podrían haberse enviado ya. Se conservarán las copias y los adjuntos. No se reenviará nada."
 }

@@ -6217,4 +6217,11 @@ class SHi extends S {
 
   @override
   String get scheduledRecoveryCopies => 'पुनर्प्राप्ति प्रतियाँ';
+
+  @override
+  String get scheduledRecoveryReset => 'क्षतिग्रस्त कतार रीसेट करें';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'इस डिवाइस पर हूबहू प्रति सहेजी गई है। इस खाते के सभी निर्धारित संदेश रीसेट करें? कुछ पहले ही भेजे जा चुके हो सकते हैं। प्रतियाँ और अटैचमेंट रखे जाएँगे। कुछ भी दोबारा नहीं भेजा जाएगा।';
 }

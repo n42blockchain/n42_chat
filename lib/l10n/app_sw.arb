@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "Uwasilishaji haujathibitishwa",
   "scheduledRecoveryCopy": "Hifadhi nakala ya urejeshaji",
   "scheduledRecoveryCopyHint": "Imehifadhiwa kwenye kifaa hiki bila kubadilisha au kutuma ujumbe. Onyesho la kukagua lina hadi herufi 8,000.",
-  "scheduledRecoveryCopies": "Nakala za urejeshaji"
+  "scheduledRecoveryCopies": "Nakala za urejeshaji",
+  "scheduledRecoveryReset": "Weka upya foleni iliyoharibika",
+  "scheduledRecoveryResetHint": "Nakala kamili imehifadhiwa kwenye kifaa hiki. Ungependa kuweka upya ujumbe wote ulioratibiwa wa akaunti hii? Baadhi huenda tayari umetumwa. Nakala na viambatisho vitahifadhiwa. Hakuna ujumbe utakaotumwa tena."
 }

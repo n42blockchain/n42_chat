@@ -6265,4 +6265,11 @@ class STe extends S {
 
   @override
   String get scheduledRecoveryCopies => 'పునరుద్ధరణ కాపీలు';
+
+  @override
+  String get scheduledRecoveryReset => 'దెబ్బతిన్న క్యూను రీసెట్ చేయండి';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'ఈ పరికరంలో యథాతథ కాపీ సేవ్ చేయబడింది. ఈ ఖాతాలోని షెడ్యూల్ చేసిన అన్ని సందేశాలను రీసెట్ చేయాలా? కొన్ని ఇప్పటికే పంపబడి ఉండవచ్చు. కాపీలు, అటాచ్‌మెంట్‌లు అలాగే ఉంటాయి. ఏదీ మళ్లీ పంపబడదు.';
 }

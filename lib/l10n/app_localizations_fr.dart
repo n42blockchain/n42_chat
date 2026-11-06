@@ -6287,4 +6287,11 @@ class SFr extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Copies de récupération';
+
+  @override
+  String get scheduledRecoveryReset => 'Réinitialiser la file endommagée';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Une copie exacte est enregistrée sur cet appareil. Réinitialiser tous les messages programmés de ce compte ? Certains ont peut-être déjà été envoyés. Les copies et pièces jointes sont conservées. Aucun message ne sera renvoyé.';
 }

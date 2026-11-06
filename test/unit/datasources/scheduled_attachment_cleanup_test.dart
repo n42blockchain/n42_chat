@@ -63,6 +63,21 @@ void main() {
     String room = 'room',
   }) => storage.removeScheduledMessage(room, id, ownerUserId: owner);
 
+  test('corrupt reset preserves managed attachments and exact original queue', () async {
+    final file = await File('${managed.path}/reset-file').writeAsString('keep');
+    await save(file.path);
+    final prefs = await SharedPreferences.getInstance();
+    final key = prefs.getKeys().singleWhere((key) => key.startsWith('n42_chat_scheduled_messages_account_'));
+    final data = jsonDecode(prefs.getString(key)!) as Map<String, dynamic>;
+    data['damaged'] = [7];
+    final raw = jsonEncode(data);
+    await prefs.setString(key, raw);
+    await storage.resetCorruptScheduledMessages(ownerUserId: '@a:test', expectedRaw: raw, isCurrent: () => true);
+    expect(await file.exists(), true);
+    expect((await storage.getScheduledRecoveryCopies(ownerUserId: '@a:test', isCurrent: () => true)).single.raw, raw);
+    expect(await storage.getDueScheduledMessages(ownerUserId: '@a:test'), isEmpty);
+  });
+
   test('recovery copy protects attachment after active draft cancellation', () async {
     final file = await File('${managed.path}/recovery-file').writeAsString('keep');
     await save(file.path);

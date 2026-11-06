@@ -6248,4 +6248,11 @@ class SIt extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Copie di recupero';
+
+  @override
+  String get scheduledRecoveryReset => 'Reimposta coda danneggiata';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Una copia esatta è salvata su questo dispositivo. Reimpostare tutti i messaggi programmati di questo account? Alcuni potrebbero essere già stati inviati. Copie e allegati vengono conservati. Nulla sarà reinviato.';
 }

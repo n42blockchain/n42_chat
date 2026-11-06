@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import 'package:n42_chat/src/data/services/scheduled_draft_operation.dart';
 
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
@@ -8,16 +10,89 @@ import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart'
 
 class _RejectRecoveryStore extends InMemorySharedPreferencesStore {
   bool reject = false;
+  bool rejectRemove = false;
+  Future<void> Function()? beforeRecoveryWrite;
   _RejectRecoveryStore() : super.empty();
   @override
   Future<bool> setValue(String type, String key, Object value) async {
+    if (key.contains('_recovery_')) await beforeRecoveryWrite?.call();
     if (reject && key.contains('_recovery_')) return false;
     return super.setValue(type, key, value);
   }
+  @override
+  Future<bool> remove(String key) async => rejectRemove ? false : super.remove(key);
 }
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  test('confirmed corrupt reset preserves bytes and other account while allowing new drafts', () async {
+    final store = PreferencesDataSource();
+    const owner = '@reset:test';
+    final key = 'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    const raw = '{damaged original';
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, raw);
+    await store.saveScheduledMessage(ownerUserId: '@other:test', roomId: 'room', messageId: 'other', text: 'other account', scheduledAt: DateTime(2030));
+    await store.resetCorruptScheduledMessages(ownerUserId: owner, expectedRaw: raw, isCurrent: () => true);
+    expect(prefs.getString(key), isNull);
+    expect((await store.getScheduledRecoveryCopies(ownerUserId: owner, isCurrent: () => true)).single.raw, raw);
+    expect((await store.getScheduledMessages('room', ownerUserId: '@other:test')).single.text, 'other account');
+    await store.saveScheduledMessage(ownerUserId: owner, roomId: 'room', messageId: 'new', text: 'new draft', scheduledAt: DateTime(2030));
+    expect((await store.getScheduledMessages('room', ownerUserId: owner)).single.text, 'new draft');
+  });
+  test('reset rejects healthy, changed and stale queues without deleting data', () async {
+    final store = PreferencesDataSource();
+    const owner = '@reset:test';
+    final key = 'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    final prefs = await SharedPreferences.getInstance();
+    for (final raw in ['{}', '{"room":[]}', '{newer damage']) {
+      await prefs.setString(key, raw);
+      await expectLater(store.resetCorruptScheduledMessages(ownerUserId: owner, expectedRaw: raw.startsWith('{newer') ? '{old damage' : raw, isCurrent: () => true), throwsStateError);
+      expect(prefs.getString(key), raw);
+    }
+    var checks = 0;
+    await expectLater(store.resetCorruptScheduledMessages(ownerUserId: owner, expectedRaw: '{newer damage', isCurrent: () => ++checks < 3), throwsStateError);
+    expect(prefs.getString(key), '{newer damage');
+  });
+  for (final failBackup in [true, false]) {
+    test('reset preserves queue on failed ${failBackup ? 'backup' : 'removal'} acknowledgement', () async {
+      final platform = _RejectRecoveryStore();
+      SharedPreferencesStorePlatform.instance = platform;
+      final store = PreferencesDataSource();
+      const owner = '@reset:test';
+      final key = 'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(key, '{damaged');
+      platform.reject = failBackup; platform.rejectRemove = !failBackup;
+      await expectLater(store.resetCorruptScheduledMessages(ownerUserId: owner, expectedRaw: '{damaged', isCurrent: () => true), throwsStateError);
+      expect(prefs.getString(key), '{damaged');
+      platform.reject = false; platform.rejectRemove = false;
+      await store.resetCorruptScheduledMessages(ownerUserId: owner, expectedRaw: '{damaged', isCurrent: () => true);
+      expect(prefs.getString(key), isNull);
+      expect((await store.getScheduledRecoveryCopies(ownerUserId: owner, isCurrent: () => true)).single.raw, '{damaged');
+    });
+  }
+  test('reset excludes in-flight sends and preserves a save queued during recovery', () async {
+    final platform = _RejectRecoveryStore();
+    SharedPreferencesStorePlatform.instance = platform;
+    final store = PreferencesDataSource();
+    const owner = '@reset:test';
+    final key = 'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, '{damaged');
+    final sending = ScheduledDraftOperation.tryAcquire(ownerUserId: owner, roomId: 'room', messageId: 'sending')!;
+    await expectLater(store.resetCorruptScheduledMessages(ownerUserId: owner, expectedRaw: '{damaged', isCurrent: () => true), throwsStateError);
+    sending.release();
+    final entered = Completer<void>(); final release = Completer<void>();
+    platform.beforeRecoveryWrite = () async { entered.complete(); await release.future; };
+    final reset = store.resetCorruptScheduledMessages(ownerUserId: owner, expectedRaw: '{damaged', isCurrent: () => true);
+    await entered.future;
+    expect(ScheduledDraftOperation.tryAcquire(ownerUserId: owner, roomId: 'another', messageId: 'new'), isNull);
+    final save = store.saveScheduledMessage(ownerUserId: owner, roomId: 'room', messageId: 'new', text: 'queued during recovery', scheduledAt: DateTime(2030));
+    release.complete(); await reset; await save;
+    expect((await store.getScheduledMessages('room', ownerUserId: owner)).single.text, 'queued during recovery');
+  });
 
   test(
     'rejected recovery write does not claim success or change queue',

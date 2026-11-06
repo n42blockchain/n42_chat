@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/scheduled_attachment_cleanup.dart';
+import '../../services/scheduled_draft_operation.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/entities/scheduled_recovery_copy.dart';
@@ -857,6 +858,12 @@ class PreferencesDataSource {
     if (!isCurrent()) throw StateError('Scheduled recovery account changed');
     final raw = p.getString(key);
     if (raw == null) return null;
+    await _preserveScheduledCopy(p, key, raw);
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    return raw;
+  });
+
+  Future<void> _preserveScheduledCopy(SharedPreferences p, String key, String raw) async {
     final digest = sha256.convert(utf8.encode(raw));
     final backupKey = '${key}_recovery_$digest';
     final previous = p.getString(backupKey);
@@ -864,9 +871,53 @@ class PreferencesDataSource {
       throw StateError('Scheduled recovery copy integrity mismatch');
     }
     if (previous == null) await saveStringPreference(p, backupKey, raw);
+  }
+
+  /// Explicitly retire a corrupt active queue only after an exact durable copy.
+  /// Never repair fields, clear receipts, remove attachments, or resend drafts.
+  Future<void> resetCorruptScheduledMessages({
+    required String ownerUserId,
+    required String expectedRaw,
+    required bool Function() isCurrent,
+  }) async {
+    final key = _scheduledKey(ownerUserId);
     if (!isCurrent()) throw StateError('Scheduled recovery account changed');
-    return raw;
-  });
+    final lease = ScheduledDraftOperation.tryAcquireRecovery(ownerUserId);
+    if (lease == null) throw StateError('Scheduled messages are busy');
+    try {
+      await _withScheduledStore(() async {
+        final p = await prefs;
+        await p.reload();
+        if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+        final raw = p.getString(key);
+        if (raw != expectedRaw) throw StateError('Scheduled queue changed');
+        var corrupt = false;
+        try {
+          final rooms = jsonDecode(raw!) as Map<String, dynamic>;
+          for (final entry in rooms.entries) {
+            for (final item in entry.value as List<dynamic>) {
+              _scheduledDraftForRoom(item, entry.key);
+            }
+          }
+        } on FormatException {
+          corrupt = true;
+        } on TypeError {
+          corrupt = true;
+        }
+        if (!corrupt) throw StateError('Scheduled queue does not need recovery');
+        await _preserveScheduledCopy(p, key, raw!);
+        if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+        try {
+          if (!await p.remove(key)) throw StateError('Scheduled queue reset was not saved');
+        } catch (_) {
+          try { await p.reload(); } catch (_) {}
+          rethrow;
+        }
+      });
+    } finally {
+      lease.release();
+    }
+  }
 
   /// 保存定时消息
   ///

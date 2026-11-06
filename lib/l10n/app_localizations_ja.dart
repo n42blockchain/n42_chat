@@ -6083,4 +6083,11 @@ class SJa extends S {
 
   @override
   String get scheduledRecoveryCopies => '復元用コピー';
+
+  @override
+  String get scheduledRecoveryReset => '破損したキューをリセット';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      '完全なコピーをこの端末に保存しました。このアカウントの予約メッセージをすべてリセットしますか？一部は送信済みの可能性があります。コピーと添付ファイルは保持され、再送信は行いません。';
 }

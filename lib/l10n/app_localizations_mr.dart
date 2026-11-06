@@ -6216,4 +6216,11 @@ class SMr extends S {
 
   @override
   String get scheduledRecoveryCopies => 'पुनर्प्राप्ती प्रती';
+
+  @override
+  String get scheduledRecoveryReset => 'खराब झालेली रांग रीसेट करा';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'या उपकरणावर तंतोतंत प्रत जतन केली आहे. या खात्याचे सर्व नियोजित संदेश रीसेट करायचे? काही संदेश आधीच पाठवले गेले असू शकतात. प्रती व संलग्नक जपले जातील. काहीही पुन्हा पाठवले जाणार नाही.';
 }

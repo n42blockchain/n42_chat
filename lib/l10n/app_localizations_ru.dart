@@ -6249,4 +6249,11 @@ class SRu extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Копии для восстановления';
+
+  @override
+  String get scheduledRecoveryReset => 'Сбросить повреждённую очередь';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Точная копия сохранена на этом устройстве. Сбросить все запланированные сообщения этого аккаунта? Некоторые могли быть уже отправлены. Копии и вложения сохранятся. Повторной отправки не будет.';
 }

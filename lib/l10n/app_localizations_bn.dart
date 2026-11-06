@@ -6219,4 +6219,11 @@ class SBn extends S {
 
   @override
   String get scheduledRecoveryCopies => 'পুনরুদ্ধারের কপি';
+
+  @override
+  String get scheduledRecoveryReset => 'ক্ষতিগ্রস্ত সারি রিসেট করুন';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'এই ডিভাইসে হুবহু কপি সংরক্ষিত হয়েছে। এই অ্যাকাউন্টের সব নির্ধারিত বার্তা রিসেট করবেন? কিছু বার্তা ইতিমধ্যে পাঠানো হয়ে থাকতে পারে। কপি ও সংযুক্তি রাখা হবে। কিছুই আবার পাঠানো হবে না।';
 }

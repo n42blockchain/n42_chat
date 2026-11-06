@@ -6190,4 +6190,11 @@ class SEn extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Recovery copies';
+
+  @override
+  String get scheduledRecoveryReset => 'Reset damaged queue';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.';
 }

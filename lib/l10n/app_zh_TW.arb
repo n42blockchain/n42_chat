@@ -2276,5 +2276,7 @@
   "scheduledDeliveryUnconfirmed": "傳送結果尚未確認",
   "scheduledRecoveryCopy": "儲存復原副本",
   "scheduledRecoveryCopyHint": "副本儲存在此裝置，不會變更或傳送訊息。預覽最多顯示 8,000 個字元。",
-  "scheduledRecoveryCopies": "復原副本"
+  "scheduledRecoveryCopies": "復原副本",
+  "scheduledRecoveryReset": "重設損壞佇列",
+  "scheduledRecoveryResetHint": "完整副本已儲存在此裝置。要重設此帳號的所有排程訊息嗎？部分訊息可能已傳送。副本和附件將保留，不會重新傳送任何訊息。"
 }

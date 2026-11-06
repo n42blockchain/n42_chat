@@ -6207,4 +6207,11 @@ class SVi extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Bản sao khôi phục';
+
+  @override
+  String get scheduledRecoveryReset => 'Đặt lại hàng đợi bị hỏng';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Đã lưu bản sao nguyên vẹn trên thiết bị này. Đặt lại tất cả tin nhắn đã lên lịch của tài khoản này? Một số có thể đã được gửi. Bản sao và tệp đính kèm được giữ lại. Không gửi lại tin nhắn nào.';
 }

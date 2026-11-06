@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "Entrega não confirmada",
   "scheduledRecoveryCopy": "Salvar cópia de recuperação",
   "scheduledRecoveryCopyHint": "Salva neste dispositivo sem alterar nem enviar mensagens. A prévia mostra até 8.000 caracteres.",
-  "scheduledRecoveryCopies": "Cópias de recuperação"
+  "scheduledRecoveryCopies": "Cópias de recuperação",
+  "scheduledRecoveryReset": "Redefinir fila danificada",
+  "scheduledRecoveryResetHint": "Uma cópia exata foi salva neste dispositivo. Redefinir todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado."
 }

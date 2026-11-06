@@ -2888,5 +2888,7 @@
   "scheduledDeliveryUnconfirmed": "Teslimat doğrulanmadı",
   "scheduledRecoveryCopy": "Kurtarma kopyasını kaydet",
   "scheduledRecoveryCopyHint": "Mesajlar değiştirilmeden veya gönderilmeden bu cihaza kaydedildi. Önizleme en fazla 8.000 karakter gösterir.",
-  "scheduledRecoveryCopies": "Kurtarma kopyaları"
+  "scheduledRecoveryCopies": "Kurtarma kopyaları",
+  "scheduledRecoveryReset": "Bozuk kuyruğu sıfırla",
+  "scheduledRecoveryResetHint": "Bu cihaza birebir kopya kaydedildi. Bu hesabın tüm zamanlanmış mesajları sıfırlansın mı? Bazıları zaten gönderilmiş olabilir. Kopyalar ve ekler korunur. Hiçbir şey yeniden gönderilmez."
 }

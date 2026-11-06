@@ -6251,4 +6251,11 @@ class SUk extends S {
 
   @override
   String get scheduledRecoveryCopies => 'Копії для відновлення';
+
+  @override
+  String get scheduledRecoveryReset => 'Скинути пошкоджену чергу';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Точну копію збережено на цьому пристрої. Скинути всі заплановані повідомлення цього облікового запису? Деякі могли вже бути надіслані. Копії та вкладення збережуться. Нічого не буде надіслано повторно.';
 }

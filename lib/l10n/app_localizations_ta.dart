@@ -6286,4 +6286,11 @@ class STa extends S {
 
   @override
   String get scheduledRecoveryCopies => 'மீட்பு நகல்கள்';
+
+  @override
+  String get scheduledRecoveryReset => 'சேதமடைந்த வரிசையை மீட்டமை';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'இந்தச் சாதனத்தில் முழுமையான நகல் சேமிக்கப்பட்டுள்ளது. இந்தக் கணக்கின் திட்டமிட்ட செய்திகள் அனைத்தையும் மீட்டமைக்கவா? சில செய்திகள் ஏற்கெனவே அனுப்பப்பட்டிருக்கலாம். நகல்களும் இணைப்புகளும் பாதுகாக்கப்படும். எதுவும் மீண்டும் அனுப்பப்படாது.';
 }
