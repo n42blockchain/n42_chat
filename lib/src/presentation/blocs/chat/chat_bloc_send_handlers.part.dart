@@ -36,7 +36,7 @@ extension ChatBlocSendHandlers on ChatBloc {
 
   // Room generations also reject leaving and returning to the same room.
   // Account generations reject logout/login with otherwise identical IDs.
-  bool Function() _captureSendContext(Emitter<ChatState> emit, String roomId) {
+  bool Function() _captureChatContext(Emitter<ChatState>? emit, String? roomId) {
     final generation = _chatGeneration;
     final manager = _clientManager;
     final auth = _authRepository;
@@ -50,7 +50,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         server = client?.homeserver;
     return () =>
         !isClosed &&
-        !emit.isDone &&
+        !(emit?.isDone ?? false) &&
         _chatGeneration == generation &&
         _currentRoomId == roomId &&
         (auth == null || origin != null) &&
@@ -152,7 +152,7 @@ extension ChatBlocSendHandlers on ChatBloc {
     final mentionedUsers = event.mentionedUserIds == null
         ? null
         : List<String>.of(event.mentionedUserIds!);
-    final current = _captureSendContext(emit, roomId);
+    final current = _captureChatContext(emit, roomId);
     if (!current()) {
       completePreflight(TextSendPreflight.rejected);
       return;
@@ -298,7 +298,7 @@ extension ChatBlocSendHandlers on ChatBloc {
 
     final roomId = _currentRoomId!;
     final replyTargetId = state.replyTarget?.id;
-    final current = _captureSendContext(emit, roomId);
+    final current = _captureChatContext(emit, roomId);
     if (!current()) return;
     _beginMediaSend(emit);
 
@@ -347,7 +347,7 @@ extension ChatBlocSendHandlers on ChatBloc {
 
     final roomId = _currentRoomId!;
     final replyTargetId = state.replyTarget?.id;
-    final current = _captureSendContext(emit, roomId);
+    final current = _captureChatContext(emit, roomId);
     if (!current()) return;
     _beginMediaSend(emit);
 
@@ -395,7 +395,7 @@ extension ChatBlocSendHandlers on ChatBloc {
 
     final roomId = _currentRoomId!;
     final replyTargetId = state.replyTarget?.id;
-    final current = _captureSendContext(emit, roomId);
+    final current = _captureChatContext(emit, roomId);
     if (!current()) return;
     _beginMediaSend(emit);
 
@@ -451,7 +451,7 @@ extension ChatBlocSendHandlers on ChatBloc {
 
     final roomId = _currentRoomId!;
     final replyTargetId = state.replyTarget?.id;
-    final current = _captureSendContext(emit, roomId);
+    final current = _captureChatContext(emit, roomId);
     if (!current()) return;
     _beginMediaSend(emit);
 

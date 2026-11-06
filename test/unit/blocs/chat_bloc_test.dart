@@ -115,6 +115,84 @@ void main() {
     return bloc;
   }
 
+  group('message loads retain their original room generation', () {
+    for (final stage in ['cache', 'full', 'history']) {
+      for (final fails in [false, true]) {
+        test('$stage late result after room round trip, failure=$fails', () async {
+          final bloc = await buildInitializedBloc();
+          final pending = Completer<List<MessageEntity>>();
+          final started = Completer<void>();
+          Future<List<MessageEntity>> delayed(Invocation _) {
+            started.complete();
+            return pending.future;
+          }
+          if (stage == 'history') {
+            bloc.add(const LoadMessages(_roomId, limit: 1));
+            await Future<void>.delayed(const Duration(milliseconds: 30));
+            expect(bloc.state.hasMore, isTrue);
+            when(() => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit')))
+                .thenAnswer(delayed);
+            bloc.add(const LoadMoreMessages());
+          } else {
+            when(() => mockRepository.getMessages(_roomId, limit: stage == 'cache' ? 30 : 99))
+                .thenAnswer(delayed);
+            bloc.add(stage == 'cache' ? const InitializeChat(_roomId) : const LoadMessages(_roomId, limit: 99));
+          }
+          await started.future.timeout(const Duration(seconds: 2));
+          when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
+              .thenAnswer((_) async => []);
+          bloc.add(const InitializeChat('!other:server.com'));
+          await Future<void>.delayed(const Duration(milliseconds: 150));
+          bloc.add(const InitializeChat(_roomId));
+          await Future<void>.delayed(const Duration(milliseconds: 150));
+          if (fails) {
+            pending.completeError(StateError('old load failed'));
+          } else {
+            pending.complete(_testMessages);
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          expect(bloc.state.messages, isEmpty);
+          expect(bloc.state.error, isNull);
+          expect(bloc.state.isLoadingMore, isFalse);
+          await bloc.close();
+        });
+      }
+    }
+  });
+
+  test('queued subscription updates recheck their origin at handling time', () async {
+    final bloc = await buildInitializedBloc();
+    var current = true;
+    bloc.add(MessagesUpdated([], isCurrent: () => current));
+    current = false;
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(bloc.state.messages, _testMessages);
+    await bloc.close();
+  });
+
+  test('slow subscription cancellation cannot replace the newest room stream', () async {
+    final cancelled = Completer<void>();
+    final oldStream = StreamController<List<MessageEntity>>(onCancel: () => cancelled.future);
+    final latestStream = StreamController<List<MessageEntity>>();
+    when(() => mockRepository.watchMessages(_roomId)).thenAnswer((_) => oldStream.stream);
+    when(() => mockRepository.watchMessages('!latest:server.com')).thenAnswer((_) => latestStream.stream);
+    final bloc = await buildInitializedBloc();
+    bloc.add(const InitializeChat('!middle:server.com'));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    bloc.add(const InitializeChat('!latest:server.com'));
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    cancelled.complete();
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    verifyNever(() => mockRepository.watchMessages('!middle:server.com'));
+    verify(() => mockRepository.watchMessages('!latest:server.com')).called(1);
+    latestStream.add([]);
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(bloc.state.messages, isEmpty);
+    await bloc.close();
+    await oldStream.close();
+    await latestStream.close();
+  });
+
   group('text send context across awaits', () {
     for (final returnToOrigin in [false, true]) {
       test('settings wait rejects room switch, return=$returnToOrigin', () async {

@@ -250,6 +250,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     _chatGeneration++;
     _currentRoomId = event.roomId;
+    final current = _captureChatContext(emit, event.roomId);
     _locallyDeletedMessageIds.clear();
 
     // 从持久化存储加载已删除的消息ID（异步，不阻塞）
@@ -257,7 +258,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 立即显示界面，不等待网络
     emit(
-      state.copyWith(
+      ChatState.initial().copyWith(
         roomId: event.roomId, isLoading: false, clearError: true,
         isSendingText: false, isSending: false, activeMediaSends: 0,
       ),
@@ -270,7 +271,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         limit: 30, // 首屏只需要 30 条
       );
 
-      if (cachedMessages.isNotEmpty && !isClosed) {
+      if (!current()) return;
+      if (cachedMessages.isNotEmpty) {
         // 过滤已删除的消息
         final filteredMessages = cachedMessages
             .where((m) => !_locallyDeletedMessageIds.contains(m.id))
@@ -290,6 +292,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       debugLog('ChatBloc: Failed to load cached messages: $e');
     }
+
+    if (!current()) return;
 
     // 订阅消息更新（后台同步）
     add(const SubscribeMessages());
@@ -398,14 +402,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 后台加载完整消息数据
   void _loadFullMessagesInBackground(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
-      if (isClosed || _currentRoomId != roomId) return;
+      if (!current()) return;
 
       try {
         // 延迟加载 reactions 和 polls，避免阻塞首屏
         await Future<void>.delayed(const Duration(milliseconds: 100));
 
-        if (isClosed || _currentRoomId != roomId) return;
+        if (!current()) return;
 
         // 触发完整消息加载（包含 reactions 和 polls）
         add(LoadMessages(roomId));
@@ -417,10 +422,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 异步加载已删除消息ID
   void _loadDeletedMessageIds(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
       try {
         final persistedDeletedIds = await _messageRepository
             .getLocallyDeletedMessageIds(roomId);
+        if (!current()) return;
         _locallyDeletedMessageIds.addAll(persistedDeletedIds);
         debugLog(
           'ChatBloc: Loaded ${persistedDeletedIds.length} locally deleted message IDs from storage',

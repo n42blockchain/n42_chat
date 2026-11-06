@@ -329,10 +329,13 @@ class SendTypingNotification extends ChatEvent {
 class MessagesUpdated extends ChatEvent {
   final List<MessageEntity> messages;
 
-  const MessagesUpdated(this.messages);
+  /// Internal subscription guard, rechecked when the queued event is handled.
+  final bool Function()? isCurrent;
+
+  const MessagesUpdated(this.messages, {this.isCurrent});
 
   @override
-  List<Object?> get props => [messages];
+  List<Object?> get props => [messages, if (isCurrent != null) isCurrent];
 }
 
 /// 正在输入的用户列表更新（内部事件）
