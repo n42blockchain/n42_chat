@@ -35,6 +35,46 @@ void main() {
 
   MessageActionBloc buildBloc() => MessageActionBloc(mockRepo);
 
+  for (final action in ['reply', 'edit', 'forward']) {
+    for (final emptyReceipt in [false, true]) {
+      blocTest<MessageActionBloc, MessageActionState>(
+        '$action rejects missing acknowledgement, emptyReceipt=$emptyReceipt',
+        build: buildBloc,
+        setUp: () {
+          final result = emptyReceipt
+              ? MessageEntity(
+                  id: '',
+                  roomId: '!room:s',
+                  senderId: '@user:s',
+                  senderName: 'User',
+                  content: 'Hello',
+                  timestamp: DateTime(2025),
+                  type: MessageType.text,
+                  status: MessageStatus.sending,
+                )
+              : null;
+          when(() => mockRepo.replyToMessage(any(), any(), any()))
+              .thenAnswer((_) async => result);
+          when(() => mockRepo.editMessage(any(), any(), any()))
+              .thenAnswer((_) async => result);
+          when(() => mockRepo.forwardMessage(any(), any(), any()))
+              .thenAnswer((_) async => result);
+        },
+        act: (bloc) => bloc.add(
+          action == 'reply'
+              ? const ReplyToMessage('!room:s', 'original', 'Hello')
+              : action == 'edit'
+              ? const EditMessage('!room:s', 'original', 'Hello')
+              : const ForwardMessage('!source:s', 'original', '!room:s'),
+        ),
+        expect: () => [
+          MessageActionLoading(action),
+          isA<MessageActionFailure>().having((s) => s.action, 'action', action),
+        ],
+      );
+    }
+  }
+
   group('initial state', () {
     test('is MessageActionInitial', () {
       expect(buildBloc().state, isA<MessageActionInitial>());
@@ -134,7 +174,11 @@ void main() {
       build: buildBloc,
       setUp: () {
         when(() => mockRepo.editMessage(any(), any(), any()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async => MessageEntity(
+              id: 'accepted-edit', roomId: '!room:s', senderId: '@user:s',
+              senderName: 'User', content: 'Updated', timestamp: DateTime(2025),
+              type: MessageType.text, status: MessageStatus.sending,
+            ));
       },
       act: (bloc) => bloc.add(
         const EditMessage('!room:s', '\$event1', 'Updated content'),

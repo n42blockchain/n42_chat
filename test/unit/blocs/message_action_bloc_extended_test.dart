@@ -49,7 +49,7 @@ void main() {
       build: buildBloc,
       setUp: () {
         when(() => mockRepo.replyToMessage(any(), any(), any()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async => _kMsg);
       },
       act: (bloc) => bloc.add(
         const ReplyToMessage('!room:s', r'$event1', 'Hello!'),
@@ -95,7 +95,7 @@ void main() {
       build: buildBloc,
       setUp: () {
         when(() => mockRepo.forwardMessage(any(), any(), any()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async => _kMsg);
       },
       act: (bloc) => bloc.add(
         const ForwardMessage('!from:s', r'$event1', '!to:s'),

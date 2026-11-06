@@ -45,7 +45,11 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
     emit(const MessageActionLoading('removeReaction'));
 
     try {
-      await _repository.removeReaction(event.roomId, event.eventId, event.emoji);
+      await _repository.removeReaction(
+        event.roomId,
+        event.eventId,
+        event.emoji,
+      );
       emit(const MessageActionSuccess('removeReaction'));
     } catch (e) {
       emit(MessageActionFailure('removeReaction', e.toString()));
@@ -59,7 +63,11 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
     emit(const MessageActionLoading('toggleReaction'));
 
     try {
-      await _repository.toggleReaction(event.roomId, event.eventId, event.emoji);
+      await _repository.toggleReaction(
+        event.roomId,
+        event.eventId,
+        event.emoji,
+      );
       emit(const MessageActionSuccess('toggleReaction'));
     } catch (e) {
       emit(MessageActionFailure('toggleReaction', e.toString()));
@@ -71,7 +79,10 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
     Emitter<MessageActionState> emit,
   ) async {
     try {
-      final reactions = await _repository.getReactions(event.roomId, event.eventId);
+      final reactions = await _repository.getReactions(
+        event.roomId,
+        event.eventId,
+      );
       emit(ReactionsLoaded(event.eventId, reactions));
     } catch (e) {
       emit(MessageActionFailure('loadReactions', e.toString()));
@@ -85,11 +96,20 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
     emit(const MessageActionLoading('reply'));
 
     try {
-      await _repository.replyToMessage(
+      final receipt = await _repository.replyToMessage(
         event.roomId,
         event.originalEventId,
         event.content,
       );
+      if (receipt == null || receipt.id.trim().isEmpty) {
+        emit(
+          const MessageActionFailure(
+            'reply',
+            'Message acknowledgement unavailable',
+          ),
+        );
+        return;
+      }
       emit(const MessageActionSuccess('reply', message: 'Reply sent'));
     } catch (e) {
       emit(MessageActionFailure('reply', e.toString()));
@@ -103,11 +123,20 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
     emit(const MessageActionLoading('edit'));
 
     try {
-      await _repository.editMessage(
+      final receipt = await _repository.editMessage(
         event.roomId,
         event.originalEventId,
         event.newContent,
       );
+      if (receipt == null || receipt.id.trim().isEmpty) {
+        emit(
+          const MessageActionFailure(
+            'edit',
+            'Message acknowledgement unavailable',
+          ),
+        );
+        return;
+      }
       emit(const MessageActionSuccess('edit', message: 'Message edited'));
     } catch (e) {
       emit(MessageActionFailure('edit', e.toString()));
@@ -139,11 +168,20 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
     emit(const MessageActionLoading('forward'));
 
     try {
-      await _repository.forwardMessage(
+      final receipt = await _repository.forwardMessage(
         event.fromRoomId,
         event.eventId,
         event.toRoomId,
       );
+      if (receipt == null || receipt.id.trim().isEmpty) {
+        emit(
+          const MessageActionFailure(
+            'forward',
+            'Message acknowledgement unavailable',
+          ),
+        );
+        return;
+      }
       emit(const MessageActionSuccess('forward', message: 'Message forwarded'));
     } catch (e) {
       emit(MessageActionFailure('forward', e.toString()));
@@ -227,4 +265,3 @@ class MessageActionBloc extends Bloc<MessageActionEvent, MessageActionState> {
     return _repository.canRedact(roomId, senderId);
   }
 }
-
