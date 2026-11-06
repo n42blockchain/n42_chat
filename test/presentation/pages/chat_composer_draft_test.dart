@@ -171,6 +171,7 @@ void main() {
   for (final scenario in [
     'preflight rejected',
     'preflight newer input',
+    'preflight typed then cleared',
     'preflight account changed',
     'preflight admitted',
     'preflight handled',
@@ -261,6 +262,10 @@ void main() {
         expect(tester.widget<TextField>(input).controller!.text, '');
         if (scenario == 'preflight newer input') {
           await tester.enterText(input, 'new draft');
+        }
+        if (scenario == 'preflight typed then cleared') {
+          await tester.enterText(input, 'new input');
+          await tester.enterText(input, '');
         }
         if (scenario == 'preflight account changed') account.active = false;
         expect(events.single.preflightCompletion, isNotNull);

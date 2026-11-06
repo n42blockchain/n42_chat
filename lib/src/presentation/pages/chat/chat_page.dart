@@ -766,6 +766,7 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
       return;
     }
 
+    int? clearedDraftRevision;
     if (editingMsg != null) {
       final actionBloc = getIt<MessageActionBloc>();
       actionBloc.add(
@@ -784,7 +785,8 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
         }
         _pendingEncryptedDraft = null;
         _pendingEncryptedDraftStarted = false;
-        if (result == TextSendPreflight.rejected && _inputController.text.isEmpty) {
+        if (result == TextSendPreflight.rejected && _inputController.text.isEmpty &&
+            _draftRevision == clearedDraftRevision) {
           _inputController.text = text;
           setState(() => _composerMentions = mentions);
           _saveDraft();
@@ -801,6 +803,7 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
       );
     }
     _inputController.clear();
+    clearedDraftRevision = _draftRevision;
     _clearComposerMentions();
   }
 
