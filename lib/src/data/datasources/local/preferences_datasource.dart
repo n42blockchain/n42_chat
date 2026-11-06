@@ -1847,6 +1847,47 @@ class PreferencesDataSource {
   // 草稿持久化
   // ============================================
 
+  String _accountDraftKey(String ownerUserId, String roomId) {
+    if (ownerUserId.trim().isEmpty || ownerUserId != ownerUserId.trim() || roomId.trim().isEmpty) {
+      throw ArgumentError('Draft account and room are required');
+    }
+    return 'n42_chat_account_draft_v1_${sha256.convert(utf8.encode(jsonEncode([ownerUserId, roomId])))}';
+  }
+
+  /// Account-scoped composer draft. Unknown legacy drafts stay untouched.
+  Future<String?> getAccountDraft(String roomId, {
+    required String ownerUserId, required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final key = _accountDraftKey(ownerUserId, roomId);
+    if (!isCurrent()) throw StateError('Draft account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Draft account changed');
+    return p.getString(key);
+  });
+
+  Future<void> saveAccountDraft(String roomId, String text, {
+    required String ownerUserId, required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final key = _accountDraftKey(ownerUserId, roomId);
+    if (!isCurrent()) throw StateError('Draft account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Draft account changed');
+    if (text.isNotEmpty) {
+      await saveStringPreference(p, key, text);
+    } else {
+      try {
+        if (!await p.remove(key)) throw StateError('Draft deletion rejected');
+      } catch (_) {
+        try { await p.reload(); } catch (_) {}
+        rethrow;
+      }
+    }
+  });
+
+  /// Legacy unowned draft compatibility only. The composer uses account-scoped
+  /// methods above; do not assign these retained values to a current account.
   /// 保存房间草稿（独立 key 存储，避免 N+1 读写）
   Future<void> saveDraft(String roomId, String text) async {
     try {

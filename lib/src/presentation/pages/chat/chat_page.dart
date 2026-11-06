@@ -326,6 +326,9 @@ class _ChatPageState extends State<_ChatPageContent> {
   bool _showLinkPreviews = true;
   bool _sessionPrivacyShieldEnabled = false;
   int _privacyPreferencesLoadVersion = 0;
+  int _draftRevision = 0;
+  bool _draftLoaded = false;
+  void _onDraftInputChanged() => _draftRevision++;
   String? _pendingInitialTargetMessageId;
 
   /// initState 缓存的 ChatBloc，供 dispose 阶段安全使用（那时 context 已
@@ -388,6 +391,7 @@ class _ChatPageState extends State<_ChatPageContent> {
     _loadFontSize();
 
     // 加载草稿
+    _inputController.addListener(_onDraftInputChanged);
     _loadDraft();
 
     // 加载隐私相关配置（链接预览、私密聊天截图防护）
@@ -533,13 +537,26 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   /// 加载草稿
   Future<void> _loadDraft() async {
-    final storage = getIt<PreferencesDataSource>();
-    final draft = await storage.getDraft(widget.conversation.id);
-    if (mounted && draft != null && draft.isNotEmpty) {
-      _inputController.text = draft;
-      _inputController.selection = TextSelection.fromPosition(
-        TextPosition(offset: draft.length),
-      );
+    final origin = _scheduledOrigin;
+    final owner = _currentUserId;
+    final room = widget.conversation.id;
+    final openingValue = _inputController.value;
+    if (origin?.isCurrent != true || owner == null || owner.isEmpty) return;
+    final openingRevision = _draftRevision;
+    try {
+      final storage = getIt<PreferencesDataSource>();
+      final draft = await storage.getAccountDraft(room, ownerUserId: owner,
+        isCurrent: () => mounted && origin!.isCurrent && _currentUserId == owner);
+      if (!mounted || origin?.isCurrent != true || _currentUserId != owner || widget.conversation.id != room) return;
+      _draftLoaded = true;
+      if (_draftRevision != openingRevision || _inputController.value != openingValue ||
+          openingValue.text.isNotEmpty || draft == null || draft.isEmpty) {
+        return;
+      }
+      _inputController.value = TextEditingValue(text: draft,
+        selection: TextSelection.collapsed(offset: draft.length));
+    } catch (_) {
+      debugLog('ChatPage: Unable to load account draft');
     }
   }
 
@@ -580,8 +597,17 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   /// 保存草稿
   void _saveDraft() {
+    // A failed/unfinished load is not evidence that the stored draft is empty.
+    if (!_draftLoaded && _draftRevision == 0) return;
+    final origin = _scheduledOrigin;
+    final owner = _currentUserId;
+    if (origin?.isCurrent != true || owner == null || owner.isEmpty) return;
     final storage = getIt<PreferencesDataSource>();
-    storage.saveDraft(widget.conversation.id, _inputController.text);
+    unawaited(storage.saveAccountDraft(widget.conversation.id, _inputController.text,
+      ownerUserId: owner, isCurrent: () => origin!.isCurrent && _currentUserId == owner,
+    ).catchError((Object _) {
+      debugLog('ChatPage: Unable to save account draft');
+    }));
   }
 
   /// 构建聊天背景装饰
