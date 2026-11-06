@@ -629,6 +629,44 @@ void main() {
     await bloc.close();
   });
 
+  for (final fails in [false, true]) {
+    test('dispose cancellation cannot reset a newly opened room, failure=$fails', () async {
+      final cancelled = Completer<void>();
+      final started = Completer<void>();
+      final oldStream = StreamController<List<MessageEntity>>(onCancel: () {
+        if (!started.isCompleted) started.complete();
+        return cancelled.future;
+      });
+      final newStream = StreamController<List<MessageEntity>>();
+      var pollCancelled = false;
+      final polls = StreamController<Map<String, dynamic>>(onCancel: () { pollCancelled = true; });
+      when(() => mockRepository.watchMessages(_roomId)).thenAnswer((_) => oldStream.stream);
+      when(() => mockRepository.watchMessages('!new:server.com')).thenAnswer((_) => newStream.stream);
+      when(() => mockRepository.watchPollResponses(_roomId)).thenAnswer((_) => polls.stream);
+      final bloc = await buildInitializedBloc();
+      bloc.add(const DisposeChat());
+      await started.future.timeout(const Duration(seconds: 3));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(bloc.state.roomId, isNull);
+      expect(pollCancelled, isTrue);
+      bloc.add(const InitializeChat('!new:server.com'));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      if (fails) { cancelled.completeError(StateError('cancel failed')); }
+      else { cancelled.complete(); }
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final message = _testMessages.first.copyWith(roomId: '!new:server.com', content: 'new stream');
+      newStream.add([message]);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.roomId, '!new:server.com');
+      expect(bloc.state.messages, [message]);
+      expect(bloc.state.error, isNull);
+      await bloc.close();
+      await oldStream.close();
+      await newStream.close();
+      await polls.close();
+    });
+  }
+
   group('text send context across awaits', () {
     for (final returnToOrigin in [false, true]) {
       test('settings wait rejects room switch, return=$returnToOrigin', () async {

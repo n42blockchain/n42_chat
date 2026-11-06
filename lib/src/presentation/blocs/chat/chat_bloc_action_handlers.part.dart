@@ -409,21 +409,37 @@ extension ChatBlocActionHandlers on ChatBloc {
   /// 清理聊天室
   Future<void> onDisposeChat(DisposeChat event, Emitter<ChatState> emit) async {
     _chatGeneration++;
-    await _messagesSubscription?.cancel();
+    // Detach the old session before awaiting cancellation. A new initialization
+    // can then install its subscriptions without this cleanup touching them.
+    final subscriptions = <StreamSubscription<dynamic>?>[
+      _messagesSubscription, _pollResponsesSubscription, _syncStatusSubscription,
+    ];
     _messagesSubscription = null;
+    _pollResponsesSubscription = null;
+    _syncStatusSubscription = null;
     _typingUsersTimer?.cancel();
     _typingUsersTimer = null;
-    await _syncStatusSubscription?.cancel();
-    _syncStatusSubscription = null;
     _retryTimer?.cancel();
     _retryTimer = null;
+    _destructionTimer?.cancel();
+    _destructionTimer = null;
+    _scheduledMessageTimer?.cancel();
+    _scheduledMessageTimer = null;
+    _translationRequests.clear();
     _pendingRetryMessages.clear();
     _permanentlyFailedMessages.clear();
     _currentRoomId = null;
     _locallyDeletedMessageIds.clear();
-    if (!isClosed) {
+    if (!isClosed && !emit.isDone) {
       emit(ChatState.initial());
     }
+    await Future.wait(subscriptions.map((subscription) async {
+      try {
+        await subscription?.cancel();
+      } catch (error) {
+        debugLog('ChatBloc: Failed to cancel disposed subscription: $error');
+      }
+    }));
   }
 
   /// 清空聊天记录（本地）
