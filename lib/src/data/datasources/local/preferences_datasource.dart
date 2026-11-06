@@ -1055,6 +1055,9 @@ class PreferencesDataSource {
           if (data == null) return;
 
           final allData = jsonDecode(data) as Map<String, dynamic>;
+          final removed = (allData[roomId] as List<dynamic>?)
+              ?.cast<Map<String, dynamic>>();
+          if (removed == null) return;
           allData.remove(roomId);
 
           if (allData.isEmpty) {
@@ -1076,6 +1079,7 @@ class PreferencesDataSource {
             );
           }
 
+          await _cleanupRemovedScheduledAttachments(p, removed);
           prefsLog('Cleared all scheduled messages for $roomId');
         } catch (e) {
           prefsLog('Failed to clear scheduled messages - $e');

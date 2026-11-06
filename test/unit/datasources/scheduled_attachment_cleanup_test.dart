@@ -93,6 +93,76 @@ void main() {
     expect(await file.exists(), isTrue);
   });
 
+  test('room clear removes only unshared managed attachments', () async {
+    final own = await File('${managed.path}/own').writeAsString('one');
+    final shared = await File('${managed.path}/shared').writeAsString('two');
+    final outside = await File('${root.path}/outside').writeAsString('three');
+    await save(own.path);
+    await save(own.path, id: 'duplicate-reference');
+    await save(shared.path, id: 'shared');
+    await save(outside.path, id: 'external');
+    await save(shared.path, id: 'other-room', room: 'remaining');
+    await save(shared.path, id: 'other-account', owner: '@b:test');
+    await storage.clearScheduledMessages('room', ownerUserId: '@a:test');
+    expect(await own.exists(), isFalse);
+    expect(await shared.exists(), isTrue);
+    expect(await outside.exists(), isTrue);
+    expect(
+      await storage.getScheduledMessages('room', ownerUserId: '@a:test'),
+      isEmpty,
+    );
+    await storage.clearScheduledMessages('remaining', ownerUserId: '@a:test');
+    expect(await shared.exists(), isTrue);
+    await storage.clearScheduledMessages('room', ownerUserId: '@b:test');
+    expect(await shared.exists(), isFalse);
+  });
+  for (final otherRoom in [false, true]) {
+    test(
+      'failed room clear preserves its attachment: otherRoom=$otherRoom',
+      () async {
+        final file = await File('${managed.path}/file').writeAsString('keep');
+        final prefs = _Prefs();
+        when(() => prefs.reload()).thenAnswer((_) async {});
+        when(() => prefs.getString(any())).thenReturn(
+          jsonEncode({
+            'room': [
+              {
+                'messageId': 'one',
+                'payload': {'localPath': file.path},
+              },
+            ],
+            if (otherRoom)
+              'remaining': [
+                {'messageId': 'two'},
+              ],
+          }),
+        );
+        when(() => prefs.remove(any())).thenAnswer((_) async => false);
+        when(() => prefs.setString(any(), any()))
+            .thenAnswer((_) async => false);
+        await expectLater(
+          _Source(prefs).clearScheduledMessages('room'),
+          throwsStateError,
+        );
+        expect(await file.exists(), isTrue);
+        verifyNever(() => prefs.getKeys());
+      },
+    );
+  }
+  test(
+    'missing room does not rewrite other queues or attempt cleanup',
+    () async {
+      final prefs = _Prefs();
+      when(() => prefs.reload()).thenAnswer((_) async {});
+      when(() => prefs.getString(any()))
+          .thenReturn(jsonEncode({'remaining': <Object?>[]}));
+      await _Source(prefs).clearScheduledMessages('missing');
+      verifyNever(() => prefs.remove(any()));
+      verifyNever(() => prefs.setString(any(), any()));
+      verifyNever(() => prefs.getKeys());
+    },
+  );
+
   test('last managed reference is deleted after durable removal', () async {
     final file = await File('${managed.path}/file').writeAsString('keep');
     await save(file.path);
