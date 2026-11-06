@@ -155,6 +155,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   ) async {
     final roomId = _currentRoomId;
     if (roomId == null) return;
+    if (event.origin == null
+        ? _authRepository != null
+        : !event.origin!.isCurrent ||
+              !identical(event.origin!.manager, _clientManager)) {
+      return;
+    }
     final account = await _captureScheduledAccount();
     if (account == null || _currentRoomId != roomId) return;
     if (event.ownerUserId != null && event.ownerUserId != account.userId) {
@@ -247,6 +253,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     (String, String, String)? operation;
     try {
       if (roomId == null || roomId.isEmpty) return;
+      if (event.origin == null
+          ? _authRepository != null
+          : !event.origin!.isCurrent ||
+                !identical(event.origin!.manager, _clientManager)) {
+        return;
+      }
       final account = await _captureScheduledAccount();
       if (account == null ||
           (event.ownerUserId != null && event.ownerUserId != account.userId)) {

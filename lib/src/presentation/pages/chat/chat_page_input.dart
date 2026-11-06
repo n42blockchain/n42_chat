@@ -511,7 +511,11 @@ extension _ChatPageInputMethods on _ChatPageState {
   void _scheduleComposerText(DateTime scheduledAt) {
     final ownerUserId = _currentUserId;
     final roomId = widget.conversation.id;
-    if (ownerUserId == null || ownerUserId.isEmpty) return;
+    if (ownerUserId == null ||
+        ownerUserId.isEmpty ||
+        _scheduledOrigin?.isCurrent != true) {
+      return;
+    }
     final text = _inputController.text.trim();
     if (text.isEmpty) {
       return;
@@ -524,6 +528,7 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
     context.read<ChatBloc>().add(
       SendScheduledMessage(
+        origin: _scheduledOrigin,
         ownerUserId: ownerUserId,
         roomId: roomId,
         text: text,
@@ -553,7 +558,7 @@ extension _ChatPageInputMethods on _ChatPageState {
       return;
     }
 
-    if (_currentUserId != ownerUserId) return;
+    if (_currentUserId != ownerUserId || _scheduledOrigin?.isCurrent != true) return;
     _scheduleComposerText(scheduledAt);
     _inputController.clear();
     _inputFocusNode.requestFocus();

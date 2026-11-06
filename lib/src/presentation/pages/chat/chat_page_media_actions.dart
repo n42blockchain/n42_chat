@@ -1198,7 +1198,11 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
   }) async {
     final ownerUserId = _currentUserId;
     final roomId = widget.conversation.id;
-    if (ownerUserId == null || ownerUserId.isEmpty) return;
+    if (ownerUserId == null ||
+        ownerUserId.isEmpty ||
+        _scheduledOrigin?.isCurrent != true) {
+      throw StateError('Scheduled message account changed');
+    }
     final persisted = await _persistScheduledAttachment(
       filename: filename,
       fileBytes: fileBytes,
@@ -1207,12 +1211,14 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       fileSize: fileSize,
     );
 
-    if (!mounted) {
-      return;
+    if (!mounted || _scheduledOrigin?.isCurrent != true) {
+      await File(persisted.localPath).delete();
+      throw StateError('Scheduled message account changed');
     }
 
     context.read<ChatBloc>().add(
       SendScheduledMessage(
+        origin: _scheduledOrigin,
         ownerUserId: ownerUserId,
         roomId: roomId,
         text: filename,

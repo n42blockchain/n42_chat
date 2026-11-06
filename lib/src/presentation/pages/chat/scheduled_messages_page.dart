@@ -16,6 +16,7 @@ import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
+import '../../blocs/chat/scheduled_message_origin.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 class ScheduledMessagesPage extends StatefulWidget {
@@ -38,6 +39,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   final IMessageRepository _messages = getIt<IMessageRepository>();
   StreamSubscription<bool>? _accountSubscription;
   String? _ownerUserId;
+  final ScheduledMessageOrigin? _origin = ScheduledMessageOrigin.capture();
   int _loadVersion = 0;
   bool _isLoading = true;
   final Set<String> _cancelling = {};
@@ -71,7 +73,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     final version = ++_loadVersion;
     setState(() => _isLoading = true);
     try {
-      final owner = await _messages.getCurrentUserId();
+      final owner = _origin?.isCurrent == true
+          ? await _messages.getCurrentUserId()
+          : null;
       final drafts =
           owner == null || owner.isEmpty
                 ? <ScheduledMessageDraft>[]
@@ -83,8 +87,12 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
       final stillOwner = await _messages.getCurrentUserId();
       if (!mounted || version != _loadVersion) return;
       setState(() {
-        _ownerUserId = stillOwner == owner ? owner : null;
-        _drafts = stillOwner == owner ? drafts : const [];
+        _ownerUserId = stillOwner == owner && _origin?.isCurrent == true
+            ? owner
+            : null;
+        _drafts = stillOwner == owner && _origin?.isCurrent == true
+            ? drafts
+            : const [];
         _isLoading = false;
       });
     } catch (e) {
@@ -103,7 +111,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     setState(() {});
     final owner = _ownerUserId;
     try {
-      if (owner == null || owner != await _messages.getCurrentUserId()) {
+      if (_origin?.isCurrent != true ||
+          owner == null ||
+          owner != await _messages.getCurrentUserId() ||
+          _origin?.isCurrent != true) {
         await _loadDrafts();
         return;
       }
@@ -116,6 +127,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             draft.messageId,
             roomId: widget.roomId,
             ownerUserId: owner,
+            origin: _origin,
             completion: completion,
           ),
         );
@@ -131,9 +143,11 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           ownerUserId: owner,
         );
       }
-      if (owner != await _messages.getCurrentUserId() ||
+      if (_origin?.isCurrent != true ||
+          owner != await _messages.getCurrentUserId() ||
           !mounted ||
-          owner != _ownerUserId) {
+          owner != _ownerUserId ||
+          _origin?.isCurrent != true) {
         return;
       }
       setState(() {
@@ -145,7 +159,8 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         const SnackBar(content: Text('Scheduled message cancelled')),
       );
     } catch (e) {
-      if (!mounted ||
+      if (_origin?.isCurrent != true ||
+          !mounted ||
           owner != _ownerUserId ||
           owner != await _messages.getCurrentUserId() ||
           !mounted) {

@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'message_report_origin.dart';
+import 'scheduled_message_origin.dart';
 
 /// 聊天事件
 abstract class ChatEvent extends Equatable {
@@ -515,6 +516,7 @@ class UpdateDestructionCountdown extends ChatEvent {
 
 /// 发送定时消息
 class SendScheduledMessage extends ChatEvent {
+  final ScheduledMessageOrigin? origin;
   final String? ownerUserId;
   final String? roomId;
   final String text;
@@ -526,6 +528,7 @@ class SendScheduledMessage extends ChatEvent {
   final bool mentionsRoom;
 
   const SendScheduledMessage({
+    this.origin,
     this.ownerUserId,
     this.roomId,
     required this.text,
@@ -539,6 +542,7 @@ class SendScheduledMessage extends ChatEvent {
 
   @override
   List<Object?> get props => [
+    origin,
     ownerUserId,
     roomId,
     text,
@@ -556,18 +560,26 @@ class CancelScheduledMessage extends ChatEvent {
   final String messageId;
 
   final String? roomId;
+  final ScheduledMessageOrigin? origin;
   final String? ownerUserId;
   final Completer<bool>? completion;
 
   const CancelScheduledMessage(
     this.messageId, {
     this.roomId,
+    this.origin,
     this.ownerUserId,
     this.completion,
   });
 
   @override
-  List<Object?> get props => [messageId, roomId, ownerUserId, completion];
+  List<Object?> get props => [
+    messageId,
+    roomId,
+    ownerUserId,
+    origin,
+    completion,
+  ];
 }
 
 /// 发送到期的定时消息（内部事件，由定时器触发）

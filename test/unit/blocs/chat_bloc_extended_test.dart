@@ -4,6 +4,7 @@
 //   DeleteFailedMessage, ReplyToMessage, LoadPinnedMessages, PinMessage, UnpinMessage
 
 import 'dart:async';
+import 'package:n42_chat/src/presentation/blocs/chat/scheduled_message_origin.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -800,6 +801,104 @@ void main() {
   });
 
   group('Scheduled rich messages', () {
+    for (final stale in [true, false]) {
+      test(
+        'queued creation and cancellation validate origin: stale=$stale',
+        () async {
+          final auth = MockReportAuth();
+          final client = mockClient;
+          when(() => client.homeserver)
+              .thenReturn(Uri.parse('https://server.com'));
+          when(() => client.accessToken).thenReturn('same-token');
+          AuthSessionInvalidation generation() => AuthSessionInvalidation(
+            userId: '@me:server.com',
+            homeserver: Uri.parse('https://server.com'),
+            deviceId: null,
+            isCurrent: () => true,
+            matchesClient: (candidate) => identical(candidate, client),
+          );
+          when(() => auth.currentAccountGeneration).thenReturn(generation());
+          getIt.pushNewScope();
+          getIt.registerSingleton<MatrixClientManager>(mockClientManager);
+          getIt.registerSingleton<IAuthRepository>(auth);
+          addTearDown(getIt.popScope);
+          final origin = ScheduledMessageOrigin.capture();
+          expect(origin, isNotNull);
+          final bloc = ChatBloc(
+            messageRepository: mockRepo,
+            secureStorage: mockPrefs,
+            clientManager: mockClientManager,
+            authRepository: auth,
+          );
+          await initBloc(bloc);
+          when(
+            () => mockPrefs.saveScheduledMessage(
+              ownerUserId: any(named: 'ownerUserId'),
+              roomId: any(named: 'roomId'),
+              messageId: any(named: 'messageId'),
+              text: any(named: 'text'),
+              scheduledAt: any(named: 'scheduledAt'),
+              payload: any(named: 'payload'),
+              selfDestructAfter: any(named: 'selfDestructAfter'),
+              mentionedUserIds: any(named: 'mentionedUserIds'),
+              mentionsRoom: any(named: 'mentionsRoom'),
+            ),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockPrefs.removeScheduledMessage(
+              _roomId,
+              'old',
+              ownerUserId: '@me:server.com',
+            ),
+          ).thenAnswer((_) async {});
+          if (stale)
+            when(() => auth.currentAccountGeneration).thenReturn(generation());
+          final done = Completer<bool>();
+          bloc.add(
+            SendScheduledMessage(
+              text: 'Old intent',
+              scheduledAt: DateTime(2030),
+              origin: origin,
+            ),
+          );
+          bloc.add(
+            CancelScheduledMessage(
+              'old',
+              roomId: _roomId,
+              origin: origin,
+              completion: done,
+            ),
+          );
+          expect(await done.future, !stale);
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+          if (stale) {
+            expect(bloc.state.messages.map((m) => m.id), [_msg.id]);
+            verifyNever(
+              () => mockPrefs.removeScheduledMessage(
+                any(),
+                any(),
+                ownerUserId: any(named: 'ownerUserId'),
+              ),
+            );
+          } else {
+            expect(
+              bloc.state.messages.any((m) => m.content == 'Old intent'),
+              isTrue,
+            );
+            verify(
+              () => mockPrefs.removeScheduledMessage(
+                _roomId,
+                'old',
+                ownerUserId: '@me:server.com',
+              ),
+            ).called(1);
+          }
+          await bloc.close();
+        },
+      );
+    }
+
+
     for (final relogin in [true, false]) {
       test(
         'in-flight due queue respects login generation: relogin=$relogin',

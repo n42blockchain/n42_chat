@@ -171,6 +171,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- 2026-11-06 queued UI follow-up: scheduled creation/cancellation now carries an opaque page-origin capability. Production BLoC rejects absent/stale/wrong-manager origins; the standalone scheduled page also rejects stale same-user login generations. The Chat page captures its origin at initialization, so pickers cannot rebind an old intent to a new session. Invalid attachment scheduling throws before a success notice and cleans up a newly persisted attachment if its origin expires during persistence. 251 BLoC/event/page/media-interaction tests pass, including positive and stale origins, old page cancellation and an image picker interrupted by login invalidation. This supersedes the queued-UI/standalone-page gaps below. Legacy draft recovery, multiple processes/devices, server deduplication and cancellation races with already-dispatched SDK operations remain open; no live/device acceptance claim.
+
+
 - 2026-11-06 login-generation follow-up: production ChatBloc now receives the auth lifecycle and captures its opaque login generation before asynchronous scheduled reads/operations. A same-client/user/token re-login invalidates an in-flight due queue; a current generation still sends and removes only the confirmed draft. Extended BLoC suite: 52 passed. UI intents captured before handler entry and standalone scheduled-page same-user re-login still need generation binding; this does not close those separate gaps.
 
 

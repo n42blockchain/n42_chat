@@ -494,7 +494,8 @@ void main() {
     expect(message.videoBytes, Uint8List.fromList([4, 5, 6]));
   });
 
-  testWidgets('scheduled original image persists a safe readable attachment', (
+  for (final relogin in [false, true]) {
+  testWidgets('scheduled original image keeps login origin: relogin=$relogin', (
     tester,
   ) async {
     imagePicker.images = [
@@ -503,7 +504,11 @@ void main() {
         'Vacation: Original Photo.png',
       ),
     ];
-    final chat = await pumpChat(tester);
+    late _Auth schedulingAuth;
+    final chat = await pumpChat(tester, configureAuth: (auth) {
+      schedulingAuth = auth;
+      when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+    });
     final sentEvents = <ChatEvent>[];
     when(() => chat.add(any())).thenAnswer((invocation) {
       sentEvents.add(invocation.positionalArguments.single as ChatEvent);
@@ -518,6 +523,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('Original Images'), findsOneWidget);
+    if (relogin) when(() => schedulingAuth.currentAccountGeneration).thenReturn(null);
     await tester.tap(find.text('Original Images'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
@@ -533,8 +539,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(imagePicker.multiImageCalls, 1);
+    if (relogin) {
+      expect(sentEvents.whereType<SendScheduledMessage>(), isEmpty);
+      expect(find.textContaining('Scheduled original image:'), findsNothing);
+      expect(tester.takeException(), isNull);
+      return;
+    }
     expect(sentEvents, isNotEmpty);
     final scheduled = sentEvents.whereType<SendScheduledMessage>().single;
+    expect(scheduled.origin?.isCurrent, isTrue);
+    expect(scheduled.ownerUserId, '@me:hs.test');
     final localPath = scheduled.payload!['localPath'] as String;
     final persistedFile = File(localPath);
     expect(scheduled.type, MessageType.file);
@@ -558,6 +572,7 @@ void main() {
     expect(imagePicker.multiImageCalls, 1);
     expect(tester.takeException(), isNull);
   });
+  }
 
   testWidgets('camera menu cancel does not open the camera picker', (
     tester,

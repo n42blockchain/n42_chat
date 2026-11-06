@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:matrix/matrix.dart' as matrix;
+import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
+import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/domain/repositories/message_repository.dart';
 import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
@@ -12,6 +15,13 @@ import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_event.dart';
 import 'package:n42_chat/src/presentation/pages/chat/scheduled_messages_page.dart';
+
+class _Manager extends Mock implements MatrixClientManager {}
+
+class _Client extends Mock implements matrix.Client {}
+
+class _Auth extends Mock
+    implements IAuthRepository, IAccountBoundDeletionLifecycle {}
 
 class _Prefs extends Mock implements PreferencesDataSource {}
 
@@ -22,12 +32,33 @@ class _Bloc extends Mock implements ChatBloc {}
 void main() {
   late _Prefs prefs;
   late _Messages messages;
+  late _Auth auth;
+  late _Client client;
+  AuthSessionInvalidation generation() => AuthSessionInvalidation(
+    userId: '@me:test',
+    homeserver: Uri.parse('https://test'),
+    deviceId: null,
+    isCurrent: () => true,
+    matchesClient: (candidate) => identical(candidate, client),
+  );
   setUpAll(
     () => registerFallbackValue(const CancelScheduledMessage('fallback')),
   );
   setUp(() async {
     await getIt.reset();
     prefs = _Prefs();
+    auth = _Auth();
+    client = _Client();
+    final manager = _Manager();
+    when(() => manager.client).thenReturn(client);
+    when(client.isLogged).thenReturn(true);
+    when(() => client.userID).thenReturn('@me:test');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://test'));
+    when(() => client.accessToken).thenReturn('test-token');
+    when(() => auth.currentAccountGeneration).thenReturn(generation());
+    when(() => auth.loginStateStream).thenAnswer((_) => const Stream.empty());
+    getIt.registerSingleton<MatrixClientManager>(manager);
+    getIt.registerSingleton<IAuthRepository>(auth);
     messages = _Messages();
     getIt.registerSingleton<IMessageRepository>(messages);
     when(() => messages.getCurrentUserId()).thenAnswer((_) async => '@me:test');
@@ -184,5 +215,22 @@ void main() {
         ownerUserId: any(named: 'ownerUserId'),
       ),
     );
+  });
+  testWidgets('same-account relogin invalidates old cancellation controls', (
+    tester,
+  ) async {
+    await pump(tester);
+    when(() => auth.currentAccountGeneration).thenReturn(generation());
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    verifyNever(
+      () => prefs.removeScheduledMessage(
+        any(),
+        any(),
+        ownerUserId: any(named: 'ownerUserId'),
+      ),
+    );
+    expect(find.text('Keep until confirmed'), findsNothing);
+    expect(find.text('Scheduled message cancelled'), findsNothing);
   });
 }

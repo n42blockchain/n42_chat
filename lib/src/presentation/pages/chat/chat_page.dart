@@ -1,6 +1,7 @@
 import '../../../domain/repositories/chat_catch_up_repository.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import 'history_share_page.dart';
+import '../../blocs/chat/scheduled_message_origin.dart';
 import 'chat_catch_up_sheet.dart';
 
 import 'package:share_plus/share_plus.dart';
@@ -262,6 +263,7 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   // 当前用户ID（用于表情回应高亮）
   String? _currentUserId;
+  ScheduledMessageOrigin? _scheduledOrigin;
 
   // 贴纸输入联想（按词推荐贴纸）
   List<StickerHit> _stickerSuggestions = const [];
@@ -477,6 +479,7 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   /// 加载当前用户ID
   void _loadCurrentUserId() {
+    _scheduledOrigin = ScheduledMessageOrigin.capture();
     try {
       final authRepository = getIt<IAuthRepository>();
       _currentUserId = authRepository.currentUser?.userId;

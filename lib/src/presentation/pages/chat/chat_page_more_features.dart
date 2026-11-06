@@ -973,9 +973,14 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     Map<String, dynamic> payload = const {},
   }) {
     final roomId = widget.conversation.id;
-    if (ownerUserId == null || ownerUserId.isEmpty) return;
+    if (ownerUserId == null ||
+        ownerUserId.isEmpty ||
+        _scheduledOrigin?.isCurrent != true) {
+      return;
+    }
     context.read<ChatBloc>().add(
       SendScheduledMessage(
+        origin: _scheduledOrigin,
         ownerUserId: ownerUserId,
         roomId: roomId,
         text: text,
