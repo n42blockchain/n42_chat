@@ -523,6 +523,54 @@ void main() {
     });
   }
 
+  for (final action in ['reaction', 'read', 'typing', 'resend', 'resend error']) {
+    test('late $action keeps original room context', () async {
+      final bloc = await buildInitializedBloc();
+      final started = Completer<void>();
+      final permission = Completer<bool>();
+      final user = Completer<String?>();
+      when(() => mockRepository.getCurrentUserId()).thenAnswer((_) { started.complete(); return user.future; });
+      when(() => mockSecureStorage.shouldShowReadReceipts()).thenAnswer((_) { started.complete(); return permission.future; });
+      when(() => mockSecureStorage.shouldShowTypingIndicator()).thenAnswer((_) { started.complete(); return permission.future; });
+      when(() => mockRepository.resendMessage(any(), any())).thenAnswer((_) { started.complete(); return permission.future; });
+      when(() => mockRepository.addReaction(any(), any(), any())).thenAnswer((_) async => true);
+      final message = _testMessages.first;
+      bloc.add(action == 'reaction' ? AddReaction(messageId: message.id, emoji: '👍')
+        : action == 'read' ? MarkMessageAsRead(message.id)
+        : action == 'typing' ? const SendTypingNotification(true)
+        : ResendMessage(message.id));
+      await started.future.timeout(const Duration(seconds: 3));
+      bloc.add(const InitializeChat('!other:server.com'));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      clearInteractions(mockRepository);
+      if (action == 'reaction') { user.complete('@alice:server.com'); }
+      else if (action == 'resend error') { permission.completeError(StateError('old failure')); }
+      else { permission.complete(true); }
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      bloc.add(MessagesUpdated([message]));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(bloc.state.messages, [message]);
+      expect(bloc.state.error, isNull);
+      if (action == 'reaction') verifyNever(() => mockRepository.addReaction(any(), any(), any()));
+      if (action == 'read') verifyNever(() => mockRepository.markAsRead(any(), any()));
+      if (action == 'typing') verifyNever(() => mockRepository.sendTypingNotification(any(), any()));
+      await bloc.close();
+    });
+  }
+
+  test('rejected resend keeps the failed message visible', () async {
+    final bloc = await buildInitializedBloc();
+    when(() => mockRepository.resendMessage(any(), any())).thenAnswer((_) async => false);
+    final message = _testMessages.first;
+    bloc.add(ResendMessage(message.id));
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    bloc.add(MessagesUpdated([message]));
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(bloc.state.messages, [message]);
+    expect(bloc.state.error, 'Failed to resend');
+    await bloc.close();
+  });
+
   group('text send context across awaits', () {
     for (final returnToOrigin in [false, true]) {
       test('settings wait rejects room switch, return=$returnToOrigin', () async {

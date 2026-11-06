@@ -11,17 +11,22 @@ extension ChatBlocActionHandlers on ChatBloc {
     ResendMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
-      await _messageRepository.resendMessage(_currentRoomId!, event.messageId);
+      final success = await _messageRepository.resendMessage(roomId, event.messageId);
+      if (!isCurrent()) return;
+      if (!success) throw StateError('Resend rejected');
       // 旧的 EventStatus.error 事件仍在 SDK 时间线中，将其 ID 加入本地删除集合
       // 防止 scanFailedMessages 将旧事件重新入队形成死循环。
       _locallyDeletedMessageIds.add(event.messageId);
       // 允许新事件（由 resendMessage 创建）被自动重试系统处理
       _permanentlyFailedMessages.remove(event.messageId);
     } catch (e) {
-      emit(state.copyWith(error: 'Failed to resend'));
+      if (isCurrent()) emit(state.copyWith(error: 'Failed to resend'));
     }
   }
 
@@ -221,11 +226,15 @@ extension ChatBlocActionHandlers on ChatBloc {
 
   /// 添加表情回应
   Future<void> onAddReaction(AddReaction event, Emitter<ChatState> emit) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
       // 先立即更新本地UI，显示表情回应
       final currentUserId = await _messageRepository.getCurrentUserId();
+      if (!isCurrent()) return;
       final updatedMessages = state.messages.map((msg) {
         if (msg.id == event.messageId) {
           // 查找是否已有该表情的回应
@@ -296,7 +305,7 @@ extension ChatBlocActionHandlers on ChatBloc {
 
       // 发送到服务器
       await _messageRepository.addReaction(
-        _currentRoomId!,
+        roomId,
         event.messageId,
         event.emoji,
       );
@@ -305,7 +314,7 @@ extension ChatBlocActionHandlers on ChatBloc {
       );
     } catch (e) {
       debugLog('ChatBloc: Failed to add reaction: $e');
-      emit(state.copyWith(error: 'Failed to add reaction'));
+      if (isCurrent()) emit(state.copyWith(error: 'Failed to add reaction'));
     }
   }
 
@@ -316,18 +325,22 @@ extension ChatBlocActionHandlers on ChatBloc {
     MarkMessageAsRead event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
       // 检查隐私设置：是否允许发送已读回执
       final shouldSendReadReceipts = await _secureStorage
           .shouldShowReadReceipts();
+      if (!isCurrent()) return;
       if (!shouldSendReadReceipts) {
         debugLog('ChatBloc: Skipping read receipt due to privacy settings');
         return;
       }
 
-      await _messageRepository.markAsRead(_currentRoomId!, event.messageId);
+      await _messageRepository.markAsRead(roomId, event.messageId);
     } catch (e) {
       // 静默失败
       debugLog('Error: $e');
@@ -341,12 +354,16 @@ extension ChatBlocActionHandlers on ChatBloc {
     SendTypingNotification event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
       // 检查隐私设置：是否允许发送输入状态
       final shouldSendTypingIndicator = await _secureStorage
           .shouldShowTypingIndicator();
+      if (!isCurrent()) return;
       if (!shouldSendTypingIndicator) {
         debugLog(
           'ChatBloc: Skipping typing notification due to privacy settings',
@@ -355,7 +372,7 @@ extension ChatBlocActionHandlers on ChatBloc {
       }
 
       await _messageRepository.sendTypingNotification(
-        _currentRoomId!,
+        roomId,
         event.isTyping,
       );
     } catch (e) {
