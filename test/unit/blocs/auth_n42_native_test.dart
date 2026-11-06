@@ -42,10 +42,11 @@ class Api extends IdHubApi {
   @override
   Future<IdHubWalletResponse> completeNativeLogin(
     IdHubNativeChallenge c,
-    String token,
-  ) async {
+    String token, {
+    String? serverAuthCode,
+  }) async {
     completed++;
-    receivedToken = token;
+    receivedToken = serverAuthCode ?? token;
     return IdHubWalletResponse.success(
       did: 'did:plc:alice',
       matrixHomeserver: 'https://matrix.example',
@@ -188,4 +189,49 @@ void main() {
     ).called(1);
     await bloc.close();
   });
+  for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
+    test('Google server code reaches isolated login on $platform', () async {
+      debugDefaultTargetPlatformOverride = platform;
+      when(
+        () => repo.loginWithToken(
+          homeserver: 'https://matrix.example',
+          accessToken: 'matrix-token',
+          userId: '@alice:matrix.example',
+          deviceId: '',
+        ),
+      ).thenAnswer((_) async => AuthResult.failure('test-only'));
+      final bloc = build((provider, _) async {
+        expect(provider, 'google');
+        return SocialLoginResult(
+          provider: 'google',
+          extra: {'serverAuthCode': 'one-use-code'},
+        );
+      });
+      final done = wait(bloc);
+      bloc.add(
+        const AuthGoogleLoginRequested(homeserver: 'https://legacy.example'),
+      );
+      await done;
+      expect(api.receivedToken, 'one-use-code');
+      expect(api.completed, 1);
+      await bloc.close();
+    });
+  }
+  test(
+    'Google never downgrades a missing server code to an ID token',
+    () async {
+      final bloc = build(
+        (_, _) async =>
+            SocialLoginResult(provider: 'google', idToken: 'id-token-only'),
+      );
+      final done = wait(bloc);
+      bloc.add(
+        const AuthGoogleLoginRequested(homeserver: 'https://legacy.example'),
+      );
+      await done;
+      expect(bloc.state.status, AuthStatus.error);
+      expect(api.completed, 0);
+      await bloc.close();
+    },
+  );
 }

@@ -892,15 +892,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _nativeSocialLoginBusy = true;
     final epoch = ++_nativeSocialEpoch;
     final startingUser = _authRepository.currentUser?.userId;
+    final failureKey = provider == 'google'
+        ? BlocMessageKeys.authGoogleLoginFailed
+        : provider == 'apple'
+        ? BlocMessageKeys.authAppleLoginFailed
+        : BlocMessageKeys.authFacebookLoginFailed;
     IdHubApi? api;
     try {
       // Limited Login produces an OIDC proof on iOS. Android classic Facebook
       // requires the separate authorization-code path; never send it as an ID token.
-      if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) {
+      final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+      final isAndroid = defaultTargetPlatform == TargetPlatform.android;
+      if (kIsWeb || (!isIOS && !(provider == 'google' && isAndroid))) {
         throw StateError('Native OIDC login is not supported on this platform');
       }
       api = _idHubApiFactory(url);
-      final challenge = await api.startNativeLogin(provider, 'ios');
+      final challenge = await api.startNativeLogin(
+        provider,
+        isIOS ? 'ios' : 'android',
+      );
       if (emit.isDone ||
           isClosed ||
           epoch != _nativeSocialEpoch ||
@@ -909,6 +919,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final service = AuthMethodsService();
       final proof = _nativeSocialProof != null
           ? await _nativeSocialProof(provider, challenge.nonce)
+          : provider == 'google'
+          ? await service.signInWithGoogle(requireServerCode: true)
           : provider == 'apple'
           ? await service.signInWithApple(serverNonce: challenge.nonce)
           : await service.signInWithFacebook(serverNonce: challenge.nonce);
@@ -926,14 +938,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         return true;
       }
+      final code = proof.extra?['serverAuthCode'];
       if (proof.provider != provider ||
-          proof.idToken == null ||
-          proof.idToken!.isEmpty) {
+          (provider == 'google'
+              ? code is! String || code.isEmpty
+              : proof.idToken == null || proof.idToken!.isEmpty)) {
         throw const FormatException('Missing provider identity token');
       }
       final credentials = await api.completeNativeLogin(
         challenge,
-        proof.idToken!,
+        provider == 'google' ? '' : proof.idToken!,
+        serverAuthCode: provider == 'google' ? code as String : null,
       );
       if (emit.isDone ||
           isClosed ||
@@ -953,20 +968,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(
           state.copyWith(
             status: AuthStatus.error,
-            errorMessage:
-                result.errorMessage ?? BlocMessageKeys.authAppleLoginFailed,
+            errorMessage: result.errorMessage ?? failureKey,
           ),
         );
       }
     } catch (_) {
       if (!emit.isDone && !isClosed && epoch == _nativeSocialEpoch)
         emit(
-          state.copyWith(
-            status: AuthStatus.error,
-            errorMessage: provider == 'apple'
-                ? BlocMessageKeys.authAppleLoginFailed
-                : BlocMessageKeys.authFacebookLoginFailed,
-          ),
+          state.copyWith(status: AuthStatus.error, errorMessage: failureKey),
         );
     } finally {
       api?.close();
@@ -982,6 +991,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
+
+    if (await _tryN42NativeSocialLogin('google', emit)) return;
 
     try {
       final authService = AuthMethodsService();

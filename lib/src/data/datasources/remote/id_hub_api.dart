@@ -125,7 +125,7 @@ class IdHubApi {
     String provider,
     String platform,
   ) async {
-    if (!['apple', 'facebook'].contains(provider) ||
+    if (!['google', 'apple', 'facebook'].contains(provider) ||
         !['ios', 'android'].contains(platform)) {
       throw ArgumentError('Unsupported native OIDC provider or platform');
     }
@@ -156,15 +156,24 @@ class IdHubApi {
   /// Exchange the proof then obtain Matrix credentials for that exact Hub DID.
   Future<IdHubWalletResponse> completeNativeLogin(
     IdHubNativeChallenge challenge,
-    String identityToken,
-  ) async {
-    if (identityToken.isEmpty || identityToken.length > 16384) {
+    String identityToken, {
+    String? serverAuthCode,
+  }) async {
+    if (serverAuthCode != null &&
+        (serverAuthCode.isEmpty ||
+            serverAuthCode.length > 4096 ||
+            identityToken.isNotEmpty)) {
+      throw const FormatException('Invalid Google authorization code');
+    }
+    if (serverAuthCode == null &&
+        (identityToken.isEmpty || identityToken.length > 16384)) {
       throw const FormatException('Missing provider identity token');
     }
     final result = await _nativePost('/native/complete', {
       'flow_id': challenge.flowId,
       'completion_secret': challenge.completionSecret,
-      'identity_token': identityToken,
+      if (serverAuthCode == null) 'identity_token': identityToken,
+      if (serverAuthCode != null) 'server_auth_code': serverAuthCode,
     });
     final session = result['session'];
     if (result['status'] != 'complete' ||

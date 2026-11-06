@@ -770,7 +770,9 @@ class AuthMethodsService {
   /// - 使用 GoogleSignIn.instance singleton
   /// - authenticate() 替代 signIn()
   /// - accessToken 需要单独请求 authorization
-  Future<SocialLoginResult?> signInWithGoogle() async {
+  Future<SocialLoginResult?> signInWithGoogle({
+    bool requireServerCode = false,
+  }) async {
     if (_googleSignIn == null) {
       throw Exception('Google Sign In not configured');
     }
@@ -786,6 +788,18 @@ class AuthMethodsService {
       );
 
       final auth = account.authentication;
+      if (requireServerCode) {
+        final authorization = await account.authorizationClient.authorizeServer(
+          ['openid', 'email', 'profile'],
+        );
+        final code = authorization?.serverAuthCode;
+        if (code == null || code.isEmpty)
+          throw StateError('Google server authorization is unavailable');
+        return SocialLoginResult(
+          provider: 'google',
+          extra: {'serverAuthCode': code},
+        );
+      }
 
       // 获取 access token (需要单独请求 authorization)
       String? accessToken;

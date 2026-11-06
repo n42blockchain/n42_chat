@@ -154,4 +154,37 @@ void main() {
     );
     api.close();
   });
+  test(
+    'Google sends only its server code and refuses mixed proof formats',
+    () async {
+      var calls = 0;
+      final api = IdHubApi(
+        baseUrl: 'https://id.n42.world',
+        client: MockClient((r) async {
+          calls++;
+          expect(jsonDecode(r.body), {
+            'flow_id': challenge.flowId,
+            'completion_secret': challenge.completionSecret,
+            'server_auth_code': 'one-use',
+          });
+          return http.Response('{}', 400);
+        }),
+      );
+      await expectLater(
+        api.completeNativeLogin(
+          challenge,
+          'id-token',
+          serverAuthCode: 'one-use',
+        ),
+        throwsFormatException,
+      );
+      expect(calls, 0);
+      await expectLater(
+        api.completeNativeLogin(challenge, '', serverAuthCode: 'one-use'),
+        throwsA(isA<IdHubException>()),
+      );
+      expect(calls, 1);
+      api.close();
+    },
+  );
 }

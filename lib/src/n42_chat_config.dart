@@ -254,7 +254,7 @@ class N42ChatConfig {
   /// （旧五家仍走默认 `api.n42.network`）。例如 `https://social-auth.n42.world`。
   final String? socialAuthBaseUrl;
 
-  /// Dedicated N42 identity hub. When set, Apple/Facebook never use legacy auth.
+  /// Dedicated N42 identity hub. When set, Google/Apple/Facebook never use legacy auth.
   /// Keep unset until the host has enabled and accepted the backend integration.
   final String? n42NativeAuthUrl;
 
