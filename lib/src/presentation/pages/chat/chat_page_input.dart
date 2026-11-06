@@ -52,6 +52,7 @@ extension _ChatPageInputMethods on _ChatPageState {
       controller: _inputController,
       focusNode: _inputFocusNode,
       onSendText: _sendMessage,
+      clearTextOnSend: false,
       onSendVoice: _sendVoiceMessage,
       onRecordingStateChanged: _onRecordingStateChanged,
       onChanged: _onInputChanged,

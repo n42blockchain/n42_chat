@@ -130,6 +130,9 @@ class ChatInputBar extends StatefulWidget {
   /// 发送文本回调
   final ValueChanged<String>? onSendText;
 
+  /// Disable when the parent handles admission and draft recovery.
+  final bool clearTextOnSend;
+
   /// 发送语音回调
   final VoiceRecordCallback? onSendVoice;
 
@@ -199,6 +202,7 @@ class ChatInputBar extends StatefulWidget {
   const ChatInputBar({
     super.key,
     this.onSendText,
+    this.clearTextOnSend = true,
     this.onSendVoice,
     this.onRecordingStateChanged,
     this.onVoicePressed,
@@ -432,7 +436,7 @@ class ChatInputBarState extends State<ChatInputBar> {
     final rawText = _controller.text;
     if (rawText.trim().isNotEmpty) {
       widget.onSendText?.call(rawText);
-      _controller.clear();
+      if (widget.clearTextOnSend) _controller.clear();
     }
   }
 

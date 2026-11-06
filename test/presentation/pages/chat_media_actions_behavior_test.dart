@@ -320,6 +320,7 @@ void main() {
     configureAuth?.call(account.auth);
 
     final chat = _Chat();
+    when(() => chat.isClosed).thenReturn(false);
     when(() => chat.state).thenReturn(
       ChatState(
         roomId: _roomId,
@@ -826,6 +827,40 @@ void main() {
       expect(messages.single.text, 'hello from the composer');
     },
   );
+
+  testWidgets('send button restores locally rejected input without a second clear', (tester) async {
+    final chat = await pumpChat(tester);
+    when(() => chat.add(any())).thenAnswer((invocation) {
+      final event = invocation.positionalArguments.single;
+      if (event is SendTextMessage) {
+        event.preflightCompletion!.complete(TextSendPreflight.rejected);
+      }
+    });
+    final input = find.byType(TextField).last;
+    await tester.enterText(input, 'rejected draft');
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.send));
+    await tester.pump();
+    expect(tester.widget<TextField>(input).controller!.text, 'rejected draft');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('closed chat preserves composer input and does not dispatch', (tester) async {
+    final chat = await pumpChat(tester);
+    final events = <ChatEvent>[];
+    when(() => chat.add(any())).thenAnswer((invocation) {
+      events.add(invocation.positionalArguments.single as ChatEvent);
+    });
+    final input = find.byType(TextField).last;
+    await tester.enterText(input, 'keep this draft');
+    await tester.pump();
+    when(() => chat.isClosed).thenReturn(true);
+    await tester.tap(find.byIcon(Icons.send));
+    await tester.pump();
+    expect(events.whereType<SendTextMessage>(), isEmpty);
+    expect(tester.widget<TextField>(input).controller!.text, 'keep this draft');
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('emoji and attachment panels are mutually exclusive', (
     tester,
