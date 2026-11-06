@@ -107,6 +107,43 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  for (final language in ['en', 'ar']) {
+    testWidgets(
+      'load failure is retryable without a false empty state: $language',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 480);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final draft = ScheduledMessageDraft(
+          messageId: 'retained',
+          text: 'Recovered draft',
+          type: MessageType.text,
+          scheduledAt: DateTime(2030),
+          createdAt: DateTime(2026),
+        );
+        var attempts = 0;
+        when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test'))
+            .thenAnswer((_) async {
+              if (++attempts == 1) throw StateError('storage unavailable');
+              return [draft];
+            });
+        await pump(tester, locale: Locale(language), scale: 2);
+        final strings = S.of(
+          tester.element(find.byType(ScheduledMessagesPage)),
+        )!;
+        expect(find.text(strings.commonLoadFailed), findsOneWidget);
+        expect(find.text(strings.scheduledMessagesEmpty), findsNothing);
+        await tester.tap(find.text(strings.commonRetry));
+        await tester.pumpAndSettle();
+        expect(find.text('Recovered draft'), findsOneWidget);
+        expect(find.text(strings.commonLoadFailed), findsNothing);
+        expect(attempts, 2);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   for (final success in [true, false]) {
     testWidgets('bloc cancellation waits for acknowledgement: $success', (
       tester,

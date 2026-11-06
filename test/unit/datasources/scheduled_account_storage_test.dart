@@ -5,6 +5,26 @@ import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart'
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  for (final malformed in ['{', '{"room":[42]}']) {
+    test(
+      'room read reports corruption and preserves stored bytes: $malformed',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          'n42_chat_scheduled_messages': malformed,
+        });
+        final storage = PreferencesDataSource();
+        await expectLater(
+          storage.getScheduledMessages('room'),
+          throwsA(anything),
+        );
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString('n42_chat_scheduled_messages'), malformed);
+        await prefs.remove('n42_chat_scheduled_messages');
+        expect(await storage.getScheduledMessages('room'), isEmpty);
+      },
+    );
+  }
+
   test(
     'same room and draft IDs stay separate across accounts and legacy storage',
     () async {
@@ -85,12 +105,12 @@ void main() {
   test('blank owner cannot silently access legacy drafts', () async {
     final storage = PreferencesDataSource();
     expect(await storage.getDueScheduledMessages(ownerUserId: ''), isEmpty);
-    expect(
-      await storage.getScheduledMessages(
+    await expectLater(
+      storage.getScheduledMessages(
         '!room:test',
         ownerUserId: ' @a:test ',
       ),
-      isEmpty,
+      throwsArgumentError,
     );
   });
 }

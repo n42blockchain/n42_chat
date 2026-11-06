@@ -899,20 +899,20 @@ class PreferencesDataSource {
       final data = p.getString(_scheduledKey(ownerUserId));
       if (data == null) return [];
 
-          final allData = jsonDecode(data) as Map<String, dynamic>;
-          final roomMessages = allData[roomId] as List<dynamic>?;
-          if (roomMessages == null) return [];
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      final roomMessages = allData[roomId] as List<dynamic>?;
+      if (roomMessages == null) return [];
 
       return roomMessages
-          .whereType<Map<dynamic, dynamic>>()
           .map(
-            (item) =>
-                ScheduledMessageDraft.fromJson(Map<String, dynamic>.from(item)),
+            (item) => ScheduledMessageDraft.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
           )
           .toList(growable: false);
     } catch (e) {
-      prefsLog('Failed to read scheduled messages - $e');
-      return [];
+      prefsLog('Failed to read scheduled messages - ${e.runtimeType}');
+      rethrow;
     }
   });
 

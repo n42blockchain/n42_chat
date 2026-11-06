@@ -43,6 +43,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   final ScheduledMessageOrigin? _origin = ScheduledMessageOrigin.capture();
   int _loadVersion = 0;
   bool _isLoading = true;
+  bool _loadFailed = false;
   final Set<String> _cancelling = {};
   List<ScheduledMessageDraft> _drafts = const [];
 
@@ -73,7 +74,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   Future<void> _loadDrafts() async {
     if (!mounted) return;
     final version = ++_loadVersion;
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _loadFailed = false;
+    });
     try {
       final owner = _origin?.isCurrent == true
           ? await _messages.getCurrentUserId()
@@ -98,10 +102,11 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('ScheduledMessagesPage._loadDrafts error: $e');
+      debugPrint('ScheduledMessagesPage._loadDrafts error: ${e.runtimeType}');
       if (!mounted || version != _loadVersion) return;
       setState(() {
         _isLoading = false;
+        _loadFailed = _origin?.isCurrent == true;
         _ownerUserId = null;
         _drafts = const [];
       });
@@ -233,7 +238,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         onRefresh: _loadDrafts,
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : (_drafts.isEmpty
+            : (_loadFailed
+                  ? _buildLoadError()
+                  : _drafts.isEmpty
                   ? _buildEmptyState()
                   : ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -247,6 +254,31 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
                       },
                     )),
       ),
+    );
+  }
+
+  Widget _buildLoadError() {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(AppDimensions.spacing),
+      children: [
+        const SizedBox(height: AppDimensions.spacingXXL),
+        Icon(Icons.error_outline, color: context.textSecondary, size: 48),
+        const SizedBox(height: AppDimensions.spacing),
+        Text(
+          S.of(context)?.commonLoadFailed ?? 'Failed to load',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: context.textPrimary),
+        ),
+        const SizedBox(height: AppDimensions.spacing),
+        Center(
+          child: TextButton.icon(
+            onPressed: _loadDrafts,
+            icon: const Icon(Icons.refresh),
+            label: Text(S.of(context)?.commonRetry ?? 'Retry'),
+          ),
+        ),
+      ],
     );
   }
 

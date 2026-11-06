@@ -171,6 +171,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- 2026-11-06 read-recovery follow-up: room queue reads now propagate storage/decoding errors instead of returning a false empty queue or silently omitting non-map entries. The scheduled page displays localized load-failed/retry controls, clears unsafe actions and retries against its original account capability; original stored bytes are unchanged. 259 storage/page/BLoC regressions pass, plus the final page suite with English/Arabic 320x480 at 2x text. Scoped analysis is clean. All 26 catalogs contain the reused strings. This does not repair corrupt records, persist per-draft send failures, recover unknown server outcomes or establish device acceptance.
+
 - 2026-11-06 stale-cancellation follow-up: absence of a scheduled record is no longer acknowledged as successful cancellation; it may have been sent elsewhere. BLoC clears a stale preview and returns false; standalone pages reread the account-scoped record while holding the shared lease before removal. Rejected cancellation refreshes the page, and late rejection after navigation does not update disposed state. Tests cover missing records, cancellation after another BLoC sends/cleans up, real pending-record removal, storage failures and navigation. This does not infer unsent status for send attempts whose remote outcome is unknown; that recovery path remains open.
 
 
