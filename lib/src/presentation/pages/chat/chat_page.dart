@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/services/attachment_size_policy.dart';
 
 import 'dart:async';
+import 'package:uuid/uuid.dart';
 
 import '../../../data/datasources/matrix/message/encrypted_send_guard.dart';
 import '../../../data/datasources/matrix/message/direct_chat_send_guard.dart';

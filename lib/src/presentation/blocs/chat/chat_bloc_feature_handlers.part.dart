@@ -668,29 +668,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       draft.messageId,
       ownerUserId: account.userId,
     );
-    await _deleteScheduledDraftArtifacts(draft);
     if (account.isCurrent() && roomId == _currentRoomId) {
       _emitWithoutScheduledPreview(draft.messageId, emit);
-    }
-  }
-
-  Future<void> _deleteScheduledDraftArtifacts(
-    ScheduledMessageDraft draft,
-  ) async {
-    final path = draft.localAttachmentPath;
-    if (path == null || path.isEmpty) {
-      return;
-    }
-
-    try {
-      final file = File(path);
-      if (await file.exists()) {
-        await file.delete();
-      }
-    } catch (e) {
-      debugLog(
-        'ChatBloc: Failed to delete scheduled attachment artifact ${draft.messageId}: $e',
-      );
     }
   }
 

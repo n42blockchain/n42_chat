@@ -1335,7 +1335,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     final sanitized = filename
         .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
         .replaceAll(' ', '_');
-    return '${DateTime.now().microsecondsSinceEpoch}_$sanitized';
+    return '${const Uuid().v4()}_$sanitized';
   }
 
   void _showScheduledAttachmentSnackBar(String filename, DateTime scheduledAt) {

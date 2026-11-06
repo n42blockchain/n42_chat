@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/scheduled_attachment_cleanup.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/entities/user_profile_entity.dart';
@@ -972,6 +973,7 @@ class PreferencesDataSource {
           ?.cast<Map<String, dynamic>>();
       if (roomMessages == null) return;
 
+      final removed = roomMessages.where((msg) => msg['messageId'] == messageId).toList();
       roomMessages.removeWhere((msg) => msg['messageId'] == messageId);
 
       if (roomMessages.isEmpty) {
@@ -985,6 +987,7 @@ class PreferencesDataSource {
           : await p.setString(_scheduledKey(ownerUserId), jsonEncode(allData));
       if (!saved) throw StateError('Scheduled message deletion was not saved');
 
+      await _cleanupRemovedScheduledAttachments(p, removed);
       prefsLog('Scheduled message removed - $messageId');
     } catch (e) {
       prefsLog('Failed to remove scheduled message - $e');
@@ -995,6 +998,52 @@ class PreferencesDataSource {
       rethrow;
     }
   });
+
+  Future<void> _cleanupRemovedScheduledAttachments(
+    SharedPreferences storage,
+    List<Map<String, dynamic>> removed,
+  ) async {
+    try {
+      final candidates = <String>{};
+      for (final draft in removed) {
+        final payload = draft['payload'] as Map<String, dynamic>?;
+        final path = payload?['localPath'] as String?;
+        if (path != null && path.isNotEmpty) candidates.add(path);
+      }
+      if (candidates.isEmpty) return;
+      // Include other accounts and unattributed legacy drafts. Never interpret
+      // a corrupt/unavailable queue as an empty queue when deleting user files.
+      await storage.reload();
+      final references = <String>{};
+      for (final key in storage.getKeys()) {
+        if (key != _keyScheduledMessages &&
+            !key.startsWith('${_keyScheduledMessages}_account_')) {
+          continue;
+        }
+        final encoded = storage.getString(key);
+        if (encoded == null) throw StateError('Scheduled queue unavailable');
+        final rooms = jsonDecode(encoded) as Map<String, dynamic>;
+        for (final value in rooms.values) {
+          for (final draft in value as List<dynamic>) {
+            final payload =
+                (draft as Map<String, dynamic>)['payload']
+                    as Map<String, dynamic>?;
+            final path = payload?['localPath'] as String?;
+            if (path != null && path.isNotEmpty) references.add(path);
+          }
+        }
+      }
+      for (final candidate in candidates) {
+        await ScheduledAttachmentCleanup.deleteUnreferenced(
+          candidate,
+          references,
+        );
+      }
+    } catch (error) {
+      // Draft deletion is acknowledged; uncertain file cleanup is deferred.
+      prefsLog('Scheduled attachment cleanup deferred - ${error.runtimeType}');
+    }
+  }
 
   /// 清除房间所有定时消息
   Future<void> clearScheduledMessages(String roomId, {String? ownerUserId}) =>
