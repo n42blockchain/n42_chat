@@ -451,6 +451,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 订阅投票响应事件
   void _subscribeToPollResponses(String roomId) {
+    final isCurrent = _captureChatContext(null, roomId);
+    if (!isCurrent()) return;
     _pollResponsesSubscription?.cancel();
     final stream = _messageRepository.watchPollResponses(roomId);
     if (stream == null) return;
@@ -458,7 +460,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _pollResponsesSubscription = stream.listen(
       (response) {
         // 防止在 BLoC 关闭后添加事件
-        if (isClosed) return;
+        if (!isCurrent()) return;
 
         final type = response['type'] as String?;
         final pollEventId = response['pollEventId'] as String?;
@@ -477,10 +479,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
               selectedOptionIds: answers,
               senderId: senderId,
               isCurrentUser: isCurrentUser,
+              isCurrent: isCurrent,
             ),
           );
         } else if (type == 'end') {
-          add(PollEnded(pollEventId: pollEventId));
+          add(PollEnded(pollEventId: pollEventId, isCurrent: isCurrent));
         }
       },
       onError: (Object error) {

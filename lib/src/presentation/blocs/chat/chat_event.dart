@@ -435,12 +435,14 @@ class PollResponseReceived extends ChatEvent {
   final List<String> selectedOptionIds;
   final String senderId;
   final bool isCurrentUser;
+  final bool Function()? isCurrent;
 
   const PollResponseReceived({
     required this.pollEventId,
     required this.selectedOptionIds,
     required this.senderId,
     required this.isCurrentUser,
+    this.isCurrent,
   });
 
   @override
@@ -449,6 +451,7 @@ class PollResponseReceived extends ChatEvent {
     selectedOptionIds,
     senderId,
     isCurrentUser,
+    if (isCurrent != null) isCurrent,
   ];
 }
 
@@ -465,11 +468,12 @@ class EndPoll extends ChatEvent {
 /// 投票已结束事件（从服务器接收）
 class PollEnded extends ChatEvent {
   final String pollEventId;
+  final bool Function()? isCurrent;
 
-  const PollEnded({required this.pollEventId});
+  const PollEnded({required this.pollEventId, this.isCurrent});
 
   @override
-  List<Object?> get props => [pollEventId];
+  List<Object?> get props => [pollEventId, if (isCurrent != null) isCurrent];
 }
 
 /// 发送自定义消息（红包、转账等）

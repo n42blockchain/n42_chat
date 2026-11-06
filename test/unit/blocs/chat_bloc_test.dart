@@ -298,6 +298,108 @@ void main() {
     await bloc.close();
   });
 
+  for (final type in ['vote', 'end']) {
+    for (final stale in [false, true]) {
+      test('poll stream $type respects room origin, stale=$stale', () async {
+        final stream = StreamController<Map<String, dynamic>>();
+        when(() => mockRepository.watchPollResponses(_roomId)).thenAnswer((_) => stream.stream);
+        final bloc = await buildInitializedBloc();
+        final loading = Completer<List<MessageEntity>>();
+        if (stale) {
+          when(() => mockRepository.getMessages('!other:server.com', limit: 30))
+              .thenAnswer((_) => loading.future);
+          bloc.add(const InitializeChat('!other:server.com'));
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+        }
+        final poll = _testMessages.first.copyWith(type: MessageType.poll,
+          metadata: const MessageMetadata(pollQuestion: 'Choose', voteCounts: {'a': 0}, totalVoters: 0, pollEnded: false));
+        bloc.add(MessagesUpdated([poll]));
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        stream.add({'type': type, 'pollEventId': poll.id, 'answers': ['a'],
+          'senderId': '@other:server.com', 'isCurrentUser': false});
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        final metadata = bloc.state.messages.single.metadata!;
+        expect(metadata.voteCounts!['a'], !stale && type == 'vote' ? 1 : 0);
+        expect(metadata.pollEnded, !stale && type == 'end');
+        if (stale) loading.complete([]);
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        await bloc.close();
+        await stream.close();
+      });
+    }
+  }
+
+  for (final action in ['vote', 'end', 'aggregate', 'send']) {
+    for (final fails in [false, true]) {
+      test('poll $action late completion preserves new session, failure=$fails', () async {
+        final bloc = await buildInitializedBloc();
+        final started = Completer<void>();
+        final pending = Completer<bool>();
+        final aggregate = Completer<Map<String, dynamic>?>();
+        final sent = Completer<MessageEntity?>();
+        when(() => mockRepository.voteOnPoll(_roomId,
+          pollEventId: r'$event1', selectedOptionIds: ['a']))
+            .thenAnswer((_) { if (action == 'vote') started.complete(); return action == 'aggregate' ? Future.value(true) : pending.future; });
+        when(() => mockRepository.endPoll(_roomId, r'$event1'))
+            .thenAnswer((_) { started.complete(); return pending.future; });
+        when(() => mockRepository.getPollAggregations(_roomId, r'$event1'))
+            .thenAnswer((_) { started.complete(); return aggregate.future; });
+        when(() => mockRepository.sendPollMessage(_roomId, question: 'Choose',
+          options: ['a', 'b'], maxSelections: 1, isAnonymous: false,
+          quizCorrectIndex: null, quizExplanation: null))
+            .thenAnswer((_) { started.complete(); return sent.future; });
+        bloc.add(action == 'end' ? const EndPoll(pollEventId: r'$event1')
+          : action == 'send' ? const SendPollMessage(question: 'Choose', options: ['a', 'b'])
+          : const VoteOnPoll(pollEventId: r'$event1', selectedOptionIds: ['a']));
+        await started.future.timeout(const Duration(seconds: 3));
+        bloc.add(const InitializeChat('!other:server.com'));
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        bloc.add(const InitializeChat(_roomId));
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        final poll = _testMessages.first.copyWith(type: MessageType.poll,
+          metadata: const MessageMetadata(pollQuestion: 'Choose', voteCounts: {'a': 0}, totalVoters: 0, pollEnded: false));
+        bloc.add(MessagesUpdated([poll]));
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        expect(bloc.state.messages.single.metadata!.voteCounts, {'a': 0});
+        if (action == 'aggregate') {
+          if (fails) { aggregate.completeError(StateError('old request')); }
+          else { aggregate.complete({'voteCounts': {'a': 5}, 'totalVoters': 5, 'myVotes': ['a']}); }
+        } else if (action == 'send') {
+          if (fails) { sent.completeError(StateError('old request')); }
+          else { sent.complete(poll); }
+        } else {
+          if (fails) { pending.completeError(StateError('old request')); }
+          else { pending.complete(true); }
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(bloc.state.messages.single.metadata!.voteCounts, {'a': 0});
+        expect(bloc.state.messages.single.metadata!.pollEnded, isFalse);
+        expect(bloc.state.error, isNull);
+        if (action == 'vote') {
+          verifyNever(() => mockRepository.getPollAggregations(any(), any()));
+        }
+        await bloc.close();
+      });
+    }
+  }
+
+  for (final current in [false, true]) {
+    test('queued poll events respect captured origin, current=$current', () async {
+      final bloc = await buildInitializedBloc();
+      final poll = _testMessages.first.copyWith(type: MessageType.poll,
+        metadata: const MessageMetadata(voteCounts: {'a': 0}, totalVoters: 0, pollEnded: false));
+      bloc.add(MessagesUpdated([poll]));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      bloc.add(PollResponseReceived(pollEventId: poll.id, selectedOptionIds: ['a'],
+        senderId: '@other:server.com', isCurrentUser: false, isCurrent: () => current));
+      bloc.add(PollEnded(pollEventId: poll.id, isCurrent: () => current));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(bloc.state.messages.single.metadata!.voteCounts!['a'], current ? 1 : 0);
+      expect(bloc.state.messages.single.metadata!.pollEnded, current);
+      await bloc.close();
+    });
+  }
+
   group('message loads retain their original room generation', () {
     for (final stage in ['cache', 'full', 'history']) {
       for (final fails in [false, true]) {
