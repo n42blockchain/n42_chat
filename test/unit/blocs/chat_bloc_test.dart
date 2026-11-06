@@ -616,6 +616,33 @@ void main() {
       },
     );
 
+    test('text preflight reports local rejection before repository dispatch', () async {
+      when(() => mockRepository.sendTextMessage(any(), any(),
+        selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'),
+        mentionsRoom: any(named: 'mentionsRoom'),
+      )).thenAnswer((_) async => _testMessages.first);
+      final bloc = await buildInitializedBloc();
+      bloc.add(const RoomInfoLoaded(isChannel: false, canSendMessages: true, slowModeInterval: 60));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final first = Completer<TextSendPreflight>();
+      bloc.add(SendTextMessage('first', preflightCompletion: first));
+      expect(await first.future, TextSendPreflight.admitted);
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      clearInteractions(mockRepository);
+      final rejected = Completer<TextSendPreflight>();
+      bloc.add(SendTextMessage('blocked', preflightCompletion: rejected));
+      expect(await rejected.future, TextSendPreflight.rejected);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.isSendingText, isFalse);
+      expect(bloc.state.error, contains('Slow mode: wait'));
+      verifyNever(() => mockRepository.sendTextMessage(any(), any(),
+        selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'),
+        mentionsRoom: any(named: 'mentionsRoom')));
+      await bloc.close();
+    });
+
     test('blocks image send during slow mode cooldown', () async {
       when(
         () => mockRepository.sendTextMessage(

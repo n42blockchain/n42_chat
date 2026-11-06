@@ -1,3 +1,5 @@
+import 'package:n42_chat/src/presentation/widgets/chat/chat_input_bar.dart';
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -167,6 +169,11 @@ class _DraftStore extends PreferencesDataSource {
 void main() {
   setUpAll(() => registerFallbackValue(_Event()));
   for (final scenario in [
+    'preflight rejected',
+    'preflight newer input',
+    'preflight account changed',
+    'preflight admitted',
+    'preflight handled',
     'autosave',
     'autosave retry',
     'autosave background',
@@ -194,6 +201,7 @@ void main() {
       getIt.registerSingleton<PreferencesDataSource>(store);
       final account = _ReportAccount();
       final chat = _Chat();
+      when(() => chat.isClosed).thenReturn(false);
       whenListen(
         chat,
         const Stream<ChatState>.empty(),
@@ -237,6 +245,64 @@ void main() {
       );
       await tester.pumpAndSettle();
       final input = find.byType(TextField).first;
+      if (scenario.startsWith('preflight')) {
+        store.pending.complete(null);
+        await tester.pumpAndSettle();
+        final events = <SendTextMessage>[];
+        when(() => chat.add(any())).thenAnswer((invocation) {
+          final event = invocation.positionalArguments.single;
+          if (event is SendTextMessage) events.add(event);
+        });
+        await tester.enterText(input, 'blocked draft');
+        tester
+            .widget<ChatInputBar>(find.byType(ChatInputBar))
+            .onSendText!('blocked draft');
+        expect(events, hasLength(1));
+        expect(tester.widget<TextField>(input).controller!.text, '');
+        if (scenario == 'preflight newer input') {
+          await tester.enterText(input, 'new draft');
+        }
+        if (scenario == 'preflight account changed') account.active = false;
+        expect(events.single.preflightCompletion, isNotNull);
+        events.single.preflightCompletion!.complete(
+          scenario == 'preflight admitted'
+              ? TextSendPreflight.admitted
+              : scenario == 'preflight handled'
+              ? TextSendPreflight.handled
+              : TextSendPreflight.rejected,
+        );
+        await tester.pump();
+        expect(
+          tester.widget<TextField>(input).controller!.text,
+          scenario == 'preflight rejected'
+              ? 'blocked draft'
+              : scenario == 'preflight newer input'
+              ? 'new draft'
+              : '',
+        );
+        if (scenario == 'preflight rejected') {
+          expect(store.writes.last.$3, 'blocked draft');
+        }
+        if ([
+          'preflight rejected',
+          'preflight newer input',
+          'preflight handled',
+        ].contains(scenario)) {
+          await tester.enterText(input, 'retry draft');
+          tester
+              .widget<ChatInputBar>(find.byType(ChatInputBar))
+              .onSendText!('retry draft');
+          expect(
+            events,
+            hasLength(2),
+            reason:
+                'local rejection or handled command releases the composer lock',
+          );
+          events.last.preflightCompletion!.complete(TextSendPreflight.admitted);
+          await tester.pump();
+        }
+        return;
+      }
       if (scenario.startsWith('autosave')) {
         if (scenario != 'autosave load pending') {
           store.pending.complete(null);

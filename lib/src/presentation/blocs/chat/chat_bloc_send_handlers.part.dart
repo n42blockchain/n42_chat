@@ -78,7 +78,16 @@ extension ChatBlocSendHandlers on ChatBloc {
     SendTextMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null || event.text.trim().isEmpty) return;
+    void completePreflight(TextSendPreflight result) {
+      final completion = event.preflightCompletion;
+      if (completion != null && !completion.isCompleted) {
+        completion.complete(result);
+      }
+    }
+    if (_currentRoomId == null || event.text.trim().isEmpty) {
+      completePreflight(TextSendPreflight.rejected);
+      return;
+    }
 
     // 斜杠命令拦截
     final trimmed = event.text.trim();
@@ -86,6 +95,7 @@ extension ChatBlocSendHandlers on ChatBloc {
       final parts = trimmed.substring(1).split(_whitespaceRe);
       final cmd = parts.isNotEmpty ? parts[0].toLowerCase() : '';
       final args = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+      completePreflight(TextSendPreflight.handled);
       add(ExecuteSlashCommand(command: cmd, args: args));
       return;
     }
@@ -97,10 +107,13 @@ extension ChatBlocSendHandlers on ChatBloc {
           .inSeconds;
       if (elapsed < state.slowModeInterval) {
         final remaining = state.slowModeInterval - elapsed;
+        completePreflight(TextSendPreflight.rejected);
         emit(state.copyWith(error: 'Slow mode: wait ${remaining}s'));
         return;
       }
     }
+
+    completePreflight(TextSendPreflight.admitted);
 
     // 智能回复翻译：发送前自动翻译为对方语言
     String textToSend = event.text;

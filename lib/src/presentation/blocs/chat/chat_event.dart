@@ -53,8 +53,12 @@ class UnsubscribeMessages extends ChatEvent {
   const UnsubscribeMessages();
 }
 
+/// Local admission only; admitted does not prove network delivery.
+enum TextSendPreflight { admitted, rejected, handled }
+
 /// 发送文本消息
 class SendTextMessage extends ChatEvent {
+  final Completer<TextSendPreflight>? preflightCompletion;
   final String text;
   final int? selfDestructAfter;
   final List<String>? mentionedUserIds;
@@ -63,6 +67,7 @@ class SendTextMessage extends ChatEvent {
   const SendTextMessage(
     this.text, {
     this.selfDestructAfter,
+    this.preflightCompletion,
     this.mentionedUserIds,
     this.mentionsRoom = false,
   });
@@ -73,7 +78,7 @@ class SendTextMessage extends ChatEvent {
     selfDestructAfter,
     mentionedUserIds,
     mentionsRoom,
-  ];
+    if (preflightCompletion != null) preflightCompletion,  ];
 }
 
 /// 发送图片消息

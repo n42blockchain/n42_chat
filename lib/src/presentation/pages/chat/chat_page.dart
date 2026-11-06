@@ -750,7 +750,10 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
 
     // 斜杠命令拦截（编辑模式下不拦截）
     final chatBloc = context.read<ChatBloc>();
-    if (chatBloc.state.isSendingText || _pendingEncryptedDraft != null) return;
+    if (chatBloc.isClosed || chatBloc.state.isSendingText ||
+        _pendingEncryptedDraft != null) {
+      return;
+    }
     final editingMsg = chatBloc.state.editingMessage;
 
     if (editingMsg == null &&
@@ -771,9 +774,26 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
       chatBloc.add(const SetEditTarget(null));
     } else {
       _pendingEncryptedDraft = text;
+      final origin = _scheduledOrigin;
+      final mentions = _composerMentions;
+      final completion = Completer<TextSendPreflight>();
+      unawaited(completion.future.then((result) {
+        if (result == TextSendPreflight.admitted || !mounted ||
+            origin?.isCurrent != true || _pendingEncryptedDraft != text) {
+          return;
+        }
+        _pendingEncryptedDraft = null;
+        _pendingEncryptedDraftStarted = false;
+        if (result == TextSendPreflight.rejected && _inputController.text.isEmpty) {
+          _inputController.text = text;
+          setState(() => _composerMentions = mentions);
+          _saveDraft();
+        }
+      }));
       chatBloc.add(
         SendTextMessage(
           text,
+          preflightCompletion: completion,
           selfDestructAfter: _selfDestructAfter,
           mentionedUserIds: mentionPayload.mentionedUserIds,
           mentionsRoom: mentionPayload.mentionsRoom,
