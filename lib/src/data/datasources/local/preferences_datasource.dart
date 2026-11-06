@@ -791,6 +791,22 @@ class PreferencesDataSource {
   // 定时消息管理
   // ============================================
 
+  // All instances in this isolate share one persisted scheduled-message map.
+  // Serialize its reads and mutations, including reload and platform ack.
+  static Future<void> _scheduledStoreTail = Future<void>.value();
+
+  Future<T> _withScheduledStore<T>(Future<T> Function() operation) async {
+    final previous = _scheduledStoreTail;
+    final release = Completer<void>();
+    _scheduledStoreTail = release.future;
+    await previous;
+    try {
+      return await operation();
+    } finally {
+      release.complete();
+    }
+  }
+
   /// 保存定时消息
   ///
   /// [roomId] 房间ID
@@ -810,9 +826,10 @@ class PreferencesDataSource {
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
-  }) async {
+  }) => _withScheduledStore(() async {
     try {
       final p = await prefs;
+      await p.reload();
       final data = p.getString(_keyScheduledMessages);
       Map<String, dynamic> allData = {};
 
@@ -824,6 +841,9 @@ class PreferencesDataSource {
       final roomMessages =
           (allData[roomId] as List<dynamic>?)?.cast<Map<String, dynamic>>() ??
           [];
+
+      // Repeated saves of the same local ID replace the draft, not duplicate it.
+      roomMessages.removeWhere((item) => item['messageId'] == messageId);
 
       // 添加新的定时消息
       roomMessages.add(
@@ -842,78 +862,86 @@ class PreferencesDataSource {
 
       allData[roomId] = roomMessages;
 
-      await p.setString(_keyScheduledMessages, jsonEncode(allData));
+      await saveStringPreference(p, _keyScheduledMessages, jsonEncode(allData));
 
       prefsLog('Scheduled message saved - $messageId for $scheduledAt');
     } catch (e) {
       prefsLog('Failed to save scheduled message - $e');
+      rethrow;
     }
-  }
+  });
 
   /// 获取房间的所有定时消息
-  Future<List<ScheduledMessageDraft>> getScheduledMessages(
-    String roomId,
-  ) async {
-    try {
-      final p = await prefs;
-      final data = p.getString(_keyScheduledMessages);
-      if (data == null) return [];
+  Future<List<ScheduledMessageDraft>> getScheduledMessages(String roomId) =>
+      _withScheduledStore(() async {
+        try {
+          final p = await prefs;
+          await p.reload();
+          final data = p.getString(_keyScheduledMessages);
+          if (data == null) return [];
 
-      final allData = jsonDecode(data) as Map<String, dynamic>;
-      final roomMessages = allData[roomId] as List<dynamic>?;
-      if (roomMessages == null) return [];
+          final allData = jsonDecode(data) as Map<String, dynamic>;
+          final roomMessages = allData[roomId] as List<dynamic>?;
+          if (roomMessages == null) return [];
 
-      return roomMessages
-          .whereType<Map<dynamic, dynamic>>()
-          .map(
-            (item) =>
-                ScheduledMessageDraft.fromJson(Map<String, dynamic>.from(item)),
-          )
-          .toList(growable: false);
-    } catch (e) {
-      prefsLog('Failed to read scheduled messages - $e');
-      return [];
-    }
-  }
+          return roomMessages
+              .whereType<Map<dynamic, dynamic>>()
+              .map(
+                (item) => ScheduledMessageDraft.fromJson(
+                  Map<String, dynamic>.from(item),
+                ),
+              )
+              .toList(growable: false);
+        } catch (e) {
+          prefsLog('Failed to read scheduled messages - $e');
+          return [];
+        }
+      });
 
   /// 获取所有房间的到期定时消息
-  Future<List<ScheduledMessageDraft>> getDueScheduledMessages() async {
-    try {
-      final p = await prefs;
-      final data = p.getString(_keyScheduledMessages);
-      if (data == null) return [];
+  Future<List<ScheduledMessageDraft>> getDueScheduledMessages() =>
+      _withScheduledStore(() async {
+        try {
+          final p = await prefs;
+          await p.reload();
+          final data = p.getString(_keyScheduledMessages);
+          if (data == null) return [];
 
-      final allData = jsonDecode(data) as Map<String, dynamic>;
-      final now = DateTime.now();
-      final dueMessages = <ScheduledMessageDraft>[];
+          final allData = jsonDecode(data) as Map<String, dynamic>;
+          final now = DateTime.now();
+          final dueMessages = <ScheduledMessageDraft>[];
 
-      for (final entry in allData.entries) {
-        final roomId = entry.key;
-        final messages = (entry.value as List<dynamic>)
-            .whereType<Map<dynamic, dynamic>>()
-            .map(
-              (item) => ScheduledMessageDraft.fromJson(
-                Map<String, dynamic>.from(item),
-              ),
-            );
+          for (final entry in allData.entries) {
+            final roomId = entry.key;
+            final messages = (entry.value as List<dynamic>)
+                .whereType<Map<dynamic, dynamic>>()
+                .map(
+                  (item) => ScheduledMessageDraft.fromJson(
+                    Map<String, dynamic>.from(item),
+                  ),
+                );
 
-        for (final msg in messages) {
-          final scheduledAt = msg.scheduledAt;
-          if (now.isAfter(scheduledAt) || now.isAtSameMomentAs(scheduledAt)) {
-            dueMessages.add(msg.copyWith(roomId: roomId));
+            for (final msg in messages) {
+              final scheduledAt = msg.scheduledAt;
+              if (now.isAfter(scheduledAt) ||
+                  now.isAtSameMomentAs(scheduledAt)) {
+                dueMessages.add(msg.copyWith(roomId: roomId));
+              }
+            }
           }
-        }
-      }
 
-      return dueMessages;
-    } catch (e) {
-      prefsLog('Failed to get due scheduled messages - $e');
-      return [];
-    }
-  }
+          return dueMessages;
+        } catch (e) {
+          prefsLog('Failed to get due scheduled messages - $e');
+          return [];
+        }
+      });
 
   /// 删除定时消息
-  Future<void> removeScheduledMessage(String roomId, String messageId) async {
+  Future<void> removeScheduledMessage(
+    String roomId,
+    String messageId,
+  ) => _withScheduledStore(() async {
     final p = await prefs;
     try {
       // Read durable state again: a failed platform write can change the cache.
@@ -948,29 +976,45 @@ class PreferencesDataSource {
       } catch (_) {}
       rethrow;
     }
-  }
+  });
 
   /// 清除房间所有定时消息
-  Future<void> clearScheduledMessages(String roomId) async {
-    try {
-      final p = await prefs;
-      final data = p.getString(_keyScheduledMessages);
-      if (data == null) return;
+  Future<void> clearScheduledMessages(String roomId) =>
+      _withScheduledStore(() async {
+        try {
+          final p = await prefs;
+          await p.reload();
+          final data = p.getString(_keyScheduledMessages);
+          if (data == null) return;
 
-      final allData = jsonDecode(data) as Map<String, dynamic>;
-      allData.remove(roomId);
+          final allData = jsonDecode(data) as Map<String, dynamic>;
+          allData.remove(roomId);
 
-      if (allData.isEmpty) {
-        await p.remove(_keyScheduledMessages);
-      } else {
-        await p.setString(_keyScheduledMessages, jsonEncode(allData));
-      }
+          if (allData.isEmpty) {
+            try {
+              if (!await p.remove(_keyScheduledMessages)) {
+                throw StateError('Scheduled messages were not cleared');
+              }
+            } catch (_) {
+              try {
+                await p.reload();
+              } catch (_) {}
+              rethrow;
+            }
+          } else {
+            await saveStringPreference(
+              p,
+              _keyScheduledMessages,
+              jsonEncode(allData),
+            );
+          }
 
-      prefsLog('Cleared all scheduled messages for $roomId');
-    } catch (e) {
-      prefsLog('Failed to clear scheduled messages - $e');
-    }
-  }
+          prefsLog('Cleared all scheduled messages for $roomId');
+        } catch (e) {
+          prefsLog('Failed to clear scheduled messages - $e');
+          rethrow;
+        }
+      });
 
   // ============================================
   // 朋友圈设置

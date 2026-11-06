@@ -941,6 +941,46 @@ void main() {
       expect(bloc.state.messages.map((m) => m.id), [_msg.id]);
       await bloc.close();
     });
+    test('failed scheduled save reports error without a phantom preview', () async {
+      when(
+        () => mockRepo.getCurrentUserId(),
+      ).thenAnswer((_) async => '@me:test');
+      when(
+        () => mockPrefs.saveScheduledMessage(
+          roomId: any(named: 'roomId'),
+          messageId: any(named: 'messageId'),
+          text: any(named: 'text'),
+          type: MessageType.poll,
+          payload: any(named: 'payload'),
+          scheduledAt: any(named: 'scheduledAt'),
+          selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ),
+      ).thenThrow(StateError('disk full'));
+
+      final bloc = buildBloc();
+      await initBloc(bloc);
+
+      bloc.add(
+        SendScheduledMessage(
+          text: 'Lunch?',
+          type: MessageType.poll,
+          payload: {
+            'options': ['Sushi', 'Pizza'],
+            'maxSelections': 1,
+            'isAnonymous': true,
+          },
+          scheduledAt: DateTime.now().add(const Duration(hours: 1)),
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      expect(bloc.state.error, 'Failed to schedule message');
+      expect(bloc.state.messages.map((message) => message.id), [_msg.id]);
+      await bloc.close();
+    });
+
     test('saves scheduled poll payload and adds preview message', () async {
       when(
         () => mockRepo.getCurrentUserId(),
