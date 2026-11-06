@@ -375,6 +375,13 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ],
+          if (draft.retryAt != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              '${S.of(context)?.commonRetry ?? 'Retry'}: ${_formatScheduledAt(draft.retryAt!)}',
+              style: TextStyle(color: secondaryColor),
+            ),
+          ],
           const SizedBox(height: 10),
           Text(
             draft.text,

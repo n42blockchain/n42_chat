@@ -10,6 +10,12 @@ class ScheduledMessageDraft extends Equatable {
   String get transactionId =>
       'n42_scheduled_${sha256.convert(utf8.encode(jsonEncode([roomId, messageId])))}';
 
+  final int failedAttempts;
+  final DateTime? retryAt;
+  bool isDue(DateTime now) =>
+      !now.isBefore(scheduledAt) &&
+      (retryAt == null || !now.isBefore(retryAt!));
+
   final bool deliveryUnconfirmed;
   final String messageId;
   final String? roomId;
@@ -23,6 +29,8 @@ class ScheduledMessageDraft extends Equatable {
   final Map<String, dynamic> payload;
 
   const ScheduledMessageDraft({
+    this.failedAttempts = 0,
+    this.retryAt,
     this.deliveryUnconfirmed = false,
     required this.messageId,
     required this.text,
@@ -39,8 +47,17 @@ class ScheduledMessageDraft extends Equatable {
   factory ScheduledMessageDraft.fromJson(Map<String, dynamic> json) {
     final rawPayload = json['payload'];
     final rawType = json['type'] as String?;
+    final failedAttempts = json['failedAttempts'] as int? ?? 0;
+    if (failedAttempts < 0) {
+      throw const FormatException('Invalid scheduled retry count');
+    }
+    final retryAt = json['retryAt'] == null
+        ? null
+        : DateTime.parse(json['retryAt'] as String);
 
     return ScheduledMessageDraft(
+      failedAttempts: failedAttempts,
+      retryAt: retryAt,
       deliveryUnconfirmed: json['deliveryUnconfirmed'] == true,
       messageId: json['messageId'] as String? ?? '',
       roomId: json['roomId'] as String?,
@@ -68,6 +85,8 @@ class ScheduledMessageDraft extends Equatable {
   }
 
   Map<String, dynamic> toJson() => {
+    'failedAttempts': failedAttempts,
+    if (retryAt != null) 'retryAt': retryAt!.toIso8601String(),
     'deliveryUnconfirmed': deliveryUnconfirmed,
     'messageId': messageId,
     'text': text,
@@ -87,6 +106,8 @@ class ScheduledMessageDraft extends Equatable {
     Map<String, dynamic>? payload,
   }) {
     return ScheduledMessageDraft(
+      failedAttempts: failedAttempts,
+      retryAt: retryAt,
       deliveryUnconfirmed: deliveryUnconfirmed ?? this.deliveryUnconfirmed,
       messageId: messageId,
       roomId: roomId ?? this.roomId,
@@ -195,6 +216,8 @@ class ScheduledMessageDraft extends Equatable {
 
   @override
   List<Object?> get props => [
+    failedAttempts,
+    retryAt,
     deliveryUnconfirmed,
     messageId,
     roomId,

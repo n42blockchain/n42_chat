@@ -110,11 +110,12 @@ void main() {
   testWidgets('persisted unconfirmed status remains visible after reopening', (tester) async {
     when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test')).thenAnswer((_) async => [
       ScheduledMessageDraft(messageId: 'failed', text: 'Retained draft', type: MessageType.text,
-        scheduledAt: DateTime(2020), createdAt: DateTime(2019), deliveryUnconfirmed: true),
+        scheduledAt: DateTime(2020), createdAt: DateTime(2019), deliveryUnconfirmed: true, retryAt: DateTime(2030)),
     ]);
     await pump(tester);
     expect(find.text('Delivery not confirmed'), findsOneWidget);
     expect(find.text('Retained draft'), findsOneWidget);
+    expect(find.textContaining('Retry:'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     await pump(tester);

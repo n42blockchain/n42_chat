@@ -906,8 +906,14 @@ class PreferencesDataSource {
       (item) => (item as Map)['messageId'] == messageId,
     );
     if (index < 0) return false;
+    final previous = Map<String, dynamic>.from(messages[index] as Map);
+    final draft = ScheduledMessageDraft.fromJson(previous);
+    final attempts = draft.failedAttempts.clamp(0, 5) + 1;
+    final delayMinutes = attempts == 6 ? 30 : 1 << (attempts - 1);
     messages[index] = {
-      ...Map<String, dynamic>.from(messages[index] as Map),
+      ...previous,
+      'failedAttempts': attempts,
+      'retryAt': DateTime.now().toUtc().add(Duration(minutes: delayMinutes)).toIso8601String(),
       'deliveryUnconfirmed': true,
     };
     await saveStringPreference(p, key, jsonEncode(data));
@@ -967,8 +973,7 @@ class PreferencesDataSource {
                 );
 
         for (final msg in messages) {
-          final scheduledAt = msg.scheduledAt;
-          if (now.isAfter(scheduledAt) || now.isAtSameMomentAs(scheduledAt)) {
+          if (msg.isDue(now)) {
             dueMessages.add(msg.copyWith(roomId: roomId));
           }
         }

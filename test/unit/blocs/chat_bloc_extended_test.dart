@@ -1164,6 +1164,20 @@ void main() {
       await bloc.close();
     });
 
+    test('stale due snapshot respects the current persisted retry deadline', () async {
+      final old = ScheduledMessageDraft(messageId: 'retry-wait', roomId: _roomId, text: 'Wait', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));
+      final current = ScheduledMessageDraft.fromJson({...old.toJson(), 'retryAt': DateTime.now().add(const Duration(hours: 1)).toIso8601String(), 'failedAttempts': 1});
+      final bloc = buildBloc();
+      await initBloc(bloc);
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [old]);
+      when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [current]);
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      verifyNever(() => mockRepo.sendTextMessage(_roomId, old.text, transactionId: old.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null));
+      verifyNever(() => mockPrefs.removeScheduledMessage(_roomId, old.messageId, ownerUserId: any(named: 'ownerUserId')));
+      await bloc.close();
+    });
+
     test('unconfirmed scheduled delivery retains the draft', () async {
       when(() => mockPrefs.markScheduledDeliveryUnconfirmed(ownerUserId: any(named: 'ownerUserId'), roomId: _roomId, messageId: 'unconfirmed')).thenAnswer((_) async => true);
       final draft = ScheduledMessageDraft(messageId: 'unconfirmed', roomId: _roomId, text: 'Keep me', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));

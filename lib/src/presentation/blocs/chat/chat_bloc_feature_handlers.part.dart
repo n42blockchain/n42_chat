@@ -342,7 +342,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             draft.messageId,
             account,
           );
-          if (current == null) continue;
+          if (current == null || !current.isDue(DateTime.now())) continue;
           await _sendScheduledDraft(current, account);
           accepted = true;
 
