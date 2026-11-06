@@ -1,4 +1,7 @@
+
 import 'package:matrix/matrix.dart' as matrix;
+
+import '../datasources/local/chat_history_clear_store.dart';
 
 import '../../domain/entities/contact_entity.dart';
 import '../../domain/entities/conversation_entity.dart';
@@ -24,6 +27,7 @@ class SearchRepositoryImpl implements ISearchRepository {
   final ArchiveSearchService? _archiveSearch;
   final PreferencesDataSource? _preferences;
   final ChatLockService _chatLockService;
+  final ChatHistoryClearStore? _historyClearStore;
 
   SearchRepositoryImpl(
     this._searchDataSource,
@@ -33,11 +37,64 @@ class SearchRepositoryImpl implements ISearchRepository {
     ArchiveSearchService? archiveSearch,
     PreferencesDataSource? preferences,
     ChatLockService? chatLockService,
+    ChatHistoryClearStore? historyClearStore,
   }) : _ensCacheService = ensCacheService,
        _usernameService = usernameService,
        _archiveSearch = archiveSearch,
        _preferences = preferences,
+       _historyClearStore = historyClearStore,
        _chatLockService = chatLockService ?? ChatLockService();
+
+  ({String? owner, bool Function() isCurrent}) _historyOrigin() {
+    final client = _clientManager.client;
+    final owner = client?.userID;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    final homeserver = client?.homeserver;
+    return (
+      owner: owner,
+      isCurrent: () =>
+          identical(_clientManager.client, client) &&
+          client?.userID == owner &&
+          client?.accessToken == token &&
+          client?.deviceID == device &&
+          client?.homeserver == homeserver,
+    );
+  }
+
+  Future<List<T>> _visibleHistory<T>(
+    List<T> items,
+    ({String? owner, bool Function() isCurrent}) origin, {
+    required String? Function(T) roomOf,
+    required DateTime? Function(T) timeOf,
+  }) async {
+    final store = _historyClearStore;
+    if (store == null) return items;
+    final owner = origin.owner;
+    if (owner == null || owner.isEmpty || !origin.isCurrent()) return [];
+    try {
+      final boundaries = <String, DateTime?>{};
+      for (final room in items.map(roomOf).whereType<String>().toSet()) {
+        boundaries[room] = await store.read(
+          ownerUserId: owner,
+          roomId: room,
+          isCurrent: origin.isCurrent,
+        );
+      }
+      if (!origin.isCurrent()) return [];
+      return items.where((item) {
+        final room = roomOf(item);
+        if (room == null || !boundaries.containsKey(room)) return false;
+        final boundary = boundaries[room];
+        final timestamp = timeOf(item);
+        return boundary == null ||
+            (timestamp != null && timestamp.isAfter(boundary));
+      }).toList();
+    } catch (error) {
+      debugLog('SearchRepository: history visibility unavailable: $error');
+      return [];
+    }
+  }
 
   /// Returns hidden and locked room IDs for global-search filtering.
   ///
@@ -243,6 +300,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     String? roomId,
     MessageSearchFilter? filter,
   }) async {
+    final origin = _historyOrigin();
     if (roomId != null) {
       // 在指定房间搜索
       final events = filter == null || filter.isEmpty
@@ -262,7 +320,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       final roomName = room?.getLocalizedDisplayname() ?? '未知会话';
       final roomAvatar = _getRoomAvatarUrl(room);
 
-      return events.map((event) {
+      final items = events.map((event) {
         final message = _mapEventToMessage(event);
         return SearchResultItem.fromMessage(
           message,
@@ -272,6 +330,12 @@ class SearchRepositoryImpl implements ISearchRepository {
           matchedKeyword: query,
         );
       }).toList();
+      return _visibleHistory(
+        items,
+        origin,
+        roomOf: (item) => item.roomId,
+        timeOf: (item) => item.timestamp,
+      );
     } else {
       // 全局搜索消息
       final results = filter == null || filter.isEmpty
@@ -310,7 +374,7 @@ class SearchRepositoryImpl implements ISearchRepository {
         limit: limit,
         filter: filter,
       );
-      if (archiveItems.isEmpty) return liveItems;
+
       // 合并后按时间倒序重排——否则 live 全部排在 archive 之前,时间顺序错乱
       // (复审 P2)。无 timestamp 的排最后。
       final merged = [...liveItems, ...archiveItems]
@@ -322,7 +386,13 @@ class SearchRepositoryImpl implements ISearchRepository {
           if (tb == null) return -1;
           return tb.compareTo(ta);
         });
-      return merged.take(limit).toList();
+      final visible = await _visibleHistory(
+        merged,
+        origin,
+        roomOf: (item) => item.roomId,
+        timeOf: (item) => item.timestamp,
+      );
+      return visible.take(limit).toList();
     }
   }
 
@@ -377,6 +447,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     MessageSearchFilter? filter,
     int limit = 50,
   }) async {
+    final origin = _historyOrigin();
     if (query.trim().isEmpty) {
       return ChatSearchResults(roomId: roomId);
     }
@@ -394,7 +465,12 @@ class SearchRepositoryImpl implements ISearchRepository {
             limit: limit,
           );
 
-    final messages = events.map(_mapEventToMessage).toList();
+    final messages = await _visibleHistory(
+      events.map(_mapEventToMessage).toList(),
+      origin,
+      roomOf: (message) => message.roomId,
+      timeOf: (message) => message.timestamp,
+    );
 
     return ChatSearchResults(
       messages: messages,
@@ -411,6 +487,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     ChatSearchResults currentResults, {
     int limit = 50,
   }) async {
+    final origin = _historyOrigin();
     // 加载更多结果
     final filter = currentResults.filter;
     final events = filter == null || filter.isEmpty
@@ -426,7 +503,12 @@ class SearchRepositoryImpl implements ISearchRepository {
             limit: currentResults.messages.length + limit,
           );
 
-    final messages = events.map(_mapEventToMessage).toList();
+    final messages = await _visibleHistory(
+      events.map(_mapEventToMessage).toList(),
+      origin,
+      roomOf: (message) => message.roomId,
+      timeOf: (message) => message.timestamp,
+    );
 
     // A refreshed timeline may insert or remove results before the selected
     // message. Preserve its identity, then fall back to a valid nearby index.

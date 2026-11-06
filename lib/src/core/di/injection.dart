@@ -959,6 +959,7 @@ void _registerRepositories() {
     () => SearchRepositoryImpl(
       getIt<MatrixSearchDataSource>(),
       getIt<MatrixClientManager>(),
+      historyClearStore: ChatHistoryClearStore(),
       ensCacheService: getIt<EnsCacheService>(),
       usernameService: getIt<UsernameService>(),
       // FTS5 归档全文搜索：跨会话搜索合并完整历史（内存扫描只覆盖已加载）
