@@ -339,11 +339,14 @@ void main() {
       await tester.runAsync(() async {
         await tester.tap(find.text('Add'));
         final deadline = DateTime.now().add(const Duration(seconds: 5));
-        while (((await store.load())['photos'] as List?)?.length != 2) {
+        await tester.pump();
+        while (((await store.load())['photos'] as List?)?.length != 2 ||
+            find.byType(LinearProgressIndicator).evaluate().isNotEmpty) {
           if (DateTime.now().isAfter(deadline)) {
             fail('Photo imports did not finish before the deadline');
           }
           await Future<void>.delayed(const Duration(milliseconds: 20));
+          await tester.pump();
         }
       });
       await tester.pumpAndSettle();
@@ -372,12 +375,15 @@ void main() {
       await tester.runAsync(() async {
         await tester.tap(find.byIcon(Icons.delete_outline).first);
         final deadline = DateTime.now().add(const Duration(seconds: 5));
+        await tester.pump();
         while (((await store.load())['photos'] as List?)?.length != 1 ||
-            saved.existsSync()) {
+            saved.existsSync() ||
+            find.byType(LinearProgressIndicator).evaluate().isNotEmpty) {
           if (DateTime.now().isAfter(deadline)) {
             fail('Photo deletion did not finish before the deadline');
           }
           await Future<void>.delayed(const Duration(milliseconds: 20));
+          await tester.pump();
         }
       });
       await tester.pumpAndSettle();
