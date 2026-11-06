@@ -895,7 +895,9 @@ class PreferencesDataSource {
     required String messageId,
     required String eventId,
   }) => _withScheduledStore(() async {
-    if (eventId.isEmpty) throw ArgumentError.value(eventId, 'eventId');
+    if (!ScheduledMessageDraft.isValidAcceptedEventId(eventId)) {
+      throw ArgumentError('Invalid scheduled delivery receipt');
+    }
     final p = await prefs;
     await p.reload();
     final key = _scheduledKey(ownerUserId);

@@ -40,6 +40,8 @@ void main() {
       {'createdAt': 'broken'},
       {'type': 'futureType'},
       {'payload': 'broken'},
+      for (final value in ['true', 'false', 0, 1, <String, dynamic>{}]) {'deliveryUnconfirmed': value},
+      for (final value in ['', ' ', ' event', 'event\n', 'ev\u0000ent', 42]) {'acceptedEventId': value},
     ]) {
       expect(
         () => ScheduledMessageDraft.fromJson({...original, ...change}),

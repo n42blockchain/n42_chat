@@ -6,6 +6,41 @@ import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart'
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('corrupt delivery states preserve bytes and prevent due recovery', () async {
+    final store = PreferencesDataSource();
+    await store.saveScheduledMessage(roomId: 'room', messageId: 'draft',
+      text: 'keep', scheduledAt: DateTime(2020));
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'n42_chat_scheduled_messages';
+    final original = jsonDecode(prefs.getString(key)!) as Map<String, dynamic>;
+    final draft = Map<String, dynamic>.from((original['room'] as List).single as Map);
+    for (final change in [
+      {'deliveryUnconfirmed': 'true'}, {'deliveryUnconfirmed': 1},
+      {'acceptedEventId': ''}, {'acceptedEventId': ' '}, {'acceptedEventId': 'event\n'},
+    ]) {
+      final damaged = jsonEncode({'room': [{...draft, ...change}]});
+      await prefs.setString(key, damaged);
+      await expectLater(store.getScheduledMessages('room'), throwsFormatException);
+      await expectLater(store.getDueScheduledMessages(), throwsFormatException);
+      expect(prefs.getString(key), damaged);
+    }
+    await prefs.setString(key, jsonEncode(original));
+    expect((await store.getDueScheduledMessages()).single.text, 'keep');
+  });
+
+  test('invalid server receipt cannot alter an account draft', () async {
+    final store = PreferencesDataSource();
+    await store.saveScheduledMessage(roomId: 'room', ownerUserId: '@a:test', messageId: 'draft',
+      text: 'keep', scheduledAt: DateTime(2020));
+    for (final event in ['', ' ', 'event\n', 'ev\u0000ent']) {
+      await expectLater(store.markScheduledDeliveryAccepted(ownerUserId: '@a:test', roomId: 'room', messageId: 'draft', eventId: event), throwsArgumentError);
+      final draft = (await store.getScheduledMessages('room', ownerUserId: '@a:test')).single;
+      expect(draft.acceptedEventId, isNull); expect(draft.text, 'keep');
+    }
+    expect(await store.markScheduledDeliveryAccepted(ownerUserId: '@a:test', roomId: 'room', messageId: 'draft', eventId: r'$valid:test'), true);
+    expect((await store.getScheduledMessages('room', ownerUserId: '@a:test')).single.acceptedEventId, r'$valid:test');
+  });
+
   test('room mismatch preserves records while legacy room identity stays stable', () async {
     final storage = PreferencesDataSource();
     await storage.saveScheduledMessage(roomId: 'room', messageId: 'identity',

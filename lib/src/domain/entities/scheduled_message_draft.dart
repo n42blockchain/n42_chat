@@ -10,6 +10,9 @@ class ScheduledMessageDraft extends Equatable {
   String get transactionId =>
       'n42_scheduled_${sha256.convert(utf8.encode(jsonEncode([roomId, messageId])))}';
 
+  static bool isValidAcceptedEventId(String value) =>
+      value.isNotEmpty && !RegExp(r'[\s\x00-\x1f\x7f]').hasMatch(value);
+
   final String? acceptedEventId;
   final int failedAttempts;
   final DateTime? retryAt;
@@ -66,10 +69,18 @@ class ScheduledMessageDraft extends Equatable {
         ? null
         : DateTime.parse(json['retryAt'] as String);
 
+    final rawUnconfirmed = json['deliveryUnconfirmed'];
+    if (rawUnconfirmed != null && rawUnconfirmed is! bool) {
+      throw const FormatException('Invalid scheduled delivery state');
+    }
+    final eventId = json['acceptedEventId'];
+    if (eventId != null &&
+        (eventId is! String || !isValidAcceptedEventId(eventId))) {
+      throw const FormatException('Invalid scheduled delivery receipt');
+    }
+
     return ScheduledMessageDraft(
-      acceptedEventId: (json['acceptedEventId'] as String?)?.isNotEmpty == true
-          ? json['acceptedEventId'] as String
-          : null,
+      acceptedEventId: eventId as String?,
       failedAttempts: failedAttempts,
       retryAt: retryAt,
       deliveryUnconfirmed: json['deliveryUnconfirmed'] == true,
