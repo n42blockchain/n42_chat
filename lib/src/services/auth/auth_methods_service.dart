@@ -18,6 +18,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:twitter_login/twitter_login.dart';
+
 import '../../core/utils/debug_log.dart';
 
 // Passkey 相关类型定义（简化版，实际需要使用 passkeys 包）
@@ -423,15 +424,17 @@ class AuthMethodsService {
       // 使用 MethodChannel 调用原生 API
       const channel = MethodChannel('n42.chat/passkey');
 
-      final result = await channel
-          .invokeMethod<Map<dynamic, dynamic>>('createCredential', {
-            'rpId': rpId,
-            'rpName': rpName,
-            'userId': userId,
-            'userName': username,
-            'displayName': displayName,
-            'challenge': challenge,
-          });
+      final result = await channel.invokeMethod<Map<dynamic, dynamic>>(
+        'createCredential',
+        {
+          'rpId': rpId,
+          'rpName': rpName,
+          'userId': userId,
+          'userName': username,
+          'displayName': displayName,
+          'challenge': challenge,
+        },
+      );
 
       if (result == null) return null;
 
@@ -513,12 +516,14 @@ class AuthMethodsService {
     try {
       const channel = MethodChannel('n42.chat/passkey');
 
-      final result = await channel
-          .invokeMethod<Map<dynamic, dynamic>>('getAssertion', {
-            'rpId': rpId,
-            'challenge': challenge,
-            'allowedCredentials': allowedCredentials ?? [],
-          });
+      final result = await channel.invokeMethod<Map<dynamic, dynamic>>(
+        'getAssertion',
+        {
+          'rpId': rpId,
+          'challenge': challenge,
+          'allowedCredentials': allowedCredentials ?? [],
+        },
+      );
 
       if (result == null) return null;
 
@@ -792,12 +797,11 @@ class AuthMethodsService {
         debugLog('AuthMethodsService: Failed to get access token: $e');
       }
 
-      debugLog('AuthMethodsService: Google Sign In success: ${account.email}');
+      debugLog('AuthMethodsService: Google Sign In success');
 
       final idToken = auth.idToken;
-      if ((idToken == null || idToken.isEmpty) &&
-          (accessToken == null || accessToken.isEmpty)) {
-        throw Exception('Google Sign In did not return any usable token');
+      if (idToken == null || idToken.isEmpty) {
+        throw Exception('Google Sign In did not return an ID token');
       }
 
       return SocialLoginResult(
@@ -871,6 +875,9 @@ class AuthMethodsService {
           'state': credential.state,
         },
       );
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) return null;
+      rethrow;
     } catch (e, stackTrace) {
       debugLog('AuthMethodsService: Apple Sign In failed: $e');
       debugLog('Stack: $stackTrace');
@@ -884,8 +891,7 @@ class AuthMethodsService {
 
   /// 检查 Facebook 登录是否可用
   bool isFacebookSignInAvailable() {
-    // Facebook 登录在所有平台都可用
-    return true;
+    return Platform.isAndroid || Platform.isIOS;
   }
 
   /// Facebook 登录
@@ -893,8 +899,11 @@ class AuthMethodsService {
     try {
       debugLog('AuthMethodsService: Starting Facebook Sign In');
 
+      final nonce = _generateNonce();
       final LoginResult result = await FacebookAuth.instance.login(
-        permissions: ['email', 'public_profile'],
+        permissions: ['public_profile'],
+        loginTracking: LoginTracking.limited,
+        nonce: nonce,
       );
 
       if (result.status == LoginStatus.success) {
@@ -904,9 +913,22 @@ class AuthMethodsService {
           return null;
         }
 
+        if (accessToken is LimitedToken) {
+          if (accessToken.nonce != nonce || accessToken.tokenString.isEmpty) {
+            throw Exception('Invalid Facebook authentication response');
+          }
+          // Limited Login returns an OIDC token, never a Graph access token.
+          return SocialLoginResult(
+            provider: 'facebook',
+            idToken: accessToken.tokenString,
+            displayName: accessToken.userName,
+            extra: {'token_type': 'limited', 'rawNonce': nonce},
+          );
+        }
+
         // 获取用户信息
         final userData = await FacebookAuth.instance.getUserData(
-          fields: 'email,name,picture.width(200)',
+          fields: 'name,picture.width(200)',
         );
 
         debugLog('AuthMethodsService: Facebook Sign In success');

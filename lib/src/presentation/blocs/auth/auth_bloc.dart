@@ -1049,10 +1049,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _authRepository.loginWithSocialToken(
         homeserver: event.homeserver,
         provider: 'facebook',
-        idToken: facebookResult.accessToken,
+        idToken: facebookResult.idToken ?? facebookResult.accessToken,
         accessToken: facebookResult.accessToken,
         email: facebookResult.email,
         displayName: facebookResult.displayName,
+        extra: facebookResult.extra,
       );
 
       if (result.success && result.user != null) {

@@ -1,5 +1,6 @@
 import '../../core/encryption/local_room_key_store.dart';
 import '../../core/encryption/token_device_session.dart';
+
 import 'dart:typed_data';
 import 'dart:async';
 
@@ -984,6 +985,8 @@ class AuthRepositoryImpl
         case 'facebook':
           response = await _socialAuthApi.loginWithFacebook(
             accessToken: accessToken ?? primaryCredential,
+            limitedLogin: extra?['token_type'] == 'limited',
+            nonce: extra?['rawNonce'] as String?,
           );
           break;
         case 'twitter':

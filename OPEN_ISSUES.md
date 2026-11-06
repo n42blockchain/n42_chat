@@ -624,3 +624,10 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 
 - Resolved: 2026-10-30 follow-up.
 - The untouched baseline reproduced 4 light-theme and 6 dark-theme changed pixels. ImageIO comparison found maximum channel deltas of 2/3, confined to antialiasing at icon edges. Baselines were regenerated with Flutter 3.47.5 and strict comparisons pass; no tolerance was added. See follow-up verification records.
+
+### AUTH-SOCIAL-001 N42 native social-login provider acceptance
+
+- Severity: H
+- Added: 2026-11-05
+- Current state: Facebook Limited Login now sends an ID token, token_type and nonce without Graph access-token use; classic Android payload remains compatible. Google requires an ID token and Apple cancellation returns normally. Focused SDK-channel/API/repository/BLoC tests pass. The external api.n42.network backend source and its Limited Login verification have not been located; do not enable host iOS Facebook until server signature/issuer/audience/expiry/nonce verification is confirmed. N42 Google OAuth client registration and real-device first/repeat/cancel/account-switch acceptance remain unverified.
+- Next step: configure N42-specific provider clients; validate the external verifier against Limited Login, wrong app/nonce/expired proofs, and complete first/repeat login on physical devices. Do not substitute other products' credentials or treat local mock tokens as provider acceptance.
