@@ -587,6 +587,88 @@ void main() {
   // SendImageMessage
   // =========================================================================
 
+  group('media send context across awaits', () {
+    final mediaEvents = <String, ChatEvent>{
+      'image': SendImageMessage(imageBytes: Uint8List(1), filename: 'image.png'),
+      'voice': SendVoiceMessage(audioBytes: Uint8List(1), filename: 'audio.ogg', duration: 10),
+      'video': SendVideoMessage(videoBytes: Uint8List(1), filename: 'video.mp4'),
+      'file bytes': SendFileMessage(fileBytes: Uint8List(1), filename: 'file.txt'),
+      'file path': const SendFileMessage(filePath: '/public-test.txt', filename: 'file.txt'),
+      'file stream': const SendFileMessage(fileStream: Stream.empty(), filename: 'file.txt'),
+    };
+    for (final media in mediaEvents.entries) {
+      for (final stage in ['preparation', 'receipt', 'failure']) {
+        test('${media.key} isolates old $stage from a new upload', () async {
+          final rooms = <String>[];
+          final oldResult = Completer<MessageEntity?>();
+          final newResult = Completer<MessageEntity?>();
+          Future<MessageEntity?> dispatch(Invocation call) {
+            rooms.add(call.positionalArguments.first as String);
+            return rooms.length == 1 ? oldResult.future : newResult.future;
+          }
+          when(() => mockRepository.sendImageMessage(any(),
+            imageBytes: any(named: 'imageBytes'), filename: any(named: 'filename'),
+            mimeType: any(named: 'mimeType'), selfDestructAfter: any(named: 'selfDestructAfter'),
+          )).thenAnswer(dispatch);
+          when(() => mockRepository.sendVoiceMessage(any(),
+            audioBytes: any(named: 'audioBytes'), filename: any(named: 'filename'),
+            duration: any(named: 'duration'), mimeType: any(named: 'mimeType'),
+            selfDestructAfter: any(named: 'selfDestructAfter'),
+          )).thenAnswer(dispatch);
+          when(() => mockRepository.sendVideoMessage(any(),
+            videoBytes: any(named: 'videoBytes'), filename: any(named: 'filename'),
+            mimeType: any(named: 'mimeType'), thumbnailBytes: any(named: 'thumbnailBytes'),
+            selfDestructAfter: any(named: 'selfDestructAfter'),
+          )).thenAnswer(dispatch);
+          when(() => mockRepository.sendFileMessage(any(),
+            fileBytes: any(named: 'fileBytes'), filename: any(named: 'filename'),
+            mimeType: any(named: 'mimeType'), selfDestructAfter: any(named: 'selfDestructAfter'),
+            filePath: any(named: 'filePath'), fileStream: any(named: 'fileStream'),
+            fileSize: any(named: 'fileSize'),
+          )).thenAnswer(dispatch);
+          final bloc = await buildInitializedBloc();
+          final settings = Completer<int?>();
+          if (stage == 'preparation') {
+            when(() => mockSecureStorage.getDefaultSelfDestructSeconds())
+                .thenAnswer((_) => settings.future);
+          }
+          bloc.add(media.value);
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          expect(bloc.state.activeMediaSends, 1);
+          if (stage != 'preparation') expect(rooms, [_roomId]);
+          bloc.add(const InitializeChat('!other:server.com'));
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          if (stage == 'preparation') {
+            settings.complete(null);
+            await Future<void>.delayed(const Duration(milliseconds: 30));
+            expect(rooms, isEmpty);
+            expect(bloc.state.activeMediaSends, 0);
+          } else {
+            bloc.add(media.value);
+            await Future<void>.delayed(const Duration(milliseconds: 30));
+            expect(rooms, [_roomId, '!other:server.com']);
+            expect(bloc.state.activeMediaSends, 1);
+            if (stage == 'failure') {
+              oldResult.completeError(StateError('old upload failed'));
+            } else {
+              oldResult.complete(_testMessages.first);
+            }
+            await Future<void>.delayed(const Duration(milliseconds: 30));
+            expect(bloc.state.activeMediaSends, 1);
+            expect(bloc.state.isSending, isTrue);
+            expect(bloc.state.error, isNull);
+            expect(bloc.state.lastMessageSentAt, isNull);
+            newResult.complete(_testMessages.last);
+            await Future<void>.delayed(const Duration(milliseconds: 30));
+            expect(bloc.state.activeMediaSends, 0);
+            expect(bloc.state.isSending, isFalse);
+          }
+          await bloc.close();
+        });
+      }
+    }
+  });
+
   group('SendImageMessage', () {
     test('overlapping uploads keep the media count until both finish', () async {
       final firstUpload = Completer<MessageEntity>();
@@ -618,9 +700,12 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
       expect(bloc.state.activeMediaSends, 2);
 
+      bloc.add(SetReplyTarget(_testMessages.last));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
       firstUpload.complete(_testMessages.first);
       await Future<void>.delayed(const Duration(milliseconds: 50));
       expect(bloc.state.activeMediaSends, 1);
+      expect(bloc.state.replyTarget, _testMessages.last);
       expect(bloc.state.isSending, isTrue);
 
       secondUpload.complete(_testMessages.first);

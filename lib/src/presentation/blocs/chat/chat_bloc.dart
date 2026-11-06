@@ -259,7 +259,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(
       state.copyWith(
         roomId: event.roomId, isLoading: false, clearError: true,
-        isSendingText: false, isSending: state.activeMediaSends > 0,
+        isSendingText: false, isSending: false, activeMediaSends: 0,
       ),
     );
 

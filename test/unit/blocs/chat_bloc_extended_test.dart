@@ -939,6 +939,53 @@ void main() {
       ));
       await bloc.close();
     });
+    for (final media in <ChatEvent>[
+      SendImageMessage(imageBytes: Uint8List(1), filename: 'image.png'),
+      SendVoiceMessage(audioBytes: Uint8List(1), filename: 'audio.ogg', duration: 10),
+      SendVideoMessage(videoBytes: Uint8List(1), filename: 'video.mp4'),
+      SendFileMessage(fileBytes: Uint8List(1), filename: 'file.txt'),
+    ]) {
+    test('${media.runtimeType} rejects replacement account during preparation', () async {
+      final auth = MockReportAuth();
+      final client = mockClient;
+      when(() => client.homeserver).thenReturn(Uri.parse('https://server.com'));
+      when(() => client.accessToken).thenReturn('same-token');
+      AuthSessionInvalidation generation() => AuthSessionInvalidation(
+        userId: '@me:server.com', homeserver: Uri.parse('https://server.com'),
+        deviceId: null, isCurrent: () => true,
+        matchesClient: (candidate) => identical(candidate, client),
+      );
+      when(() => auth.currentAccountGeneration).thenReturn(generation());
+      final bloc = ChatBloc(messageRepository: mockRepo, secureStorage: mockPrefs,
+        clientManager: mockClientManager, authRepository: auth);
+      await initBloc(bloc);
+      final settings = Completer<int?>();
+      when(() => mockPrefs.getDefaultSelfDestructSeconds())
+          .thenAnswer((_) => settings.future);
+      bloc.add(media);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(bloc.state.activeMediaSends, 1);
+      when(() => auth.currentAccountGeneration).thenReturn(generation());
+      settings.complete(null);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      verifyNever(() => mockRepo.sendImageMessage(any(),
+        imageBytes: any(named: 'imageBytes'), filename: any(named: 'filename'),
+        mimeType: any(named: 'mimeType'), selfDestructAfter: any(named: 'selfDestructAfter')));
+      verifyNever(() => mockRepo.sendVoiceMessage(any(),
+        audioBytes: any(named: 'audioBytes'), filename: any(named: 'filename'),
+        duration: any(named: 'duration'), mimeType: any(named: 'mimeType'),
+        selfDestructAfter: any(named: 'selfDestructAfter')));
+      verifyNever(() => mockRepo.sendVideoMessage(any(),
+        videoBytes: any(named: 'videoBytes'), filename: any(named: 'filename'),
+        thumbnailBytes: any(named: 'thumbnailBytes'), mimeType: any(named: 'mimeType'),
+        selfDestructAfter: any(named: 'selfDestructAfter')));
+      verifyNever(() => mockRepo.sendFileMessage(any(),
+        fileBytes: any(named: 'fileBytes'), filename: any(named: 'filename'),
+        mimeType: any(named: 'mimeType'), fileSize: any(named: 'fileSize'),
+        selfDestructAfter: any(named: 'selfDestructAfter')));
+      await bloc.close();
+    });
+    }
     for (final stale in [true, false]) {
       test(
         'queued creation and cancellation validate origin: stale=$stale',
