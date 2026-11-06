@@ -25,6 +25,7 @@ class MatrixPollHandler {
     bool isAnonymous = false,
     int? quizCorrectIndex,
     String? quizExplanation,
+    String? transactionId,
   }) async {
     final room = await prepareRoomForSending(_client, roomId);
     if (room == null) {
@@ -38,7 +39,9 @@ class MatrixPollHandler {
         final index = entry.key;
         final text = entry.value;
         // 使用时间戳+索引生成唯一ID
-        final optionId = '${DateTime.now().millisecondsSinceEpoch}_$index';
+        final optionId = transactionId == null
+            ? '${DateTime.now().millisecondsSinceEpoch}_$index'
+            : '${transactionId}_$index';
         return {'id': optionId, 'org.matrix.msc1767.text': text};
       }).toList();
 
@@ -65,6 +68,7 @@ class MatrixPollHandler {
 
       final eventId = await room.sendEvent(
         content,
+        txid: transactionId,
         type: 'org.matrix.msc3381.poll.start',
       );
 

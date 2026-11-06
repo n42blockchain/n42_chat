@@ -35,6 +35,7 @@ abstract class IMessageRepository {
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
+    String? transactionId,
   });
 
   /// 发送图片消息
@@ -44,6 +45,7 @@ abstract class IMessageRepository {
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? transactionId,
   });
 
   /// 发送语音消息
@@ -64,6 +66,7 @@ abstract class IMessageRepository {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+    String? transactionId,
   });
 
   /// 发送文件消息
@@ -76,6 +79,7 @@ abstract class IMessageRepository {
     String? filePath,
     Stream<List<int>>? fileStream,
     int? fileSize,
+    String? transactionId,
   });
 
   /// 发送位置消息
@@ -94,6 +98,7 @@ abstract class IMessageRepository {
     int? width,
     int? height,
     String? title,
+    String? transactionId,
   });
 
   /// 发送贴纸消息
@@ -109,6 +114,7 @@ abstract class IMessageRepository {
     int? height,
     String? mimeType,
     int? size,
+    String? transactionId,
   });
 
   /// 重发失败的消息
@@ -202,6 +208,7 @@ abstract class IMessageRepository {
     bool isAnonymous = false,
     int? quizCorrectIndex,
     String? quizExplanation,
+    String? transactionId,
   });
 
   /// 发送转发的投票快照（包含投票结果，不可再投票）

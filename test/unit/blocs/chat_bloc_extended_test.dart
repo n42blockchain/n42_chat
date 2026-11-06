@@ -798,6 +798,41 @@ void main() {
   });
 
   group('Scheduled rich messages', () {
+    test('unconfirmed scheduled delivery retains the draft', () async {
+      final draft = ScheduledMessageDraft(messageId: 'unconfirmed', roomId: _roomId, text: 'Keep me', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));
+      final bloc = buildBloc();
+      await initBloc(bloc);
+      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer((_) async => [draft]);
+      when(() => mockPrefs.getScheduledMessages(_roomId)).thenAnswer((_) async => [draft]);
+      when(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: draft.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).thenAnswer((_) async => null);
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      verify(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: draft.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).called(1);
+      verifyNever(() => mockPrefs.removeScheduledMessage(any(), any()));
+      await bloc.close();
+    });
+
+    test('recreated bloc reuses transaction ID after accepted send and failed cleanup', () async {
+      final draft = ScheduledMessageDraft(messageId: 'cleanup-failed', roomId: _roomId, text: 'Once', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));
+      var removed = false;
+      var removalAttempts = 0;
+      final sentIds = <String?>[];
+      when(() => mockRepo.getCurrentUserId()).thenAnswer((_) async => '@me:test');
+      when(() => mockPrefs.removeScheduledMessage(_roomId, draft.messageId)).thenAnswer((_) async { if (++removalAttempts == 1) throw StateError('disk'); removed = true; });
+      when(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: any(named: 'transactionId'), mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).thenAnswer((invocation) async { sentIds.add(invocation.namedArguments[#transactionId] as String?); return _msg; });
+      for (var attempt = 0; attempt < 2; attempt++) {
+        final bloc = buildBloc();
+        await initBloc(bloc);
+        when(() => mockPrefs.getDueScheduledMessages()).thenAnswer((_) async => removed ? [] : [draft]);
+        when(() => mockPrefs.getScheduledMessages(_roomId)).thenAnswer((_) async => removed ? [] : [ScheduledMessageDraft.fromJson(draft.toJson())]);
+        bloc.add(const SendDueScheduledMessages());
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await bloc.close();
+      }
+      expect(removed, isTrue);
+      expect(sentIds, [draft.transactionId, draft.transactionId]);
+    });
+
     test(
       'cancellation completion waits for storage and reports failure',
       () async {
@@ -877,6 +912,7 @@ void main() {
         when(
           () => mockRepo.sendPollMessage(
             any(),
+          transactionId: any(named: 'transactionId'),
             question: any(named: 'question'),
             options: any(named: 'options'),
             maxSelections: any(named: 'maxSelections'),
@@ -935,7 +971,8 @@ void main() {
       verify(() => mockPrefs.getScheduledMessages(_roomId)).called(1);
       verifyNever(() => mockPrefs.removeScheduledMessage(any(), any()));
       verifyNever(() => mockRepo.sendTextMessage(
-        _roomId, draft.text, selfDestructAfter: draft.selfDestructAfter,
+        _roomId, draft.text,
+          transactionId: any(named: 'transactionId'), selfDestructAfter: draft.selfDestructAfter,
         mentionedUserIds: draft.mentionedUserIds, mentionsRoom: draft.mentionsRoom,
       ));
       expect(bloc.state.messages.map((m) => m.id), [_msg.id]);
@@ -1058,6 +1095,7 @@ void main() {
       when(
         () => mockRepo.sendPollMessage(
           any(),
+          transactionId: any(named: 'transactionId'),
           question: any(named: 'question'),
           options: any(named: 'options'),
           maxSelections: any(named: 'maxSelections'),
@@ -1079,6 +1117,7 @@ void main() {
       verify(
         () => mockRepo.sendPollMessage(
           _roomId,
+          transactionId: any(named: 'transactionId'),
           question: 'Lunch?',
           options: ['Sushi', 'Pizza'],
           maxSelections: 1,
@@ -1114,6 +1153,7 @@ void main() {
       when(
         () => mockRepo.sendGifMessage(
           any(),
+          transactionId: any(named: 'transactionId'),
           gifUrl: any(named: 'gifUrl'),
           previewUrl: any(named: 'previewUrl'),
           width: any(named: 'width'),
@@ -1136,6 +1176,7 @@ void main() {
       verify(
         () => mockRepo.sendGifMessage(
           _roomId,
+          transactionId: any(named: 'transactionId'),
           gifUrl: 'https://media.giphy.com/media/abc/giphy.gif',
           previewUrl: 'https://media.giphy.com/media/abc/preview.gif',
           width: 320,
@@ -1183,6 +1224,7 @@ void main() {
       when(
         () => mockRepo.sendImageMessage(
           any(),
+          transactionId: any(named: 'transactionId'),
           imageBytes: any(named: 'imageBytes'),
           filename: any(named: 'filename'),
           mimeType: any(named: 'mimeType'),
@@ -1204,6 +1246,7 @@ void main() {
       verify(
         () => mockRepo.sendImageMessage(
           _roomId,
+          transactionId: any(named: 'transactionId'),
           imageBytes: any(named: 'imageBytes'),
           filename: 'photo.jpg',
           mimeType: 'image/jpeg',
@@ -1250,6 +1293,7 @@ void main() {
       when(
         () => mockRepo.sendFileMessage(
           any(),
+          transactionId: any(named: 'transactionId'),
           fileBytes: any(named: 'fileBytes'),
           filename: any(named: 'filename'),
           mimeType: any(named: 'mimeType'),
@@ -1274,6 +1318,7 @@ void main() {
       verify(
         () => mockRepo.sendFileMessage(
           _roomId,
+          transactionId: any(named: 'transactionId'),
           fileBytes: any(named: 'fileBytes'),
           filename: 'doc.pdf',
           mimeType: 'application/pdf',
@@ -1325,6 +1370,7 @@ void main() {
         when(
           () => mockRepo.sendFileMessage(
             any(),
+          transactionId: any(named: 'transactionId'),
             fileBytes: any(named: 'fileBytes'),
             filename: any(named: 'filename'),
             mimeType: any(named: 'mimeType'),
@@ -1349,6 +1395,7 @@ void main() {
         verify(
           () => mockRepo.sendFileMessage(
             _roomId,
+          transactionId: any(named: 'transactionId'),
             filename: 'doc.pdf',
             mimeType: 'application/pdf',
             selfDestructAfter: null,
@@ -1359,6 +1406,7 @@ void main() {
         verifyNever(
           () => mockRepo.sendFileMessage(
             _roomId,
+          transactionId: any(named: 'transactionId'),
             fileBytes: any(named: 'fileBytes'),
             filename: 'doc.pdf',
             mimeType: 'application/pdf',

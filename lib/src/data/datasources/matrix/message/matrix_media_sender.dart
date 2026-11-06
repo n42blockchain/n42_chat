@@ -39,10 +39,12 @@ class MatrixMediaSender {
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? transactionId,
   }) => MediaTelemetry.trace(
     MediaStage.send,
     () => _sendImageMessage(
       roomId,
+      transactionId: transactionId,
       imageBytes: imageBytes,
       filename: filename,
       mimeType: mimeType,
@@ -50,13 +52,13 @@ class MatrixMediaSender {
     ),
     bytes: imageBytes.length,
   );
-
   Future<String?> _sendImageMessage(
     String roomId, {
     required Uint8List imageBytes,
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? transactionId,
   }) async {
     debugLog('=== sendImageMessage start ===');
     debugLog(
@@ -107,6 +109,7 @@ class MatrixMediaSender {
             name: filename,
             mimeType: actualMimeType,
           ),
+          txid: transactionId,
           extraContent: {
             if (selfDestructAfter != null && selfDestructAfter > 0)
               'n42.self_destruct': {'after': selfDestructAfter},
@@ -165,7 +168,7 @@ class MatrixMediaSender {
         content['n42.self_destruct'] = {'after': selfDestructAfter};
       }
 
-      final result = await room.sendEvent(content);
+      final result = await room.sendEvent(content, txid: transactionId);
       debugLog('sendEvent result: $result');
       debugLog('=== sendImageMessage completed ===');
       return result;
@@ -330,10 +333,12 @@ class MatrixMediaSender {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+    String? transactionId,
   }) => MediaTelemetry.trace(
     MediaStage.send,
     () => _sendVideoMessage(
       roomId,
+      transactionId: transactionId,
       videoBytes: videoBytes,
       filename: filename,
       mimeType: mimeType,
@@ -342,7 +347,6 @@ class MatrixMediaSender {
     ),
     bytes: videoBytes.length,
   );
-
   Future<String?> _sendVideoMessage(
     String roomId, {
     required Uint8List videoBytes,
@@ -350,6 +354,7 @@ class MatrixMediaSender {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+    String? transactionId,
   }) async {
     debugLog('=== MatrixMessageDataSource.sendVideoMessage start ===');
     debugLog('roomId: $roomId');
@@ -397,6 +402,7 @@ class MatrixMediaSender {
                   name: 'thumbnail.jpg',
                   mimeType: 'image/jpeg',
                 ),
+          txid: transactionId,
           extraContent: {
             if (selfDestructAfter != null && selfDestructAfter > 0)
               'n42.self_destruct': {'after': selfDestructAfter},
@@ -455,7 +461,7 @@ class MatrixMediaSender {
         content['n42.self_destruct'] = {'after': selfDestructAfter};
       }
 
-      final result = await room.sendEvent(content);
+      final result = await room.sendEvent(content, txid: transactionId);
       debugLog(
         '=== sendVideoMessage completed successfully (manual method) ===',
       );
@@ -480,10 +486,12 @@ class MatrixMediaSender {
     String? filePath,
     Stream<List<int>>? fileStream,
     int? fileSize,
+    String? transactionId,
   }) => MediaTelemetry.trace(
     MediaStage.send,
     () => _sendFileMessage(
       roomId,
+      transactionId: transactionId,
       fileBytes: fileBytes,
       filename: filename,
       mimeType: mimeType,
@@ -494,7 +502,6 @@ class MatrixMediaSender {
     ),
     bytes: fileSize ?? fileBytes?.length ?? 0,
   );
-
   Future<String?> _sendFileMessage(
     String roomId, {
     Uint8List? fileBytes,
@@ -504,6 +511,7 @@ class MatrixMediaSender {
     String? filePath,
     Stream<List<int>>? fileStream,
     int? fileSize,
+    String? transactionId,
   }) async {
     debugLog('=== MatrixMessageDataSource.sendFileMessage start ===');
     debugLog('roomId: $roomId');
@@ -590,7 +598,7 @@ class MatrixMediaSender {
             'info': {'mimetype': actualMimeType, 'size': encrypted.size},
             if (selfDestructAfter != null)
               'n42.self_destruct': {'seconds': selfDestructAfter},
-          });
+          }, txid: transactionId);
         } finally {
           await encrypted.dispose();
         }
@@ -641,7 +649,7 @@ class MatrixMediaSender {
             'n42.self_destruct': {'seconds': selfDestructAfter},
         };
 
-        final result = await room.sendEvent(content);
+        final result = await room.sendEvent(content, txid: transactionId);
         debugLog(
           '=== sendFileMessage completed successfully (streaming method) ===',
         );
@@ -663,6 +671,7 @@ class MatrixMediaSender {
 
         final result = await room.sendFileEvent(
           matrixFile,
+          txid: transactionId,
           extraContent: selfDestructAfter != null
               ? {
                   'n42.self_destruct': {'seconds': selfDestructAfter},
@@ -707,7 +716,7 @@ class MatrixMediaSender {
           'n42.self_destruct': {'seconds': selfDestructAfter},
       };
 
-      final result = await room.sendEvent(content);
+      final result = await room.sendEvent(content, txid: transactionId);
       debugLog(
         '=== sendFileMessage completed successfully (manual method) ===',
       );
@@ -719,4 +728,5 @@ class MatrixMediaSender {
       rethrow;
     }
   }
+
 }

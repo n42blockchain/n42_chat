@@ -46,8 +46,10 @@ class MatrixMessageSender {
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? transactionId,
   }) => _mediaSender.sendImageMessage(
     roomId,
+    transactionId: transactionId,
     imageBytes: imageBytes,
     filename: filename,
     mimeType: mimeType,
@@ -79,8 +81,10 @@ class MatrixMessageSender {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+    String? transactionId,
   }) => _mediaSender.sendVideoMessage(
     roomId,
+    transactionId: transactionId,
     videoBytes: videoBytes,
     filename: filename,
     mimeType: mimeType,
@@ -98,8 +102,10 @@ class MatrixMessageSender {
     String? filePath,
     Stream<List<int>>? fileStream,
     int? fileSize,
+    String? transactionId,
   }) => _mediaSender.sendFileMessage(
     roomId,
+    transactionId: transactionId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
@@ -124,6 +130,7 @@ class MatrixMessageSender {
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
+    String? transactionId,
   }) async {
     final room = await prepareRoomForSending(_client, roomId);
     if (room == null) return null;
@@ -138,10 +145,10 @@ class MatrixMessageSender {
 
     // 如果有特殊字段，使用 sendEvent；否则使用 sendTextEvent
     if (hasExtendedTextMetadata(content)) {
-      return await room.sendEvent(content);
+      return await room.sendEvent(content, txid: transactionId);
     }
 
-    return await room.sendTextEvent(text);
+    return await room.sendTextEvent(text, txid: transactionId);
   }
 
   /// 发送位置消息
@@ -234,6 +241,7 @@ class MatrixMessageSender {
     int? width,
     int? height,
     String? title,
+    String? transactionId,
   }) async {
     debugLog('=== MatrixMessageDataSource.sendGifMessage start ===');
     debugLog('roomId: $roomId');
@@ -274,7 +282,7 @@ class MatrixMessageSender {
       debugLog('GIF content: $content');
       debugLog('Calling room.sendEvent...');
 
-      final result = await room.sendEvent(content);
+      final result = await room.sendEvent(content, txid: transactionId);
       debugLog('sendEvent result: $result');
 
       debugLog('=== sendGifMessage completed successfully ===');
@@ -302,6 +310,7 @@ class MatrixMessageSender {
     int? height,
     String? mimeType,
     int? size,
+    String? transactionId,
   }) async {
     debugLog('=== MatrixMessageDataSource.sendStickerMessage start ===');
     debugLog('roomId: $roomId');
@@ -330,7 +339,7 @@ class MatrixMessageSender {
       if (url.startsWith('emoji:')) {
         final emojiChar = url.substring(6);
         debugLog('Sending emoji sticker as text: $emojiChar');
-        return await room.sendTextEvent(emojiChar);
+        return await room.sendTextEvent(emojiChar, txid: transactionId);
       }
 
       var mediaUrl = url;
@@ -381,6 +390,7 @@ class MatrixMessageSender {
 
       final result = await room.sendEvent(
         content,
+        txid: transactionId,
         type: matrix.EventTypes.Sticker,
       );
       debugLog('sendEvent result: $result');

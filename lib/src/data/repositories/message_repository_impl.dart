@@ -344,10 +344,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
+    String? transactionId,
   }) async {
     final eventId = await _messageDataSource.sendTextMessage(
       roomId,
       text,
+      transactionId: transactionId,
       selfDestructAfter: selfDestructAfter,
       mentionedUserIds: mentionedUserIds,
       mentionsRoom: mentionsRoom,
@@ -364,9 +366,11 @@ class MessageRepositoryImpl implements IMessageRepository {
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? transactionId,
   }) async {
     final eventId = await _messageDataSource.sendImageMessage(
       roomId,
+      transactionId: transactionId,
       imageBytes: imageBytes,
       filename: filename,
       mimeType: mimeType,
@@ -407,9 +411,11 @@ class MessageRepositoryImpl implements IMessageRepository {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+    String? transactionId,
   }) async {
     final eventId = await _messageDataSource.sendVideoMessage(
       roomId,
+      transactionId: transactionId,
       videoBytes: videoBytes,
       filename: filename,
       mimeType: mimeType,
@@ -431,9 +437,11 @@ class MessageRepositoryImpl implements IMessageRepository {
     String? filePath,
     Stream<List<int>>? fileStream,
     int? fileSize,
+    String? transactionId,
   }) async {
     final eventId = await _messageDataSource.sendFileMessage(
       roomId,
+      transactionId: transactionId,
       fileBytes: fileBytes,
       filename: filename,
       mimeType: mimeType,
@@ -473,9 +481,11 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? width,
     int? height,
     String? title,
+    String? transactionId,
   }) async {
     final eventId = await _messageDataSource.sendGifMessage(
       roomId,
+      transactionId: transactionId,
       gifUrl: gifUrl,
       previewUrl: previewUrl,
       width: width,
@@ -500,9 +510,11 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? height,
     String? mimeType,
     int? size,
+    String? transactionId,
   }) async {
     final eventId = await _messageDataSource.sendStickerMessage(
       roomId,
+      transactionId: transactionId,
       stickerId: stickerId,
       packId: packId,
       url: url,
@@ -907,6 +919,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     bool isAnonymous = false,
     int? quizCorrectIndex,
     String? quizExplanation,
+    String? transactionId,
   }) async {
     try {
       debugLog(
@@ -914,6 +927,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       );
       final eventId = await _messageDataSource.sendPollMessage(
         roomId,
+        transactionId: transactionId,
         question: question,
         options: options,
         maxSelections: maxSelections,

@@ -1,8 +1,15 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:equatable/equatable.dart';
 
 import 'message_entity.dart';
 
 class ScheduledMessageDraft extends Equatable {
+  /// Stable across storage reloads and retries; Matrix scopes it to a device.
+  String get transactionId =>
+      'n42_scheduled_${sha256.convert(utf8.encode(jsonEncode([roomId, messageId])))}';
+
   final String messageId;
   final String? roomId;
   final String text;
@@ -36,8 +43,12 @@ class ScheduledMessageDraft extends Equatable {
       roomId: json['roomId'] as String?,
       text: json['text'] as String? ?? '',
       type: _parseMessageType(rawType),
-      scheduledAt: DateTime.tryParse(json['scheduledAt'] as String? ?? '') ?? DateTime.now(),
-      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      scheduledAt:
+          DateTime.tryParse(json['scheduledAt'] as String? ?? '') ??
+          DateTime.now(),
+      createdAt:
+          DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+          DateTime.now(),
       mentionedUserIds:
           (json['mentionedUserIds'] as List<dynamic>?)
               ?.map((item) => item.toString())

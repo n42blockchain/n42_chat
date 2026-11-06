@@ -170,7 +170,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         event.selfDestructAfter,
       );
       // 生成临时消息ID
-      final tempId = 'scheduled_${DateTime.now().millisecondsSinceEpoch}';
+      final tempId = 'scheduled_${const Uuid().v4()}';
 
       // 获取当前用户ID
       final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
@@ -340,6 +340,11 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       (payload['localPath'] as String?)?.isNotEmpty == true &&
       (payload['filename'] as String?)?.trim().isNotEmpty == true;
 
+  Future<void> _requireScheduledSend(Future<MessageEntity?> operation) async {
+    if (await operation == null) {
+      throw StateError('Scheduled message delivery is not confirmed');
+    }
+  }
   Future<void> _sendScheduledDraft(ScheduledMessageDraft draft) async {
     final roomId = draft.roomId;
     if (roomId == null || roomId.isEmpty) {
@@ -348,23 +353,29 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     switch (draft.type) {
       case MessageType.poll:
-        await _messageRepository.sendPollMessage(
-          roomId,
-          question: draft.text,
-          options: draft.pollOptions,
-          maxSelections: draft.pollMaxSelections,
-          isAnonymous: draft.payload['isAnonymous'] as bool? ?? false,
+        await _requireScheduledSend(
+          _messageRepository.sendPollMessage(
+            roomId,
+            transactionId: draft.transactionId,
+            question: draft.text,
+            options: draft.pollOptions,
+            maxSelections: draft.pollMaxSelections,
+            isAnonymous: draft.payload['isAnonymous'] as bool? ?? false,
+          ),
         );
         return;
       case MessageType.image:
         if (draft.isGif) {
-          await _messageRepository.sendGifMessage(
-            roomId,
-            gifUrl: draft.payload['gifUrl'] as String,
-            previewUrl: draft.payload['previewUrl'] as String?,
-            width: draft.payload['width'] as int?,
-            height: draft.payload['height'] as int?,
-            title: draft.text.isEmpty ? null : draft.text,
+          await _requireScheduledSend(
+            _messageRepository.sendGifMessage(
+              roomId,
+              transactionId: draft.transactionId,
+              gifUrl: draft.payload['gifUrl'] as String,
+              previewUrl: draft.payload['previewUrl'] as String?,
+              width: draft.payload['width'] as int?,
+              height: draft.payload['height'] as int?,
+              title: draft.text.isEmpty ? null : draft.text,
+            ),
           );
           return;
         }
@@ -378,31 +389,36 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         await _sendScheduledLocalFile(draft);
         return;
       case MessageType.sticker:
-        await _messageRepository.sendStickerMessage(
-          roomId,
-          stickerId: draft.payload['stickerId'] as String,
-          packId: draft.payload['packId'] as String,
-          url: draft.payload['url'] as String,
-          httpUrl: draft.payload['httpUrl'] as String?,
-          name: draft.payload['name'] as String?,
-          emoji: draft.payload['emoji'] as String?,
-          width: draft.payload['width'] as int?,
-          height: draft.payload['height'] as int?,
-          mimeType: draft.payload['mimeType'] as String?,
-          size: draft.payload['size'] as int?,
+        await _requireScheduledSend(
+          _messageRepository.sendStickerMessage(
+            roomId,
+            transactionId: draft.transactionId,
+            stickerId: draft.payload['stickerId'] as String,
+            packId: draft.payload['packId'] as String,
+            url: draft.payload['url'] as String,
+            httpUrl: draft.payload['httpUrl'] as String?,
+            name: draft.payload['name'] as String?,
+            emoji: draft.payload['emoji'] as String?,
+            width: draft.payload['width'] as int?,
+            height: draft.payload['height'] as int?,
+            mimeType: draft.payload['mimeType'] as String?,
+            size: draft.payload['size'] as int?,
+          ),
         );
         return;
       default:
-        await _messageRepository.sendTextMessage(
-          roomId,
-          draft.text,
-          selfDestructAfter: draft.selfDestructAfter,
-          mentionedUserIds: draft.mentionedUserIds,
-          mentionsRoom: draft.mentionsRoom,
+        await _requireScheduledSend(
+          _messageRepository.sendTextMessage(
+            roomId,
+            draft.text,
+            transactionId: draft.transactionId,
+            selfDestructAfter: draft.selfDestructAfter,
+            mentionedUserIds: draft.mentionedUserIds,
+            mentionsRoom: draft.mentionsRoom,
+          ),
         );
     }
   }
-
   Future<void> _sendScheduledLocalImage(ScheduledMessageDraft draft) async {
     final file = await _requireScheduledAttachmentFile(draft);
     final bytes = await file.readAsBytes();
@@ -410,18 +426,20 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       throw StateError('Scheduled image attachment is empty');
     }
 
-    await _messageRepository.sendImageMessage(
-      draft.roomId!,
-      imageBytes: bytes,
-      filename: draft.attachmentFilename,
-      mimeType:
-          draft.attachmentMimeType ??
-          lookupMimeType(file.path, headerBytes: bytes) ??
-          'image/jpeg',
-      selfDestructAfter: draft.selfDestructAfter,
+    await _requireScheduledSend(
+      _messageRepository.sendImageMessage(
+        draft.roomId!,
+        transactionId: draft.transactionId,
+        imageBytes: bytes,
+        filename: draft.attachmentFilename,
+        mimeType:
+            draft.attachmentMimeType ??
+            lookupMimeType(file.path, headerBytes: bytes) ??
+            'image/jpeg',
+        selfDestructAfter: draft.selfDestructAfter,
+      ),
     );
   }
-
   Future<void> _sendScheduledLocalVideo(ScheduledMessageDraft draft) async {
     final file = await _requireScheduledAttachmentFile(draft);
     final bytes = await file.readAsBytes();
@@ -443,17 +461,21 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       );
     }
 
-    await _messageRepository.sendVideoMessage(
-      draft.roomId!,
-      videoBytes: bytes,
-      filename: draft.attachmentFilename,
-      mimeType:
-          draft.attachmentMimeType ?? lookupMimeType(file.path) ?? 'video/mp4',
-      thumbnailBytes: thumbnailBytes,
-      selfDestructAfter: draft.selfDestructAfter,
+    await _requireScheduledSend(
+      _messageRepository.sendVideoMessage(
+        draft.roomId!,
+        transactionId: draft.transactionId,
+        videoBytes: bytes,
+        filename: draft.attachmentFilename,
+        mimeType:
+            draft.attachmentMimeType ??
+            lookupMimeType(file.path) ??
+            'video/mp4',
+        thumbnailBytes: thumbnailBytes,
+        selfDestructAfter: draft.selfDestructAfter,
+      ),
     );
   }
-
   Future<void> _sendScheduledLocalFile(ScheduledMessageDraft draft) async {
     final file = await _requireScheduledAttachmentFile(draft);
     final fileSize = draft.attachmentFileSize ?? await file.length();
@@ -464,33 +486,38 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         throw StateError('Scheduled file attachment is empty');
       }
 
-      await _messageRepository.sendFileMessage(
+      await _requireScheduledSend(
+        _messageRepository.sendFileMessage(
+          draft.roomId!,
+          transactionId: draft.transactionId,
+          fileBytes: bytes,
+          filename: draft.attachmentFilename,
+          mimeType:
+              draft.attachmentMimeType ??
+              lookupMimeType(file.path) ??
+              'application/octet-stream',
+          selfDestructAfter: draft.selfDestructAfter,
+          fileSize: fileSize,
+        ),
+      );
+      return;
+    }
+
+    await _requireScheduledSend(
+      _messageRepository.sendFileMessage(
         draft.roomId!,
-        fileBytes: bytes,
+        transactionId: draft.transactionId,
         filename: draft.attachmentFilename,
         mimeType:
             draft.attachmentMimeType ??
             lookupMimeType(file.path) ??
             'application/octet-stream',
         selfDestructAfter: draft.selfDestructAfter,
+        filePath: file.path,
         fileSize: fileSize,
-      );
-      return;
-    }
-
-    await _messageRepository.sendFileMessage(
-      draft.roomId!,
-      filename: draft.attachmentFilename,
-      mimeType:
-          draft.attachmentMimeType ??
-          lookupMimeType(file.path) ??
-          'application/octet-stream',
-      selfDestructAfter: draft.selfDestructAfter,
-      filePath: file.path,
-      fileSize: fileSize,
+      ),
     );
   }
-
   bool _requiresEncryptedFileUpload(String roomId) {
     final client = _clientManager?.client;
     final room = client?.getRoomById(roomId);
