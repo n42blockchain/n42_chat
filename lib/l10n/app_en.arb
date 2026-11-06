@@ -2896,5 +2896,10 @@
   "chatDeviceActions": "On-device actions",
   "chatDeviceActionsReview": "After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.",
   "chatHistoryMaxMessages": "Message limit (1–50)",
-  "chatHistoryMaxHours": "History window in hours (1–720)"
+  "chatHistoryMaxHours": "History window in hours (1–720)",
+  "chatNotifyAll": "All Messages",
+  "chatNotifyAllDescription": "Notify for every new message in this chat",
+  "chatNotifyMentions": "Mentions Only",
+  "chatNotifyMentionsDescription": "Only notify when you are mentioned or @room is used",
+  "chatNotifyMutedDescription": "Disable notifications for this chat on all devices"
 }

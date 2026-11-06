@@ -6220,4 +6220,22 @@ class SDe extends S {
 
   @override
   String get chatHistoryMaxHours => 'Verlaufsfenster in Stunden (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Alle Nachrichten';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Bei jeder neuen Nachricht in diesem Chat benachrichtigen';
+
+  @override
+  String get chatNotifyMentions => 'Nur Erwähnungen';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Nur benachrichtigen, wenn du erwähnt wirst oder @room verwendet wird';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Benachrichtigungen für diesen Chat auf allen Geräten deaktivieren';
 }

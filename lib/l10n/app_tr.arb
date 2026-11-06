@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "Cihazdaki işlemler",
   "chatDeviceActionsReview": "Onaydan sonra yalnızca bu mesaj sistemin cihaz içi işlem önerilerine verilir. Takvim, Anımsatıcılar veya Haritalar'ı açmak için bir işlem seçin.",
   "chatHistoryMaxMessages": "Mesaj sınırı (1–50)",
-  "chatHistoryMaxHours": "Geçmiş aralığı, saat (1–720)"
+  "chatHistoryMaxHours": "Geçmiş aralığı, saat (1–720)",
+  "chatNotifyAll": "Tüm Mesajlar",
+  "chatNotifyAllDescription": "Bu sohbetteki her yeni mesaj için bildirim gönder",
+  "chatNotifyMentions": "Yalnızca Bahsetmeler",
+  "chatNotifyMentionsDescription": "Yalnızca sizden bahsedildiğinde veya @room kullanıldığında bildirim gönder",
+  "chatNotifyMutedDescription": "Bu sohbetin bildirimlerini tüm cihazlarda kapat"
 }

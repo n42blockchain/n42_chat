@@ -6200,4 +6200,22 @@ class SRu extends S {
 
   @override
   String get chatHistoryMaxHours => 'Глубина истории в часах (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Все сообщения';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Уведомлять о каждом новом сообщении в этом чате';
+
+  @override
+  String get chatNotifyMentions => 'Только упоминания';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Уведомлять только при упоминании вас или использовании @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Отключить уведомления этого чата на всех устройствах';
 }

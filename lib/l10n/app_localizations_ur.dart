@@ -6185,4 +6185,21 @@ class SUr extends S {
 
   @override
   String get chatHistoryMaxHours => 'ہسٹری کی مدت گھنٹوں میں (1–720)';
+
+  @override
+  String get chatNotifyAll => 'تمام پیغامات';
+
+  @override
+  String get chatNotifyAllDescription => 'اس چیٹ کے ہر نئے پیغام کی اطلاع دیں';
+
+  @override
+  String get chatNotifyMentions => 'صرف تذکرے';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'صرف آپ کا تذکرہ ہونے یا @room استعمال ہونے پر اطلاع دیں';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'تمام آلات پر اس چیٹ کی اطلاعات بند کریں';
 }

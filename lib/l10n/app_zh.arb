@@ -2262,5 +2262,10 @@
   "reportUnsupported": "此主服务器不支持举报用户。",
   "reportRoomUnsupported": "此主服务器不支持举报房间。",
   "reportRateLimited": "举报过于频繁，请稍后重试。",
-  "reportCouldNotSend": "无法发送举报，请重试。"
+  "reportCouldNotSend": "无法发送举报，请重试。",
+  "chatNotifyAll": "所有消息",
+  "chatNotifyAllDescription": "此聊天中每条新消息都通知",
+  "chatNotifyMentions": "仅提及我",
+  "chatNotifyMentionsDescription": "仅在有人提及你或使用 @room 时通知",
+  "chatNotifyMutedDescription": "在所有设备上关闭此聊天的通知"
 }

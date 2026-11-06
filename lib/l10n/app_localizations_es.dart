@@ -6213,4 +6213,22 @@ class SEs extends S {
 
   @override
   String get chatHistoryMaxHours => 'Intervalo del historial en horas (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Todos los mensajes';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notificar cada mensaje nuevo en este chat';
+
+  @override
+  String get chatNotifyMentions => 'Solo menciones';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Notificar solo cuando te mencionen o se use @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Desactivar las notificaciones de este chat en todos los dispositivos';
 }

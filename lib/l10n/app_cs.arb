@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "Akce v zařízení",
   "chatDeviceActionsReview": "Po potvrzení se pouze tato zpráva předá systémovým návrhům akcí v zařízení. Vyberte akci pro otevření Kalendáře, Připomínek nebo Map.",
   "chatHistoryMaxMessages": "Limit zpráv (1–50)",
-  "chatHistoryMaxHours": "Rozsah historie v hodinách (1–720)"
+  "chatHistoryMaxHours": "Rozsah historie v hodinách (1–720)",
+  "chatNotifyAll": "Všechny zprávy",
+  "chatNotifyAllDescription": "Upozornit na každou novou zprávu v tomto chatu",
+  "chatNotifyMentions": "Pouze zmínky",
+  "chatNotifyMentionsDescription": "Upozornit pouze při zmínce o vás nebo použití @room",
+  "chatNotifyMutedDescription": "Vypnout oznámení tohoto chatu na všech zařízeních"
 }

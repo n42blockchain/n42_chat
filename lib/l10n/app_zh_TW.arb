@@ -2262,5 +2262,10 @@
   "reportUnsupported": "此主伺服器不支援檢舉使用者。",
   "reportRoomUnsupported": "此主伺服器不支援檢舉聊天室。",
   "reportRateLimited": "檢舉過於頻繁，請稍後重試。",
-  "reportCouldNotSend": "無法傳送檢舉，請重試。"
+  "reportCouldNotSend": "無法傳送檢舉，請重試。",
+  "chatNotifyAll": "所有訊息",
+  "chatNotifyAllDescription": "此聊天中的每則新訊息都通知",
+  "chatNotifyMentions": "僅提及我",
+  "chatNotifyMentionsDescription": "僅在有人提及你或使用 @room 時通知",
+  "chatNotifyMutedDescription": "在所有裝置上關閉此聊天的通知"
 }

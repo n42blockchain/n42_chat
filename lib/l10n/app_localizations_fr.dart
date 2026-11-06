@@ -6238,4 +6238,22 @@ class SFr extends S {
 
   @override
   String get chatHistoryMaxHours => 'Période d’historique en heures (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Tous les messages';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notifier chaque nouveau message dans cette discussion';
+
+  @override
+  String get chatNotifyMentions => 'Mentions uniquement';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Notifier uniquement lorsque vous êtes mentionné ou que @room est utilisé';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Désactiver les notifications de cette discussion sur tous les appareils';
 }

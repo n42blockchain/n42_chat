@@ -6000,6 +6000,21 @@ class SZh extends S {
 
   @override
   String get chatHistoryMaxHours => '回溯小时数（1–720）';
+
+  @override
+  String get chatNotifyAll => '所有消息';
+
+  @override
+  String get chatNotifyAllDescription => '此聊天中每条新消息都通知';
+
+  @override
+  String get chatNotifyMentions => '仅提及我';
+
+  @override
+  String get chatNotifyMentionsDescription => '仅在有人提及你或使用 @room 时通知';
+
+  @override
+  String get chatNotifyMutedDescription => '在所有设备上关闭此聊天的通知';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -11998,4 +12013,19 @@ class SZhTw extends SZh {
 
   @override
   String get chatHistoryMaxHours => '回溯小時數（1–720）';
+
+  @override
+  String get chatNotifyAll => '所有訊息';
+
+  @override
+  String get chatNotifyAllDescription => '此聊天中的每則新訊息都通知';
+
+  @override
+  String get chatNotifyMentions => '僅提及我';
+
+  @override
+  String get chatNotifyMentionsDescription => '僅在有人提及你或使用 @room 時通知';
+
+  @override
+  String get chatNotifyMutedDescription => '在所有裝置上關閉此聊天的通知';
 }

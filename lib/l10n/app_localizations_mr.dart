@@ -6167,4 +6167,22 @@ class SMr extends S {
 
   @override
   String get chatHistoryMaxHours => 'इतिहासाची वेळमर्यादा, तासांमध्ये (1–720)';
+
+  @override
+  String get chatNotifyAll => 'सर्व संदेश';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'या चॅटमधील प्रत्येक नवीन संदेशाची सूचना द्या';
+
+  @override
+  String get chatNotifyMentions => 'फक्त उल्लेख';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'तुमचा उल्लेख झाल्यावर किंवा @room वापरल्यावरच सूचना द्या';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'सर्व डिव्हाइसवर या चॅटच्या सूचना बंद करा';
 }

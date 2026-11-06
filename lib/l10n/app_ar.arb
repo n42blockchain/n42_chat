@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "إجراءات على الجهاز",
   "chatDeviceActionsReview": "بعد التأكيد، تُقدَّم هذه الرسالة فقط لاقتراحات إجراءات النظام التي تُعالَج على الجهاز. اختر إجراءً لفتح التقويم أو التذكيرات أو الخرائط.",
   "chatHistoryMaxMessages": "حد الرسائل (1–50)",
-  "chatHistoryMaxHours": "نطاق السجل بالساعات (1–720)"
+  "chatHistoryMaxHours": "نطاق السجل بالساعات (1–720)",
+  "chatNotifyAll": "كل الرسائل",
+  "chatNotifyAllDescription": "إرسال إشعار بكل رسالة جديدة في هذه المحادثة",
+  "chatNotifyMentions": "الإشارات فقط",
+  "chatNotifyMentionsDescription": "إرسال إشعار فقط عند الإشارة إليك أو استخدام @room",
+  "chatNotifyMutedDescription": "إيقاف إشعارات هذه المحادثة على جميع الأجهزة"
 }

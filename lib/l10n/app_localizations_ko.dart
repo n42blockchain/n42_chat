@@ -6040,4 +6040,19 @@ class SKo extends S {
 
   @override
   String get chatHistoryMaxHours => '기록 시간 범위(1~720시간)';
+
+  @override
+  String get chatNotifyAll => '모든 메시지';
+
+  @override
+  String get chatNotifyAllDescription => '이 채팅의 모든 새 메시지 알림 받기';
+
+  @override
+  String get chatNotifyMentions => '멘션만';
+
+  @override
+  String get chatNotifyMentionsDescription => '나를 멘션하거나 @room을 사용할 때만 알림 받기';
+
+  @override
+  String get chatNotifyMutedDescription => '모든 기기에서 이 채팅의 알림 끄기';
 }

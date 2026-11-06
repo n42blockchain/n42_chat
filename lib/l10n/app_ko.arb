@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "기기 내 작업",
   "chatDeviceActionsReview": "확인 후 이 메시지만 시스템의 기기 내 작업 제안 기능에 전달합니다. 작업을 선택하여 캘린더, 미리 알림 또는 지도를 여세요.",
   "chatHistoryMaxMessages": "메시지 수 제한(1~50)",
-  "chatHistoryMaxHours": "기록 시간 범위(1~720시간)"
+  "chatHistoryMaxHours": "기록 시간 범위(1~720시간)",
+  "chatNotifyAll": "모든 메시지",
+  "chatNotifyAllDescription": "이 채팅의 모든 새 메시지 알림 받기",
+  "chatNotifyMentions": "멘션만",
+  "chatNotifyMentionsDescription": "나를 멘션하거나 @room을 사용할 때만 알림 받기",
+  "chatNotifyMutedDescription": "모든 기기에서 이 채팅의 알림 끄기"
 }

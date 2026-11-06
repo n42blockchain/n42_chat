@@ -6170,4 +6170,22 @@ class SBn extends S {
 
   @override
   String get chatHistoryMaxHours => 'ইতিহাসের সময়সীমা, ঘণ্টায় (১–৭২০)';
+
+  @override
+  String get chatNotifyAll => 'সব বার্তা';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'এই চ্যাটের প্রতিটি নতুন বার্তার জন্য বিজ্ঞপ্তি দিন';
+
+  @override
+  String get chatNotifyMentions => 'শুধু উল্লেখ';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'শুধু আপনাকে উল্লেখ করা হলে বা @room ব্যবহার করা হলে বিজ্ঞপ্তি দিন';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'সব ডিভাইসে এই চ্যাটের বিজ্ঞপ্তি বন্ধ করুন';
 }

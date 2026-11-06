@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "Дії на пристрої",
   "chatDeviceActionsReview": "Після підтвердження лише це повідомлення передається системним пропозиціям дій на пристрої. Виберіть дію, щоб відкрити Календар, Нагадування або Карти.",
   "chatHistoryMaxMessages": "Ліміт повідомлень (1–50)",
-  "chatHistoryMaxHours": "Глибина історії в годинах (1–720)"
+  "chatHistoryMaxHours": "Глибина історії в годинах (1–720)",
+  "chatNotifyAll": "Усі повідомлення",
+  "chatNotifyAllDescription": "Сповіщати про кожне нове повідомлення в цьому чаті",
+  "chatNotifyMentions": "Лише згадки",
+  "chatNotifyMentionsDescription": "Сповіщати лише коли вас згадують або використовують @room",
+  "chatNotifyMutedDescription": "Вимкнути сповіщення цього чату на всіх пристроях"
 }

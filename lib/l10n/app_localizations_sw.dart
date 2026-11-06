@@ -6202,4 +6202,22 @@ class SSw extends S {
 
   @override
   String get chatHistoryMaxHours => 'Kipindi cha historia kwa saa (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Ujumbe wote';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Arifu kuhusu kila ujumbe mpya katika gumzo hili';
+
+  @override
+  String get chatNotifyMentions => 'Kutajwa tu';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Arifu tu unapotajwa au @room inapotumiwa';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Zima arifa za gumzo hili kwenye vifaa vyote';
 }

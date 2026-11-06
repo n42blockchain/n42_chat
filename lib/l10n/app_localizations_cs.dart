@@ -6182,4 +6182,22 @@ class SCs extends S {
 
   @override
   String get chatHistoryMaxHours => 'Rozsah historie v hodinách (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Všechny zprávy';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Upozornit na každou novou zprávu v tomto chatu';
+
+  @override
+  String get chatNotifyMentions => 'Pouze zmínky';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Upozornit pouze při zmínce o vás nebo použití @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Vypnout oznámení tohoto chatu na všech zařízeních';
 }

@@ -6182,4 +6182,22 @@ class SId extends S {
 
   @override
   String get chatHistoryMaxHours => 'Rentang riwayat dalam jam (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Semua Pesan';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Beri notifikasi untuk setiap pesan baru dalam obrolan ini';
+
+  @override
+  String get chatNotifyMentions => 'Hanya Sebutan';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Beri notifikasi hanya saat Anda disebut atau @room digunakan';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Nonaktifkan notifikasi obrolan ini di semua perangkat';
 }

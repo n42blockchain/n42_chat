@@ -11368,6 +11368,36 @@ abstract class S {
   /// In en, this message translates to:
   /// **'History window in hours (1–720)'**
   String get chatHistoryMaxHours;
+
+  /// No description provided for @chatNotifyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All Messages'**
+  String get chatNotifyAll;
+
+  /// No description provided for @chatNotifyAllDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify for every new message in this chat'**
+  String get chatNotifyAllDescription;
+
+  /// No description provided for @chatNotifyMentions.
+  ///
+  /// In en, this message translates to:
+  /// **'Mentions Only'**
+  String get chatNotifyMentions;
+
+  /// No description provided for @chatNotifyMentionsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Only notify when you are mentioned or @room is used'**
+  String get chatNotifyMentionsDescription;
+
+  /// No description provided for @chatNotifyMutedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable notifications for this chat on all devices'**
+  String get chatNotifyMutedDescription;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

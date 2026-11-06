@@ -6169,4 +6169,21 @@ class SHi extends S {
 
   @override
   String get chatHistoryMaxHours => 'इतिहास की समय सीमा, घंटे में (1–720)';
+
+  @override
+  String get chatNotifyAll => 'सभी संदेश';
+
+  @override
+  String get chatNotifyAllDescription => 'इस चैट के हर नए संदेश की सूचना दें';
+
+  @override
+  String get chatNotifyMentions => 'केवल उल्लेख';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'केवल आपका उल्लेख होने या @room का उपयोग होने पर सूचना दें';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'सभी डिवाइस पर इस चैट की सूचनाएँ बंद करें';
 }

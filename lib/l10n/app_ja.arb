@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "端末上のアクション",
   "chatDeviceActionsReview": "確認後、このメッセージのみを端末上のアクション提案機能に渡します。アクションを選択するとカレンダー、リマインダー、マップを開きます。",
   "chatHistoryMaxMessages": "メッセージ数の上限（1～50）",
-  "chatHistoryMaxHours": "履歴の対象時間（1～720 時間）"
+  "chatHistoryMaxHours": "履歴の対象時間（1～720 時間）",
+  "chatNotifyAll": "すべてのメッセージ",
+  "chatNotifyAllDescription": "このチャットの新しいメッセージをすべて通知",
+  "chatNotifyMentions": "メンションのみ",
+  "chatNotifyMentionsDescription": "自分へのメンションまたは @room が使われた場合のみ通知",
+  "chatNotifyMutedDescription": "すべてのデバイスでこのチャットの通知を無効にする"
 }

@@ -434,6 +434,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-006 Direct UI literals still need module-by-module translation review
 
+- 2026-11-06 notification settings: replaced five hardcoded labels/descriptions in chat details with resources in all 26 catalogs, including the selected-mode summary. The sheet scrolls on narrow/large-text screens. Generated localization files were regenerated. All 26 locales pass real-page tests at 390×700 and 1.6 text scale, including RTL layouts and persisted mute selection; existing selection and failure-rollback tests still pass. Combined page/localization suite: 46 passed; scoped analysis clean. Logs: `/tmp/n42-chat-notifications-tests-final.log`, `/tmp/n42-chat-notifications-analyze.log`. Native-speaker and physical-device acceptance remain unverified. The 533-candidate report below is a historical baseline, not a fresh remaining count; other modules remain open.
+
 - 2026-11-04 resource completion: all 25 non-English catalogs now include the 57 missing English-template keys; Simplified/Traditional Chinese include their 24 missing deletion/report labels. Existing substantive English fallback labels were also translated, with brands/native homographs retained after review. Localization code regenerated; structural audit checks no missing/empty/extra keys or placeholder loss. Verification: 16 localization/accessibility/catch-up tests pass; analyzer has no errors or warnings. This resolves the resource gap, not every direct literal candidate below or native-speaker/device acceptance.
 
 

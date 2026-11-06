@@ -6202,4 +6202,22 @@ class SUk extends S {
 
   @override
   String get chatHistoryMaxHours => 'Глибина історії в годинах (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Усі повідомлення';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Сповіщати про кожне нове повідомлення в цьому чаті';
+
+  @override
+  String get chatNotifyMentions => 'Лише згадки';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Сповіщати лише коли вас згадують або використовують @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Вимкнути сповіщення цього чату на всіх пристроях';
 }

@@ -6158,4 +6158,22 @@ class SVi extends S {
 
   @override
   String get chatHistoryMaxHours => 'Khoảng thời gian lịch sử theo giờ (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Tất cả tin nhắn';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Thông báo cho mỗi tin nhắn mới trong cuộc trò chuyện này';
+
+  @override
+  String get chatNotifyMentions => 'Chỉ lượt nhắc';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Chỉ thông báo khi bạn được nhắc đến hoặc khi dùng @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Tắt thông báo của cuộc trò chuyện này trên mọi thiết bị';
 }

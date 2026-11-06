@@ -6207,4 +6207,22 @@ class SPl extends S {
 
   @override
   String get chatHistoryMaxHours => 'Zakres historii w godzinach (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Wszystkie wiadomości';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Powiadamiaj o każdej nowej wiadomości na tym czacie';
+
+  @override
+  String get chatNotifyMentions => 'Tylko wzmianki';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Powiadamiaj tylko o wzmiankach o Tobie lub użyciu @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Wyłącz powiadomienia tego czatu na wszystkich urządzeniach';
 }

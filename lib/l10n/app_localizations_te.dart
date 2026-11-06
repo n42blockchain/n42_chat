@@ -6215,4 +6215,22 @@ class STe extends S {
 
   @override
   String get chatHistoryMaxHours => 'చరిత్ర పరిధి గంటల్లో (1–720)';
+
+  @override
+  String get chatNotifyAll => 'అన్ని సందేశాలు';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'ఈ చాట్‌లోని ప్రతి కొత్త సందేశానికి తెలియజేయండి';
+
+  @override
+  String get chatNotifyMentions => 'ప్రస్తావనలు మాత్రమే';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'మిమ్మల్ని ప్రస్తావించినప్పుడు లేదా @room ఉపయోగించినప్పుడు మాత్రమే తెలియజేయండి';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'అన్ని పరికరాల్లో ఈ చాట్ నోటిఫికేషన్‌లను ఆపివేయండి';
 }

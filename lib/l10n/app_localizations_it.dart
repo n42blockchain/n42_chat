@@ -6199,4 +6199,22 @@ class SIt extends S {
   @override
   String get chatHistoryMaxHours =>
       'Intervallo della cronologia in ore (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Tutti i messaggi';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notifica ogni nuovo messaggio in questa chat';
+
+  @override
+  String get chatNotifyMentions => 'Solo menzioni';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Notifica solo quando vieni menzionato o viene usato @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Disattiva le notifiche di questa chat su tutti i dispositivi';
 }

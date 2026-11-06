@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "डिवाइस पर कार्रवाइयाँ",
   "chatDeviceActionsReview": "पुष्टि के बाद केवल यह संदेश सिस्टम के डिवाइस पर कार्रवाई सुझावों को दिया जाता है। कैलेंडर, रिमाइंडर या मैप खोलने के लिए कोई कार्रवाई चुनें।",
   "chatHistoryMaxMessages": "संदेशों की सीमा (1–50)",
-  "chatHistoryMaxHours": "इतिहास की समय सीमा, घंटे में (1–720)"
+  "chatHistoryMaxHours": "इतिहास की समय सीमा, घंटे में (1–720)",
+  "chatNotifyAll": "सभी संदेश",
+  "chatNotifyAllDescription": "इस चैट के हर नए संदेश की सूचना दें",
+  "chatNotifyMentions": "केवल उल्लेख",
+  "chatNotifyMentionsDescription": "केवल आपका उल्लेख होने या @room का उपयोग होने पर सूचना दें",
+  "chatNotifyMutedDescription": "सभी डिवाइस पर इस चैट की सूचनाएँ बंद करें"
 }

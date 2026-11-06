@@ -6141,4 +6141,22 @@ class SEn extends S {
 
   @override
   String get chatHistoryMaxHours => 'History window in hours (1–720)';
+
+  @override
+  String get chatNotifyAll => 'All Messages';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notify for every new message in this chat';
+
+  @override
+  String get chatNotifyMentions => 'Mentions Only';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Only notify when you are mentioned or @room is used';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Disable notifications for this chat on all devices';
 }

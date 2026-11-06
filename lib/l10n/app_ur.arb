@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "آلے پر ہونے والے اقدامات",
   "chatDeviceActionsReview": "تصدیق کے بعد صرف یہ پیغام سسٹم کی آلے پر تیار ہونے والی عملی تجاویز کو دیا جاتا ہے۔ کیلنڈر، یاددہانیاں یا نقشے کھولنے کے لیے کوئی عمل منتخب کریں۔",
   "chatHistoryMaxMessages": "پیغامات کی حد (1–50)",
-  "chatHistoryMaxHours": "ہسٹری کی مدت گھنٹوں میں (1–720)"
+  "chatHistoryMaxHours": "ہسٹری کی مدت گھنٹوں میں (1–720)",
+  "chatNotifyAll": "تمام پیغامات",
+  "chatNotifyAllDescription": "اس چیٹ کے ہر نئے پیغام کی اطلاع دیں",
+  "chatNotifyMentions": "صرف تذکرے",
+  "chatNotifyMentionsDescription": "صرف آپ کا تذکرہ ہونے یا @room استعمال ہونے پر اطلاع دیں",
+  "chatNotifyMutedDescription": "تمام آلات پر اس چیٹ کی اطلاعات بند کریں"
 }

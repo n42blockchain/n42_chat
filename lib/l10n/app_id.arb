@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "Tindakan di perangkat",
   "chatDeviceActionsReview": "Setelah dikonfirmasi, hanya pesan ini yang diberikan ke saran tindakan sistem di perangkat. Pilih tindakan untuk membuka Kalender, Pengingat, atau Peta.",
   "chatHistoryMaxMessages": "Batas pesan (1–50)",
-  "chatHistoryMaxHours": "Rentang riwayat dalam jam (1–720)"
+  "chatHistoryMaxHours": "Rentang riwayat dalam jam (1–720)",
+  "chatNotifyAll": "Semua Pesan",
+  "chatNotifyAllDescription": "Beri notifikasi untuk setiap pesan baru dalam obrolan ini",
+  "chatNotifyMentions": "Hanya Sebutan",
+  "chatNotifyMentionsDescription": "Beri notifikasi hanya saat Anda disebut atau @room digunakan",
+  "chatNotifyMutedDescription": "Nonaktifkan notifikasi obrolan ini di semua perangkat"
 }

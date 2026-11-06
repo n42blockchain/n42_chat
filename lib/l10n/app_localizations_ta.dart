@@ -6235,4 +6235,22 @@ class STa extends S {
 
   @override
   String get chatHistoryMaxHours => 'வரலாற்றுக் கால அளவு மணிநேரங்களில் (1–720)';
+
+  @override
+  String get chatNotifyAll => 'அனைத்து செய்திகளும்';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'இந்த அரட்டையில் வரும் ஒவ்வொரு புதிய செய்திக்கும் அறிவிக்கவும்';
+
+  @override
+  String get chatNotifyMentions => 'குறிப்பிடல்கள் மட்டும்';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'உங்களைக் குறிப்பிடும்போது அல்லது @room பயன்படுத்தும்போது மட்டும் அறிவிக்கவும்';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'அனைத்து சாதனங்களிலும் இந்த அரட்டையின் அறிவிப்புகளை முடக்கவும்';
 }

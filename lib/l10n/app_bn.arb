@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "ডিভাইসে সম্পাদিত কাজ",
   "chatDeviceActionsReview": "নিশ্চিত করার পর কেবল এই বার্তাটি সিস্টেমের ডিভাইসভিত্তিক কাজের পরামর্শে দেওয়া হয়। ক্যালেন্ডার, রিমাইন্ডার বা মানচিত্র খুলতে একটি কাজ বাছুন।",
   "chatHistoryMaxMessages": "বার্তার সীমা (১–৫০)",
-  "chatHistoryMaxHours": "ইতিহাসের সময়সীমা, ঘণ্টায় (১–৭২০)"
+  "chatHistoryMaxHours": "ইতিহাসের সময়সীমা, ঘণ্টায় (১–৭২০)",
+  "chatNotifyAll": "সব বার্তা",
+  "chatNotifyAllDescription": "এই চ্যাটের প্রতিটি নতুন বার্তার জন্য বিজ্ঞপ্তি দিন",
+  "chatNotifyMentions": "শুধু উল্লেখ",
+  "chatNotifyMentionsDescription": "শুধু আপনাকে উল্লেখ করা হলে বা @room ব্যবহার করা হলে বিজ্ঞপ্তি দিন",
+  "chatNotifyMutedDescription": "সব ডিভাইসে এই চ্যাটের বিজ্ঞপ্তি বন্ধ করুন"
 }

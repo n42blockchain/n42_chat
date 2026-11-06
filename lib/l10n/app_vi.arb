@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "Thao tác trên thiết bị",
   "chatDeviceActionsReview": "Sau khi xác nhận, chỉ tin nhắn này được cung cấp cho tính năng đề xuất thao tác trên thiết bị của hệ thống. Chọn thao tác để mở Lịch, Lời nhắc hoặc Bản đồ.",
   "chatHistoryMaxMessages": "Giới hạn tin nhắn (1–50)",
-  "chatHistoryMaxHours": "Khoảng thời gian lịch sử theo giờ (1–720)"
+  "chatHistoryMaxHours": "Khoảng thời gian lịch sử theo giờ (1–720)",
+  "chatNotifyAll": "Tất cả tin nhắn",
+  "chatNotifyAllDescription": "Thông báo cho mỗi tin nhắn mới trong cuộc trò chuyện này",
+  "chatNotifyMentions": "Chỉ lượt nhắc",
+  "chatNotifyMentionsDescription": "Chỉ thông báo khi bạn được nhắc đến hoặc khi dùng @room",
+  "chatNotifyMutedDescription": "Tắt thông báo của cuộc trò chuyện này trên mọi thiết bị"
 }

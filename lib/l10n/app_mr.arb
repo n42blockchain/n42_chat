@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "डिव्हाइसवरील कृती",
   "chatDeviceActionsReview": "पुष्टी केल्यानंतर फक्त हा संदेश प्रणालीच्या डिव्हाइसवरील कृती सूचनांना दिला जातो. कॅलेंडर, स्मरणपत्रे किंवा नकाशे उघडण्यासाठी कृती निवडा.",
   "chatHistoryMaxMessages": "संदेश मर्यादा (1–50)",
-  "chatHistoryMaxHours": "इतिहासाची वेळमर्यादा, तासांमध्ये (1–720)"
+  "chatHistoryMaxHours": "इतिहासाची वेळमर्यादा, तासांमध्ये (1–720)",
+  "chatNotifyAll": "सर्व संदेश",
+  "chatNotifyAllDescription": "या चॅटमधील प्रत्येक नवीन संदेशाची सूचना द्या",
+  "chatNotifyMentions": "फक्त उल्लेख",
+  "chatNotifyMentionsDescription": "तुमचा उल्लेख झाल्यावर किंवा @room वापरल्यावरच सूचना द्या",
+  "chatNotifyMutedDescription": "सर्व डिव्हाइसवर या चॅटच्या सूचना बंद करा"
 }

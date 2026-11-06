@@ -2874,5 +2874,10 @@
   "chatDeviceActions": "Aktionen auf dem Gerät",
   "chatDeviceActionsReview": "Nach Ihrer Bestätigung wird nur diese Nachricht den Aktionsvorschlägen auf dem Gerät bereitgestellt. Wählen Sie eine Aktion, um Kalender, Erinnerungen oder Karten zu öffnen.",
   "chatHistoryMaxMessages": "Nachrichtenlimit (1–50)",
-  "chatHistoryMaxHours": "Verlaufsfenster in Stunden (1–720)"
+  "chatHistoryMaxHours": "Verlaufsfenster in Stunden (1–720)",
+  "chatNotifyAll": "Alle Nachrichten",
+  "chatNotifyAllDescription": "Bei jeder neuen Nachricht in diesem Chat benachrichtigen",
+  "chatNotifyMentions": "Nur Erwähnungen",
+  "chatNotifyMentionsDescription": "Nur benachrichtigen, wenn du erwähnt wirst oder @room verwendet wird",
+  "chatNotifyMutedDescription": "Benachrichtigungen für diesen Chat auf allen Geräten deaktivieren"
 }

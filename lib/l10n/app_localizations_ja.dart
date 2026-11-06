@@ -6038,4 +6038,19 @@ class SJa extends S {
 
   @override
   String get chatHistoryMaxHours => '履歴の対象時間（1～720 時間）';
+
+  @override
+  String get chatNotifyAll => 'すべてのメッセージ';
+
+  @override
+  String get chatNotifyAllDescription => 'このチャットの新しいメッセージをすべて通知';
+
+  @override
+  String get chatNotifyMentions => 'メンションのみ';
+
+  @override
+  String get chatNotifyMentionsDescription => '自分へのメンションまたは @room が使われた場合のみ通知';
+
+  @override
+  String get chatNotifyMutedDescription => 'すべてのデバイスでこのチャットの通知を無効にする';
 }

@@ -6204,6 +6204,24 @@ class SPt extends S {
 
   @override
   String get chatHistoryMaxHours => 'Período do histórico em horas (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Todas as mensagens';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notificar cada nova mensagem nesta conversa';
+
+  @override
+  String get chatNotifyMentions => 'Apenas menções';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Notificar apenas quando houver uma menção a si ou for usado @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Desativar as notificações desta conversa em todos os dispositivos';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12407,4 +12425,22 @@ class SPtBr extends SPt {
 
   @override
   String get chatHistoryMaxHours => 'Período do histórico em horas (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Todas as mensagens';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notificar cada nova mensagem nesta conversa';
+
+  @override
+  String get chatNotifyMentions => 'Apenas menções';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Notificar apenas quando você for mencionado ou @room for usado';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Desativar as notificações desta conversa em todos os dispositivos';
 }

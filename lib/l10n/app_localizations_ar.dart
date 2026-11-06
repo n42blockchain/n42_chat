@@ -6142,4 +6142,22 @@ class SAr extends S {
 
   @override
   String get chatHistoryMaxHours => 'نطاق السجل بالساعات (1–720)';
+
+  @override
+  String get chatNotifyAll => 'كل الرسائل';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'إرسال إشعار بكل رسالة جديدة في هذه المحادثة';
+
+  @override
+  String get chatNotifyMentions => 'الإشارات فقط';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'إرسال إشعار فقط عند الإشارة إليك أو استخدام @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'إيقاف إشعارات هذه المحادثة على جميع الأجهزة';
 }

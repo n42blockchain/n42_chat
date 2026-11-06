@@ -6172,4 +6172,22 @@ class STr extends S {
 
   @override
   String get chatHistoryMaxHours => 'Geçmiş aralığı, saat (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Tüm Mesajlar';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Bu sohbetteki her yeni mesaj için bildirim gönder';
+
+  @override
+  String get chatNotifyMentions => 'Yalnızca Bahsetmeler';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Yalnızca sizden bahsedildiğinde veya @room kullanıldığında bildirim gönder';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Bu sohbetin bildirimlerini tüm cihazlarda kapat';
 }
