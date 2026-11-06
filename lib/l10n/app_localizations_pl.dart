@@ -6269,4 +6269,11 @@ class SPl extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Ten plik zawiera niezaszyfrowany tekst szkiców i dane konta. Załączniki nie są uwzględnione. Wybierz zaufane miejsce docelowe.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importuj kopię odzyskiwania';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Zapisz ten podgląd tylko jako kopię odzyskiwania. Żadne wiadomości nie zostaną zaplanowane ani wysłane. Załączniki nie są dołączone. Autor pliku nie został zweryfikowany.';
 }

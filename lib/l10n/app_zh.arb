@@ -2279,5 +2279,7 @@
   "scheduledRecoveryCopies": "恢复副本",
   "scheduledRecoveryReset": "重置损坏队列",
   "scheduledRecoveryResetHint": "完整副本已保存在此设备。要重置此账号的所有定时消息吗？部分消息可能已发送。副本和附件将保留，不会重新发送任何消息。",
-  "scheduledRecoveryExportHint": "此文件包含未加密的草稿文本和账号信息，不包含附件。请选择可信的保存或分享位置。"
+  "scheduledRecoveryExportHint": "此文件包含未加密的草稿文本和账号信息，不包含附件。请选择可信的保存或分享位置。",
+  "scheduledRecoveryImport": "导入恢复副本",
+  "scheduledRecoveryImportHint": "仅将预览内容保存为恢复副本，不会安排或发送消息。文件不含附件，文件作者未经验证。"
 }

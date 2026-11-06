@@ -6280,4 +6280,11 @@ class SDe extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Diese Datei enthält unverschlüsselten Entwurfstext und Kontodaten. Anhänge sind nicht enthalten. Wähle ein vertrauenswürdiges Ziel.';
+
+  @override
+  String get scheduledRecoveryImport => 'Wiederherstellungskopie importieren';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Diese Vorschau nur als Wiederherstellungskopie speichern. Es werden keine Nachrichten geplant oder gesendet. Anhänge sind nicht enthalten. Der Dateiautor ist nicht verifiziert.';
 }

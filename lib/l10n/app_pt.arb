@@ -2891,5 +2891,7 @@
   "scheduledRecoveryCopies": "Cópias de recuperação",
   "scheduledRecoveryReset": "Repor fila danificada",
   "scheduledRecoveryResetHint": "Foi guardada uma cópia exata neste dispositivo. Repor todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado.",
-  "scheduledRecoveryExportHint": "Este ficheiro contém texto de rascunhos e dados da conta não encriptados. Os anexos não estão incluídos. Escolha um destino de confiança."
+  "scheduledRecoveryExportHint": "Este ficheiro contém texto de rascunhos e dados da conta não encriptados. Os anexos não estão incluídos. Escolha um destino de confiança.",
+  "scheduledRecoveryImport": "Importar cópia de recuperação",
+  "scheduledRecoveryImportHint": "Guardar esta pré-visualização apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do ficheiro não foi verificado."
 }

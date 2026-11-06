@@ -2891,5 +2891,7 @@
   "scheduledRecoveryCopies": "Kopie pro obnovu",
   "scheduledRecoveryReset": "Obnovit poškozenou frontu",
   "scheduledRecoveryResetHint": "Přesná kopie je uložena v tomto zařízení. Resetovat všechny naplánované zprávy tohoto účtu? Některé již mohly být odeslány. Kopie a přílohy zůstanou zachovány. Nic nebude odesláno znovu.",
-  "scheduledRecoveryExportHint": "Tento soubor obsahuje nešifrovaný text konceptu a údaje účtu. Přílohy nejsou zahrnuty. Vyberte důvěryhodné místo pro uložení nebo sdílení."
+  "scheduledRecoveryExportHint": "Tento soubor obsahuje nešifrovaný text konceptu a údaje účtu. Přílohy nejsou zahrnuty. Vyberte důvěryhodné místo pro uložení nebo sdílení.",
+  "scheduledRecoveryImport": "Importovat kopii pro obnovení",
+  "scheduledRecoveryImportHint": "Uložit tento náhled pouze jako kopii pro obnovení. Žádné zprávy se nenaplánují ani neodešlou. Přílohy nejsou zahrnuty. Autor souboru není ověřen."
 }

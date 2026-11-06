@@ -6201,4 +6201,11 @@ class SEn extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.';
+
+  @override
+  String get scheduledRecoveryImport => 'Import recovery copy';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.';
 }

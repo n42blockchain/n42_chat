@@ -6218,4 +6218,11 @@ class SVi extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Tệp này chứa văn bản nháp và thông tin tài khoản chưa được mã hóa. Không bao gồm tệp đính kèm. Hãy chọn nơi lưu hoặc chia sẻ đáng tin cậy.';
+
+  @override
+  String get scheduledRecoveryImport => 'Nhập bản sao khôi phục';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Chỉ lưu bản xem trước này dưới dạng bản sao khôi phục. Không có tin nhắn nào được lên lịch hoặc gửi. Không bao gồm tệp đính kèm. Tác giả tệp chưa được xác minh.';
 }

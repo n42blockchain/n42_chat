@@ -2279,5 +2279,7 @@
   "scheduledRecoveryCopies": "復原副本",
   "scheduledRecoveryReset": "重設損壞佇列",
   "scheduledRecoveryResetHint": "完整副本已儲存在此裝置。要重設此帳號的所有排程訊息嗎？部分訊息可能已傳送。副本和附件將保留，不會重新傳送任何訊息。",
-  "scheduledRecoveryExportHint": "此檔案包含未加密的草稿文字和帳號資訊，不包含附件。請選擇可信任的儲存或分享位置。"
+  "scheduledRecoveryExportHint": "此檔案包含未加密的草稿文字和帳號資訊，不包含附件。請選擇可信任的儲存或分享位置。",
+  "scheduledRecoveryImport": "匯入復原副本",
+  "scheduledRecoveryImportHint": "僅將預覽內容儲存為復原副本，不會排程或傳送訊息。檔案不含附件，檔案作者未經驗證。"
 }

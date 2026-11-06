@@ -6202,4 +6202,11 @@ class SAr extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'يحتوي هذا الملف على نص مسودة وتفاصيل حساب غير مشفرة. لا يتضمن المرفقات. اختر وجهة موثوقة.';
+
+  @override
+  String get scheduledRecoveryImport => 'استيراد نسخة استرداد';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'احفظ هذه المعاينة كنسخة استرداد فقط. لن تتم جدولة أي رسائل أو إرسالها. المرفقات غير مضمنة. لم يتم التحقق من مؤلف الملف.';
 }

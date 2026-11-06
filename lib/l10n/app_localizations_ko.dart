@@ -6097,4 +6097,11 @@ class SKo extends S {
   @override
   String get scheduledRecoveryExportHint =>
       '이 파일에는 암호화되지 않은 초안 텍스트와 계정 정보가 포함됩니다. 첨부 파일은 포함되지 않습니다. 신뢰할 수 있는 저장 또는 공유 위치를 선택하세요.';
+
+  @override
+  String get scheduledRecoveryImport => '복구 사본 가져오기';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      '이 미리보기를 복구 사본으로만 저장합니다. 메시지는 예약되거나 전송되지 않습니다. 첨부 파일은 포함되지 않습니다. 파일 작성자는 확인되지 않았습니다.';
 }

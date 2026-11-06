@@ -6273,4 +6273,11 @@ class SEs extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Este archivo contiene texto de borradores y datos de la cuenta sin cifrar. No incluye archivos adjuntos. Elige un destino de confianza.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importar copia de recuperación';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Guardar esta vista previa solo como copia de recuperación. No se programarán ni enviarán mensajes. No se incluyen archivos adjuntos. El autor del archivo no está verificado.';
 }

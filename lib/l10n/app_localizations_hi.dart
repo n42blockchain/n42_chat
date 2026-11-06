@@ -6228,4 +6228,11 @@ class SHi extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'इस फ़ाइल में बिना एन्क्रिप्शन वाला ड्राफ़्ट टेक्स्ट और खाते की जानकारी है। अटैचमेंट शामिल नहीं हैं। भरोसेमंद गंतव्य चुनें।';
+
+  @override
+  String get scheduledRecoveryImport => 'पुनर्प्राप्ति प्रति आयात करें';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'इस पूर्वावलोकन को केवल पुनर्प्राप्ति प्रति के रूप में सहेजें। कोई संदेश निर्धारित या भेजा नहीं जाएगा। संलग्नक शामिल नहीं हैं। फ़ाइल के लेखक की पुष्टि नहीं हुई है।';
 }

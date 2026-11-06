@@ -6056,6 +6056,13 @@ class SZh extends S {
   @override
   String get scheduledRecoveryExportHint =>
       '此文件包含未加密的草稿文本和账号信息，不包含附件。请选择可信的保存或分享位置。';
+
+  @override
+  String get scheduledRecoveryImport => '导入恢复副本';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      '仅将预览内容保存为恢复副本，不会安排或发送消息。文件不含附件，文件作者未经验证。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12110,4 +12117,11 @@ class SZhTw extends SZh {
   @override
   String get scheduledRecoveryExportHint =>
       '此檔案包含未加密的草稿文字和帳號資訊，不包含附件。請選擇可信任的儲存或分享位置。';
+
+  @override
+  String get scheduledRecoveryImport => '匯入復原副本';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      '僅將預覽內容儲存為復原副本，不會排程或傳送訊息。檔案不含附件，檔案作者未經驗證。';
 }

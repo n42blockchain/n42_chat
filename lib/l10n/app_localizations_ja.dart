@@ -6094,4 +6094,11 @@ class SJa extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'このファイルには暗号化されていない下書きのテキストとアカウント情報が含まれます。添付ファイルは含まれません。信頼できる保存先または共有先を選択してください。';
+
+  @override
+  String get scheduledRecoveryImport => '復元用コピーをインポート';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'このプレビューを復元用コピーとしてのみ保存します。メッセージの予約や送信は行いません。添付ファイルは含まれません。ファイルの作成者は確認されていません。';
 }

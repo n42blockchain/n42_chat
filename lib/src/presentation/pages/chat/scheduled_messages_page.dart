@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:share_plus/share_plus.dart';
+import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,12 +29,14 @@ class ScheduledMessagesPage extends StatefulWidget {
   final String roomId;
   final String roomName;
   final Future<void> Function(Uint8List bytes)? recoveryExporter;
+  final Future<Uint8List?> Function()? recoveryFilePicker;
 
   const ScheduledMessagesPage({
     super.key,
     required this.roomId,
     required this.roomName,
     this.recoveryExporter,
+    this.recoveryFilePicker,
   });
 
   @override
@@ -361,6 +364,74 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     );
   }
 
+  Future<Uint8List?> _pickRecoveryFile() async {
+    final file = await FilePicker.pickFile(type: FileType.custom, allowedExtensions: ['json']);
+    if (file == null || !mounted || _origin?.isCurrent != true) return null;
+    final size = file.lengthSync();
+    if (size != null && size > ScheduledRecoveryCopy.maxImportBytes) {
+      throw const FormatException('Recovery file too large');
+    }
+    final bytes = BytesBuilder(copy: true);
+    await for (final chunk in file.readAsByteStream()) {
+      if (!mounted || _origin?.isCurrent != true) return null;
+      if (bytes.length + chunk.length > ScheduledRecoveryCopy.maxImportBytes) {
+        throw const FormatException('Recovery file too large');
+      }
+      bytes.add(chunk);
+    }
+    return bytes.takeBytes();
+  }
+
+  Future<void> _importRecoveryCopy() async {
+    if (_savingRecovery || _origin?.isCurrent != true) return;
+    setState(() => _savingRecovery = true);
+    try {
+      final owner = await _messages.getCurrentUserId();
+      bool current() => mounted && _origin?.isCurrent == true;
+      if (!current() || owner == null || owner.isEmpty) return;
+      final bytes = await (widget.recoveryFilePicker ?? _pickRecoveryFile)();
+      if (!current() || bytes == null || owner != await _messages.getCurrentUserId() || !current()) return;
+      if (!mounted) return;
+      final copy = ScheduledRecoveryCopy.fromExportBytes(bytes, ownerUserId: owner);
+      final route = DialogRoute<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          scrollable: true,
+          title: Text((S.of(context)?.scheduledRecoveryImport ?? 'Import recovery copy')),
+          content: SizedBox(width: double.maxFinite, child: Column(
+            mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text((S.of(context)?.scheduledRecoveryImportHint ?? 'Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.')),
+              const SizedBox(height: 16),
+              SelectableText(String.fromCharCodes(copy.raw!.runes.take(8000))),
+            ],
+          )),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text((S.of(context)?.commonCancel ?? 'Cancel'))),
+            TextButton(key: const ValueKey('scheduled-recovery-import-confirm'),
+              onPressed: () => Navigator.pop(context, true), child: Text((S.of(context)?.commonConfirm ?? 'Confirm'))),
+          ],
+        ),
+      );
+      _recoveryRoute = route;
+      final confirmed = await Navigator.of(context).push(route);
+      if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+      if (!current() || confirmed != true || owner != await _messages.getCurrentUserId() || !current()) return;
+      await _preferences.importScheduledRecoveryCopy(
+        bytes: copy.exportBytes(owner), ownerUserId: owner, isCurrent: current,
+      );
+      if (current()) {
+        await _showRecoveryPreview(copy.raw!);
+      }
+    } catch (_) {
+      if (mounted && _origin?.isCurrent == true) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text((S.of(context)?.commonFailedToSave ?? 'Failed to save'))));
+      }
+    } finally {
+      if (mounted) setState(() => _savingRecovery = false);
+    }
+  }
+
   Future<void> _openRecoveryCopies() async {
     if (_savingRecovery || _origin?.isCurrent != true) return;
     setState(() => _savingRecovery = true);
@@ -623,6 +694,12 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           ),
         ),
         actions: [
+          IconButton(
+            key: const ValueKey('scheduled-recovery-import'),
+            icon: const Icon(Icons.file_open_outlined),
+            tooltip: (S.of(context)?.scheduledRecoveryImport ?? 'Import recovery copy'),
+            onPressed: _savingRecovery ? null : _importRecoveryCopy,
+          ),
           IconButton(
             key: const ValueKey('scheduled-recovery-history'),
             icon: const Icon(Icons.history),

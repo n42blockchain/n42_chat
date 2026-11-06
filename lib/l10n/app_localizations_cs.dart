@@ -6242,4 +6242,11 @@ class SCs extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Tento soubor obsahuje nešifrovaný text konceptu a údaje účtu. Přílohy nejsou zahrnuty. Vyberte důvěryhodné místo pro uložení nebo sdílení.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importovat kopii pro obnovení';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Uložit tento náhled pouze jako kopii pro obnovení. Žádné zprávy se nenaplánují ani neodešlou. Přílohy nejsou zahrnuty. Autor souboru není ověřen.';
 }

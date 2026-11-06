@@ -6227,4 +6227,11 @@ class SMr extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'या फाइलमध्ये एन्क्रिप्ट न केलेला मसुदा मजकूर आणि खात्याचे तपशील आहेत. संलग्नके समाविष्ट नाहीत. विश्वसनीय गंतव्य निवडा.';
+
+  @override
+  String get scheduledRecoveryImport => 'पुनर्प्राप्ती प्रत आयात करा';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'हे पूर्वावलोकन फक्त पुनर्प्राप्ती प्रत म्हणून जतन करा. कोणताही संदेश नियोजित किंवा पाठवला जाणार नाही. संलग्नके समाविष्ट नाहीत. फाइलचा लेखक पडताळलेला नाही.';
 }

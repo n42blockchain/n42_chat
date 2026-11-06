@@ -6244,4 +6244,11 @@ class SUr extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'اس فائل میں غیر مرموز مسودے کا متن اور اکاؤنٹ کی تفصیلات شامل ہیں۔ منسلکات شامل نہیں ہیں۔ قابل اعتماد منزل منتخب کریں۔';
+
+  @override
+  String get scheduledRecoveryImport => 'بحالی کی نقل درآمد کریں';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'اس پیش منظر کو صرف بحالی کی نقل کے طور پر محفوظ کریں۔ کوئی پیغام مقرر یا ارسال نہیں ہوگا۔ منسلکات شامل نہیں ہیں۔ فائل کے مصنف کی تصدیق نہیں ہوئی۔';
 }

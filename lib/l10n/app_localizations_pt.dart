@@ -6264,6 +6264,13 @@ class SPt extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Este ficheiro contém texto de rascunhos e dados da conta não encriptados. Os anexos não estão incluídos. Escolha um destino de confiança.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importar cópia de recuperação';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Guardar esta pré-visualização apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do ficheiro não foi verificado.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12527,4 +12534,11 @@ class SPtBr extends SPt {
   @override
   String get scheduledRecoveryExportHint =>
       'Este arquivo contém texto de rascunhos e dados da conta não criptografados. Os anexos não estão incluídos. Escolha um destino confiável.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importar cópia de recuperação';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Salvar esta prévia apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do arquivo não foi verificado.';
 }

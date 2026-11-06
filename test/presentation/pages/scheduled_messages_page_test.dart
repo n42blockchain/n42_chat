@@ -51,6 +51,7 @@ void main() {
     () {
       registerFallbackValue(const CancelScheduledMessage('fallback'));
       registerFallbackValue(() => false);
+      registerFallbackValue(Uint8List(0));
     },
   );
   setUp(() async {
@@ -93,8 +94,9 @@ void main() {
     double scale = 1,
     bool use24Hours = false,
     Future<void> Function(Uint8List)? exporter,
+    Future<Uint8List?> Function()? picker,
   }) async {
-    final page = ScheduledMessagesPage(roomId: 'room', roomName: 'Room', recoveryExporter: exporter);
+    final page = ScheduledMessagesPage(roomId: 'room', roomName: 'Room', recoveryExporter: exporter, recoveryFilePicker: picker);
     await tester.pumpWidget(
       MaterialApp(
         locale: locale,
@@ -115,6 +117,74 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Uint8List portable({String owner = '@me:test'}) {
+    const raw = '{broken portable queue';
+    return ScheduledRecoveryCopy(id: sha256.convert(utf8.encode(raw)).toString(),
+      raw: raw, isIntact: true).exportBytes(owner);
+  }
+  for (final scenario in ['confirm', 'cancel', 'picker cancelled', 'foreign', 'malformed', 'write fails', 'account changes']) {
+    testWidgets('recovery import: $scenario', (tester) async {
+      var writes = 0;
+      when(() => prefs.importScheduledRecoveryCopy(bytes: any(named: 'bytes'),
+        ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((call) async {
+          writes++;
+          expect((call.namedArguments[#isCurrent] as bool Function())(), isTrue);
+          if (scenario == 'write fails') throw StateError('disk');
+          return ScheduledRecoveryCopy.fromExportBytes(call.namedArguments[#bytes] as Uint8List, ownerUserId: '@me:test');
+        });
+      await pump(tester, picker: () async {
+        if (scenario == 'picker cancelled') return null;
+        if (scenario == 'account changes') when(() => messages.getCurrentUserId()).thenAnswer((_) async => '@other:test');
+        if (scenario == 'malformed') return Uint8List.fromList([255]);
+        return portable(owner: scenario == 'foreign' ? '@other:test' : '@me:test');
+      });
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-import')));
+      await tester.pumpAndSettle();
+      final confirm = find.byKey(const ValueKey('scheduled-recovery-import-confirm'));
+      if (['confirm','cancel','write fails'].contains(scenario)) {
+        expect(confirm, findsOneWidget);
+        expect(find.text('{broken portable queue'), findsOneWidget);
+        expect(writes, 0);
+        if (scenario == 'cancel') {
+          await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Cancel')));
+        } else {
+          await tester.tap(confirm);
+        }
+        await tester.pumpAndSettle();
+      } else {
+        expect(confirm, findsNothing);
+      }
+      expect(writes, ['confirm','write fails'].contains(scenario) ? 1 : 0);
+      if (scenario == 'confirm') expect(find.byKey(const ValueKey('scheduled-recovery-export')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+    });
+  }
+  testWidgets('import preview fits narrow RTL large-text layout', (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await pump(tester, locale: const Locale('ar'), scale: 2, picker: () async => portable());
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-import')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('scheduled-recovery-import-confirm')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+  testWidgets('account change during import confirmation cannot write', (tester) async {
+    await pump(tester, picker: () async => portable());
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-import')));
+    await tester.pumpAndSettle();
+    when(() => messages.getCurrentUserId()).thenAnswer((_) async => '@other:test');
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-import-confirm')));
+    await tester.pumpAndSettle();
+    verifyNever(() => prefs.importScheduledRecoveryCopy(bytes: any(named: 'bytes'),
+      ownerUserId: any(named: 'ownerUserId'), isCurrent: any(named: 'isCurrent')));
+    await tester.pumpWidget(const SizedBox());
+  });
   testWidgets('persisted unconfirmed status remains visible after reopening', (tester) async {
     when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test')).thenAnswer((_) async => [
       ScheduledMessageDraft(messageId: 'failed', text: 'Retained draft', type: MessageType.text,

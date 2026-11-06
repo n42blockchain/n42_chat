@@ -6232,4 +6232,11 @@ class STr extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Bu dosya şifrelenmemiş taslak metni ve hesap bilgileri içerir. Ekler dahil değildir. Güvenilir bir hedef seçin.';
+
+  @override
+  String get scheduledRecoveryImport => 'Kurtarma kopyasını içe aktar';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Bu önizlemeyi yalnızca kurtarma kopyası olarak kaydet. Hiçbir mesaj planlanmaz veya gönderilmez. Ekler dahil değildir. Dosyanın yazarı doğrulanmamıştır.';
 }

@@ -2891,5 +2891,7 @@
   "scheduledRecoveryCopies": "Salinan pemulihan",
   "scheduledRecoveryReset": "Reset antrean yang rusak",
   "scheduledRecoveryResetHint": "Salinan persis telah disimpan di perangkat ini. Reset semua pesan terjadwal untuk akun ini? Sebagian mungkin sudah terkirim. Salinan dan lampiran tetap disimpan. Tidak ada yang dikirim ulang.",
-  "scheduledRecoveryExportHint": "File ini berisi teks draf dan detail akun yang tidak dienkripsi. Lampiran tidak disertakan. Pilih tujuan yang tepercaya."
+  "scheduledRecoveryExportHint": "File ini berisi teks draf dan detail akun yang tidak dienkripsi. Lampiran tidak disertakan. Pilih tujuan yang tepercaya.",
+  "scheduledRecoveryImport": "Impor salinan pemulihan",
+  "scheduledRecoveryImportHint": "Simpan pratinjau ini hanya sebagai salinan pemulihan. Tidak ada pesan yang dijadwalkan atau dikirim. Lampiran tidak disertakan. Penulis berkas belum diverifikasi."
 }

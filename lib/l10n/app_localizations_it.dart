@@ -6259,4 +6259,11 @@ class SIt extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Questo file contiene testo delle bozze e dati dell’account non crittografati. Gli allegati non sono inclusi. Scegli una destinazione attendibile.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importa copia di recupero';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Salva questa anteprima solo come copia di recupero. Nessun messaggio verrà programmato o inviato. Gli allegati non sono inclusi. L’autore del file non è verificato.';
 }

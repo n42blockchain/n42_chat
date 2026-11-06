@@ -6230,4 +6230,11 @@ class SBn extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'এই ফাইলে এনক্রিপ্ট না করা খসড়া লেখা ও অ্যাকাউন্টের তথ্য রয়েছে। সংযুক্তি অন্তর্ভুক্ত নেই। একটি বিশ্বস্ত গন্তব্য বেছে নিন।';
+
+  @override
+  String get scheduledRecoveryImport => 'পুনরুদ্ধার কপি আমদানি';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'এই প্রিভিউটি শুধু পুনরুদ্ধার কপি হিসেবে সংরক্ষণ করুন। কোনো বার্তা নির্ধারণ বা পাঠানো হবে না। সংযুক্তি অন্তর্ভুক্ত নয়। ফাইলের লেখক যাচাই করা হয়নি।';
 }

@@ -11470,6 +11470,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.'**
   String get scheduledRecoveryExportHint;
+
+  /// No description provided for @scheduledRecoveryImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import recovery copy'**
+  String get scheduledRecoveryImport;
+
+  /// No description provided for @scheduledRecoveryImportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.'**
+  String get scheduledRecoveryImportHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

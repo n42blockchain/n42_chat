@@ -6242,4 +6242,11 @@ class SId extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'File ini berisi teks draf dan detail akun yang tidak dienkripsi. Lampiran tidak disertakan. Pilih tujuan yang tepercaya.';
+
+  @override
+  String get scheduledRecoveryImport => 'Impor salinan pemulihan';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Simpan pratinjau ini hanya sebagai salinan pemulihan. Tidak ada pesan yang dijadwalkan atau dikirim. Lampiran tidak disertakan. Penulis berkas belum diverifikasi.';
 }

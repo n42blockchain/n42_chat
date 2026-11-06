@@ -6262,4 +6262,11 @@ class SSw extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Faili hili lina maandishi ya rasimu na maelezo ya akaunti ambayo hayajasimbwa kwa njia fiche. Viambatisho havijajumuishwa. Chagua mahali unapoamini.';
+
+  @override
+  String get scheduledRecoveryImport => 'Ingiza nakala ya urejeshaji';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Hifadhi onyesho hili kama nakala ya urejeshaji pekee. Hakuna ujumbe utakaoratibiwa au kutumwa. Viambatisho havijajumuishwa. Mwandishi wa faili hajathibitishwa.';
 }

@@ -6276,4 +6276,11 @@ class STe extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'ఈ ఫైల్‌లో ఎన్‌క్రిప్ట్ చేయని చిత్తుప్రతి వచనం మరియు ఖాతా వివరాలు ఉన్నాయి. జోడింపులు చేర్చబడలేదు. నమ్మదగిన గమ్యస్థానాన్ని ఎంచుకోండి.';
+
+  @override
+  String get scheduledRecoveryImport => 'పునరుద్ధరణ కాపీని దిగుమతి చేయండి';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'ఈ ప్రివ్యూను పునరుద్ధరణ కాపీగా మాత్రమే సేవ్ చేయండి. సందేశాలు షెడ్యూల్ చేయబడవు లేదా పంపబడవు. జోడింపులు చేర్చబడలేదు. ఫైల్ రచయిత ధృవీకరించబడలేదు.';
 }

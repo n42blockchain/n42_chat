@@ -6298,4 +6298,11 @@ class SFr extends S {
   @override
   String get scheduledRecoveryExportHint =>
       'Ce fichier contient du texte de brouillons et des informations de compte non chiffrés. Les pièces jointes ne sont pas incluses. Choisissez une destination de confiance.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importer une copie de récupération';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Enregistrer cet aperçu uniquement comme copie de récupération. Aucun message ne sera programmé ni envoyé. Les pièces jointes ne sont pas incluses. L’auteur du fichier n’est pas vérifié.';
 }
