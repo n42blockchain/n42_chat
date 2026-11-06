@@ -6214,4 +6214,8 @@ class SVi extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Đã lưu bản sao nguyên vẹn trên thiết bị này. Đặt lại tất cả tin nhắn đã lên lịch của tài khoản này? Một số có thể đã được gửi. Bản sao và tệp đính kèm được giữ lại. Không gửi lại tin nhắn nào.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Tệp này chứa văn bản nháp và thông tin tài khoản chưa được mã hóa. Không bao gồm tệp đính kèm. Hãy chọn nơi lưu hoặc chia sẻ đáng tin cậy.';
 }

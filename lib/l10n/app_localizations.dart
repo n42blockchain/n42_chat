@@ -11464,6 +11464,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.'**
   String get scheduledRecoveryResetHint;
+
+  /// No description provided for @scheduledRecoveryExportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.'**
+  String get scheduledRecoveryExportHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

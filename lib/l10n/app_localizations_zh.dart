@@ -6052,6 +6052,10 @@ class SZh extends S {
   @override
   String get scheduledRecoveryResetHint =>
       '完整副本已保存在此设备。要重置此账号的所有定时消息吗？部分消息可能已发送。副本和附件将保留，不会重新发送任何消息。';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      '此文件包含未加密的草稿文本和账号信息，不包含附件。请选择可信的保存或分享位置。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12102,4 +12106,8 @@ class SZhTw extends SZh {
   @override
   String get scheduledRecoveryResetHint =>
       '完整副本已儲存在此裝置。要重設此帳號的所有排程訊息嗎？部分訊息可能已傳送。副本和附件將保留，不會重新傳送任何訊息。';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      '此檔案包含未加密的草稿文字和帳號資訊，不包含附件。請選擇可信任的儲存或分享位置。';
 }

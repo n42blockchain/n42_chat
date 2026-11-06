@@ -6255,4 +6255,8 @@ class SIt extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Una copia esatta è salvata su questo dispositivo. Reimpostare tutti i messaggi programmati di questo account? Alcuni potrebbero essere già stati inviati. Copie e allegati vengono conservati. Nulla sarà reinviato.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Questo file contiene testo delle bozze e dati dell’account non crittografati. Gli allegati non sono inclusi. Scegli una destinazione attendibile.';
 }

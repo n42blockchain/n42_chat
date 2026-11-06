@@ -6238,4 +6238,8 @@ class SId extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Salinan persis telah disimpan di perangkat ini. Reset semua pesan terjadwal untuk akun ini? Sebagian mungkin sudah terkirim. Salinan dan lampiran tetap disimpan. Tidak ada yang dikirim ulang.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'File ini berisi teks draf dan detail akun yang tidak dienkripsi. Lampiran tidak disertakan. Pilih tujuan yang tepercaya.';
 }

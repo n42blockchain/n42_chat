@@ -6197,4 +6197,8 @@ class SEn extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.';
 }

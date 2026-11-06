@@ -2890,5 +2890,6 @@
   "scheduledRecoveryCopyHint": "Enregistrée sur cet appareil sans modifier ni envoyer de messages. L’aperçu affiche jusqu’à 8 000 caractères.",
   "scheduledRecoveryCopies": "Copies de récupération",
   "scheduledRecoveryReset": "Réinitialiser la file endommagée",
-  "scheduledRecoveryResetHint": "Une copie exacte est enregistrée sur cet appareil. Réinitialiser tous les messages programmés de ce compte ? Certains ont peut-être déjà été envoyés. Les copies et pièces jointes sont conservées. Aucun message ne sera renvoyé."
+  "scheduledRecoveryResetHint": "Une copie exacte est enregistrée sur cet appareil. Réinitialiser tous les messages programmés de ce compte ? Certains ont peut-être déjà été envoyés. Les copies et pièces jointes sont conservées. Aucun message ne sera renvoyé.",
+  "scheduledRecoveryExportHint": "Ce fichier contient du texte de brouillons et des informations de compte non chiffrés. Les pièces jointes ne sont pas incluses. Choisissez une destination de confiance."
 }

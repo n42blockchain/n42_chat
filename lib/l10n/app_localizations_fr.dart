@@ -6294,4 +6294,8 @@ class SFr extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Une copie exacte est enregistrée sur cet appareil. Réinitialiser tous les messages programmés de ce compte ? Certains ont peut-être déjà été envoyés. Les copies et pièces jointes sont conservées. Aucun message ne sera renvoyé.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Ce fichier contient du texte de brouillons et des informations de compte non chiffrés. Les pièces jointes ne sont pas incluses. Choisissez une destination de confiance.';
 }

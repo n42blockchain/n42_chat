@@ -2890,5 +2890,6 @@
   "scheduledRecoveryCopyHint": "Disimpan di perangkat ini tanpa mengubah atau mengirim pesan. Pratinjau menampilkan hingga 8.000 karakter.",
   "scheduledRecoveryCopies": "Salinan pemulihan",
   "scheduledRecoveryReset": "Reset antrean yang rusak",
-  "scheduledRecoveryResetHint": "Salinan persis telah disimpan di perangkat ini. Reset semua pesan terjadwal untuk akun ini? Sebagian mungkin sudah terkirim. Salinan dan lampiran tetap disimpan. Tidak ada yang dikirim ulang."
+  "scheduledRecoveryResetHint": "Salinan persis telah disimpan di perangkat ini. Reset semua pesan terjadwal untuk akun ini? Sebagian mungkin sudah terkirim. Salinan dan lampiran tetap disimpan. Tidak ada yang dikirim ulang.",
+  "scheduledRecoveryExportHint": "File ini berisi teks draf dan detail akun yang tidak dienkripsi. Lampiran tidak disertakan. Pilih tujuan yang tepercaya."
 }

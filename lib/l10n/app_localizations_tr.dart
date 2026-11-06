@@ -6228,4 +6228,8 @@ class STr extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Bu cihaza birebir kopya kaydedildi. Bu hesabın tüm zamanlanmış mesajları sıfırlansın mı? Bazıları zaten gönderilmiş olabilir. Kopyalar ve ekler korunur. Hiçbir şey yeniden gönderilmez.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Bu dosya şifrelenmemiş taslak metni ve hesap bilgileri içerir. Ekler dahil değildir. Güvenilir bir hedef seçin.';
 }

@@ -6238,4 +6238,8 @@ class SCs extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Přesná kopie je uložena v tomto zařízení. Resetovat všechny naplánované zprávy tohoto účtu? Některé již mohly být odeslány. Kopie a přílohy zůstanou zachovány. Nic nebude odesláno znovu.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Tento soubor obsahuje nešifrovaný text konceptu a údaje účtu. Přílohy nejsou zahrnuty. Vyberte důvěryhodné místo pro uložení nebo sdílení.';
 }

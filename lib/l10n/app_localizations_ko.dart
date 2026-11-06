@@ -6093,4 +6093,8 @@ class SKo extends S {
   @override
   String get scheduledRecoveryResetHint =>
       '이 기기에 원본 그대로의 사본이 저장되었습니다. 이 계정의 모든 예약 메시지를 초기화할까요? 일부는 이미 전송되었을 수 있습니다. 사본과 첨부파일은 유지되며 어떤 메시지도 다시 전송하지 않습니다.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      '이 파일에는 암호화되지 않은 초안 텍스트와 계정 정보가 포함됩니다. 첨부 파일은 포함되지 않습니다. 신뢰할 수 있는 저장 또는 공유 위치를 선택하세요.';
 }

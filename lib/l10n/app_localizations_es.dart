@@ -6269,4 +6269,8 @@ class SEs extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Se ha guardado una copia exacta en este dispositivo. ¿Restablecer todos los mensajes programados de esta cuenta? Algunos podrían haberse enviado ya. Se conservarán las copias y los adjuntos. No se reenviará nada.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Este archivo contiene texto de borradores y datos de la cuenta sin cifrar. No incluye archivos adjuntos. Elige un destino de confianza.';
 }

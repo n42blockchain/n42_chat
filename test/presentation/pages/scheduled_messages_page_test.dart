@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:crypto/crypto.dart';
 
 import 'package:flutter/material.dart';
 import 'package:n42_chat/src/data/services/scheduled_draft_operation.dart';
@@ -89,8 +92,9 @@ void main() {
     Locale? locale,
     double scale = 1,
     bool use24Hours = false,
+    Future<void> Function(Uint8List)? exporter,
   }) async {
-    const page = ScheduledMessagesPage(roomId: 'room', roomName: 'Room');
+    final page = ScheduledMessagesPage(roomId: 'room', roomName: 'Room', recoveryExporter: exporter);
     await tester.pumpWidget(
       MaterialApp(
         locale: locale,
@@ -306,6 +310,73 @@ void main() {
         verifyNever(() => prefs.deleteScheduledRecoveryCopy(ownerUserId: any(named: 'ownerUserId'), expectedRaw: any(named: 'expectedRaw'), isCurrent: any(named: 'isCurrent')));
       }
       expect(find.byType(AlertDialog), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final action in ['confirm', 'cancel', 'logout', 'removed', 'changed', 'lateLogout', 'failure', 'arabic']) {
+    testWidgets('recovery export protects reviewed content: $action', (tester) async {
+      final events = StreamController<bool>.broadcast(sync: true);
+      addTearDown(events.close);
+      when(() => auth.loginStateStream).thenAnswer((_) => events.stream);
+      final raw = 'private draft ${'😀' * 9000}';
+      final id = sha256.convert(utf8.encode(raw)).toString();
+      final copy = ScheduledRecoveryCopy(id: id, raw: raw, isIntact: true);
+      var reads = 0;
+      final pending = Completer<List<ScheduledRecoveryCopy>>();
+      when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async {
+        reads++;
+        if (reads > 1) {
+          if (action == 'removed') return [];
+          if (action == 'changed') return [ScheduledRecoveryCopy(id: id, raw: 'changed', isIntact: true)];
+          if (action == 'lateLogout') return pending.future;
+        }
+        return [copy];
+      });
+      Uint8List? exported;
+      var exports = 0;
+      if (action == 'arabic') {
+        await tester.binding.setSurfaceSize(const Size(320, 480));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+      }
+      await pump(tester, locale: action == 'arabic' ? const Locale('ar') : null, scale: action == 'arabic' ? 2 : 1, exporter: (bytes) async {
+        exports++;
+        if (action == 'failure') throw StateError('sharing unavailable');
+        exported = bytes;
+      });
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-history')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('scheduled-recovery-$id')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-export')));
+      await tester.pumpAndSettle();
+      expect(exports, 0);
+      expect(find.textContaining(action == 'arabic' ? 'غير مشفرة' : 'unencrypted draft'), findsOneWidget);
+      if (action == 'cancel') {
+        await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Cancel')));
+      } else if (action == 'logout') {
+        when(() => auth.currentAccountGeneration).thenReturn(null);
+        events.add(false);
+      } else {
+        await tester.tap(find.byKey(const ValueKey('scheduled-recovery-export-confirm')));
+      }
+      await tester.pumpAndSettle();
+      if (action == 'lateLogout') {
+        expect(reads, 2);
+        when(() => auth.currentAccountGeneration).thenReturn(null);
+        events.add(false);
+        pending.complete([copy]);
+        await tester.pumpAndSettle();
+      }
+      expect(exports, action == 'confirm' || action == 'failure' || action == 'arabic' ? 1 : 0);
+      if (action == 'confirm') {
+        final data = jsonDecode(utf8.decode(exported!)) as Map<String, dynamic>;
+        expect(data['raw'], raw);
+        expect(data['ownerUserId'], '@me:test');
+        expect(data['sha256'], id);
+        expect(data['attachmentsIncluded'], false);
+      }
+      verifyNever(() => prefs.deleteScheduledRecoveryCopy(ownerUserId: any(named: 'ownerUserId'), expectedRaw: any(named: 'expectedRaw'), isCurrent: any(named: 'isCurrent')));
       expect(tester.takeException(), isNull);
     });
   }

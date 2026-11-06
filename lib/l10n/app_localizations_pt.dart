@@ -6260,6 +6260,10 @@ class SPt extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Foi guardada uma cópia exata neste dispositivo. Repor todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Este ficheiro contém texto de rascunhos e dados da conta não encriptados. Os anexos não estão incluídos. Escolha um destino de confiança.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12519,4 +12523,8 @@ class SPtBr extends SPt {
   @override
   String get scheduledRecoveryResetHint =>
       'Uma cópia exata foi salva neste dispositivo. Redefinir todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Este arquivo contém texto de rascunhos e dados da conta não criptografados. Os anexos não estão incluídos. Escolha um destino confiável.';
 }

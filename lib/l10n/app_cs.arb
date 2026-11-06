@@ -2890,5 +2890,6 @@
   "scheduledRecoveryCopyHint": "Uloženo v tomto zařízení bez změny nebo odeslání zpráv. Náhled zobrazuje až 8 000 znaků.",
   "scheduledRecoveryCopies": "Kopie pro obnovu",
   "scheduledRecoveryReset": "Obnovit poškozenou frontu",
-  "scheduledRecoveryResetHint": "Přesná kopie je uložena v tomto zařízení. Resetovat všechny naplánované zprávy tohoto účtu? Některé již mohly být odeslány. Kopie a přílohy zůstanou zachovány. Nic nebude odesláno znovu."
+  "scheduledRecoveryResetHint": "Přesná kopie je uložena v tomto zařízení. Resetovat všechny naplánované zprávy tohoto účtu? Některé již mohly být odeslány. Kopie a přílohy zůstanou zachovány. Nic nebude odesláno znovu.",
+  "scheduledRecoveryExportHint": "Tento soubor obsahuje nešifrovaný text konceptu a údaje účtu. Přílohy nejsou zahrnuty. Vyberte důvěryhodné místo pro uložení nebo sdílení."
 }

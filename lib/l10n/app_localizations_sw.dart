@@ -6258,4 +6258,8 @@ class SSw extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Nakala kamili imehifadhiwa kwenye kifaa hiki. Ungependa kuweka upya ujumbe wote ulioratibiwa wa akaunti hii? Baadhi huenda tayari umetumwa. Nakala na viambatisho vitahifadhiwa. Hakuna ujumbe utakaotumwa tena.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Faili hili lina maandishi ya rasimu na maelezo ya akaunti ambayo hayajasimbwa kwa njia fiche. Viambatisho havijajumuishwa. Chagua mahali unapoamini.';
 }

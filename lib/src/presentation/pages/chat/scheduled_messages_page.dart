@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:share_plus/share_plus.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,11 +27,13 @@ import '../../../core/theme/app_dimensions.dart';
 class ScheduledMessagesPage extends StatefulWidget {
   final String roomId;
   final String roomName;
+  final Future<void> Function(Uint8List bytes)? recoveryExporter;
 
   const ScheduledMessagesPage({
     super.key,
     required this.roomId,
     required this.roomName,
+    this.recoveryExporter,
   });
 
   @override
@@ -213,7 +218,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     final preview =
         String.fromCharCodes(previewRunes.take(8000)) +
         (previewRunes.length > 8000 ? '…' : '');
-    final route = DialogRoute<bool>(
+    final route = DialogRoute<String>(
       context: context,
       builder: (context) => AlertDialog(
         scrollable: true,
@@ -238,8 +243,13 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         ),
         actions: [
           TextButton(
+            key: const ValueKey('scheduled-recovery-export'),
+            onPressed: () => Navigator.pop(context, 'export'),
+            child: Text(S.of(context)?.commonShare ?? 'Share'),
+          ),
+          TextButton(
             key: const ValueKey('scheduled-recovery-delete'),
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(context, 'delete'),
             child: Text(S.of(context)?.commonDelete ?? 'Delete'),
           ),
           TextButton(
@@ -250,31 +260,49 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
       ),
     );
     _recoveryRoute = route;
-    final delete = await Navigator.of(context).push(route);
+    final action = await Navigator.of(context).push(route);
     if (identical(_recoveryRoute, route)) _recoveryRoute = null;
-    if (delete == true && mounted && _origin?.isCurrent == true) {
-      await _deleteRecoveryCopy(raw);
+    if (mounted && _origin?.isCurrent == true) {
+      if (action == 'delete') await _confirmRecoveryAction(raw);
+      if (action == 'export') await _confirmRecoveryAction(raw, export: true);
     }
   }
 
-  Future<void> _deleteRecoveryCopy(String raw) async {
+  Future<void> _confirmRecoveryAction(String raw, {bool export = false}) async {
     final owner = _ownerUserId;
     if (owner == null || !mounted || _origin?.isCurrent != true) return;
     final route = DialogRoute<bool>(
       context: context,
       builder: (context) => AlertDialog(
         scrollable: true,
-        title: Text(S.of(context)?.commonDelete ?? 'Delete'),
-        content: Text('${S.of(context)?.scheduledRecoveryCopies ?? 'Recovery copies'}\n\n${String.fromCharCodes(raw.runes.take(100))}'),
+        title: Text(
+          export
+              ? (S.of(context)?.commonShare ?? 'Share')
+              : (S.of(context)?.commonDelete ?? 'Delete'),
+        ),
+        content: Text(
+          export
+              ? (S.of(context)?.scheduledRecoveryExportHint ??
+                    'This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.')
+              : '${S.of(context)?.scheduledRecoveryCopies ?? 'Recovery copies'}\n\n${String.fromCharCodes(raw.runes.take(100))}',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
-            key: const ValueKey('scheduled-recovery-delete-confirm'),
+            key: ValueKey(
+              export
+                  ? 'scheduled-recovery-export-confirm'
+                  : 'scheduled-recovery-delete-confirm',
+            ),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(S.of(context)?.commonDelete ?? 'Delete'),
+            child: Text(
+              export
+                  ? (S.of(context)?.commonShare ?? 'Share')
+                  : (S.of(context)?.commonDelete ?? 'Delete'),
+            ),
           ),
         ],
       ),
@@ -282,12 +310,53 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     _recoveryRoute = route;
     final confirmed = await Navigator.of(context).push(route);
     if (identical(_recoveryRoute, route)) _recoveryRoute = null;
-    if (confirmed != true || !mounted || _origin?.isCurrent != true ||
-        owner != await _messages.getCurrentUserId() || !mounted || _origin?.isCurrent != true) {
+    if (confirmed != true ||
+        !mounted ||
+        _origin?.isCurrent != true ||
+        owner != await _messages.getCurrentUserId() ||
+        !mounted ||
+        _origin?.isCurrent != true) {
+      return;
+    }
+    if (export) {
+      final copies = await _preferences.getScheduledRecoveryCopies(
+        ownerUserId: owner,
+        isCurrent: () => mounted && _origin?.isCurrent == true,
+      );
+      if (!mounted ||
+          _origin?.isCurrent != true ||
+          owner != await _messages.getCurrentUserId() ||
+          !mounted ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      final copy = copies.singleWhere(
+        (copy) => copy.isIntact && copy.raw == raw,
+      );
+      final bytes = copy.exportBytes(owner);
+      final exporter = widget.recoveryExporter;
+      if (exporter != null) {
+        await exporter(bytes);
+      } else {
+        final box = context.findRenderObject() as RenderBox?;
+        if (box == null || !box.hasSize) {
+          throw StateError('Export view unavailable');
+        }
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile.fromData(bytes, mimeType: 'application/json')],
+            fileNameOverrides: [
+              'n42-recovery-${copy.id.substring(0, 12)}.json',
+            ],
+            sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+          ),
+        );
+      }
       return;
     }
     await _preferences.deleteScheduledRecoveryCopy(
-      ownerUserId: owner, expectedRaw: raw,
+      ownerUserId: owner,
+      expectedRaw: raw,
       isCurrent: () => mounted && _origin?.isCurrent == true,
     );
   }

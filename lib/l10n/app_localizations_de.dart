@@ -6276,4 +6276,8 @@ class SDe extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Eine exakte Kopie ist auf diesem Gerät gespeichert. Alle geplanten Nachrichten dieses Kontos zurücksetzen? Einige wurden möglicherweise bereits gesendet. Kopien und Anhänge bleiben erhalten. Nichts wird erneut gesendet.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Diese Datei enthält unverschlüsselten Entwurfstext und Kontodaten. Anhänge sind nicht enthalten. Wähle ein vertrauenswürdiges Ziel.';
 }

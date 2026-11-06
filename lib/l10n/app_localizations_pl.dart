@@ -6265,4 +6265,8 @@ class SPl extends S {
   @override
   String get scheduledRecoveryResetHint =>
       'Dokładna kopia jest zapisana na tym urządzeniu. Zresetować wszystkie zaplanowane wiadomości tego konta? Niektóre mogły już zostać wysłane. Kopie i załączniki zostaną zachowane. Nic nie zostanie wysłane ponownie.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Ten plik zawiera niezaszyfrowany tekst szkiców i dane konta. Załączniki nie są uwzględnione. Wybierz zaufane miejsce docelowe.';
 }
