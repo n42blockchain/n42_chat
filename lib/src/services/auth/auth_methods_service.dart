@@ -844,11 +844,11 @@ class AuthMethodsService {
   }
 
   /// Apple 登录
-  Future<SocialLoginResult?> signInWithApple() async {
+  Future<SocialLoginResult?> signInWithApple({String? serverNonce}) async {
     try {
       debugLog('AuthMethodsService: Starting Apple Sign In');
 
-      final rawNonce = _generateNonce();
+      final rawNonce = serverNonce ?? _generateNonce();
       final hashedNonce = _sha256OfString(rawNonce);
 
       final credential = await SignInWithApple.getAppleIDCredential(
@@ -895,11 +895,11 @@ class AuthMethodsService {
   }
 
   /// Facebook 登录
-  Future<SocialLoginResult?> signInWithFacebook() async {
+  Future<SocialLoginResult?> signInWithFacebook({String? serverNonce}) async {
     try {
       debugLog('AuthMethodsService: Starting Facebook Sign In');
 
-      final nonce = _generateNonce();
+      final nonce = serverNonce ?? _generateNonce();
       final LoginResult result = await FacebookAuth.instance.login(
         permissions: ['public_profile'],
         loginTracking: LoginTracking.limited,

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/services/biometric_service.dart';
@@ -27,6 +28,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final BiometricService _biometricService;
   final SecureStorageDataSource _secureStorage;
   final IdHubApi Function(String baseUrl) _idHubApiFactory;
+  final Future<SocialLoginResult?> Function(String provider, String nonce)?
+  _nativeSocialProof;
+  bool _nativeSocialLoginBusy = false;
+  int _nativeSocialEpoch = 0;
   StreamSubscription<bool>? _loginStateSubscription;
   StreamSubscription<AuthSessionInvalidation>? _accountInvalidationSubscription;
   bool _logoutInProgress = false;
@@ -36,7 +41,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     BiometricService? biometricService,
     SecureStorageDataSource? secureStorage,
     IdHubApi Function(String baseUrl)? idHubApiFactory,
-  }) : _authRepository = authRepository,
+    Future<SocialLoginResult?> Function(String provider, String nonce)?
+    nativeSocialProof,
+  }) : _nativeSocialProof = nativeSocialProof,
+       _authRepository = authRepository,
        _biometricService = biometricService ?? BiometricService(),
        _secureStorage = secureStorage ?? SecureStorageDataSource(),
        _idHubApiFactory =
@@ -182,6 +190,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (_logoutInProgress || !originIsCurrent()) {
       return;
     }
+    _nativeSocialEpoch++;
     _logoutInProgress = true;
     emit(state.copyWith(status: AuthStatus.loading));
 
@@ -871,6 +880,102 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   // 第三方登录
   // ============================================
 
+  Future<bool> _tryN42NativeSocialLogin(
+    String provider,
+    Emitter<AuthState> emit,
+  ) async {
+    final url = getIt.isRegistered<N42ChatConfig>()
+        ? getIt<N42ChatConfig>().n42NativeAuthUrl
+        : null;
+    if (url == null || url.isEmpty) return false;
+    if (_nativeSocialLoginBusy) return true;
+    _nativeSocialLoginBusy = true;
+    final epoch = ++_nativeSocialEpoch;
+    final startingUser = _authRepository.currentUser?.userId;
+    IdHubApi? api;
+    try {
+      // Limited Login produces an OIDC proof on iOS. Android classic Facebook
+      // requires the separate authorization-code path; never send it as an ID token.
+      if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) {
+        throw StateError('Native OIDC login is not supported on this platform');
+      }
+      api = _idHubApiFactory(url);
+      final challenge = await api.startNativeLogin(provider, 'ios');
+      if (emit.isDone ||
+          isClosed ||
+          epoch != _nativeSocialEpoch ||
+          _authRepository.currentUser?.userId != startingUser)
+        return true;
+      final service = AuthMethodsService();
+      final proof = _nativeSocialProof != null
+          ? await _nativeSocialProof(provider, challenge.nonce)
+          : provider == 'apple'
+          ? await service.signInWithApple(serverNonce: challenge.nonce)
+          : await service.signInWithFacebook(serverNonce: challenge.nonce);
+      if (emit.isDone ||
+          isClosed ||
+          epoch != _nativeSocialEpoch ||
+          _authRepository.currentUser?.userId != startingUser)
+        return true;
+      if (proof == null) {
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: BlocMessageKeys.authLoginCancelled,
+          ),
+        );
+        return true;
+      }
+      if (proof.provider != provider ||
+          proof.idToken == null ||
+          proof.idToken!.isEmpty) {
+        throw const FormatException('Missing provider identity token');
+      }
+      final credentials = await api.completeNativeLogin(
+        challenge,
+        proof.idToken!,
+      );
+      if (emit.isDone ||
+          isClosed ||
+          epoch != _nativeSocialEpoch ||
+          _authRepository.currentUser?.userId != startingUser)
+        return true;
+      final result = await _authRepository.loginWithToken(
+        homeserver: credentials.matrixHomeserver!,
+        accessToken: credentials.matrixAccessToken!,
+        userId: credentials.matrixUserId!,
+        deviceId: credentials.matrixDeviceId ?? '',
+      );
+      if (emit.isDone || isClosed || epoch != _nativeSocialEpoch) return true;
+      if (result.success && result.user != null) {
+        await _completeAuthenticatedFlow(result.user!, emit);
+      } else {
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                result.errorMessage ?? BlocMessageKeys.authAppleLoginFailed,
+          ),
+        );
+      }
+    } catch (_) {
+      if (!emit.isDone && !isClosed && epoch == _nativeSocialEpoch)
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: provider == 'apple'
+                ? BlocMessageKeys.authAppleLoginFailed
+                : BlocMessageKeys.authFacebookLoginFailed,
+          ),
+        );
+    } finally {
+      api?.close();
+      _nativeSocialLoginBusy = false;
+    }
+    // An opted-in N42 flow never falls back to legacy account lookup.
+    return true;
+  }
+
   /// Google 登录
   Future<void> _onGoogleLogin(
     AuthGoogleLoginRequested event,
@@ -931,6 +1036,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
+
+    if (await _tryN42NativeSocialLogin('apple', emit)) return;
 
     try {
       final authService = AuthMethodsService();
@@ -1030,6 +1137,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
+
+    if (await _tryN42NativeSocialLogin('facebook', emit)) return;
 
     try {
       final authService = AuthMethodsService();

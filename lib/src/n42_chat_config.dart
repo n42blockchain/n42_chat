@@ -254,6 +254,10 @@ class N42ChatConfig {
   /// （旧五家仍走默认 `api.n42.network`）。例如 `https://social-auth.n42.world`。
   final String? socialAuthBaseUrl;
 
+  /// Dedicated N42 identity hub. When set, Apple/Facebook never use legacy auth.
+  /// Keep unset until the host has enabled and accepted the backend integration.
+  final String? n42NativeAuthUrl;
+
   /// Matrix SSO 浏览器回调地址
   ///
   /// 默认使用 `n42://auth/sso`。
@@ -563,6 +567,7 @@ class N42ChatConfig {
     this.telegramBotId,
     this.oauthRedirectUri = 'n42app://oauth/callback',
     this.socialAuthBaseUrl,
+    this.n42NativeAuthUrl,
     this.ssoRedirectUrl = 'n42://auth/sso',
     this.onMessageTap,
     this.onAvatarTap,
@@ -658,6 +663,7 @@ class N42ChatConfig {
     Object? telegramBotId = _copyWithUndefined,
     String? oauthRedirectUri,
     Object? socialAuthBaseUrl = _copyWithUndefined,
+    Object? n42NativeAuthUrl = _copyWithUndefined,
     String? ssoRedirectUrl,
     Object? onMessageTap = _copyWithUndefined,
     Object? onAvatarTap = _copyWithUndefined,
@@ -793,6 +799,10 @@ class N42ChatConfig {
         this.telegramBotId,
       ),
       oauthRedirectUri: oauthRedirectUri ?? this.oauthRedirectUri,
+      n42NativeAuthUrl: _nullableCopyWithValue<String>(
+        n42NativeAuthUrl,
+        this.n42NativeAuthUrl,
+      ),
       socialAuthBaseUrl: _nullableCopyWithValue<String>(
         socialAuthBaseUrl,
         this.socialAuthBaseUrl,

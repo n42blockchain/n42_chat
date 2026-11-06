@@ -120,6 +120,117 @@ class IdHubApi {
     }
   }
 
+  /// Fetch a server-owned nonce; no provider token has been obtained yet.
+  Future<IdHubNativeChallenge> startNativeLogin(
+    String provider,
+    String platform,
+  ) async {
+    if (!['apple', 'facebook'].contains(provider) ||
+        !['ios', 'android'].contains(platform)) {
+      throw ArgumentError('Unsupported native OIDC provider or platform');
+    }
+    final data = await _nativePost('/native/start', {
+      'provider': provider,
+      'platform': platform,
+    });
+    String secret(String name) {
+      final value = data[name];
+      if (value is! String || !RegExp(r'^[A-Za-z0-9_-]{43}$').hasMatch(value)) {
+        throw const FormatException('Invalid native login challenge');
+      }
+      return value;
+    }
+
+    if (data['expires_in'] is! int ||
+        (data['expires_in'] as int) <= 0 ||
+        (data['expires_in'] as int) > 300) {
+      throw const FormatException('Invalid native login expiry');
+    }
+    return IdHubNativeChallenge(
+      flowId: secret('flow_id'),
+      completionSecret: secret('completion_secret'),
+      nonce: secret('nonce'),
+    );
+  }
+
+  /// Exchange the proof then obtain Matrix credentials for that exact Hub DID.
+  Future<IdHubWalletResponse> completeNativeLogin(
+    IdHubNativeChallenge challenge,
+    String identityToken,
+  ) async {
+    if (identityToken.isEmpty || identityToken.length > 16384) {
+      throw const FormatException('Missing provider identity token');
+    }
+    final result = await _nativePost('/native/complete', {
+      'flow_id': challenge.flowId,
+      'completion_secret': challenge.completionSecret,
+      'identity_token': identityToken,
+    });
+    final session = result['session'];
+    if (result['status'] != 'complete' ||
+        session is! Map<String, dynamic> ||
+        session['sub'] is! String ||
+        !(session['sub'] as String).startsWith('did:') ||
+        session['access_token'] is! String ||
+        (session['access_token'] as String).isEmpty ||
+        session['token_type'] != 'Bearer') {
+      throw const FormatException('Invalid native login session');
+    }
+    final token = session['access_token'] as String;
+    try {
+      final data = await _nativePost('/matrix/session', {}, token: token);
+      if (data['sub'] != session['sub'])
+        throw const FormatException('Matrix identity mismatch');
+      final response = IdHubWalletResponse.success(
+        did: data['sub'] as String?,
+        matrixUserId: data['matrix_user_id'] as String?,
+        matrixAccessToken: data['matrix_access_token'] as String?,
+        matrixDeviceId: data['matrix_device_id'] as String?,
+        matrixHomeserver: data['matrix_homeserver'] as String?,
+      );
+      response.validate();
+      if (!response.hasMatrixCredentials)
+        throw const FormatException('Missing Matrix credentials');
+      return response;
+    } finally {
+      // This adapter owns no wallet session. Revoke its temporary Hub grant.
+      final refresh = session['refresh_token'];
+      if (refresh is String && refresh.isNotEmpty) {
+        try {
+          final request =
+              http.Request('POST', Uri.parse('$baseUrl/v1/oauth/revoke'))
+                ..followRedirects = false
+                ..headers['Content-Type'] = 'application/x-www-form-urlencoded'
+                ..headers['Authorization'] = 'Bearer $token'
+                ..bodyFields = {'refresh_token': refresh};
+          await (await _client.send(request).timeout(_requestTimeout)).stream
+              .drain<void>()
+              .timeout(_requestTimeout);
+        } catch (_) {
+          /* Do not replace a completed login with a cleanup error. */
+        }
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> _nativePost(
+    String path,
+    Map<String, Object?> body, {
+    String? token,
+  }) async {
+    final request = http.Request('POST', Uri.parse('$baseUrl/v1/auth/n42$path'))
+      ..followRedirects = false
+      ..headers['Content-Type'] = 'application/json'
+      ..body = jsonEncode(body);
+    if (token != null) request.headers['Authorization'] = 'Bearer $token';
+    final response = await http.Response.fromStream(
+      await _client.send(request).timeout(_requestTimeout),
+    ).timeout(_requestTimeout);
+    if (response.statusCode != 200)
+      throw IdHubException('N42 login request failed', response.statusCode);
+    return _decodeObject(response);
+  }
+
   Future<http.Response> _post(Uri uri, Map<String, Object?> body) {
     return _client
         .post(
@@ -255,4 +366,16 @@ class IdHubException implements Exception {
 
   @override
   String toString() => 'IdHubException($statusCode $code): $message';
+}
+
+/// Short-lived credentials kept only in the active login attempt.
+class IdHubNativeChallenge {
+  final String flowId;
+  final String completionSecret;
+  final String nonce;
+  const IdHubNativeChallenge({
+    required this.flowId,
+    required this.completionSecret,
+    required this.nonce,
+  });
 }
