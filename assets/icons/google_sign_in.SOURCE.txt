@@ -1,0 +1,2 @@
+Google sign-in G logo: https://developers.google.com/identity/images/g-logo.png
+Used to identify Google sign-in. Google trademarks belong to Google LLC.

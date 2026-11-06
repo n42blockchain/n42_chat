@@ -258,6 +258,10 @@ class N42ChatConfig {
   /// Keep unset until the host has enabled and accepted the backend integration.
   final String? n42NativeAuthUrl;
 
+  /// Optional host-rendered Apple control, for example ASAuthorizationAppleIDButton.
+  /// A null callback means that another login is in progress.
+  final Widget Function(BuildContext, VoidCallback?)? appleSignInButtonBuilder;
+
   /// Matrix SSO 浏览器回调地址
   ///
   /// 默认使用 `n42://auth/sso`。
@@ -568,6 +572,7 @@ class N42ChatConfig {
     this.oauthRedirectUri = 'n42app://oauth/callback',
     this.socialAuthBaseUrl,
     this.n42NativeAuthUrl,
+    this.appleSignInButtonBuilder,
     this.ssoRedirectUrl = 'n42://auth/sso',
     this.onMessageTap,
     this.onAvatarTap,
@@ -664,6 +669,7 @@ class N42ChatConfig {
     String? oauthRedirectUri,
     Object? socialAuthBaseUrl = _copyWithUndefined,
     Object? n42NativeAuthUrl = _copyWithUndefined,
+    Object? appleSignInButtonBuilder = _copyWithUndefined,
     String? ssoRedirectUrl,
     Object? onMessageTap = _copyWithUndefined,
     Object? onAvatarTap = _copyWithUndefined,
@@ -799,6 +805,11 @@ class N42ChatConfig {
         this.telegramBotId,
       ),
       oauthRedirectUri: oauthRedirectUri ?? this.oauthRedirectUri,
+      appleSignInButtonBuilder:
+          _nullableCopyWithValue<Widget Function(BuildContext, VoidCallback?)>(
+            appleSignInButtonBuilder,
+            this.appleSignInButtonBuilder,
+          ),
       n42NativeAuthUrl: _nullableCopyWithValue<String>(
         n42NativeAuthUrl,
         this.n42NativeAuthUrl,
