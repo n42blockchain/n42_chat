@@ -394,7 +394,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         }
       }
     } catch (e) {
-      debugLog('ChatBloc: Failed to process due scheduled messages: $e');
+      debugLog('ChatBloc: Failed to process due scheduled messages: ${e.runtimeType}');
     }
   }
 

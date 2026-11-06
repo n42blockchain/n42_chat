@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
@@ -64,6 +65,48 @@ void main() {
     expect(await storage.markScheduledDeliveryAccepted(ownerUserId: '@a:test', roomId: 'room', messageId: 'accepted', eventId: r'$event'), false);
   });
 
+  test(
+    'due scan rejects partial corrupt queues and resumes after explicit repair',
+    () async {
+      final storage = PreferencesDataSource();
+      await storage.saveScheduledMessage(
+        roomId: 'room',
+        messageId: 'valid',
+        text: 'keep',
+        scheduledAt: DateTime(2020),
+      );
+      final prefs = await SharedPreferences.getInstance();
+      const key = 'n42_chat_scheduled_messages';
+      final original = prefs.getString(key)!;
+      final good = jsonDecode(original) as Map<String, dynamic>;
+      for (final broken in <Object?>[
+        42,
+        null,
+        'not a message',
+        {},
+        {...(good['room'] as List).single as Map, 'type': 'futureType'},
+        {...(good['room'] as List).single as Map, 'scheduledAt': 'broken'},
+      ]) {
+        final raw = jsonEncode({
+          'room': [...good['room'] as List, broken],
+        });
+        await prefs.setString(key, raw);
+        await expectLater(storage.getDueScheduledMessages(), throwsA(anything));
+        await expectLater(
+          storage.getScheduledMessages('room'),
+          throwsA(anything),
+        );
+        await expectLater(storage.getDueScheduledMessages(), throwsA(anything));
+        expect(prefs.getString(key), raw);
+      }
+      await prefs.setString(key, original);
+      expect(
+        (await storage.getDueScheduledMessages()).single.messageId,
+        'valid',
+      );
+    },
+  );
+
   for (final malformed in ['{', '{"room":[42]}']) {
     test(
       'room read reports corruption and preserves stored bytes: $malformed',
@@ -76,6 +119,7 @@ void main() {
           storage.getScheduledMessages('room'),
           throwsA(anything),
         );
+        await expectLater(storage.getDueScheduledMessages(), throwsA(anything));
         final prefs = await SharedPreferences.getInstance();
         expect(prefs.getString('n42_chat_scheduled_messages'), malformed);
         await prefs.remove('n42_chat_scheduled_messages');
@@ -163,7 +207,7 @@ void main() {
 
   test('blank owner cannot silently access legacy drafts', () async {
     final storage = PreferencesDataSource();
-    expect(await storage.getDueScheduledMessages(ownerUserId: ''), isEmpty);
+    await expectLater(storage.getDueScheduledMessages(ownerUserId: ''), throwsArgumentError);
     await expectLater(
       storage.getScheduledMessages(
         '!room:test',

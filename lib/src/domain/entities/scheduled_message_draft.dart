@@ -47,7 +47,16 @@ class ScheduledMessageDraft extends Equatable {
   });
 
   factory ScheduledMessageDraft.fromJson(Map<String, dynamic> json) {
+    final messageId = json['messageId'] as String?;
+    if (messageId == null || messageId.trim().isEmpty) {
+      throw const FormatException('Missing scheduled message identity');
+    }
+    final scheduledAt = DateTime.parse(json['scheduledAt'] as String);
+    final createdAt = DateTime.parse(json['createdAt'] as String);
     final rawPayload = json['payload'];
+    if (rawPayload != null && rawPayload is! Map) {
+      throw const FormatException('Invalid scheduled message payload');
+    }
     final rawType = json['type'] as String?;
     final failedAttempts = json['failedAttempts'] as int? ?? 0;
     if (failedAttempts < 0) {
@@ -64,16 +73,12 @@ class ScheduledMessageDraft extends Equatable {
       failedAttempts: failedAttempts,
       retryAt: retryAt,
       deliveryUnconfirmed: json['deliveryUnconfirmed'] == true,
-      messageId: json['messageId'] as String? ?? '',
+      messageId: messageId,
       roomId: json['roomId'] as String?,
       text: json['text'] as String? ?? '',
       type: _parseMessageType(rawType),
-      scheduledAt:
-          DateTime.tryParse(json['scheduledAt'] as String? ?? '') ??
-          DateTime.now(),
-      createdAt:
-          DateTime.tryParse(json['createdAt'] as String? ?? '') ??
-          DateTime.now(),
+      scheduledAt: scheduledAt,
+      createdAt: createdAt,
       mentionedUserIds:
           (json['mentionedUserIds'] as List<dynamic>?)
               ?.map((item) => item.toString())
@@ -250,6 +255,6 @@ class ScheduledMessageDraft extends Equatable {
       }
     }
 
-    return MessageType.text;
+    throw const FormatException('Unknown scheduled message type');
   }
 }

@@ -987,33 +987,28 @@ class PreferencesDataSource {
       final data = p.getString(_scheduledKey(ownerUserId));
       if (data == null) return [];
 
-          final allData = jsonDecode(data) as Map<String, dynamic>;
-          final now = DateTime.now();
-          final dueMessages = <ScheduledMessageDraft>[];
+      final allData = jsonDecode(data) as Map<String, dynamic>;
+      final now = DateTime.now();
+      final dueMessages = <ScheduledMessageDraft>[];
 
-          for (final entry in allData.entries) {
-            final roomId = entry.key;
-            final messages = (entry.value as List<dynamic>)
-                .whereType<Map<dynamic, dynamic>>()
-                .map(
-                  (item) => ScheduledMessageDraft.fromJson(
-                    Map<String, dynamic>.from(item),
-                  ),
-                );
-
-        for (final msg in messages) {
+      for (final entry in allData.entries) {
+        final roomId = entry.key;
+        final messages = entry.value as List<dynamic>;
+        for (final item in messages) {
+          final msg = ScheduledMessageDraft.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          );
           if (msg.isDue(now)) {
             dueMessages.add(msg.copyWith(roomId: roomId));
           }
         }
       }
-
-          return dueMessages;
-        } catch (e) {
-          prefsLog('Failed to get due scheduled messages - $e');
-          return [];
-        }
-      });
+      return dueMessages;
+    } catch (e) {
+      prefsLog('Failed to get due scheduled messages - ${e.runtimeType}');
+      rethrow;
+    }
+  });
 
   /// 删除定时消息
   Future<void> removeScheduledMessage(

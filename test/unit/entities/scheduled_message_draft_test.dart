@@ -24,6 +24,39 @@ void main() {
     );
   });
 
+  test('rejects damaged identity, dates, payload and unknown types', () {
+    final original = ScheduledMessageDraft(
+      messageId: 'draft',
+      text: 'keep',
+      type: MessageType.text,
+      scheduledAt: DateTime.utc(2030),
+      createdAt: DateTime.utc(2026),
+    ).toJson();
+    for (final change in <Map<String, dynamic>>[
+      {'messageId': null},
+      {'messageId': ' '},
+      {'scheduledAt': null},
+      {'scheduledAt': 'broken'},
+      {'createdAt': 'broken'},
+      {'type': 'futureType'},
+      {'payload': 'broken'},
+    ]) {
+      expect(
+        () => ScheduledMessageDraft.fromJson({...original, ...change}),
+        throwsA(anything),
+        reason: change.keys.single,
+      );
+    }
+    // Older text-only drafts had no type or payload field.
+    final legacy = {...original}
+      ..remove('type')
+      ..remove('payload');
+    final restored = ScheduledMessageDraft.fromJson(legacy);
+    expect(restored.type, MessageType.text);
+    expect(restored.payload, isEmpty);
+    expect(restored.scheduledAt, DateTime.utc(2030));
+  });
+
   group('ScheduledMessageDraft', () {
     test('parses poll payload and builds preview text', () {
       final draft = ScheduledMessageDraft.fromJson({
