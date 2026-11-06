@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:crypto/crypto.dart';
@@ -843,6 +844,29 @@ class PreferencesDataSource {
       );
     }));
   });
+
+  /// Import only into evidence storage. Never replace active queues, receipts,
+  /// legacy ownership or attachments, and never enqueue imported content.
+  Future<ScheduledRecoveryCopy> importScheduledRecoveryCopy({
+    required Uint8List bytes,
+    required String ownerUserId,
+    required bool Function() isCurrent,
+  }) {
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    // Decode synchronously before awaiting the store lock. Mutable caller bytes
+    // cannot substitute another file while a preceding operation is pending.
+    final copy = ScheduledRecoveryCopy.fromExportBytes(bytes, ownerUserId: ownerUserId);
+    final key = _scheduledKey(ownerUserId);
+    return _withScheduledStore(() async {
+      if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+      final p = await prefs;
+      await p.reload();
+      if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+      await _preserveScheduledCopy(p, key, copy.raw!);
+      if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+      return copy;
+    });
+  }
 
   /// Remove only the reviewed intact copy, never the active queue or legacy data.
   Future<void> deleteScheduledRecoveryCopy({

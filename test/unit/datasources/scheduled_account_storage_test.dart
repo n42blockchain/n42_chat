@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:n42_chat/src/domain/entities/scheduled_recovery_copy.dart';
 import 'dart:async';
 import 'package:n42_chat/src/data/services/scheduled_draft_operation.dart';
 
@@ -26,6 +27,62 @@ class _RejectRecoveryStore extends InMemorySharedPreferencesStore {
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('import is idempotent evidence only and isolated from active/legacy accounts', () async {
+    const raw = '{broken imported queue';
+    final bytes = ScheduledRecoveryCopy(id: sha256.convert(utf8.encode(raw)).toString(),
+      raw: raw, isIntact: true).exportBytes('@a:test');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('n42_chat_scheduled_messages', 'legacy sentinel');
+    await prefs.setString('n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode('@a:test'))}', '{}');
+    final initial = {for(final key in prefs.getKeys()) key: prefs.get(key)};
+    final store = PreferencesDataSource();
+    await Future.wait(List.generate(3, (_) => store.importScheduledRecoveryCopy(
+      bytes: bytes, ownerUserId: '@a:test', isCurrent: () => true)));
+    final copies = await store.getScheduledRecoveryCopies(ownerUserId: '@a:test', isCurrent: () => true);
+    expect(copies, hasLength(1));
+    expect(copies.single.raw, raw);
+    expect(await store.getScheduledMessages('!room:test', ownerUserId: '@a:test'), isEmpty);
+    expect(await store.getScheduledRecoveryCopies(ownerUserId: '@b:test', isCurrent: () => true), isEmpty);
+    await prefs.reload();
+    for (final entry in initial.entries) { expect(prefs.get(entry.key), entry.value); }
+    expect(prefs.getKeys().difference(initial.keys.toSet()).every((key) => key.contains('_recovery_')), isTrue);
+    expect(() => store.importScheduledRecoveryCopy(bytes: bytes,
+      ownerUserId: '@b:test', isCurrent: () => true), throwsFormatException);
+  });
+  test('caller byte mutation cannot change an import waiting on storage', () async {
+    const raw = 'reviewed bytes';
+    final bytes = ScheduledRecoveryCopy(id: sha256.convert(utf8.encode(raw)).toString(),
+      raw: raw, isIntact: true).exportBytes('@a:test');
+    final store = PreferencesDataSource();
+    final pending = store.importScheduledRecoveryCopy(bytes: bytes,
+      ownerUserId: '@a:test', isCurrent: () => true);
+    bytes.fillRange(0, bytes.length, 0);
+    expect((await pending).raw, raw);
+    expect((await store.getScheduledRecoveryCopies(ownerUserId: '@a:test', isCurrent: () => true)).single.raw, raw);
+  });
+  test('failed import write does not report success or retain optimistic copy', () async {
+    final platform = _RejectRecoveryStore()..reject = true;
+    SharedPreferencesStorePlatform.instance = platform;
+    final store = PreferencesDataSource();
+    const raw = 'fixture';
+    final bytes = ScheduledRecoveryCopy(id: sha256.convert(utf8.encode(raw)).toString(),
+      raw: raw, isIntact: true).exportBytes('@a:test');
+    await expectLater(store.importScheduledRecoveryCopy(bytes: bytes, ownerUserId: '@a:test',
+      isCurrent: () => true), throwsStateError);
+    expect(await store.getScheduledRecoveryCopies(ownerUserId: '@a:test', isCurrent: () => true), isEmpty);
+  });
+  test('account change while import waits prevents persistence', () async {
+    final store = PreferencesDataSource();
+    const raw = 'fixture';
+    final bytes = ScheduledRecoveryCopy(id: sha256.convert(utf8.encode(raw)).toString(),
+      raw: raw, isIntact: true).exportBytes('@a:test');
+    var current = true;
+    final future = store.importScheduledRecoveryCopy(bytes: bytes,
+      ownerUserId: '@a:test', isCurrent: () => current);
+    current = false;
+    await expectLater(future, throwsStateError);
+    expect(await store.getScheduledRecoveryCopies(ownerUserId: '@a:test', isCurrent: () => true), isEmpty);
+  });
   test('confirmed corrupt reset preserves bytes and other account while allowing new drafts', () async {
     final store = PreferencesDataSource();
     const owner = '@reset:test';
