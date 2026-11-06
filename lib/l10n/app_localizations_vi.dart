@@ -6197,4 +6197,11 @@ class SVi extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Chưa xác nhận gửi thành công';
+
+  @override
+  String get scheduledRecoveryCopy => 'Lưu bản sao khôi phục';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Đã lưu trên thiết bị này mà không thay đổi hoặc gửi tin nhắn. Bản xem trước hiển thị tối đa 8.000 ký tự.';
 }

@@ -44,6 +44,8 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   int _loadVersion = 0;
   bool _isLoading = true;
   bool _loadFailed = false;
+  bool _savingRecovery = false;
+  DialogRoute<void>? _recoveryRoute;
   final Set<String> _cancelling = {};
   List<ScheduledMessageDraft> _drafts = const [];
 
@@ -55,6 +57,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         _,
       ) {
         if (!mounted) return;
+        _closeRecovery();
         setState(() {
           _ownerUserId = null;
           _drafts = const [];
@@ -68,7 +71,98 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   @override
   void dispose() {
     _accountSubscription?.cancel();
+    final route = _recoveryRoute;
+    _recoveryRoute = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (route?.isActive == true && route!.navigator?.mounted == true) {
+        route.navigator!.removeRoute(route);
+      }
+    });
     super.dispose();
+  }
+
+  void _closeRecovery() {
+    final route = _recoveryRoute;
+    _recoveryRoute = null;
+    if (route?.isActive == true) route!.navigator?.removeRoute(route);
+  }
+
+  Future<void> _saveRecoveryCopy() async {
+    if (_savingRecovery || _origin?.isCurrent != true) return;
+    setState(() => _savingRecovery = true);
+    try {
+      final owner = await _messages.getCurrentUserId();
+      if (!mounted ||
+          owner == null ||
+          owner.isEmpty ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      final raw = await _preferences.saveScheduledRecoveryCopy(
+        ownerUserId: owner,
+        isCurrent: () => mounted && _origin?.isCurrent == true,
+      );
+      if (!mounted ||
+          _origin?.isCurrent != true ||
+          owner != await _messages.getCurrentUserId() ||
+          !mounted ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      if (raw == null) {
+        await _loadDrafts();
+        return;
+      }
+      final previewRunes = raw.runes.take(8001).toList(growable: false);
+      final preview =
+          String.fromCharCodes(previewRunes.take(8000)) +
+          (previewRunes.length > 8000 ? '…' : '');
+      final route = DialogRoute<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            S.of(context)?.scheduledRecoveryCopy ?? 'Save recovery copy',
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    S.of(context)?.scheduledRecoveryCopyHint ?? 'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.',
+                  ),
+                  const SizedBox(height: 16),
+                  SelectableText(preview),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+            ),
+          ],
+        ),
+      );
+      _recoveryRoute = route;
+      await Navigator.of(context).push(route);
+      if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+    } catch (_) {
+      if (mounted && _origin?.isCurrent == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.commonFailedToSave ?? 'Failed to save',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _savingRecovery = false);
+    }
   }
 
   Future<void> _loadDrafts() async {
@@ -281,6 +375,16 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             onPressed: _loadDrafts,
             icon: const Icon(Icons.refresh),
             label: Text(S.of(context)?.commonRetry ?? 'Retry'),
+          ),
+        ),
+        Center(
+          child: TextButton.icon(
+            key: const ValueKey('scheduled-recovery-copy'),
+            onPressed: _savingRecovery ? null : _saveRecoveryCopy,
+            icon: const Icon(Icons.save_outlined),
+            label: Text(
+              S.of(context)?.scheduledRecoveryCopy ?? 'Save recovery copy',
+            ),
           ),
         ),
       ],

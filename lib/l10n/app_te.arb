@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "సందేశాన్ని షెడ్యూల్ చేయడానికి పంపు, ఫోటోలు, ఫైల్‌లు, GIF లేదా స్టిక్కర్‌ను ఎక్కువసేపు నొక్కండి.",
   "scheduledMessageCancelled": "షెడ్యూల్ చేసిన సందేశం రద్దు చేయబడింది",
   "scheduledMessageCreatedAt": "సృష్టించిన సమయం: {time}",
-  "scheduledDeliveryUnconfirmed": "డెలివరీ నిర్ధారించబడలేదు"
+  "scheduledDeliveryUnconfirmed": "డెలివరీ నిర్ధారించబడలేదు",
+  "scheduledRecoveryCopy": "పునరుద్ధరణ కాపీని సేవ్ చేయండి",
+  "scheduledRecoveryCopyHint": "సందేశాలను మార్చకుండా లేదా పంపకుండా ఈ పరికరంలో సేవ్ చేయబడింది. ప్రివ్యూలో గరిష్ఠంగా 8,000 అక్షరాలు కనిపిస్తాయి."
 }

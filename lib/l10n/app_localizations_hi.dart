@@ -6207,4 +6207,11 @@ class SHi extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'डिलीवरी की पुष्टि नहीं हुई';
+
+  @override
+  String get scheduledRecoveryCopy => 'पुनर्प्राप्ति प्रति सहेजें';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'संदेश बदले या भेजे बिना इस डिवाइस पर सहेजा गया। पूर्वावलोकन में अधिकतम 8,000 अक्षर दिखते हैं।';
 }

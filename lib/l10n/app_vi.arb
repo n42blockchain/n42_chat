@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Nhấn giữ Gửi, Ảnh, Tệp, GIF hoặc nhãn dán để lên lịch gửi tin nhắn.",
   "scheduledMessageCancelled": "Đã hủy tin nhắn đã lên lịch",
   "scheduledMessageCreatedAt": "Đã tạo lúc {time}",
-  "scheduledDeliveryUnconfirmed": "Chưa xác nhận gửi thành công"
+  "scheduledDeliveryUnconfirmed": "Chưa xác nhận gửi thành công",
+  "scheduledRecoveryCopy": "Lưu bản sao khôi phục",
+  "scheduledRecoveryCopyHint": "Đã lưu trên thiết bị này mà không thay đổi hoặc gửi tin nhắn. Bản xem trước hiển thị tối đa 8.000 ký tự."
 }

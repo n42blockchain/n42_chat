@@ -6181,4 +6181,11 @@ class SAr extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'لم يتم تأكيد التسليم';
+
+  @override
+  String get scheduledRecoveryCopy => 'حفظ نسخة للاسترداد';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'تُحفظ على هذا الجهاز دون تغيير الرسائل أو إرسالها. تعرض المعاينة حتى 8,000 حرف.';
 }

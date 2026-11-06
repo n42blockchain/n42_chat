@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Bonyeza kwa muda Tuma, Picha, Faili, GIF au kibandiko ili kuratibu ujumbe.",
   "scheduledMessageCancelled": "Ujumbe ulioratibiwa umeghairiwa",
   "scheduledMessageCreatedAt": "Uliundwa {time}",
-  "scheduledDeliveryUnconfirmed": "Uwasilishaji haujathibitishwa"
+  "scheduledDeliveryUnconfirmed": "Uwasilishaji haujathibitishwa",
+  "scheduledRecoveryCopy": "Hifadhi nakala ya urejeshaji",
+  "scheduledRecoveryCopyHint": "Imehifadhiwa kwenye kifaa hiki bila kubadilisha au kutuma ujumbe. Onyesho la kukagua lina hadi herufi 8,000."
 }

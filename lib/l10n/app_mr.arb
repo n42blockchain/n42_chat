@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "संदेशाची वेळ ठरवण्यासाठी पाठवा, फोटो, फाइल्स, GIF किंवा स्टिकर दीर्घकाळ दाबा.",
   "scheduledMessageCancelled": "नियोजित संदेश रद्द केला",
   "scheduledMessageCreatedAt": "तयार केले: {time}",
-  "scheduledDeliveryUnconfirmed": "वितरणाची पुष्टी झालेली नाही"
+  "scheduledDeliveryUnconfirmed": "वितरणाची पुष्टी झालेली नाही",
+  "scheduledRecoveryCopy": "पुनर्प्राप्ती प्रत जतन करा",
+  "scheduledRecoveryCopyHint": "संदेश न बदलता किंवा न पाठवता या उपकरणावर जतन केले. पूर्वावलोकनात जास्तीत जास्त 8,000 अक्षरे दिसतात."
 }

@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Tieni premuto Invia, Foto, File, una GIF o un adesivo per programmare un messaggio.",
   "scheduledMessageCancelled": "Messaggio programmato annullato",
   "scheduledMessageCreatedAt": "Creato: {time}",
-  "scheduledDeliveryUnconfirmed": "Consegna non confermata"
+  "scheduledDeliveryUnconfirmed": "Consegna non confermata",
+  "scheduledRecoveryCopy": "Salva copia di recupero",
+  "scheduledRecoveryCopyHint": "Salvata su questo dispositivo senza modificare o inviare messaggi. L’anteprima mostra fino a 8.000 caratteri."
 }

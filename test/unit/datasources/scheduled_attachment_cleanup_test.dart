@@ -63,6 +63,15 @@ void main() {
     String room = 'room',
   }) => storage.removeScheduledMessage(room, id, ownerUserId: owner);
 
+  test('recovery copy protects attachment after active draft cancellation', () async {
+    final file = await File('${managed.path}/recovery-file').writeAsString('keep');
+    await save(file.path);
+    await storage.saveScheduledRecoveryCopy(ownerUserId: '@a:test', isCurrent: () => true);
+    await remove();
+    expect(await storage.getDueScheduledMessages(ownerUserId: '@a:test'), isEmpty);
+    expect(await file.exists(), isTrue);
+  });
+
   test('failed durable removal never deletes the attachment', () async {
     final file = await File('${managed.path}/file').writeAsString('keep');
     final prefs = _Prefs();

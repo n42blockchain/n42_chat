@@ -2273,5 +2273,7 @@
   "scheduledMessagesHint": "长按发送、照片、文件、GIF 或贴纸，即可设置定时发送。",
   "scheduledMessageCancelled": "已取消定时消息",
   "scheduledMessageCreatedAt": "创建于 {time}",
-  "scheduledDeliveryUnconfirmed": "发送结果未确认"
+  "scheduledDeliveryUnconfirmed": "发送结果未确认",
+  "scheduledRecoveryCopy": "保存恢复副本",
+  "scheduledRecoveryCopyHint": "副本保存在此设备，不会更改或发送消息。预览最多显示 8,000 个字符。"
 }

@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Mantenha pressionado Enviar, Fotos, Arquivos, um GIF ou uma figurinha para agendar uma mensagem.",
   "scheduledMessageCancelled": "Mensagem agendada cancelada",
   "scheduledMessageCreatedAt": "Criado em {time}",
-  "scheduledDeliveryUnconfirmed": "Entrega não confirmada"
+  "scheduledDeliveryUnconfirmed": "Entrega não confirmada",
+  "scheduledRecoveryCopy": "Salvar cópia de recuperação",
+  "scheduledRecoveryCopyHint": "Salva neste dispositivo sem alterar nem enviar mensagens. A prévia mostra até 8.000 caracteres."
 }

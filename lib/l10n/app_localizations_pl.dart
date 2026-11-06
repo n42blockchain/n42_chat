@@ -6248,4 +6248,11 @@ class SPl extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Dostarczenie niepotwierdzone';
+
+  @override
+  String get scheduledRecoveryCopy => 'Zapisz kopię do odzyskania';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Zapisano na tym urządzeniu bez zmiany ani wysyłania wiadomości. Podgląd pokazuje do 8 000 znaków.';
 }

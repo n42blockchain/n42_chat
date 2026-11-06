@@ -6211,4 +6211,11 @@ class STr extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Teslimat doğrulanmadı';
+
+  @override
+  String get scheduledRecoveryCopy => 'Kurtarma kopyasını kaydet';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Mesajlar değiştirilmeden veya gönderilmeden bu cihaza kaydedildi. Önizleme en fazla 8.000 karakter gösterir.';
 }

@@ -819,6 +819,31 @@ class PreferencesDataSource {
     }
   }
 
+  /// Preserve the exact account-owned queue before any manual recovery.
+  /// Recovery copies are never read by the dispatcher. Keep the account prefix
+  /// so attachment cleanup also preserves files referenced by these copies.
+  Future<String?> saveScheduledRecoveryCopy({
+    required String ownerUserId,
+    required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final key = _scheduledKey(ownerUserId);
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final raw = p.getString(key);
+    if (raw == null) return null;
+    final digest = sha256.convert(utf8.encode(raw));
+    final backupKey = '${key}_recovery_$digest';
+    final previous = p.getString(backupKey);
+    if (previous != null && previous != raw) {
+      throw StateError('Scheduled recovery copy integrity mismatch');
+    }
+    if (previous == null) await saveStringPreference(p, backupKey, raw);
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    return raw;
+  });
+
   /// 保存定时消息
   ///
   /// [roomId] 房间ID

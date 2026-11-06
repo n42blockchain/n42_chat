@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "संदेश का समय तय करने के लिए भेजें, फ़ोटो, फ़ाइलें, GIF या स्टिकर को देर तक दबाएँ।",
   "scheduledMessageCancelled": "निर्धारित संदेश रद्द कर दिया गया",
   "scheduledMessageCreatedAt": "बनाया गया: {time}",
-  "scheduledDeliveryUnconfirmed": "डिलीवरी की पुष्टि नहीं हुई"
+  "scheduledDeliveryUnconfirmed": "डिलीवरी की पुष्टि नहीं हुई",
+  "scheduledRecoveryCopy": "पुनर्प्राप्ति प्रति सहेजें",
+  "scheduledRecoveryCopyHint": "संदेश बदले या भेजे बिना इस डिवाइस पर सहेजा गया। पूर्वावलोकन में अधिकतम 8,000 अक्षर दिखते हैं।"
 }

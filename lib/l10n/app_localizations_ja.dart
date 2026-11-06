@@ -6073,4 +6073,11 @@ class SJa extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => '配信が確認されていません';
+
+  @override
+  String get scheduledRecoveryCopy => '復元用コピーを保存';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'メッセージを変更・送信せず、この端末に保存しました。プレビューは最大8,000文字です。';
 }

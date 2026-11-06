@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Mesaj zamanlamak için Gönder, Fotoğraflar, Dosyalar, bir GIF veya çıkartmaya uzun basın.",
   "scheduledMessageCancelled": "Zamanlanmış mesaj iptal edildi",
   "scheduledMessageCreatedAt": "Oluşturulma: {time}",
-  "scheduledDeliveryUnconfirmed": "Teslimat doğrulanmadı"
+  "scheduledDeliveryUnconfirmed": "Teslimat doğrulanmadı",
+  "scheduledRecoveryCopy": "Kurtarma kopyasını kaydet",
+  "scheduledRecoveryCopyHint": "Mesajlar değiştirilmeden veya gönderilmeden bu cihaza kaydedildi. Önizleme en fazla 8.000 karakter gösterir."
 }

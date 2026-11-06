@@ -6241,4 +6241,11 @@ class SSw extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Uwasilishaji haujathibitishwa';
+
+  @override
+  String get scheduledRecoveryCopy => 'Hifadhi nakala ya urejeshaji';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Imehifadhiwa kwenye kifaa hiki bila kubadilisha au kutuma ujumbe. Onyesho la kukagua lina hadi herufi 8,000.';
 }

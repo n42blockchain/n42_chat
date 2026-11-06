@@ -44,7 +44,10 @@ void main() {
     matchesClient: (candidate) => identical(candidate, client),
   );
   setUpAll(
-    () => registerFallbackValue(const CancelScheduledMessage('fallback')),
+    () {
+      registerFallbackValue(const CancelScheduledMessage('fallback'));
+      registerFallbackValue(() => false);
+    },
   );
   setUp(() async {
     await getIt.reset();
@@ -132,6 +135,84 @@ void main() {
     expect(find.text('Delivery not confirmed'), findsNothing);
     final cancel = tester.widget<TextButton>(find.widgetWithText(TextButton, 'Cancel'));
     expect(cancel.onPressed, isNull);
+  });
+
+  testWidgets('late recovery copy never exposes the previous account', (tester) async {
+    final pending = Completer<String?>();
+    when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test')).thenThrow(const FormatException('damaged'));
+    when(() => prefs.saveScheduledRecoveryCopy(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) => pending.future);
+    await pump(tester);
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-copy')));
+    await tester.pump();
+    when(() => messages.getCurrentUserId()).thenAnswer((_) async => '@b:test');
+    pending.complete('private previous account copy');
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('private previous account copy'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final language in ['en', 'ar']) {
+    testWidgets(
+      'recovery copy opens a bounded preview and closes on logout: $language',
+      (tester) async {
+        final events = StreamController<bool>.broadcast(sync: true);
+        addTearDown(events.close);
+        when(() => auth.loginStateStream).thenAnswer((_) => events.stream);
+        when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test'))
+            .thenThrow(const FormatException('damaged'));
+        when(
+          () => prefs.saveScheduledRecoveryCopy(
+            ownerUserId: '@me:test',
+            isCurrent: any(named: 'isCurrent'),
+          ),
+        ).thenAnswer((call) async {
+          expect((call.namedArguments[#isCurrent] as bool Function())(), true);
+          return 'private recovery ${'😀' * 9000}';
+        });
+        tester.view.physicalSize = const Size(320, 480);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await pump(tester, locale: Locale(language), scale: 2);
+        final button = find.byKey(const ValueKey('scheduled-recovery-copy'));
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsOneWidget);
+        final preview = tester
+            .widget<SelectableText>(find.byType(SelectableText))
+            .data!;
+        expect(preview.startsWith('private recovery'), true);
+        expect(preview.runes.length, lessThanOrEqualTo(8001));
+        expect(preview.contains('�'), false);
+        when(() => auth.currentAccountGeneration).thenReturn(null);
+        events.add(false);
+        await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.byType(SelectableText), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+  testWidgets('failed recovery copy shows no content and permits retry', (
+    tester,
+  ) async {
+    when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test'))
+        .thenThrow(const FormatException('damaged'));
+    when(
+      () => prefs.saveScheduledRecoveryCopy(
+        ownerUserId: '@me:test',
+        isCurrent: any(named: 'isCurrent'),
+      ),
+    ).thenThrow(StateError('disk'));
+    await pump(tester);
+    final button = find.byKey(const ValueKey('scheduled-recovery-copy'));
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(tester.widget<TextButton>(button).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
   });
 
   for (final language in ['en', 'ar']) {

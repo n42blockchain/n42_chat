@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Przytrzymaj Wyślij, Zdjęcia, Pliki, GIF lub naklejkę, aby zaplanować wiadomość.",
   "scheduledMessageCancelled": "Zaplanowana wiadomość została anulowana",
   "scheduledMessageCreatedAt": "Utworzono: {time}",
-  "scheduledDeliveryUnconfirmed": "Dostarczenie niepotwierdzone"
+  "scheduledDeliveryUnconfirmed": "Dostarczenie niepotwierdzone",
+  "scheduledRecoveryCopy": "Zapisz kopię do odzyskania",
+  "scheduledRecoveryCopyHint": "Zapisano na tym urządzeniu bez zmiany ani wysyłania wiadomości. Podgląd pokazuje do 8 000 znaków."
 }

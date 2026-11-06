@@ -6180,4 +6180,11 @@ class SEn extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Delivery not confirmed';
+
+  @override
+  String get scheduledRecoveryCopy => 'Save recovery copy';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.';
 }

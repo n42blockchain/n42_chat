@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "اضغط مطولًا على إرسال أو الصور أو الملفات أو صورة GIF أو ملصق لجدولة رسالة.",
   "scheduledMessageCancelled": "تم إلغاء الرسالة المجدولة",
   "scheduledMessageCreatedAt": "أُنشئت في {time}",
-  "scheduledDeliveryUnconfirmed": "لم يتم تأكيد التسليم"
+  "scheduledDeliveryUnconfirmed": "لم يتم تأكيد التسليم",
+  "scheduledRecoveryCopy": "حفظ نسخة للاسترداد",
+  "scheduledRecoveryCopyHint": "تُحفظ على هذا الجهاز دون تغيير الرسائل أو إرسالها. تعرض المعاينة حتى 8,000 حرف."
 }

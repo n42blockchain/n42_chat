@@ -6035,6 +6035,13 @@ class SZh extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => '发送结果未确认';
+
+  @override
+  String get scheduledRecoveryCopy => '保存恢复副本';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      '副本保存在此设备，不会更改或发送消息。预览最多显示 8,000 个字符。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12068,4 +12075,11 @@ class SZhTw extends SZh {
 
   @override
   String get scheduledDeliveryUnconfirmed => '傳送結果尚未確認';
+
+  @override
+  String get scheduledRecoveryCopy => '儲存復原副本';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      '副本儲存在此裝置，不會變更或傳送訊息。預覽最多顯示 8,000 個字元。';
 }

@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Mantén pulsado Enviar, Fotos, Archivos, un GIF o un sticker para programar un mensaje.",
   "scheduledMessageCancelled": "Mensaje programado cancelado",
   "scheduledMessageCreatedAt": "Creado: {time}",
-  "scheduledDeliveryUnconfirmed": "Entrega no confirmada"
+  "scheduledDeliveryUnconfirmed": "Entrega no confirmada",
+  "scheduledRecoveryCopy": "Guardar copia de recuperación",
+  "scheduledRecoveryCopyHint": "Guardada en este dispositivo sin modificar ni enviar mensajes. La vista previa muestra hasta 8.000 caracteres."
 }

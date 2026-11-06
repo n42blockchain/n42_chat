@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "پیغام کا وقت طے کرنے کے لیے بھیجیں، تصاویر، فائلیں، GIF یا اسٹیکر کو دیر تک دبائیں۔",
   "scheduledMessageCancelled": "طے شدہ پیغام منسوخ کر دیا گیا",
   "scheduledMessageCreatedAt": "بنایا گیا: {time}",
-  "scheduledDeliveryUnconfirmed": "ترسیل کی تصدیق نہیں ہوئی"
+  "scheduledDeliveryUnconfirmed": "ترسیل کی تصدیق نہیں ہوئی",
+  "scheduledRecoveryCopy": "بحالی کی نقل محفوظ کریں",
+  "scheduledRecoveryCopyHint": "پیغامات کو تبدیل یا ارسال کیے بغیر اس آلے پر محفوظ کیا گیا۔ پیش منظر میں زیادہ سے زیادہ 8,000 حروف دکھائے جاتے ہیں۔"
 }

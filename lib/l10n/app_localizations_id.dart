@@ -6221,4 +6221,11 @@ class SId extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Pengiriman belum dikonfirmasi';
+
+  @override
+  String get scheduledRecoveryCopy => 'Simpan salinan pemulihan';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Disimpan di perangkat ini tanpa mengubah atau mengirim pesan. Pratinjau menampilkan hingga 8.000 karakter.';
 }

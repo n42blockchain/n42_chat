@@ -11434,6 +11434,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Delivery not confirmed'**
   String get scheduledDeliveryUnconfirmed;
+
+  /// No description provided for @scheduledRecoveryCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Save recovery copy'**
+  String get scheduledRecoveryCopy;
+
+  /// No description provided for @scheduledRecoveryCopyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.'**
+  String get scheduledRecoveryCopyHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

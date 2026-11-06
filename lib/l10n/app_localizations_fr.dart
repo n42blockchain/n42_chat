@@ -6277,4 +6277,11 @@ class SFr extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Livraison non confirmée';
+
+  @override
+  String get scheduledRecoveryCopy => 'Enregistrer une copie de récupération';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Enregistrée sur cet appareil sans modifier ni envoyer de messages. L’aperçu affiche jusqu’à 8 000 caractères.';
 }

@@ -6255,4 +6255,11 @@ class STe extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'డెలివరీ నిర్ధారించబడలేదు';
+
+  @override
+  String get scheduledRecoveryCopy => 'పునరుద్ధరణ కాపీని సేవ్ చేయండి';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'సందేశాలను మార్చకుండా లేదా పంపకుండా ఈ పరికరంలో సేవ్ చేయబడింది. ప్రివ్యూలో గరిష్ఠంగా 8,000 అక్షరాలు కనిపిస్తాయి.';
 }

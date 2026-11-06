@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Нажмите и удерживайте «Отправить», «Фото», «Файлы», GIF или стикер, чтобы запланировать сообщение.",
   "scheduledMessageCancelled": "Запланированное сообщение отменено",
   "scheduledMessageCreatedAt": "Создано: {time}",
-  "scheduledDeliveryUnconfirmed": "Доставка не подтверждена"
+  "scheduledDeliveryUnconfirmed": "Доставка не подтверждена",
+  "scheduledRecoveryCopy": "Сохранить копию для восстановления",
+  "scheduledRecoveryCopyHint": "Сохранено на этом устройстве без изменения или отправки сообщений. Предпросмотр показывает до 8 000 символов."
 }

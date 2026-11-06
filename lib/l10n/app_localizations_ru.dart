@@ -6239,4 +6239,11 @@ class SRu extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Доставка не подтверждена';
+
+  @override
+  String get scheduledRecoveryCopy => 'Сохранить копию для восстановления';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Сохранено на этом устройстве без изменения или отправки сообщений. Предпросмотр показывает до 8 000 символов.';
 }

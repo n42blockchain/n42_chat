@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Tekan lama Kirim, Foto, File, GIF, atau stiker untuk menjadwalkan pesan.",
   "scheduledMessageCancelled": "Pesan terjadwal dibatalkan",
   "scheduledMessageCreatedAt": "Dibuat {time}",
-  "scheduledDeliveryUnconfirmed": "Pengiriman belum dikonfirmasi"
+  "scheduledDeliveryUnconfirmed": "Pengiriman belum dikonfirmasi",
+  "scheduledRecoveryCopy": "Simpan salinan pemulihan",
+  "scheduledRecoveryCopyHint": "Disimpan di perangkat ini tanpa mengubah atau mengirim pesan. Pratinjau menampilkan hingga 8.000 karakter."
 }

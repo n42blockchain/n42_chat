@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "বার্তা পাঠানোর সময় নির্ধারণ করতে পাঠান, ছবি, ফাইল, GIF বা স্টিকারে দীর্ঘক্ষণ চাপ দিন।",
   "scheduledMessageCancelled": "নির্ধারিত বার্তা বাতিল করা হয়েছে",
   "scheduledMessageCreatedAt": "তৈরি হয়েছে {time}",
-  "scheduledDeliveryUnconfirmed": "ডেলিভারি নিশ্চিত করা হয়নি"
+  "scheduledDeliveryUnconfirmed": "ডেলিভারি নিশ্চিত করা হয়নি",
+  "scheduledRecoveryCopy": "পুনরুদ্ধারের কপি সংরক্ষণ করুন",
+  "scheduledRecoveryCopyHint": "বার্তা পরিবর্তন বা পাঠানো ছাড়াই এই ডিভাইসে সংরক্ষিত। প্রিভিউতে সর্বোচ্চ 8,000 অক্ষর দেখানো হয়।"
 }

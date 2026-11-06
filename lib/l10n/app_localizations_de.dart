@@ -6259,4 +6259,11 @@ class SDe extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Zustellung nicht bestätigt';
+
+  @override
+  String get scheduledRecoveryCopy => 'Wiederherstellungskopie speichern';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Auf diesem Gerät gespeichert, ohne Nachrichten zu ändern oder zu senden. Die Vorschau zeigt bis zu 8.000 Zeichen.';
 }

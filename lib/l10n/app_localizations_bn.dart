@@ -6209,4 +6209,11 @@ class SBn extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'ডেলিভারি নিশ্চিত করা হয়নি';
+
+  @override
+  String get scheduledRecoveryCopy => 'পুনরুদ্ধারের কপি সংরক্ষণ করুন';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'বার্তা পরিবর্তন বা পাঠানো ছাড়াই এই ডিভাইসে সংরক্ষিত। প্রিভিউতে সর্বোচ্চ 8,000 অক্ষর দেখানো হয়।';
 }

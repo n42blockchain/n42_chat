@@ -6252,4 +6252,11 @@ class SEs extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Entrega no confirmada';
+
+  @override
+  String get scheduledRecoveryCopy => 'Guardar copia de recuperación';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Guardada en este dispositivo sin modificar ni enviar mensajes. La vista previa muestra hasta 8.000 caracteres.';
 }

@@ -6206,4 +6206,11 @@ class SMr extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'वितरणाची पुष्टी झालेली नाही';
+
+  @override
+  String get scheduledRecoveryCopy => 'पुनर्प्राप्ती प्रत जतन करा';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'संदेश न बदलता किंवा न पाठवता या उपकरणावर जतन केले. पूर्वावलोकनात जास्तीत जास्त 8,000 अक्षरे दिसतात.';
 }

@@ -1,10 +1,152 @@
 import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 
+class _RejectRecoveryStore extends InMemorySharedPreferencesStore {
+  bool reject = false;
+  _RejectRecoveryStore() : super.empty();
+  @override
+  Future<bool> setValue(String type, String key, Object value) async {
+    if (reject && key.contains('_recovery_')) return false;
+    return super.setValue(type, key, value);
+  }
+}
+
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  test(
+    'rejected recovery write does not claim success or change queue',
+    () async {
+      final platform = _RejectRecoveryStore();
+      SharedPreferencesStorePlatform.instance = platform;
+      final store = PreferencesDataSource();
+      await store.saveScheduledMessage(
+        roomId: 'room',
+        ownerUserId: '@a:test',
+        messageId: 'draft',
+        text: 'keep',
+        scheduledAt: DateTime(2030),
+      );
+      final prefs = await SharedPreferences.getInstance();
+      final original = Map.fromEntries(
+        prefs.getKeys().map((key) => MapEntry(key, prefs.getString(key))),
+      );
+      platform.reject = true;
+      await expectLater(
+        store.saveScheduledRecoveryCopy(
+          ownerUserId: '@a:test',
+          isCurrent: () => true,
+        ),
+        throwsStateError,
+      );
+      expect(
+        Map.fromEntries(
+          prefs.getKeys().map((key) => MapEntry(key, prefs.getString(key))),
+        ),
+        original,
+      );
+      platform.reject = false;
+      expect(
+        await store.saveScheduledRecoveryCopy(
+          ownerUserId: '@a:test',
+          isCurrent: () => true,
+        ),
+        isNotNull,
+      );
+      expect(
+        (await store.getScheduledMessages(
+          'room',
+          ownerUserId: '@a:test',
+        )).single.text,
+        'keep',
+      );
+    },
+  );
+
+  test('recovery copy preserves exact corrupt bytes and never claims legacy data', () async {
+    const owner = '@a:test';
+    final key =
+        'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    const raw = '{damaged json with private text';
+    SharedPreferences.setMockInitialValues({
+      key: raw,
+      'n42_chat_scheduled_messages': 'unowned',
+    });
+    final store = PreferencesDataSource();
+    expect(
+      await store.saveScheduledRecoveryCopy(
+        ownerUserId: owner,
+        isCurrent: () => true,
+      ),
+      raw,
+    );
+    expect(
+      await PreferencesDataSource().saveScheduledRecoveryCopy(
+        ownerUserId: owner,
+        isCurrent: () => true,
+      ),
+      raw,
+    );
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final copies = prefs
+        .getKeys()
+        .where((key) => key.contains('_recovery_'))
+        .toList();
+    expect(copies, hasLength(1));
+    expect(prefs.getString(copies.single), raw);
+    expect(prefs.getString(key), raw);
+    expect(prefs.getString('n42_chat_scheduled_messages'), 'unowned');
+    expect(
+      await store.saveScheduledRecoveryCopy(
+        ownerUserId: '@b:test',
+        isCurrent: () => true,
+      ),
+      isNull,
+    );
+    await expectLater(
+      store.getDueScheduledMessages(ownerUserId: owner),
+      throwsFormatException,
+    );
+    await prefs.remove(key);
+    expect(await store.getDueScheduledMessages(ownerUserId: owner), isEmpty);
+    expect(prefs.getString(copies.single), raw);
+  });
+
+  test('stale recovery and conflicting copy preserve source without overwriting', () async {
+    const owner = '@a:test';
+    final key =
+        'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    const raw = '{original';
+    final backup = '${key}_recovery_${sha256.convert(utf8.encode(raw))}';
+    SharedPreferences.setMockInitialValues({key: raw});
+    final store = PreferencesDataSource();
+    var checks = 0;
+    await expectLater(
+      store.saveScheduledRecoveryCopy(
+        ownerUserId: owner,
+        isCurrent: () => ++checks == 1,
+      ),
+      throwsStateError,
+    );
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.containsKey(backup), false);
+    await prefs.setString(backup, 'preserve conflicting copy');
+    await expectLater(
+      store.saveScheduledRecoveryCopy(
+        ownerUserId: owner,
+        isCurrent: () => true,
+      ),
+      throwsStateError,
+    );
+    expect(prefs.getString(backup), 'preserve conflicting copy');
+    expect(prefs.getString(key), raw);
+  });
 
   test('corrupt delivery states preserve bytes and prevent due recovery', () async {
     final store = PreferencesDataSource();

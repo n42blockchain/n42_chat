@@ -6238,4 +6238,11 @@ class SIt extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Consegna non confermata';
+
+  @override
+  String get scheduledRecoveryCopy => 'Salva copia di recupero';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Salvata su questo dispositivo senza modificare o inviare messaggi. L’anteprima mostra fino a 8.000 caratteri.';
 }

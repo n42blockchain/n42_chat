@@ -6276,4 +6276,11 @@ class STa extends S {
   @override
   String get scheduledDeliveryUnconfirmed =>
       'விநியோகம் உறுதிப்படுத்தப்படவில்லை';
+
+  @override
+  String get scheduledRecoveryCopy => 'மீட்பு நகலைச் சேமி';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'செய்திகளை மாற்றாமலும் அனுப்பாமலும் இந்தச் சாதனத்தில் சேமிக்கப்பட்டது. முன்னோட்டம் அதிகபட்சம் 8,000 எழுத்துகளைக் காட்டும்.';
 }

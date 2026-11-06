@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Натисніть і утримуйте «Надіслати», «Фото», «Файли», GIF або наліпку, щоб запланувати повідомлення.",
   "scheduledMessageCancelled": "Заплановане повідомлення скасовано",
   "scheduledMessageCreatedAt": "Створено: {time}",
-  "scheduledDeliveryUnconfirmed": "Доставку не підтверджено"
+  "scheduledDeliveryUnconfirmed": "Доставку не підтверджено",
+  "scheduledRecoveryCopy": "Зберегти копію для відновлення",
+  "scheduledRecoveryCopyHint": "Збережено на цьому пристрої без зміни чи надсилання повідомлень. Попередній перегляд показує до 8 000 символів."
 }

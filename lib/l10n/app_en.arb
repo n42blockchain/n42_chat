@@ -2914,5 +2914,7 @@
       }
     }
   },
-  "scheduledDeliveryUnconfirmed": "Delivery not confirmed"
+  "scheduledDeliveryUnconfirmed": "Delivery not confirmed",
+  "scheduledRecoveryCopy": "Save recovery copy",
+  "scheduledRecoveryCopyHint": "Saved on this device without changing or sending messages. Preview shows up to 8,000 characters."
 }

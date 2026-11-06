@@ -6241,4 +6241,11 @@ class SUk extends S {
 
   @override
   String get scheduledDeliveryUnconfirmed => 'Доставку не підтверджено';
+
+  @override
+  String get scheduledRecoveryCopy => 'Зберегти копію для відновлення';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Збережено на цьому пристрої без зміни чи надсилання повідомлень. Попередній перегляд показує до 8 000 символів.';
 }

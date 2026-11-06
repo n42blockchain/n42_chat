@@ -2885,5 +2885,7 @@
   "scheduledMessagesHint": "Halte Senden, Fotos, Dateien, ein GIF oder einen Sticker gedrückt, um eine Nachricht zu planen.",
   "scheduledMessageCancelled": "Geplante Nachricht abgebrochen",
   "scheduledMessageCreatedAt": "Erstellt: {time}",
-  "scheduledDeliveryUnconfirmed": "Zustellung nicht bestätigt"
+  "scheduledDeliveryUnconfirmed": "Zustellung nicht bestätigt",
+  "scheduledRecoveryCopy": "Wiederherstellungskopie speichern",
+  "scheduledRecoveryCopyHint": "Auf diesem Gerät gespeichert, ohne Nachrichten zu ändern oder zu senden. Die Vorschau zeigt bis zu 8.000 Zeichen."
 }
