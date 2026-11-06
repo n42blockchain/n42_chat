@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/services.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:file_picker_darwin/file_picker_darwin.dart';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 import 'package:flutter/material.dart';
@@ -156,6 +159,63 @@ void main() {
       }
       expect(writes, ['confirm','write fails'].contains(scenario) ? 1 : 0);
       if (scenario == 'confirm') expect(find.byKey(const ValueKey('scheduled-recovery-export')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+    });
+  }
+  for (final scenario in ['file', 'cancel', 'missing', 'oversized metadata', 'understated size']) {
+    testWidgets('real recovery file adapter: $scenario', (tester) async {
+      final oldPicker = FilePickerPlatform.instance;
+      FilePickerDarwin.registerWith();
+      final directory = Directory.systemTemp.createTempSync('n42-recovery-fixture-');
+      final file = File('${directory.path}/recovery.json');
+      if (scenario == 'understated size') {
+        final handle = file.openSync(mode: FileMode.write);
+        handle.truncateSync(ScheduledRecoveryCopy.maxImportBytes + 1);
+        handle.closeSync();
+      } else if (scenario != 'missing') {
+        file.writeAsBytesSync(portable());
+      }
+      const channel = MethodChannel('miguelruivo.flutter.plugins.filepicker');
+      final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      var calls = 0;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        calls++;
+        expect(call.method, 'custom');
+        expect(call.arguments['allowMultipleSelection'], false);
+        expect(call.arguments['allowedExtensions'], ['json']);
+        if (scenario == 'cancel') return null;
+        return [{'path': file.path, 'name': 'recovery.json',
+          'size': scenario == 'oversized metadata' ? ScheduledRecoveryCopy.maxImportBytes + 1 : 1}];
+      });
+      addTearDown(() {
+        FilePickerPlatform.instance = oldPicker;
+        messenger.setMockMethodCallHandler(channel, null);
+        directory.deleteSync(recursive: true);
+      });
+      await pump(tester);
+      await tester.runAsync(() async {
+        await tester.tap(find.byKey(const ValueKey('scheduled-recovery-import')));
+        // Native filesystem streams need the real event loop. Wait for the
+        // import control to re-enable or the confirmation route to be queued.
+        for (var i = 0; i < 100; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+          await tester.pump();
+          if (find.byKey(const ValueKey('scheduled-recovery-import-confirm')).evaluate().isNotEmpty ||
+              tester.widget<IconButton>(find.byKey(const ValueKey('scheduled-recovery-import'))).onPressed != null) {
+            break;
+          }
+        }
+      });
+      await tester.pumpAndSettle();
+      expect(calls, 1);
+      expect(find.byKey(const ValueKey('scheduled-recovery-import-confirm')),
+        scenario == 'file' ? findsOneWidget : findsNothing);
+      if (scenario == 'file') expect(find.text('{broken portable queue'), findsOneWidget);
+      if (!['file','cancel'].contains(scenario)) expect(find.text('Failed to save'), findsOneWidget);
+      verifyNever(() => prefs.importScheduledRecoveryCopy(bytes: any(named: 'bytes'),
+        ownerUserId: any(named: 'ownerUserId'), isCurrent: any(named: 'isCurrent')));
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
       await tester.pump();

@@ -619,7 +619,7 @@ packages:
     source: hosted
     version: "13.3.2"
   file_picker_darwin:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: file_picker_darwin
       sha256: daeb0219f6279c73eb9c63ae9a566beef04ae13d59b8feba0be2a7f3b258d3d4

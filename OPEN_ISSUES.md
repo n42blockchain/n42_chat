@@ -171,6 +171,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- 2026-11-06 recovery file-adapter acceptance (wallet batch 150): five new widget cases exercise the real FilePickerDarwin/PlatformFile/XFile disk-read path with temporary files, mocking only the native selection response. Normal JSON reaches preview; picker cancellation, missing disk file, oversized metadata and an actual >8 MiB file claiming one byte cannot persist. All 62 scheduled-page tests pass; scoped analysis clean. This strengthens the former injected-byte-only evidence but does not validate native OS panels, iCloud/document-provider permissions, Android SAF or device/process durability. file_picker_darwin is now an explicit dev dependency at the already-resolved version; runtime dependencies did not change. Manual repair/re-enqueue, legacy ownership and retention remain open.
+
+
 - 2026-11-06 recovery import UI (wallet batch 149): scheduled-message page now exposes a JSON file picker, bounded streamed read (8 MiB), validated account-bound preview and explicit confirmation before evidence-only import. Cancellation, invalid/foreign files, write failures and account changes stop the flow. A successful import opens the saved copy preview; it never schedules messages or claims attachment restoration. New copy covers all 26 catalogs and generated localizations. 122 entity/storage/cleanup/page/localization checks pass, including narrow RTL large-text preview. Missing-localization host regression was found and fixed with existing fallback behavior; scoped analysis clean. This supersedes the prior unwired-UI statement. Native OS file-provider and share delivery, editorial review, manual repair/re-enqueue, legacy ownership, retention and physical process durability remain open; picker bytes are injected in widget tests.
 
 
