@@ -476,6 +476,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: all 26 ARB catalogs have matching English keys and no blank values. This does not cover direct UI literals: the conservative scanner initially found 539 candidates in 33 presentation directories, including on-device AI, points and system settings. Brands/examples are not necessarily defects. M1/M3/M4 localized the changed expression/actions labels. The settings follow-up localized six messages in all catalogs and reused the backup label; 533 direct literal candidates remain. Nested account/privacy hubs and notification-filter content still require translation; the complete backlog is not fixed.
 - Next step: review and translate candidates by module, regenerate catalogs, then verify RTL and expanded text with real UI tests. Do not treat key parity as full translation coverage.
 
+- Scheduled picker follow-up (2026-11-06): the existing translated options now scroll on short/large-text screens. Four locale regressions (English/German/Arabic/Chinese, 320x480 at 2x text) reproduced 213–795px overflow on the previous source and pass after the fix, including opening the custom date dialog. Expired tonight presets are omitted and quick selections are rechecked at tap time. Five tests pass; scoped analysis is clean. Other direct UI literals and device/editorial acceptance remain open.
+
 ### QA-007 iPhone data continuity after test-runner cleanup is unverified
 
 - Severity: H
