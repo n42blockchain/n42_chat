@@ -1188,6 +1188,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     TranslationSettingsLoaded event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     emit(
       state.copyWith(
         autoTranslate: event.autoTranslate,
@@ -1286,11 +1287,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
   /// 加载房间信息以判断频道类型和发言权限
   void _loadRoomInfo(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
-      if (_groupRepository == null) return;
+      if (_groupRepository == null || !current()) return;
       try {
         final group = await _groupRepository.getGroup(roomId);
-        if (group == null || isClosed) return;
+        if (group == null || !current()) return;
 
         final isChannel = group.isChannel;
         // 频道中：如果 membersCanSpeak == false 且当前用户不是管理员，则不能发言
@@ -1298,6 +1300,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
         add(
           RoomInfoLoaded(
+            isCurrent: current,
             isChannel: isChannel,
             canSendMessages: canSend,
             slowModeInterval: group.slowModeInterval,
@@ -1311,6 +1314,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
   /// 处理房间信息加载完成
   void _onRoomInfoLoaded(RoomInfoLoaded event, Emitter<ChatState> emit) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     emit(
       state.copyWith(
         isChannel: event.isChannel,

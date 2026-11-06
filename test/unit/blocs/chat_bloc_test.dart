@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:n42_chat/src/domain/repositories/group_repository.dart';
+import 'package:n42_chat/src/domain/entities/group_entity.dart';
+import 'package:n42_chat/src/domain/entities/content_filter_entity.dart';
 import 'package:n42_chat/src/core/services/translation_service.dart';
 
 import 'package:n42_chat/src/data/datasources/matrix/message/encrypted_send_guard.dart';
@@ -20,6 +23,7 @@ import 'package:n42_chat/src/presentation/blocs/chat/chat_state.dart';
 // ---------------------------------------------------------------------------
 
 class MockMessageRepository extends Mock implements IMessageRepository {}
+class MockGroupRepository extends Mock implements IGroupRepository {}
 
 class MockSecureStorage extends Mock implements PreferencesDataSource {}
 class MockTranslationService extends Mock implements ITranslationService {}
@@ -113,6 +117,81 @@ void main() {
     // Wait for all background tasks (cached load + full load) to complete
     await Future<void>.delayed(const Duration(milliseconds: 500));
     return bloc;
+  }
+
+  for (final roundTrip in [false, true]) {
+    test('late background settings retain current room, roundTrip=$roundTrip', () async {
+      final groupRepo = MockGroupRepository();
+      final group = Completer<GroupEntity?>();
+      final filter = Completer<ContentFilterConfig?>();
+      final translation = Completer<Map<String, dynamic>?>();
+      final destruction = Completer<Map<String, DateTime>>();
+      when(() => groupRepo.getGroup(any())).thenAnswer((_) => group.future);
+      when(() => groupRepo.getContentFilter(any())).thenAnswer((_) => filter.future);
+      when(() => mockSecureStorage.getTranslationSettings()).thenAnswer((_) => translation.future);
+      when(() => mockSecureStorage.getMessageDestructionTimes(any())).thenAnswer((_) => destruction.future);
+      final message = _testMessages.first.copyWith(selfDestructAfter: 60);
+      when(() => mockRepository.getMessages(any(), limit: any(named: 'limit')))
+          .thenAnswer((_) async => [message]);
+      final bloc = ChatBloc(messageRepository: mockRepository, secureStorage: mockSecureStorage,
+        groupRepository: groupRepo);
+      bloc.add(const InitializeChat(_roomId));
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      verify(() => groupRepo.getGroup(_roomId)).called(1);
+      verify(() => groupRepo.getContentFilter(_roomId)).called(1);
+      verify(() => mockSecureStorage.getTranslationSettings()).called(1);
+      verify(() => mockSecureStorage.getMessageDestructionTimes(_roomId)).called(1);
+      when(() => groupRepo.getGroup(any())).thenAnswer((_) async => null);
+      when(() => groupRepo.getContentFilter(any())).thenAnswer((_) async => null);
+      when(() => mockSecureStorage.getTranslationSettings()).thenAnswer((_) async => null);
+      when(() => mockSecureStorage.getMessageDestructionTimes(any())).thenAnswer((_) async => {});
+      bloc.add(const InitializeChat('!other:server.com'));
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      if (roundTrip) {
+        bloc.add(const InitializeChat(_roomId));
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+      }
+      group.complete(const GroupEntity(roomId: _roomId, name: 'old', slowModeInterval: 90));
+      filter.complete(const ContentFilterConfig(enabled: true, forbiddenWords: ['old']));
+      translation.complete({'autoTranslate': false, 'smartReplyTranslate': true, 'defaultTargetLanguage': 'ja'});
+      destruction.complete({message.id: DateTime.now().add(const Duration(hours: 1))});
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.slowModeInterval, 0);
+      expect(bloc.state.contentFilter?.enabled ?? false, isFalse);
+      expect(bloc.state.smartReplyTranslate, isFalse);
+      expect(bloc.state.messages.single.destroyedAt, isNull);
+      await bloc.close();
+    });
+  }
+
+  for (final stale in [false, true]) {
+    test('queued room settings check origin when handled, stale=$stale', () async {
+      final bloc = await buildInitializedBloc();
+      final message = _testMessages.first.copyWith(selfDestructAfter: 60);
+      bloc.add(MessagesUpdated([message]));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      final before = bloc.state;
+      var current = true;
+      final deadline = DateTime.now().add(const Duration(hours: 1));
+      bloc.add(RoomInfoLoaded(isChannel: false, canSendMessages: true,
+        slowModeInterval: 90, isCurrent: () => current));
+      bloc.add(ContentFilterLoaded(const ContentFilterConfig(enabled: true,
+        forbiddenWords: ['old']), isCurrent: () => current));
+      bloc.add(TranslationSettingsLoaded(autoTranslate: false,
+        defaultTargetLanguage: 'ja', smartReplyTranslate: true, isCurrent: () => current));
+      bloc.add(DestructionTimesLoaded({message.id: deadline}, isCurrent: () => current));
+      if (stale) current = false;
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      if (stale) {
+        expect(bloc.state, before);
+      } else {
+        expect(bloc.state.slowModeInterval, 90);
+        expect(bloc.state.contentFilter?.enabled, isTrue);
+        expect(bloc.state.smartReplyTranslate, isTrue);
+        expect(bloc.state.messages.single.destroyedAt, deadline);
+      }
+      await bloc.close();
+    });
   }
 
   group('message loads retain their original room generation', () {

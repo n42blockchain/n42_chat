@@ -806,11 +806,13 @@ class UpdateTranslationSettings extends ChatEvent {
 
 /// 翻译设置加载完成（内部事件）
 class TranslationSettingsLoaded extends ChatEvent {
+  final bool Function()? isCurrent;
   final bool autoTranslate;
   final String defaultTargetLanguage;
   final bool smartReplyTranslate;
 
   const TranslationSettingsLoaded({
+    this.isCurrent,
     required this.autoTranslate,
     required this.defaultTargetLanguage,
     this.smartReplyTranslate = false,
@@ -818,6 +820,7 @@ class TranslationSettingsLoaded extends ChatEvent {
 
   @override
   List<Object?> get props => [
+    if (isCurrent != null) isCurrent,
     autoTranslate,
     defaultTargetLanguage,
     smartReplyTranslate,
@@ -845,12 +848,13 @@ class ConnectionStatusChanged extends ChatEvent {
 
 /// 销毁时间加载完成（内部事件，替代 Future.microtask + 直接 emit）
 class DestructionTimesLoaded extends ChatEvent {
+  final bool Function()? isCurrent;
   final Map<String, DateTime> destructionTimes;
 
-  const DestructionTimesLoaded(this.destructionTimes);
+  const DestructionTimesLoaded(this.destructionTimes, {this.isCurrent});
 
   @override
-  List<Object?> get props => [destructionTimes];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, destructionTimes];
 }
 
 /// 发送联系人名片消息
@@ -882,18 +886,20 @@ class ExecuteSlashCommand extends ChatEvent {
 
 /// 房间信息加载完成（频道判断、发言权限等）
 class RoomInfoLoaded extends ChatEvent {
+  final bool Function()? isCurrent;
   final bool isChannel;
   final bool canSendMessages;
   final int slowModeInterval;
 
   const RoomInfoLoaded({
+    this.isCurrent,
     required this.isChannel,
     required this.canSendMessages,
     this.slowModeInterval = 0,
   });
 
   @override
-  List<Object?> get props => [isChannel, canSendMessages, slowModeInterval];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, isChannel, canSendMessages, slowModeInterval];
 }
 
 /// 清除待处理的斜杠命令信号
@@ -919,12 +925,13 @@ class ReportMessage extends ChatEvent {
 
 /// 关键词过滤配置加载完成（内部事件）
 class ContentFilterLoaded extends ChatEvent {
+  final bool Function()? isCurrent;
   final ContentFilterConfig? config;
 
-  const ContentFilterLoaded(this.config);
+  const ContentFilterLoaded(this.config, {this.isCurrent});
 
   @override
-  List<Object?> get props => [config];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, config];
 }
 
 /// 定时消息预览加载完成（内部事件）

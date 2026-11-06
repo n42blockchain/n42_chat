@@ -216,6 +216,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     DestructionTimesLoaded event,
     Emitter<ChatState> emit,
   ) async {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     final updatedMessages = state.messages.map((msg) {
       final destroyedAt = event.destructionTimes[msg.id];
       if (destroyedAt != null &&
@@ -333,11 +334,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   void _loadContentFilter(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
+      if (!current()) return;
       try {
         final filter = await _groupRepository?.getContentFilter(roomId);
-        if (!isClosed) {
-          add(ContentFilterLoaded(filter));
+        if (current()) {
+          add(ContentFilterLoaded(filter, isCurrent: current));
         }
       } catch (e) {
         // content filter 不影响聊天主流程，静默忽略错误
@@ -349,16 +352,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ContentFilterLoaded event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     emit(state.copyWith(contentFilter: event.config));
   }
 
   void _loadTranslationSettings() {
+    final current = _captureChatContext(null, _currentRoomId);
     Future.microtask(() async {
+      if (!current()) return;
       try {
         final settings = await _secureStorage.getTranslationSettings();
-        if (!isClosed && settings != null) {
+        if (current() && settings != null) {
           add(
             TranslationSettingsLoaded(
+              isCurrent: current,
               autoTranslate: settings['autoTranslate'] as bool? ?? false,
               defaultTargetLanguage: normalizeTranslationLanguageCode(
                 settings['defaultTargetLanguage'] as String? ??
@@ -388,12 +395,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 加载已保存的销毁时间
   void _loadSavedDestructionTimes(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
+      if (!current()) return;
       try {
         final destructionTimes = await _secureStorage
             .getMessageDestructionTimes(roomId);
-        if (destructionTimes.isEmpty || isClosed) return;
-        add(DestructionTimesLoaded(destructionTimes));
+        if (destructionTimes.isEmpty || !current()) return;
+        add(DestructionTimesLoaded(destructionTimes, isCurrent: current));
       } catch (e) {
         debugLog('ChatBloc: Failed to load saved destruction times: $e');
       }
