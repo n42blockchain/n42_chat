@@ -47,6 +47,23 @@ void main() {
     }
   });
 
+  test('server receipt survives reload, clears backoff and cannot be downgraded', () async {
+    final storage = PreferencesDataSource();
+    await storage.saveScheduledMessage(roomId: 'room', ownerUserId: '@a:test', messageId: 'accepted', text: 'Sent', scheduledAt: DateTime(2020));
+    await storage.markScheduledDeliveryUnconfirmed(ownerUserId: '@a:test', roomId: 'room', messageId: 'accepted');
+    expect(await storage.markScheduledDeliveryAccepted(ownerUserId: '@a:test', roomId: 'room', messageId: 'accepted', eventId: r'$event'), true);
+    final restored = (await PreferencesDataSource().getDueScheduledMessages(ownerUserId: '@a:test')).single;
+    expect(restored.acceptedEventId, r'$event');
+    expect(restored.copyWith(roomId: 'room').acceptedEventId, r'$event');
+    expect(restored.deliveryUnconfirmed, false);
+    expect(restored.retryAt, null);
+    expect(restored.failedAttempts, 0);
+    expect(await storage.markScheduledDeliveryUnconfirmed(ownerUserId: '@a:test', roomId: 'room', messageId: 'accepted'), false);
+    expect(await storage.markScheduledDeliveryAccepted(ownerUserId: '@b:test', roomId: 'room', messageId: 'accepted', eventId: r'$other'), false);
+    await storage.removeScheduledMessage('room', 'accepted', ownerUserId: '@a:test');
+    expect(await storage.markScheduledDeliveryAccepted(ownerUserId: '@a:test', roomId: 'room', messageId: 'accepted', eventId: r'$event'), false);
+  });
+
   for (final malformed in ['{', '{"room":[42]}']) {
     test(
       'room read reports corruption and preserves stored bytes: $malformed',

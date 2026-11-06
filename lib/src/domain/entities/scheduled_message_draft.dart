@@ -10,11 +10,12 @@ class ScheduledMessageDraft extends Equatable {
   String get transactionId =>
       'n42_scheduled_${sha256.convert(utf8.encode(jsonEncode([roomId, messageId])))}';
 
+  final String? acceptedEventId;
   final int failedAttempts;
   final DateTime? retryAt;
   bool isDue(DateTime now) =>
       !now.isBefore(scheduledAt) &&
-      (retryAt == null || !now.isBefore(retryAt!));
+      (acceptedEventId != null || retryAt == null || !now.isBefore(retryAt!));
 
   final bool deliveryUnconfirmed;
   final String messageId;
@@ -29,6 +30,7 @@ class ScheduledMessageDraft extends Equatable {
   final Map<String, dynamic> payload;
 
   const ScheduledMessageDraft({
+    this.acceptedEventId,
     this.failedAttempts = 0,
     this.retryAt,
     this.deliveryUnconfirmed = false,
@@ -56,6 +58,9 @@ class ScheduledMessageDraft extends Equatable {
         : DateTime.parse(json['retryAt'] as String);
 
     return ScheduledMessageDraft(
+      acceptedEventId: (json['acceptedEventId'] as String?)?.isNotEmpty == true
+          ? json['acceptedEventId'] as String
+          : null,
       failedAttempts: failedAttempts,
       retryAt: retryAt,
       deliveryUnconfirmed: json['deliveryUnconfirmed'] == true,
@@ -85,6 +90,7 @@ class ScheduledMessageDraft extends Equatable {
   }
 
   Map<String, dynamic> toJson() => {
+    if (acceptedEventId != null) 'acceptedEventId': acceptedEventId,
     'failedAttempts': failedAttempts,
     if (retryAt != null) 'retryAt': retryAt!.toIso8601String(),
     'deliveryUnconfirmed': deliveryUnconfirmed,
@@ -106,6 +112,7 @@ class ScheduledMessageDraft extends Equatable {
     Map<String, dynamic>? payload,
   }) {
     return ScheduledMessageDraft(
+      acceptedEventId: acceptedEventId,
       failedAttempts: failedAttempts,
       retryAt: retryAt,
       deliveryUnconfirmed: deliveryUnconfirmed ?? this.deliveryUnconfirmed,
@@ -216,6 +223,7 @@ class ScheduledMessageDraft extends Equatable {
 
   @override
   List<Object?> get props => [
+    acceptedEventId,
     failedAttempts,
     retryAt,
     deliveryUnconfirmed,

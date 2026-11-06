@@ -122,6 +122,18 @@ void main() {
     expect(find.text('Delivery not confirmed'), findsOneWidget);
   });
 
+  testWidgets('accepted drafts show sent and cannot be cancelled', (tester) async {
+    when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test')).thenAnswer((_) async => [
+      ScheduledMessageDraft(messageId: 'accepted', text: 'Accepted', type: MessageType.text,
+        scheduledAt: DateTime(2020), createdAt: DateTime(2019), acceptedEventId: r'$event', deliveryUnconfirmed: true),
+    ]);
+    await pump(tester);
+    expect(find.text('Sent'), findsOneWidget);
+    expect(find.text('Delivery not confirmed'), findsNothing);
+    final cancel = tester.widget<TextButton>(find.widgetWithText(TextButton, 'Cancel'));
+    expect(cancel.onPressed, isNull);
+  });
+
   for (final language in ['en', 'ar']) {
     testWidgets(
       'load failure is retryable without a false empty state: $language',

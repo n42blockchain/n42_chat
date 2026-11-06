@@ -158,7 +158,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           widget.roomId,
           ownerUserId: owner,
         );
-        if (!remaining.any((item) => item.messageId == draft.messageId)) {
+        if (!remaining.any(
+          (item) =>
+              item.messageId == draft.messageId && item.acceptedEventId == null,
+        )) {
           await _loadDrafts();
           throw StateError('Scheduled draft is no longer pending');
         }
@@ -359,7 +362,9 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           Align(
             alignment: AlignmentDirectional.centerEnd,
             child: TextButton(
-              onPressed: _cancelling.contains(draft.messageId)
+              onPressed:
+                  draft.acceptedEventId != null ||
+                      _cancelling.contains(draft.messageId)
                   ? null
                   : () => _cancelDraft(draft),
               child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
@@ -367,7 +372,11 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           ),
           const SizedBox(height: 10),
           _buildChip(label: _localizedType(draft)),
-          if (draft.deliveryUnconfirmed) ...[
+          if (draft.acceptedEventId != null) ...[
+            const SizedBox(height: 10),
+            Text(S.of(context)?.chatMessageSent ?? 'Sent'),
+          ],
+          if (draft.acceptedEventId == null && draft.deliveryUnconfirmed) ...[
             const SizedBox(height: 10),
             Text(
               S.of(context)?.scheduledDeliveryUnconfirmed ??
@@ -375,7 +384,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ],
-          if (draft.retryAt != null) ...[
+          if (draft.acceptedEventId == null && draft.retryAt != null) ...[
             const SizedBox(height: 6),
             Text(
               '${S.of(context)?.commonRetry ?? 'Retry'}: ${_formatScheduledAt(draft.retryAt!)}',

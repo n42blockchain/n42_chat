@@ -288,6 +288,13 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         }
         return;
       }
+      if (draft.acceptedEventId != null ||
+          _scheduledAcceptedReceipts.containsKey((
+            account.userId,
+            roomId,
+            draft.messageId,
+          )))
+        return;
       await _removeScheduledDraftRecord(draft, emit, account);
       cancelled = await _scheduledAccountIsCurrent(account);
       debugLog('ChatBloc: Scheduled message cancelled - ${event.messageId}');
@@ -342,11 +349,30 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             draft.messageId,
             account,
           );
-          if (current == null || !current.isDue(DateTime.now())) continue;
-          await _sendScheduledDraft(current, account);
+          if (current == null) continue;
+          final receiptKey = (account.userId, roomId, draft.messageId);
+          var eventId =
+              current.acceptedEventId ?? _scheduledAcceptedReceipts[receiptKey];
+          if (eventId == null && !current.isDue(DateTime.now())) continue;
+          eventId ??= await _sendScheduledDraft(current, account);
           accepted = true;
-
+          _scheduledAcceptedReceipts[receiptKey] = eventId;
+          try {
+            await _secureStorage.markScheduledDeliveryAccepted(
+              ownerUserId: account.userId,
+              roomId: roomId,
+              messageId: draft.messageId,
+              eventId: eventId,
+            );
+          } catch (storageError) {
+            debugLog(
+              'ChatBloc: Could not persist scheduled receipt: ${storageError.runtimeType}',
+            );
+          }
           await _removeScheduledDraftRecord(current, emit, account);
+          if (await _scheduledAccountIsCurrent(account)) {
+            _scheduledAcceptedReceipts.remove(receiptKey);
+          }
 
           debugLog('ChatBloc: Sent scheduled message - ${draft.messageId}');
         } catch (e) {
@@ -411,19 +437,21 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       (payload['localPath'] as String?)?.isNotEmpty == true &&
       (payload['filename'] as String?)?.trim().isNotEmpty == true;
 
-  Future<void> _requireScheduledSend(
+  Future<String> _requireScheduledSend(
     _ScheduledAccount account,
     Future<MessageEntity?> Function() operation,
   ) async {
     if (!await _scheduledAccountIsCurrent(account)) {
       throw StateError('Scheduled account changed');
     }
-    if (await operation() == null) {
+    final receipt = await operation();
+    if (receipt == null || receipt.id.isEmpty) {
       throw StateError('Scheduled message delivery is not confirmed');
     }
+    return receipt.id;
   }
 
-  Future<void> _sendScheduledDraft(
+  Future<String> _sendScheduledDraft(
     ScheduledMessageDraft draft,
     _ScheduledAccount account,
   ) async {
@@ -434,7 +462,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     switch (draft.type) {
       case MessageType.poll:
-        await _requireScheduledSend(
+        return _requireScheduledSend(
           account,
           () => _messageRepository.sendPollMessage(
             roomId,
@@ -447,10 +475,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             quizExplanation: draft.payload['quizExplanation'] as String?,
           ),
         );
-        return;
+
       case MessageType.image:
         if (draft.isGif) {
-          await _requireScheduledSend(
+          return _requireScheduledSend(
             account,
             () => _messageRepository.sendGifMessage(
               roomId,
@@ -462,19 +490,18 @@ extension ChatBlocFeatureHandlers on ChatBloc {
               title: draft.text.isEmpty ? null : draft.text,
             ),
           );
-          return;
         }
 
-        await _sendScheduledLocalImage(draft, account);
-        return;
+        return _sendScheduledLocalImage(draft, account);
+
       case MessageType.video:
-        await _sendScheduledLocalVideo(draft, account);
-        return;
+        return _sendScheduledLocalVideo(draft, account);
+
       case MessageType.file:
-        await _sendScheduledLocalFile(draft, account);
-        return;
+        return _sendScheduledLocalFile(draft, account);
+
       case MessageType.sticker:
-        await _requireScheduledSend(
+        return _requireScheduledSend(
           account,
           () => _messageRepository.sendStickerMessage(
             roomId,
@@ -491,9 +518,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             size: draft.payload['size'] as int?,
           ),
         );
-        return;
+
       default:
-        await _requireScheduledSend(
+        return _requireScheduledSend(
           account,
           () => _messageRepository.sendTextMessage(
             roomId,
@@ -507,7 +534,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     }
   }
 
-  Future<void> _sendScheduledLocalImage(
+  Future<String> _sendScheduledLocalImage(
     ScheduledMessageDraft draft,
     _ScheduledAccount account,
   ) async {
@@ -517,7 +544,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       throw StateError('Scheduled image attachment is empty');
     }
 
-    await _requireScheduledSend(
+    return _requireScheduledSend(
       account,
       () => _messageRepository.sendImageMessage(
         draft.roomId!,
@@ -533,7 +560,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     );
   }
 
-  Future<void> _sendScheduledLocalVideo(
+  Future<String> _sendScheduledLocalVideo(
     ScheduledMessageDraft draft,
     _ScheduledAccount account,
   ) async {
@@ -557,7 +584,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       );
     }
 
-    await _requireScheduledSend(
+    return _requireScheduledSend(
       account,
       () => _messageRepository.sendVideoMessage(
         draft.roomId!,
@@ -574,7 +601,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     );
   }
 
-  Future<void> _sendScheduledLocalFile(
+  Future<String> _sendScheduledLocalFile(
     ScheduledMessageDraft draft,
     _ScheduledAccount account,
   ) async {
@@ -587,7 +614,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         throw StateError('Scheduled file attachment is empty');
       }
 
-      await _requireScheduledSend(
+      return _requireScheduledSend(
         account,
         () => _messageRepository.sendFileMessage(
           draft.roomId!,
@@ -602,10 +629,9 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           fileSize: fileSize,
         ),
       );
-      return;
     }
 
-    await _requireScheduledSend(
+    return _requireScheduledSend(
       account,
       () => _messageRepository.sendFileMessage(
         draft.roomId!,

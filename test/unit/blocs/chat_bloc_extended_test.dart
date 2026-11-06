@@ -1194,9 +1194,34 @@ void main() {
       await bloc.close();
     });
 
-    test('recreated bloc reuses transaction ID after accepted send and failed cleanup', () async {
+    test('live bloc retains acceptance when receipt and cleanup writes fail', () async {
+      final draft = ScheduledMessageDraft(messageId: 'receipt-disk', roomId: _roomId, text: 'Once', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));
+      final bloc = buildBloc();
+      await initBloc(bloc);
+      var removes = 0;
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [draft]);
+      when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [draft]);
+      when(() => mockPrefs.markScheduledDeliveryAccepted(ownerUserId: any(named: 'ownerUserId'), roomId: _roomId, messageId: draft.messageId, eventId: any(named: 'eventId'))).thenThrow(StateError('receipt disk'));
+      when(() => mockPrefs.removeScheduledMessage(_roomId, draft.messageId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async { if (++removes == 1) throw StateError('cleanup disk'); });
+      when(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: draft.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).thenAnswer((_) async => _msg);
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      final cancelled = Completer<bool>();
+      bloc.add(CancelScheduledMessage(draft.messageId, roomId: _roomId, completion: cancelled));
+      expect(await cancelled.future.timeout(const Duration(seconds: 2)), false);
+      expect(removes, 1);
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      verify(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: draft.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).called(1);
+      expect(removes, 2);
+      await bloc.close();
+    });
+
+    test('recreated bloc cleans accepted draft without resending', () async {
       final draft = ScheduledMessageDraft(messageId: 'cleanup-failed', roomId: _roomId, text: 'Once', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));
       var removed = false;
+      String? persistedReceipt;
+      when(() => mockPrefs.markScheduledDeliveryAccepted(ownerUserId: any(named: 'ownerUserId'), roomId: _roomId, messageId: draft.messageId, eventId: any(named: 'eventId'))).thenAnswer((invocation) async { persistedReceipt = invocation.namedArguments[#eventId] as String; return true; });
       var removalAttempts = 0;
       final sentIds = <String?>[];
       when(() => mockRepo.getCurrentUserId()).thenAnswer((_) async => '@me:test');
@@ -1206,13 +1231,14 @@ void main() {
         final bloc = buildBloc();
         await initBloc(bloc);
         when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => removed ? [] : [draft]);
-        when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => removed ? [] : [ScheduledMessageDraft.fromJson(draft.toJson())]);
+        when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => removed ? [] : [ScheduledMessageDraft.fromJson({...draft.toJson(), if (persistedReceipt != null) 'acceptedEventId': persistedReceipt})]);
         bloc.add(const SendDueScheduledMessages());
         await Future<void>.delayed(const Duration(milliseconds: 100));
         await bloc.close();
       }
       expect(removed, isTrue);
-      expect(sentIds, [draft.transactionId, draft.transactionId]);
+      expect(sentIds, [draft.transactionId]);
+      expect(persistedReceipt, _msg.id);
       verifyNever(() => mockPrefs.markScheduledDeliveryUnconfirmed(ownerUserId: any(named: 'ownerUserId'), roomId: _roomId, messageId: draft.messageId));
     });
 

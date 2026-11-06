@@ -888,6 +888,34 @@ class PreferencesDataSource {
     }
   });
 
+  /// Persist the server receipt before removing the local draft.
+  Future<bool> markScheduledDeliveryAccepted({
+    required String ownerUserId,
+    required String roomId,
+    required String messageId,
+    required String eventId,
+  }) => _withScheduledStore(() async {
+    if (eventId.isEmpty) throw ArgumentError.value(eventId, 'eventId');
+    final p = await prefs;
+    await p.reload();
+    final key = _scheduledKey(ownerUserId);
+    final raw = p.getString(key);
+    if (raw == null) return false;
+    final data = jsonDecode(raw) as Map<String, dynamic>;
+    final messages = data[roomId] as List<dynamic>?;
+    if (messages == null) return false;
+    final index = messages.indexWhere((item) => (item as Map)['messageId'] == messageId);
+    if (index < 0) return false;
+    final updated = Map<String, dynamic>.from(messages[index] as Map)
+      ..['acceptedEventId'] = eventId
+      ..['deliveryUnconfirmed'] = false
+      ..['failedAttempts'] = 0
+      ..remove('retryAt');
+    messages[index] = updated;
+    await saveStringPreference(p, key, jsonEncode(data));
+    return true;
+  });
+
   /// Record a failed/unconfirmed attempt without recreating a cancelled draft.
   Future<bool> markScheduledDeliveryUnconfirmed({
     required String ownerUserId,
@@ -908,6 +936,7 @@ class PreferencesDataSource {
     if (index < 0) return false;
     final previous = Map<String, dynamic>.from(messages[index] as Map);
     final draft = ScheduledMessageDraft.fromJson(previous);
+    if (draft.acceptedEventId != null) return false;
     final attempts = draft.failedAttempts.clamp(0, 5) + 1;
     final delayMinutes = attempts == 6 ? 30 : 1 << (attempts - 1);
     messages[index] = {

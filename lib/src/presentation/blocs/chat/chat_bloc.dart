@@ -63,6 +63,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   // 定时发送检查定时器
   Timer? _scheduledMessageTimer;
+  final Map<(String, String, String), String> _scheduledAcceptedReceipts = {};
 
   // 输入状态过期刷新定时器
   Timer? _typingUsersTimer;
