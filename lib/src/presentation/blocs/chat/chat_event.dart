@@ -515,6 +515,8 @@ class UpdateDestructionCountdown extends ChatEvent {
 
 /// 发送定时消息
 class SendScheduledMessage extends ChatEvent {
+  final String? ownerUserId;
+  final String? roomId;
   final String text;
   final MessageType type;
   final Map<String, dynamic>? payload;
@@ -524,6 +526,8 @@ class SendScheduledMessage extends ChatEvent {
   final bool mentionsRoom;
 
   const SendScheduledMessage({
+    this.ownerUserId,
+    this.roomId,
     required this.text,
     this.type = MessageType.text,
     this.payload,
@@ -535,6 +539,8 @@ class SendScheduledMessage extends ChatEvent {
 
   @override
   List<Object?> get props => [
+    ownerUserId,
+    roomId,
     text,
     type,
     payload == null ? null : jsonEncode(payload),
@@ -550,12 +556,18 @@ class CancelScheduledMessage extends ChatEvent {
   final String messageId;
 
   final String? roomId;
+  final String? ownerUserId;
   final Completer<bool>? completion;
 
-  const CancelScheduledMessage(this.messageId, {this.roomId, this.completion});
+  const CancelScheduledMessage(
+    this.messageId, {
+    this.roomId,
+    this.ownerUserId,
+    this.completion,
+  });
 
   @override
-  List<Object?> get props => [messageId, roomId, completion];
+  List<Object?> get props => [messageId, roomId, ownerUserId, completion];
 }
 
 /// 发送到期的定时消息（内部事件，由定时器触发）
@@ -896,10 +908,16 @@ class ContentFilterLoaded extends ChatEvent {
 class ScheduledMessagesPreviewLoaded extends ChatEvent {
   final List<MessageEntity> previewMessages;
 
-  const ScheduledMessagesPreviewLoaded(this.previewMessages);
+  final String? ownerUserId;
+  final bool Function()? isCurrent;
+  const ScheduledMessagesPreviewLoaded(
+    this.previewMessages, {
+    this.ownerUserId,
+    this.isCurrent,
+  });
 
   @override
-  List<Object?> get props => [previewMessages];
+  List<Object?> get props => [previewMessages, ownerUserId, isCurrent];
 }
 
 /// 对方语言检测完成（内部事件）

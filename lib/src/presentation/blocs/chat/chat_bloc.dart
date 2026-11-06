@@ -1,12 +1,16 @@
 import 'dart:async';
+
 import '../../../data/datasources/matrix/message/encrypted_send_guard.dart';
 import '../../../data/datasources/matrix/message/direct_chat_send_guard.dart';
+
 import 'dart:io';
 import 'dart:math' show min;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../domain/entities/chat_sync_phase.dart';
+
 import 'package:mime/mime.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -33,6 +37,12 @@ part 'chat_bloc_feature_handlers.part.dart';
 part 'chat_bloc_retry_handlers.part.dart';
 
 /// 聊天BLoC
+class _ScheduledAccount {
+  final String userId;
+  final bool Function() isCurrent;
+  _ScheduledAccount(this.userId, this.isCurrent);
+}
+
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IMessageRepository _messageRepository;
   final PreferencesDataSource _secureStorage;
@@ -49,7 +59,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   // 定时发送检查定时器
   Timer? _scheduledMessageTimer;
-  final Set<(String, String)> _scheduledDraftOperations = {};
+  final Set<(String, String, String)> _scheduledDraftOperations = {};
 
   // 输入状态过期刷新定时器
   Timer? _typingUsersTimer;
@@ -462,30 +472,64 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     });
   }
 
-  /// 加载定时消息
+  Future<_ScheduledAccount?> _captureScheduledAccount() async {
+    final manager = _clientManager;
+    final client = manager?.client;
+    final user = client?.userID,
+        token = client?.accessToken,
+        device = client?.deviceID,
+        server = client?.homeserver;
+    final owner = await _messageRepository.getCurrentUserId();
+    bool current() =>
+        !isClosed &&
+        (manager == null ||
+            (client != null &&
+                identical(manager.client, client) &&
+                client.isLogged() &&
+                client.userID == user &&
+                user == owner &&
+                client.accessToken == token &&
+                client.deviceID == device &&
+                client.homeserver == server));
+    if (owner == null || owner.isEmpty || !current()) return null;
+    return _ScheduledAccount(owner, current);
+  }
+
+  Future<bool> _scheduledAccountIsCurrent(_ScheduledAccount account) async =>
+      account.isCurrent() &&
+      await _messageRepository.getCurrentUserId() == account.userId &&
+      account.isCurrent();
+
+  /// Load only drafts owned by the current account, and reject late previews.
   void _loadScheduledMessages(String roomId) {
     Future.microtask(() async {
       try {
+        final account = await _captureScheduledAccount();
+        if (account == null) return;
         final scheduledMessages = await _secureStorage.getScheduledMessages(
           roomId,
+          ownerUserId: account.userId,
         );
-        if (scheduledMessages.isEmpty || isClosed) return;
-
-        // 获取当前用户ID
-        final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
-
-        // 为每个定时消息创建临时消息实体显示在UI中
-        final tempMessages = scheduledMessages
+        if (_currentRoomId != roomId ||
+            !await _scheduledAccountIsCurrent(account)) {
+          return;
+        }
+        final previews = scheduledMessages
             .map(
               (draft) => draft.toPreviewMessage(
                 roomId: roomId,
-                senderId: currentUserId,
+                senderId: account.userId,
               ),
             )
             .toList(growable: false);
-
-        if (tempMessages.isNotEmpty && !isClosed) {
-          add(ScheduledMessagesPreviewLoaded(tempMessages));
+        if (previews.isNotEmpty) {
+          add(
+            ScheduledMessagesPreviewLoaded(
+              previews,
+              ownerUserId: account.userId,
+              isCurrent: account.isCurrent,
+            ),
+          );
         }
       } catch (e) {
         debugLog('ChatBloc: Failed to load scheduled messages: $e');
@@ -497,6 +541,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ScheduledMessagesPreviewLoaded event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
+    if (event.previewMessages.any(
+      (message) => message.roomId != _currentRoomId,
+    )) {
+      return;
+    }
+    if (event.ownerUserId != null &&
+        _clientManager != null &&
+        _clientManager.client?.userID != event.ownerUserId) {
+      return;
+    }
     final allMessages = [...state.messages, ...event.previewMessages];
     allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     emit(state.copyWith(messages: allMessages));

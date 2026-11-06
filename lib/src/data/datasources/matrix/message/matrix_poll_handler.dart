@@ -27,7 +27,18 @@ class MatrixPollHandler {
     String? quizExplanation,
     String? transactionId,
   }) async {
-    final room = await prepareRoomForSending(_client, roomId);
+    final sendingClient = _client;
+    final user = sendingClient?.userID, token = sendingClient?.accessToken,
+        device = sendingClient?.deviceID;
+    void requireSameSession() {
+      if (sendingClient == null || !identical(_client, sendingClient) ||
+          !sendingClient.isLogged() || sendingClient.userID != user ||
+          sendingClient.accessToken != token || sendingClient.deviceID != device) {
+        throw StateError('Message sending account changed');
+      }
+    }
+
+    final room = await prepareRoomForSending(sendingClient, roomId);
     if (room == null) {
       debugLog('MatrixMessageDataSource: Room not found: $roomId');
       return null;
@@ -65,6 +76,8 @@ class MatrixPollHandler {
               'explanation': quizExplanation.trim(),
           },
       };
+
+      requireSameSession();
 
       final eventId = await room.sendEvent(
         content,

@@ -11,6 +11,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/repositories/message_repository.dart';
+import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
@@ -33,6 +35,10 @@ class ScheduledMessagesPage extends StatefulWidget {
 class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   final PreferencesDataSource _preferences = getIt<PreferencesDataSource>();
 
+  final IMessageRepository _messages = getIt<IMessageRepository>();
+  StreamSubscription<bool>? _accountSubscription;
+  String? _ownerUserId;
+  int _loadVersion = 0;
   bool _isLoading = true;
   final Set<String> _cancelling = {};
   List<ScheduledMessageDraft> _drafts = const [];
@@ -40,32 +46,68 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   @override
   void initState() {
     super.initState();
+    if (getIt.isRegistered<IAuthRepository>()) {
+      _accountSubscription = getIt<IAuthRepository>().loginStateStream.listen((
+        _,
+      ) {
+        if (!mounted) return;
+        setState(() {
+          _ownerUserId = null;
+          _drafts = const [];
+        });
+        _loadDrafts();
+      });
+    }
     _loadDrafts();
   }
 
+  @override
+  void dispose() {
+    _accountSubscription?.cancel();
+    super.dispose();
+  }
+
   Future<void> _loadDrafts() async {
+    final version = ++_loadVersion;
     setState(() => _isLoading = true);
     try {
-      final drafts = (await _preferences.getScheduledMessages(
-        widget.roomId,
-      )).toList()..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
-
-      if (!mounted) return;
+      final owner = await _messages.getCurrentUserId();
+      final drafts =
+          owner == null || owner.isEmpty
+                ? <ScheduledMessageDraft>[]
+                : (await _preferences.getScheduledMessages(
+                    widget.roomId,
+                    ownerUserId: owner,
+                  )).toList()
+            ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+      final stillOwner = await _messages.getCurrentUserId();
+      if (!mounted || version != _loadVersion) return;
       setState(() {
-        _drafts = drafts;
+        _ownerUserId = stillOwner == owner ? owner : null;
+        _drafts = stillOwner == owner ? drafts : const [];
         _isLoading = false;
       });
     } catch (e) {
       debugPrint('ScheduledMessagesPage._loadDrafts error: $e');
-      if (!mounted) return;
-      setState(() => _isLoading = false);
+      if (!mounted || version != _loadVersion) return;
+      setState(() {
+        _isLoading = false;
+        _ownerUserId = null;
+        _drafts = const [];
+      });
     }
   }
 
   Future<void> _cancelDraft(ScheduledMessageDraft draft) async {
     if (!_cancelling.add(draft.messageId)) return;
     setState(() {});
+    final owner = _ownerUserId;
     try {
+      if (owner == null || owner != await _messages.getCurrentUserId()) {
+        await _loadDrafts();
+        return;
+      }
+      if (!mounted) return;
       final bloc = context.read<ChatBloc?>();
       if (bloc != null) {
         final completion = Completer<bool>();
@@ -73,6 +115,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           CancelScheduledMessage(
             draft.messageId,
             roomId: widget.roomId,
+            ownerUserId: owner,
             completion: completion,
           ),
         );
@@ -85,9 +128,14 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         await _preferences.removeScheduledMessage(
           widget.roomId,
           draft.messageId,
+          ownerUserId: owner,
         );
       }
-      if (!mounted) return;
+      if (owner != await _messages.getCurrentUserId() ||
+          !mounted ||
+          owner != _ownerUserId) {
+        return;
+      }
       setState(() {
         _drafts = _drafts
             .where((item) => item.messageId != draft.messageId)
@@ -97,7 +145,12 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         const SnackBar(content: Text('Scheduled message cancelled')),
       );
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted ||
+          owner != _ownerUserId ||
+          owner != await _messages.getCurrentUserId() ||
+          !mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.commonFailedToSave ?? 'Failed to save'),

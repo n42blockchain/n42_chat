@@ -76,6 +76,7 @@ void main() {
 
   /// Stub everything that InitializeChat triggers
   void stubInitDefaults() {
+    when(() => mockRepo.getCurrentUserId()).thenAnswer((_) async => mockClient.userID);
     when(
       () => mockRepo.getMessages(any(), limit: any(named: 'limit')),
     ).thenAnswer((_) async => [_msg]);
@@ -100,7 +101,7 @@ void main() {
       () => mockPrefs.getMessageDestructionTimes(any()),
     ).thenAnswer((_) async => <String, DateTime>{});
     when(
-      () => mockPrefs.getScheduledMessages(any()),
+      () => mockPrefs.getScheduledMessages(any(), ownerUserId: any(named: 'ownerUserId')),
     ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
     when(
       () => mockPrefs.shouldShowReadReceipts(),
@@ -109,7 +110,7 @@ void main() {
       () => mockPrefs.shouldShowTypingIndicator(),
     ).thenAnswer((_) async => true);
     when(
-      () => mockPrefs.getDueScheduledMessages(),
+      () => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId')),
     ).thenAnswer((_) async => <ScheduledMessageDraft>[]);
     when(
       () => mockPrefs.getDefaultSelfDestructSeconds(),
@@ -157,6 +158,7 @@ void main() {
     when(() => mockClientManager.client).thenReturn(mockClient);
     when(() => mockClient.getRoomById(_roomId)).thenReturn(mockRoom);
     when(() => mockClient.userID).thenReturn('@me:server.com');
+    when(mockClient.isLogged).thenReturn(true);
     when(
       () => mockClient.typingIndicatorTimeout,
     ).thenReturn(const Duration(milliseconds: 20));
@@ -798,17 +800,62 @@ void main() {
   });
 
   group('Scheduled rich messages', () {
+    test('account switch discards a pending due queue without removing drafts', () async {
+      final pending = Completer<List<ScheduledMessageDraft>>();
+      var owner = '@a:test';
+      when(() => mockRepo.getCurrentUserId()).thenAnswer((_) async => owner);
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: '@a:test'))
+          .thenAnswer((_) => pending.future);
+      final bloc = buildBloc();
+      await initBloc(bloc);
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      owner = '@b:test';
+      pending.complete([ScheduledMessageDraft(
+        messageId: 'private', type: MessageType.text, createdAt: DateTime(2026), roomId: _roomId, text: 'A private draft', scheduledAt: DateTime(2020),
+      )]);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      verifyNever(() => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
+      verifyNever(() => mockRepo.sendTextMessage(any(), any(),
+        transactionId: any(named: 'transactionId'), selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'), mentionsRoom: any(named: 'mentionsRoom')));
+      await bloc.close();
+    });
+
+    test('queued schedule cannot be claimed by a different account or room', () async {
+      final bloc = buildBloc();
+      await initBloc(bloc);
+      bloc.add(SendScheduledMessage(
+        text: 'Private draft', ownerUserId: '@other:test', roomId: _roomId,
+        scheduledAt: DateTime.now().add(const Duration(hours: 1)),
+      ));
+      bloc.add(SendScheduledMessage(
+        text: 'Other room', ownerUserId: mockClient.userID, roomId: '!other:test',
+        scheduledAt: DateTime.now().add(const Duration(hours: 1)),
+      ));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.messages.map((m) => m.id), [_msg.id]);
+      verifyNever(() => mockPrefs.saveScheduledMessage(
+        ownerUserId: any(named: 'ownerUserId'),
+        roomId: any(named: 'roomId'), messageId: any(named: 'messageId'),
+        text: any(named: 'text'), scheduledAt: any(named: 'scheduledAt'),
+        payload: any(named: 'payload'), selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'), mentionsRoom: any(named: 'mentionsRoom'),
+      ));
+      await bloc.close();
+    });
+
     test('unconfirmed scheduled delivery retains the draft', () async {
       final draft = ScheduledMessageDraft(messageId: 'unconfirmed', roomId: _roomId, text: 'Keep me', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));
       final bloc = buildBloc();
       await initBloc(bloc);
-      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer((_) async => [draft]);
-      when(() => mockPrefs.getScheduledMessages(_roomId)).thenAnswer((_) async => [draft]);
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [draft]);
+      when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [draft]);
       when(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: draft.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).thenAnswer((_) async => null);
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 50));
       verify(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: draft.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).called(1);
-      verifyNever(() => mockPrefs.removeScheduledMessage(any(), any()));
+      verifyNever(() => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
       await bloc.close();
     });
 
@@ -818,13 +865,13 @@ void main() {
       var removalAttempts = 0;
       final sentIds = <String?>[];
       when(() => mockRepo.getCurrentUserId()).thenAnswer((_) async => '@me:test');
-      when(() => mockPrefs.removeScheduledMessage(_roomId, draft.messageId)).thenAnswer((_) async { if (++removalAttempts == 1) throw StateError('disk'); removed = true; });
+      when(() => mockPrefs.removeScheduledMessage(_roomId, draft.messageId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async { if (++removalAttempts == 1) throw StateError('disk'); removed = true; });
       when(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: any(named: 'transactionId'), mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).thenAnswer((invocation) async { sentIds.add(invocation.namedArguments[#transactionId] as String?); return _msg; });
       for (var attempt = 0; attempt < 2; attempt++) {
         final bloc = buildBloc();
         await initBloc(bloc);
-        when(() => mockPrefs.getDueScheduledMessages()).thenAnswer((_) async => removed ? [] : [draft]);
-        when(() => mockPrefs.getScheduledMessages(_roomId)).thenAnswer((_) async => removed ? [] : [ScheduledMessageDraft.fromJson(draft.toJson())]);
+        when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => removed ? [] : [draft]);
+        when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => removed ? [] : [ScheduledMessageDraft.fromJson(draft.toJson())]);
         bloc.add(const SendDueScheduledMessages());
         await Future<void>.delayed(const Duration(milliseconds: 100));
         await bloc.close();
@@ -837,7 +884,7 @@ void main() {
       'cancellation completion waits for storage and reports failure',
       () async {
         final write = Completer<void>();
-        when(() => mockPrefs.removeScheduledMessage(_roomId, 'pending'))
+        when(() => mockPrefs.removeScheduledMessage(_roomId, 'pending', ownerUserId: any(named: 'ownerUserId')))
             .thenAnswer((_) => write.future);
         final bloc = buildBloc();
         await initBloc(bloc);
@@ -860,7 +907,7 @@ void main() {
     test(
       'cancellation uses the explicit draft room, not the open room',
       () async {
-        when(() => mockPrefs.removeScheduledMessage('!other:test', 'pending'))
+        when(() => mockPrefs.removeScheduledMessage('!other:test', 'pending', ownerUserId: any(named: 'ownerUserId')))
             .thenAnswer((_) async {});
         final bloc = buildBloc();
         await initBloc(bloc);
@@ -873,9 +920,9 @@ void main() {
           ),
         );
         expect(await completion.future, isTrue);
-        verify(() => mockPrefs.removeScheduledMessage('!other:test', 'pending'))
+        verify(() => mockPrefs.removeScheduledMessage('!other:test', 'pending', ownerUserId: any(named: 'ownerUserId')))
             .called(1);
-        verifyNever(() => mockPrefs.removeScheduledMessage(_roomId, 'pending'));
+        verifyNever(() => mockPrefs.removeScheduledMessage(_roomId, 'pending', ownerUserId: any(named: 'ownerUserId')));
         expect(bloc.state.messages.map((m) => m.id), contains(_msg.id));
         await bloc.close();
       },
@@ -905,9 +952,9 @@ void main() {
         );
         final sending = Completer<MessageEntity>();
         final started = Completer<void>();
-        when(() => mockPrefs.getDueScheduledMessages())
+        when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId')))
             .thenAnswer((_) async => [draft]);
-        when(() => mockPrefs.removeScheduledMessage(_roomId, 'sending'))
+        when(() => mockPrefs.removeScheduledMessage(_roomId, 'sending', ownerUserId: any(named: 'ownerUserId')))
             .thenAnswer((_) async {});
         when(
           () => mockRepo.sendPollMessage(
@@ -924,7 +971,7 @@ void main() {
         });
         final bloc = buildBloc();
         await initBloc(bloc);
-        when(() => mockPrefs.getScheduledMessages(_roomId))
+        when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId')))
             .thenAnswer((_) async => [draft]);
         bloc.add(const SendDueScheduledMessages());
         await started.future;
@@ -937,10 +984,11 @@ void main() {
           ),
         );
         expect(await completion.future, isFalse);
-        verifyNever(() => mockPrefs.removeScheduledMessage(any(), any()));
+        verifyNever(() => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
         sending.complete(_msg);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
         await bloc.close();
-        verify(() => mockPrefs.removeScheduledMessage(_roomId, 'sending'))
+        verify(() => mockPrefs.removeScheduledMessage(_roomId, 'sending', ownerUserId: any(named: 'ownerUserId')))
             .called(1);
       },
     );
@@ -954,9 +1002,9 @@ void main() {
         scheduledAt: DateTime(2020),
         createdAt: DateTime(2019),
       );
-      when(() => mockPrefs.getDueScheduledMessages())
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId')))
           .thenAnswer((_) async => [draft]);
-      when(() => mockPrefs.removeScheduledMessage(_roomId, 'stale'))
+      when(() => mockPrefs.removeScheduledMessage(_roomId, 'stale', ownerUserId: any(named: 'ownerUserId')))
           .thenAnswer((_) async {});
       final bloc = buildBloc();
       await initBloc(bloc);
@@ -968,8 +1016,8 @@ void main() {
       clearInteractions(mockPrefs);
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 50));
-      verify(() => mockPrefs.getScheduledMessages(_roomId)).called(1);
-      verifyNever(() => mockPrefs.removeScheduledMessage(any(), any()));
+      verify(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).called(1);
+      verifyNever(() => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
       verifyNever(() => mockRepo.sendTextMessage(
         _roomId, draft.text,
           transactionId: any(named: 'transactionId'), selfDestructAfter: draft.selfDestructAfter,
@@ -984,6 +1032,7 @@ void main() {
       ).thenAnswer((_) async => '@me:test');
       when(
         () => mockPrefs.saveScheduledMessage(
+          ownerUserId: any(named: 'ownerUserId'),
           roomId: any(named: 'roomId'),
           messageId: any(named: 'messageId'),
           text: any(named: 'text'),
@@ -1024,6 +1073,7 @@ void main() {
       ).thenAnswer((_) async => '@me:test');
       when(
         () => mockPrefs.saveScheduledMessage(
+          ownerUserId: any(named: 'ownerUserId'),
           roomId: any(named: 'roomId'),
           messageId: any(named: 'messageId'),
           text: any(named: 'text'),
@@ -1055,6 +1105,7 @@ void main() {
 
       verify(
         () => mockPrefs.saveScheduledMessage(
+          ownerUserId: any(named: 'ownerUserId'),
           roomId: _roomId,
           messageId: any(named: 'messageId'),
           text: 'Lunch?',
@@ -1075,7 +1126,7 @@ void main() {
     });
 
     test('sends due scheduled poll through repository', () async {
-      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer(
         (_) async => [
           ScheduledMessageDraft(
             messageId: 'scheduled_poll',
@@ -1103,14 +1154,14 @@ void main() {
         ),
       ).thenAnswer((_) async => _msg.copyWith(type: MessageType.poll));
       when(
-        () => mockPrefs.removeScheduledMessage(any(), any()),
+        () => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')),
       ).thenAnswer((_) async {});
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
-      when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
-        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
+      when(() => mockPrefs.getScheduledMessages(any(), ownerUserId: any(named: 'ownerUserId'))).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages(ownerUserId: invocation.namedArguments[#ownerUserId] as String?)).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -1125,14 +1176,14 @@ void main() {
         ),
       ).called(1);
       verify(
-        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_poll'),
+        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_poll', ownerUserId: any(named: 'ownerUserId')),
       ).called(1);
 
       await bloc.close();
     });
 
     test('sends due scheduled gif through repository', () async {
-      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer(
         (_) async => [
           ScheduledMessageDraft(
             messageId: 'scheduled_gif',
@@ -1162,14 +1213,14 @@ void main() {
         ),
       ).thenAnswer((_) async => _msg.copyWith(type: MessageType.image));
       when(
-        () => mockPrefs.removeScheduledMessage(any(), any()),
+        () => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')),
       ).thenAnswer((_) async {});
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
-      when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
-        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
+      when(() => mockPrefs.getScheduledMessages(any(), ownerUserId: any(named: 'ownerUserId'))).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages(ownerUserId: invocation.namedArguments[#ownerUserId] as String?)).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -1185,7 +1236,7 @@ void main() {
         ),
       ).called(1);
       verify(
-        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_gif'),
+        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_gif', ownerUserId: any(named: 'ownerUserId')),
       ).called(1);
 
       await bloc.close();
@@ -1203,7 +1254,7 @@ void main() {
       final imageFile = File('${tempDir.path}/photo.jpg');
       await imageFile.writeAsBytes(const [0xFF, 0xD8, 0xFF, 0xDB]);
 
-      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer(
         (_) async => [
           ScheduledMessageDraft(
             messageId: 'scheduled_photo',
@@ -1232,14 +1283,14 @@ void main() {
         ),
       ).thenAnswer((_) async => _msg.copyWith(type: MessageType.image));
       when(
-        () => mockPrefs.removeScheduledMessage(any(), any()),
+        () => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')),
       ).thenAnswer((_) async {});
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
-      when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
-        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
+      when(() => mockPrefs.getScheduledMessages(any(), ownerUserId: any(named: 'ownerUserId'))).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages(ownerUserId: invocation.namedArguments[#ownerUserId] as String?)).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -1254,7 +1305,7 @@ void main() {
         ),
       ).called(1);
       verify(
-        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_photo'),
+        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_photo', ownerUserId: any(named: 'ownerUserId')),
       ).called(1);
 
       await bloc.close();
@@ -1272,7 +1323,7 @@ void main() {
       final documentFile = File('${tempDir.path}/doc.pdf');
       await documentFile.writeAsBytes(const [1, 2, 3, 4, 5]);
 
-      when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+      when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer(
         (_) async => [
           ScheduledMessageDraft(
             messageId: 'scheduled_file',
@@ -1304,14 +1355,14 @@ void main() {
         ),
       ).thenAnswer((_) async => _msg.copyWith(type: MessageType.file));
       when(
-        () => mockPrefs.removeScheduledMessage(any(), any()),
+        () => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')),
       ).thenAnswer((_) async {});
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
-      when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
-        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
+      when(() => mockPrefs.getScheduledMessages(any(), ownerUserId: any(named: 'ownerUserId'))).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages(ownerUserId: invocation.namedArguments[#ownerUserId] as String?)).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -1327,7 +1378,7 @@ void main() {
         ),
       ).called(1);
       verify(
-        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_file'),
+        () => mockPrefs.removeScheduledMessage(_roomId, 'scheduled_file', ownerUserId: any(named: 'ownerUserId')),
       ).called(1);
 
       await bloc.close();
@@ -1349,7 +1400,7 @@ void main() {
 
         when(() => mockRoom.encrypted).thenReturn(false);
         when(() => mockClient.fileEncryptionEnabled).thenReturn(true);
-        when(() => mockPrefs.getDueScheduledMessages()).thenAnswer(
+        when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer(
           (_) async => [
             ScheduledMessageDraft(
               messageId: 'scheduled_file_path',
@@ -1381,14 +1432,14 @@ void main() {
           ),
         ).thenAnswer((_) async => _msg.copyWith(type: MessageType.file));
         when(
-          () => mockPrefs.removeScheduledMessage(any(), any()),
+          () => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')),
         ).thenAnswer((_) async {});
 
         final bloc = buildBlocWithClientManager();
         await initBloc(bloc);
 
-        when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
-        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
+        when(() => mockPrefs.getScheduledMessages(any(), ownerUserId: any(named: 'ownerUserId'))).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages(ownerUserId: invocation.namedArguments[#ownerUserId] as String?)).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
         await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -1417,7 +1468,7 @@ void main() {
         );
         verify(
           () =>
-              mockPrefs.removeScheduledMessage(_roomId, 'scheduled_file_path'),
+              mockPrefs.removeScheduledMessage(_roomId, 'scheduled_file_path', ownerUserId: any(named: 'ownerUserId')),
         ).called(1);
 
         await bloc.close();

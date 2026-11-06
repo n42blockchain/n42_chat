@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../domain/entities/message_entity.dart';
@@ -791,6 +792,16 @@ class PreferencesDataSource {
   // 定时消息管理
   // ============================================
 
+  String _scheduledKey(String? ownerUserId) {
+    if (ownerUserId == null) {
+      return _keyScheduledMessages; // Legacy, never auto-claimed.
+    }
+    if (ownerUserId.trim().isEmpty || ownerUserId != ownerUserId.trim()) {
+      throw ArgumentError.value(ownerUserId, 'ownerUserId');
+    }
+    return '${_keyScheduledMessages}_account_${sha256.convert(utf8.encode(ownerUserId))}';
+  }
+
   // All instances in this isolate share one persisted scheduled-message map.
   // Serialize its reads and mutations, including reload and platform ack.
   static Future<void> _scheduledStoreTail = Future<void>.value();
@@ -818,6 +829,7 @@ class PreferencesDataSource {
   /// [mentionsRoom] 是否 @全体成员
   Future<void> saveScheduledMessage({
     required String roomId,
+    String? ownerUserId,
     required String messageId,
     required String text,
     MessageType type = MessageType.text,
@@ -830,7 +842,7 @@ class PreferencesDataSource {
     try {
       final p = await prefs;
       await p.reload();
-      final data = p.getString(_keyScheduledMessages);
+      final data = p.getString(_scheduledKey(ownerUserId));
       Map<String, dynamic> allData = {};
 
       if (data != null) {
@@ -862,7 +874,11 @@ class PreferencesDataSource {
 
       allData[roomId] = roomMessages;
 
-      await saveStringPreference(p, _keyScheduledMessages, jsonEncode(allData));
+      await saveStringPreference(
+        p,
+        _scheduledKey(ownerUserId),
+        jsonEncode(allData),
+      );
 
       prefsLog('Scheduled message saved - $messageId for $scheduledAt');
     } catch (e) {
@@ -872,40 +888,42 @@ class PreferencesDataSource {
   });
 
   /// 获取房间的所有定时消息
-  Future<List<ScheduledMessageDraft>> getScheduledMessages(String roomId) =>
-      _withScheduledStore(() async {
-        try {
-          final p = await prefs;
-          await p.reload();
-          final data = p.getString(_keyScheduledMessages);
-          if (data == null) return [];
+  Future<List<ScheduledMessageDraft>> getScheduledMessages(
+    String roomId, {
+    String? ownerUserId,
+  }) => _withScheduledStore(() async {
+    try {
+      final p = await prefs;
+      await p.reload();
+      final data = p.getString(_scheduledKey(ownerUserId));
+      if (data == null) return [];
 
           final allData = jsonDecode(data) as Map<String, dynamic>;
           final roomMessages = allData[roomId] as List<dynamic>?;
           if (roomMessages == null) return [];
 
-          return roomMessages
-              .whereType<Map<dynamic, dynamic>>()
-              .map(
-                (item) => ScheduledMessageDraft.fromJson(
-                  Map<String, dynamic>.from(item),
-                ),
-              )
-              .toList(growable: false);
-        } catch (e) {
-          prefsLog('Failed to read scheduled messages - $e');
-          return [];
-        }
-      });
+      return roomMessages
+          .whereType<Map<dynamic, dynamic>>()
+          .map(
+            (item) =>
+                ScheduledMessageDraft.fromJson(Map<String, dynamic>.from(item)),
+          )
+          .toList(growable: false);
+    } catch (e) {
+      prefsLog('Failed to read scheduled messages - $e');
+      return [];
+    }
+  });
 
   /// 获取所有房间的到期定时消息
-  Future<List<ScheduledMessageDraft>> getDueScheduledMessages() =>
-      _withScheduledStore(() async {
-        try {
-          final p = await prefs;
-          await p.reload();
-          final data = p.getString(_keyScheduledMessages);
-          if (data == null) return [];
+  Future<List<ScheduledMessageDraft>> getDueScheduledMessages({
+    String? ownerUserId,
+  }) => _withScheduledStore(() async {
+    try {
+      final p = await prefs;
+      await p.reload();
+      final data = p.getString(_scheduledKey(ownerUserId));
+      if (data == null) return [];
 
           final allData = jsonDecode(data) as Map<String, dynamic>;
           final now = DateTime.now();
@@ -921,14 +939,13 @@ class PreferencesDataSource {
                   ),
                 );
 
-            for (final msg in messages) {
-              final scheduledAt = msg.scheduledAt;
-              if (now.isAfter(scheduledAt) ||
-                  now.isAtSameMomentAs(scheduledAt)) {
-                dueMessages.add(msg.copyWith(roomId: roomId));
-              }
-            }
+        for (final msg in messages) {
+          final scheduledAt = msg.scheduledAt;
+          if (now.isAfter(scheduledAt) || now.isAtSameMomentAs(scheduledAt)) {
+            dueMessages.add(msg.copyWith(roomId: roomId));
           }
+        }
+      }
 
           return dueMessages;
         } catch (e) {
@@ -940,13 +957,14 @@ class PreferencesDataSource {
   /// 删除定时消息
   Future<void> removeScheduledMessage(
     String roomId,
-    String messageId,
-  ) => _withScheduledStore(() async {
+    String messageId, {
+    String? ownerUserId,
+  }) => _withScheduledStore(() async {
     final p = await prefs;
     try {
       // Read durable state again: a failed platform write can change the cache.
       await p.reload();
-      final data = p.getString(_keyScheduledMessages);
+      final data = p.getString(_scheduledKey(ownerUserId));
       if (data == null) return;
 
       final allData = jsonDecode(data) as Map<String, dynamic>;
@@ -963,8 +981,8 @@ class PreferencesDataSource {
       }
 
       final saved = allData.isEmpty
-          ? await p.remove(_keyScheduledMessages)
-          : await p.setString(_keyScheduledMessages, jsonEncode(allData));
+          ? await p.remove(_scheduledKey(ownerUserId))
+          : await p.setString(_scheduledKey(ownerUserId), jsonEncode(allData));
       if (!saved) throw StateError('Scheduled message deletion was not saved');
 
       prefsLog('Scheduled message removed - $messageId');
@@ -979,12 +997,12 @@ class PreferencesDataSource {
   });
 
   /// 清除房间所有定时消息
-  Future<void> clearScheduledMessages(String roomId) =>
+  Future<void> clearScheduledMessages(String roomId, {String? ownerUserId}) =>
       _withScheduledStore(() async {
         try {
           final p = await prefs;
           await p.reload();
-          final data = p.getString(_keyScheduledMessages);
+          final data = p.getString(_scheduledKey(ownerUserId));
           if (data == null) return;
 
           final allData = jsonDecode(data) as Map<String, dynamic>;
@@ -992,7 +1010,7 @@ class PreferencesDataSource {
 
           if (allData.isEmpty) {
             try {
-              if (!await p.remove(_keyScheduledMessages)) {
+              if (!await p.remove(_scheduledKey(ownerUserId))) {
                 throw StateError('Scheduled messages were not cleared');
               }
             } catch (_) {
@@ -1004,7 +1022,7 @@ class PreferencesDataSource {
           } else {
             await saveStringPreference(
               p,
-              _keyScheduledMessages,
+              _scheduledKey(ownerUserId),
               jsonEncode(allData),
             );
           }

@@ -1196,6 +1196,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     int? fileSize,
     int? selfDestructAfter,
   }) async {
+    final ownerUserId = _currentUserId;
+    final roomId = widget.conversation.id;
+    if (ownerUserId == null || ownerUserId.isEmpty) return;
     final persisted = await _persistScheduledAttachment(
       filename: filename,
       fileBytes: fileBytes,
@@ -1210,6 +1213,8 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
     context.read<ChatBloc>().add(
       SendScheduledMessage(
+        ownerUserId: ownerUserId,
+        roomId: roomId,
         text: filename,
         type: type,
         payload: {

@@ -378,8 +378,9 @@ extension _ChatPageInputMethods on _ChatPageState {
       },
       onPhotoLongPress: () async {
         _hideMorePanel();
+        final ownerUserId = _currentUserId;
         final scheduledAt = await showScheduledSendPicker(context);
-        if (!mounted || scheduledAt == null) {
+        if (!mounted || scheduledAt == null || ownerUserId != _currentUserId) {
           return;
         }
         await _showPhotoPickerOptions(scheduledAt: scheduledAt);
@@ -410,8 +411,9 @@ extension _ChatPageInputMethods on _ChatPageState {
       },
       onFileLongPress: () async {
         _hideMorePanel();
+        final ownerUserId = _currentUserId;
         final scheduledAt = await showScheduledSendPicker(context);
-        if (!mounted || scheduledAt == null) {
+        if (!mounted || scheduledAt == null || ownerUserId != _currentUserId) {
           return;
         }
         await _pickFile(scheduledAt: scheduledAt);
@@ -507,6 +509,9 @@ extension _ChatPageInputMethods on _ChatPageState {
   }
 
   void _scheduleComposerText(DateTime scheduledAt) {
+    final ownerUserId = _currentUserId;
+    final roomId = widget.conversation.id;
+    if (ownerUserId == null || ownerUserId.isEmpty) return;
     final text = _inputController.text.trim();
     if (text.isEmpty) {
       return;
@@ -519,6 +524,8 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
     context.read<ChatBloc>().add(
       SendScheduledMessage(
+        ownerUserId: ownerUserId,
+        roomId: roomId,
         text: text,
         scheduledAt: scheduledAt,
         mentionedUserIds: mentionPayload.mentionedUserIds,
@@ -540,11 +547,13 @@ extension _ChatPageInputMethods on _ChatPageState {
       return;
     }
 
+    final ownerUserId = _currentUserId;
     final scheduledAt = await showScheduledSendPicker(context);
     if (!mounted || scheduledAt == null) {
       return;
     }
 
+    if (_currentUserId != ownerUserId) return;
     _scheduleComposerText(scheduledAt);
     _inputController.clear();
     _inputFocusNode.requestFocus();

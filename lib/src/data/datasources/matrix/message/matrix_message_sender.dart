@@ -132,7 +132,18 @@ class MatrixMessageSender {
     bool mentionsRoom = false,
     String? transactionId,
   }) async {
-    final room = await prepareRoomForSending(_client, roomId);
+    final sendingClient = _client;
+    final user = sendingClient?.userID, token = sendingClient?.accessToken,
+        device = sendingClient?.deviceID;
+    void requireSameSession() {
+      if (sendingClient == null || !identical(_client, sendingClient) ||
+          !sendingClient.isLogged() || sendingClient.userID != user ||
+          sendingClient.accessToken != token || sendingClient.deviceID != device) {
+        throw StateError('Message sending account changed');
+      }
+    }
+
+    final room = await prepareRoomForSending(sendingClient, roomId);
     if (room == null) return null;
 
     final content = buildTextMessageContent(
@@ -145,8 +156,11 @@ class MatrixMessageSender {
 
     // 如果有特殊字段，使用 sendEvent；否则使用 sendTextEvent
     if (hasExtendedTextMetadata(content)) {
+      requireSameSession();
       return await room.sendEvent(content, txid: transactionId);
     }
+
+    requireSameSession();
 
     return await room.sendTextEvent(text, txid: transactionId);
   }
@@ -243,6 +257,17 @@ class MatrixMessageSender {
     String? title,
     String? transactionId,
   }) async {
+    final sendingClient = _client;
+    final user = sendingClient?.userID, token = sendingClient?.accessToken,
+        device = sendingClient?.deviceID;
+    void requireSameSession() {
+      if (sendingClient == null || !identical(_client, sendingClient) ||
+          !sendingClient.isLogged() || sendingClient.userID != user ||
+          sendingClient.accessToken != token || sendingClient.deviceID != device) {
+        throw StateError('Message sending account changed');
+      }
+    }
+
     debugLog('=== MatrixMessageDataSource.sendGifMessage start ===');
     debugLog('roomId: $roomId');
     debugLog('gifUrl: $gifUrl');
@@ -258,7 +283,7 @@ class MatrixMessageSender {
         throw Exception('未登录');
       }
 
-      final room = await prepareRoomForSending(_client, roomId);
+      final room = await prepareRoomForSending(sendingClient, roomId);
       if (room == null) {
         debugLog('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
@@ -281,6 +306,8 @@ class MatrixMessageSender {
 
       debugLog('GIF content: $content');
       debugLog('Calling room.sendEvent...');
+
+      requireSameSession();
 
       final result = await room.sendEvent(content, txid: transactionId);
       debugLog('sendEvent result: $result');
@@ -312,6 +339,17 @@ class MatrixMessageSender {
     int? size,
     String? transactionId,
   }) async {
+    final sendingClient = _client;
+    final user = sendingClient?.userID, token = sendingClient?.accessToken,
+        device = sendingClient?.deviceID;
+    void requireSameSession() {
+      if (sendingClient == null || !identical(_client, sendingClient) ||
+          !sendingClient.isLogged() || sendingClient.userID != user ||
+          sendingClient.accessToken != token || sendingClient.deviceID != device) {
+        throw StateError('Message sending account changed');
+      }
+    }
+
     debugLog('=== MatrixMessageDataSource.sendStickerMessage start ===');
     debugLog('roomId: $roomId');
     debugLog('stickerId: $stickerId');
@@ -329,7 +367,7 @@ class MatrixMessageSender {
         throw Exception('未登录');
       }
 
-      final room = await prepareRoomForSending(_client, roomId);
+      final room = await prepareRoomForSending(sendingClient, roomId);
       if (room == null) {
         debugLog('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
@@ -339,6 +377,7 @@ class MatrixMessageSender {
       if (url.startsWith('emoji:')) {
         final emojiChar = url.substring(6);
         debugLog('Sending emoji sticker as text: $emojiChar');
+        requireSameSession();
         return await room.sendTextEvent(emojiChar, txid: transactionId);
       }
 
@@ -387,6 +426,8 @@ class MatrixMessageSender {
 
       debugLog('Sticker content: $content');
       debugLog('Calling room.sendEvent with type m.sticker...');
+
+      requireSameSession();
 
       final result = await room.sendEvent(
         content,

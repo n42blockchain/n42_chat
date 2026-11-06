@@ -509,9 +509,8 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Tip failed: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Tip failed: $e')));
       }
       return;
     }
@@ -624,9 +623,8 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('NFT gift failed: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('NFT gift failed: $e')));
       }
       return;
     }
@@ -968,13 +966,18 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
   }
 
   void _queueScheduledRichDraft({
+    required String? ownerUserId,
     required String text,
     required MessageType type,
     required DateTime scheduledAt,
     Map<String, dynamic> payload = const {},
   }) {
+    final roomId = widget.conversation.id;
+    if (ownerUserId == null || ownerUserId.isEmpty) return;
     context.read<ChatBloc>().add(
       SendScheduledMessage(
+        ownerUserId: ownerUserId,
+        roomId: roomId,
         text: text,
         type: type,
         payload: payload,
@@ -988,12 +991,14 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     required MessageType type,
     Map<String, dynamic> payload = const {},
   }) async {
+    final ownerUserId = _currentUserId;
     final scheduledAt = await showScheduledSendPicker(context);
     if (!mounted || scheduledAt == null) {
       return;
     }
 
     _queueScheduledRichDraft(
+      ownerUserId: ownerUserId,
       text: text,
       type: type,
       payload: payload,
@@ -1079,12 +1084,14 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
 
   /// 显示 GIF 选择器
   Future<void> _showGifPicker() async {
+    final ownerUserId = _currentUserId;
     final selection = await showGifPicker(context);
     if (selection != null && mounted) {
       final payload = selection.scheduledPayload;
 
       if (selection.scheduledAt != null) {
         _queueScheduledRichDraft(
+          ownerUserId: ownerUserId,
           text: selection.title.trim().isEmpty ? 'GIF' : selection.title,
           type: MessageType.image,
           payload: payload,
