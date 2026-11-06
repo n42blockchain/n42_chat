@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:n42_chat/src/data/datasources/local/chat_history_clear_store.dart';
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:n42_chat/src/domain/repositories/group_repository.dart';
@@ -59,12 +61,16 @@ final _testMessages = [
   ),
 ];
 
+class MockHistoryClearStore extends Mock implements ChatHistoryClearStore {}
+
 void main() {
   late MockMessageRepository mockRepository;
   late MockSecureStorage mockSecureStorage;
 
   setUpAll(() {
     registerFallbackValue(Uint8List(0));
+    registerFallbackValue(DateTime(2026));
+    registerFallbackValue(() => true);
   });
 
   setUp(() {
@@ -693,6 +699,71 @@ void main() {
     bloc.add(ClearChatHistory(roomId: _roomId, isCurrent: isCurrent));
     await Future<void>.delayed(const Duration(milliseconds: 30));
     expect(bloc.state.messages, _testMessages);
+    await bloc.close();
+  });
+
+  test('durable clear survives recreation and filters refresh pagination and updates per account', () async {
+    SharedPreferences.setMockInitialValues({});
+    when(() => mockRepository.getCurrentUserId()).thenAnswer((_) async => '@alice:server.com');
+    ChatBloc create() => ChatBloc(messageRepository: mockRepository,
+      secureStorage: mockSecureStorage, historyClearStore: ChatHistoryClearStore());
+    var bloc = create();
+    bloc.add(const InitializeChat(_roomId));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    expect(bloc.state.messages, _testMessages);
+    final completion = Completer<bool>();
+    bloc.add(ClearChatHistory(roomId: _roomId, completion: completion));
+    expect(await completion.future, isTrue);
+    expect(bloc.state.messages, isEmpty);
+    await bloc.close();
+    bloc = create();
+    bloc.add(const InitializeChat(_roomId));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    expect(bloc.state.messages, isEmpty);
+    final fresh = _testMessages.first.copyWith(id: 'fresh', timestamp: DateTime.now().add(const Duration(hours: 1)));
+    final mixed = [fresh, ..._testMessages];
+    when(() => mockRepository.getMessages(any(), limit: any(named: 'limit'))).thenAnswer((_) async => mixed);
+    bloc.add(LoadMessages(_roomId));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(bloc.state.messages, [fresh]);
+    when(() => mockRepository.loadMoreMessages(any(), limit: any(named: 'limit'))).thenAnswer((_) async => mixed);
+    bloc.emit(bloc.state.copyWith(hasMore: true));
+    bloc.add(const LoadMoreMessages());
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(bloc.state.messages, [fresh]);
+    expect(bloc.state.hasMore, isFalse);
+    bloc.add(MessagesUpdated(mixed));
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(bloc.state.messages, [fresh]);
+    await bloc.close();
+    when(() => mockRepository.getCurrentUserId()).thenAnswer((_) async => '@bob:server.com');
+    bloc = create();
+    bloc.add(const InitializeChat(_roomId));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    expect(bloc.state.messages, mixed);
+    await bloc.close();
+  });
+
+  test('clear waits for durable acknowledgement and preserves timeline on failure', () async {
+    final store = MockHistoryClearStore();
+    when(() => mockRepository.getCurrentUserId()).thenAnswer((_) async => '@alice:server.com');
+    when(() => store.read(ownerUserId: any(named: 'ownerUserId'), roomId: any(named: 'roomId'),
+      isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => null);
+    final pending = Completer<DateTime>();
+    when(() => store.clearThrough(ownerUserId: any(named: 'ownerUserId'), roomId: any(named: 'roomId'),
+      boundary: any(named: 'boundary'), isCurrent: any(named: 'isCurrent'))).thenAnswer((_) => pending.future);
+    final bloc = ChatBloc(messageRepository: mockRepository, secureStorage: mockSecureStorage, historyClearStore: store);
+    bloc.add(const InitializeChat(_roomId));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    final completion = Completer<bool>();
+    bloc.add(ClearChatHistory(completion: completion));
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(completion.isCompleted, isFalse);
+    expect(bloc.state.messages, _testMessages);
+    pending.completeError(StateError('disk rejected'));
+    expect(await completion.future, isFalse);
+    expect(bloc.state.messages, _testMessages);
+    expect(bloc.state.error, 'Failed to clear chat history');
     await bloc.close();
   });
 

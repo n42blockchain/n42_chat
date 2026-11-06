@@ -19,6 +19,7 @@ import '../../../core/services/speech_to_text_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/utils/content_filter_utils.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
+import '../../../data/datasources/local/chat_history_clear_store.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../core/utils/event_message_data.dart';
@@ -49,6 +50,10 @@ class _ScheduledAccount {
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IMessageRepository _messageRepository;
   final PreferencesDataSource _secureStorage;
+  final ChatHistoryClearStore? _historyClearStore;
+  DateTime? _historyClearedThrough;
+  String? _historyOwner;
+  bool _historyReady = true;
   final IGroupRepository? _groupRepository;
   final ITranslationService? _translationService;
   final MatrixClientManager? _clientManager;
@@ -103,12 +108,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ChatBloc({
     required IMessageRepository messageRepository,
     required PreferencesDataSource secureStorage,
+    ChatHistoryClearStore? historyClearStore,
     IGroupRepository? groupRepository,
     ITranslationService? translationService,
     MatrixClientManager? clientManager,
     IAuthRepository? authRepository,
   }) : _messageRepository = messageRepository,
        _secureStorage = secureStorage,
+       _historyClearStore = historyClearStore,
        _groupRepository = groupRepository,
        _translationService = translationService,
        _clientManager = clientManager,
@@ -230,6 +237,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(state.copyWith(messages: updatedMessages));
   }
 
+  bool _historyBoundaryReached(List<MessageEntity> messages) =>
+      _historyClearedThrough != null && messages.any((message) =>
+          !message.timestamp.isAfter(_historyClearedThrough!));
+
+  List<MessageEntity> _visibleHistory(List<MessageEntity> messages) {
+    if (!_historyReady) return [];
+    final boundary = _historyClearedThrough;
+    return messages.where((message) =>
+      !_locallyDeletedMessageIds.contains(message.id) &&
+      (boundary == null || message.timestamp.isAfter(boundary))).toList();
+  }
+
   /// Retain the originating session for callbacks kept by child routes.
   bool Function() captureCurrentSession() =>
       _captureChatContext(null, _currentRoomId);
@@ -257,6 +276,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _chatGeneration++;
     _translationRequests.clear();
     _currentRoomId = event.roomId;
+    _historyOwner = null;
+    _historyClearedThrough = null;
+    _historyReady = _historyClearStore == null;
     final current = _captureChatContext(emit, event.roomId);
     _locallyDeletedMessageIds.clear();
 
@@ -270,6 +292,24 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         isSendingText: false, isSending: false, activeMediaSends: 0,
       ),
     );
+
+    if (_historyClearStore != null) {
+      try {
+        final owner = await _messageRepository.getCurrentUserId();
+        if (!current()) return;
+        if (owner == null || owner.isEmpty) throw StateError('History owner unavailable');
+        final boundary = await _historyClearStore.read(
+          ownerUserId: owner, roomId: event.roomId, isCurrent: current,
+        );
+        if (!current()) return;
+        _historyOwner = owner;
+        _historyClearedThrough = boundary;
+        _historyReady = true;
+      } catch (error) {
+        if (current()) emit(state.copyWith(error: 'Failed to load chat history'));
+        return;
+      }
+    }
 
     // 先尝试快速加载本地缓存消息
     try {
@@ -287,9 +327,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
         emit(
           state.copyWith(
-            messages: filteredMessages,
+            messages: _visibleHistory(filteredMessages),
             isLoading: false,
-            hasMore: true,
+            hasMore: !_historyBoundaryReached(cachedMessages),
           ),
         );
         debugLog(

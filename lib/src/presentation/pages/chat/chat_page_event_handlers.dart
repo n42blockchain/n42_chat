@@ -1107,11 +1107,13 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
               _openMemberProfile(ctx, userId, displayName, avatarUrl);
             },
             canClearHistory: canClearHistory,
-            onClearHistory: () {
-              if (!canClearHistory()) return;
+            onClearHistoryAsync: () async {
+              if (!canClearHistory()) return false;
+              final completion = Completer<bool>();
               settingsBloc.add(ClearChatHistory(
-                roomId: settingsRoomId, isCurrent: canClearHistory,
+                roomId: settingsRoomId, isCurrent: canClearHistory, completion: completion,
               ));
+              return completion.future;
             },
           );
 

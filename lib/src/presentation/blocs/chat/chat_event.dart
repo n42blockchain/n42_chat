@@ -495,13 +495,15 @@ class SendCustomMessage extends ChatEvent {
 /// 清空聊天记录（本地）
 class ClearChatHistory extends ChatEvent {
   final String? roomId;
+  final Completer<bool>? completion;
   final bool Function()? isCurrent;
 
-  const ClearChatHistory({this.roomId, this.isCurrent});
+  const ClearChatHistory({this.roomId, this.isCurrent, this.completion});
 
   @override
   List<Object?> get props => [
     if (roomId != null) roomId,
+    if (completion != null) completion,
     if (isCurrent != null) isCurrent,
   ];
 }

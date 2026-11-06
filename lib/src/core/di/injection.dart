@@ -1,3 +1,4 @@
+import '../../data/datasources/local/chat_history_clear_store.dart';
 import '../../domain/repositories/chat_catch_up_repository.dart';
 import '../../data/services/matrix_history_sharing.dart';
 import 'dart:async';
@@ -1093,6 +1094,7 @@ void _registerBlocs() {
   // 聊天BLoC
   getIt.registerFactory<ChatBloc>(
     () => ChatBloc(
+      historyClearStore: ChatHistoryClearStore(),
       messageRepository: getIt<IMessageRepository>(),
       secureStorage: getIt<PreferencesDataSource>(),
       groupRepository: getIt<IGroupRepository>(),

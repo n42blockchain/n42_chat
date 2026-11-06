@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,6 +33,7 @@ void main() {
     Locale? locale,
     double textScale = 1,
     VoidCallback? onClearHistory,
+    Future<bool> Function()? onClearHistoryAsync,
     bool Function()? canClearHistory,
     bool canChangeSettings = false,
     void Function(String userId, String displayName, String? avatarUrl)?
@@ -63,6 +65,7 @@ void main() {
                   isPinned: pinned,
                 ),
             onClearHistory: onClearHistory,
+            onClearHistoryAsync: onClearHistoryAsync,
             canClearHistory: canClearHistory,
             canChangeSettings: canChangeSettings,
             onMemberTap: onMemberTap,
@@ -242,6 +245,22 @@ void main() {
 
     expect(find.text('All Messages'), findsOneWidget);
   });
+
+  for (final succeeds in [false, true]) {
+    testWidgets('clear feedback waits for persistence, success=$succeeds', (tester) async {
+      final pending = Completer<bool>();
+      await pumpPage(tester, onClearHistoryAsync: () => pending.future);
+      await tester.ensureVisible(find.text('Clear Chat History'));
+      await tester.tap(find.text('Clear Chat History'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Clear'));
+      await tester.pumpAndSettle();
+      expect(find.text('Chat history cleared'), findsNothing);
+      pending.complete(succeeds);
+      await tester.pumpAndSettle();
+      expect(find.text(succeeds ? 'Chat history cleared' : 'Failed to save'), findsOneWidget);
+    });
+  }
 
   testWidgets('stale clear confirmation cannot invoke callback or report success', (tester) async {
     var current = true;

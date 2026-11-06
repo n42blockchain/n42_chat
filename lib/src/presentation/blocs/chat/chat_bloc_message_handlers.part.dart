@@ -73,9 +73,9 @@ extension ChatBlocMessageHandlers on ChatBloc {
 
       emit(
         state.copyWith(
-          messages: mergedMessages,
+          messages: _visibleHistory(mergedMessages),
           isLoading: false,
-          hasMore: messages.length >= event.limit,
+          hasMore: messages.length >= event.limit && !_historyBoundaryReached(messages),
         ),
       );
 
@@ -233,9 +233,10 @@ extension ChatBlocMessageHandlers on ChatBloc {
       if (!current()) return;
       emit(
         state.copyWith(
-          messages: moreMessages,
+          messages: _visibleHistory(moreMessages),
           isLoadingMore: false,
-          hasMore: moreMessages.length > state.messages.length,
+          hasMore: moreMessages.length > state.messages.length &&
+              !_historyBoundaryReached(moreMessages),
         ),
       );
     } catch (e) {
@@ -339,7 +340,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
   void onMessagesUpdated(MessagesUpdated event, Emitter<ChatState> emit) {
     if (event.isCurrent != null && !event.isCurrent!()) return;
     // 过滤掉已本地删除的消息和线程内回复消息（线程回复只在线程详情页显示）
-    final filteredMessages = event.messages
+    final filteredMessages = _visibleHistory(event.messages)
         .where((m) => !_locallyDeletedMessageIds.contains(m.id))
         .where((m) => !m.isInThread)
         .toList();
@@ -430,7 +431,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
     final typingUsers = _resolveCurrentTypingUsers();
 
     if (!isClosed) {
-      emit(state.copyWith(messages: mergedMessages, typingUsers: typingUsers));
+      emit(state.copyWith(messages: _visibleHistory(mergedMessages), typingUsers: typingUsers));
       _scheduleTypingUsersRefresh(typingUsers);
 
       // 扫描失败消息加入自动重试队列

@@ -67,6 +67,7 @@ class ChatDetailPage extends StatefulWidget {
 
   /// 清空聊天记录的回调
   final VoidCallback? onClearHistory;
+  final Future<bool> Function()? onClearHistoryAsync;
   final bool Function()? canClearHistory;
 
   const ChatDetailPage({
@@ -78,6 +79,7 @@ class ChatDetailPage extends StatefulWidget {
     this.onRemoveMember,
     this.onMemberTap,
     this.onClearHistory,
+    this.onClearHistoryAsync,
     this.canClearHistory,
   });
 
@@ -1806,18 +1808,28 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
-              if (widget.onClearHistory == null ||
+              if ((widget.onClearHistory == null && widget.onClearHistoryAsync == null) ||
                   (widget.canClearHistory != null && !widget.canClearHistory!())) {
                 return;
               }
-              widget.onClearHistory!();
+              var success = false;
+              try {
+                if (widget.onClearHistoryAsync != null) {
+                  success = await widget.onClearHistoryAsync!();
+                } else {
+                  widget.onClearHistory!();
+                  success = true;
+                }
+              } catch (_) {}
+              if (!mounted || (widget.canClearHistory != null && !widget.canClearHistory!())) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    S.of(context)?.commonChatHistoryCleared ??
-                        'Chat history cleared',
+                    success
+                        ? (S.of(context)?.commonChatHistoryCleared ?? 'Chat history cleared')
+                        : (S.of(context)?.commonFailedToSave ?? 'Failed to save'),
                   ),
                   duration: const Duration(seconds: 1),
                 ),

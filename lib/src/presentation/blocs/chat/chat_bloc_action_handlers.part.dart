@@ -447,18 +447,38 @@ extension ChatBlocActionHandlers on ChatBloc {
     ClearChatHistory event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null ||
-        (event.roomId != null && event.roomId != _currentRoomId) ||
-        (event.isCurrent != null && !event.isCurrent!())) {
-      return;
-    }
-    debugLog('ChatBloc: Clearing chat history for room $_currentRoomId');
-
-    // 清空本地消息列表
-    _locallyDeletedMessageIds.addAll(state.messages.map((m) => m.id));
-
-    if (!isClosed) {
-      emit(state.copyWith(messages: [], clearError: true));
+    var completed = false;
+    final roomId = _currentRoomId;
+    final sessionCurrent = _captureChatContext(emit, roomId);
+    bool current() => sessionCurrent() &&
+        (event.isCurrent == null || event.isCurrent!());
+    try {
+      if (roomId == null || !current() ||
+          (event.roomId != null && event.roomId != roomId)) {
+        return;
+      }
+      final store = _historyClearStore;
+      if (store != null) {
+        final owner = _historyOwner;
+        if (!_historyReady || owner == null) throw StateError('History owner unavailable');
+        final boundary = await store.clearThrough(
+          ownerUserId: owner, roomId: roomId, boundary: DateTime.now(), isCurrent: current,
+        );
+        if (!current()) return;
+        _historyClearedThrough = boundary;
+        emit(state.copyWith(messages: _visibleHistory(state.messages), clearError: true));
+      } else {
+        // Legacy embedded callers retain in-memory clearing. Never acknowledge
+        // this path as a durable clear to the production confirmation UI.
+        if (event.completion != null) throw StateError('History storage unavailable');
+        _locallyDeletedMessageIds.addAll(state.messages.map((m) => m.id));
+        emit(state.copyWith(messages: [], clearError: true));
+      }
+      completed = true;
+    } catch (error) {
+      if (current()) emit(state.copyWith(error: 'Failed to clear chat history'));
+    } finally {
+      if (event.completion?.isCompleted == false) event.completion!.complete(completed);
     }
   }
 
