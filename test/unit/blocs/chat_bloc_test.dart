@@ -194,6 +194,110 @@ void main() {
     });
   }
 
+  for (final action in ['switch', 'clear', 'retry']) {
+    for (final fails in [false, true]) {
+      test('translation $action rejects stale completion, failure=$fails', () async {
+        final service = MockTranslationService();
+        final oldResult = Completer<TranslationResult>();
+        final newResult = Completer<TranslationResult>();
+        var calls = 0;
+        when(() => service.translate(text: any(named: 'text'), targetLanguage: any(named: 'targetLanguage')))
+            .thenAnswer((_) => calls++ == 0 ? oldResult.future : newResult.future);
+        final bloc = ChatBloc(messageRepository: mockRepository, secureStorage: mockSecureStorage,
+          translationService: service);
+        bloc.add(const InitializeChat(_roomId));
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+        bloc.add(TranslateMessage(messageId: _testMessages.first.id, targetLanguage: 'ja'));
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        expect(calls, 1);
+        if (action == 'switch') {
+          bloc.add(const InitializeChat('!other:server.com'));
+          await Future<void>.delayed(const Duration(milliseconds: 150));
+          bloc.add(const InitializeChat(_roomId));
+        } else {
+          bloc.add(ClearTranslation(_testMessages.first.id));
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+        if (action == 'retry') {
+          bloc.add(TranslateMessage(messageId: _testMessages.first.id, targetLanguage: 'fr'));
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          expect(calls, 2);
+        }
+        if (fails) {
+          oldResult.completeError(StateError('old request failed'));
+        } else {
+          oldResult.complete(const TranslationResult(translatedText: 'old', targetLanguage: 'ja'));
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        expect(bloc.state.translatedMessages, isEmpty);
+        expect(bloc.state.error, isNull);
+        expect(bloc.state.isTranslating(_testMessages.first.id), action == 'retry');
+        if (action == 'retry') {
+          newResult.complete(const TranslationResult(translatedText: 'new', targetLanguage: 'fr'));
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          expect(bloc.state.getTranslation(_testMessages.first.id), 'new');
+          expect(bloc.state.isTranslating(_testMessages.first.id), isFalse);
+        }
+        await bloc.close();
+      });
+    }
+  }
+
+  for (final auto in [false, true]) {
+    for (final switchRoom in [false, true]) {
+      test('language detection rejects stale mode=$auto switch=$switchRoom', () async {
+        final service = MockTranslationService();
+        final detection = Completer<String?>();
+        when(() => service.detectLanguage(any())).thenAnswer((_) => detection.future);
+        final bloc = ChatBloc(messageRepository: mockRepository, secureStorage: mockSecureStorage,
+          translationService: service);
+        bloc.add(const InitializeChat(_roomId));
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+        bloc.add(TranslationSettingsLoaded(autoTranslate: auto, defaultTargetLanguage: 'ja',
+          smartReplyTranslate: !auto));
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        verify(() => service.detectLanguage(_testMessages.first.content)).called(1);
+        if (switchRoom) {
+          bloc.add(const InitializeChat('!other:server.com'));
+        } else {
+          bloc.add(const TranslationSettingsLoaded(autoTranslate: false,
+            defaultTargetLanguage: 'ja', smartReplyTranslate: false));
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+        detection.complete('fr');
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        expect(bloc.state.detectedRecipientLanguage, isNull);
+        expect(bloc.state.translatingMessageIds, isEmpty);
+        expect(bloc.state.error, isNull);
+        verifyNever(() => service.translate(text: any(named: 'text'), targetLanguage: any(named: 'targetLanguage')));
+        await bloc.close();
+      });
+    }
+  }
+
+  test('old preference save cannot start translation in a new room', () async {
+    final service = MockTranslationService();
+    final saved = Completer<void>();
+    when(() => mockSecureStorage.saveTranslationSettings(
+      autoTranslate: any(named: 'autoTranslate'),
+      defaultTargetLanguage: any(named: 'defaultTargetLanguage'),
+      smartReplyTranslate: any(named: 'smartReplyTranslate'),
+    )).thenAnswer((_) => saved.future);
+    final bloc = ChatBloc(messageRepository: mockRepository, secureStorage: mockSecureStorage,
+      translationService: service);
+    bloc.add(const InitializeChat(_roomId));
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    bloc.add(const UpdateTranslationSettings(autoTranslate: true, smartReplyTranslate: true));
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(bloc.state.autoTranslate, isTrue);
+    bloc.add(const InitializeChat('!other:server.com'));
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    saved.complete();
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    verifyNever(() => service.detectLanguage(any()));
+    await bloc.close();
+  });
+
   group('message loads retain their original room generation', () {
     for (final stage in ['cache', 'full', 'history']) {
       for (final fails in [false, true]) {

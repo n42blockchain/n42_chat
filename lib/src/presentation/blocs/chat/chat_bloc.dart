@@ -58,6 +58,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription<Map<String, dynamic>>? _pollResponsesSubscription;
   String? _currentRoomId;
   int _chatGeneration = 0;
+  final Map<String, Object> _translationRequests = {};
 
   // 阅后即焚定时器
   Timer? _destructionTimer;
@@ -250,6 +251,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     _chatGeneration++;
+    _translationRequests.clear();
     _currentRoomId = event.roomId;
     final current = _captureChatContext(emit, event.roomId);
     _locallyDeletedMessageIds.clear();

@@ -990,10 +990,14 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     TranslateMessage event,
     Emitter<ChatState> emit,
   ) async {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
+    final initialContext = _captureChatContext(null, _currentRoomId);
+    if (!initialContext()) return;
     if (_translationService == null) {
       debugLog('ChatBloc: Translation service not available');
       add(
         TranslationCompleted(
+          isCurrent: initialContext,
           messageId: event.messageId,
           success: false,
           error: 'Translation service not configured',
@@ -1038,6 +1042,13 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       return;
     }
 
+    final contextCurrent = _captureChatContext(null, _currentRoomId);
+    final request = Object();
+    _translationRequests[event.messageId] = request;
+    bool current() => contextCurrent() &&
+        identical(_translationRequests[event.messageId], request);
+    if (!current()) return;
+
     // 更新状态为正在翻译
     final newTranslatingIds = Set<String>.from(state.translatingMessageIds)
       ..add(event.messageId);
@@ -1053,8 +1064,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         targetLanguage: event.targetLanguage,
       );
 
+      if (!current()) return;
       add(
         TranslationCompleted(
+          isCurrent: current,
           messageId: event.messageId,
           translatedText: result.translatedText,
           detectedSourceLanguage: result.detectedSourceLanguage,
@@ -1064,8 +1077,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       );
     } catch (e) {
       debugLog('ChatBloc: Translation error: $e');
+      if (!current()) return;
       add(
         TranslationCompleted(
+          isCurrent: current,
           messageId: event.messageId,
           success: false,
           error: e.toString(),
@@ -1079,6 +1094,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     TranslationCompleted event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
+    _translationRequests.remove(event.messageId);
     // 移除正在翻译状态
     final newTranslatingIds = Set<String>.from(state.translatingMessageIds)
       ..remove(event.messageId);
@@ -1125,6 +1142,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
   /// 清除消息翻译
   void onClearTranslation(ClearTranslation event, Emitter<ChatState> emit) {
+    _translationRequests.remove(event.messageId);
+    final translating = Set<String>.from(state.translatingMessageIds)..remove(event.messageId);
     final newTranslatedMessages = Map<String, String>.from(
       state.translatedMessages,
     )..remove(event.messageId);
@@ -1134,6 +1153,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     emit(
       state.copyWith(
+        translatingMessageIds: translating,
         translatedMessages: newTranslatedMessages,
         detectedSourceLanguages: newDetectedLanguages,
       ),
@@ -1147,6 +1167,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     UpdateTranslationSettings event,
     Emitter<ChatState> emit,
   ) async {
+    final current = _captureChatContext(emit, _currentRoomId);
+    if (!current()) return;
     final newAutoTranslate = event.autoTranslate ?? state.autoTranslate;
     final newTargetLang =
         event.defaultTargetLanguage ?? state.defaultTargetLanguage;
@@ -1172,13 +1194,15 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       debugLog('ChatBloc: Failed to save translation settings: $e');
     }
 
+    if (!current()) return;
+
     // 如果刚开启自动翻译，对当前可见的未翻译消息触发翻译
-    if (newAutoTranslate) {
+    if (state.autoTranslate) {
       _autoTranslateMessages(emit);
     }
 
     // 如果刚开启智能回复翻译，立即检测对方语言
-    if (newSmartReply && _translationService != null) {
+    if (state.smartReplyTranslate && _translationService != null) {
       _detectRecipientLanguage(emit);
     }
   }
@@ -1211,6 +1235,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   void _autoTranslateMessages(Emitter<ChatState> emit) {
     if (_translationService == null) return;
 
+    final contextCurrent = _captureChatContext(null, _currentRoomId);
     final targetLang = state.defaultTargetLanguage;
     final messagesToTranslate = state.messages
         .where(
@@ -1226,10 +1251,14 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     for (final msg in messagesToTranslate) {
       // 检测消息语言，与目标语言相同则跳过
+      bool current() => contextCurrent() && state.autoTranslate &&
+          state.defaultTargetLanguage == targetLang;
       _translationService.detectLanguage(msg.content).then((detected) {
-        if (detected != targetLang && !isClosed) {
-          add(TranslateMessage(messageId: msg.id, targetLanguage: targetLang));
+        if (detected != targetLang && current()) {
+          add(TranslateMessage(messageId: msg.id, targetLanguage: targetLang, isCurrent: current));
         }
+      }).catchError((Object error) {
+        debugLog('ChatBloc: Auto translation detection failed: $error');
       });
     }
   }
@@ -1257,14 +1286,17 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     if (recipientMsg == null) return;
 
+    final contextCurrent = _captureChatContext(null, _currentRoomId);
+    bool current() => contextCurrent() && state.smartReplyTranslate;
+
     // detectLanguage 基于字符集正则，几乎即时完成
     _translationService
         .detectLanguage(recipientMsg.content)
         .then((detected) {
           if (detected != null &&
-              !isClosed &&
+              current() &&
               state.detectedRecipientLanguage != detected) {
-            add(RecipientLanguageDetected(detected));
+            add(RecipientLanguageDetected(detected, isCurrent: current));
           }
         })
         .catchError((Object e) {
@@ -1277,6 +1309,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     RecipientLanguageDetected event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     emit(state.copyWith(detectedRecipientLanguage: event.language));
     debugLog('ChatBloc: Detected recipient language: ${event.language}');
   }

@@ -736,20 +736,23 @@ class NavigatePinnedMessage extends ChatEvent {
 
 /// 翻译消息
 class TranslateMessage extends ChatEvent {
+  final bool Function()? isCurrent;
   final String messageId;
   final String targetLanguage;
 
   const TranslateMessage({
+    this.isCurrent,
     required this.messageId,
     required this.targetLanguage,
   });
 
   @override
-  List<Object?> get props => [messageId, targetLanguage];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, messageId, targetLanguage];
 }
 
 /// 翻译完成（内部事件）
 class TranslationCompleted extends ChatEvent {
+  final bool Function()? isCurrent;
   final String messageId;
   final String? translatedText;
   final String? detectedSourceLanguage;
@@ -757,6 +760,7 @@ class TranslationCompleted extends ChatEvent {
   final String? error;
 
   const TranslationCompleted({
+    this.isCurrent,
     required this.messageId,
     this.translatedText,
     this.detectedSourceLanguage,
@@ -765,7 +769,7 @@ class TranslationCompleted extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [
+  List<Object?> get props => [if (isCurrent != null) isCurrent,
     messageId,
     translatedText,
     detectedSourceLanguage,
@@ -952,10 +956,11 @@ class ScheduledMessagesPreviewLoaded extends ChatEvent {
 
 /// 对方语言检测完成（内部事件）
 class RecipientLanguageDetected extends ChatEvent {
+  final bool Function()? isCurrent;
   final String language;
 
-  const RecipientLanguageDetected(this.language);
+  const RecipientLanguageDetected(this.language, {this.isCurrent});
 
   @override
-  List<Object?> get props => [language];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, language];
 }
