@@ -800,6 +800,118 @@ void main() {
   });
 
   group('Scheduled rich messages', () {
+    for (final relogin in [true, false]) {
+      test(
+        'in-flight due queue respects login generation: relogin=$relogin',
+        () async {
+          final auth = MockReportAuth();
+          final client = mockClient;
+          when(() => client.homeserver)
+              .thenReturn(Uri.parse('https://server.com'));
+          when(() => client.accessToken).thenReturn('same-token');
+          AuthSessionInvalidation generation() => AuthSessionInvalidation(
+            userId: '@me:server.com',
+            homeserver: Uri.parse('https://server.com'),
+            deviceId: null,
+            isCurrent: () => true,
+            matchesClient: (candidate) => identical(candidate, client),
+          );
+          when(() => auth.currentAccountGeneration).thenReturn(generation());
+          final pending = Completer<List<ScheduledMessageDraft>>();
+          final started = Completer<void>();
+          when(
+            () =>
+                mockPrefs.getDueScheduledMessages(ownerUserId: '@me:server.com'),
+          ).thenAnswer((_) {
+            started.complete();
+            return pending.future;
+          });
+          final bloc = ChatBloc(
+            messageRepository: mockRepo,
+            secureStorage: mockPrefs,
+            clientManager: mockClientManager,
+            authRepository: auth,
+          );
+          await initBloc(bloc);
+          bloc.add(const SendDueScheduledMessages());
+          await started.future;
+          // Same client, ID, device and token. Only the login generation changes.
+          if (relogin)
+            when(() => auth.currentAccountGeneration).thenReturn(generation());
+          final draft = ScheduledMessageDraft(
+            messageId: 'old-session',
+            roomId: _roomId,
+            text: 'Private',
+            type: MessageType.text,
+            createdAt: DateTime(2026),
+            scheduledAt: DateTime(2020),
+          );
+          when(
+            () => mockPrefs.getScheduledMessages(
+              _roomId,
+              ownerUserId: '@me:server.com',
+            ),
+          ).thenAnswer((_) async => [draft]);
+          when(
+            () => mockPrefs.removeScheduledMessage(
+              _roomId,
+              'old-session',
+              ownerUserId: '@me:server.com',
+            ),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockRepo.sendTextMessage(
+              _roomId,
+              'Private',
+              transactionId: any(named: 'transactionId'),
+              selfDestructAfter: null,
+              mentionedUserIds: const [],
+              mentionsRoom: false,
+            ),
+          ).thenAnswer((_) async => _msg);
+          pending.complete([draft]);
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          if (relogin) {
+            verifyNever(
+              () => mockPrefs.removeScheduledMessage(
+                any(),
+                any(),
+                ownerUserId: any(named: 'ownerUserId'),
+              ),
+            );
+            verifyNever(
+              () => mockRepo.sendTextMessage(
+                any(),
+                any(),
+                transactionId: any(named: 'transactionId'),
+                selfDestructAfter: any(named: 'selfDestructAfter'),
+                mentionedUserIds: any(named: 'mentionedUserIds'),
+                mentionsRoom: any(named: 'mentionsRoom'),
+              ),
+            );
+          } else {
+            verify(
+              () => mockPrefs.removeScheduledMessage(
+                _roomId,
+                'old-session',
+                ownerUserId: '@me:server.com',
+              ),
+            ).called(1);
+            verify(
+              () => mockRepo.sendTextMessage(
+                _roomId,
+                'Private',
+                transactionId: any(named: 'transactionId'),
+                selfDestructAfter: null,
+                mentionedUserIds: const [],
+                mentionsRoom: false,
+              ),
+            ).called(1);
+          }
+          await bloc.close();
+        },
+      );
+    }
     test('account switch discards a pending due queue without removing drafts', () async {
       final pending = Completer<List<ScheduledMessageDraft>>();
       var owner = '@a:test';

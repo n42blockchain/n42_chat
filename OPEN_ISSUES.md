@@ -171,6 +171,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- 2026-11-06 login-generation follow-up: production ChatBloc now receives the auth lifecycle and captures its opaque login generation before asynchronous scheduled reads/operations. A same-client/user/token re-login invalidates an in-flight due queue; a current generation still sends and removes only the confirmed draft. Extended BLoC suite: 52 passed. UI intents captured before handler entry and standalone scheduled-page same-user re-login still need generation binding; this does not close those separate gaps.
+
+
 - 2026-11-06 account-isolation follow-up: new scheduled drafts are stored under a hashed Matrix-user namespace. Queue reads, previews, cancellation and cleanup bind to that account; UI creation events carry the originating user/room. Late reads and session changes reject sends/cancellation acknowledgements. Text/poll/GIF/sticker transport now rechecks its captured client/session before SDK dispatch (media retains its existing checks). Broad relevant suites: 3,398 passed; four additional client/token-switch transport cases passed. Legacy unowned drafts remain in their old storage key and are not automatically displayed or sent under any account. A safe user-confirmed recovery/migration flow is still missing; do not describe legacy scheduling as fully migrated. Multiple processes/devices, same-user re-login intent generations and live-server delivery/cancellation remain unverified. Source tests do not establish device acceptance.
 
 

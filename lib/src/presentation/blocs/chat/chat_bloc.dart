@@ -24,6 +24,8 @@ import '../../../domain/entities/message_entity.dart';
 import '../../../core/utils/event_message_data.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../../../domain/repositories/auth_repository.dart';
+import '../../../data/services/account_action_capture.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
@@ -49,6 +51,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IGroupRepository? _groupRepository;
   final ITranslationService? _translationService;
   final MatrixClientManager? _clientManager;
+  final IAuthRepository? _authRepository;
 
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
   StreamSubscription<Map<String, dynamic>>? _pollResponsesSubscription;
@@ -101,11 +104,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     IGroupRepository? groupRepository,
     ITranslationService? translationService,
     MatrixClientManager? clientManager,
+    IAuthRepository? authRepository,
   }) : _messageRepository = messageRepository,
        _secureStorage = secureStorage,
        _groupRepository = groupRepository,
        _translationService = translationService,
        _clientManager = clientManager,
+       _authRepository = authRepository,
        super(ChatState.initial()) {
     // 消息加载/订阅/更新
     on<InitializeChat>(_onInitializeChat);
@@ -474,6 +479,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   Future<_ScheduledAccount?> _captureScheduledAccount() async {
     final manager = _clientManager;
+    final auth = _authRepository;
+    final origin = manager != null && auth != null
+        ? captureAccountAction(manager, auth)
+        : null;
+    // A configured lifecycle must supply a live generation, never fall back to
+    // matching user/token values after logout and a same-account login.
+    if (auth != null && origin == null) return null;
     final client = manager?.client;
     final user = client?.userID,
         token = client?.accessToken,
@@ -482,6 +494,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final owner = await _messageRepository.getCurrentUserId();
     bool current() =>
         !isClosed &&
+        (origin == null || origin.isCurrent) &&
         (manager == null ||
             (client != null &&
                 identical(manager.client, client) &&

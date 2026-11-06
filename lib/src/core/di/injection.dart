@@ -1098,6 +1098,7 @@ void _registerBlocs() {
       groupRepository: getIt<IGroupRepository>(),
       translationService: getIt<ITranslationService>(),
       clientManager: getIt<MatrixClientManager>(),
+      authRepository: getIt<IAuthRepository>(),
     ),
   );
 
