@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "Dibuat {time}",
   "scheduledDeliveryUnconfirmed": "Pengiriman belum dikonfirmasi",
   "scheduledRecoveryCopy": "Simpan salinan pemulihan",
-  "scheduledRecoveryCopyHint": "Disimpan di perangkat ini tanpa mengubah atau mengirim pesan. Pratinjau menampilkan hingga 8.000 karakter."
+  "scheduledRecoveryCopyHint": "Disimpan di perangkat ini tanpa mengubah atau mengirim pesan. Pratinjau menampilkan hingga 8.000 karakter.",
+  "scheduledRecoveryCopies": "Salinan pemulihan"
 }

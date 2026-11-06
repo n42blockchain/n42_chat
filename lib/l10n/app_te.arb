@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "సృష్టించిన సమయం: {time}",
   "scheduledDeliveryUnconfirmed": "డెలివరీ నిర్ధారించబడలేదు",
   "scheduledRecoveryCopy": "పునరుద్ధరణ కాపీని సేవ్ చేయండి",
-  "scheduledRecoveryCopyHint": "సందేశాలను మార్చకుండా లేదా పంపకుండా ఈ పరికరంలో సేవ్ చేయబడింది. ప్రివ్యూలో గరిష్ఠంగా 8,000 అక్షరాలు కనిపిస్తాయి."
+  "scheduledRecoveryCopyHint": "సందేశాలను మార్చకుండా లేదా పంపకుండా ఈ పరికరంలో సేవ్ చేయబడింది. ప్రివ్యూలో గరిష్ఠంగా 8,000 అక్షరాలు కనిపిస్తాయి.",
+  "scheduledRecoveryCopies": "పునరుద్ధరణ కాపీలు"
 }

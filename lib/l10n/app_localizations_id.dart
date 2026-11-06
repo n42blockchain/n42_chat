@@ -6228,4 +6228,7 @@ class SId extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Disimpan di perangkat ini tanpa mengubah atau mengirim pesan. Pratinjau menampilkan hingga 8.000 karakter.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Salinan pemulihan';
 }

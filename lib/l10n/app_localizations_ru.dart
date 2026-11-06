@@ -6246,4 +6246,7 @@ class SRu extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Сохранено на этом устройстве без изменения или отправки сообщений. Предпросмотр показывает до 8 000 символов.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Копии для восстановления';
 }

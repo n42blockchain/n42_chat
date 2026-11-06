@@ -15,6 +15,7 @@ import '../../../data/services/scheduled_draft_operation.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
+import '../../../domain/entities/scheduled_recovery_copy.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/scheduled_message_origin.dart';
@@ -45,7 +46,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   bool _isLoading = true;
   bool _loadFailed = false;
   bool _savingRecovery = false;
-  DialogRoute<void>? _recoveryRoute;
+  DialogRoute<dynamic>? _recoveryRoute;
   final Set<String> _cancelling = {};
   List<ScheduledMessageDraft> _drafts = const [];
 
@@ -113,43 +114,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         await _loadDrafts();
         return;
       }
-      final previewRunes = raw.runes.take(8001).toList(growable: false);
-      final preview =
-          String.fromCharCodes(previewRunes.take(8000)) +
-          (previewRunes.length > 8000 ? '…' : '');
-      final route = DialogRoute<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            S.of(context)?.scheduledRecoveryCopy ?? 'Save recovery copy',
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    S.of(context)?.scheduledRecoveryCopyHint ?? 'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.',
-                  ),
-                  const SizedBox(height: 16),
-                  SelectableText(preview),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(MaterialLocalizations.of(context).closeButtonLabel),
-            ),
-          ],
-        ),
-      );
-      _recoveryRoute = route;
-      await Navigator.of(context).push(route);
-      if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+      await _showRecoveryPreview(raw);
     } catch (_) {
       if (mounted && _origin?.isCurrent == true) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -157,6 +122,145 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             content: Text(
               S.of(context)?.commonFailedToSave ?? 'Failed to save',
             ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _savingRecovery = false);
+    }
+  }
+
+  Future<void> _showRecoveryPreview(String raw) async {
+    final previewRunes = raw.runes.take(8001).toList(growable: false);
+    final preview =
+        String.fromCharCodes(previewRunes.take(8000)) +
+        (previewRunes.length > 8000 ? '…' : '');
+    final route = DialogRoute<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          S.of(context)?.scheduledRecoveryCopy ?? 'Save recovery copy',
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  S.of(context)?.scheduledRecoveryCopyHint ?? 'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.',
+                ),
+                const SizedBox(height: 16),
+                SelectableText(preview),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+          ),
+        ],
+      ),
+    );
+    _recoveryRoute = route;
+    await Navigator.of(context).push(route);
+    if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+  }
+
+  Future<void> _openRecoveryCopies() async {
+    if (_savingRecovery || _origin?.isCurrent != true) return;
+    setState(() => _savingRecovery = true);
+    try {
+      final owner = await _messages.getCurrentUserId();
+      if (!mounted ||
+          owner == null ||
+          owner.isEmpty ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      final copies = await _preferences.getScheduledRecoveryCopies(
+        ownerUserId: owner,
+        isCurrent: () => mounted && _origin?.isCurrent == true,
+      );
+      if (!mounted ||
+          _origin?.isCurrent != true ||
+          owner != await _messages.getCurrentUserId() ||
+          !mounted ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      final route = DialogRoute<ScheduledRecoveryCopy>(
+        context: context,
+        builder: (context) => Dialog.fullscreen(
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(
+                S.of(context)?.scheduledRecoveryCopies ?? 'Recovery copies',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: MaterialLocalizations.of(context).closeButtonLabel,
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            body: copies.isEmpty
+                ? Center(
+                    child: Text(
+                      S.of(context)?.backupNoBackups ?? 'No backups yet',
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: copies.length,
+                    itemBuilder: (context, index) {
+                      final copy = copies[index];
+                      final preview = copy.isIntact
+                          ? String.fromCharCodes(copy.raw!.runes.take(100))
+                          : (S.of(context)?.commonLoadFailed ??
+                                'Failed to load');
+                      return ListTile(
+                        key: ValueKey('scheduled-recovery-${copy.id}'),
+                        leading: Icon(
+                          copy.isIntact
+                              ? Icons.description_outlined
+                              : Icons.error_outline,
+                        ),
+                        title: Text(
+                          preview,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        enabled: copy.isIntact,
+                        onTap: copy.isIntact
+                            ? () => Navigator.pop(context, copy)
+                            : null,
+                      );
+                    },
+                  ),
+          ),
+        ),
+      );
+      _recoveryRoute = route;
+      final selected = await Navigator.of(context).push(route);
+      if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+      if (!mounted ||
+          _origin?.isCurrent != true ||
+          selected?.isIntact != true ||
+          owner != await _messages.getCurrentUserId() ||
+          !mounted ||
+          _origin?.isCurrent != true) {
+        return;
+      }
+      await _showRecoveryPreview(selected!.raw!);
+    } catch (_) {
+      if (mounted && _origin?.isCurrent == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context)?.commonLoadFailed ?? 'Failed to load'),
           ),
         );
       }
@@ -327,6 +431,15 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
             height: 1.3,
           ),
         ),
+        actions: [
+          IconButton(
+            key: const ValueKey('scheduled-recovery-history'),
+            icon: const Icon(Icons.history),
+            tooltip:
+                S.of(context)?.scheduledRecoveryCopies ?? 'Recovery copies',
+            onPressed: _savingRecovery ? null : _openRecoveryCopies,
+          ),
+        ],
         leading: IconButton(
           icon: Icon(AppIcons.back, color: context.textPrimary, size: 20),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,

@@ -6218,4 +6218,7 @@ class STr extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Mesajlar değiştirilmeden veya gönderilmeden bu cihaza kaydedildi. Önizleme en fazla 8.000 karakter gösterir.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Kurtarma kopyaları';
 }

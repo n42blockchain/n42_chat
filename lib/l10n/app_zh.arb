@@ -2275,5 +2275,6 @@
   "scheduledMessageCreatedAt": "创建于 {time}",
   "scheduledDeliveryUnconfirmed": "发送结果未确认",
   "scheduledRecoveryCopy": "保存恢复副本",
-  "scheduledRecoveryCopyHint": "副本保存在此设备，不会更改或发送消息。预览最多显示 8,000 个字符。"
+  "scheduledRecoveryCopyHint": "副本保存在此设备，不会更改或发送消息。预览最多显示 8,000 个字符。",
+  "scheduledRecoveryCopies": "恢复副本"
 }

@@ -6187,4 +6187,7 @@ class SEn extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Recovery copies';
 }

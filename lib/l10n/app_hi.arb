@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "बनाया गया: {time}",
   "scheduledDeliveryUnconfirmed": "डिलीवरी की पुष्टि नहीं हुई",
   "scheduledRecoveryCopy": "पुनर्प्राप्ति प्रति सहेजें",
-  "scheduledRecoveryCopyHint": "संदेश बदले या भेजे बिना इस डिवाइस पर सहेजा गया। पूर्वावलोकन में अधिकतम 8,000 अक्षर दिखते हैं।"
+  "scheduledRecoveryCopyHint": "संदेश बदले या भेजे बिना इस डिवाइस पर सहेजा गया। पूर्वावलोकन में अधिकतम 8,000 अक्षर दिखते हैं।",
+  "scheduledRecoveryCopies": "पुनर्प्राप्ति प्रतियाँ"
 }

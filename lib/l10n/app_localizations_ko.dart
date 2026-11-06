@@ -6083,4 +6083,7 @@ class SKo extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       '메시지를 변경하거나 보내지 않고 이 기기에 저장했습니다. 미리보기에는 최대 8,000자가 표시됩니다.';
+
+  @override
+  String get scheduledRecoveryCopies => '복구용 사본';
 }

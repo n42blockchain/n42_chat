@@ -6262,4 +6262,7 @@ class STe extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'సందేశాలను మార్చకుండా లేదా పంపకుండా ఈ పరికరంలో సేవ్ చేయబడింది. ప్రివ్యూలో గరిష్ఠంగా 8,000 అక్షరాలు కనిపిస్తాయి.';
+
+  @override
+  String get scheduledRecoveryCopies => 'పునరుద్ధరణ కాపీలు';
 }

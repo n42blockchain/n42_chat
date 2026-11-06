@@ -6255,4 +6255,7 @@ class SPl extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Zapisano na tym urządzeniu bez zmiany ani wysyłania wiadomości. Podgląd pokazuje do 8 000 znaków.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Kopie do odzyskania';
 }

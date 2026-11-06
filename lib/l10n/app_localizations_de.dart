@@ -6266,4 +6266,7 @@ class SDe extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Auf diesem Gerät gespeichert, ohne Nachrichten zu ändern oder zu senden. Die Vorschau zeigt bis zu 8.000 Zeichen.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Wiederherstellungskopien';
 }

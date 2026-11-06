@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "作成日時：{time}",
   "scheduledDeliveryUnconfirmed": "配信が確認されていません",
   "scheduledRecoveryCopy": "復元用コピーを保存",
-  "scheduledRecoveryCopyHint": "メッセージを変更・送信せず、この端末に保存しました。プレビューは最大8,000文字です。"
+  "scheduledRecoveryCopyHint": "メッセージを変更・送信せず、この端末に保存しました。プレビューは最大8,000文字です。",
+  "scheduledRecoveryCopies": "復元用コピー"
 }

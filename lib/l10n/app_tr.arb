@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "Oluşturulma: {time}",
   "scheduledDeliveryUnconfirmed": "Teslimat doğrulanmadı",
   "scheduledRecoveryCopy": "Kurtarma kopyasını kaydet",
-  "scheduledRecoveryCopyHint": "Mesajlar değiştirilmeden veya gönderilmeden bu cihaza kaydedildi. Önizleme en fazla 8.000 karakter gösterir."
+  "scheduledRecoveryCopyHint": "Mesajlar değiştirilmeden veya gönderilmeden bu cihaza kaydedildi. Önizleme en fazla 8.000 karakter gösterir.",
+  "scheduledRecoveryCopies": "Kurtarma kopyaları"
 }

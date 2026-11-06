@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "Utworzono: {time}",
   "scheduledDeliveryUnconfirmed": "Dostarczenie niepotwierdzone",
   "scheduledRecoveryCopy": "Zapisz kopię do odzyskania",
-  "scheduledRecoveryCopyHint": "Zapisano na tym urządzeniu bez zmiany ani wysyłania wiadomości. Podgląd pokazuje do 8 000 znaków."
+  "scheduledRecoveryCopyHint": "Zapisano na tym urządzeniu bez zmiany ani wysyłania wiadomości. Podgląd pokazuje do 8 000 znaków.",
+  "scheduledRecoveryCopies": "Kopie do odzyskania"
 }

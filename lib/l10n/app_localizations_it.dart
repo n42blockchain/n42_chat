@@ -6245,4 +6245,7 @@ class SIt extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Salvata su questo dispositivo senza modificare o inviare messaggi. L’anteprima mostra fino a 8.000 caratteri.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Copie di recupero';
 }

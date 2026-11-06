@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "Створено: {time}",
   "scheduledDeliveryUnconfirmed": "Доставку не підтверджено",
   "scheduledRecoveryCopy": "Зберегти копію для відновлення",
-  "scheduledRecoveryCopyHint": "Збережено на цьому пристрої без зміни чи надсилання повідомлень. Попередній перегляд показує до 8 000 символів."
+  "scheduledRecoveryCopyHint": "Збережено на цьому пристрої без зміни чи надсилання повідомлень. Попередній перегляд показує до 8 000 символів.",
+  "scheduledRecoveryCopies": "Копії для відновлення"
 }

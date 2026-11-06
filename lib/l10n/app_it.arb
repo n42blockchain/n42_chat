@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "Creato: {time}",
   "scheduledDeliveryUnconfirmed": "Consegna non confermata",
   "scheduledRecoveryCopy": "Salva copia di recupero",
-  "scheduledRecoveryCopyHint": "Salvata su questo dispositivo senza modificare o inviare messaggi. L’anteprima mostra fino a 8.000 caratteri."
+  "scheduledRecoveryCopyHint": "Salvata su questo dispositivo senza modificare o inviare messaggi. L’anteprima mostra fino a 8.000 caratteri.",
+  "scheduledRecoveryCopies": "Copie di recupero"
 }

@@ -6080,4 +6080,7 @@ class SJa extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'メッセージを変更・送信せず、この端末に保存しました。プレビューは最大8,000文字です。';
+
+  @override
+  String get scheduledRecoveryCopies => '復元用コピー';
 }

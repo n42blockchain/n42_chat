@@ -6216,4 +6216,7 @@ class SBn extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'বার্তা পরিবর্তন বা পাঠানো ছাড়াই এই ডিভাইসে সংরক্ষিত। প্রিভিউতে সর্বোচ্চ 8,000 অক্ষর দেখানো হয়।';
+
+  @override
+  String get scheduledRecoveryCopies => 'পুনরুদ্ধারের কপি';
 }

@@ -6188,4 +6188,7 @@ class SAr extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'تُحفظ على هذا الجهاز دون تغيير الرسائل أو إرسالها. تعرض المعاينة حتى 8,000 حرف.';
+
+  @override
+  String get scheduledRecoveryCopies => 'نسخ الاسترداد';
 }

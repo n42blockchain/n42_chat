@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "Erstellt: {time}",
   "scheduledDeliveryUnconfirmed": "Zustellung nicht bestätigt",
   "scheduledRecoveryCopy": "Wiederherstellungskopie speichern",
-  "scheduledRecoveryCopyHint": "Auf diesem Gerät gespeichert, ohne Nachrichten zu ändern oder zu senden. Die Vorschau zeigt bis zu 8.000 Zeichen."
+  "scheduledRecoveryCopyHint": "Auf diesem Gerät gespeichert, ohne Nachrichten zu ändern oder zu senden. Die Vorschau zeigt bis zu 8.000 Zeichen.",
+  "scheduledRecoveryCopies": "Wiederherstellungskopien"
 }

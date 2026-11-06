@@ -6214,4 +6214,7 @@ class SHi extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'संदेश बदले या भेजे बिना इस डिवाइस पर सहेजा गया। पूर्वावलोकन में अधिकतम 8,000 अक्षर दिखते हैं।';
+
+  @override
+  String get scheduledRecoveryCopies => 'पुनर्प्राप्ति प्रतियाँ';
 }

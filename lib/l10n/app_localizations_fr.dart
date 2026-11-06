@@ -6284,4 +6284,7 @@ class SFr extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Enregistrée sur cet appareil sans modifier ni envoyer de messages. L’aperçu affiche jusqu’à 8 000 caractères.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Copies de récupération';
 }

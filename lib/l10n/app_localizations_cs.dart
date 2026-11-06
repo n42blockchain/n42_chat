@@ -6228,4 +6228,7 @@ class SCs extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Uloženo v tomto zařízení bez změny nebo odeslání zpráv. Náhled zobrazuje až 8 000 znaků.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Kopie pro obnovu';
 }

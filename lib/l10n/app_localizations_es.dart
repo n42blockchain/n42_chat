@@ -6259,4 +6259,7 @@ class SEs extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Guardada en este dispositivo sin modificar ni enviar mensajes. La vista previa muestra hasta 8.000 caracteres.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Copias de recuperación';
 }

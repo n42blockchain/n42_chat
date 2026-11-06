@@ -6250,6 +6250,9 @@ class SPt extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Guardada neste dispositivo sem alterar nem enviar mensagens. A pré-visualização mostra até 8.000 caracteres.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Cópias de recuperação';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12499,4 +12502,7 @@ class SPtBr extends SPt {
   @override
   String get scheduledRecoveryCopyHint =>
       'Salva neste dispositivo sem alterar nem enviar mensagens. A prévia mostra até 8.000 caracteres.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Cópias de recuperação';
 }

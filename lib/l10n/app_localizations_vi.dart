@@ -6204,4 +6204,7 @@ class SVi extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Đã lưu trên thiết bị này mà không thay đổi hoặc gửi tin nhắn. Bản xem trước hiển thị tối đa 8.000 ký tự.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Bản sao khôi phục';
 }

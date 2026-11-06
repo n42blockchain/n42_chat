@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "Uliundwa {time}",
   "scheduledDeliveryUnconfirmed": "Uwasilishaji haujathibitishwa",
   "scheduledRecoveryCopy": "Hifadhi nakala ya urejeshaji",
-  "scheduledRecoveryCopyHint": "Imehifadhiwa kwenye kifaa hiki bila kubadilisha au kutuma ujumbe. Onyesho la kukagua lina hadi herufi 8,000."
+  "scheduledRecoveryCopyHint": "Imehifadhiwa kwenye kifaa hiki bila kubadilisha au kutuma ujumbe. Onyesho la kukagua lina hadi herufi 8,000.",
+  "scheduledRecoveryCopies": "Nakala za urejeshaji"
 }

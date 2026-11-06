@@ -6248,4 +6248,7 @@ class SUk extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'Збережено на цьому пристрої без зміни чи надсилання повідомлень. Попередній перегляд показує до 8 000 символів.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Копії для відновлення';
 }

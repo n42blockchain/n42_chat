@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "أُنشئت في {time}",
   "scheduledDeliveryUnconfirmed": "لم يتم تأكيد التسليم",
   "scheduledRecoveryCopy": "حفظ نسخة للاسترداد",
-  "scheduledRecoveryCopyHint": "تُحفظ على هذا الجهاز دون تغيير الرسائل أو إرسالها. تعرض المعاينة حتى 8,000 حرف."
+  "scheduledRecoveryCopyHint": "تُحفظ على هذا الجهاز دون تغيير الرسائل أو إرسالها. تعرض المعاينة حتى 8,000 حرف.",
+  "scheduledRecoveryCopies": "نسخ الاسترداد"
 }

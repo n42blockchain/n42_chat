@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/scheduled_attachment_cleanup.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
+import '../../../domain/entities/scheduled_recovery_copy.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/utils/preference_write_utils.dart';
@@ -818,6 +819,29 @@ class PreferencesDataSource {
       release.complete();
     }
   }
+
+  /// Read this account's saved copies even when its active queue is empty.
+  /// Integrity failures stay in the result; never silently drop recovery data.
+  Future<List<ScheduledRecoveryCopy>> getScheduledRecoveryCopies({
+    required String ownerUserId,
+    required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final prefix = '${_scheduledKey(ownerUserId)}_recovery_';
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final keys = p.getKeys().where((key) => key.startsWith(prefix)).toList()..sort();
+    return List.unmodifiable(keys.map((key) {
+      final id = key.substring(prefix.length);
+      final value = p.get(key);
+      final raw = value is String ? value : null;
+      return ScheduledRecoveryCopy(
+        id: id, raw: raw,
+        isIntact: raw != null && id == sha256.convert(utf8.encode(raw)).toString(),
+      );
+    }));
+  });
 
   /// Preserve the exact account-owned queue before any manual recovery.
   /// Recovery copies are never read by the dispatcher. Keep the account prefix

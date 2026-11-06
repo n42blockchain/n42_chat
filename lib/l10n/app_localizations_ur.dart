@@ -6230,4 +6230,7 @@ class SUr extends S {
   @override
   String get scheduledRecoveryCopyHint =>
       'پیغامات کو تبدیل یا ارسال کیے بغیر اس آلے پر محفوظ کیا گیا۔ پیش منظر میں زیادہ سے زیادہ 8,000 حروف دکھائے جاتے ہیں۔';
+
+  @override
+  String get scheduledRecoveryCopies => 'بحالی کی نقول';
 }

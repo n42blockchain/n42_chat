@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "तयार केले: {time}",
   "scheduledDeliveryUnconfirmed": "वितरणाची पुष्टी झालेली नाही",
   "scheduledRecoveryCopy": "पुनर्प्राप्ती प्रत जतन करा",
-  "scheduledRecoveryCopyHint": "संदेश न बदलता किंवा न पाठवता या उपकरणावर जतन केले. पूर्वावलोकनात जास्तीत जास्त 8,000 अक्षरे दिसतात."
+  "scheduledRecoveryCopyHint": "संदेश न बदलता किंवा न पाठवता या उपकरणावर जतन केले. पूर्वावलोकनात जास्तीत जास्त 8,000 अक्षरे दिसतात.",
+  "scheduledRecoveryCopies": "पुनर्प्राप्ती प्रती"
 }

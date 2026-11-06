@@ -11446,6 +11446,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.'**
   String get scheduledRecoveryCopyHint;
+
+  /// No description provided for @scheduledRecoveryCopies.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery copies'**
+  String get scheduledRecoveryCopies;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

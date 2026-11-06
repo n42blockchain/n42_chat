@@ -14,6 +14,7 @@ import 'package:n42_chat/src/core/di/injection.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
+import 'package:n42_chat/src/domain/entities/scheduled_recovery_copy.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/chat/chat_event.dart';
 import 'package:n42_chat/src/presentation/pages/chat/scheduled_messages_page.dart';
@@ -135,6 +136,96 @@ void main() {
     expect(find.text('Delivery not confirmed'), findsNothing);
     final cancel = tester.widget<TextButton>(find.widgetWithText(TextButton, 'Cancel'));
     expect(cancel.onPressed, isNull);
+  });
+
+  for (final language in ['en', 'ar']) {
+    testWidgets('recovery history reopens saved content on healthy page: $language', (tester) async {
+      final events = StreamController<bool>.broadcast(sync: true);
+      addTearDown(events.close);
+      when(() => auth.loginStateStream).thenAnswer((_) => events.stream);
+      when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => const [
+        ScheduledRecoveryCopy(id: 'good', raw: 'saved previous draft', isIntact: true),
+        ScheduledRecoveryCopy(id: 'bad', raw: 'damaged copy bytes', isIntact: false),
+      ]);
+      tester.view.physicalSize = const Size(320, 480);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await pump(tester, locale: Locale(language), scale: 2);
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-history')));
+      await tester.pumpAndSettle();
+      expect(find.byType(Dialog), findsOneWidget);
+      final scroll = find.descendant(of: find.byType(Dialog), matching: find.byType(Scrollable));
+      final bad = find.byKey(const ValueKey('scheduled-recovery-bad'));
+      await tester.scrollUntilVisible(bad, 80, scrollable: scroll);
+      expect(tester.widget<ListTile>(bad).onTap, isNull);
+      expect(find.text('damaged copy bytes'), findsNothing);
+      final good = find.byKey(const ValueKey('scheduled-recovery-good'));
+      await tester.scrollUntilVisible(good, -80, scrollable: scroll);
+      await tester.pumpAndSettle();
+      await tester.tap(good);
+      await tester.pumpAndSettle();
+      expect(find.byType(SelectableText), findsOneWidget);
+      expect(tester.widget<SelectableText>(find.byType(SelectableText)).data, 'saved previous draft');
+      when(() => auth.currentAccountGeneration).thenReturn(null);
+      events.add(false);
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+  testWidgets('logout dismisses the history list before any copy is selected', (tester) async {
+    final events = StreamController<bool>.broadcast(sync: true);
+    addTearDown(events.close);
+    when(() => auth.loginStateStream).thenAnswer((_) => events.stream);
+    when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => const [ScheduledRecoveryCopy(id: 'one', raw: 'private history', isIntact: true)]);
+    await pump(tester);
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-history')));
+    await tester.pumpAndSettle();
+    expect(find.text('private history'), findsOneWidget);
+    when(() => auth.currentAccountGeneration).thenReturn(null);
+    events.add(false);
+    await tester.pumpAndSettle();
+    expect(find.byType(Dialog), findsNothing);
+    expect(find.text('private history'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('failed history read unlocks retry without showing content', (tester) async {
+    when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenThrow(StateError('unavailable'));
+    await pump(tester);
+    final button = find.byKey(const ValueKey('scheduled-recovery-history'));
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.byType(Dialog), findsNothing);
+    expect(tester.widget<IconButton>(button).onPressed, isNotNull);
+    when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => []);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.text('No backups yet'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('history read arriving after account switch is hidden', (tester) async {
+    final read = Completer<List<ScheduledRecoveryCopy>>();
+    when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) => read.future);
+    await pump(tester);
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-history')));
+    await tester.pump();
+    when(() => messages.getCurrentUserId()).thenAnswer((_) async => '@b:test');
+    read.complete(const [ScheduledRecoveryCopy(id: 'private', raw: 'private copy', isIntact: true)]);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('private copy'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('empty recovery history does not create a backup', (tester) async {
+    when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => []);
+    await pump(tester);
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-history')));
+    await tester.pumpAndSettle();
+    expect(find.text('No backups yet'), findsOneWidget);
+    verifyNever(() => prefs.saveScheduledRecoveryCopy(ownerUserId: any(named: 'ownerUserId'), isCurrent: any(named: 'isCurrent')));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('late recovery copy never exposes the previous account', (tester) async {

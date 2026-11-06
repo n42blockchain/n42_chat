@@ -148,6 +148,43 @@ void main() {
     expect(prefs.getString(key), raw);
   });
 
+  test('saved copies reopen without active queue and stay account-scoped', () async {
+    final store = PreferencesDataSource();
+    const owner = '@a:test';
+    final key = 'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    final prefs = await SharedPreferences.getInstance();
+    for (final raw in ['{first damaged', '{second damaged']) {
+      await prefs.setString(key, raw);
+      await store.saveScheduledRecoveryCopy(ownerUserId: owner, isCurrent: () => true);
+    }
+    await prefs.remove(key);
+    final copies = await PreferencesDataSource().getScheduledRecoveryCopies(ownerUserId: owner, isCurrent: () => true);
+    expect(copies.map((copy) => copy.raw).toSet(), {'{first damaged', '{second damaged'});
+    expect(copies.every((copy) => copy.isIntact), true);
+    expect(() => copies.clear(), throwsUnsupportedError);
+    expect(await store.getScheduledRecoveryCopies(ownerUserId: '@b:test', isCurrent: () => true), isEmpty);
+    expect(await store.getDueScheduledMessages(ownerUserId: owner), isEmpty);
+  });
+
+  test('damaged copies are reported alongside intact copies without mutation', () async {
+    final store = PreferencesDataSource();
+    const owner = '@a:test';
+    final key = 'n42_chat_scheduled_messages_account_${sha256.convert(utf8.encode(owner))}';
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, '{valid snapshot');
+    await store.saveScheduledRecoveryCopy(ownerUserId: owner, isCurrent: () => true);
+    await prefs.setString('${key}_recovery_bad-digest', 'changed bytes');
+    await prefs.setInt('${key}_recovery_wrong-type', 42);
+    final copies = await store.getScheduledRecoveryCopies(ownerUserId: owner, isCurrent: () => true);
+    expect(copies.where((copy) => copy.isIntact), hasLength(1));
+    expect(copies.where((copy) => !copy.isIntact), hasLength(2));
+    expect(prefs.getString('${key}_recovery_bad-digest'), 'changed bytes');
+    expect(prefs.getInt('${key}_recovery_wrong-type'), 42);
+    var checks = 0;
+    await expectLater(store.getScheduledRecoveryCopies(ownerUserId: owner, isCurrent: () => ++checks == 1), throwsStateError);
+    await expectLater(store.getScheduledRecoveryCopies(ownerUserId: '', isCurrent: () => true), throwsArgumentError);
+  });
+
   test('corrupt delivery states preserve bytes and prevent due recovery', () async {
     final store = PreferencesDataSource();
     await store.saveScheduledMessage(roomId: 'room', messageId: 'draft',

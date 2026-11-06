@@ -2887,5 +2887,6 @@
   "scheduledMessageCreatedAt": "Créé le {time}",
   "scheduledDeliveryUnconfirmed": "Livraison non confirmée",
   "scheduledRecoveryCopy": "Enregistrer une copie de récupération",
-  "scheduledRecoveryCopyHint": "Enregistrée sur cet appareil sans modifier ni envoyer de messages. L’aperçu affiche jusqu’à 8 000 caractères."
+  "scheduledRecoveryCopyHint": "Enregistrée sur cet appareil sans modifier ni envoyer de messages. L’aperçu affiche jusqu’à 8 000 caractères.",
+  "scheduledRecoveryCopies": "Copies de récupération"
 }
