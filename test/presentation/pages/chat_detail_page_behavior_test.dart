@@ -32,6 +32,7 @@ void main() {
     Locale? locale,
     double textScale = 1,
     VoidCallback? onClearHistory,
+    bool Function()? canClearHistory,
     bool canChangeSettings = false,
     void Function(String userId, String displayName, String? avatarUrl)?
     onMemberTap,
@@ -62,6 +63,7 @@ void main() {
                   isPinned: pinned,
                 ),
             onClearHistory: onClearHistory,
+            canClearHistory: canClearHistory,
             canChangeSettings: canChangeSettings,
             onMemberTap: onMemberTap,
           ),
@@ -239,6 +241,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('All Messages'), findsOneWidget);
+  });
+
+  testWidgets('stale clear confirmation cannot invoke callback or report success', (tester) async {
+    var current = true;
+    var calls = 0;
+    await pumpPage(tester, onClearHistory: () => calls++, canClearHistory: () => current);
+    await tester.ensureVisible(find.text('Clear Chat History'));
+    await tester.tap(find.text('Clear Chat History'));
+    await tester.pumpAndSettle();
+    current = false;
+    await tester.tap(find.widgetWithText(TextButton, 'Clear'));
+    await tester.pumpAndSettle();
+    expect(calls, 0);
+    expect(find.text('Chat history cleared'), findsNothing);
   });
 
   testWidgets(

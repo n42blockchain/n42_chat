@@ -447,6 +447,11 @@ extension ChatBlocActionHandlers on ChatBloc {
     ClearChatHistory event,
     Emitter<ChatState> emit,
   ) async {
+    if (_currentRoomId == null ||
+        (event.roomId != null && event.roomId != _currentRoomId) ||
+        (event.isCurrent != null && !event.isCurrent!())) {
+      return;
+    }
     debugLog('ChatBloc: Clearing chat history for room $_currentRoomId');
 
     // 清空本地消息列表

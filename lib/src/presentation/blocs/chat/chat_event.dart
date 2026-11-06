@@ -494,7 +494,16 @@ class SendCustomMessage extends ChatEvent {
 
 /// 清空聊天记录（本地）
 class ClearChatHistory extends ChatEvent {
-  const ClearChatHistory();
+  final String? roomId;
+  final bool Function()? isCurrent;
+
+  const ClearChatHistory({this.roomId, this.isCurrent});
+
+  @override
+  List<Object?> get props => [
+    if (roomId != null) roomId,
+    if (isCurrent != null) isCurrent,
+  ];
 }
 
 /// 开始消息的自毁倒计时（消息被阅读时触发）

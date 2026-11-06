@@ -1056,7 +1056,13 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 打开聊天设置页面
   void _openChatSettings() async {
+    final settingsBloc = context.read<ChatBloc>();
+    final settingsRoomId = widget.conversation.id;
+    final settingsSessionIsCurrent = settingsBloc.captureCurrentSession();
     final recoveryOrigin = _scheduledOrigin;
+    bool canClearHistory() => mounted && settingsSessionIsCurrent() && !settingsBloc.isClosed &&
+        settingsBloc.state.roomId == settingsRoomId &&
+        recoveryOrigin?.isCurrent == true;
     final recoveryOwner = _currentUserId;
     final openingRevision = _draftRevision;
     final openingInput = _inputController.value;
@@ -1100,8 +1106,12 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             onMemberTap: (userId, displayName, avatarUrl) {
               _openMemberProfile(ctx, userId, displayName, avatarUrl);
             },
+            canClearHistory: canClearHistory,
             onClearHistory: () {
-              context.read<ChatBloc>().add(const ClearChatHistory());
+              if (!canClearHistory()) return;
+              settingsBloc.add(ClearChatHistory(
+                roomId: settingsRoomId, isCurrent: canClearHistory,
+              ));
             },
           );
 

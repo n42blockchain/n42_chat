@@ -667,6 +667,35 @@ void main() {
     });
   }
 
+  for (final mode in ['current', 'stale origin', 'wrong room']) {
+    test('clear history respects $mode', () async {
+      final bloc = await buildInitializedBloc();
+      bloc.add(ClearChatHistory(
+        roomId: mode == 'wrong room' ? '!old:server.com' : _roomId,
+        isCurrent: () => mode != 'stale origin',
+      ));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(bloc.state.messages, mode == 'current' ? isEmpty : _testMessages);
+      bloc.add(MessagesUpdated(_testMessages));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(bloc.state.messages, mode == 'current' ? isEmpty : _testMessages);
+      await bloc.close();
+    });
+  }
+
+  test('clear history rejects callback from a previous visit to the same room', () async {
+    final bloc = await buildInitializedBloc();
+    final isCurrent = bloc.captureCurrentSession();
+    expect(isCurrent(), isTrue);
+    bloc.add(const InitializeChat(_roomId));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    expect(isCurrent(), isFalse);
+    bloc.add(ClearChatHistory(roomId: _roomId, isCurrent: isCurrent));
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(bloc.state.messages, _testMessages);
+    await bloc.close();
+  });
+
   group('text send context across awaits', () {
     for (final returnToOrigin in [false, true]) {
       test('settings wait rejects room switch, return=$returnToOrigin', () async {

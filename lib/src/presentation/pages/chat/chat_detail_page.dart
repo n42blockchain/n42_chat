@@ -67,6 +67,7 @@ class ChatDetailPage extends StatefulWidget {
 
   /// 清空聊天记录的回调
   final VoidCallback? onClearHistory;
+  final bool Function()? canClearHistory;
 
   const ChatDetailPage({
     super.key,
@@ -77,6 +78,7 @@ class ChatDetailPage extends StatefulWidget {
     this.onRemoveMember,
     this.onMemberTap,
     this.onClearHistory,
+    this.canClearHistory,
   });
 
   @override
@@ -1806,7 +1808,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              widget.onClearHistory?.call();
+              if (widget.onClearHistory == null ||
+                  (widget.canClearHistory != null && !widget.canClearHistory!())) {
+                return;
+              }
+              widget.onClearHistory!();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(

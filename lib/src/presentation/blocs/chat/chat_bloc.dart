@@ -230,6 +230,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(state.copyWith(messages: updatedMessages));
   }
 
+  /// Retain the originating session for callbacks kept by child routes.
+  bool Function() captureCurrentSession() =>
+      _captureChatContext(null, _currentRoomId);
+
   @override
   Future<void> close() {
     _messagesSubscription?.cancel();
