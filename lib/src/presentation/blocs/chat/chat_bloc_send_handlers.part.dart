@@ -84,6 +84,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         completion.complete(result);
       }
     }
+
     if (_currentRoomId == null || event.text.trim().isEmpty) {
       completePreflight(TextSendPreflight.rejected);
       return;
@@ -113,19 +114,66 @@ extension ChatBlocSendHandlers on ChatBloc {
       }
     }
 
-    completePreflight(TextSendPreflight.admitted);
+    final roomId = _currentRoomId!;
+    final generation = _chatGeneration;
+    final replyTarget = state.replyTarget;
+    final translate = state.smartReplyTranslate;
+    final recipientLanguage = state.detectedRecipientLanguage;
+    final mentionedUsers = event.mentionedUserIds == null
+        ? null
+        : List<String>.of(event.mentionedUserIds!);
+    final manager = _clientManager;
+    final auth = _authRepository;
+    final origin = manager != null && auth != null
+        ? captureAccountAction(manager, auth)
+        : null;
+    final client = manager?.client;
+    final user = client?.userID,
+        token = client?.accessToken,
+        device = client?.deviceID,
+        server = client?.homeserver;
+    bool current() =>
+        !isClosed &&
+        !emit.isDone &&
+        _chatGeneration == generation &&
+        _currentRoomId == roomId &&
+        (auth == null || origin != null) &&
+        (origin == null || origin.isCurrent) &&
+        (manager == null ||
+            (client != null &&
+                identical(manager.client, client) &&
+                client.isLogged() &&
+                client.userID == user &&
+                client.accessToken == token &&
+                client.deviceID == device &&
+                client.homeserver == server));
+    if (!current()) {
+      completePreflight(TextSendPreflight.rejected);
+      return;
+    }
 
     // 智能回复翻译：发送前自动翻译为对方语言
     String textToSend = event.text;
     String? originalText;
-    final selfDestructAfter = await _resolveSelfDestructAfter(
-      event.selfDestructAfter,
-    );
+    int? selfDestructAfter;
+    try {
+      selfDestructAfter = await _resolveSelfDestructAfter(
+        event.selfDestructAfter,
+      );
+    } catch (e) {
+      completePreflight(TextSendPreflight.rejected);
+      if (current()) {
+        emit(state.copyWith(error: _sendFailure(e, 'Failed to send')));
+      }
+      return;
+    }
+    if (!current()) {
+      completePreflight(TextSendPreflight.rejected);
+      return;
+    }
 
-    if (state.smartReplyTranslate &&
-        _translationService != null &&
-        state.detectedRecipientLanguage != null) {
-      final recipientLang = state.detectedRecipientLanguage!;
+    if (translate && _translationService != null && recipientLanguage != null) {
+      final recipientLang = recipientLanguage;
       final userLang = getDeviceLanguageCode();
       if (translationLanguageBaseCode(recipientLang) !=
           translationLanguageBaseCode(userLang)) {
@@ -146,25 +194,31 @@ extension ChatBlocSendHandlers on ChatBloc {
       }
     }
 
+    if (!current()) {
+      completePreflight(TextSendPreflight.rejected);
+      return;
+    }
+    completePreflight(TextSendPreflight.admitted);
     emit(
       state.copyWith(isSending: true, isSendingText: true, clearError: true),
     );
 
     try {
       // 如果有回复目标，使用回复功能
-      if (state.replyTarget != null) {
+      if (replyTarget != null) {
         final sentMsg = await _messageRepository.replyToMessage(
-          _currentRoomId!,
-          state.replyTarget!.id,
+          roomId,
+          replyTarget.id,
           textToSend,
           selfDestructAfter: selfDestructAfter,
-          mentionedUserIds: event.mentionedUserIds,
+          mentionedUserIds: mentionedUsers,
           mentionsRoom: event.mentionsRoom,
         );
+        if (!current()) return;
         var newState = state.copyWith(
           isSending: state.activeMediaSends > 0,
           isSendingText: false,
-          clearReplyTarget: true,
+          clearReplyTarget: state.replyTarget?.id == replyTarget.id,
           lastMessageSentAt: DateTime.now(),
         );
         // 记录智能回复原文
@@ -186,12 +240,13 @@ extension ChatBlocSendHandlers on ChatBloc {
         emit(newState);
       } else {
         final sentMsg = await _messageRepository.sendTextMessage(
-          _currentRoomId!,
+          roomId,
           textToSend,
           selfDestructAfter: selfDestructAfter,
-          mentionedUserIds: event.mentionedUserIds,
+          mentionedUserIds: mentionedUsers,
           mentionsRoom: event.mentionsRoom,
         );
+        if (!current()) return;
         var newState = state.copyWith(
           isSending: state.activeMediaSends > 0,
           isSendingText: false,
@@ -215,6 +270,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         emit(newState);
       }
     } catch (e) {
+      if (!current()) return;
       emit(
         state.copyWith(
           isSending: state.activeMediaSends > 0,

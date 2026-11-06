@@ -908,6 +908,37 @@ void main() {
         },
       );
     }
+    test('text preparation rejects same-account replacement generation', () async {
+      final auth = MockReportAuth();
+      final client = mockClient;
+      when(() => client.homeserver).thenReturn(Uri.parse('https://server.com'));
+      when(() => client.accessToken).thenReturn('same-token');
+      AuthSessionInvalidation generation() => AuthSessionInvalidation(
+        userId: '@me:server.com', homeserver: Uri.parse('https://server.com'),
+        deviceId: null, isCurrent: () => true,
+        matchesClient: (candidate) => identical(candidate, client),
+      );
+      when(() => auth.currentAccountGeneration).thenReturn(generation());
+      final bloc = ChatBloc(messageRepository: mockRepo, secureStorage: mockPrefs,
+        clientManager: mockClientManager, authRepository: auth);
+      await initBloc(bloc);
+      final settings = Completer<int?>();
+      when(() => mockPrefs.getDefaultSelfDestructSeconds())
+          .thenAnswer((_) => settings.future);
+      final admission = Completer<TextSendPreflight>();
+      bloc.add(SendTextMessage('old session', preflightCompletion: admission));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(admission.isCompleted, isFalse);
+      when(() => auth.currentAccountGeneration).thenReturn(generation());
+      settings.complete(null);
+      expect(await admission.future, TextSendPreflight.rejected);
+      verifyNever(() => mockRepo.sendTextMessage(
+        any(), any(), selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'),
+        mentionsRoom: any(named: 'mentionsRoom'),
+      ));
+      await bloc.close();
+    });
     for (final stale in [true, false]) {
       test(
         'queued creation and cancellation validate origin: stale=$stale',

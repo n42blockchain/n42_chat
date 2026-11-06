@@ -335,6 +335,7 @@ extension ChatBlocActionHandlers on ChatBloc {
 
   /// 清理聊天室
   Future<void> onDisposeChat(DisposeChat event, Emitter<ChatState> emit) async {
+    _chatGeneration++;
     await _messagesSubscription?.cancel();
     _messagesSubscription = null;
     _typingUsersTimer?.cancel();

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:n42_chat/src/core/services/translation_service.dart';
 
 import 'package:n42_chat/src/data/datasources/matrix/message/encrypted_send_guard.dart';
 
@@ -21,6 +22,7 @@ import 'package:n42_chat/src/presentation/blocs/chat/chat_state.dart';
 class MockMessageRepository extends Mock implements IMessageRepository {}
 
 class MockSecureStorage extends Mock implements PreferencesDataSource {}
+class MockTranslationService extends Mock implements ITranslationService {}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -112,6 +114,131 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     return bloc;
   }
+
+  group('text send context across awaits', () {
+    for (final returnToOrigin in [false, true]) {
+      test('settings wait rejects room switch, return=$returnToOrigin', () async {
+        final bloc = await buildInitializedBloc();
+        final settings = Completer<int?>();
+        when(() => mockSecureStorage.getDefaultSelfDestructSeconds())
+            .thenAnswer((_) => settings.future);
+        final admission = Completer<TextSendPreflight>();
+        bloc.add(SendTextMessage('old input', preflightCompletion: admission));
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        bloc.add(const InitializeChat('!other:server.com'));
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        if (returnToOrigin) {
+          bloc.add(const InitializeChat(_roomId));
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+        }
+        settings.complete(null);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(await admission.future, TextSendPreflight.rejected);
+        verifyNever(() => mockRepository.sendTextMessage(
+          any(), any(), selfDestructAfter: any(named: 'selfDestructAfter'),
+          mentionedUserIds: any(named: 'mentionedUserIds'),
+          mentionsRoom: any(named: 'mentionsRoom'),
+        ));
+        expect(bloc.state.isSendingText, isFalse);
+        await bloc.close();
+      });
+    }
+    test('settings failure rejects admission without dispatch', () async {
+      final bloc = await buildInitializedBloc();
+      when(() => mockSecureStorage.getDefaultSelfDestructSeconds())
+          .thenThrow(StateError('storage unavailable'));
+      final admission = Completer<TextSendPreflight>();
+      bloc.add(SendTextMessage('retain me', preflightCompletion: admission));
+      expect(await admission.future, TextSendPreflight.rejected);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(bloc.state.isSendingText, isFalse);
+      expect(bloc.state.error, isNotNull);
+      verifyNever(() => mockRepository.sendTextMessage(
+        any(), any(), selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'),
+        mentionsRoom: any(named: 'mentionsRoom'),
+      ));
+      await bloc.close();
+    });
+    test('translation wait cannot dispatch into another room', () async {
+      final translation = MockTranslationService();
+      when(() => translation.detectLanguage(any())).thenAnswer((_) async => null);
+      final translated = Completer<TranslationResult>();
+      final entered = Completer<void>();
+      when(() => translation.translate(text: any(named: 'text'),
+        targetLanguage: any(named: 'targetLanguage'))).thenAnswer((_) {
+        entered.complete();
+        return translated.future;
+      });
+      final bloc = ChatBloc(messageRepository: mockRepository,
+        secureStorage: mockSecureStorage, translationService: translation);
+      bloc.add(const InitializeChat(_roomId));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      bloc.add(const TranslationSettingsLoaded(autoTranslate: false,
+        defaultTargetLanguage: 'ja', smartReplyTranslate: true));
+      bloc.add(const RecipientLanguageDetected('ja'));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      final admission = Completer<TextSendPreflight>();
+      bloc.add(SendTextMessage('hello', preflightCompletion: admission));
+      await entered.future;
+      bloc.add(const InitializeChat('!other:server.com'));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      translated.complete(const TranslationResult(translatedText: 'こんにちは',
+        targetLanguage: 'ja'));
+      expect(await admission.future, TextSendPreflight.rejected);
+      verifyNever(() => mockRepository.sendTextMessage(
+        any(), any(), selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'),
+        mentionsRoom: any(named: 'mentionsRoom'),
+      ));
+      await bloc.close();
+    });
+    test('reply snapshot survives preparation and keeps a newer reply target', () async {
+      final bloc = await buildInitializedBloc();
+      bloc.add(SetReplyTarget(_testMessages.first));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      final settings = Completer<int?>();
+      when(() => mockSecureStorage.getDefaultSelfDestructSeconds())
+          .thenAnswer((_) => settings.future);
+      when(() => mockRepository.replyToMessage(
+        any(), any(), any(), selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'),
+        mentionsRoom: any(named: 'mentionsRoom'),
+      )).thenAnswer((_) async => _testMessages.last);
+      bloc.add(const SendTextMessage('reply'));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      bloc.add(SetReplyTarget(_testMessages.last));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      settings.complete(null);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      verify(() => mockRepository.replyToMessage(
+        _roomId, _testMessages.first.id, 'reply', selfDestructAfter: null,
+        mentionedUserIds: null, mentionsRoom: false,
+      )).called(1);
+      expect(bloc.state.replyTarget, _testMessages.last);
+      await bloc.close();
+    });
+    test('late receipt cannot change the new room send state', () async {
+      final bloc = await buildInitializedBloc();
+      final receipt = Completer<MessageEntity?>();
+      when(() => mockRepository.sendTextMessage(
+        any(), any(), selfDestructAfter: any(named: 'selfDestructAfter'),
+        mentionedUserIds: any(named: 'mentionedUserIds'),
+        mentionsRoom: any(named: 'mentionsRoom'),
+      )).thenAnswer((_) => receipt.future);
+      bloc.add(const SendTextMessage('old input'));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.isSendingText, isTrue);
+      bloc.add(const InitializeChat('!other:server.com'));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.isSendingText, isFalse);
+      receipt.complete(_testMessages.last);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state.lastMessageSentAt, isNull);
+      expect(bloc.state.roomId, '!other:server.com');
+      await bloc.close();
+    });
+  });
 
   // =========================================================================
   // Initial state

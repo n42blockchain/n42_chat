@@ -57,6 +57,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
   StreamSubscription<Map<String, dynamic>>? _pollResponsesSubscription;
   String? _currentRoomId;
+  int _chatGeneration = 0;
 
   // 阅后即焚定时器
   Timer? _destructionTimer;
@@ -247,6 +248,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     InitializeChat event,
     Emitter<ChatState> emit,
   ) async {
+    _chatGeneration++;
     _currentRoomId = event.roomId;
     _locallyDeletedMessageIds.clear();
 
@@ -255,7 +257,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 立即显示界面，不等待网络
     emit(
-      state.copyWith(roomId: event.roomId, isLoading: false, clearError: true),
+      state.copyWith(
+        roomId: event.roomId, isLoading: false, clearError: true,
+        isSendingText: false, isSending: state.activeMediaSends > 0,
+      ),
     );
 
     // 先尝试快速加载本地缓存消息
