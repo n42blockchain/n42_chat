@@ -934,6 +934,10 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 50));
       verify(() => mockPrefs.getScheduledMessages(_roomId)).called(1);
       verifyNever(() => mockPrefs.removeScheduledMessage(any(), any()));
+      verifyNever(() => mockRepo.sendTextMessage(
+        _roomId, draft.text, selfDestructAfter: draft.selfDestructAfter,
+        mentionedUserIds: draft.mentionedUserIds, mentionsRoom: draft.mentionsRoom,
+      ));
       expect(bloc.state.messages.map((m) => m.id), [_msg.id]);
       await bloc.close();
     });
