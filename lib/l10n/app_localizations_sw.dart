@@ -6269,4 +6269,8 @@ class SSw extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Hifadhi onyesho hili kama nakala ya urejeshaji pekee. Hakuna ujumbe utakaoratibiwa au kutumwa. Viambatisho havijajumuishwa. Mwandishi wa faili hajathibitishwa.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Ongeza maandishi kwenye rasimu ya sasa ili uyakague. Hakuna kitakachotumwa. Viambatisho, mitajo na vipima muda havitarejeshwa. Angalia kama ujumbe huu tayari umewasilishwa.';
 }

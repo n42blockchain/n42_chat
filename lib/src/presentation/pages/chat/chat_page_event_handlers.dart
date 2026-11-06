@@ -1056,6 +1056,10 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 打开聊天设置页面
   void _openChatSettings() async {
+    final recoveryOrigin = _scheduledOrigin;
+    final recoveryOwner = _currentUserId;
+    final openingRevision = _draftRevision;
+    final openingInput = _inputController.value;
     // 获取当前的 ContactBloc
     ContactBloc? contactBloc;
     try {
@@ -1111,6 +1115,17 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
     await _loadBackground();
     if (!mounted) {
+      return;
+    }
+
+    if (result is RecoveredComposerText) {
+      if (recoveryOrigin?.isCurrent != true || recoveryOwner == null ||
+          _currentUserId != recoveryOwner || result.ownerUserId != recoveryOwner ||
+          result.roomId != widget.conversation.id || result.text.trim().isEmpty ||
+          _draftRevision != openingRevision || _inputController.value != openingInput) { return; }
+      final text = openingInput.text.isEmpty ? result.text : '${openingInput.text}\n${result.text}';
+      _inputController.value = TextEditingValue(text: text, selection: TextSelection.collapsed(offset: text.length));
+      _saveDraft();
       return;
     }
 

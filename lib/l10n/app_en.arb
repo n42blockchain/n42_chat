@@ -2922,5 +2922,6 @@
   "scheduledRecoveryResetHint": "An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.",
   "scheduledRecoveryExportHint": "This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.",
   "scheduledRecoveryImport": "Import recovery copy",
-  "scheduledRecoveryImportHint": "Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified."
+  "scheduledRecoveryImportHint": "Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.",
+  "scheduledRecoveryComposerHint": "Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered."
 }

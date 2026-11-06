@@ -6225,4 +6225,8 @@ class SVi extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Chỉ lưu bản xem trước này dưới dạng bản sao khôi phục. Không có tin nhắn nào được lên lịch hoặc gửi. Không bao gồm tệp đính kèm. Tác giả tệp chưa được xác minh.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Thêm văn bản vào bản nháp hiện tại để xem lại. Không có gì được gửi. Tệp đính kèm, lượt nhắc và bộ hẹn giờ không được khôi phục. Hãy kiểm tra xem tin nhắn này đã được giao chưa.';
 }

@@ -6276,4 +6276,8 @@ class SPl extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Zapisz ten podgląd tylko jako kopię odzyskiwania. Żadne wiadomości nie zostaną zaplanowane ani wysłane. Załączniki nie są dołączone. Autor pliku nie został zweryfikowany.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Dołącz tekst do bieżącej wersji roboczej do sprawdzenia. Nic nie zostanie wysłane. Załączniki, wzmianki i minutniki nie zostaną przywrócone. Sprawdź, czy ta wiadomość została już dostarczona.';
 }

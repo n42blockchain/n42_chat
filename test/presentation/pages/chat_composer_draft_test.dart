@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:n42_chat/src/domain/entities/recovered_composer_text.dart';
+import 'package:n42_chat/src/presentation/pages/chat/chat_detail_page.dart';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -102,6 +105,11 @@ void main() {
     'typed then cleared',
     'account changed',
     'failure',
+    'recover',
+    'recover foreign room',
+    'recover foreign owner',
+    'recover account changed',
+    'recover input changed',
   ]) {
     testWidgets('composer draft $scenario', (tester) async {
       await getIt.reset();
@@ -161,6 +169,39 @@ void main() {
         store.pending.complete('saved account text');
       }
       await tester.pumpAndSettle();
+      if (scenario.startsWith('recover')) {
+        final controller = tester.widget<TextField>(input).controller!;
+        expect(controller.text, 'saved account text');
+        await tester.tap(find.byIcon(Icons.more_horiz));
+        await tester.pumpAndSettle();
+        expect(find.byType(ChatDetailPage), findsOneWidget);
+        if (scenario == 'recover account changed') account.active = false;
+        if (scenario == 'recover input changed') {
+          controller.text = 'new input';
+          controller.text = 'saved account text';
+        }
+        Navigator.of(tester.element(find.byType(ChatDetailPage))).pop(
+          RecoveredComposerText(
+            ownerUserId: scenario == 'recover foreign owner'
+                ? '@other:test'
+                : '@me:hs.test',
+            roomId: scenario == 'recover foreign room'
+                ? '!other:test'
+                : '!room:test',
+            text: 'recovered text',
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          controller.text,
+          scenario == 'recover'
+              ? 'saved account text\nrecovered text'
+              : 'saved account text',
+        );
+        verifyNever(() => chat.add(any(that: isA<SendTextMessage>())));
+        expect(tester.takeException(), isNull);
+        return;
+      }
       final text = tester.widget<TextField>(input).controller!.text;
       expect(
         text,

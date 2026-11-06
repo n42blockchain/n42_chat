@@ -6249,4 +6249,8 @@ class SId extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Simpan pratinjau ini hanya sebagai salinan pemulihan. Tidak ada pesan yang dijadwalkan atau dikirim. Lampiran tidak disertakan. Penulis berkas belum diverifikasi.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Tambahkan teks ke draf saat ini untuk ditinjau. Tidak ada yang dikirim. Lampiran, sebutan, dan pengatur waktu tidak dipulihkan. Periksa apakah pesan ini sudah terkirim.';
 }

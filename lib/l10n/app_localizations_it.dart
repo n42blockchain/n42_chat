@@ -6266,4 +6266,8 @@ class SIt extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Salva questa anteprima solo come copia di recupero. Nessun messaggio verrà programmato o inviato. Gli allegati non sono inclusi. L’autore del file non è verificato.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Aggiungi il testo alla bozza attuale per controllarlo. Non verrà inviato nulla. Allegati, menzioni e timer non verranno ripristinati. Verifica se questo messaggio è già stato consegnato.';
 }

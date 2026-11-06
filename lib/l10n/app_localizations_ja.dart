@@ -6101,4 +6101,8 @@ class SJa extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'このプレビューを復元用コピーとしてのみ保存します。メッセージの予約や送信は行いません。添付ファイルは含まれません。ファイルの作成者は確認されていません。';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      '確認用に現在の下書きへテキストを追加します。送信はされません。添付ファイル、メンション、タイマーは復元されません。このメッセージがすでに配信されていないか確認してください。';
 }

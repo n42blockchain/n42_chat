@@ -6280,4 +6280,8 @@ class SEs extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Guardar esta vista previa solo como copia de recuperación. No se programarán ni enviarán mensajes. No se incluyen archivos adjuntos. El autor del archivo no está verificado.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Añade el texto al borrador actual para revisarlo. No se enviará nada. No se restaurarán los archivos adjuntos, las menciones ni los temporizadores. Comprueba si este mensaje ya se entregó.';
 }

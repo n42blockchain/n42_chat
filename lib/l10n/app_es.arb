@@ -2893,5 +2893,6 @@
   "scheduledRecoveryResetHint": "Se ha guardado una copia exacta en este dispositivo. ¿Restablecer todos los mensajes programados de esta cuenta? Algunos podrían haberse enviado ya. Se conservarán las copias y los adjuntos. No se reenviará nada.",
   "scheduledRecoveryExportHint": "Este archivo contiene texto de borradores y datos de la cuenta sin cifrar. No incluye archivos adjuntos. Elige un destino de confianza.",
   "scheduledRecoveryImport": "Importar copia de recuperación",
-  "scheduledRecoveryImportHint": "Guardar esta vista previa solo como copia de recuperación. No se programarán ni enviarán mensajes. No se incluyen archivos adjuntos. El autor del archivo no está verificado."
+  "scheduledRecoveryImportHint": "Guardar esta vista previa solo como copia de recuperación. No se programarán ni enviarán mensajes. No se incluyen archivos adjuntos. El autor del archivo no está verificado.",
+  "scheduledRecoveryComposerHint": "Añade el texto al borrador actual para revisarlo. No se enviará nada. No se restaurarán los archivos adjuntos, las menciones ni los temporizadores. Comprueba si este mensaje ya se entregó."
 }

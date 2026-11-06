@@ -35,6 +35,8 @@ import '../group/group_media_hub_page.dart';
 import '../group/group_settings_page.dart';
 import 'chat_export_page.dart';
 import 'scheduled_messages_page.dart';
+import '../../../domain/entities/recovered_composer_text.dart';
+import '../../blocs/chat/scheduled_message_origin.dart';
 import '../settings/auto_download_settings_page.dart';
 import '../settings/backup_restore_page.dart';
 import '../settings/chat_background_page.dart';
@@ -910,7 +912,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: 'Scheduled Messages',
+                  title: S.of(context)?.scheduledMessagesTitle ?? 'Scheduled messages',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _openScheduledMessages(),
@@ -1744,15 +1746,19 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     );
   }
 
-  void _openScheduledMessages() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
+  void _openScheduledMessages() async {
+    final origin = ScheduledMessageOrigin.capture();
+    final result = await Navigator.of(context).push<RecoveredComposerText>(
+      MaterialPageRoute<RecoveredComposerText>(
         builder: (_) => ScheduledMessagesPage(
           roomId: widget.conversation.id,
           roomName: widget.conversation.name,
         ),
       ),
     );
+    if (mounted && origin?.isCurrent == true && result != null && result.roomId == widget.conversation.id) {
+      Navigator.of(context).pop(result);
+    }
   }
 
   void _openBackupRestore() {

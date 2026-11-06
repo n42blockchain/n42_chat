@@ -2893,5 +2893,6 @@
   "scheduledRecoveryResetHint": "Uma cópia exata foi salva neste dispositivo. Redefinir todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado.",
   "scheduledRecoveryExportHint": "Este arquivo contém texto de rascunhos e dados da conta não criptografados. Os anexos não estão incluídos. Escolha um destino confiável.",
   "scheduledRecoveryImport": "Importar cópia de recuperação",
-  "scheduledRecoveryImportHint": "Salvar esta prévia apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do arquivo não foi verificado."
+  "scheduledRecoveryImportHint": "Salvar esta prévia apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do arquivo não foi verificado.",
+  "scheduledRecoveryComposerHint": "Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue."
 }

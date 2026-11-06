@@ -2893,5 +2893,6 @@
   "scheduledRecoveryResetHint": "Una copia esatta è salvata su questo dispositivo. Reimpostare tutti i messaggi programmati di questo account? Alcuni potrebbero essere già stati inviati. Copie e allegati vengono conservati. Nulla sarà reinviato.",
   "scheduledRecoveryExportHint": "Questo file contiene testo delle bozze e dati dell’account non crittografati. Gli allegati non sono inclusi. Scegli una destinazione attendibile.",
   "scheduledRecoveryImport": "Importa copia di recupero",
-  "scheduledRecoveryImportHint": "Salva questa anteprima solo come copia di recupero. Nessun messaggio verrà programmato o inviato. Gli allegati non sono inclusi. L’autore del file non è verificato."
+  "scheduledRecoveryImportHint": "Salva questa anteprima solo come copia di recupero. Nessun messaggio verrà programmato o inviato. Gli allegati non sono inclusi. L’autore del file non è verificato.",
+  "scheduledRecoveryComposerHint": "Aggiungi il testo alla bozza attuale per controllarlo. Non verrà inviato nulla. Allegati, menzioni e timer non verranno ripristinati. Verifica se questo messaggio è già stato consegnato."
 }

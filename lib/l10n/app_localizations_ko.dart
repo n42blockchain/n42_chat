@@ -6104,4 +6104,8 @@ class SKo extends S {
   @override
   String get scheduledRecoveryImportHint =>
       '이 미리보기를 복구 사본으로만 저장합니다. 메시지는 예약되거나 전송되지 않습니다. 첨부 파일은 포함되지 않습니다. 파일 작성자는 확인되지 않았습니다.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      '검토할 수 있도록 현재 초안에 텍스트를 추가합니다. 아무것도 전송되지 않습니다. 첨부 파일, 멘션 및 타이머는 복원되지 않습니다. 이 메시지가 이미 전달되었는지 확인하세요.';
 }

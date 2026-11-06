@@ -2893,5 +2893,6 @@
   "scheduledRecoveryResetHint": "Đã lưu bản sao nguyên vẹn trên thiết bị này. Đặt lại tất cả tin nhắn đã lên lịch của tài khoản này? Một số có thể đã được gửi. Bản sao và tệp đính kèm được giữ lại. Không gửi lại tin nhắn nào.",
   "scheduledRecoveryExportHint": "Tệp này chứa văn bản nháp và thông tin tài khoản chưa được mã hóa. Không bao gồm tệp đính kèm. Hãy chọn nơi lưu hoặc chia sẻ đáng tin cậy.",
   "scheduledRecoveryImport": "Nhập bản sao khôi phục",
-  "scheduledRecoveryImportHint": "Chỉ lưu bản xem trước này dưới dạng bản sao khôi phục. Không có tin nhắn nào được lên lịch hoặc gửi. Không bao gồm tệp đính kèm. Tác giả tệp chưa được xác minh."
+  "scheduledRecoveryImportHint": "Chỉ lưu bản xem trước này dưới dạng bản sao khôi phục. Không có tin nhắn nào được lên lịch hoặc gửi. Không bao gồm tệp đính kèm. Tác giả tệp chưa được xác minh.",
+  "scheduledRecoveryComposerHint": "Thêm văn bản vào bản nháp hiện tại để xem lại. Không có gì được gửi. Tệp đính kèm, lượt nhắc và bộ hẹn giờ không được khôi phục. Hãy kiểm tra xem tin nhắn này đã được giao chưa."
 }

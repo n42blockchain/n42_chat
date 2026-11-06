@@ -6287,4 +6287,8 @@ class SDe extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Diese Vorschau nur als Wiederherstellungskopie speichern. Es werden keine Nachrichten geplant oder gesendet. Anhänge sind nicht enthalten. Der Dateiautor ist nicht verifiziert.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Text zur Prüfung an den aktuellen Entwurf anhängen. Es wird nichts gesendet. Anhänge, Erwähnungen und Timer werden nicht wiederhergestellt. Prüfen Sie, ob diese Nachricht bereits zugestellt wurde.';
 }

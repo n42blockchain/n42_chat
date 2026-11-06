@@ -6239,4 +6239,8 @@ class STr extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Bu önizlemeyi yalnızca kurtarma kopyası olarak kaydet. Hiçbir mesaj planlanmaz veya gönderilmez. Ekler dahil değildir. Dosyanın yazarı doğrulanmamıştır.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'İncelemek için metni mevcut taslağa ekleyin. Hiçbir şey gönderilmez. Ekler, bahsetmeler ve zamanlayıcılar geri yüklenmez. Bu mesajın daha önce iletilip iletilmediğini kontrol edin.';
 }

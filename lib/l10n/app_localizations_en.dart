@@ -6208,4 +6208,8 @@ class SEn extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered.';
 }

@@ -6305,4 +6305,8 @@ class SFr extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Enregistrer cet aperçu uniquement comme copie de récupération. Aucun message ne sera programmé ni envoyé. Les pièces jointes ne sont pas incluses. L’auteur du fichier n’est pas vérifié.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Ajoutez le texte au brouillon actuel pour le vérifier. Rien ne sera envoyé. Les pièces jointes, mentions et minuteries ne seront pas restaurées. Vérifiez si ce message a déjà été remis.';
 }

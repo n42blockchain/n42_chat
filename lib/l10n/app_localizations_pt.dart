@@ -6271,6 +6271,10 @@ class SPt extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Guardar esta pré-visualização apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do ficheiro não foi verificado.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12541,4 +12545,8 @@ class SPtBr extends SPt {
   @override
   String get scheduledRecoveryImportHint =>
       'Salvar esta prévia apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do arquivo não foi verificado.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue.';
 }

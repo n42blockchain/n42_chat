@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:n42_chat/src/domain/entities/recovered_composer_text.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
@@ -92,6 +93,7 @@ void main() {
   tearDown(() async => getIt.reset());
   Future<void> pump(
     WidgetTester tester, {
+    void Function(RecoveredComposerText?)? onRecovered,
     ChatBloc? bloc,
     Locale? locale,
     double scale = 1,
@@ -112,12 +114,21 @@ void main() {
           ),
           child: child!,
         ),
-        home: bloc == null
+        home: onRecovered != null
+            ? Builder(builder: (context) => TextButton(onPressed: () async {
+                final result = await Navigator.of(context).push<RecoveredComposerText>(MaterialPageRoute(builder: (_) => page));
+                onRecovered(result);
+              }, child: const Text('Open queue')))
+            : bloc == null
             ? page
             : BlocProvider<ChatBloc>.value(value: bloc, child: page),
       ),
     );
     await tester.pumpAndSettle();
+    if (onRecovered != null) {
+      await tester.tap(find.text('Open queue'));
+      await tester.pumpAndSettle();
+    }
   }
 
   Uint8List portable({String owner = '@me:test'}) {
@@ -507,6 +518,55 @@ void main() {
         expect(data['attachmentsIncluded'], false);
       }
       verifyNever(() => prefs.deleteScheduledRecoveryCopy(ownerUserId: any(named: 'ownerUserId'), expectedRaw: any(named: 'expectedRaw'), isCurrent: any(named: 'isCurrent')));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final scenario in ['confirm', 'cancel', 'copy changed', 'account changed']) {
+    testWidgets('reviewed composer recovery $scenario', (tester) async {
+      final raw = jsonEncode({'room': [
+        ScheduledMessageDraft(messageId: 'one', text: 'Recovered text', type: MessageType.text,
+          scheduledAt: DateTime(2030), createdAt: DateTime(2026)).toJson(),
+        {'messageId': 'broken'},
+        ScheduledMessageDraft(messageId: 'image', text: 'Photo', type: MessageType.image,
+          scheduledAt: DateTime(2030), createdAt: DateTime(2026)).toJson(),
+      ], 'elsewhere': [ScheduledMessageDraft(messageId: 'foreign', text: 'Other room', type: MessageType.text,
+          scheduledAt: DateTime(2030), createdAt: DateTime(2026)).toJson()]});
+      final copy = ScheduledRecoveryCopy(id: sha256.convert(utf8.encode(raw)).toString(), raw: raw, isIntact: true);
+      var available = true;
+      when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent')))
+        .thenAnswer((_) async => available ? [copy] : []);
+      RecoveredComposerText? result;
+      await pump(tester, onRecovered: (value) => result = value);
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-history')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('scheduled-recovery-${copy.id}')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-inspect')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('scheduled-recovery-edit-0')), findsOneWidget);
+      for (final i in [1, 2, 3]) {
+        expect(find.byKey(ValueKey('scheduled-recovery-edit-$i')), findsNothing);
+      }
+      await tester.tap(find.byKey(const ValueKey('scheduled-recovery-edit-0')));
+      await tester.pumpAndSettle();
+      expect(result, isNull);
+      if (scenario == 'copy changed') available = false;
+      if (scenario == 'account changed') {
+        when(() => messages.getCurrentUserId()).thenAnswer((_) async => '@other:test');
+      }
+      await tester.tap(scenario == 'cancel' ? find.descendant(of: find.byType(AlertDialog), matching: find.text('Cancel')) : find.byKey(const ValueKey('scheduled-recovery-composer-confirm')));
+      await tester.pumpAndSettle();
+      if (scenario == 'confirm') {
+        expect(result?.text, 'Recovered text');
+        expect(result?.ownerUserId, '@me:test');
+        expect(result?.roomId, 'room');
+        expect(find.text('Open queue'), findsOneWidget);
+      } else {
+        expect(result, isNull);
+      }
+      verifyNever(() => prefs.importScheduledRecoveryCopy(bytes: any(named: 'bytes'),
+        ownerUserId: any(named: 'ownerUserId'), isCurrent: any(named: 'isCurrent')));
       expect(tester.takeException(), isNull);
     });
   }

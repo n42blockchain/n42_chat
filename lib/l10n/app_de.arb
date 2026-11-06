@@ -2893,5 +2893,6 @@
   "scheduledRecoveryResetHint": "Eine exakte Kopie ist auf diesem Gerät gespeichert. Alle geplanten Nachrichten dieses Kontos zurücksetzen? Einige wurden möglicherweise bereits gesendet. Kopien und Anhänge bleiben erhalten. Nichts wird erneut gesendet.",
   "scheduledRecoveryExportHint": "Diese Datei enthält unverschlüsselten Entwurfstext und Kontodaten. Anhänge sind nicht enthalten. Wähle ein vertrauenswürdiges Ziel.",
   "scheduledRecoveryImport": "Wiederherstellungskopie importieren",
-  "scheduledRecoveryImportHint": "Diese Vorschau nur als Wiederherstellungskopie speichern. Es werden keine Nachrichten geplant oder gesendet. Anhänge sind nicht enthalten. Der Dateiautor ist nicht verifiziert."
+  "scheduledRecoveryImportHint": "Diese Vorschau nur als Wiederherstellungskopie speichern. Es werden keine Nachrichten geplant oder gesendet. Anhänge sind nicht enthalten. Der Dateiautor ist nicht verifiziert.",
+  "scheduledRecoveryComposerHint": "Text zur Prüfung an den aktuellen Entwurf anhängen. Es wird nichts gesendet. Anhänge, Erwähnungen und Timer werden nicht wiederhergestellt. Prüfen Sie, ob diese Nachricht bereits zugestellt wurde."
 }

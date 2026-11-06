@@ -21,6 +21,7 @@ import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/entities/scheduled_recovery_copy.dart';
 import '../../../domain/entities/scheduled_recovery_inspection.dart';
+import '../../../domain/entities/recovered_composer_text.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/scheduled_message_origin.dart';
@@ -291,7 +292,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     final matching = copies.where((copy) => copy.isIntact && copy.raw == raw);
     if (matching.length != 1) throw StateError('Recovery copy changed');
     final report = ScheduledRecoveryInspection.inspect(matching.single);
-    final route = DialogRoute<void>(context: context, builder: (context) => Dialog.fullscreen(
+    final route = DialogRoute<ScheduledRecoveryEntry>(context: context, builder: (context) => Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(title: Text(S.of(context)?.chatDetails ?? 'Details'),
           leading: IconButton(icon: const Icon(Icons.close),
@@ -311,14 +312,59 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
                     ? Text(S.of(context)?.commonLoadFailed ?? 'Failed to load')
                     : SelectableText(String.fromCharCodes(entry.draft!.text.runes.take(8000))),
                 subtitle: Text(entry.roomId),
+                trailing: report.documentIssue == null && entry.issue == null &&
+                    entry.roomId == widget.roomId && entry.draft?.type == MessageType.text &&
+                    entry.draft!.text.trim().isNotEmpty
+                    ? IconButton(key: ValueKey('scheduled-recovery-edit-$index'),
+                        icon: const Icon(Icons.edit_outlined),
+                        tooltip: S.of(context)?.commonEdit ?? 'Edit',
+                        onPressed: () => Navigator.pop(context, entry))
+                    : null,
               );
             })),
         ]),
       ),
     ));
     _recoveryRoute = route;
-    await Navigator.of(context).push(route);
+    final selected = await Navigator.of(context).push(route);
     if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+    if (selected != null && mounted && _origin?.isCurrent == true) {
+      await _confirmComposerRecovery(raw, selected);
+    }
+  }
+
+  Future<void> _confirmComposerRecovery(String raw, ScheduledRecoveryEntry entry) async {
+    final owner = _ownerUserId;
+    final draft = entry.draft;
+    if (owner == null || draft == null || entry.roomId != widget.roomId ||
+        draft.type != MessageType.text || !mounted || _origin?.isCurrent != true) { return; }
+    final route = DialogRoute<bool>(context: context, builder: (context) => AlertDialog(
+      scrollable: true,
+      title: Text(S.of(context)?.commonEdit ?? 'Edit'),
+      content: Text(S.of(context)?.scheduledRecoveryComposerHint ??
+        'Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered.'),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(S.of(context)?.commonCancel ?? 'Cancel')),
+        TextButton(key: const ValueKey('scheduled-recovery-composer-confirm'),
+          onPressed: () => Navigator.pop(context, true), child: Text(S.of(context)?.commonConfirm ?? 'Confirm')),
+      ],
+    ));
+    _recoveryRoute = route;
+    final confirmed = await Navigator.of(context).push(route);
+    if (identical(_recoveryRoute, route)) _recoveryRoute = null;
+    if (!mounted || confirmed != true || _origin?.isCurrent != true ||
+        owner != await _messages.getCurrentUserId() || !mounted || _origin?.isCurrent != true) { return; }
+    final copies = await _preferences.getScheduledRecoveryCopies(ownerUserId: owner,
+      isCurrent: () => mounted && _origin?.isCurrent == true);
+    if (!mounted || _origin?.isCurrent != true) return;
+    final matches = copies.where((copy) => copy.isIntact && copy.raw == raw);
+    if (matches.length != 1) throw StateError('Recovery copy changed');
+    final report = ScheduledRecoveryInspection.inspect(matches.single);
+    final records = report.entries.where((item) => item.roomId == entry.roomId && item.index == entry.index);
+    if (report.documentIssue != null || records.length != 1 ||
+        records.single.issue != null || records.single.draft != draft) { throw StateError('Recovery record changed'); }
+    if (owner != await _messages.getCurrentUserId() || !mounted || _origin?.isCurrent != true) { return; }
+    Navigator.of(context).pop(RecoveredComposerText(ownerUserId: owner, roomId: entry.roomId, text: draft.text));
   }
 
   Future<void> _confirmRecoveryAction(String raw, {bool export = false}) async {

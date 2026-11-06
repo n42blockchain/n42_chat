@@ -2893,5 +2893,6 @@
   "scheduledRecoveryResetHint": "Une copie exacte est enregistrée sur cet appareil. Réinitialiser tous les messages programmés de ce compte ? Certains ont peut-être déjà été envoyés. Les copies et pièces jointes sont conservées. Aucun message ne sera renvoyé.",
   "scheduledRecoveryExportHint": "Ce fichier contient du texte de brouillons et des informations de compte non chiffrés. Les pièces jointes ne sont pas incluses. Choisissez une destination de confiance.",
   "scheduledRecoveryImport": "Importer une copie de récupération",
-  "scheduledRecoveryImportHint": "Enregistrer cet aperçu uniquement comme copie de récupération. Aucun message ne sera programmé ni envoyé. Les pièces jointes ne sont pas incluses. L’auteur du fichier n’est pas vérifié."
+  "scheduledRecoveryImportHint": "Enregistrer cet aperçu uniquement comme copie de récupération. Aucun message ne sera programmé ni envoyé. Les pièces jointes ne sont pas incluses. L’auteur du fichier n’est pas vérifié.",
+  "scheduledRecoveryComposerHint": "Ajoutez le texte au brouillon actuel pour le vérifier. Rien ne sera envoyé. Les pièces jointes, mentions et minuteries ne seront pas restaurées. Vérifiez si ce message a déjà été remis."
 }

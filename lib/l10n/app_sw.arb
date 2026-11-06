@@ -2893,5 +2893,6 @@
   "scheduledRecoveryResetHint": "Nakala kamili imehifadhiwa kwenye kifaa hiki. Ungependa kuweka upya ujumbe wote ulioratibiwa wa akaunti hii? Baadhi huenda tayari umetumwa. Nakala na viambatisho vitahifadhiwa. Hakuna ujumbe utakaotumwa tena.",
   "scheduledRecoveryExportHint": "Faili hili lina maandishi ya rasimu na maelezo ya akaunti ambayo hayajasimbwa kwa njia fiche. Viambatisho havijajumuishwa. Chagua mahali unapoamini.",
   "scheduledRecoveryImport": "Ingiza nakala ya urejeshaji",
-  "scheduledRecoveryImportHint": "Hifadhi onyesho hili kama nakala ya urejeshaji pekee. Hakuna ujumbe utakaoratibiwa au kutumwa. Viambatisho havijajumuishwa. Mwandishi wa faili hajathibitishwa."
+  "scheduledRecoveryImportHint": "Hifadhi onyesho hili kama nakala ya urejeshaji pekee. Hakuna ujumbe utakaoratibiwa au kutumwa. Viambatisho havijajumuishwa. Mwandishi wa faili hajathibitishwa.",
+  "scheduledRecoveryComposerHint": "Ongeza maandishi kwenye rasimu ya sasa ili uyakague. Hakuna kitakachotumwa. Viambatisho, mitajo na vipima muda havitarejeshwa. Angalia kama ujumbe huu tayari umewasilishwa."
 }

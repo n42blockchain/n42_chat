@@ -6249,4 +6249,8 @@ class SCs extends S {
   @override
   String get scheduledRecoveryImportHint =>
       'Uložit tento náhled pouze jako kopii pro obnovení. Žádné zprávy se nenaplánují ani neodešlou. Přílohy nejsou zahrnuty. Autor souboru není ověřen.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Připojte text k aktuálnímu konceptu ke kontrole. Nic se neodešle. Přílohy, zmínky ani časovače se neobnoví. Zkontrolujte, zda již byla zpráva doručena.';
 }
