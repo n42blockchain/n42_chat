@@ -801,6 +801,23 @@ void main() {
   });
 
   group('Scheduled rich messages', () {
+    void pendingRecord(String roomId, String id) {
+      when(() => mockPrefs.getScheduledMessages(roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [
+        ScheduledMessageDraft(messageId: id, roomId: roomId, text: 'Pending', type: MessageType.text,
+          createdAt: DateTime(2026), scheduledAt: DateTime(2030)),
+      ]);
+    }
+
+    test('missing draft is not reported as successfully cancelled', () async {
+      final bloc = buildBloc();
+      await initBloc(bloc);
+      final result = Completer<bool>();
+      bloc.add(CancelScheduledMessage('already-sent', roomId: _roomId, completion: result));
+      expect(await result.future, isFalse);
+      verifyNever(() => mockPrefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
+      await bloc.close();
+    });
+
     for (final firstFails in [false, true]) {
       test(
         'two BLoCs share send/cancel lease and release it: failure=$firstFails',
@@ -883,6 +900,9 @@ void main() {
           await Future<void>.delayed(const Duration(milliseconds: 30));
           expect(sends, firstFails ? 2 : 1);
           expect(stored, isFalse);
+          final afterSend = Completer<bool>();
+          second.add(CancelScheduledMessage('shared', roomId: _roomId, completion: afterSend));
+          expect(await afterSend.future, isFalse);
           await first.close();
           await second.close();
         },
@@ -940,6 +960,7 @@ void main() {
           ).thenAnswer((_) async {});
           if (stale)
             when(() => auth.currentAccountGeneration).thenReturn(generation());
+          pendingRecord(_roomId, 'old');
           final done = Completer<bool>();
           bloc.add(
             SendScheduledMessage(
@@ -1186,6 +1207,7 @@ void main() {
             .thenAnswer((_) => write.future);
         final bloc = buildBloc();
         await initBloc(bloc);
+        pendingRecord(_roomId, 'pending');
         final completion = Completer<bool>();
         bloc.add(
           CancelScheduledMessage(
@@ -1209,6 +1231,7 @@ void main() {
             .thenAnswer((_) async {});
         final bloc = buildBloc();
         await initBloc(bloc);
+        pendingRecord('!other:test', 'pending');
         final completion = Completer<bool>();
         bloc.add(
           CancelScheduledMessage(
@@ -1302,10 +1325,12 @@ void main() {
       );
       when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId')))
           .thenAnswer((_) async => [draft]);
+      var stored = true;
       when(() => mockPrefs.removeScheduledMessage(_roomId, 'stale', ownerUserId: any(named: 'ownerUserId')))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async { stored = false; });
       final bloc = buildBloc();
       await initBloc(bloc);
+      when(() => mockPrefs.getScheduledMessages(_roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => stored ? [draft] : []);
       final completion = Completer<bool>();
       bloc.add(
         CancelScheduledMessage('stale', roomId: _roomId, completion: completion),

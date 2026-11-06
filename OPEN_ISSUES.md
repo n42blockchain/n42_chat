@@ -171,6 +171,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- 2026-11-06 stale-cancellation follow-up: absence of a scheduled record is no longer acknowledged as successful cancellation; it may have been sent elsewhere. BLoC clears a stale preview and returns false; standalone pages reread the account-scoped record while holding the shared lease before removal. Rejected cancellation refreshes the page, and late rejection after navigation does not update disposed state. Tests cover missing records, cancellation after another BLoC sends/cleans up, real pending-record removal, storage failures and navigation. This does not infer unsent status for send attempts whose remote outcome is unknown; that recovery path remains open.
+
+
 - 2026-11-06 shared-operation follow-up: scheduled sends and cancellation now acquire the same non-blocking account/room/draft lease across BLoCs and standalone pages in one isolate. It spans transport and persistence awaits, and releases in finally; old/double release cannot release a newer lease. Two-BLoC tests prove one concurrent send, rejected in-flight cancellation, preserved draft and retry after failure; a standalone-page test rejects cancellation while a sender holds the lease and allows retry afterward. Account/room/draft separation is tested. 71 focused tests pass; source analysis has no errors/warnings, seven existing style infos. This supersedes the same-isolate cross-BLoC/standalone cancellation gap below; durable multi-isolate/process coordination, server outcomes, legacy recovery and device acceptance remain open.
 
 

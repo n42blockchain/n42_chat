@@ -321,4 +321,30 @@ void main() {
     expect(find.text('Scheduled message cancelled'), findsOneWidget);
   });
 
+  testWidgets('stale draft already removed by a sender is not cancelled again', (tester) async {
+    await pump(tester);
+    when(() => prefs.getScheduledMessages('room', ownerUserId: '@me:test')).thenAnswer((_) async => []);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    verifyNever(() => prefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
+    expect(find.text('Scheduled message cancelled'), findsNothing);
+    expect(find.text('Keep until confirmed'), findsNothing);
+  });
+
+  testWidgets('late cancellation rejection after leaving the page is ignored', (tester) async {
+    final bloc = _Bloc();
+    when(() => bloc.stream).thenAnswer((_) => const Stream.empty());
+    CancelScheduledMessage? event;
+    when(() => bloc.add(any())).thenAnswer((invocation) {
+      event = invocation.positionalArguments.first as CancelScheduledMessage;
+    });
+    await pump(tester, bloc: bloc);
+    await tester.tap(find.text('Cancel'));
+    await tester.pump();
+    await tester.pumpWidget(const SizedBox.shrink());
+    event!.completion!.complete(false);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
 }

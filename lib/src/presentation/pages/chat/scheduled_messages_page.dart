@@ -71,6 +71,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   }
 
   Future<void> _loadDrafts() async {
+    if (!mounted) return;
     final version = ++_loadVersion;
     setState(() => _isLoading = true);
     try {
@@ -137,7 +138,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           const Duration(seconds: 30),
           onTimeout: () => false,
         );
-        if (!cancelled) throw StateError('Cancellation was not confirmed');
+        if (!cancelled) {
+          await _loadDrafts();
+          throw StateError('Cancellation was not confirmed');
+        }
       } else {
         operation = ScheduledDraftOperation.tryAcquire(
           ownerUserId: owner,
@@ -145,6 +149,15 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           messageId: draft.messageId,
         );
         if (operation == null) throw StateError('Scheduled message is busy');
+        final remaining = await _preferences.getScheduledMessages(
+          widget.roomId,
+          ownerUserId: owner,
+        );
+        if (!remaining.any((item) => item.messageId == draft.messageId)) {
+          await _loadDrafts();
+          throw StateError('Scheduled draft is no longer pending');
+        }
+        if (!mounted || _origin?.isCurrent != true) return;
         await _preferences.removeScheduledMessage(
           widget.roomId,
           draft.messageId,

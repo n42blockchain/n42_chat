@@ -272,18 +272,14 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       if (operation == null) return;
       final draft = await _findScheduledDraft(roomId, event.messageId, account);
       if (!await _scheduledAccountIsCurrent(account)) return;
-      if (draft != null) {
-        await _removeScheduledDraftRecord(draft, emit, account);
-      } else {
-        await _secureStorage.removeScheduledMessage(
-          roomId,
-          event.messageId,
-          ownerUserId: account.userId,
-        );
+      if (draft == null) {
+        // Absence can mean it was already sent, not that this request cancelled it.
         if (account.isCurrent() && roomId == _currentRoomId) {
           _emitWithoutScheduledPreview(event.messageId, emit);
         }
+        return;
       }
+      await _removeScheduledDraftRecord(draft, emit, account);
       cancelled = await _scheduledAccountIsCurrent(account);
       debugLog('ChatBloc: Scheduled message cancelled - ${event.messageId}');
     } catch (e) {
