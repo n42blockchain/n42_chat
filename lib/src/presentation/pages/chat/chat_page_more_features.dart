@@ -1110,7 +1110,16 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
   /// 显示 GIF 选择器
   Future<void> _showGifPicker() async {
     final ownerUserId = _currentUserId;
-    final selection = await showGifPicker(context);
+    final selection = await showGifPicker(
+      context,
+      onSchedule: (selection) => _queueScheduledRichDraft(
+        ownerUserId: ownerUserId,
+        text: selection.title.trim().isEmpty ? 'GIF' : selection.title,
+        type: MessageType.image,
+        payload: selection.scheduledPayload,
+        scheduledAt: selection.scheduledAt!,
+      ),
+    );
     if (selection != null && mounted) {
       final payload = selection.scheduledPayload;
 

@@ -58,6 +58,133 @@ void main() {
     );
   }
 
+  const gif = GiphyGif(
+    id: 'sample',
+    title: 'Sample',
+    originalUrl: 'https://test/gif',
+    previewUrl: 'https://test/preview',
+    width: 20,
+    height: 30,
+    previewWidth: 20,
+    previewHeight: 30,
+  );
+
+  for (final schedule in [false, true]) {
+    testWidgets(
+      'legacy GIF selection still returns its result: scheduled=$schedule',
+      (tester) async {
+        GifPickerResult? result;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  child: const Text('Open'),
+                  onPressed: () async {
+                    result = await showGifPicker(context);
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.text('Open'));
+        await tester.pump();
+        source.requests.last.$3.complete(_empty);
+        await tester.pumpAndSettle();
+        final picker = tester.widget<GifPicker>(find.byType(GifPicker));
+        if (schedule) {
+          final selection = picker.onGifLongPressed!(gif);
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('In 1 hour'));
+          await tester.pumpAndSettle();
+          await selection;
+        } else {
+          picker.onGifSelected(gif);
+          await tester.pumpAndSettle();
+        }
+        expect(result?.gif, same(gif));
+        expect(result?.scheduledAt, schedule ? isNotNull : isNull);
+        expect(find.byType(GifPicker), findsNothing);
+      },
+    );
+  }
+
+  for (final outcome in ['saved', 'failed', 'cancel', 'disposed']) {
+    testWidgets(
+      'scheduled GIF retains picker until acknowledgement: $outcome',
+      (tester) async {
+        final acknowledgement = Completer<bool>();
+        final selections = <GifPickerResult>[];
+        GifPickerResult? returned;
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: S.localizationsDelegates,
+            supportedLocales: S.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  child: const Text('Open'),
+                  onPressed: () async {
+                    returned = await showGifPicker(
+                      context,
+                      onSchedule: (selection) {
+                        selections.add(selection);
+                        return acknowledgement.future;
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.text('Open'));
+        await tester.pump();
+        source.requests.last.$3.complete(_empty);
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField), 'cats');
+        await tester.pump(const Duration(milliseconds: 600));
+        source.requests.last.$3.complete(_empty);
+        await tester.pumpAndSettle();
+        final picker = tester.widget<GifPicker>(find.byType(GifPicker));
+        final operation = picker.onGifLongPressed!(gif);
+        await tester.pumpAndSettle();
+        if (outcome == 'cancel') {
+          Navigator.of(tester.element(find.text('In 1 hour'))).pop();
+        } else {
+          await tester.tap(find.text('In 1 hour'));
+          await tester.pumpAndSettle();
+          expect(selections, hasLength(1));
+          expect(selections.single.scheduledPayload['gifUrl'], gif.originalUrl);
+          expect(
+            selections.single.scheduledAt!.isAfter(DateTime.now()),
+            isTrue,
+          );
+          expect(find.byType(GifPicker), findsOneWidget);
+          picker.onGifSelected(gif);
+          await picker.onGifLongPressed!(gif);
+          expect(selections, hasLength(1));
+          if (outcome == 'disposed') await tester.pumpWidget(const SizedBox());
+          acknowledgement.complete(outcome != 'failed');
+        }
+        await tester.pumpAndSettle();
+        await operation;
+        expect(returned, isNull);
+        if (outcome == 'failed' || outcome == 'cancel') {
+          expect(find.byType(GifPicker), findsOneWidget);
+          expect(
+            tester.widget<TextField>(find.byType(TextField)).controller!.text,
+            'cats',
+          );
+        } else {
+          expect(find.byType(GifPicker), findsNothing);
+        }
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets(
     'stalled GIF request ends with retry instead of an endless spinner',
     (tester) async {

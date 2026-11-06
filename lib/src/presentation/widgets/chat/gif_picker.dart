@@ -397,8 +397,14 @@ class _GifPickerState extends State<GifPicker> {
 /// GIF 选择对话框
 ///
 /// 以底部弹出的方式显示 GIF 选择器
-Future<GifPickerResult?> showGifPicker(BuildContext context) async {
+/// With [onSchedule], keep the picker until persistence succeeds. Handled
+/// schedules return null so callers cannot dispatch the same draft twice.
+Future<GifPickerResult?> showGifPicker(
+  BuildContext context, {
+  Future<bool> Function(GifPickerResult selection)? onSchedule,
+}) async {
   GifPickerResult? selectedGif;
+  var scheduling = false;
 
   await showModalBottomSheet<void>(
     context: context,
@@ -445,19 +451,30 @@ Future<GifPickerResult?> showGifPicker(BuildContext context) async {
             child: GifPicker(
               height: double.infinity,
               onGifSelected: (gif) {
+                if (scheduling) return;
                 selectedGif = GifPickerResult(gif: gif);
                 Navigator.pop(context);
               },
               onGifLongPressed: (gif) async {
-                final scheduledAt = await showScheduledSendPicker(context);
-                if (!context.mounted || scheduledAt == null) {
-                  return;
+                if (scheduling) return;
+                scheduling = true;
+                try {
+                  final scheduledAt = await showScheduledSendPicker(context);
+                  if (!context.mounted || scheduledAt == null) return;
+                  final selection = GifPickerResult(
+                    gif: gif,
+                    scheduledAt: scheduledAt,
+                  );
+                  if (onSchedule != null) {
+                    final saved = await onSchedule(selection);
+                    if (context.mounted && saved) Navigator.pop(context);
+                  } else {
+                    selectedGif = selection;
+                    Navigator.pop(context);
+                  }
+                } finally {
+                  scheduling = false;
                 }
-                selectedGif = GifPickerResult(
-                  gif: gif,
-                  scheduledAt: scheduledAt,
-                );
-                Navigator.pop(context);
               },
             ),
           ),

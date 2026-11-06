@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:n42_chat/src/core/services/gif_service.dart';
+import 'package:n42_chat/src/core/services/giphy_service.dart';
+import 'package:n42_chat/src/presentation/widgets/chat/gif_picker.dart';
 import 'package:n42_chat/src/domain/repositories/sticker_repository.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/sticker_picker.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
@@ -49,6 +52,8 @@ import 'package:n42_chat/src/presentation/widgets/chat/poll_create_sheet.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/open_red_packet_dialog.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _Gifs extends Mock implements GifService {}
 
 class _Stickers extends Mock implements IStickerRepository {}
 
@@ -881,6 +886,40 @@ void main() {
     expect(messages.single.content, '```dart\nvoid main() {}\n```');
     expect(messages.single.type, MessageType.codeBlock);
   });
+
+  for (final saved in [true, false]) {
+    testWidgets('GIF scheduling passes persistence acknowledgement without immediate resend: $saved', (tester) async {
+      final chat = await pumpChat(tester, configureAuth: (auth) {
+        when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+      });
+      when(() => chat.isClosed).thenReturn(false);
+      final gifs = _Gifs();
+      when(() => gifs.isAvailable).thenReturn(true);
+      when(() => gifs.getTrendingGifs()).thenAnswer((_) async => const GiphySearchResult(gifs: [], totalCount: 0, offset: 0));
+      getIt.registerSingleton<GifService>(gifs);
+      final events = <ChatEvent>[];
+      when(() => chat.add(any())).thenAnswer((invocation) => events.add(invocation.positionalArguments.single as ChatEvent));
+      await openAttachmentPanel(tester);
+      tester.widget<ChatMorePanel>(find.byType(ChatMorePanel)).onGifPressed!();
+      await tester.pumpAndSettle();
+      final picker = tester.widget<GifPicker>(find.byType(GifPicker));
+      final operation = picker.onGifLongPressed!(const GiphyGif(id: 'sample', title: 'Sample', originalUrl: 'https://test/gif', previewUrl: 'https://test/preview', width: 20, height: 30, previewWidth: 20, previewHeight: 30));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('In 1 hour'));
+      await tester.pumpAndSettle();
+      final scheduled = events.whereType<SendScheduledMessage>().single;
+      expect(scheduled.origin?.isCurrent, isTrue);
+      expect(scheduled.payload!['gifUrl'], 'https://test/gif');
+      expect(find.byType(GifPicker), findsOneWidget);
+      scheduled.completion!.complete(saved);
+      await tester.pumpAndSettle();
+      await operation;
+      expect(find.byType(GifPicker), saved ? findsNothing : findsOneWidget);
+      expect(events.whereType<SendScheduledMessage>(), hasLength(1));
+      expect(events.whereType<SendGifMessage>(), isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   for (final outcome in ['saved', 'failed', 'cancel']) {
     testWidgets('scheduled sticker keeps picker until saved: $outcome', (tester) async {
