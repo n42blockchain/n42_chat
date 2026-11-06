@@ -20,6 +20,7 @@ import '../../../domain/repositories/message_repository.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/entities/scheduled_recovery_copy.dart';
+import '../../../domain/entities/scheduled_recovery_inspection.dart';
 import '../../blocs/chat/chat_bloc.dart';
 import '../../blocs/chat/chat_event.dart';
 import '../../blocs/chat/scheduled_message_origin.dart';
@@ -246,6 +247,11 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
         ),
         actions: [
           TextButton(
+            key: const ValueKey('scheduled-recovery-inspect'),
+            onPressed: () => Navigator.pop(context, 'inspect'),
+            child: Text(S.of(context)?.chatDetails ?? 'Details'),
+          ),
+          TextButton(
             key: const ValueKey('scheduled-recovery-export'),
             onPressed: () => Navigator.pop(context, 'export'),
             child: Text(S.of(context)?.commonShare ?? 'Share'),
@@ -266,9 +272,53 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     final action = await Navigator.of(context).push(route);
     if (identical(_recoveryRoute, route)) _recoveryRoute = null;
     if (mounted && _origin?.isCurrent == true) {
+      if (action == 'inspect') await _inspectRecoveryCopy(raw);
       if (action == 'delete') await _confirmRecoveryAction(raw);
       if (action == 'export') await _confirmRecoveryAction(raw, export: true);
     }
+  }
+
+  Future<void> _inspectRecoveryCopy(String raw) async {
+    final owner = _ownerUserId;
+    if (owner == null || !mounted || _origin?.isCurrent != true) return;
+    final copies = await _preferences.getScheduledRecoveryCopies(
+      ownerUserId: owner, isCurrent: () => mounted && _origin?.isCurrent == true,
+    );
+    if (!mounted || _origin?.isCurrent != true ||
+        owner != await _messages.getCurrentUserId() || !mounted || _origin?.isCurrent != true) {
+      return;
+    }
+    final matching = copies.where((copy) => copy.isIntact && copy.raw == raw);
+    if (matching.length != 1) throw StateError('Recovery copy changed');
+    final report = ScheduledRecoveryInspection.inspect(matching.single);
+    final route = DialogRoute<void>(context: context, builder: (context) => Dialog.fullscreen(
+      child: Scaffold(
+        appBar: AppBar(title: Text(S.of(context)?.chatDetails ?? 'Details'),
+          leading: IconButton(icon: const Icon(Icons.close),
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            onPressed: () => Navigator.pop(context))),
+        body: Column(children: [
+          Padding(padding: const EdgeInsets.all(16), child: Text(
+            S.of(context)?.scheduledRecoveryCopyHint ?? 'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.')),
+          if (report.documentIssue != null) Padding(padding: const EdgeInsets.all(16),
+            child: Text(S.of(context)?.commonLoadFailed ?? 'Failed to load')),
+          Expanded(child: ListView.builder(itemCount: report.entries.length,
+            itemBuilder: (context, index) {
+              final entry = report.entries[index];
+              return ListTile(key: ValueKey('scheduled-recovery-entry-$index'),
+                leading: Icon(entry.issue == null ? Icons.description_outlined : Icons.error_outline),
+                title: entry.draft == null
+                    ? Text(S.of(context)?.commonLoadFailed ?? 'Failed to load')
+                    : SelectableText(String.fromCharCodes(entry.draft!.text.runes.take(8000))),
+                subtitle: Text(entry.roomId),
+              );
+            })),
+        ]),
+      ),
+    ));
+    _recoveryRoute = route;
+    await Navigator.of(context).push(route);
+    if (identical(_recoveryRoute, route)) _recoveryRoute = null;
   }
 
   Future<void> _confirmRecoveryAction(String raw, {bool export = false}) async {

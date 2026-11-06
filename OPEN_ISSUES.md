@@ -171,6 +171,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- 2026-11-06 structured recovery inspection (wallet batch 151): saved-copy preview now has Details, which rechecks the current account and exact intact stored copy before inspecting it. A bounded read-only report preserves per-room/index failures beside valid siblings, rejects mismatched rooms and marks every duplicate identity ambiguous (including duplicates of malformed records). All draft types remain identifiable; acceptedEventId, deliveryUnconfirmed, retry state and payload are not reset or recreated. The virtualized view permits copying valid text and retains failure rows; logout dismisses it. It does not enqueue/send/repair records or authenticate imported receipts. 129 related tests passed; final parser/page rerun 73 passed and scoped analysis clean. Explicit confirmed recovery scheduling, legacy ownership and attachment restoration remain open. A parsed record is not proof of safe re-delivery; source bytes stay untouched.
+
+
 - 2026-11-06 recovery file-adapter acceptance (wallet batch 150): five new widget cases exercise the real FilePickerDarwin/PlatformFile/XFile disk-read path with temporary files, mocking only the native selection response. Normal JSON reaches preview; picker cancellation, missing disk file, oversized metadata and an actual >8 MiB file claiming one byte cannot persist. All 62 scheduled-page tests pass; scoped analysis clean. This strengthens the former injected-byte-only evidence but does not validate native OS panels, iCloud/document-provider permissions, Android SAF or device/process durability. file_picker_darwin is now an explicit dev dependency at the already-resolved version; runtime dependencies did not change. Manual repair/re-enqueue, legacy ownership and retention remain open.
 
 

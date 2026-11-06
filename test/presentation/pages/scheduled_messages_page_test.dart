@@ -511,6 +511,36 @@ void main() {
     });
   }
 
+  testWidgets('recovery details isolate malformed siblings and dismiss on logout', (tester) async {
+    final events = StreamController<bool>.broadcast(sync: true);
+    addTearDown(events.close);
+    when(() => auth.loginStateStream).thenAnswer((_) => events.stream);
+    final raw = jsonEncode({'room':[
+      ScheduledMessageDraft(messageId:'one', text:'Recover this text', type:MessageType.text,
+        scheduledAt:DateTime(2030), createdAt:DateTime(2026)).toJson(),
+      {'messageId':'broken'},
+    ]});
+    final copy=ScheduledRecoveryCopy(id:sha256.convert(utf8.encode(raw)).toString(),raw:raw,isIntact:true);
+    when(() => prefs.getScheduledRecoveryCopies(ownerUserId:'@me:test',isCurrent:any(named:'isCurrent')))
+      .thenAnswer((_) async => [copy]);
+    await pump(tester);
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-history')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(ValueKey('scheduled-recovery-${copy.id}')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('scheduled-recovery-inspect')));
+    await tester.pumpAndSettle();
+    expect(find.text('Recover this text'),findsOneWidget);
+    expect(find.byKey(const ValueKey('scheduled-recovery-entry-1')),findsOneWidget);
+    expect(find.text('Failed to load'),findsOneWidget);
+    verifyNever(() => prefs.importScheduledRecoveryCopy(bytes:any(named:'bytes'),
+      ownerUserId:any(named:'ownerUserId'),isCurrent:any(named:'isCurrent')));
+    when(() => auth.currentAccountGeneration).thenReturn(null);
+    events.add(false);
+    await tester.pumpAndSettle();
+    expect(find.text('Recover this text'),findsNothing);
+    expect(tester.takeException(),isNull);
+  });
   testWidgets('empty recovery history does not create a backup', (tester) async {
     when(() => prefs.getScheduledRecoveryCopies(ownerUserId: '@me:test', isCurrent: any(named: 'isCurrent'))).thenAnswer((_) async => []);
     await pump(tester);
