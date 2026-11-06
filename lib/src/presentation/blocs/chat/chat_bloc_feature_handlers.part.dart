@@ -227,23 +227,33 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     CancelScheduledMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
-
+    final roomId = event.roomId ?? _currentRoomId;
+    var cancelled = false;
+    (String, String)? operation;
     try {
-      final draft = await _findScheduledDraft(_currentRoomId!, event.messageId);
+      if (roomId == null || roomId.isEmpty) return;
+      final key = (roomId, event.messageId);
+      if (!_scheduledDraftOperations.add(key)) return;
+      operation = key;
+      final draft = await _findScheduledDraft(roomId, event.messageId);
       if (draft != null) {
         await _removeScheduledDraftRecord(draft, emit);
       } else {
-        await _secureStorage.removeScheduledMessage(
-          _currentRoomId!,
-          event.messageId,
-        );
-        _emitWithoutScheduledPreview(event.messageId, emit);
+        await _secureStorage.removeScheduledMessage(roomId, event.messageId);
+        if (roomId == _currentRoomId) {
+          _emitWithoutScheduledPreview(event.messageId, emit);
+        }
       }
-
+      cancelled = true;
       debugLog('ChatBloc: Scheduled message cancelled - ${event.messageId}');
     } catch (e) {
       debugLog('ChatBloc: Failed to cancel scheduled message: $e');
+    } finally {
+      if (operation != null) _scheduledDraftOperations.remove(operation);
+      final completion = event.completion;
+      if (completion != null && !completion.isCompleted) {
+        completion.complete(cancelled);
+      }
     }
   }
 
@@ -268,10 +278,15 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           continue;
         }
 
+        final operation = (roomId, draft.messageId);
+        if (!_scheduledDraftOperations.add(operation)) continue;
         try {
-          await _sendScheduledDraft(draft);
+          // The due list may predate a completed cancellation.
+          final current = await _findScheduledDraft(roomId, draft.messageId);
+          if (current == null) continue;
+          await _sendScheduledDraft(current);
 
-          await _removeScheduledDraftRecord(draft, emit);
+          await _removeScheduledDraftRecord(current, emit);
 
           debugLog('ChatBloc: Sent scheduled message - ${draft.messageId}');
         } catch (e) {
@@ -285,6 +300,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
               'ChatBloc: Discarded scheduled draft with unreadable local attachment - ${draft.messageId}',
             );
           }
+        } finally {
+          _scheduledDraftOperations.remove(operation);
         }
       }
     } catch (e) {

@@ -914,8 +914,10 @@ class PreferencesDataSource {
 
   /// 删除定时消息
   Future<void> removeScheduledMessage(String roomId, String messageId) async {
+    final p = await prefs;
     try {
-      final p = await prefs;
+      // Read durable state again: a failed platform write can change the cache.
+      await p.reload();
       final data = p.getString(_keyScheduledMessages);
       if (data == null) return;
 
@@ -932,15 +934,19 @@ class PreferencesDataSource {
         allData[roomId] = roomMessages;
       }
 
-      if (allData.isEmpty) {
-        await p.remove(_keyScheduledMessages);
-      } else {
-        await p.setString(_keyScheduledMessages, jsonEncode(allData));
-      }
+      final saved = allData.isEmpty
+          ? await p.remove(_keyScheduledMessages)
+          : await p.setString(_keyScheduledMessages, jsonEncode(allData));
+      if (!saved) throw StateError('Scheduled message deletion was not saved');
 
       prefsLog('Scheduled message removed - $messageId');
     } catch (e) {
       prefsLog('Failed to remove scheduled message - $e');
+      // SharedPreferences mutates its cache before the platform acknowledges it.
+      try {
+        await p.reload();
+      } catch (_) {}
+      rethrow;
     }
   }
 

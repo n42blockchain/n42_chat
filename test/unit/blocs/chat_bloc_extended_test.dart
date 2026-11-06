@@ -798,6 +798,145 @@ void main() {
   });
 
   group('Scheduled rich messages', () {
+    test(
+      'cancellation completion waits for storage and reports failure',
+      () async {
+        final write = Completer<void>();
+        when(() => mockPrefs.removeScheduledMessage(_roomId, 'pending'))
+            .thenAnswer((_) => write.future);
+        final bloc = buildBloc();
+        await initBloc(bloc);
+        final completion = Completer<bool>();
+        bloc.add(
+          CancelScheduledMessage(
+            'pending',
+            roomId: _roomId,
+            completion: completion,
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        expect(completion.isCompleted, isFalse);
+        write.completeError(StateError('disk failure'));
+        expect(await completion.future, isFalse);
+        await bloc.close();
+      },
+    );
+
+    test(
+      'cancellation uses the explicit draft room, not the open room',
+      () async {
+        when(() => mockPrefs.removeScheduledMessage('!other:test', 'pending'))
+            .thenAnswer((_) async {});
+        final bloc = buildBloc();
+        await initBloc(bloc);
+        final completion = Completer<bool>();
+        bloc.add(
+          CancelScheduledMessage(
+            'pending',
+            roomId: '!other:test',
+            completion: completion,
+          ),
+        );
+        expect(await completion.future, isTrue);
+        verify(() => mockPrefs.removeScheduledMessage('!other:test', 'pending'))
+            .called(1);
+        verifyNever(() => mockPrefs.removeScheduledMessage(_roomId, 'pending'));
+        expect(bloc.state.messages.map((m) => m.id), contains(_msg.id));
+        await bloc.close();
+      },
+    );
+
+    test('cancellation without a room completes with failure', () async {
+      final bloc = buildBloc();
+      final completion = Completer<bool>();
+      bloc.add(CancelScheduledMessage('pending', completion: completion));
+      expect(await completion.future, isFalse);
+      await bloc.close();
+    });
+
+    test(
+      'cancellation cannot report success while the draft is sending',
+      () async {
+        final draft = ScheduledMessageDraft(
+          messageId: 'sending',
+          roomId: _roomId,
+          text: 'Question?',
+          type: MessageType.poll,
+          scheduledAt: DateTime(2020),
+          createdAt: DateTime(2019),
+          payload: {
+            'options': ['A', 'B'],
+          },
+        );
+        final sending = Completer<MessageEntity>();
+        final started = Completer<void>();
+        when(() => mockPrefs.getDueScheduledMessages())
+            .thenAnswer((_) async => [draft]);
+        when(() => mockPrefs.removeScheduledMessage(_roomId, 'sending'))
+            .thenAnswer((_) async {});
+        when(
+          () => mockRepo.sendPollMessage(
+            any(),
+            question: any(named: 'question'),
+            options: any(named: 'options'),
+            maxSelections: any(named: 'maxSelections'),
+            isAnonymous: any(named: 'isAnonymous'),
+          ),
+        ).thenAnswer((_) {
+          started.complete();
+          return sending.future;
+        });
+        final bloc = buildBloc();
+        await initBloc(bloc);
+        when(() => mockPrefs.getScheduledMessages(_roomId))
+            .thenAnswer((_) async => [draft]);
+        bloc.add(const SendDueScheduledMessages());
+        await started.future;
+        final completion = Completer<bool>();
+        bloc.add(
+          CancelScheduledMessage(
+            'sending',
+            roomId: _roomId,
+            completion: completion,
+          ),
+        );
+        expect(await completion.future, isFalse);
+        verifyNever(() => mockPrefs.removeScheduledMessage(any(), any()));
+        sending.complete(_msg);
+        await bloc.close();
+        verify(() => mockPrefs.removeScheduledMessage(_roomId, 'sending'))
+            .called(1);
+      },
+    );
+
+    test('stale due queue cannot send a draft after cancellation', () async {
+      final draft = ScheduledMessageDraft(
+        messageId: 'stale',
+        roomId: _roomId,
+        text: 'Cancelled',
+        type: MessageType.text,
+        scheduledAt: DateTime(2020),
+        createdAt: DateTime(2019),
+      );
+      when(() => mockPrefs.getDueScheduledMessages())
+          .thenAnswer((_) async => [draft]);
+      when(() => mockPrefs.removeScheduledMessage(_roomId, 'stale'))
+          .thenAnswer((_) async {});
+      final bloc = buildBloc();
+      await initBloc(bloc);
+      final completion = Completer<bool>();
+      bloc.add(
+        CancelScheduledMessage('stale', roomId: _roomId, completion: completion),
+      );
+      expect(await completion.future, isTrue);
+      clearInteractions(mockPrefs);
+      bloc.add(const SendDueScheduledMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      verify(() => mockPrefs.getScheduledMessages(_roomId)).called(1);
+      verifyNever(() => mockPrefs.removeScheduledMessage(any(), any()));
+      expect(bloc.state.messages.map((m) => m.id), [_msg.id]);
+      await bloc.close();
+    });
     test('saves scheduled poll payload and adds preview message', () async {
       when(
         () => mockRepo.getCurrentUserId(),
@@ -888,6 +1027,8 @@ void main() {
       final bloc = buildBloc();
       await initBloc(bloc);
 
+      when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -943,6 +1084,8 @@ void main() {
       final bloc = buildBloc();
       await initBloc(bloc);
 
+      when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -1009,6 +1152,8 @@ void main() {
       final bloc = buildBloc();
       await initBloc(bloc);
 
+      when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -1077,6 +1222,8 @@ void main() {
       final bloc = buildBloc();
       await initBloc(bloc);
 
+      when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
@@ -1150,7 +1297,9 @@ void main() {
         final bloc = buildBlocWithClientManager();
         await initBloc(bloc);
 
-        bloc.add(const SendDueScheduledMessages());
+        when(() => mockPrefs.getScheduledMessages(any())).thenAnswer((invocation) async =>
+        (await mockPrefs.getDueScheduledMessages()).where((draft) => draft.roomId == invocation.positionalArguments.first).toList());
+      bloc.add(const SendDueScheduledMessages());
         await Future<void>.delayed(const Duration(milliseconds: 100));
 
         verify(

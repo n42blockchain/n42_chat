@@ -549,10 +549,13 @@ class SendScheduledMessage extends ChatEvent {
 class CancelScheduledMessage extends ChatEvent {
   final String messageId;
 
-  const CancelScheduledMessage(this.messageId);
+  final String? roomId;
+  final Completer<bool>? completion;
+
+  const CancelScheduledMessage(this.messageId, {this.roomId, this.completion});
 
   @override
-  List<Object?> get props => [messageId];
+  List<Object?> get props => [messageId, roomId, completion];
 }
 
 /// 发送到期的定时消息（内部事件，由定时器触发）

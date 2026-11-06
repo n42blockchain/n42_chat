@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:n42_chat/l10n/app_localizations.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
@@ -31,6 +34,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   final PreferencesDataSource _preferences = getIt<PreferencesDataSource>();
 
   bool _isLoading = true;
+  final Set<String> _cancelling = {};
   List<ScheduledMessageDraft> _drafts = const [];
 
   @override
@@ -59,21 +63,50 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   }
 
   Future<void> _cancelDraft(ScheduledMessageDraft draft) async {
+    if (!_cancelling.add(draft.messageId)) return;
+    setState(() {});
     try {
-      context.read<ChatBloc>().add(CancelScheduledMessage(draft.messageId));
-    } catch (_) {
-      await _preferences.removeScheduledMessage(widget.roomId, draft.messageId);
+      final bloc = context.read<ChatBloc?>();
+      if (bloc != null) {
+        final completion = Completer<bool>();
+        bloc.add(
+          CancelScheduledMessage(
+            draft.messageId,
+            roomId: widget.roomId,
+            completion: completion,
+          ),
+        );
+        final cancelled = await completion.future.timeout(
+          const Duration(seconds: 30),
+          onTimeout: () => false,
+        );
+        if (!cancelled) throw StateError('Cancellation was not confirmed');
+      } else {
+        await _preferences.removeScheduledMessage(
+          widget.roomId,
+          draft.messageId,
+        );
+      }
+      if (!mounted) return;
+      setState(() {
+        _drafts = _drafts
+            .where((item) => item.messageId != draft.messageId)
+            .toList();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Scheduled message cancelled')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(S.of(context)?.commonFailedToSave ?? 'Failed to save'),
+        ),
+      );
+    } finally {
+      _cancelling.remove(draft.messageId);
+      if (mounted) setState(() {});
     }
-
-    if (!mounted) return;
-    setState(() {
-      _drafts = _drafts
-          .where((item) => item.messageId != draft.messageId)
-          .toList();
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Scheduled message cancelled')),
-    );
   }
 
   @override
@@ -193,8 +226,10 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
                 ),
               ),
               TextButton(
-                onPressed: () => _cancelDraft(draft),
-                child: const Text('Cancel'),
+                onPressed: _cancelling.contains(draft.messageId)
+                    ? null
+                    : () => _cancelDraft(draft),
+                child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
               ),
             ],
           ),
