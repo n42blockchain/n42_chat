@@ -346,6 +346,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     bool mentionsRoom = false,
     String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendTextMessage(
       roomId,
       text,
@@ -356,7 +357,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: text,
+      type: MessageType.text,
+    );
   }
 
   @override
@@ -368,6 +376,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? selfDestructAfter,
     String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendImageMessage(
       roomId,
       transactionId: transactionId,
@@ -378,7 +387,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: filename,
+      type: MessageType.image,
+    );
   }
 
   @override
@@ -413,6 +429,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? selfDestructAfter,
     String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendVideoMessage(
       roomId,
       transactionId: transactionId,
@@ -424,7 +441,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: filename,
+      type: MessageType.video,
+    );
   }
 
   @override
@@ -439,6 +463,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? fileSize,
     String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendFileMessage(
       roomId,
       transactionId: transactionId,
@@ -452,7 +477,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: filename,
+      type: MessageType.file,
+    );
   }
 
   @override
@@ -483,6 +515,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     String? title,
     String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendGifMessage(
       roomId,
       transactionId: transactionId,
@@ -494,7 +527,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: title ?? 'GIF',
+      type: MessageType.image,
+    );
   }
 
   @override
@@ -512,6 +552,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? size,
     String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendStickerMessage(
       roomId,
       transactionId: transactionId,
@@ -528,7 +569,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: name ?? emoji ?? stickerId,
+      type: MessageType.sticker,
+    );
   }
 
   @override
@@ -921,6 +969,7 @@ class MessageRepositoryImpl implements IMessageRepository {
     String? quizExplanation,
     String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     try {
       debugLog(
         'MessageRepositoryImpl: Sending poll - question: $question, options: $options, isAnonymous: $isAnonymous',
@@ -935,7 +984,25 @@ class MessageRepositoryImpl implements IMessageRepository {
         quizCorrectIndex: quizCorrectIndex,
         quizExplanation: quizExplanation,
       );
-      if (eventId != null) {
+      if (eventId != null && eventId.isNotEmpty) {
+        if (transactionId != null) {
+          return await _resolveScheduledSendAcknowledgement(
+            roomId: roomId,
+            eventId: eventId,
+            transactionId: transactionId,
+            senderId: senderId,
+            content: question,
+            type: MessageType.poll,
+            metadata: MessageMetadata(
+              pollQuestion: question,
+              pollOptions: options,
+              isAnonymousPoll: isAnonymous,
+              maxSelections: maxSelections,
+              quizCorrectIndex: quizCorrectIndex,
+              quizExplanation: quizExplanation,
+            ),
+          );
+        }
         debugLog(
           'MessageRepositoryImpl: Poll sent successfully - eventId: $eventId',
         );
@@ -1412,6 +1479,36 @@ class MessageRepositoryImpl implements IMessageRepository {
     });
     debugLog(
       'MessageRepositoryImpl: Cleaned message cache, remaining: ${_messageEntityCache.length}',
+    );
+  }
+
+  /// A server event ID confirms acceptance even if the local echo is delayed.
+  /// Scheduled callers need that receipt to stop retries, not a populated cache.
+  /// Ordinary sends retain their existing local-message lookup behavior.
+  Future<MessageEntity?> _resolveScheduledSendAcknowledgement({
+    required String roomId,
+    required String eventId,
+    required String? transactionId,
+    required String senderId,
+    required String content,
+    required MessageType type,
+    MessageMetadata? metadata,
+  }) async {
+    if (transactionId == null) return _getMessageById(roomId, eventId);
+    if (eventId.isEmpty) return null;
+    // Minimal acceptance receipt. Normal sync supplies authoritative timestamps
+    // and full media metadata; this is not a recipient delivery/read receipt.
+    return MessageEntity(
+      id: eventId,
+      roomId: roomId,
+      senderId: senderId,
+      senderName: senderId,
+      content: content,
+      type: type,
+      timestamp: DateTime.now(),
+      status: MessageStatus.sent,
+      isFromMe: true,
+      metadata: metadata,
     );
   }
 

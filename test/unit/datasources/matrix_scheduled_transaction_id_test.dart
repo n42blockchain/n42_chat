@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:n42_chat/src/domain/entities/message_entity.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -33,15 +34,18 @@ void main() {
     'file',
   ]) {
     test(
-      '$kind preserves retry identity through repository and data source to SDK',
+      '$kind preserves server receipt without querying the local echo',
       () async {
         final manager = _Manager(), client = _Client();
         final room = _Room();
         when(() => manager.client).thenReturn(client);
         when(() => client.isLogged()).thenReturn(true);
+        when(() => client.userID).thenReturn('@sender:test');
         when(() => client.getRoomById('!room:test')).thenReturn(room);
         when(() => room.client).thenReturn(client);
-        when(() => room.getEventById(any())).thenAnswer((_) async => null);
+        when(() => room.getEventById(any())).thenAnswer((_) async {
+          throw StateError('local echo unavailable');
+        });
         var encryptionReads = 0;
         // Exercise the existing video encrypted SDK branch after room preparation.
         when(() => room.encrypted)
@@ -96,35 +100,36 @@ void main() {
         final bytes = Uint8List.fromList([1, 2, 3]);
         for (var attempt = 0; attempt < 2; attempt++) {
           encryptionReads = 0;
+          MessageEntity? receipt;
           switch (kind) {
             case 'text':
-              await repository.sendTextMessage(
+              receipt = await repository.sendTextMessage(
                 '!room:test',
                 'Hi',
                 transactionId: tx,
               );
             case 'mention':
-              await repository.sendTextMessage(
+              receipt = await repository.sendTextMessage(
                 '!room:test',
                 'Hi',
                 mentionedUserIds: ['@friend:test'],
                 transactionId: tx,
               );
             case 'poll':
-              await repository.sendPollMessage(
+              receipt = await repository.sendPollMessage(
                 '!room:test',
                 question: 'Lunch?',
                 options: ['A', 'B'],
                 transactionId: tx,
               );
             case 'gif':
-              await repository.sendGifMessage(
+              receipt = await repository.sendGifMessage(
                 '!room:test',
                 gifUrl: 'mxc://server/gif',
                 transactionId: tx,
               );
             case 'sticker':
-              await repository.sendStickerMessage(
+              receipt = await repository.sendStickerMessage(
                 '!room:test',
                 stickerId: 's',
                 packId: 'p',
@@ -132,29 +137,34 @@ void main() {
                 transactionId: tx,
               );
             case 'image':
-              await repository.sendImageMessage(
+              receipt = await repository.sendImageMessage(
                 '!room:test',
                 imageBytes: bytes,
                 filename: 'image.png',
                 transactionId: tx,
               );
             case 'video':
-              await repository.sendVideoMessage(
+              receipt = await repository.sendVideoMessage(
                 '!room:test',
                 videoBytes: bytes,
                 filename: 'video.mp4',
                 transactionId: tx,
               );
             case 'file':
-              await repository.sendFileMessage(
+              receipt = await repository.sendFileMessage(
                 '!room:test',
                 fileBytes: bytes,
                 filename: 'file.bin',
                 transactionId: tx,
               );
           }
+          expect(receipt?.id, r'$accepted');
+          expect(receipt?.status, MessageStatus.sent);
+          expect(receipt?.roomId, '!room:test');
+          expect(receipt?.senderId, '@sender:test');
         }
         expect(ids, [tx, tx]);
+        verifyNever(() => room.getEventById(any()));
         if (kind == 'poll') {
           expect(
             contents[0],

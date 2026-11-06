@@ -200,6 +200,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: the live smoke script covers UTF-8 text, reply, edit, reaction redaction, and thread behavior, and now includes a poll send/vote/end path in code. However the latest confirmed real-homeserver run still does not cover search, favorites/bookmarks, pinning, built-in translation, scheduled send, and the new poll path still needs a live run with credentials to count as verified.
 - Next step: run the updated smoke script against a real homeserver, then either extend it further for the remaining Matrix-facing flows or add a Flutter-hosted live test path for client-local features such as scheduled send that depend on local storage/BLoC wiring.
 
+- Server acknowledgement follow-up (2026-11-06): scheduled sends with a nonempty SDK server event ID now return a minimal acceptance receipt without waiting for local echo/profile lookup. Sender identity is captured before dispatch. Text/mention/poll/GIF/sticker/image/video/file contract tests cover delayed local echo and stable retry IDs. Null/empty IDs remain unconfirmed. Repository and scheduling regression: 611 passed. This closes known acceptance being lost before sync, not unknown transport outcomes, crash-before-cleanup or cross-device recovery.
+
 ### CALL-001 Background blur / replacement still lacks a real video processor path
 
 - Severity: M

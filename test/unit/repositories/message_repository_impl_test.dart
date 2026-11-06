@@ -84,6 +84,33 @@ void main() {
   });
 
   group('sendTextMessage', () {
+    for (final eventId in <String?>[null, '']) {
+      test('scheduled send without an event ID remains unconfirmed: $eventId', () async {
+        when(() => mockMsgDS.sendTextMessage(testRoomId, testText, transactionId: 'scheduled'))
+            .thenAnswer((_) async => eventId);
+        final result = await repository.sendTextMessage(testRoomId, testText, transactionId: 'scheduled');
+        expect(result, isNull);
+      });
+    }
+
+    test('receipt keeps the original sender when account switches after acceptance', () async {
+      when(() => mockClient.userID).thenReturn('@a:test');
+      final replacement = MockClient();
+      when(() => replacement.userID).thenReturn('@b:test');
+      when(() => mockMsgDS.sendTextMessage(testRoomId, testText, transactionId: 'scheduled'))
+          .thenAnswer((_) async { when(() => mockClientMgr.client).thenReturn(replacement); return testEventId; });
+      final result = await repository.sendTextMessage(testRoomId, testText, transactionId: 'scheduled');
+      expect(result?.senderId, '@a:test');
+      expect(result?.content, testText);
+      expect(result?.status, MessageStatus.sent);
+      verifyNever(() => replacement.getRoomById(any()));
+    });
+
+    test('ordinary send still waits for the local message', () async {
+      when(() => mockMsgDS.sendTextMessage(testRoomId, testText)).thenAnswer((_) async => testEventId);
+      expect(await repository.sendTextMessage(testRoomId, testText), isNull);
+    });
+
     test('delegates to datasource', () async {
       when(() => mockMsgDS.sendTextMessage(testRoomId, testText))
           .thenAnswer((_) async => testEventId);
