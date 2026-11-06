@@ -6,6 +6,34 @@ import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart'
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('room mismatch preserves records while legacy room identity stays stable', () async {
+    final storage = PreferencesDataSource();
+    await storage.saveScheduledMessage(roomId: 'room', messageId: 'identity',
+      text: 'keep', scheduledAt: DateTime(2020));
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'n42_chat_scheduled_messages';
+    final original = jsonDecode(prefs.getString(key)!) as Map<String, dynamic>;
+    final record = Map<String, dynamic>.from((original['room'] as List).single as Map);
+    for (final wrongRoom in ['other-room', '']) {
+      final raw = jsonEncode({'room': [{...record, 'roomId': wrongRoom}]});
+      await prefs.setString(key, raw);
+      await expectLater(storage.getScheduledMessages('room'), throwsFormatException);
+      await expectLater(storage.getDueScheduledMessages(), throwsFormatException);
+      expect(prefs.getString(key), raw);
+    }
+    for (final legacy in [false, true]) {
+      final repaired = {...record, 'roomId': 'room'};
+      if (legacy) repaired.remove('roomId');
+      await prefs.setString(key, jsonEncode({'room': [repaired]}));
+      final listed = (await storage.getScheduledMessages('room')).single;
+      final due = (await storage.getDueScheduledMessages()).single;
+      expect(listed.roomId, 'room');
+      expect(due.roomId, 'room');
+      expect(listed.transactionId, due.transactionId);
+      expect(listed.text, 'keep');
+    }
+  });
+
   test('unconfirmed attempts persist without changing payload, identity or other accounts', () async {
     final storage = PreferencesDataSource();
     for (final user in ['@a:test', '@b:test']) {

@@ -949,6 +949,21 @@ class PreferencesDataSource {
     return true;
   });
 
+  static ScheduledMessageDraft _scheduledDraftForRoom(
+    Object? item,
+    String roomId,
+  ) {
+    final draft = ScheduledMessageDraft.fromJson(
+      Map<String, dynamic>.from(item as Map),
+    );
+    if (roomId.trim().isEmpty ||
+        (draft.roomId != null && draft.roomId != roomId)) {
+      throw const FormatException('Scheduled message room identity mismatch');
+    }
+    // Older records omit roomId; the containing room supplies their identity.
+    return draft.copyWith(roomId: roomId);
+  }
+
   /// 获取房间的所有定时消息
   Future<List<ScheduledMessageDraft>> getScheduledMessages(
     String roomId, {
@@ -966,9 +981,7 @@ class PreferencesDataSource {
 
       return roomMessages
           .map(
-            (item) => ScheduledMessageDraft.fromJson(
-              Map<String, dynamic>.from(item as Map),
-            ),
+            (item) => _scheduledDraftForRoom(item, roomId),
           )
           .toList(growable: false);
     } catch (e) {
@@ -995,11 +1008,9 @@ class PreferencesDataSource {
         final roomId = entry.key;
         final messages = entry.value as List<dynamic>;
         for (final item in messages) {
-          final msg = ScheduledMessageDraft.fromJson(
-            Map<String, dynamic>.from(item as Map),
-          );
+          final msg = _scheduledDraftForRoom(item, roomId);
           if (msg.isDue(now)) {
-            dueMessages.add(msg.copyWith(roomId: roomId));
+            dueMessages.add(msg);
           }
         }
       }
