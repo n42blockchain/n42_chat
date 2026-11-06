@@ -95,7 +95,12 @@ void main() {
     await fill(tester);
     await tap(tester, find.text('Multi'));
     await tap(tester, find.byType(Switch).first);
-    await tap(tester, find.text('Schedule'));
+    await tap(
+      tester,
+      find.text(
+        S.of(tester.element(find.byType(PollCreateSheet)))!.scheduledSendTitle,
+      ),
+    );
     expect(result!.action, PollComposerAction.schedule);
     expect(result!.isAnonymous, isTrue);
     expect(result!.maxSelections, 0);
@@ -104,7 +109,12 @@ void main() {
     tester,
   ) async {
     await open(tester, scheduling: false);
-    expect(find.text('Schedule'), findsNothing);
+    expect(
+      find.text(
+        S.of(tester.element(find.byType(PollCreateSheet)))!.scheduledSendTitle,
+      ),
+      findsNothing,
+    );
     await tap(tester, find.text('Cancel'));
     expect(result, isNull);
     expect(find.byType(PollCreateSheet), findsNothing);
