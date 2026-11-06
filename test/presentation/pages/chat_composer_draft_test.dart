@@ -1,4 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
+import 'package:n42_chat/src/domain/entities/scheduled_recovery_copy.dart';
+import 'package:n42_chat/src/domain/repositories/message_repository.dart';
+import 'package:n42_chat/src/domain/repositories/conversation_repository.dart';
+import 'package:n42_chat/src/presentation/pages/chat/scheduled_messages_page.dart';
 
 import 'package:n42_chat/src/domain/entities/recovered_composer_text.dart';
 import 'package:n42_chat/src/presentation/pages/chat/chat_detail_page.dart';
@@ -26,6 +35,10 @@ import 'package:n42_chat/src/presentation/blocs/contact/contact_state.dart';
 import 'package:n42_chat/src/presentation/pages/chat/chat_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class _Messages extends Mock implements IMessageRepository {}
+
+class _Conversations extends Mock implements IConversationRepository {}
+
 class _Chat extends MockBloc<ChatEvent, ChatState> implements ChatBloc {}
 
 class _Event extends Fake implements ChatEvent {}
@@ -51,6 +64,17 @@ class _ReportAccount {
     when(() => client.deviceID).thenReturn(null);
     when(client.isLogged).thenReturn(true);
     when(() => auth.currentAccountGeneration).thenReturn(generation);
+    when(() => auth.loginStateStream)
+        .thenAnswer((_) => const Stream<bool>.empty());
+    final messages = _Messages();
+    when(messages.getCurrentUserId).thenAnswer((_) async => '@me:hs.test');
+    getIt.registerSingleton<IMessageRepository>(messages);
+    final conversations = _Conversations();
+    when(() => conversations.getNotificationMode(any()))
+        .thenAnswer((_) async => ConversationNotificationMode.allMessages);
+    when(() => conversations.getStrongReminder(any()))
+        .thenAnswer((_) async => false);
+    getIt.registerSingleton<IConversationRepository>(conversations);
     when(() => auth.currentUser)
         .thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
     final groups = _GroupRepository();
@@ -76,6 +100,43 @@ class _ReportAccount {
 class _DraftStore extends PreferencesDataSource {
   final pending = Completer<String?>();
   final writes = <(String, String, String)>[];
+  @override
+  Future<List<ScheduledMessageDraft>> getScheduledMessages(
+    String roomId, {
+    String? ownerUserId,
+  }) async {
+    expect(roomId, '!room:test');
+    expect(ownerUserId, '@me:hs.test');
+    return [];
+  }
+
+  late final recovery = (() {
+    final raw = jsonEncode({
+      '!room:test': [
+        ScheduledMessageDraft(
+          messageId: 'recovered',
+          text: 'recovered text',
+          type: MessageType.text,
+          scheduledAt: DateTime(2030),
+          createdAt: DateTime(2026),
+        ).toJson(),
+      ],
+    });
+    return ScheduledRecoveryCopy(
+      id: sha256.convert(utf8.encode(raw)).toString(),
+      raw: raw,
+      isIntact: true,
+    );
+  })();
+  @override
+  Future<List<ScheduledRecoveryCopy>> getScheduledRecoveryCopies({
+    required String ownerUserId,
+    required bool Function() isCurrent,
+  }) async {
+    expect(ownerUserId, '@me:hs.test');
+    return isCurrent() ? [recovery] : [];
+  }
+
   @override
   Future<String?> getAccountDraft(
     String roomId, {
@@ -110,6 +171,9 @@ void main() {
     'recover foreign owner',
     'recover account changed',
     'recover input changed',
+    'recover full route',
+    'recover full route account changed',
+    'recover full route input changed',
   ]) {
     testWidgets('composer draft $scenario', (tester) async {
       await getIt.reset();
@@ -175,6 +239,66 @@ void main() {
         await tester.tap(find.byIcon(Icons.more_horiz));
         await tester.pumpAndSettle();
         expect(find.byType(ChatDetailPage), findsOneWidget);
+        if (scenario.startsWith('recover full route')) {
+          final scheduled = find.text('Scheduled messages');
+          await tester.ensureVisible(scheduled);
+          await tester.tap(scheduled);
+          await tester.pumpAndSettle();
+          expect(find.byType(ScheduledMessagesPage), findsOneWidget);
+          await tester.tap(
+            find.byKey(const ValueKey('scheduled-recovery-history')),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(ValueKey('scheduled-recovery-${store.recovery.id}')),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(const ValueKey('scheduled-recovery-inspect')),
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.byKey(const ValueKey('scheduled-recovery-edit-0')),
+          );
+          await tester.pumpAndSettle();
+          if (scenario.endsWith('account changed')) account.active = false;
+          if (scenario.endsWith('input changed')) {
+            controller.text = 'intervening edit';
+            controller.text = 'saved account text';
+          }
+          await tester.tap(
+            find.byKey(const ValueKey('scheduled-recovery-composer-confirm')),
+          );
+          await tester.pumpAndSettle();
+          final accepted = scenario == 'recover full route';
+          expect(
+            controller.text,
+            accepted
+                ? 'saved account text\nrecovered text'
+                : 'saved account text',
+          );
+          if (!scenario.endsWith('account changed')) {
+            expect(find.byType(ScheduledMessagesPage), findsNothing);
+            expect(find.byType(ChatDetailPage), findsNothing);
+          }
+          if (accepted) {
+            expect(store.writes.last, (
+              '!room:test',
+              '@me:hs.test',
+              controller.text,
+            ));
+          } else {
+            expect(
+              store.writes.where(
+                (write) => write.$3.contains('recovered text'),
+              ),
+              isEmpty,
+            );
+          }
+          verifyNever(() => chat.add(any(that: isA<SendTextMessage>())));
+          expect(tester.takeException(), isNull);
+          return;
+        }
         if (scenario == 'recover account changed') account.active = false;
         if (scenario == 'recover input changed') {
           controller.text = 'new input';
