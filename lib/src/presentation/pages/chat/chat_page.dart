@@ -223,7 +223,7 @@ class _ChatPageContent extends StatefulWidget {
   State<_ChatPageContent> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<_ChatPageContent> {
+class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _inputFocusNode = FocusNode();
@@ -329,7 +329,26 @@ class _ChatPageState extends State<_ChatPageContent> {
   int _privacyPreferencesLoadVersion = 0;
   int _draftRevision = 0;
   bool _draftLoaded = false;
-  void _onDraftInputChanged() => _draftRevision++;
+  Timer? _draftSaveTimer;
+  bool _restoringDraft = false;
+  String _lastDraftText = '';
+
+  void _onDraftInputChanged() {
+    _draftRevision++;
+    final text = _inputController.text;
+    if (text == _lastDraftText) return;
+    _lastDraftText = text;
+    _draftSaveTimer?.cancel();
+    if (_restoringDraft) return;
+    _draftSaveTimer = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) _saveDraft();
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) _saveDraft();
+  }
   String? _pendingInitialTargetMessageId;
 
   /// initState 缓存的 ChatBloc，供 dispose 阶段安全使用（那时 context 已
@@ -339,6 +358,7 @@ class _ChatPageState extends State<_ChatPageContent> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     // 缓存 bloc 引用供 dispose 使用：dispose 阶段 widget 已 deactivated，
     // 再走 context.read 会触发 "deactivated context" 警告（九测真机记录）。
@@ -554,8 +574,13 @@ class _ChatPageState extends State<_ChatPageContent> {
           openingValue.text.isNotEmpty || draft == null || draft.isEmpty) {
         return;
       }
-      _inputController.value = TextEditingValue(text: draft,
-        selection: TextSelection.collapsed(offset: draft.length));
+      _restoringDraft = true;
+      try {
+        _inputController.value = TextEditingValue(text: draft,
+          selection: TextSelection.collapsed(offset: draft.length));
+      } finally {
+        _restoringDraft = false;
+      }
     } catch (_) {
       debugLog('ChatPage: Unable to load account draft');
     }
@@ -598,6 +623,8 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   /// 保存草稿
   void _saveDraft() {
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = null;
     // A failed/unfinished load is not evidence that the stored draft is empty.
     if (!_draftLoaded && _draftRevision == 0) return;
     final origin = _scheduledOrigin;
@@ -632,6 +659,8 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _draftSaveTimer?.cancel();
     // 离开聊天页停止朗读(TtsService 是进程级单例,否则跨页继续播)
     unawaited(TtsService.instance.stop());
     _privacyPreferencesLoadVersion++;

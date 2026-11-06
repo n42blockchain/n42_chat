@@ -100,6 +100,7 @@ class _ReportAccount {
 class _DraftStore extends PreferencesDataSource {
   final pending = Completer<String?>();
   final writes = <(String, String, String)>[];
+  bool failNextWrite = false;
   @override
   Future<List<ScheduledMessageDraft>> getScheduledMessages(
     String roomId, {
@@ -154,13 +155,24 @@ class _DraftStore extends PreferencesDataSource {
     required String ownerUserId,
     required bool Function() isCurrent,
   }) async {
-    if (isCurrent()) writes.add((roomId, ownerUserId, text));
+    if (!isCurrent()) return;
+    if (failNextWrite) {
+      failNextWrite = false;
+      throw StateError('Storage unavailable');
+    }
+    writes.add((roomId, ownerUserId, text));
   }
 }
 
 void main() {
   setUpAll(() => registerFallbackValue(_Event()));
   for (final scenario in [
+    'autosave',
+    'autosave retry',
+    'autosave background',
+    'autosave account changed',
+    'autosave dispose',
+    'autosave load pending',
     'load',
     'typed',
     'typed then cleared',
@@ -197,6 +209,9 @@ void main() {
         initialState: const ContactState(),
       );
       addTearDown(() async {
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
         await tester.pumpWidget(const SizedBox());
         await getIt.reset();
       });
@@ -222,6 +237,77 @@ void main() {
       );
       await tester.pumpAndSettle();
       final input = find.byType(TextField).first;
+      if (scenario.startsWith('autosave')) {
+        if (scenario != 'autosave load pending') {
+          store.pending.complete(null);
+          await tester.pumpAndSettle();
+        }
+        await tester.enterText(input, 'first edit');
+        await tester.pump(const Duration(milliseconds: 300));
+        await tester.enterText(input, 'latest edit');
+        await tester.pump(const Duration(milliseconds: 499));
+        expect(store.writes, isEmpty);
+        if (scenario == 'autosave account changed') account.active = false;
+        if (scenario == 'autosave retry') store.failNextWrite = true;
+        if (scenario == 'autosave background') {
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.paused,
+          );
+          await tester.pump();
+        } else if (scenario == 'autosave dispose') {
+          await tester.pumpWidget(const SizedBox());
+          await tester.pump();
+        } else {
+          await tester.pump(const Duration(milliseconds: 1));
+          await tester.pump();
+        }
+        if (scenario == 'autosave retry') {
+          expect(store.writes, isEmpty);
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.paused,
+          );
+          await tester.pump();
+          expect(tester.takeException(), isNull);
+        }
+        if (scenario == 'autosave account changed') {
+          expect(store.writes, isEmpty);
+        } else {
+          expect(store.writes, [('!room:test', '@me:hs.test', 'latest edit')]);
+        }
+        if (scenario == 'autosave') {
+          final controller = tester.widget<TextField>(input).controller!;
+          controller.selection = const TextSelection.collapsed(offset: 0);
+          await tester.pump(const Duration(seconds: 1));
+          expect(
+            store.writes,
+            hasLength(1),
+            reason: 'selection does not rewrite text',
+          );
+          await tester.enterText(input, '');
+          await tester.pump(const Duration(milliseconds: 500));
+          await tester.pump();
+          expect(store.writes.last, ('!room:test', '@me:hs.test', ''));
+        }
+        if (scenario == 'autosave load pending') {
+          store.pending.complete('old text');
+          await tester.pumpAndSettle();
+          expect(
+            tester.widget<TextField>(input).controller!.text,
+            'latest edit',
+          );
+        }
+        if (scenario == 'autosave dispose' ||
+            scenario == 'autosave background') {
+          await tester.pump(const Duration(seconds: 1));
+          expect(
+            store.writes,
+            hasLength(1),
+            reason: 'flush cancels pending timer',
+          );
+        }
+        verifyNever(() => chat.add(any(that: isA<SendTextMessage>())));
+        return;
+      }
       if (scenario.startsWith('typed')) {
         await tester.enterText(input, 'new text');
         if (scenario == 'typed then cleared') await tester.enterText(input, '');
