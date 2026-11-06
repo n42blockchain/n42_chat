@@ -571,6 +571,64 @@ void main() {
     await bloc.close();
   });
 
+  for (final removing in [false, true]) {
+    for (final throws in [false, true]) {
+      test('reaction rejection restores own change, remove=$removing throw=$throws', () async {
+        final bloc = await buildInitializedBloc();
+        const prior = MessageReaction(key: '👍', userIds: ['@me:server.com'], isMe: true);
+        final message = _testMessages.first.copyWith(reactions: removing ? [prior] : []);
+        bloc.add(MessagesUpdated([message]));
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        final pending = Completer<bool>();
+        final started = Completer<void>();
+        when(() => mockRepository.getCurrentUserId()).thenAnswer((_) async => '@me:server.com');
+        when(() => mockRepository.addReaction(any(), any(), any())).thenAnswer((_) {
+          started.complete(); return pending.future;
+        });
+        bloc.add(AddReaction(messageId: message.id, emoji: '👍'));
+        await started.future.timeout(const Duration(seconds: 3));
+        final optimistic = bloc.state.messages.single;
+        expect(optimistic.reactions.any((r) => r.key == '👍'), !removing);
+        const other = MessageReaction(key: '❤️', userIds: ['@other:server.com']);
+        final arrival = _testMessages.last;
+        bloc.add(MessagesUpdated([optimistic.copyWith(content: 'new content',
+          reactions: [...optimistic.reactions, other]), arrival]));
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        if (throws) { pending.completeError(StateError('rejected')); }
+        else { pending.complete(false); }
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        final current = bloc.state.messages.firstWhere((m) => m.id == message.id);
+        expect(current.content, 'new content');
+        expect(current.reactions.where((r) => r.key == '👍').toList(), removing ? [prior] : isEmpty);
+        expect(current.reactions.contains(other), isTrue);
+        expect(bloc.state.messages.contains(arrival), isTrue);
+        expect(bloc.state.error, 'Failed to add reaction');
+        await bloc.close();
+      });
+    }
+  }
+
+  test('reaction rejection preserves newer server reaction', () async {
+    final bloc = await buildInitializedBloc();
+    final pending = Completer<bool>();
+    final started = Completer<void>();
+    when(() => mockRepository.getCurrentUserId()).thenAnswer((_) async => '@me:server.com');
+    when(() => mockRepository.addReaction(any(), any(), any())).thenAnswer((_) {
+      started.complete(); return pending.future;
+    });
+    final message = _testMessages.first;
+    bloc.add(AddReaction(messageId: message.id, emoji: '👍'));
+    await started.future.timeout(const Duration(seconds: 3));
+    const server = MessageReaction(key: '👍', userIds: ['@other:server.com'], aggregateCount: 4);
+    bloc.add(MessagesUpdated([message.copyWith(reactions: [server])]));
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    pending.complete(false);
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(bloc.state.messages.single.reactions, [server]);
+    expect(bloc.state.error, 'Failed to add reaction');
+    await bloc.close();
+  });
+
   group('text send context across awaits', () {
     for (final returnToOrigin in [false, true]) {
       test('settings wait rejects room switch, return=$returnToOrigin', () async {

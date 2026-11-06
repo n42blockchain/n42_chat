@@ -231,6 +231,10 @@ extension ChatBlocActionHandlers on ChatBloc {
     final isCurrent = _captureChatContext(emit, roomId);
     if (!isCurrent()) return;
 
+    MessageReaction? originalReaction;
+    MessageReaction? optimisticReaction;
+    var changed = false;
+
     try {
       // 先立即更新本地UI，显示表情回应
       final currentUserId = await _messageRepository.getCurrentUserId();
@@ -242,6 +246,9 @@ extension ChatBlocActionHandlers on ChatBloc {
             (r) => r.key == event.emoji,
           );
 
+          changed = true;
+          originalReaction = existingReactionIndex < 0
+              ? null : msg.reactions[existingReactionIndex];
           List<MessageReaction> newReactions;
           if (existingReactionIndex >= 0) {
             // 已有该表情，增加计数
@@ -296,6 +303,9 @@ extension ChatBlocActionHandlers on ChatBloc {
             ];
           }
 
+          for (final reaction in newReactions) {
+            if (reaction.key == event.emoji) optimisticReaction = reaction;
+          }
           return msg.copyWith(reactions: newReactions);
         }
         return msg;
@@ -304,17 +314,32 @@ extension ChatBlocActionHandlers on ChatBloc {
       emit(state.copyWith(messages: updatedMessages));
 
       // 发送到服务器
-      await _messageRepository.addReaction(
+      final success = await _messageRepository.addReaction(
         roomId,
         event.messageId,
         event.emoji,
       );
+      if (!success) throw StateError('Reaction rejected');
       debugLog(
         'ChatBloc: Reaction $event.emoji added to message ${event.messageId}',
       );
     } catch (e) {
       debugLog('ChatBloc: Failed to add reaction: $e');
-      if (isCurrent()) emit(state.copyWith(error: 'Failed to add reaction'));
+      if (!isCurrent()) return;
+      final restored = state.messages.map((message) {
+        if (!changed || message.id != event.messageId) return message;
+        MessageReaction? currentReaction;
+        for (final reaction in message.reactions) {
+          if (reaction.key == event.emoji) currentReaction = reaction;
+        }
+        // Preserve later updates to this emoji, other reactions and message fields.
+        if (!identical(currentReaction, optimisticReaction)) return message;
+        final reactions = message.reactions
+            .where((reaction) => reaction.key != event.emoji).toList();
+        if (originalReaction != null) reactions.add(originalReaction!);
+        return message.copyWith(reactions: reactions);
+      }).toList();
+      emit(state.copyWith(messages: restored, error: 'Failed to add reaction'));
     }
   }
 
