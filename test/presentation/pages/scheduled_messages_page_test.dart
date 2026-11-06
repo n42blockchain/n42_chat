@@ -367,6 +367,27 @@ void main() {
     expect(find.textContaining('12:00 AM'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('standalone cancellation rechecks shared acceptance after rendering', (tester) async {
+    await pump(tester);
+    final sending = ScheduledDraftOperation.tryAcquire(ownerUserId: '@me:test', roomId: 'room', messageId: 'draft')!;
+    sending.rememberAcceptance('shared-event');
+    sending.release();
+    addTearDown(() {
+      final cleanup = ScheduledDraftOperation.tryAcquire(ownerUserId: '@me:test', roomId: 'room', messageId: 'draft')!;
+      cleanup.confirmCleanup();
+      cleanup.release();
+    });
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Scheduled message cancelled'), findsNothing);
+    expect(find.text('Sent'), findsOneWidget);
+    expect(tester.widget<TextButton>(find.widgetWithText(TextButton, 'Cancel')).onPressed, isNull);
+    verifyNever(() => prefs.removeScheduledMessage(any(), any(), ownerUserId: any(named: 'ownerUserId')));
+    await tester.pumpWidget(const SizedBox());
+    await pump(tester);
+    expect(find.text('Sent'), findsOneWidget);
+  });
+
   testWidgets('standalone cancellation cannot race an active sender', (tester) async {
     final sending = ScheduledDraftOperation.tryAcquire(ownerUserId: '@me:test', roomId: 'room', messageId: 'draft')!;
     addTearDown(sending.release);

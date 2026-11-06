@@ -1194,9 +1194,9 @@ void main() {
       await bloc.close();
     });
 
-    test('live bloc retains acceptance when receipt and cleanup writes fail', () async {
+    test('recreated bloc retains acceptance when receipt and cleanup writes fail', () async {
       final draft = ScheduledMessageDraft(messageId: 'receipt-disk', roomId: _roomId, text: 'Once', type: MessageType.text, scheduledAt: DateTime(2020), createdAt: DateTime(2019));
-      final bloc = buildBloc();
+      var bloc = buildBloc();
       await initBloc(bloc);
       var removes = 0;
       when(() => mockPrefs.getDueScheduledMessages(ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [draft]);
@@ -1206,6 +1206,9 @@ void main() {
       when(() => mockRepo.sendTextMessage(_roomId, draft.text, transactionId: draft.transactionId, mentionedUserIds: const [], mentionsRoom: false, selfDestructAfter: null)).thenAnswer((_) async => _msg);
       bloc.add(const SendDueScheduledMessages());
       await Future<void>.delayed(const Duration(milliseconds: 100));
+      await bloc.close();
+      bloc = buildBloc();
+      await initBloc(bloc);
       final cancelled = Completer<bool>();
       bloc.add(CancelScheduledMessage(draft.messageId, roomId: _roomId, completion: cancelled));
       expect(await cancelled.future.timeout(const Duration(seconds: 2)), false);

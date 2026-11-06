@@ -288,13 +288,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         }
         return;
       }
-      if (draft.acceptedEventId != null ||
-          _scheduledAcceptedReceipts.containsKey((
-            account.userId,
-            roomId,
-            draft.messageId,
-          )))
-        return;
+      if (draft.acceptedEventId != null || operation.receipt != null) return;
       await _removeScheduledDraftRecord(draft, emit, account);
       cancelled = await _scheduledAccountIsCurrent(account);
       debugLog('ChatBloc: Scheduled message cancelled - ${event.messageId}');
@@ -350,13 +344,11 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             account,
           );
           if (current == null) continue;
-          final receiptKey = (account.userId, roomId, draft.messageId);
-          var eventId =
-              current.acceptedEventId ?? _scheduledAcceptedReceipts[receiptKey];
+          var eventId = current.acceptedEventId ?? operation.receipt;
           if (eventId == null && !current.isDue(DateTime.now())) continue;
           eventId ??= await _sendScheduledDraft(current, account);
           accepted = true;
-          _scheduledAcceptedReceipts[receiptKey] = eventId;
+          operation.rememberAcceptance(eventId);
           try {
             await _secureStorage.markScheduledDeliveryAccepted(
               ownerUserId: account.userId,
@@ -371,7 +363,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           }
           await _removeScheduledDraftRecord(current, emit, account);
           if (await _scheduledAccountIsCurrent(account)) {
-            _scheduledAcceptedReceipts.remove(receiptKey);
+            operation.confirmCleanup();
           }
 
           debugLog('ChatBloc: Sent scheduled message - ${draft.messageId}');

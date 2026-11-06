@@ -158,10 +158,12 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           widget.roomId,
           ownerUserId: owner,
         );
-        if (!remaining.any(
-          (item) =>
-              item.messageId == draft.messageId && item.acceptedEventId == null,
-        )) {
+        if (operation.receipt != null ||
+            !remaining.any(
+              (item) =>
+                  item.messageId == draft.messageId &&
+                  item.acceptedEventId == null,
+            )) {
           await _loadDrafts();
           throw StateError('Scheduled draft is no longer pending');
         }
@@ -331,6 +333,15 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
   }
 
   Widget _buildDraftCard(ScheduledMessageDraft draft) {
+    final accepted =
+        draft.acceptedEventId != null ||
+        (_ownerUserId != null &&
+            ScheduledDraftOperation.acceptedReceipt(
+                  ownerUserId: _ownerUserId!,
+                  roomId: widget.roomId,
+                  messageId: draft.messageId,
+                ) !=
+                null);
     final cardColor = context.surfaceColor;
     final secondaryColor = context.textSecondary;
 
@@ -362,9 +373,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           Align(
             alignment: AlignmentDirectional.centerEnd,
             child: TextButton(
-              onPressed:
-                  draft.acceptedEventId != null ||
-                      _cancelling.contains(draft.messageId)
+              onPressed: accepted || _cancelling.contains(draft.messageId)
                   ? null
                   : () => _cancelDraft(draft),
               child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
@@ -372,11 +381,11 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
           ),
           const SizedBox(height: 10),
           _buildChip(label: _localizedType(draft)),
-          if (draft.acceptedEventId != null) ...[
+          if (accepted) ...[
             const SizedBox(height: 10),
             Text(S.of(context)?.chatMessageSent ?? 'Sent'),
           ],
-          if (draft.acceptedEventId == null && draft.deliveryUnconfirmed) ...[
+          if (!accepted && draft.deliveryUnconfirmed) ...[
             const SizedBox(height: 10),
             Text(
               S.of(context)?.scheduledDeliveryUnconfirmed ??
@@ -384,7 +393,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ],
-          if (draft.acceptedEventId == null && draft.retryAt != null) ...[
+          if (!accepted && draft.retryAt != null) ...[
             const SizedBox(height: 6),
             Text(
               '${S.of(context)?.commonRetry ?? 'Retry'}: ${_formatScheduledAt(draft.retryAt!)}',
