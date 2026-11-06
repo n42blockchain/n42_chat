@@ -264,6 +264,7 @@ class _ChatPageState extends State<_ChatPageContent> {
   // 当前用户ID（用于表情回应高亮）
   String? _currentUserId;
   ScheduledMessageOrigin? _scheduledOrigin;
+  bool _isSchedulingComposerText = false;
 
   // 贴纸输入联想（按词推荐贴纸）
   List<StickerHit> _stickerSuggestions = const [];

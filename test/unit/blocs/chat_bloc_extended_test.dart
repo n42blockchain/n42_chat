@@ -1371,8 +1371,10 @@ void main() {
       final bloc = buildBloc();
       await initBloc(bloc);
 
+      final completion = Completer<bool>();
       bloc.add(
         SendScheduledMessage(
+          completion: completion,
           text: 'Lunch?',
           type: MessageType.poll,
           payload: {
@@ -1383,7 +1385,7 @@ void main() {
           scheduledAt: DateTime.now().add(const Duration(hours: 1)),
         ),
       );
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(await completion.future, isFalse);
 
       expect(bloc.state.error, 'Failed to schedule message');
       expect(bloc.state.messages.map((message) => message.id), [_msg.id]);
@@ -1391,6 +1393,7 @@ void main() {
     });
 
     test('saves scheduled poll payload and adds preview message', () async {
+      final writeGate = Completer<void>();
       when(
         () => mockRepo.getCurrentUserId(),
       ).thenAnswer((_) async => '@me:test');
@@ -1407,13 +1410,15 @@ void main() {
           mentionedUserIds: any(named: 'mentionedUserIds'),
           mentionsRoom: any(named: 'mentionsRoom'),
         ),
-      ).thenAnswer((_) async {});
+      ).thenAnswer((_) => writeGate.future);
 
       final bloc = buildBloc();
       await initBloc(bloc);
 
+      final completion = Completer<bool>();
       bloc.add(
         SendScheduledMessage(
+          completion: completion,
           text: 'Lunch?',
           type: MessageType.poll,
           payload: {
@@ -1424,7 +1429,10 @@ void main() {
           scheduledAt: DateTime.now().add(const Duration(hours: 1)),
         ),
       );
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(completion.isCompleted, isFalse);
+      writeGate.complete();
+      expect(await completion.future, isTrue);
 
       verify(
         () => mockPrefs.saveScheduledMessage(

@@ -508,7 +508,8 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
   }
 
-  void _scheduleComposerText(DateTime scheduledAt) {
+  Future<void> _scheduleComposerText(DateTime scheduledAt) async {
+    if (_isSchedulingComposerText) return;
     final ownerUserId = _currentUserId;
     final roomId = widget.conversation.id;
     if (ownerUserId == null ||
@@ -516,7 +517,8 @@ extension _ChatPageInputMethods on _ChatPageState {
         _scheduledOrigin?.isCurrent != true) {
       return;
     }
-    final text = _inputController.text.trim();
+    final originalText = _inputController.text;
+    final text = originalText.trim();
     if (text.isEmpty) {
       return;
     }
@@ -526,18 +528,35 @@ extension _ChatPageInputMethods on _ChatPageState {
       selections: _composerMentions,
       members: _groupMembers,
     );
-    context.read<ChatBloc>().add(
-      SendScheduledMessage(
-        origin: _scheduledOrigin,
-        ownerUserId: ownerUserId,
-        roomId: roomId,
-        text: text,
-        scheduledAt: scheduledAt,
-        mentionedUserIds: mentionPayload.mentionedUserIds,
-        mentionsRoom: mentionPayload.mentionsRoom,
-      ),
-    );
-    _clearComposerMentions();
+    _isSchedulingComposerText = true;
+    try {
+      final completion = Completer<bool>();
+      final bloc = context.read<ChatBloc>();
+      if (bloc.isClosed) return;
+      bloc.add(
+        SendScheduledMessage(
+          origin: _scheduledOrigin,
+          completion: completion,
+          ownerUserId: ownerUserId,
+          roomId: roomId,
+          text: text,
+          scheduledAt: scheduledAt,
+          mentionedUserIds: mentionPayload.mentionedUserIds,
+          mentionsRoom: mentionPayload.mentionsRoom,
+        ),
+      );
+      final saved = await completion.future;
+      if (!saved ||
+          !mounted ||
+          _scheduledOrigin?.isCurrent != true ||
+          _inputController.text != originalText) {
+        return;
+      }
+      _inputController.clear();
+      _clearComposerMentions();
+    } finally {
+      _isSchedulingComposerText = false;
+    }
   }
 
   Future<void> _openScheduledComposerPicker() async {
@@ -559,9 +578,8 @@ extension _ChatPageInputMethods on _ChatPageState {
     }
 
     if (_currentUserId != ownerUserId || _scheduledOrigin?.isCurrent != true) return;
-    _scheduleComposerText(scheduledAt);
-    _inputController.clear();
-    _inputFocusNode.requestFocus();
+    await _scheduleComposerText(scheduledAt);
+    if (mounted) _inputFocusNode.requestFocus();
   }
 
   void _openMiniApps({MiniAppCategory? initialCategory}) {

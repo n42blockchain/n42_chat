@@ -517,6 +517,7 @@ class UpdateDestructionCountdown extends ChatEvent {
 /// 发送定时消息
 class SendScheduledMessage extends ChatEvent {
   final ScheduledMessageOrigin? origin;
+  final Completer<bool>? completion;
   final String? ownerUserId;
   final String? roomId;
   final String text;
@@ -529,6 +530,7 @@ class SendScheduledMessage extends ChatEvent {
 
   const SendScheduledMessage({
     this.origin,
+    this.completion,
     this.ownerUserId,
     this.roomId,
     required this.text,
@@ -543,6 +545,7 @@ class SendScheduledMessage extends ChatEvent {
   @override
   List<Object?> get props => [
     origin,
+    completion,
     ownerUserId,
     roomId,
     text,

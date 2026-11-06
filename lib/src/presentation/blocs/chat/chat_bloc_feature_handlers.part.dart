@@ -153,92 +153,101 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     SendScheduledMessage event,
     Emitter<ChatState> emit,
   ) async {
-    final roomId = _currentRoomId;
-    if (roomId == null) return;
-    if (event.origin == null
-        ? _authRepository != null
-        : !event.origin!.isCurrent ||
-              !identical(event.origin!.manager, _clientManager)) {
-      return;
-    }
-    final account = await _captureScheduledAccount();
-    if (account == null || _currentRoomId != roomId) return;
-    if (event.ownerUserId != null && event.ownerUserId != account.userId) {
-      return;
-    }
-    if (event.roomId != null && event.roomId != roomId) return;
+    var saved = false;
     try {
-      final normalizedText = event.text.trim();
-      final payload = Map<String, dynamic>.from(event.payload ?? const {});
-      if (!_isValidScheduledDraft(
-        type: event.type,
-        text: normalizedText,
-        payload: payload,
-      )) {
+      final roomId = _currentRoomId;
+      if (roomId == null) return;
+      if (event.origin == null
+          ? _authRepository != null
+          : !event.origin!.isCurrent ||
+                !identical(event.origin!.manager, _clientManager)) {
         return;
       }
-
-      final selfDestructAfter = await _resolveSelfDestructAfter(
-        event.selfDestructAfter,
-      );
-      // 生成临时消息ID
-      final tempId = 'scheduled_${const Uuid().v4()}';
-
-      // 获取当前用户ID
-      if (!await _scheduledAccountIsCurrent(account) ||
-          _currentRoomId != roomId) {
+      final account = await _captureScheduledAccount();
+      if (account == null || _currentRoomId != roomId) return;
+      if (event.ownerUserId != null && event.ownerUserId != account.userId) {
         return;
       }
-      final currentUserId = account.userId;
+      if (event.roomId != null && event.roomId != roomId) return;
+      try {
+        final normalizedText = event.text.trim();
+        final payload = Map<String, dynamic>.from(event.payload ?? const {});
+        if (!_isValidScheduledDraft(
+          type: event.type,
+          text: normalizedText,
+          payload: payload,
+        )) {
+          return;
+        }
 
-      final draft = ScheduledMessageDraft(
-        messageId: tempId,
-        text: normalizedText,
-        type: event.type,
-        scheduledAt: event.scheduledAt,
-        createdAt: DateTime.now(),
-        selfDestructAfter: selfDestructAfter,
-        mentionedUserIds: event.mentionedUserIds ?? const [],
-        mentionsRoom: event.mentionsRoom,
-        payload: payload,
-      );
+        final selfDestructAfter = await _resolveSelfDestructAfter(
+          event.selfDestructAfter,
+        );
+        // 生成临时消息ID
+        final tempId = 'scheduled_${const Uuid().v4()}';
 
-      // 保存定时消息到本地存储
-      await _secureStorage.saveScheduledMessage(
-        ownerUserId: account.userId,
-        roomId: roomId,
-        messageId: tempId,
-        text: draft.text,
-        type: draft.type,
-        payload: draft.payload,
-        scheduledAt: draft.scheduledAt,
-        selfDestructAfter: selfDestructAfter,
-        mentionedUserIds: draft.mentionedUserIds,
-        mentionsRoom: draft.mentionsRoom,
-      );
+        // 获取当前用户ID
+        if (!await _scheduledAccountIsCurrent(account) ||
+            _currentRoomId != roomId) {
+          return;
+        }
+        final currentUserId = account.userId;
 
-      if (!await _scheduledAccountIsCurrent(account) ||
-          _currentRoomId != roomId) {
-        return;
+        final draft = ScheduledMessageDraft(
+          messageId: tempId,
+          text: normalizedText,
+          type: event.type,
+          scheduledAt: event.scheduledAt,
+          createdAt: DateTime.now(),
+          selfDestructAfter: selfDestructAfter,
+          mentionedUserIds: event.mentionedUserIds ?? const [],
+          mentionsRoom: event.mentionsRoom,
+          payload: payload,
+        );
+
+        // 保存定时消息到本地存储
+        await _secureStorage.saveScheduledMessage(
+          ownerUserId: account.userId,
+          roomId: roomId,
+          messageId: tempId,
+          text: draft.text,
+          type: draft.type,
+          payload: draft.payload,
+          scheduledAt: draft.scheduledAt,
+          selfDestructAfter: selfDestructAfter,
+          mentionedUserIds: draft.mentionedUserIds,
+          mentionsRoom: draft.mentionsRoom,
+        );
+
+        saved = true;
+
+        if (!await _scheduledAccountIsCurrent(account) ||
+            _currentRoomId != roomId) {
+          return;
+        }
+        // 创建临时消息显示在UI中
+        final tempMessage = draft.toPreviewMessage(
+          roomId: roomId,
+          senderId: currentUserId,
+        );
+
+        // 添加到消息列表
+        if (!isClosed && account.isCurrent() && _currentRoomId == roomId) {
+          emit(state.copyWith(messages: [tempMessage, ...state.messages]));
+        }
+
+        debugLog(
+          'ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}',
+        );
+      } catch (e) {
+        debugLog('ChatBloc: Failed to schedule message: $e');
+        if (!isClosed && account.isCurrent() && _currentRoomId == roomId) {
+          emit(state.copyWith(error: 'Failed to schedule message'));
+        }
       }
-      // 创建临时消息显示在UI中
-      final tempMessage = draft.toPreviewMessage(
-        roomId: roomId,
-        senderId: currentUserId,
-      );
-
-      // 添加到消息列表
-      if (!isClosed && account.isCurrent() && _currentRoomId == roomId) {
-        emit(state.copyWith(messages: [tempMessage, ...state.messages]));
-      }
-
-      debugLog(
-        'ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}',
-      );
-    } catch (e) {
-      debugLog('ChatBloc: Failed to schedule message: $e');
-      if (!isClosed && account.isCurrent() && _currentRoomId == roomId) {
-        emit(state.copyWith(error: 'Failed to schedule message'));
+    } finally {
+      if (event.completion?.isCompleted == false) {
+        event.completion!.complete(saved);
       }
     }
   }

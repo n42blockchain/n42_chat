@@ -928,9 +928,8 @@ class ChatInputBarState extends State<ChatInputBar> {
                 if (_controller.text.trim().isEmpty) return;
                 final scheduledAt = await showScheduledSendPicker(context);
                 if (!mounted || scheduledAt == null) return;
+                // The owner clears only after durable scheduling succeeds.
                 widget.onScheduledSend?.call(scheduledAt);
-                if (!mounted) return;
-                _controller.clear();
               }
             : null,
         child: InkWell(

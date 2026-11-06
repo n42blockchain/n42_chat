@@ -369,6 +369,38 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
   }
 
+  for (final outcome in ['saved', 'failed', 'edited', 'relogin']) {
+    testWidgets('scheduled composer retains text until acknowledgement: $outcome', (tester) async {
+      late _Auth auth;
+      final chat = await pumpChat(tester, configureAuth: (value) {
+        auth = value;
+        when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+      });
+      when(() => chat.isClosed).thenReturn(false);
+      final events = <SendScheduledMessage>[];
+      when(() => chat.add(any())).thenAnswer((invocation) {
+        final event = invocation.positionalArguments.single;
+        if (event is SendScheduledMessage) events.add(event);
+      });
+      final field = find.descendant(of: find.byType(ChatInputBar), matching: find.byType(TextField));
+      await tester.enterText(field, 'Keep this draft');
+      final input = tester.widget<ChatInputBar>(find.byType(ChatInputBar));
+      input.onScheduledSend!(DateTime.now().add(const Duration(hours: 1)));
+      await tester.pump();
+      expect(events, hasLength(1));
+      expect(tester.widget<TextField>(field).controller!.text, 'Keep this draft');
+      input.onScheduledSend!(DateTime.now().add(const Duration(hours: 1)));
+      expect(events, hasLength(1));
+      if (outcome == 'edited') await tester.enterText(field, 'New draft');
+      if (outcome == 'relogin') when(() => auth.currentAccountGeneration).thenReturn(null);
+      events.single.completion!.complete(outcome != 'failed');
+      await tester.pump();
+      expect(tester.widget<TextField>(field).controller!.text,
+          outcome == 'saved' ? '' : outcome == 'edited' ? 'New draft' : 'Keep this draft');
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('photo picker cancel does not invoke the platform picker', (
     tester,
   ) async {

@@ -202,6 +202,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 - Server acknowledgement follow-up (2026-11-06): scheduled sends with a nonempty SDK server event ID now return a minimal acceptance receipt without waiting for local echo/profile lookup. Sender identity is captured before dispatch. Text/mention/poll/GIF/sticker/image/video/file contract tests cover delayed local echo and stable retry IDs. Null/empty IDs remain unconfirmed. Repository and scheduling regression: 611 passed. This closes known acceptance being lost before sync, not unknown transport outcomes, crash-before-cleanup or cross-device recovery.
 
+- Creation acknowledgement follow-up (2026-11-06): scheduled text now waits for the persisted-draft result before clearing the composer or mentions. Early rejection and failed writes complete false; completed writes complete true even if later preview/session checks stop UI updates. The page guards its login origin and unchanged text, preserves edits during the await, and excludes duplicate pending text submissions. The input bar delegates clearing to the owner. 102 focused BLoC/page/input tests and 152 event tests pass. Remaining confirmed UI gap: attachment scheduling still queues the event and displays its local scheduling notice before draft-storage acknowledgement; migrate that path to the same completion contract, preserving files on uncertain persistence.
+
 ### CALL-001 Background blur / replacement still lacks a real video processor path
 
 - Severity: M
