@@ -237,24 +237,31 @@ class ChatBackupService {
     return '${_keyLastIncrementalBackupTs}_v3_$owner';
   }
 
-  /// 获取备份目录
-  Future<Directory> _getBackupDir() async {
-    if (_backupDirProvider != null) {
-      final provided = await _backupDirProvider();
-      if (!provided.existsSync()) {
-        provided.createSync(recursive: true);
-      }
-      return provided;
+  String? _backupDirectoryScope() {
+    final client = _clientManager.client;
+    final user = client?.userID;
+    final server = client?.homeserver;
+    if (user == null || server == null) return null;
+    try {
+      return ArchiveDatabase.accountStorageId(userId: user, homeserver: server);
+    } on ArgumentError {
+      return null;
     }
+  }
 
-    final appDir = await getApplicationDocumentsDirectory();
-    final backupDir = Directory(
-      p.join(appDir.path, StorageConstants.backupDirName),
-    );
-    if (!backupDir.existsSync()) {
-      backupDir.createSync(recursive: true);
+  /// Legacy root files are retained for explicit file selection, never adopted.
+  Future<Directory> _getBackupDir() async {
+    final scope = _backupDirectoryScope() ?? 'unowned';
+    final Directory root;
+    if (_backupDirProvider != null) {
+      root = await _backupDirProvider();
+    } else {
+      final appDir = await getApplicationDocumentsDirectory();
+      root = Directory(p.join(appDir.path, StorageConstants.backupDirName));
     }
-    return backupDir;
+    final directory = Directory(p.join(root.path, scope));
+    if (!directory.existsSync()) directory.createSync(recursive: true);
+    return directory;
   }
 
   /// 创建备份
@@ -498,12 +505,16 @@ class ChatBackupService {
 
   /// 列出所有备份
   Future<List<BackupInfo>> listBackups() async {
+    if (_backupDirectoryScope() == null) return [];
+    final ensureCurrent = _captureBackupSession();
     final backupDir = await _getBackupDir();
+    ensureCurrent();
     final results = <BackupInfo>[];
 
     if (!backupDir.existsSync()) return results;
 
     await for (final entity in backupDir.list()) {
+      ensureCurrent();
       if (entity is File &&
           entity.path.endsWith(StorageConstants.backupExtension)) {
         try {
@@ -528,18 +539,24 @@ class ChatBackupService {
       }
     }
 
+    ensureCurrent();
     results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return results;
   }
 
   /// 删除备份
   Future<void> deleteBackup(String backupId) async {
+    if (_backupDirectoryScope() == null) return;
+    final ensureCurrent = _captureBackupSession();
     final backups = await listBackups();
+    ensureCurrent();
     final target = backups.where((b) => b.backupId == backupId).firstOrNull;
     if (target != null) {
       final file = File(target.filePath);
       if (file.existsSync()) {
+        ensureCurrent();
         await file.delete();
+        ensureCurrent();
       }
     }
   }

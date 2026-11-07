@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -526,7 +527,7 @@ void main() {
                   : service.createBackup(onProgress: progress),
               throwsStateError,
             );
-            expect(await directory.list().toList(), isEmpty);
+            expect(await directory.list(recursive: true).where((entry) => entry is File).toList(), isEmpty);
             verifyNever(() => secure.write(any(), any()));
           },
         );
@@ -576,7 +577,7 @@ void main() {
       when(() => manager.client).thenReturn(null);
       await expectLater(service.createBackup(), throwsStateError);
       await expectLater(service.createIncrementalBackup(), throwsStateError);
-      expect(await directory.list().toList(), isEmpty);
+      expect(await directory.list(recursive: true).where((entry) => entry is File).toList(), isEmpty);
       final estimate = await service.estimateBackupSize(includeMedia: true);
       expect(estimate.estimatedBytes, 0);
       expect(estimate.roomCount, 0);
@@ -740,6 +741,51 @@ void main() {
     );
     expect(await service.verifyBackup(result.filePath), isTrue);
   });
+  test('backup files list and deletion are partitioned by account and server', () async {
+    final first = await service.createBackup();
+    when(() => client.userID).thenReturn('@bob:example.org');
+    expect(await service.listBackups(), isEmpty);
+    await service.deleteBackup(first.backupId);
+    expect(await File(first.filePath).exists(), isTrue);
+    final second = await service.createBackup();
+    expect(File(first.filePath).parent.path, isNot(File(second.filePath).parent.path));
+    when(() => client.userID).thenReturn('@alice:example.org');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://other.example.org'));
+    expect(await service.listBackups(), isEmpty);
+    await service.deleteBackup(first.backupId);
+    expect(await File(first.filePath).exists(), isTrue);
+    when(() => client.homeserver).thenReturn(Uri.parse('https://example.org'));
+    expect((await service.listBackups()).single.backupId, first.backupId);
+    await service.deleteBackup(first.backupId);
+    expect(await File(first.filePath).exists(), isFalse);
+    expect(await File(second.filePath).exists(), isTrue);
+  });
+
+  test('legacy root backups remain available for explicit preview only', () async {
+    final result = await service.createBackup();
+    final rootCopy = File('${directory.path}/legacy-root.n42backup');
+    await File(result.filePath).copy(rootCopy.path);
+    await File(result.filePath).delete();
+    expect(await service.listBackups(), isEmpty);
+    expect((await service.previewBackup(rootCopy.path)).backupId, result.backupId);
+    expect(await rootCopy.exists(), isTrue);
+  });
+
+  for (final deleting in [false, true]) {
+    test('account change while resolving backup directory cancels ${deleting ? 'deletion' : 'listing'}', () async {
+      final result = await service.createBackup();
+      final gate = Completer<Directory>();
+      final guarded = ChatBackupService(clientManager: manager, secureStorage: secure,
+        preferencesStorage: preferences, backupDirProvider: () => gate.future);
+      final pending = deleting ? guarded.deleteBackup(result.backupId) : guarded.listBackups();
+      final rejected = expectLater(pending, throwsStateError);
+      when(() => client.userID).thenReturn('@bob:example.org');
+      gate.complete(directory);
+      await rejected;
+      expect(await File(result.filePath).exists(), isTrue);
+    });
+  }
+
   test('list ignores unrelated files and directories', () async {
     await File('${directory.path}/notes.txt').writeAsString('ignore');
     await Directory('${directory.path}/folder.n42backup').create();
