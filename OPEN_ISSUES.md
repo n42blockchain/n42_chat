@@ -738,6 +738,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
 
+- 2026-11-07 registration audit: reproduced password login proceeding during a pending registration. Registration now shares the existing authentication mutex and releases it on additional-auth/failure paths. Session behavior suite: 60 passed. Anonymous username preflight and stale UI completion remain under audit; this does not close QA-005.
+
 - 2026-11-07 room profile sync isolation: reproduced a second-room write under a replacement user after the first room request was held. Poke-text sync now captures its user and room list and checks the session before each write. Changed-account rejection and stable-account all-room success pass; the combined auth/avatar/database cluster passes 53 tests. Scoped analysis has two pre-existing datasource infos only. Full current-source suite, native account switch and production acceptance remain separate.
 
 - 2026-11-07 SDK avatar upload isolation: a real SDK/temporary SQLite regression proved a replaced token still set the profile. Upload and both fallback paths now retain the captured client and recheck user/token/device/homeserver after asynchronous boundaries. Five avatar scenarios plus the existing database lifecycle case pass, including normal SDK/fallback success and replacement during fallback response. Scoped analysis has no new findings (two existing infos). Poke-text room-loop and real-device acceptance remain open.

@@ -69,6 +69,41 @@ void main() {
     userId: session['userId']!,
     deviceId: session['deviceId']!,
   );
+  test(
+    'registration excludes concurrent password login and releases its lock',
+    () async {
+      final pending = Completer<RegisterResponse>();
+      when(
+        () => auth.register(
+          homeserver: any(named: 'homeserver'),
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+          email: any(named: 'email'),
+          registrationToken: any(named: 'registrationToken'),
+        ),
+      ).thenAnswer((_) => pending.future);
+      final registration = repository.register(
+        homeserver: 'https://hs.test',
+        username: 'guest',
+        password: 'fixture-password',
+      );
+      expect((await login()).errorType, AuthErrorType.rateLimited);
+      verifyNever(
+        () => auth.loginWithPassword(
+          homeserver: any(named: 'homeserver'),
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+        ),
+      );
+      pending.complete(RegisterResponse(userId: '@guest:hs.test'));
+      expect(
+        (await registration).errorType,
+        AuthErrorType.additionalAuthRequired,
+      );
+      expect((await login()).success, isTrue);
+    },
+  );
+
   for (final anonymous in [false, true]) {
     for (final message in [
       'M_FORBIDDEN: Registration has been disabled',

@@ -468,6 +468,12 @@ class AuthRepositoryImpl
     String? email,
     String? registrationToken,
   }) async {
+    if (_authInProgress != null && !_authInProgress!.isCompleted) {
+      return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+    }
+    final operation = Completer<void>();
+    _authInProgress = operation;
+    _isAuthenticating = true;
     try {
       _clearCachedUserProfile();
       final response = await _authDataSource.register(
@@ -532,6 +538,11 @@ class AuthRepositoryImpl
         '注册失败: ${e.toString()}',
         type: AuthErrorType.unknown,
       );
+    } finally {
+      _isAuthenticating = false;
+      operation.complete();
+      if (identical(_authInProgress, operation)) _authInProgress = null;
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
