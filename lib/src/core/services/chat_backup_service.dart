@@ -595,13 +595,15 @@ class ChatBackupService {
         if (_archiveService != null) {
           try {
             const pageSize = 500;
-            int? cursor; // beforeTimestamp cursor for pagination
+            int? cursor;
+            String? cursorEventId; // Tie-break messages sharing a timestamp.
             bool hasMore = true;
 
             while (hasMore) {
               final archived = await _archiveService!.getArchivedMessages(
                 room.id,
                 beforeTimestamp: cursor,
+                beforeEventId: cursorEventId,
                 limit: pageSize,
               );
 
@@ -636,8 +638,9 @@ class ChatBackupService {
 
               if (reachedCutoff) break;
 
-              // Move cursor to oldest message timestamp for next page
+              // Continue after the exact last row, including timestamp ties.
               cursor = archived.last.originServerTs;
+              cursorEventId = archived.last.eventId;
             }
           } catch (e) {
             complete = false;
@@ -666,7 +669,8 @@ class ChatBackupService {
         'Some room history could not be read. The incremental checkpoint was not advanced; retry this backup.',
       );
     }
-    (backupData['manifest'] as Map<String, dynamic>)['hasReadErrors'] = !complete;
+    (backupData['manifest'] as Map<String, dynamic>)['hasReadErrors'] =
+        !complete;
     (backupData['manifest'] as Map<String, dynamic>)['warnings'] = warnings;
 
     // 写入文件

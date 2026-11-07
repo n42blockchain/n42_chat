@@ -232,11 +232,13 @@ class MessageArchiveService {
   Future<List<ArchivedMessage>> getArchivedMessages(
     String roomId, {
     int? beforeTimestamp,
+    String? beforeEventId,
     int limit = 50,
   }) async {
     return _db.getMessages(
       roomId,
       beforeTimestamp: beforeTimestamp,
+      beforeEventId: beforeEventId,
       limit: limit,
     );
   }

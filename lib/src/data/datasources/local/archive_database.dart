@@ -240,23 +240,36 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   // 查询
   // ============================================
 
-  /// 分页查询归档消息（按时间倒序）
+  /// 分页查询归档消息（按时间、事件 ID 倒序）。
+  /// beforeEventId continues timestamp ties; timestamp-only callers remain exclusive.
   Future<List<ArchivedMessage>> getMessages(
     String roomId, {
     int? beforeTimestamp,
+    String? beforeEventId,
     int limit = 50,
   }) async {
+    if (beforeEventId != null && beforeTimestamp == null) {
+      throw ArgumentError('An event cursor requires its timestamp');
+    }
     final query = select(archivedMessages)
       ..where((t) {
         var expr = t.roomId.equals(roomId);
         if (beforeTimestamp != null) {
-          expr = expr & t.originServerTs.isSmallerThanValue(beforeTimestamp);
+          final older = t.originServerTs.isSmallerThanValue(beforeTimestamp);
+          expr =
+              expr &
+              (beforeEventId == null
+                  ? older
+                  : older |
+                        (t.originServerTs.equals(beforeTimestamp) &
+                            t.eventId.isSmallerThanValue(beforeEventId)));
         }
         return expr;
       })
       ..orderBy([
         (t) =>
             OrderingTerm(expression: t.originServerTs, mode: OrderingMode.desc),
+        (t) => OrderingTerm(expression: t.eventId, mode: OrderingMode.desc),
       ])
       ..limit(limit);
     return query.get();

@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart' show Value;
+import 'package:drift/native.dart';
+import 'package:n42_chat/src/data/datasources/local/archive_database.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/chat_backup_service.dart';
@@ -78,6 +81,52 @@ void main() {
     ]);
     return (room, timeline);
   }
+
+  test(
+    'incremental archive pagination exports every equal-timestamp event',
+    () async {
+      final database = ArchiveDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(database.close);
+      final (room, timeline) = roomFixture('!dense:example.org');
+      when(() => timeline.events).thenReturn([]);
+      when(() => client.rooms).thenReturn([room]);
+      service.setArchiveService(
+        MessageArchiveService(db: database, clientManager: manager),
+      );
+      final expected = <String>{};
+      final entries = <ArchivedMessagesCompanion>[];
+      for (var i = 0; i < 1203; i++) {
+        final id = 'event-${i.toString().padLeft(4, '0')}';
+        expected.add(id);
+        entries.add(
+          ArchivedMessagesCompanion.insert(
+            eventId: id,
+            roomId: room.id,
+            senderId: '@alice:example.org',
+            originServerTs: i == 0
+                ? 999
+                : i == 1202
+                ? 1001
+                : 1000,
+            type: 'm.room.message',
+            body: Value('message $i'),
+            quarter: 197001,
+            archivedAt: DateTime.utc(2026),
+          ),
+        );
+      }
+      await database.insertMessages(entries);
+      final result = await service.createIncrementalBackup();
+      expect(result.warnings, isEmpty);
+      expect(result.messageCount, expected.length);
+      final data =
+          jsonDecode(await File(result.filePath).readAsString()) as Map;
+      final messages =
+          ((data['rooms'] as Map)[room.id] as Map)['messages'] as List;
+      expect(messages.map((e) => (e as Map)['eventId']).toSet(), expected);
+      expect(messages.length, expected.length);
+    },
+  );
 
   for (final scope in [
     'different subset',
