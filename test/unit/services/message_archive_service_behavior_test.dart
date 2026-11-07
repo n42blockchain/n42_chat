@@ -268,6 +268,26 @@ void main() {
     );
   }
 
+  for (final size in [0, -1]) {
+    test(
+      'invalid archive batch size fails before touching a session: $size',
+      () async {
+        final manager = _ClientManager();
+        final isolated = MessageArchiveService(
+          db: database,
+          clientManager: manager,
+        );
+        await expectLater(
+          isolated.archiveRoom('!room:hs.test', batchSize: size),
+          throwsArgumentError,
+        );
+        verifyNever(() => manager.client);
+        expect(await database.getMessageCount('!room:hs.test'), 0);
+        expect(await database.getMetadata('!room:hs.test'), isNull);
+      },
+    );
+  }
+
   test('empty archive import does not create metadata', () async {
     expect(await service.importArchivedMessages('!empty:hs.test', []), 0);
     expect(await database.getMetadata('!empty:hs.test'), isNull);

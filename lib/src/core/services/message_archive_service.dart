@@ -70,6 +70,9 @@ class MessageArchiveService {
     String roomId, {
     int batchSize = 500,
   }) async {
+    if (batchSize <= 0) {
+      throw ArgumentError.value(batchSize, 'batchSize', 'Must be positive');
+    }
     final origin = _client;
     final user = origin?.userID;
     final token = origin?.accessToken;
