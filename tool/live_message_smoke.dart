@@ -12,6 +12,8 @@ import 'package:n42_chat/src/data/datasources/matrix/message/matrix_event_mapper
 import 'package:n42_chat/src/data/datasources/matrix/message/matrix_text_message_content.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import 'live_smoke_credentials.dart';
+
 /// 真服消息能力 smoke。
 ///
 /// 优先使用环境变量提供的现成账号：
@@ -22,6 +24,9 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 /// 如果未提供账号，则会尝试用邀请码注册临时账号：
 ///   N42_TEST_INVITE_CODE=...
 ///
+/// Existing accounts require both credentials; invite-only runs generate a
+/// private random password. Passwords are never printed.
+///
 /// 运行：
 ///   dart run tool/live_message_smoke.dart
 void main() async {
@@ -29,29 +34,20 @@ void main() async {
   final homeserver = env['N42_TEST_HOMESERVER']?.trim().isNotEmpty == true
       ? env['N42_TEST_HOMESERVER']!.trim()
       : 'https://m.si46.world';
-  final configuredUsername = env['N42_TEST_USERNAME']?.trim();
-  final configuredPassword = env['N42_TEST_PASSWORD']?.trim();
   final inviteCode = env['N42_TEST_INVITE_CODE']?.trim();
-
-  final createdAccount =
-      configuredUsername == null || configuredUsername.isEmpty;
-  late final String username;
-  if (createdAccount) {
-    username = _generateUsername();
-  } else {
-    username = configuredUsername;
-  }
-  final password =
-      (createdAccount ? env['N42_TEST_PASSWORD'] : configuredPassword) ??
-      'N42LivePass123!@#';
-
-  if (createdAccount && (inviteCode == null || inviteCode.isEmpty)) {
-    stderr.writeln(
-      'Missing N42_TEST_INVITE_CODE. '
-      'Provide an invite code or a reusable N42_TEST_USERNAME/N42_TEST_PASSWORD.',
+  late final LiveSmokeCredentials credentials;
+  try {
+    credentials = LiveSmokeCredentials.fromEnvironment(
+      env,
+      temporaryUsername: _generateUsername,
     );
+  } on StateError catch (error) {
+    stderr.writeln(error.message);
     exit(2);
   }
+  final createdAccount = credentials.isTemporary;
+  final username = credentials.username;
+  final password = credentials.password;
 
   print('Homeserver: $homeserver');
   print(
