@@ -738,6 +738,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
 
+- 2026-11-07 guest completion audit: two deterministic failures showed stale guest success before/during nickname update after account replacement. Guest completion now checks exact registered user, authentication generation and captured SDK session before/after the update. Five scenarios cover both replacements, same-user token replacement, stable success and nonfatal rename failure. Combined auth/session/BLoC tests: 105 passed; scoped analysis clean. Full current-source suite and native acceptance remain open.
+
 - 2026-11-07 anonymous caller audit: reproduced a late guest failure replacing an already authenticated AuthBloc state with error. The handler now retains the verified current authenticated user. AuthBloc plus session suites: 100 passed. Scoped analysis reports 10 existing infos, no errors/warnings. Host bootstrap has a separately tested current-repository fallback; broader post-registration nickname/session replacement remains under audit.
 
 - 2026-11-07 anonymous preflight audit: reproduced a delayed username lookup starting registration after a separate login completed. Every mutex-owning authentication now advances a generation; anonymous preflight rejects a changed generation before registering. All 61 session behavior tests pass and scoped analysis is clean. Host bootstrap and AuthBloc stale-result handling remain to be verified before host integration.

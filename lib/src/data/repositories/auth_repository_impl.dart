@@ -576,6 +576,16 @@ class AuthRepositoryImpl
         registrationToken: registrationToken,
       );
       if (!result.success || result.user == null) return result;
+      final registeredGeneration = _authenticationGeneration;
+      final isCurrent = _captureProfileSession();
+      bool guestIsCurrent() =>
+          !_isAuthenticating &&
+          registeredGeneration == _authenticationGeneration &&
+          _authDataSource.userId == result.user!.userId &&
+          isCurrent();
+      if (!guestIsCurrent()) {
+        return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+      }
 
       // Anonymous Matrix localparts are deliberately random and should never
       // become the visible nickname. Persist a readable, stable guest name so
@@ -583,6 +593,9 @@ class AuthRepositoryImpl
       final displayName =
           'Live Guest ${FriendlyDisplayName.shortCode(result.user!.userId)}';
       final updated = await updateDisplayName(displayName);
+      if (!guestIsCurrent()) {
+        return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+      }
       if (!updated) {
         authLog(
           'Anonymous account created but guest display name update failed',
