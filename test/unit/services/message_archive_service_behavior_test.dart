@@ -110,6 +110,64 @@ void main() {
     },
   );
 
+  test('older imports preserve a consistent latest event cursor', () async {
+    const room = '!room:hs.test';
+    await service.importArchivedMessages(room, [
+      _entry(eventId: r'$new', roomId: room, timestamp: 200, body: 'new'),
+    ]);
+    await service.importArchivedMessages(room, [
+      _entry(eventId: r'$old', roomId: room, timestamp: 100, body: 'old'),
+    ]);
+    final metadata = await database.getMetadata(room);
+    expect(metadata!.lastArchivedTs, 200);
+    expect(metadata.lastArchivedEventId, r'$new');
+    expect(metadata.totalArchived, 2);
+  });
+
+  test('ignored duplicate cannot supply a forged latest cursor', () async {
+    const room = '!room:hs.test';
+    await service.importArchivedMessages(room, [
+      _entry(
+        eventId: r'$existing',
+        roomId: room,
+        timestamp: 100,
+        body: 'existing',
+      ),
+    ]);
+    await service.importArchivedMessages(room, [
+      _entry(
+        eventId: r'$existing',
+        roomId: room,
+        timestamp: 999,
+        body: 'ignored',
+      ),
+      _entry(eventId: r'$actual', roomId: room, timestamp: 200, body: 'actual'),
+    ]);
+    final metadata = await database.getMetadata(room);
+    expect(metadata!.lastArchivedTs, 200);
+    expect(metadata.lastArchivedEventId, r'$actual');
+    expect(metadata.totalArchived, 2);
+  });
+
+  test('mixed-room import is rejected before any write', () async {
+    const room = '!room:hs.test';
+    await expectLater(
+      service.importArchivedMessages(room, [
+        _entry(eventId: r'$valid', roomId: room, timestamp: 100, body: 'valid'),
+        _entry(
+          eventId: r'$wrong',
+          roomId: '!other:hs.test',
+          timestamp: 200,
+          body: 'wrong',
+        ),
+      ]),
+      throwsArgumentError,
+    );
+    expect(await database.getMessageCount(room), 0);
+    expect(await database.getMessageCount('!other:hs.test'), 0);
+    expect(await database.getMetadata(room), isNull);
+  });
+
   test('empty archive import does not create metadata', () async {
     expect(await service.importArchivedMessages('!empty:hs.test', []), 0);
     expect(await database.getMetadata('!empty:hs.test'), isNull);

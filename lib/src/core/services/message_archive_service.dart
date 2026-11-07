@@ -289,31 +289,24 @@ class MessageArchiveService {
     List<ArchivedMessagesCompanion> entries,
   ) async {
     if (entries.isEmpty) return 0;
+    if (entries.any(
+      (entry) => !entry.roomId.present || entry.roomId.value != roomId,
+    )) {
+      throw ArgumentError('Archive entries must belong to the target room');
+    }
 
     final inserted = await _db.insertMessages(entries);
     if (inserted == 0) return 0;
 
-    final metadata = await _db.getMetadata(roomId);
-    final latestTs = entries
-        .map((entry) => entry.originServerTs.value)
-        .fold<int>(0, (maxTs, ts) => ts > maxTs ? ts : maxTs);
-    final latestEventId = entries
-        .firstWhere(
-          (entry) => entry.originServerTs.value == latestTs,
-          orElse: () => entries.last,
-        )
-        .eventId
-        .value;
+    // Input rows can be old or ignored duplicates. Derive both cursor fields
+    // from the same persisted row rather than mixing input with old metadata.
+    final latest = (await _db.getMessages(roomId, limit: 1)).first;
 
     await _db.updateMetadata(
       ArchiveMetadataCompanion(
         roomId: Value(roomId),
-        lastArchivedEventId: Value(latestEventId),
-        lastArchivedTs: Value(
-          latestTs > (metadata?.lastArchivedTs ?? 0)
-              ? latestTs
-              : (metadata?.lastArchivedTs ?? 0),
-        ),
+        lastArchivedEventId: Value(latest.eventId),
+        lastArchivedTs: Value(latest.originServerTs),
         totalArchived: Value(await _db.getMessageCount(roomId)),
         lastArchiveTime: Value(DateTime.now()),
       ),

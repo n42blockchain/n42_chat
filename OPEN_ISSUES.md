@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Archive import cursor follow-up: cursor timestamp/event ID now come from the same latest persisted room row, preventing older imports and ignored duplicate payloads from corrupting metadata. Mixed-room batches fail before writes. Two SQLite regressions reproduced the prior errors; 120 combined backup/archive tests pass, followed by 12 final-source SQLite tests including mixed-room atomic rejection. Scoped analysis has two infos, no errors/warnings. Concurrent import/delete metadata races, existing corrupted metadata repair and full device/history acceptance remain open.
+
 - Private duplicate restore follow-up: restoreToArchive now scans each room before importing and excludes every copy of an event ID when any backup entry carries a supported ephemeral marker. Two input-order regressions failed before the fix and now pass; the independent public message in each fixture remains restored. All 109 backup tests pass; scoped analysis has six infos and no errors/warnings. Existing archive rows, already-created files, missing markers and metadata outside the imported room remain outside this fix.
 
 - Redaction export follow-up: new full/incremental exports exclude every loaded copy of an event ID if the SDK marks any copy redacted, including stale archive copies merged after timeline inspection. Four ordering/mode regressions reproduce the previous leak and now pass; 109 backup/SDK restriction tests pass, with scoped analysis reporting seven infos and no errors/warnings. Redactions not visible in the loaded snapshot and already-created backup files remain outside this fix.
