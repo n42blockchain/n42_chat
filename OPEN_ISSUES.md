@@ -16,7 +16,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Severity: H
 - Added: 2026-11-06
 - Current state: public endpoints report Tuwunel 1.9.3. Password/token login and stored-session restore now preserve M_USER_LOCKED / M_USER_DEACTIVATED as distinct errors without removing credentials. AuthBloc exposes those restore errors without dispatching logout. Six regression cases failed before the fix; the repository and bloc suites now pass 97 tests. Scoped analysis has 11 existing info diagnostics, no errors or warnings.
-- Next step: validate sync-time account locking and unlocking without key loss, UIAA request retention, E2EE recovery and room permissions against an isolated 1.9.4 instance. SDK 15.0.0 sync soft-logout handling is tied to M_UNKNOWN_TOKEN; this login-path fix does not establish sync compatibility. Verify database/media/config backups and restore rehearsal before any live upgrade.
+- Batch 250 evidence: real SDK 15.0.0 sync-loop tests with a temporary SQLite database and simulated HTTP peer retain token, user/device identity, stored client row and account-data marker for M_USER_LOCKED / M_USER_DEACTIVATED; neither emits session-clear or logout. A subsequent successful sync after simulated unlocking advances the cursor with the same token. Combined SDK/repository/bloc suite: 99 pass; new test analysis clean. This does not exercise real cryptographic key recovery or a live 1.9.4 server.
+- Next step: validate UIAA request retention, E2EE recovery and room permissions against an isolated 1.9.4 instance. SDK 15.0.0 sync soft-logout handling is tied to M_UNKNOWN_TOKEN; do not convert locked-account errors into destructive logout. The initial-sync overlay only hides on successful sync, so lock-specific recovery UX still needs work. Verify database/media/config backups and restore rehearsal before any live upgrade.
 
 ### UGC-001 Matrix reporting still needs room, moment and operational acceptance
 
