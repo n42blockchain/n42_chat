@@ -719,6 +719,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-002 Group-call token fetching and multi-party rendering were not live-tested
 
+- 2026-11-07 offline policy acceptance: host commit 7fa420b6b adds a bounded offline JWT verifier for signature, expiry, issuer, participant, room and explicit publish grants; privileged grants are rejected. Go race tests and vet pass. Deployment guidance now covers every reachable issuer and removes online JWT decoding. This is an operator tool, not production policy deployment or SFU viewer rejection evidence.
+
 - 2026-11-07 host permissions: empty or incomplete camera/microphone result maps incorrectly passed the all-returned-values check. Three failing page cases reproduced it; both required keys must now explicitly be granted before any room is created. Host live-module 74 tests pass and scoped analysis is clean. Real native prompts and media acceptance remain open; not included in 73424.
 
 - 2026-11-07 legacy authorization live protocol: real N42 handler and signed JWT tested against isolated Tuwunel 1.9.4/v11 rooms with three synthetic accounts. Six cases pass: owner publish, owner viewer downgrade, forged/omitted viewer role denied publish, nonmember 403 and ordinary group participant publish. All accounts deactivated. Host Go race tests/vet pass. Production still uses official MatrixRTC authorization; these role protections are not deployed there. Host evidence: docs/testing/livekit-real-policy-2026-11-07.json.
