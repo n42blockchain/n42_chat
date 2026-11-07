@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Restore service session checks (batch 261): settings restore captures its starting session and checks after file reading/normalization, before and after each settings write, after progress callbacks and before returning success. Three progress-stage account mutations return failure; 85 backup tests pass. Service analysis has six infos, no errors/warnings. Already-started writes are not rolled back; queue delay before service invocation, account-owned backup validation, lifecycle generation beyond client field snapshots, UI interactions and host integration remain open.
+
 - Restore picker ownership (batch 260): picker/preview/confirmation now captures the existing account lifecycle origin before the first await and refuses stale dispatch/errors after account changes. Missing lifecycle dependencies fail closed. Scoped page analysis clean. Widget interaction, queued/in-progress service writes, encrypted password input, preview localization and host integration remain open; this only guards the page awaits, not the complete restore transaction.
 
 - Restore confirmation UI (batch 259): file selection now reads preview and presents room names, creation time and warnings in a scrollable confirmation dialog before dispatching RestoreFromBackup. Cancel/dismiss does not dispatch. Scoped page analysis is clean. Widget/device interaction, account-change handling across picker/dialog awaits, encrypted-file password input, warning localization and wallet pin integration remain open; source review is not UI acceptance.

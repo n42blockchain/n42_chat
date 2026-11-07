@@ -115,6 +115,20 @@ void main() {
     }
   }
 
+  for (final progress in [0.1, 0.5, 1.0]) {
+    test('restore rejects account change at progress $progress', () async {
+      final backup = await service.createBackup();
+      final result = await service.restoreFromBackup(
+        backupFilePath: backup.filePath,
+        restoreSettings: false,
+        onProgress: (value) {
+          if (value == progress) when(() => client.accessToken).thenReturn('replacement');
+        },
+      );
+      expect(result.hasErrors, isTrue);
+    });
+  }
+
   test(
     'incremental archive pagination exports every equal-timestamp event',
     () async {

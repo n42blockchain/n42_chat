@@ -906,8 +906,11 @@ class ChatBackupService {
     bool restoreKeys = false,
     void Function(double progress)? onProgress,
   }) async {
+    final ensureCurrent = _captureBackupSession();
     try {
+      ensureCurrent();
       final data = await _readBackupData(backupFilePath, password: password);
+      ensureCurrent();
       final rawSettings = data['settings'] as Map<String, dynamic>? ?? {};
 
       int settingsRestored = 0;
@@ -915,17 +918,21 @@ class ChatBackupService {
       final warnings = _manifestWarnings(data['manifest']);
 
       onProgress?.call(0.1);
+      ensureCurrent();
 
       // 恢复设置
       if (restoreSettings && rawSettings.isNotEmpty) {
         final settings = await _normalizeRestorableSettings(rawSettings);
+        ensureCurrent();
         for (final entry in settings.entries) {
+          ensureCurrent();
           try {
             if (entry.value != null) {
               await _preferencesStorage.write(
                 entry.key,
                 entry.value.toString(),
               );
+              ensureCurrent();
               settingsRestored++;
             }
           } catch (e) {
@@ -934,7 +941,9 @@ class ChatBackupService {
         }
       }
 
+      ensureCurrent();
       onProgress?.call(0.5);
+      ensureCurrent();
 
       if (restoreKeys) {
         warnings.add(_unsupportedKeyBackupWarning);
@@ -944,7 +953,9 @@ class ChatBackupService {
       // 本地备份主要用于保留设置和加密密钥
       // 消息会在重新登录后从服务器同步
 
+      ensureCurrent();
       onProgress?.call(1.0);
+      ensureCurrent();
 
       return RestoreResult(
         roomsRestored: 0,
