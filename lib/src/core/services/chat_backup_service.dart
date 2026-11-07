@@ -774,6 +774,8 @@ class ChatBackupService {
     try {
       final data = await _readBackupData(backupFilePath, password: password);
       ensureCurrent();
+      final ownerError = _backupOwnerError(data['manifest']);
+      if (ownerError != null) return RestoreResult(errors: [ownerError]);
       final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
       final errors = <String>[];
 
@@ -886,6 +888,23 @@ class ChatBackupService {
     );
   }
 
+  String? _backupOwnerError(Object? manifest) {
+    final owner = manifest is Map ? manifest['owner'] : null;
+      final client = _clientManager.client;
+      final declaresOwner = manifest is Map && manifest.containsKey('owner');
+      if (declaresOwner && (owner is! Map ||
+          owner['userId'] is! String || (owner['userId'] as String).trim().isEmpty ||
+          owner['homeserver'] is! String || (owner['homeserver'] as String).trim().isEmpty)) {
+        return 'Backup account owner is invalid';
+      }
+      if (owner is Map &&
+          (owner['userId'] != client?.userID ||
+           owner['homeserver'] != client?.homeserver?.toString())) {
+        return 'Backup belongs to a different account or homeserver';
+      }
+    return null;
+  }
+
   List<String> _manifestWarnings(Object? value) {
     if (value is! Map) return <String>[];
     final warnings = <String>{};
@@ -930,18 +949,8 @@ class ChatBackupService {
       ensureCurrent();
       final manifest = data['manifest'];
       final owner = manifest is Map ? manifest['owner'] : null;
-      final client = _clientManager.client;
-      final declaresOwner = manifest is Map && manifest.containsKey('owner');
-      if (declaresOwner && (owner is! Map ||
-          owner['userId'] is! String || (owner['userId'] as String).trim().isEmpty ||
-          owner['homeserver'] is! String || (owner['homeserver'] as String).trim().isEmpty)) {
-        return const RestoreResult(errors: ['Backup account owner is invalid']);
-      }
-      if (owner is Map &&
-          (owner['userId'] != client?.userID ||
-           owner['homeserver'] != client?.homeserver?.toString())) {
-        return const RestoreResult(errors: ['Backup belongs to a different account or homeserver']);
-      }
+      final ownerError = _backupOwnerError(manifest);
+      if (ownerError != null) return RestoreResult(errors: [ownerError]);
       final rawSettings = data['settings'] as Map<String, dynamic>? ?? {};
 
       int settingsRestored = 0;

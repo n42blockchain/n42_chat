@@ -139,6 +139,11 @@ void main() {
       final result = await service.restoreFromBackup(backupFilePath: backup.filePath);
       expect(result.hasErrors, isTrue);
       expect(result.settingsRestored, 0);
+      final archive = _Archive();
+      service.setArchiveService(archive);
+      final archived = await service.restoreToArchive(backupFilePath: backup.filePath);
+      expect(archived.hasErrors, isTrue);
+      verifyZeroInteractions(archive);
     });
   }
 
