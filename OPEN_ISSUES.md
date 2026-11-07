@@ -57,8 +57,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 - Severity: H
 - Added: 2026-09-26
-- Current state: standalone Chat native hooks load SQLCipher 4.19 and real archive/Vodozemac tests pass on macOS. The host's existing Android AAR already contains `libsqlcipher.so`; blindly bundling the standalone hook asset would create a duplicate. The iOS host requires executable SQLCipher symbols. Host builds/device behavior have not been verified by Task 13A.
-- Next step: Task 14 configures entrypoint sqlite3 hooks for Android system library `sqlcipher`, iOS executable, and default SQLCipher asset, retains native linkage, and validates real archive opens/build outputs. Do not hide collisions with arbitrary pickFirst.
+- Current state (2026-11-07): release inspection of host 73464 proved that the Dart native manifest binds ordinary sqlite3.framework without sqlite3_key/rekey exports. Three real host runtime checks failed, so the candidate is HELD and must not be uploaded. Archive code refuses plain SQLite before touching history. Host repair 5d3730e3c restores entrypoint hooks: Android reuses the existing libsqlcipher.so, other native platforms select sqlite3 checksum-pinned SQLCipher builds. Four real host checks pass (main/background cipher detection, encrypted reopen/wrong-key rejection, source-preserving legacy export); the related host cluster passes 38 tests. The IPA builder now checks exports in the exact Dart-bound library and rejects the old candidate. No user database was deleted or reset. Fresh iOS package, Android runtime and installed-user continuity acceptance remain pending.
+- Next step: rebuild a new host candidate and require its exact-library crypto gate; run the four database checks now included in the Android wallet integration suite, then verify installed-user archive/key continuity separately. Do not infer encryption from signature/architecture checks or hide native-library collisions with arbitrary pickFirst.
 
 ### DEP-002 Background missed-call callbacks lack recipient account provenance
 
