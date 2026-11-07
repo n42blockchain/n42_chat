@@ -262,6 +262,7 @@ class ChatBackupService {
     List<String>? roomIds,
     bool includeMedia = false,
     bool includeKeys = false,
+    bool fetchRemoteHistory = false,
     String? password,
     void Function(double progress)? onProgress,
   }) async {
@@ -308,7 +309,7 @@ class ChatBackupService {
         'roomCount': rooms.length,
         'includesMedia': includeMedia,
         'includesKeys': includesKeysInBackup,
-        'historyScope': 'loadedTimeline',
+        'historyScope': fetchRemoteHistory ? 'requestedRemoteHistory' : 'loadedTimeline',
         'checksum': '',
       },
       'rooms': <String, dynamic>{},
@@ -335,6 +336,28 @@ class ChatBackupService {
         try {
           final timeline = await room.getTimeline();
           try {
+            ensureCurrent();
+            if (fetchRemoteHistory) {
+              try {
+                var pages = 0;
+                while (timeline.canRequestHistory) {
+                  ensureCurrent();
+                  if (++pages > 10000) throw StateError('Backup history page limit reached');
+                  final before = (timeline.events.length,
+                    timeline.events.lastOrNull?.eventId, room.prev_batch);
+                  await timeline.requestHistory(historyCount: 500)
+                      .timeout(const Duration(seconds: 30));
+                  ensureCurrent();
+                  final after = (timeline.events.length,
+                    timeline.events.lastOrNull?.eventId, room.prev_batch);
+                  if (before == after && timeline.canRequestHistory) {
+                    throw StateError('Backup history pagination made no progress');
+                  }
+                }
+              } catch (_) {
+                hasReadErrors = true;
+              }
+            }
             ensureCurrent();
             final events = timeline.events
                 .where((e) => e.type == 'm.room.message')

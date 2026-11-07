@@ -115,6 +115,54 @@ void main() {
     }
   }
 
+  for (final changeAccount in [false, true]) {
+    test('remote paging completion preserves session: change=$changeAccount', () async {
+      final (room, timeline) = roomFixture('!paged:example.org');
+      when(() => room.topic).thenReturn('');
+      when(() => room.isDirectChat).thenReturn(false);
+      when(() => room.summary).thenReturn(_Summary());
+      when(() => client.rooms).thenReturn([room]);
+      final original = timeline.events.toList();
+      var more = true;
+      when(() => timeline.canRequestHistory).thenAnswer((_) => more);
+      when(() => timeline.requestHistory(historyCount: 500)).thenAnswer((_) async {
+        more = false;
+        if (changeAccount) when(() => client.accessToken).thenReturn('replacement');
+        when(() => timeline.events).thenReturn([...original, matrix.Event(
+          eventId: 'older-event', senderId: '@alice:example.org',
+          originServerTs: DateTime(2019), type: 'm.room.message',
+          content: {'msgtype': 'm.text', 'body': 'older'}, room: room,
+        )]);
+      });
+      if (changeAccount) {
+        await expectLater(service.createBackup(fetchRemoteHistory: true), throwsStateError);
+      } else {
+        final result = await service.createBackup(fetchRemoteHistory: true);
+        expect(result.messageCount, 2);
+        final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+        expect(data['manifest']['historyScope'], 'requestedRemoteHistory');
+        expect(data['manifest']['hasReadErrors'], isFalse);
+      }
+      verify(() => timeline.requestHistory(historyCount: 500)).called(1);
+      verify(() => timeline.cancelSubscriptions()).called(1);
+    });
+  }
+
+  test('remote history paging stops when the SDK makes no progress', () async {
+    final (room, timeline) = roomFixture('!history:example.org');
+    when(() => room.topic).thenReturn('');
+    when(() => room.isDirectChat).thenReturn(false);
+    when(() => room.summary).thenReturn(_Summary());
+    when(() => client.rooms).thenReturn([room]);
+    when(() => timeline.canRequestHistory).thenReturn(true);
+    when(() => timeline.requestHistory(historyCount: 500)).thenAnswer((_) async {});
+    final result = await service.createBackup(fetchRemoteHistory: true);
+    expect(result.messageCount, 1);
+    expect(result.warnings, isNotEmpty);
+    verify(() => timeline.requestHistory(historyCount: 500)).called(1);
+    verify(() => timeline.cancelSubscriptions()).called(1);
+  });
+
   test('full export retains more than 1000 loaded messages', () async {
     final (room, timeline) = roomFixture('!large:example.org');
     when(() => room.topic).thenReturn('');
