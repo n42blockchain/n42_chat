@@ -706,9 +706,20 @@ class AuthRepositoryImpl
   Future<bool> updateDisplayName(String displayName) async {
     if (!isLoggedIn) return false;
 
+    final manager = _authDataSource.clientManager;
+    final client = manager.client;
+    final userId = _authDataSource.userId;
+    final session = (client?.userID, client?.deviceID, client?.accessToken);
     try {
-      await _authDataSource.clientManager.setDisplayName(displayName);
-      // 更新缓存
+      await manager.setDisplayName(displayName);
+      // A profile response for the previous session must not rename the new one.
+      if (_isDisposed ||
+          !isLoggedIn ||
+          !identical(manager.client, client) ||
+          _authDataSource.userId != userId ||
+          (client?.userID, client?.deviceID, client?.accessToken) != session) {
+        return false;
+      }
       _cachedDisplayName = displayName;
       authLog('Display name updated to: $displayName');
       return true;

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -58,6 +59,30 @@ void main() {
   late MockMatrixClientManager mockClientManager;
   late MockSocialAuthApi mockSocialAuthApi;
   late AuthRepositoryImpl repository;
+
+  test('display name completion rejects a replaced account', () async {
+    var userId = '@first:example';
+    final pending = Completer<void>();
+    when(() => mockAuthDataSource.userId).thenAnswer((_) => userId);
+    when(() => mockClientManager.setDisplayName(any()))
+        .thenAnswer((_) => pending.future);
+    final update = repository.updateDisplayName('First account name');
+    userId = '@second:example';
+    pending.complete();
+    expect(await update, isFalse);
+  });
+
+  test('display name completion rejects logout', () async {
+    var loggedIn = true;
+    final pending = Completer<void>();
+    when(() => mockAuthDataSource.isLoggedIn).thenAnswer((_) => loggedIn);
+    when(() => mockClientManager.setDisplayName(any()))
+        .thenAnswer((_) => pending.future);
+    final update = repository.updateDisplayName('Old session name');
+    loggedIn = false;
+    pending.complete();
+    expect(await update, isFalse);
+  });
 
   setUpAll(() {
     registerFallbackValue(Uint8List(0));
