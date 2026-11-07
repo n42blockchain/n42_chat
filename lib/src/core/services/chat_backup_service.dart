@@ -108,6 +108,7 @@ class BackupPreview {
   final bool hasMedia;
   final bool hasKeys;
   final bool hasSettings;
+  final List<String> warnings;
 
   const BackupPreview({
     required this.backupId,
@@ -117,6 +118,7 @@ class BackupPreview {
     required this.hasMedia,
     required this.hasKeys,
     required this.hasSettings,
+    this.warnings = const [],
   });
 }
 
@@ -868,7 +870,21 @@ class ChatBackupService {
       hasMedia: manifest['includesMedia'] == true,
       hasKeys: manifest['includesKeys'] == true,
       hasSettings: data.containsKey('settings'),
+      warnings: _manifestWarnings(manifest),
     );
+  }
+
+  List<String> _manifestWarnings(Object? value) {
+    if (value is! Map) return <String>[];
+    final warnings = <String>{};
+    final entries = value['warnings'];
+    if (entries is List) {
+      warnings.addAll(entries.whereType<String>().where((s) => s.trim().isNotEmpty));
+    }
+    if (value['hasReadErrors'] == true) {
+      warnings.add('Some messages or settings could not be read. This backup is incomplete.');
+    }
+    return warnings.toList();
   }
 
   /// 验证备份完整性
@@ -896,7 +912,7 @@ class ChatBackupService {
 
       int settingsRestored = 0;
       final errors = <String>[];
-      final warnings = <String>[];
+      final warnings = _manifestWarnings(data['manifest']);
 
       onProgress?.call(0.1);
 

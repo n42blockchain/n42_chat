@@ -103,7 +103,11 @@ void main() {
             final result = await service.createBackup();
             final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
             expect(data['manifest']['hasReadErrors'], broken);
-            if (broken) expect(result.warnings, isNotEmpty);
+            if (broken) {
+              expect(result.warnings, isNotEmpty);
+              expect((await service.previewBackup(result.filePath)).warnings, isNotEmpty);
+              expect((await service.restoreFromBackup(backupFilePath: result.filePath, restoreSettings: false)).hasWarnings, isTrue);
+            }
           }
           verify(() => timeline.cancelSubscriptions()).called(1);
         },
