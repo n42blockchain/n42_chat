@@ -18,6 +18,10 @@ import '../constants/app_constants.dart';
 import 'message_archive_service.dart';
 import '../utils/debug_log.dart';
 
+class BackupPasswordRequired extends StateError {
+  BackupPasswordRequired() : super('This backup is password-protected');
+}
+
 /// 备份结果
 class BackupResult {
   final String backupId;
@@ -1157,7 +1161,7 @@ class ChatBackupService {
 
     if (header == 'N42ENC3:') {
       if (password == null || password.isEmpty) {
-        throw StateError('This backup is password-protected');
+        throw BackupPasswordRequired();
       }
       final decrypted = _decryptAesGcm(bytes, password);
       final jsonStr = utf8.decode(decrypted);
@@ -1166,7 +1170,7 @@ class ChatBackupService {
 
     if (header == 'N42ENC2:') {
       if (password == null || password.isEmpty) {
-        throw StateError('This backup is password-protected');
+        throw BackupPasswordRequired();
       }
       final decrypted = _decryptAes256(bytes, password);
       final jsonStr = utf8.decode(decrypted);
@@ -1177,7 +1181,7 @@ class ChatBackupService {
     final headerV1 = utf8.decode(bytes.take(7).toList(), allowMalformed: true);
     if (headerV1 == 'N42ENC:') {
       if (password == null || password.isEmpty) {
-        throw StateError('This backup is password-protected');
+        throw BackupPasswordRequired();
       }
       final keyBytes = sha256.convert(utf8.encode(password)).bytes;
       final encryptedData = bytes.sublist(7);

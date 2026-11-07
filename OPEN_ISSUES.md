@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Encrypted restore password UI (batch 264): supported encrypted formats now raise a typed BackupPasswordRequired error. Picker prompts for an obscured password only for that error; cancellation/empty password stops, valid input is passed to preview and restore. Existing origin checks cover prompt completion. Protected-preview/restore service test passes; scoped analysis has six infos, no errors/warnings. Wrong-password retry UX, widget/device interaction, localization, host integration and complete backup ownership/history remain open.
+
 - Restore stale exception presentation (batch 263): BLoC exception handling now suppresses old-account failure content when the restore origin has expired. Combined backup service/BLoC suites pass 101 tests; scoped analysis has seven infos, no errors/warnings. UI interaction, encryption-password input, localization, rollback of started writes and full-history/ownership requirements remain open.
 
 - Restore confirmation provenance (batch 262): restore event carries the opening-account predicate into the service. BLoC rejects stale queued work; service combines it with its own client snapshot throughout restore, and late results omit old success/error content after predicate invalidation. Fifteen BackupBloc tests and one stale-origin service test pass; scoped analysis has seven infos, no errors/warnings. Already-started write rollback, complete UI interaction coverage, exception-path stale presentation, localization and host integration remain open.

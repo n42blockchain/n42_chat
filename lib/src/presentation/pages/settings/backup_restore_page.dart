@@ -490,7 +490,37 @@ class _RestoreSection extends StatelessWidget {
       if (file != null) {
         final filePath = file.path;
         if (filePath != null && context.mounted && current()) {
-          final preview = await GetIt.instance<ChatBackupService>().previewBackup(filePath);
+          final service = GetIt.instance<ChatBackupService>();
+          BackupPreview preview;
+          String? password;
+          try {
+            preview = await service.previewBackup(filePath);
+          } on BackupPasswordRequired {
+            if (!context.mounted || !current()) return;
+            var input = '';
+            final labels = S.of(context);
+            password = await showDialog<String>(
+              context: context,
+              builder: (dialogContext) => AlertDialog(
+                title: Text(labels?.authPassword ?? 'Password'),
+                content: TextField(
+                  autofocus: true,
+                  obscureText: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  onChanged: (value) => input = value,
+                ),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(labels?.commonCancel ?? 'Cancel')),
+                  FilledButton(onPressed: () => Navigator.pop(dialogContext, input),
+                    child: Text(labels?.commonConfirm ?? 'Confirm')),
+                ],
+              ),
+            );
+            if (!context.mounted || !current() || password == null || password.isEmpty) return;
+            preview = await service.previewBackup(filePath, password: password);
+          }
           if (!context.mounted || !current()) return;
           final l10n = S.of(context);
           final confirmed = await showDialog<bool>(
@@ -522,7 +552,7 @@ class _RestoreSection extends StatelessWidget {
           );
           if (confirmed != true || !context.mounted || !current()) return;
           context.read<BackupBloc>().add(
-            RestoreFromBackup(backupFilePath: filePath, isCurrent: current),
+            RestoreFromBackup(backupFilePath: filePath, password: password, isCurrent: current),
           );
         }
       }
