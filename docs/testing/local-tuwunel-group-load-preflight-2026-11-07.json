@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "members": 3,
+  "messages": 100,
+  "fileMessages": 1,
+  "deliveries": 300,
+  "sendMilliseconds": 449,
+  "totalMilliseconds": 34213,
+  "offlineRecipient": 2,
+  "recipients": [
+    {
+      "recipient": 0,
+      "messages": 100,
+      "unique": 100
+    },
+    {
+      "recipient": 1,
+      "messages": 100,
+      "unique": 100
+    },
+    {
+      "recipient": 2,
+      "messages": 100,
+      "unique": 100
+    }
+  ],
+  "scope": "Matrix SDK clients, independent SQLite stores, synthetic data; no device UI/push acceptance",
+  "schema": 1,
+  "processExit": 0,
+  "testSourceSha256": "9dfeffb057b4ea6e5f599947c47da35c07d5315760002a29eb132a04931181d1",
+  "privateLogSha256": "2cd94f14fdbbf7e01f20bc90d98ca5a63147fe12c63b20324d0b8f4f796e3bf7",
+  "limitations": [
+    "3 virtual clients and 100 messages only; not the full 20/10000 target",
+    "one encrypted attachment event; file contents not downloaded in this load check",
+    "accounts logged out, not deactivated; contained in owned disposable database",
+    "no physical UI or push acceptance"
+  ]
+}
