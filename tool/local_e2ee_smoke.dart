@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:matrix/matrix.dart';
+import 'package:n42_chat/src/core/encryption/e2ee_manager.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:vodozemac/vodozemac.dart' as vod;
 
@@ -256,9 +257,70 @@ Future<void> runLocalE2eeSmoke({Map<String, String>? environment}) async {
         revokedEvent.content['body'] == afterBody) {
       throw StateError('Revoked device decrypted a fresh session');
     }
+    final ownerEncryption = E2EEManager(clients.first);
+    final recoveryKey = await ownerEncryption.createRecoveryKey(
+      passphrase: credentials.first.password,
+    );
+    if (recoveryKey == null || recoveryKey.isEmpty) {
+      throw StateError('App backup setup did not return a recovery key');
+    }
+    ownerEncryption.clearCachedRecoveryKey();
+    for (final peer in activeClients) {
+      await peer.abortSync();
+    }
+    final recoveryDb = await databaseFactoryFfi.openDatabase(
+      '${directory.path}/recovery-device.sqlite',
+    );
+    final recoveryDatabase = await MatrixSdkDatabase.init(
+      'recovery-device',
+      database: recoveryDb,
+      sqfliteFactory: databaseFactoryFfi,
+    );
+    final recovery = Client('recovery-device', database: recoveryDatabase);
+    clients.add(recovery);
+    await recovery.checkHomeserver(uri);
+    await recovery.login(
+      LoginType.mLoginPassword,
+      identifier: AuthenticationUserIdentifier(
+        user: credentials.first.username,
+      ),
+      password: credentials.first.password,
+      initialDeviceDisplayName: 'Isolated key recovery device',
+    );
+    await _until([
+      recovery,
+    ], () => recovery.getRoomById(roomId)?.encrypted == true);
+    await recovery.abortSync();
+    final historicalSession = afterRaw.content['session_id'] as String;
+    final beforeRestore = await recovery.encryption!.keyManager
+        .loadInboundGroupSession(roomId, historicalSession);
+    if (beforeRestore?.isValid == true) {
+      throw StateError(
+        'Recovery device unexpectedly already owns the historical key',
+      );
+    }
+    final recoveryManager = E2EEManager(recovery);
+    final restored = await recoveryManager.unlockWithRecoveryKey(recoveryKey);
+    recoveryManager.clearCachedRecoveryKey();
+    if (restored < 1) {
+      throw StateError('App restore did not recover any sessions');
+    }
+    final restoredEvent = await recovery.encryption!.decryptRoomEvent(
+      Event.fromMatrixEvent(afterRaw, recovery.getRoomById(roomId)!),
+    );
+    if (restoredEvent.type != EventTypes.Message ||
+        restoredEvent.content['body'] != afterBody) {
+      throw StateError(
+        'Historical message did not decrypt after app key recovery',
+      );
+    }
     print(
       jsonEncode({
         'clients': clients.length,
+        'app_backup_recovery_passed': true,
+        'restored_sessions': restored,
+        'historical_key_absent_before_restore': true,
+        'historical_message_decrypted_after_restore': true,
         'encrypted_events': 5,
         'revoked_session_rejected': true,
         'revoked_device_retains_previous_session_keys': true,
@@ -268,7 +330,7 @@ Future<void> runLocalE2eeSmoke({Map<String, String>? environment}) async {
         'decrypted_deliveries': deliveries,
         'server_ciphertext_checks': 5,
         'passed': true,
-        'scope': 'isolated protocol; not UI, recovery or device acceptance',
+        'scope': 'isolated protocol and one backup recovery; not UI or physical-device acceptance',
       }),
     );
   } finally {
