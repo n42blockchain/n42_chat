@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -47,6 +49,7 @@ class _ThreadDetailView extends StatefulWidget {
 
 class _ThreadDetailViewState extends State<_ThreadDetailView> {
   final _textController = TextEditingController();
+  bool _sendPending = false;
   final _scrollController = ScrollController();
 
   @override
@@ -88,21 +91,16 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state.error != null && state.rootMessage == null) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.error_outline, size: 48),
-                  const SizedBox(height: AppDimensions.spacingM),
-                  Text(state.error!),
-                ],
-              ),
-            );
-          }
-
           return Column(
             children: [
+              if (state.error != null)
+                Padding(
+                  padding: const EdgeInsets.all(AppDimensions.spacingS),
+                  child: Text(
+                    state.error!,
+                    style: TextStyle(color: theme.colorScheme.error),
+                  ),
+                ),
               Expanded(
                 child: CustomScrollView(
                   controller: _scrollController,
@@ -378,12 +376,25 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
     );
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final rawText = _textController.text;
-    if (rawText.trim().isEmpty) return;
+    final bloc = context.read<ThreadBloc>();
+    if (rawText.trim().isEmpty ||
+        _sendPending ||
+        bloc.isClosed ||
+        bloc.state.isSending)
+      return;
 
-    context.read<ThreadBloc>().add(SendThreadTextMessage(rawText));
-    _textController.clear();
+    _sendPending = true;
+    final completion = Completer<bool>();
+    try {
+      bloc.add(SendThreadTextMessage(rawText, completion: completion));
+      final accepted = await completion.future;
+      if (!mounted || !accepted) return;
+      if (_textController.text == rawText) _textController.clear();
+    } finally {
+      _sendPending = false;
+    }
 
     // 滚动到底部
     WidgetsBinding.instance.addPostFrameCallback((_) {

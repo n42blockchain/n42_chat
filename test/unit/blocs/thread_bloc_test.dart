@@ -151,7 +151,7 @@ void main() {
       setUp: () {
         when(
           () => mockRepo.sendThreadTextMessage(any(), any(), any()),
-        ).thenAnswer((_) async => null);
+        ).thenAnswer((_) async => _makeMessage(id: r'$sent'));
       },
       act: (bloc) => bloc.add(const SendThreadTextMessage('Hello thread!')),
       expect: () => [

@@ -175,7 +175,7 @@ void main() {
               imageBytes: any(named: 'imageBytes'),
               filename: any(named: 'filename'),
               mimeType: any(named: 'mimeType'),
-            )).thenAnswer((_) async => null);
+            )).thenAnswer((_) async => _makeMsg(r'$sent'));
       },
       act: (bloc) => bloc.add(SendThreadImageMessage(
         imageBytes: [1, 2, 3],
@@ -249,7 +249,7 @@ void main() {
               fileBytes: any(named: 'fileBytes'),
               filename: any(named: 'filename'),
               mimeType: any(named: 'mimeType'),
-            )).thenAnswer((_) async => null);
+            )).thenAnswer((_) async => _makeMsg(r'$sent'));
       },
       act: (bloc) => bloc.add(SendThreadFileMessage(
         fileBytes: [4, 5, 6],

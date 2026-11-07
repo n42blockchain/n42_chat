@@ -239,25 +239,46 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     SendThreadTextMessage event,
     Emitter<ThreadState> emit,
   ) async {
-    if (state.roomId == null || state.threadRootEventId == null) return;
+    if (state.roomId == null ||
+        state.threadRootEventId == null ||
+        state.isSending) {
+      if (event.completion?.isCompleted == false)
+        event.completion!.complete(false);
+      return;
+    }
 
+    var accepted = false;
+    final replyTarget = state.replyTarget;
     final isCurrent = _context(emit);
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
-    emit(state.copyWith(isSending: true, clearReplyTarget: true));
+    emit(state.copyWith(isSending: true, clearError: true));
     try {
-      await _messageRepository.sendThreadTextMessage(
+      final receipt = await _messageRepository.sendThreadTextMessage(
         roomId,
         rootId,
         event.text,
       );
       if (!isCurrent()) return;
-      emit(state.copyWith(isSending: false));
+      if (receipt == null || receipt.id.trim().isEmpty) {
+        throw StateError('Thread message was not acknowledged');
+      }
+      accepted = true;
+      emit(
+        state.copyWith(
+          isSending: false,
+          clearReplyTarget: identical(state.replyTarget, replyTarget),
+        ),
+      );
     } catch (e) {
       if (!isCurrent()) return;
       debugLog('ThreadBloc: Failed to send thread message: $e');
       emit(state.copyWith(isSending: false, error: e.toString()));
+    } finally {
+      if (event.completion?.isCompleted == false) {
+        event.completion!.complete(accepted);
+      }
     }
   }
 
@@ -265,15 +286,19 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     SendThreadImageMessage event,
     Emitter<ThreadState> emit,
   ) async {
-    if (state.roomId == null || state.threadRootEventId == null) return;
+    if (state.roomId == null ||
+        state.threadRootEventId == null ||
+        state.isSending) {
+      return;
+    }
 
     final isCurrent = _context(emit);
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
-    emit(state.copyWith(isSending: true));
+    emit(state.copyWith(isSending: true, clearError: true));
     try {
-      await _messageRepository.sendThreadImageMessage(
+      final receipt = await _messageRepository.sendThreadImageMessage(
         roomId,
         rootId,
         imageBytes: Uint8List.fromList(event.imageBytes),
@@ -281,6 +306,9 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
         mimeType: event.mimeType,
       );
       if (!isCurrent()) return;
+      if (receipt == null || receipt.id.trim().isEmpty) {
+        throw StateError('Thread message was not acknowledged');
+      }
       emit(state.copyWith(isSending: false));
     } catch (e) {
       if (!isCurrent()) return;
@@ -292,15 +320,19 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     SendThreadFileMessage event,
     Emitter<ThreadState> emit,
   ) async {
-    if (state.roomId == null || state.threadRootEventId == null) return;
+    if (state.roomId == null ||
+        state.threadRootEventId == null ||
+        state.isSending) {
+      return;
+    }
 
     final isCurrent = _context(emit);
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
-    emit(state.copyWith(isSending: true));
+    emit(state.copyWith(isSending: true, clearError: true));
     try {
-      await _messageRepository.sendThreadFileMessage(
+      final receipt = await _messageRepository.sendThreadFileMessage(
         roomId,
         rootId,
         fileBytes: Uint8List.fromList(event.fileBytes),
@@ -308,6 +340,9 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
         mimeType: event.mimeType,
       );
       if (!isCurrent()) return;
+      if (receipt == null || receipt.id.trim().isEmpty) {
+        throw StateError('Thread message was not acknowledged');
+      }
       emit(state.copyWith(isSending: false));
     } catch (e) {
       if (!isCurrent()) return;

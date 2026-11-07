@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/message_entity.dart';
@@ -38,10 +40,12 @@ class LoadMoreThreadMessages extends ThreadEvent {
 class SendThreadTextMessage extends ThreadEvent {
   final String text;
 
-  const SendThreadTextMessage(this.text);
+  final Completer<bool>? completion;
+
+  const SendThreadTextMessage(this.text, {this.completion});
 
   @override
-  List<Object?> get props => [text];
+  List<Object?> get props => [text, if (completion != null) completion];
 }
 
 /// 发送线程图片消息
