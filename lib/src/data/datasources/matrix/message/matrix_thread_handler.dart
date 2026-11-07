@@ -20,6 +20,24 @@ class MatrixThreadHandler {
   // An event ID is not a Matrix pagination token. Retain the continuation
   // returned for each page's oldest displayed event, scoped to its session.
   final Map<(String, String, String), String?> _threadCursors = {};
+  final Map<(String, String, String?), String?> _continuations = {};
+
+  void _validateContinuation(
+    String room,
+    String root,
+    String? token,
+    String? next,
+  ) {
+    final visited = <String>{};
+    var cursor = next;
+    while (cursor != null) {
+      if (cursor == token || !visited.add(cursor)) {
+        throw StateError('Thread pagination did not advance');
+      }
+      cursor = _continuations[(room, root, cursor)];
+    }
+  }
+
   (matrix.Client?, String?, String?, String?, Uri?)? _cursorSession;
 
   (matrix.Client?, String?, String?, String?, Uri?) get _session => (
@@ -144,9 +162,13 @@ class MatrixThreadHandler {
     String? fromToken,
     String? beforeEventId,
   }) async {
+    if (limit <= 0 || fromToken == '') {
+      throw ArgumentError('A positive limit and a nonempty token are required');
+    }
     final session = _session;
     if (_cursorSession != session) {
       _threadCursors.clear();
+      _continuations.clear();
       _cursorSession = session;
     }
     final client = _client;
@@ -174,18 +196,23 @@ class MatrixThreadHandler {
       );
 
       if (_session != session) return const ThreadMessagePage();
-      final chunk = response['chunk'] as List<dynamic>? ?? [];
+      final chunk = response['chunk'];
+      if (chunk is! List) {
+        throw const FormatException('Invalid thread page');
+      }
       final messages = <MessageEntity>[];
 
       for (final eventJson in chunk) {
         try {
-          final event = matrix.Event.fromJson(
-            eventJson as Map<String, dynamic>,
-            room,
-          );
+          if (eventJson is! Map<String, dynamic> ||
+              eventJson['event_id'] is! String ||
+              (eventJson['event_id'] as String).trim().isEmpty) {
+            throw const FormatException('Invalid thread event');
+          }
+          final event = matrix.Event.fromJson(eventJson, room);
           messages.add(_eventMapper.mapEventToMessage(event, room));
         } catch (e) {
-          debugLog('ThreadMessages: Failed to parse event: $e');
+          throw const FormatException('Invalid thread event');
         }
       }
 
@@ -195,18 +222,23 @@ class MatrixThreadHandler {
       if (next != null && (next is! String || next.isEmpty)) {
         throw const FormatException('Invalid thread continuation');
       }
-      if (next != null && next == token) {
-        throw StateError('Thread pagination did not advance');
-      }
+      final nextToken = next as String?;
+      _validateContinuation(roomId, threadRootEventId, token, nextToken);
+      _continuations[(roomId, threadRootEventId, token)] = nextToken;
       if (messages.isNotEmpty) {
         _threadCursors[(roomId, threadRootEventId, messages.first.id)] =
-            next as String?;
+            nextToken;
       }
-      return ThreadMessagePage(messages: messages, nextBatch: next as String?);
+      return ThreadMessagePage(messages: messages, nextBatch: nextToken);
     } catch (e) {
       if (_session != session) return const ThreadMessagePage();
       // A failed older-page request must not masquerade as a fresh timeline.
-      if (beforeEventId != null || fromToken != null) rethrow;
+      if (beforeEventId != null ||
+          fromToken != null ||
+          e is! matrix.MatrixException ||
+          e.errcode != 'M_UNRECOGNIZED') {
+        rethrow;
+      }
       debugLog('MatrixMessageDataSource: Failed to get thread messages: $e');
       // 回退方案：从 timeline 过滤线程消息
       final messages = await _getThreadMessagesFromTimeline(

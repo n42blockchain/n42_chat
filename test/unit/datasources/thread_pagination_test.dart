@@ -16,6 +16,8 @@ class _Room extends Mock implements matrix.Room {}
 
 class _Event extends Mock implements matrix.Event {}
 
+class _Timeline extends Mock implements matrix.Timeline {}
+
 class _Mapper extends Mock implements MatrixEventMapper {}
 
 void main() {
@@ -109,7 +111,7 @@ void main() {
     },
   );
   test('short and empty pages retain their explicit continuation', () async {
-    response(() async => {'chunk': [], 'next_batch': 'after-empty'});
+    response(() async => {'chunk': <Object?>[], 'next_batch': 'after-empty'});
     final empty = await handler.getThreadMessagePage('!room', 'root');
     expect(empty.messages, isEmpty);
     expect(empty.hasMore, isTrue);
@@ -122,7 +124,7 @@ void main() {
     expect(short.messages.length, 1);
     expect(short.hasMore, isTrue);
     expect(queries.last['from'], 'after-empty');
-    response(() async => {'chunk': []});
+    response(() async => {'chunk': <Object?>[]});
     final end = await handler.getThreadMessagePage(
       '!room',
       'root',
@@ -179,6 +181,103 @@ void main() {
       throwsStateError,
     );
   });
+  test(
+    'multi-page cycle is rejected without poisoning a valid retry',
+    () async {
+      response(() async => page('first', next: 'a'));
+      await handler.getThreadMessagePage('!room', 'root');
+      response(() async => page('second', next: 'b'));
+      await handler.getThreadMessagePage('!room', 'root', fromToken: 'a');
+      response(() async => page('third', next: 'a'));
+      await expectLater(
+        handler.getThreadMessagePage('!room', 'root', fromToken: 'b'),
+        throwsStateError,
+      );
+      response(() async => page('third', next: 'c'));
+      expect(
+        (await handler.getThreadMessagePage(
+          '!room',
+          'root',
+          fromToken: 'b',
+        )).nextBatch,
+        'c',
+      );
+    },
+  );
+
+  for (final malformed in <Map<String, dynamic>>[
+    {},
+    {'chunk': 'bad'},
+    {
+      'chunk': [42],
+    },
+    {
+      'chunk': [
+        {'event_id': ''},
+      ],
+    },
+    {'chunk': <Object?>[], 'next_batch': 42},
+    {'chunk': <Object?>[], 'next_batch': ''},
+  ]) {
+    test(
+      'malformed first page does not become an empty fallback: $malformed',
+      () async {
+        response(() async => malformed);
+        await expectLater(
+          handler.getThreadMessagePage('!room', 'root'),
+          throwsFormatException,
+        );
+        verifyNever(() => room.getTimeline());
+      },
+    );
+  }
+
+  test(
+    'initial network or permission failures are not hidden by fallback',
+    () async {
+      response(() async => throw StateError('network'));
+      await expectLater(
+        handler.getThreadMessagePage('!room', 'root'),
+        throwsStateError,
+      );
+      response(
+        () async =>
+            throw matrix.MatrixException.fromJson({'errcode': 'M_FORBIDDEN'}),
+      );
+      await expectLater(
+        handler.getThreadMessagePage('!room', 'root'),
+        throwsA(isA<matrix.MatrixException>()),
+      );
+      verifyNever(() => room.getTimeline());
+    },
+  );
+
+  test('explicit unsupported endpoint retains the local fallback', () async {
+    final timeline = _Timeline();
+    when(() => timeline.events).thenReturn([]);
+    when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+    response(
+      () async =>
+          throw matrix.MatrixException.fromJson({'errcode': 'M_UNRECOGNIZED'}),
+    );
+    final result = await handler.getThreadMessagePage('!room', 'root');
+    expect(result.messages, isEmpty);
+    expect(result.hasMore, isFalse);
+    verify(() => room.getTimeline()).called(1);
+  });
+
+  test('invalid request bounds fail before network access', () async {
+    await expectLater(
+      handler.getThreadMessagePage('!room', 'root', limit: 0),
+      throwsArgumentError,
+    );
+    await expectLater(
+      handler.getThreadMessagePage('!room', 'root', fromToken: ''),
+      throwsArgumentError,
+    );
+    expect(queries, isEmpty);
+  });
+
   test('nonadvancing continuation is rejected', () async {
     response(() async => page('anchor', next: 'opaque'));
     await handler.getThreadMessages('!room', 'root');
