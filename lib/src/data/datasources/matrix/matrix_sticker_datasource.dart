@@ -427,16 +427,24 @@ class MatrixStickerDataSource {
 
   /// 发送贴纸消息
   Future<String?> sendStickerMessage(String roomId, Sticker sticker) async {
-    if (_client == null) return null;
+    final client = _client;
+    if (client == null) return null;
+    final origin = accountScope;
 
     try {
-      final room = _client!.getRoomById(roomId);
+      final room = client.getRoomById(roomId);
       if (room == null) return null;
+      Future<String?> sendFallback(String text) async {
+        if (accountScope != origin) return null;
+        final eventId = await room.sendTextEvent(text);
+        return accountScope == origin ? eventId : null;
+      }
+
 
       // 如果是 emoji 贴纸，发送为文本消息
       if (sticker.url.startsWith('emoji:')) {
         final emoji = sticker.url.substring(6);
-        return await room.sendTextEvent(emoji);
+        return await sendFallback(emoji);
       }
 
       // 内置 asset 贴纸（SVG）：首次发送时把资源字节上传到媒体库换取 mxc，
@@ -449,6 +457,7 @@ class MatrixStickerDataSource {
         } else {
           final path = BundledStickerPacks.assetPath(sticker.url);
           final data = await rootBundle.load(path);
+          if (accountScope != origin) return null;
           final bytes = data.buffer.asUint8List();
           final filename = path.split('/').last;
           final uploaded = await uploadStickerImage(
@@ -456,9 +465,10 @@ class MatrixStickerDataSource {
             filename,
             BundledStickerPacks.mimeForAsset(sticker.url),
           );
+          if (accountScope != origin) return null;
           if (uploaded == null) {
             // 上传失败兜底：发 emoji 文本，保证用户操作有反馈
-            return await room.sendTextEvent(sticker.emoji ?? sticker.name ?? '🙂');
+            return await sendFallback(sticker.emoji ?? sticker.name ?? '🙂');
           }
           _assetMxcCache[sticker.url] = uploaded;
           mxcUrl = uploaded;
@@ -477,7 +487,9 @@ class MatrixStickerDataSource {
         },
       };
 
-      return await room.sendEvent(content, type: 'm.sticker');
+      if (accountScope != origin) return null;
+      final eventId = await room.sendEvent(content, type: 'm.sticker');
+      return accountScope == origin ? eventId : null;
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to send sticker: $e');
       return null;
