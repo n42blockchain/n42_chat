@@ -136,6 +136,7 @@ void main() {
       } else {
         when(() => client.homeserver).thenReturn(Uri.parse('https://other.example.org'));
       }
+      await expectLater(service.previewBackup(backup.filePath), throwsStateError);
       final result = await service.restoreFromBackup(backupFilePath: backup.filePath);
       expect(result.hasErrors, isTrue);
       expect(result.settingsRestored, 0);
@@ -628,6 +629,8 @@ void main() {
     const fixture = chatBackupV3Interop;
     final file = File('${directory.path}/legacy-owner.n42backup');
     await file.writeAsBytes(base64Decode(fixture['v3']!));
+    expect((await service.previewBackup(file.path, password: fixture['fixturePassword']!)).warnings,
+      contains('This legacy backup has no verified account owner.'));
     final result = await service.restoreToArchive(
       backupFilePath: file.path, password: fixture['fixturePassword']!,
     );

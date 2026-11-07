@@ -867,6 +867,8 @@ class ChatBackupService {
   }) async {
     final data = await _readBackupData(backupFilePath, password: password);
     final manifest = data['manifest'] as Map<String, dynamic>? ?? {};
+    final ownerError = _backupOwnerError(manifest);
+    if (ownerError != null) throw StateError(ownerError);
     final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
 
     final roomNames = rooms.values
@@ -885,7 +887,7 @@ class ChatBackupService {
       hasMedia: manifest['includesMedia'] == true,
       hasKeys: manifest['includesKeys'] == true,
       hasSettings: data.containsKey('settings'),
-      warnings: _manifestWarnings(manifest),
+      warnings: _restoreWarnings(manifest),
     );
   }
 

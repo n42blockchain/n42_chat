@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Preview owner preflight (batch 275): preview now uses declared-owner validation and restoration warnings. Explicit account/server mismatch fails before confirmation; ownerless legacy preview warns before consent. Generated mismatch fixtures and an independent encrypted legacy fixture verify those paths; 92 backup tests pass. Service analysis has six infos, no errors/warnings. Host pin, localized ownership explanations, complete real-file UI/device flow, metadata authenticity and full history/account isolation remain open.
+
 - Legacy archive warning parity (batch 274): archive restore now shares settings-restore warning extraction, retaining manifest warnings/read-error fallback and explicitly warning for ownerless legacy data. An independent encrypted fixture through real temporary SQLite verifies the ownership warning; 92 backup tests pass. Service analysis has six infos, no errors/warnings. This remains compatibility with an unverified owner, not proof of ownership. Host/UI integration, complete history/account isolation and live acceptance remain open.
 
 - Archive restore ownership (batch 273): settings and archive restore now share declared-owner validation. Archive import rejects mismatch before archive service interaction; two user/server mismatch tests verify zero archive calls. Ninety-one backup tests pass; service analysis has six infos, no errors/warnings. Legacy ownerless imports still require stronger policy/warning handling, unencrypted metadata is not authenticity proof, and host integration/full-history/device acceptance remain open.
