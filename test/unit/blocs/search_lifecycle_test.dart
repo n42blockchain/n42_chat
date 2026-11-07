@@ -65,6 +65,43 @@ void main() {
       },
     );
   }
+  for (final query in ['', 'active']) {
+    for (final fail in [false, true]) {
+      test(
+        'history refresh after clear preserves query=$query failure=$fail',
+        () async {
+          final oldHistory = Completer<List<String>>();
+          var reads = 0;
+          when(() => repo.getRecentSearches()).thenAnswer((_) {
+            reads++;
+            return reads == 1 ? oldHistory.future : Future.value(<String>[]);
+          });
+          when(() => repo.clearSearchHistory()).thenAnswer((_) async {});
+          when(() => repo.searchGlobal('active', type: null))
+              .thenAnswer((_) async => const SearchResults(query: 'active'));
+          bloc.add(PerformSearch(query));
+          await settle();
+          expect(reads, 1);
+          bloc.add(const ClearSearchHistory());
+          await Future<void>.delayed(Duration.zero);
+          if (fail) {
+            oldHistory.completeError(StateError('obsolete history read'));
+          } else {
+            oldHistory.complete(['deleted secret']);
+          }
+          await settle();
+          if (query.isEmpty) {
+            expect((bloc.state as SearchInitial).recentSearches, isEmpty);
+          } else {
+            final loaded = bloc.state as SearchLoaded;
+            expect(loaded.results.query, 'active');
+            expect(loaded.recentSearches, isEmpty);
+          }
+          expect(reads, 2);
+        },
+      );
+    }
+  }
   test('clear invalidates a debounced request', () async {
     bloc.add(const PerformSearch('old'));
     bloc.add(const ClearSearch());

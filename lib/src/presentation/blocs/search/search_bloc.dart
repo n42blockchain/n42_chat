@@ -78,6 +78,23 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     return (events, mapper) => events.debounceTime(duration).switchMap(mapper);
   }
 
+  // A history mutation does not cancel the user's search. Refresh only the
+  // history snapshot when its revision changed while the read was pending.
+  Future<List<String>?> _readCurrentHistory(bool Function() current) async {
+    while (current()) {
+      final revision = _historyRevision;
+      try {
+        final history = await _searchRepository.getRecentSearches();
+        if (!current()) return null;
+        if (revision == _historyRevision) return history;
+      } catch (_) {
+        if (!current()) return null;
+        if (revision == _historyRevision) rethrow;
+      }
+    }
+    return null;
+  }
+
   Future<void> _onPerformSearch(
     PerformSearch event,
     Emitter<SearchState> emit,
@@ -90,8 +107,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     if (query.isEmpty) {
       try {
-        final history = await _searchRepository.getRecentSearches();
-        if (!current()) return;
+        final history = await _readCurrentHistory(current);
+        if (!current() || history == null) return;
         emit(SearchInitial(recentSearches: history));
       } catch (e) {
         if (!current()) return;
@@ -111,9 +128,9 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               filter: event.filter,
             );
       if (!current()) return;
-      final history = await _searchRepository.getRecentSearches();
+      final history = await _readCurrentHistory(current);
 
-      if (!current()) return;
+      if (!current() || history == null) return;
       emit(
         SearchLoaded(
           results: results,
