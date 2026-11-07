@@ -10,6 +10,7 @@ import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/message_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
+import '../datasources/local/chat_history_clear_store.dart';
 import '../mappers/archived_message_mapper.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
@@ -22,6 +23,7 @@ class MessageRepositoryImpl implements IMessageRepository {
   final MatrixClientManager _clientManager;
   final PreferencesDataSource _secureStorage;
   MessageArchiveService? _archiveService;
+  final ChatHistoryClearStore? _historyClearStore;
   final ArchivedMessageMapper _archiveMapper = const ArchivedMessageMapper();
 
   static final _trailingSlashRegExp = RegExp(r'/$');
@@ -79,7 +81,40 @@ class MessageRepositoryImpl implements IMessageRepository {
     this._clientManager,
     this._secureStorage, {
     MessageArchiveService? archiveService,
-  }) : _archiveService = archiveService;
+    ChatHistoryClearStore? historyClearStore,
+  }) : _archiveService = archiveService,
+       _historyClearStore = historyClearStore;
+
+  ({String? owner, bool Function() isCurrent}) _historyOrigin() {
+    final client = _client;
+    final owner = client?.userID;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    final server = client?.homeserver;
+    return (owner: owner, isCurrent: () => identical(_client, client) &&
+      client?.userID == owner && client?.accessToken == token &&
+      client?.deviceID == device && client?.homeserver == server);
+  }
+
+  Future<List<MessageEntity>> _visibleHistory(
+    String roomId, List<MessageEntity> messages,
+    ({String? owner, bool Function() isCurrent}) origin,
+  ) async {
+    final store = _historyClearStore;
+    if (store == null) return messages;
+    final owner = origin.owner;
+    if (owner == null || owner.isEmpty || !origin.isCurrent()) return [];
+    try {
+      final boundary = await store.read(ownerUserId: owner, roomId: roomId,
+        isCurrent: origin.isCurrent);
+      if (!origin.isCurrent()) return [];
+      return messages.where((m) => m.roomId == roomId &&
+        (boundary == null || m.timestamp.isAfter(boundary))).toList();
+    } catch (error) {
+      debugLog('MessageRepository: history visibility unavailable: $error');
+      return [];
+    }
+  }
 
   /// 延迟注入归档服务
   void setArchiveService(MessageArchiveService service) {
@@ -243,6 +278,7 @@ class MessageRepositoryImpl implements IMessageRepository {
 
   @override
   Stream<MessageEntity?> watchMessage(String roomId, String messageId) async* {
+    final origin = _historyOrigin();
     final room = _client?.getRoomById(roomId);
     if (room == null) return;
 
@@ -258,7 +294,10 @@ class MessageRepositoryImpl implements IMessageRepository {
 
     try {
       final initialMessage = _findMessageInTimeline(timeline, room, messageId);
-      if (initialMessage != null) yield initialMessage;
+      if (initialMessage != null) {
+        final visible = await _visibleHistory(roomId, [initialMessage], origin);
+        yield visible.isEmpty ? null : visible.single;
+      }
       await for (final _ in updates.stream) {
         if (!_isCurrentTimeline(roomId, timeline)) break;
         _requestMissingTimelineKeys(room, timeline);
@@ -268,7 +307,8 @@ class MessageRepositoryImpl implements IMessageRepository {
           messageId,
         );
         if (updatedMessage != null) {
-          yield updatedMessage;
+          final visible = await _visibleHistory(roomId, [updatedMessage], origin);
+          yield visible.isEmpty ? null : visible.single;
         }
       }
     } finally {
@@ -1725,12 +1765,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     int limit = 50,
     String? fromEventId,
   }) async {
-    return await _messageDataSource.getThreadMessages(
+    final origin = _historyOrigin();
+    final messages = await _messageDataSource.getThreadMessages(
       roomId,
       threadRootEventId,
       limit: limit,
       fromToken: fromEventId,
     );
+    return _visibleHistory(roomId, messages, origin);
   }
 
   @override
@@ -1738,7 +1780,9 @@ class MessageRepositoryImpl implements IMessageRepository {
     String roomId,
     String threadRootEventId,
   ) {
-    return _messageDataSource.watchThreadMessages(roomId, threadRootEventId);
+    final origin = _historyOrigin();
+    return _messageDataSource.watchThreadMessages(roomId, threadRootEventId)
+        .asyncMap((messages) => _visibleHistory(roomId, messages, origin));
   }
 
   @override
@@ -1835,7 +1879,9 @@ class MessageRepositoryImpl implements IMessageRepository {
 
   @override
   Future<List<MessageEntity>> getRoomThreadRoots(String roomId) async {
-    return await _messageDataSource.getRoomThreadRoots(roomId);
+    final origin = _historyOrigin();
+    final messages = await _messageDataSource.getRoomThreadRoots(roomId);
+    return _visibleHistory(roomId, messages, origin);
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:n42_chat/src/data/datasources/local/chat_history_clear_store.dart';
 // Tests for MessageRepositoryImpl — send, redact, and message retrieval.
 
 import 'dart:async';
@@ -35,6 +37,7 @@ class MockTimeline extends Mock implements matrix.Timeline {}
 class MockEvent extends Mock implements matrix.Event {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late MessageRepositoryImpl repository;
   late MockMatrixMessageDataSource mockMsgDS;
   late MockMatrixClientManager mockClientMgr;
@@ -255,6 +258,28 @@ void main() {
   });
 
   group('watchMessage', () {
+    for (final cleared in [true, false]) {
+      test('single-message preview applies clear boundary: $cleared', () async {
+        SharedPreferences.setMockInitialValues({});
+        final store = ChatHistoryClearStore();
+        final boundary = DateTime.utc(2026, 11, 6);
+        await store.clearThrough(ownerUserId: '@alice:test', roomId: testRoomId,
+          boundary: boundary, isCurrent: () => true);
+        when(() => mockClient.userID).thenReturn('@alice:test');
+        repository = MessageRepositoryImpl(mockMsgDS, mockClientMgr, mockStorageDS,
+          historyClearStore: ChatHistoryClearStore());
+        final mapped = MessageEntity(id: testEventId, roomId: testRoomId,
+          senderId: '@alice:test', senderName: 'Alice', content: 'preview',
+          timestamp: boundary.add(Duration(seconds: cleared ? 0 : 1)),
+          type: MessageType.text);
+        when(() => mockEvent.eventId).thenReturn(testEventId);
+        when(() => mockTimeline.events).thenReturn([mockEvent]);
+        when(() => mockMsgDS.mapEventToMessage(mockEvent, mockRoom)).thenReturn(mapped);
+        final result = await repository.watchMessage(testRoomId, testEventId).first;
+        expect(result, cleared ? isNull : equals(mapped));
+      });
+    }
+
     test(
       'emits initial message immediately when timeline already contains event',
       () async {

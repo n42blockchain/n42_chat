@@ -921,6 +921,7 @@ void _registerRepositories() {
       getIt<MatrixClientManager>(),
       getIt<PreferencesDataSource>(),
       archiveService: getIt<MessageArchiveService>(),
+      historyClearStore: ChatHistoryClearStore(),
     ),
   );
 
