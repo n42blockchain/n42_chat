@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/chat_backup_service.dart';
+import 'package:n42_chat/src/core/services/message_archive_service.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
@@ -17,6 +18,12 @@ class _Manager extends Mock implements MatrixClientManager {}
 class _Client extends Mock implements matrix.Client {}
 
 class _Secure extends Mock implements SecureStorageDataSource {}
+
+class _Room extends Mock implements matrix.Room {}
+
+class _Archive extends Mock implements MessageArchiveService {}
+
+class _Timeline extends Mock implements matrix.Timeline {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +59,110 @@ void main() {
     );
   });
   tearDown(() async => directory.delete(recursive: true));
+
+  (_Room, _Timeline) roomFixture(String id) {
+    final room = _Room();
+    final timeline = _Timeline();
+    when(() => room.id).thenReturn(id);
+    when(() => room.getLocalizedDisplayname()).thenReturn(id);
+    when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+    when(() => timeline.events).thenReturn([
+      matrix.Event(
+        eventId: 'event-$id',
+        senderId: '@alice:example.org',
+        originServerTs: DateTime.utc(2020),
+        type: 'm.room.message',
+        content: {'msgtype': 'm.text', 'body': 'historical message'},
+        room: room,
+      ),
+    ]);
+    return (room, timeline);
+  }
+
+  for (final scope in [
+    'different subset',
+    'new room',
+    'same reordered scope',
+  ]) {
+    test('incremental history survives $scope', () async {
+      final (firstRoom, _) = roomFixture('!first:example.org');
+      final (secondRoom, _) = roomFixture('!second:example.org');
+      when(
+        () => client.rooms,
+      ).thenReturn(scope == 'new room' ? [firstRoom] : [firstRoom, secondRoom]);
+      final first = await service.createIncrementalBackup(
+        roomIds: scope == 'different subset' ? [firstRoom.id] : null,
+      );
+      when(() => client.rooms).thenReturn([secondRoom, firstRoom]);
+      final second = await service.createIncrementalBackup(
+        roomIds: scope == 'different subset' ? [secondRoom.id] : null,
+      );
+      final data =
+          jsonDecode(await File(second.filePath).readAsString()) as Map;
+      expect(
+        (data['manifest'] as Map)['lastBackupTimestamp'],
+        scope == 'same reordered scope'
+            ? first.createdAt.millisecondsSinceEpoch
+            : 0,
+      );
+      expect(
+        second.messageCount,
+        scope == 'same reordered scope'
+            ? 0
+            : scope == 'new room'
+            ? 2
+            : 1,
+      );
+    });
+  }
+  for (final source in ['timeline', 'archive', 'metadata']) {
+    test(
+      'failed $source export warns and preserves the incremental cursor',
+      () async {
+        final (room, timeline) = roomFixture('!failure:example.org');
+        when(() => client.rooms).thenReturn([room]);
+        final archive = _Archive();
+        if (source == 'timeline') {
+          when(() => room.getTimeline())
+              .thenThrow(StateError('fixture timeline failed'));
+        } else if (source == 'metadata') {
+          when(() => room.getLocalizedDisplayname())
+              .thenThrow(StateError('fixture metadata failed'));
+        } else {
+          service.setArchiveService(archive);
+          when(
+            () => archive.getArchivedMessages(
+              '!failure:example.org',
+              beforeTimestamp: null,
+              limit: 500,
+            ),
+          ).thenThrow(StateError('fixture archive failed'));
+        }
+        final failed = await service.createIncrementalBackup();
+        expect(failed.warnings, isNotEmpty);
+        final data =
+            jsonDecode(await File(failed.filePath).readAsString()) as Map;
+        expect((data['manifest'] as Map)['hasReadErrors'], isTrue);
+        expect((data['manifest'] as Map)['warnings'], failed.warnings);
+        verifyNever(() => secure.write(any(), any()));
+        when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+        when(() => room.getLocalizedDisplayname()).thenReturn(room.id);
+        if (source == 'archive') {
+          when(
+            () => archive.getArchivedMessages(
+              '!failure:example.org',
+              beforeTimestamp: null,
+              limit: 500,
+            ),
+          ).thenAnswer((_) async => []);
+        }
+        final recovered = await service.createIncrementalBackup();
+        expect(recovered.messageCount, 1);
+        expect(recovered.warnings, isEmpty);
+        expect(await service.verifyBackup(recovered.filePath), isTrue);
+      },
+    );
+  }
 
   for (final change in ['user', 'server', 'unknown', 'legacy']) {
     test('incremental cursor does not cross $change ownership', () async {

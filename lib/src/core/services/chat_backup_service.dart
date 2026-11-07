@@ -216,17 +216,19 @@ class ChatBackupService {
     };
   }
 
-  // The unscoped legacy cursor has no provable owner. Start a full incremental
-  // scan for a new/unknown identity instead of skipping another user's history.
-  String? _incrementalCursorKey() {
+  // Older cursors do not prove which rooms were exported. Start a full scan
+  // for a new identity or room set rather than skipping unexported history.
+  String? _incrementalCursorKey(List<String> roomIds) {
     final client = _clientManager.client;
     final user = client?.userID;
     final server = client?.homeserver;
     if (user == null || user.isEmpty || server == null) return null;
     final owner = sha256.convert(
-      utf8.encode(jsonEncode([server.toString(), user])),
+      utf8.encode(
+        jsonEncode([server.toString(), user, roomIds.toSet().toList()..sort()]),
+      ),
     );
-    return '${_keyLastIncrementalBackupTs}_v2_$owner';
+    return '${_keyLastIncrementalBackupTs}_v3_$owner';
   }
 
   /// 获取备份目录
@@ -501,7 +503,14 @@ class ChatBackupService {
   }) async {
     final ensureCurrent = _captureBackupSession();
     final client = _clientManager.client!;
-    final cursorKey = _incrementalCursorKey();
+    final rooms = client.rooms
+        .where((room) => roomIds == null || roomIds.contains(room.id))
+        .toList();
+    final cursorKey = _incrementalCursorKey(
+      rooms.map((room) => room.id).toList(),
+    );
+    var complete = true;
+    final warnings = <String>[];
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
@@ -517,10 +526,6 @@ class ChatBackupService {
 
     // 获取上次增量备份时间
     final lastBackupTs = await _getLastIncrementalBackupTs(cursorKey);
-
-    final rooms = roomIds != null
-        ? client.rooms.where((r) => roomIds.contains(r.id)).toList()
-        : client.rooms;
 
     ensureCurrent();
     onProgress?.call(0.1);
@@ -581,6 +586,7 @@ class ChatBackupService {
             });
           }
         } catch (e) {
+          complete = false;
           debugLog('ChatBackupService: Timeline error for ${room.id}: $e');
         }
 
@@ -634,6 +640,7 @@ class ChatBackupService {
               cursor = archived.last.originServerTs;
             }
           } catch (e) {
+            complete = false;
             debugLog('ChatBackupService: Archive error for ${room.id}: $e');
           }
         }
@@ -642,6 +649,7 @@ class ChatBackupService {
         messageCount += messages.length;
         (backupData['rooms'] as Map<String, dynamic>)[room.id] = roomData;
       } catch (e) {
+        complete = false;
         debugLog('ChatBackupService: Failed to backup room ${room.id}: $e');
       }
 
@@ -652,6 +660,14 @@ class ChatBackupService {
     ensureCurrent();
     onProgress?.call(0.85);
     ensureCurrent();
+
+    if (!complete) {
+      warnings.add(
+        'Some room history could not be read. The incremental checkpoint was not advanced; retry this backup.',
+      );
+    }
+    (backupData['manifest'] as Map<String, dynamic>)['hasReadErrors'] = !complete;
+    (backupData['manifest'] as Map<String, dynamic>)['warnings'] = warnings;
 
     // 写入文件
     final finalJsonStr = _finalizeBackupJson(backupData);
@@ -668,7 +684,9 @@ class ChatBackupService {
 
     ensureCurrent();
     // 记录本次备份时间
-    await _setLastIncrementalBackupTs(now.millisecondsSinceEpoch, cursorKey);
+    if (complete) {
+      await _setLastIncrementalBackupTs(now.millisecondsSinceEpoch, cursorKey);
+    }
     ensureCurrent();
 
     onProgress?.call(1.0);
@@ -683,6 +701,7 @@ class ChatBackupService {
       roomCount: rooms.length,
       messageCount: messageCount,
       createdAt: now,
+      warnings: warnings,
     );
   }
 
