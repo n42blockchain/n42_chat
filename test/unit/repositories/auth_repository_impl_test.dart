@@ -28,6 +28,8 @@ class SpyAuthRepositoryImpl extends AuthRepositoryImpl {
 
   bool updateUserProfileDataResult = true;
   int clearNftAvatarCalls = 0;
+  int profileReads = 0;
+  Future<bool>? profileWrite;
 
   @override
   Future<bool> updateUserProfileData({
@@ -46,11 +48,14 @@ class SpyAuthRepositoryImpl extends AuthRepositoryImpl {
     if (clearNftAvatar) {
       clearNftAvatarCalls++;
     }
-    return updateUserProfileDataResult;
+    return profileWrite ?? updateUserProfileDataResult;
   }
 
   @override
-  Future<UserEntity?> getCurrentUserProfile() async => null;
+  Future<UserEntity?> getCurrentUserProfile() async {
+    profileReads++;
+    return null;
+  }
 }
 
 void main() {
@@ -83,6 +88,74 @@ void main() {
     pending.complete();
     expect(await update, isFalse);
   });
+
+  for (final logout in [false, true]) {
+    test(
+      'avatar upload stops follow-up writes after ${logout ? 'logout' : 'account switch'}',
+      () async {
+        var userId = '@first:example';
+        var loggedIn = true;
+        final pending = Completer<void>();
+        when(() => mockAuthDataSource.userId).thenAnswer((_) => userId);
+        when(() => mockAuthDataSource.isLoggedIn).thenAnswer((_) => loggedIn);
+        when(() => mockClientManager.setAvatar(any(), any()))
+            .thenAnswer((_) => pending.future);
+        final spy = SpyAuthRepositoryImpl(
+          authDataSource: mockAuthDataSource,
+          secureStorage: mockSecureStorage,
+          socialAuthApi: mockSocialAuthApi,
+        );
+        final update = spy.updateAvatar(Uint8List.fromList([1]), 'avatar.png');
+        if (logout) {
+          loggedIn = false;
+        } else {
+          userId = '@second:example';
+        }
+        pending.complete();
+        expect(await update, isFalse);
+        expect(spy.clearNftAvatarCalls, 0);
+        expect(spy.profileReads, 0);
+      },
+    );
+  }
+
+  test(
+    'avatar metadata completion does not refresh a replacement account',
+    () async {
+      var userId = '@first:example';
+      final pending = Completer<bool>();
+      when(() => mockAuthDataSource.userId).thenAnswer((_) => userId);
+      final spy = SpyAuthRepositoryImpl(
+        authDataSource: mockAuthDataSource,
+        secureStorage: mockSecureStorage,
+        socialAuthApi: mockSocialAuthApi,
+      )..profileWrite = pending.future;
+      final update = spy.updateAvatar(Uint8List.fromList([1]), 'avatar.png');
+      await Future<void>.delayed(Duration.zero);
+      expect(spy.clearNftAvatarCalls, 1);
+      userId = '@second:example';
+      pending.complete(true);
+      expect(await update, isFalse);
+      expect(spy.profileReads, 0);
+    },
+  );
+
+  test(
+    'avatar update retains metadata clear and refresh for the same account',
+    () async {
+      final spy = SpyAuthRepositoryImpl(
+        authDataSource: mockAuthDataSource,
+        secureStorage: mockSecureStorage,
+        socialAuthApi: mockSocialAuthApi,
+      );
+      expect(
+        await spy.updateAvatar(Uint8List.fromList([1]), 'avatar.png'),
+        isTrue,
+      );
+      expect(spy.clearNftAvatarCalls, 1);
+      expect(spy.profileReads, 1);
+    },
+  );
 
   setUpAll(() {
     registerFallbackValue(Uint8List(0));

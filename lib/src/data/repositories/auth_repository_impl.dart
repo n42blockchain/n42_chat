@@ -677,15 +677,33 @@ class AuthRepositoryImpl
     }
   }
 
+  // Keep multi-step profile work bound to the session that started it.
+  bool Function() _captureProfileSession() {
+    final manager = _authDataSource.clientManager;
+    final client = manager.client;
+    final userId = _authDataSource.userId;
+    final session = (client?.userID, client?.deviceID, client?.accessToken);
+    return () =>
+        !_isDisposed &&
+        isLoggedIn &&
+        identical(_authDataSource.clientManager, manager) &&
+        identical(manager.client, client) &&
+        _authDataSource.userId == userId &&
+        (client?.userID, client?.deviceID, client?.accessToken) == session;
+  }
+
   @override
   Future<bool> updateAvatar(Uint8List avatarBytes, String filename) async {
     if (!isLoggedIn) return false;
 
+    final isCurrent = _captureProfileSession();
     try {
       await _authDataSource.clientManager.setAvatar(avatarBytes, filename);
+      if (!isCurrent()) return false;
       final clearedNftAvatar = await updateUserProfileData(
         clearNftAvatar: true,
       );
+      if (!isCurrent()) return false;
       if (!clearedNftAvatar) {
         authLog('Avatar uploaded but failed to clear NFT avatar metadata');
         return false;
@@ -695,7 +713,7 @@ class AuthRepositoryImpl
       // 刷新用户资料以更新缓存的头像 URL
       await getCurrentUserProfile();
 
-      return true;
+      return isCurrent();
     } catch (e) {
       authLog('Update avatar failed - $e');
       return false;
@@ -706,20 +724,11 @@ class AuthRepositoryImpl
   Future<bool> updateDisplayName(String displayName) async {
     if (!isLoggedIn) return false;
 
-    final manager = _authDataSource.clientManager;
-    final client = manager.client;
-    final userId = _authDataSource.userId;
-    final session = (client?.userID, client?.deviceID, client?.accessToken);
+    final isCurrent = _captureProfileSession();
     try {
-      await manager.setDisplayName(displayName);
+      await _authDataSource.clientManager.setDisplayName(displayName);
       // A profile response for the previous session must not rename the new one.
-      if (_isDisposed ||
-          !isLoggedIn ||
-          !identical(manager.client, client) ||
-          _authDataSource.userId != userId ||
-          (client?.userID, client?.deviceID, client?.accessToken) != session) {
-        return false;
-      }
+      if (!isCurrent()) return false;
       _cachedDisplayName = displayName;
       authLog('Display name updated to: $displayName');
       return true;
