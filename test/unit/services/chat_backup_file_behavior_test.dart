@@ -214,6 +214,32 @@ void main() {
     }
   }
 
+  for (final incremental in [false, true]) {
+    for (final redactedFirst in [false, true]) {
+      test('redacted duplicate excludes old content: incremental=$incremental first=$redactedFirst', () async {
+        final (room, timeline) = roomFixture('!redacted:example.org');
+        when(() => room.topic).thenReturn('');
+        when(() => room.isDirectChat).thenReturn(false);
+        when(() => room.summary).thenReturn(_Summary());
+        when(() => client.rooms).thenReturn([room]);
+        final original = timeline.events.single;
+        final redacted = matrix.Event(eventId: original.eventId,
+          senderId: original.senderId, originServerTs: original.originServerTs,
+          type: 'm.room.message', room: room, content: {},
+          unsigned: {'redacted_because': <String, dynamic>{
+            'event_id': 'redaction', 'type': 'm.room.redaction',
+            'sender': original.senderId, 'origin_server_ts': 1, 'content': <String, dynamic>{},
+          }});
+        expect(redacted.redacted, isTrue);
+        when(() => timeline.events).thenReturn(redactedFirst ? [redacted, original] : [original, redacted]);
+        final result = incremental ? await service.createIncrementalBackup() : await service.createBackup();
+        expect(result.messageCount, 0);
+        expect(await File(result.filePath).readAsString(), isNot(contains('historical message')));
+        verify(() => timeline.cancelSubscriptions()).called(1);
+      });
+    }
+  }
+
   test('full export deduplicates overlapping loaded event IDs', () async {
     final (room, timeline) = roomFixture('!overlap:example.org');
     when(() => room.topic).thenReturn('');

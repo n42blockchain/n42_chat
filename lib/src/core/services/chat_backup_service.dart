@@ -360,7 +360,7 @@ class ChatBackupService {
             }
             ensureCurrent();
             final loadedEvents = timeline.events.toList();
-            final privateEventIds = loadedEvents.where(_isEphemeralEvent)
+            final privateEventIds = loadedEvents.where(_isUnexportableEvent)
                 .map((event) => event.eventId).toSet();
             final exportedEventIds = <String>{};
             final events = loadedEvents
@@ -632,11 +632,11 @@ class ChatBackupService {
           try {
             ensureCurrent();
             final loadedEvents = timeline.events.toList();
-            privateEventIds.addAll(loadedEvents.where(_isEphemeralEvent)
+            privateEventIds.addAll(loadedEvents.where(_isUnexportableEvent)
                 .map((event) => event.eventId));
             for (final e in loadedEvents) {
               if (e.type != 'm.room.message') continue;
-              if (_isEphemeralEvent(e)) continue;
+              if (_isUnexportableEvent(e)) continue;
               final ts = e.originServerTs.millisecondsSinceEpoch;
               if (lastBackupTs > 0 && ts <= lastBackupTs) continue;
               addMessage({
@@ -1132,14 +1132,18 @@ class ChatBackupService {
     return migrated;
   }
 
-  /// Whether [event] carries a lifetime that a backup must not outlive.
+  /// Whether [event] must be excluded from new backups.
+  ///
+  /// Redaction excludes every loaded copy of the same event ID, including
+  /// stale plaintext still present in the timeline or merged archive.
   ///
   /// Self-destruct ({seconds}) and view-once ({after:1}) messages share the
   /// same metadata field. Writing their plaintext into a backup file would
   /// preserve it long after the message burned in-app, so they are excluded at
   /// export time — the archive already excludes them, this closes the timeline
   /// path that feeds backups directly.
-  static bool _isEphemeralEvent(dynamic event) =>
+  static bool _isUnexportableEvent(dynamic event) =>
+      event.redacted == true ||
       (event.content as Map?)?['n42.self_destruct'] != null;
 
   /// Whether a message entry from a backup file must not be restored.
