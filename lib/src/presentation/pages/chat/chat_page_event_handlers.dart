@@ -1126,7 +1126,8 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     );
 
     await _loadBackground();
-    if (!mounted) {
+    if (!mounted || !settingsSessionIsCurrent() || settingsBloc.isClosed ||
+        widget.conversation.id != settingsRoomId) {
       return;
     }
 
@@ -1141,6 +1142,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       return;
     }
 
+    if (widget.conversation.isGroup) {
+      await _refreshGroupMemberCount();
+      if (!mounted) return;
+    }
+
     if (result is Map && result['action'] == 'search') {
       final initialQuery = result['query'] is String
           ? result['query'] as String
@@ -1151,6 +1157,12 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 显示添加成员对话框
   void _showAddMemberDialog(BuildContext ctx) async {
+    final bloc = context.read<ChatBloc>();
+    final sessionIsCurrent = bloc.captureCurrentSession();
+    final roomId = widget.conversation.id;
+    bool current() => mounted && !bloc.isClosed && sessionIsCurrent() &&
+        widget.conversation.id == roomId && bloc.state.roomId == roomId;
+    if (!mounted || !current()) return;
     // 获取联系人列表
     List<ContactEntity> contacts = [];
     try {
@@ -1169,10 +1181,10 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       final existing = members.map((m) => m.userId).toSet();
       contacts = contacts.where((c) => !existing.contains(c.userId)).toList();
     } catch (_) {
-      if (mounted) context.showErrorSnackBar(S.of(context)!.commonLoadFailed);
+      if (mounted && current()) context.showErrorSnackBar(S.of(context)!.commonLoadFailed);
       return;
     }
-    if (!mounted) return;
+    if (!mounted || !current()) return;
 
     if (contacts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1195,11 +1207,14 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       ),
     );
 
+    if (!mounted || !current()) return;
     if (selectedIds != null && selectedIds.isNotEmpty) {
       try {
         final groupRepository = getIt<IGroupRepository>();
         await groupRepository.inviteUsers(widget.conversation.id, selectedIds);
-        if (mounted) {
+        if (mounted && current()) {
+          await _refreshGroupMemberCount();
+          if (!mounted || !current()) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -1210,7 +1225,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           );
         }
       } catch (e) {
-        if (mounted) {
+        if (mounted && current()) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -1226,10 +1241,18 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 从群中移除成员
   void _removeMemberFromGroup(String userId) async {
+    final bloc = context.read<ChatBloc>();
+    final sessionIsCurrent = bloc.captureCurrentSession();
+    final roomId = widget.conversation.id;
+    bool current() => mounted && !bloc.isClosed && sessionIsCurrent() &&
+        widget.conversation.id == roomId && bloc.state.roomId == roomId;
+    if (!mounted || !current()) return;
     try {
       final groupRepository = getIt<IGroupRepository>();
       await groupRepository.kickMember(widget.conversation.id, userId);
-      if (mounted) {
+      if (mounted && current()) {
+        await _refreshGroupMemberCount();
+        if (!mounted || !current()) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(S.of(context)?.chatMemberRemoved ?? 'Member removed'),
@@ -1237,7 +1260,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted && current()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -1247,6 +1270,27 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _refreshGroupMemberCount() async {
+    if (!mounted) return;
+    final bloc = context.read<ChatBloc>();
+    final sessionIsCurrent = bloc.captureCurrentSession();
+    final roomId = widget.conversation.id;
+    final revision = ++_groupMemberCountRevision;
+    bool current() => mounted && !bloc.isClosed && sessionIsCurrent() &&
+        widget.conversation.id == roomId && bloc.state.roomId == roomId &&
+        revision == _groupMemberCountRevision;
+    if (!current()) return;
+    try {
+      final group = await getIt<IGroupRepository>().getGroup(roomId);
+      if (current() && group?.roomId == roomId &&
+          group!.memberCount != _groupMemberCountOverride) {
+        setState(() => _groupMemberCountOverride = group.memberCount);
+      }
+    } catch (e) {
+      debugLog('Failed to refresh group member count: $e');
     }
   }
 

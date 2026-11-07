@@ -282,6 +282,8 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
   List<ChatMentionSelection> _composerMentions = const [];
   Future<List<ChatMentionMember>>? _groupMembersFuture;
   List<ChatMentionMember> _groupMembers = const [];
+  int? _groupMemberCountOverride;
+  int _groupMemberCountRevision = 0;
 
   // View Once 模式（阅后即焚媒体）
   bool _isViewOnce = false;
