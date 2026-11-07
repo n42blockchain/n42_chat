@@ -16,6 +16,12 @@ void main() {
       'N42_TEST_PASSWORD': 'fixture',
     },
     {'N42_TEST_HOMESERVER': 'http://user:fixture@127.0.0.1:18948'},
+    for (final attempts in ['0', '31', 'invalid'])
+      {
+        'N42_TEST_HOMESERVER': 'http://127.0.0.1:18948',
+        'N42_TEST_INVITE_CODE': 'fixture',
+        'N42_QA_RECOVERY_ATTEMPTS': attempts,
+      },
   ];
   for (var i = 0; i < cases.length; i++) {
     test(

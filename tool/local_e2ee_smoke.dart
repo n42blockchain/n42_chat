@@ -2,6 +2,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
+
+import 'package:matrix/encryption/ssss.dart';
 
 import 'package:matrix/matrix.dart';
 import 'package:n42_chat/src/core/encryption/e2ee_manager.dart';
@@ -29,6 +33,10 @@ Future<void> runLocalE2eeSmoke({Map<String, String>? environment}) async {
   if (env['N42_TEST_USERNAME']?.isNotEmpty == true ||
       env['N42_TEST_PASSWORD']?.isNotEmpty == true) {
     throw StateError('Only generated disposable accounts are supported.');
+  }
+  final attempts = int.tryParse(env['N42_QA_RECOVERY_ATTEMPTS'] ?? '1');
+  if (attempts == null || attempts < 1 || attempts > 30) {
+    throw StateError('N42_QA_RECOVERY_ATTEMPTS must be between 1 and 30.');
   }
   final stamp = DateTime.now().microsecondsSinceEpoch;
   final credentials = List.generate(
@@ -268,57 +276,94 @@ Future<void> runLocalE2eeSmoke({Map<String, String>? environment}) async {
     for (final peer in activeClients) {
       await peer.abortSync();
     }
-    final recoveryDb = await databaseFactoryFfi.openDatabase(
-      '${directory.path}/recovery-device.sqlite',
-    );
-    final recoveryDatabase = await MatrixSdkDatabase.init(
-      'recovery-device',
-      database: recoveryDb,
-      sqfliteFactory: databaseFactoryFfi,
-    );
-    final recovery = Client('recovery-device', database: recoveryDatabase);
-    clients.add(recovery);
-    await recovery.checkHomeserver(uri);
-    await recovery.login(
-      LoginType.mLoginPassword,
-      identifier: AuthenticationUserIdentifier(
-        user: credentials.first.username,
-      ),
-      password: credentials.first.password,
-      initialDeviceDisplayName: 'Isolated key recovery device',
-    );
-    await _until([
-      recovery,
-    ], () => recovery.getRoomById(roomId)?.encrypted == true);
-    await recovery.abortSync();
-    final historicalSession = afterRaw.content['session_id'] as String;
-    final beforeRestore = await recovery.encryption!.keyManager
-        .loadInboundGroupSession(roomId, historicalSession);
-    if (beforeRestore?.isValid == true) {
-      throw StateError(
-        'Recovery device unexpectedly already owns the historical key',
+    var completedRecoveries = 0;
+    var wrongKeyRejections = 0;
+    final restoredSessionCounts = <int>[];
+    for (var attempt = 0; attempt < attempts; attempt++) {
+      final recoveryDb = await databaseFactoryFfi.openDatabase(
+        '${directory.path}/recovery-device-$attempt.sqlite',
       );
-    }
-    final recoveryManager = E2EEManager(recovery);
-    final restored = await recoveryManager.unlockWithRecoveryKey(recoveryKey);
-    recoveryManager.clearCachedRecoveryKey();
-    if (restored < 1) {
-      throw StateError('App restore did not recover any sessions');
-    }
-    final restoredEvent = await recovery.encryption!.decryptRoomEvent(
-      Event.fromMatrixEvent(afterRaw, recovery.getRoomById(roomId)!),
-    );
-    if (restoredEvent.type != EventTypes.Message ||
-        restoredEvent.content['body'] != afterBody) {
-      throw StateError(
-        'Historical message did not decrypt after app key recovery',
+      final recoveryDatabase = await MatrixSdkDatabase.init(
+        'recovery-device-$attempt',
+        database: recoveryDb,
+        sqfliteFactory: databaseFactoryFfi,
       );
+      final recovery = Client(
+        'recovery-device-$attempt',
+        database: recoveryDatabase,
+      );
+      clients.add(recovery);
+      await recovery.checkHomeserver(uri);
+      await retryRateLimited(
+        () => recovery.login(
+          LoginType.mLoginPassword,
+          identifier: AuthenticationUserIdentifier(
+            user: credentials.first.username,
+          ),
+          password: credentials.first.password,
+          initialDeviceDisplayName: 'Isolated key recovery device',
+        ),
+      );
+      await _until([
+        recovery,
+      ], () => recovery.getRoomById(roomId)?.encrypted == true);
+      await recovery.abortSync();
+      final historicalSession = afterRaw.content['session_id'] as String;
+      final beforeRestore = await recovery.encryption!.keyManager
+          .loadInboundGroupSession(roomId, historicalSession);
+      if (beforeRestore?.isValid == true) {
+        throw StateError(
+          'Recovery device unexpectedly already owns the historical key',
+        );
+      }
+      final recoveryManager = E2EEManager(recovery);
+      final wrongKey = SSSS.encodeRecoveryKey(
+        Uint8List.fromList(
+          List.generate(32, (_) => Random.secure().nextInt(256)),
+        ),
+      );
+      var wrongKeyRejected = false;
+      try {
+        await recoveryManager.unlockWithRecoveryKey(wrongKey);
+      } on E2EEException {
+        wrongKeyRejected = true;
+      }
+      if (!wrongKeyRejected ||
+          await recoveryManager.getRecoveryKey() != null ||
+          (await recovery.encryption!.keyManager.loadInboundGroupSession(
+                roomId,
+                historicalSession,
+              ))?.isValid ==
+              true) {
+        throw StateError(
+          'Wrong recovery key was accepted or changed historical keys',
+        );
+      }
+      wrongKeyRejections++;
+      final restored = await recoveryManager.unlockWithRecoveryKey(recoveryKey);
+      recoveryManager.clearCachedRecoveryKey();
+      if (restored < 1) {
+        throw StateError('App restore did not recover any sessions');
+      }
+      final restoredEvent = await recovery.encryption!.decryptRoomEvent(
+        Event.fromMatrixEvent(afterRaw, recovery.getRoomById(roomId)!),
+      );
+      if (restoredEvent.type != EventTypes.Message ||
+          restoredEvent.content['body'] != afterBody) {
+        throw StateError(
+          'Historical message did not decrypt after app key recovery',
+        );
+      }
+      restoredSessionCounts.add(restored);
+      completedRecoveries++;
     }
     print(
       jsonEncode({
         'clients': clients.length,
         'app_backup_recovery_passed': true,
-        'restored_sessions': restored,
+        'restored_sessions_per_attempt': restoredSessionCounts,
+        'recovery_attempts': completedRecoveries,
+        'wrong_valid_recovery_keys_rejected': wrongKeyRejections,
         'historical_key_absent_before_restore': true,
         'historical_message_decrypted_after_restore': true,
         'encrypted_events': 5,
@@ -330,7 +375,7 @@ Future<void> runLocalE2eeSmoke({Map<String, String>? environment}) async {
         'decrypted_deliveries': deliveries,
         'server_ciphertext_checks': 5,
         'passed': true,
-        'scope': 'isolated protocol and one backup recovery; not UI or physical-device acceptance',
+        'scope': 'isolated protocol and backup recoveries; not UI or physical-device acceptance',
       }),
     );
   } finally {
@@ -368,4 +413,24 @@ class _TokenAuth extends AuthenticationData {
   final String token;
   @override
   Map<String, dynamic> toJson() => {...super.toJson(), 'token': token};
+}
+
+/// Retry only explicit server rate limits, preserving its requested delay.
+Future<T> retryRateLimited<T>(
+  Future<T> Function() action, {
+  Future<void> Function(Duration)? wait,
+  int maxRetries = 5,
+}) async {
+  for (var retry = 0; ; retry++) {
+    try {
+      return await action();
+    } on MatrixException catch (error) {
+      if (error.errcode != 'M_LIMIT_EXCEEDED' || retry >= maxRetries) rethrow;
+      final milliseconds = error.retryAfterMs ?? 60000;
+      if (milliseconds < 0 || milliseconds > 300000) rethrow;
+      final delay = Duration(milliseconds: milliseconds);
+      print('QA login rate limited; waiting ${delay.inMilliseconds} ms');
+      await (wait ?? Future<void>.delayed)(delay);
+    }
+  }
 }
