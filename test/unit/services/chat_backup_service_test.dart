@@ -277,6 +277,32 @@ void main() {
       );
     }
 
+    for (final privateFirst in [false, true]) {
+      test('restore excludes all copies of a private event: first=$privateFirst', () async {
+        final ordinary = <String, dynamic>{
+          'eventId': r'$private', 'sender': '@alice:server',
+          'type': 'm.text', 'body': 'must not return', 'ts': 123,
+        };
+        final private = {...ordinary, 'isViewOnce': true};
+        final public = {...ordinary, 'eventId': r'$public', 'body': 'keep this'};
+        final file = File('${backupDir.path}/private_duplicates.n42backup');
+        await file.writeAsString(jsonEncode({
+          'manifest': {'backupId': 'legacy'},
+          'rooms': {'!room:server': {'messages': [
+            ...privateFirst ? [private, ordinary] : [ordinary, private], public,
+          ]}},
+        }));
+        when(() => archiveService.isEventArchived(any())).thenAnswer((_) async => false);
+        when(() => archiveService.importArchivedMessages(any(), any())).thenAnswer((_) async => 1);
+        final result = await buildService().restoreToArchive(backupFilePath: file.path);
+        expect(result.errors, isEmpty);
+        final imported = verify(() => archiveService.importArchivedMessages('!room:server', captureAny())).captured.single as List<ArchivedMessagesCompanion>;
+        expect(imported, hasLength(1));
+        expect(imported.single.eventId.value, r'$public');
+        expect(imported.single.body.value, 'keep this');
+      });
+    }
+
     test('writes archived messages through MessageArchiveService', () async {
       final service = buildService();
       final backupFile = File('${backupDir.path}/restore_archive.n42backup');

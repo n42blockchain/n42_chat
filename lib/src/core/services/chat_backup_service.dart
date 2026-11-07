@@ -825,13 +825,22 @@ class ChatBackupService {
         final roomData = entry.value as Map<String, dynamic>;
         final messages = (roomData['messages'] as List<dynamic>?) ?? [];
         final companions = <ArchivedMessagesCompanion>[];
+        // A private copy invalidates stale plaintext copies regardless of order.
+        final privateEventIds = messages
+            .whereType<Map<String, dynamic>>()
+            .where(_isEphemeralBackupEntry)
+            .map((message) => message['eventId']?.toString())
+            .whereType<String>()
+            .toSet();
 
         for (final msg in messages) {
           ensureCurrent();
           try {
             final msgMap = msg as Map<String, dynamic>;
             final eventId = msgMap['eventId']?.toString();
-            if (eventId == null || eventId.isEmpty) {
+            if (eventId == null ||
+                eventId.isEmpty ||
+                privateEventIds.contains(eventId)) {
               continue;
             }
 

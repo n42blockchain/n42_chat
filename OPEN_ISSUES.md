@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Private duplicate restore follow-up: restoreToArchive now scans each room before importing and excludes every copy of an event ID when any backup entry carries a supported ephemeral marker. Two input-order regressions failed before the fix and now pass; the independent public message in each fixture remains restored. All 109 backup tests pass; scoped analysis has six infos and no errors/warnings. Existing archive rows, already-created files, missing markers and metadata outside the imported room remain outside this fix.
+
 - Redaction export follow-up: new full/incremental exports exclude every loaded copy of an event ID if the SDK marks any copy redacted, including stale archive copies merged after timeline inspection. Four ordering/mode regressions reproduce the previous leak and now pass; 109 backup/SDK restriction tests pass, with scoped analysis reporting seven infos and no errors/warnings. Redactions not visible in the loaded snapshot and already-created backup files remain outside this fix.
 
 - Duplicate privacy metadata (batch 281): export snapshots loaded events and excludes every copy of an event ID when any loaded copy has n42.self_destruct. Incremental archive merging also rejects those IDs. Four ordering/mode cases and 103 backup tests pass; service analysis has six infos, no errors/warnings. This covers privacy markers visible in the loaded snapshot; later redactions/metadata, archive-only markers, host integration and full device/history acceptance remain open.
