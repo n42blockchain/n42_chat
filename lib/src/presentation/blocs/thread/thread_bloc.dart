@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
+import '../../../domain/repositories/thread_pagination_repository.dart';
 import 'thread_event.dart';
 import 'thread_state.dart';
 import '../../../core/utils/debug_log.dart';
@@ -57,6 +58,36 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     on<DisposeThread>(_onDisposeThread);
   }
 
+  Future<({List<MessageEntity> messages, bool hasMore, String? nextBatch})>
+  _loadPage(
+    String room,
+    String root, {
+    String? fromEventId,
+    String? fromToken,
+  }) async {
+    final repository = _messageRepository;
+    if (repository is IThreadPaginationRepository) {
+      final page = await (repository as IThreadPaginationRepository)
+          .getThreadMessagePage(room, root, fromToken: fromToken);
+      return (
+        messages: page.messages,
+        hasMore: page.hasMore,
+        nextBatch: page.nextBatch,
+      );
+    }
+    final messages = await repository.getThreadMessages(
+      room,
+      root,
+      limit: 50,
+      fromEventId: fromEventId,
+    );
+    return (
+      messages: messages,
+      hasMore: messages.length >= 50,
+      nextBatch: null,
+    );
+  }
+
   Future<void> _onInitializeThread(
     InitializeThread event,
     Emitter<ThreadState> emit,
@@ -74,12 +105,10 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
 
     try {
       // 加载线程消息
-      final messages = await _messageRepository.getThreadMessages(
-        event.roomId,
-        event.threadRootEventId,
-      );
+      final page = await _loadPage(event.roomId, event.threadRootEventId);
 
       if (!isCurrent()) return;
+      final messages = page.messages;
       // 分离根消息和回复
       MessageEntity? rootMessage;
       final replies = <MessageEntity>[];
@@ -112,7 +141,9 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
           replies: replies,
           isLoading: false,
           participantCount: participantIds.length,
-          hasMore: messages.length >= 50,
+          hasMore: page.hasMore,
+          nextBatch: page.nextBatch,
+          clearNextBatch: page.nextBatch == null,
         ),
       );
 
@@ -172,12 +203,10 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
 
     emit(state.copyWith(isLoading: true));
     try {
-      final messages = await _messageRepository.getThreadMessages(
-        roomId,
-        rootId,
-      );
+      final page = await _loadPage(roomId, rootId);
 
       if (!isCurrent()) return;
+      final messages = page.messages;
       final replies = messages
           .where((m) => m.id != state.threadRootEventId)
           .toList();
@@ -186,7 +215,9 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
         state.copyWith(
           replies: replies,
           isLoading: false,
-          hasMore: messages.length >= 50,
+          hasMore: page.hasMore,
+          nextBatch: page.nextBatch,
+          clearNextBatch: page.nextBatch == null,
         ),
       );
     } catch (e) {
@@ -214,14 +245,15 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       final beforeEventId = state.replies.isNotEmpty
           ? state.replies.first.id
           : null;
-      final messages = await _messageRepository.getThreadMessages(
+      final page = await _loadPage(
         roomId,
         rootId,
-        limit: 50,
         fromEventId: beforeEventId,
+        fromToken: state.nextBatch,
       );
 
       if (!isCurrent()) return;
+      final messages = page.messages;
       final newReplies = messages
           .where((m) => m.id != state.threadRootEventId)
           .toList();
@@ -235,7 +267,9 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
             for (final message in state.replies) message.id: message,
           }.values.toList(),
           isLoading: false,
-          hasMore: messages.length >= 50,
+          hasMore: page.hasMore,
+          nextBatch: page.nextBatch,
+          clearNextBatch: page.nextBatch == null,
         ),
       );
     } catch (e) {

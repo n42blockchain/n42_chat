@@ -15,6 +15,7 @@ class ThreadState extends Equatable {
 
   /// 是否还有更多历史消息
   final bool hasMore;
+  final String? nextBatch;
 
   /// 当前回复目标（线程内引用回复）
   final MessageEntity? replyTarget;
@@ -39,6 +40,7 @@ class ThreadState extends Equatable {
     this.replies = const [],
     this.isLoading = false,
     this.hasMore = false,
+    this.nextBatch,
     this.replyTarget,
     this.participantCount = 0,
     this.roomId,
@@ -55,23 +57,26 @@ class ThreadState extends Equatable {
 
   @override
   List<Object?> get props => [
-        rootMessage,
-        replies,
-        isLoading,
-        hasMore,
-        replyTarget,
-        participantCount,
-        roomId,
-        threadRootEventId,
-        error,
-        isSending,
-      ];
+    rootMessage,
+    replies,
+    isLoading,
+    hasMore,
+    nextBatch,
+    replyTarget,
+    participantCount,
+    roomId,
+    threadRootEventId,
+    error,
+    isSending,
+  ];
 
   ThreadState copyWith({
     MessageEntity? rootMessage,
     List<MessageEntity>? replies,
     bool? isLoading,
     bool? hasMore,
+    String? nextBatch,
+    bool clearNextBatch = false,
     MessageEntity? replyTarget,
     bool clearReplyTarget = false,
     int? participantCount,
@@ -86,6 +91,7 @@ class ThreadState extends Equatable {
       replies: replies ?? this.replies,
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,
+      nextBatch: clearNextBatch ? null : (nextBatch ?? this.nextBatch),
       replyTarget: clearReplyTarget ? null : (replyTarget ?? this.replyTarget),
       participantCount: participantCount ?? this.participantCount,
       roomId: roomId ?? this.roomId,

@@ -1,3 +1,4 @@
+import '../../../domain/repositories/thread_pagination_repository.dart';
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -719,6 +720,11 @@ class MatrixMessageDataSource {
     fromToken: fromToken,
     beforeEventId: beforeEventId,
   );
+
+  Future<ThreadMessagePage> getThreadMessagePage(
+    String roomId, String threadRootEventId, {int limit = 50, String? fromToken,
+  }) => _threadHandler.getThreadMessagePage(roomId, threadRootEventId,
+      limit: limit, fromToken: fromToken);
 
   /// 监听线程消息更新
   Stream<List<MessageEntity>> watchThreadMessages(

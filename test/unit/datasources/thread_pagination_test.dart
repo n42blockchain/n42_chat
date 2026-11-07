@@ -108,6 +108,29 @@ void main() {
       expect(queries.length, 2);
     },
   );
+  test('short and empty pages retain their explicit continuation', () async {
+    response(() async => {'chunk': [], 'next_batch': 'after-empty'});
+    final empty = await handler.getThreadMessagePage('!room', 'root');
+    expect(empty.messages, isEmpty);
+    expect(empty.hasMore, isTrue);
+    response(() async => page('one', next: 'after-one'));
+    final short = await handler.getThreadMessagePage(
+      '!room',
+      'root',
+      fromToken: empty.nextBatch,
+    );
+    expect(short.messages.length, 1);
+    expect(short.hasMore, isTrue);
+    expect(queries.last['from'], 'after-empty');
+    response(() async => {'chunk': []});
+    final end = await handler.getThreadMessagePage(
+      '!room',
+      'root',
+      fromToken: short.nextBatch,
+    );
+    expect(end.hasMore, isFalse);
+  });
+
   test('anchors are isolated by root and session', () async {
     response(() async => page('anchor', next: 'opaque'));
     await handler.getThreadMessages('!room', 'root');

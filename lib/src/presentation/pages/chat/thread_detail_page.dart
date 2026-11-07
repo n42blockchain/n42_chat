@@ -105,6 +105,18 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                 child: CustomScrollView(
                   controller: _scrollController,
                   slivers: [
+                    if (state.hasMore && !state.isLoading)
+                      SliverToBoxAdapter(
+                        child: TextButton(
+                          key: const ValueKey('thread-load-more'),
+                          onPressed: () => context.read<ThreadBloc>().add(
+                            const LoadMoreThreadMessages(),
+                          ),
+                          child: Text(
+                            s?.chatCatchUpLoadMore ?? 'Load older messages',
+                          ),
+                        ),
+                      ),
                     // 加载更多指示器
                     if (state.isLoading && state.replies.isNotEmpty)
                       const SliverToBoxAdapter(

@@ -1,3 +1,4 @@
+import 'package:n42_chat/src/domain/repositories/thread_pagination_repository.dart';
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -92,6 +93,14 @@ void main() {
       ).called(1);
     },
   );
+
+  test('typed page filters cleared events and preserves continuation', () async {
+    when(() => source.getThreadMessagePage(room, 'root', limit: 50, fromToken: 'first'))
+      .thenAnswer((_) async => ThreadMessagePage(messages: [message('old', -1), message('new', 1)], nextBatch: 'second'));
+    final page = await repository.getThreadMessagePage(room, 'root', fromToken: 'first');
+    expect(page.messages.map((m) => m.id), ['new']);
+    expect(page.nextBatch, 'second');
+  });
 
   test('thread root list retains new roots only', () async {
     expect((await repository.getRoomThreadRoots(room)).map((m) => m.id), [

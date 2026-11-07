@@ -9,6 +9,7 @@ import '../../domain/entities/group_album_entity.dart';
 import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/message_repository.dart';
+import '../../domain/repositories/thread_pagination_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
 import '../datasources/local/chat_history_clear_store.dart';
 import '../mappers/archived_message_mapper.dart';
@@ -18,7 +19,7 @@ import '../../core/utils/debug_log.dart';
 import '../../core/utils/matrix_utils.dart';
 
 /// 消息仓库实现
-class MessageRepositoryImpl implements IMessageRepository {
+class MessageRepositoryImpl implements IMessageRepository, IThreadPaginationRepository {
   final MatrixMessageDataSource _messageDataSource;
   final MatrixClientManager _clientManager;
   final PreferencesDataSource _secureStorage;
@@ -1757,6 +1758,18 @@ class MessageRepositoryImpl implements IMessageRepository {
   // ============================================
   // 消息线程 (MSC3440)
   // ============================================
+
+  @override
+  Future<ThreadMessagePage> getThreadMessagePage(
+    String roomId, String threadRootEventId, {int limit = 50, String? fromToken,
+  }) async {
+    final origin = _historyOrigin();
+    final page = await _messageDataSource.getThreadMessagePage(roomId, threadRootEventId,
+      limit: limit, fromToken: fromToken);
+    final visible = await _visibleHistory(roomId, page.messages, origin);
+    if (!origin.isCurrent()) return const ThreadMessagePage();
+    return ThreadMessagePage(messages: visible, nextBatch: page.nextBatch);
+  }
 
   @override
   Future<List<MessageEntity>> getThreadMessages(
