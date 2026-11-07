@@ -101,6 +101,25 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                     style: TextStyle(color: theme.colorScheme.error),
                   ),
                 ),
+              if (state.error != null &&
+                  state.rootMessage == null &&
+                  state.replies.isEmpty &&
+                  state.roomId != null &&
+                  state.threadRootEventId != null)
+                TextButton.icon(
+                  key: const ValueKey('thread-retry-initialization'),
+                  icon: const Icon(Icons.refresh),
+                  label: Text(s?.commonRetry ?? 'Retry'),
+                  onPressed: state.isLoading
+                      ? null
+                      : () => context.read<ThreadBloc>().add(
+                          InitializeThread(
+                            roomId: state.roomId!,
+                            threadRootEventId: state.threadRootEventId!,
+                            isRetry: true,
+                          ),
+                        ),
+                ),
               Expanded(
                 child: CustomScrollView(
                   controller: _scrollController,

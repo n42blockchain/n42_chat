@@ -176,4 +176,44 @@ void main() {
     expect(bloc.state.error, isNull);
     expect(bloc.state.isSending, isFalse);
   });
+  test('initial retry rejects duplicate in-flight loads', () async {
+    when(() => repository.getThreadMessages('!room', 'root'))
+        .thenThrow(StateError('offline'));
+    await initialize('root');
+    clearInteractions(repository);
+    final pending = Completer<List<MessageEntity>>();
+    when(() => repository.getThreadMessages('!room', 'root'))
+        .thenAnswer((_) => pending.future);
+    const retry = InitializeThread(
+      roomId: '!room',
+      threadRootEventId: 'root',
+      isRetry: true,
+    );
+    bloc.add(retry);
+    bloc.add(retry);
+    await pumpEventQueue();
+    verify(() => repository.getThreadMessages('!room', 'root')).called(1);
+    pending.complete([message('root')]);
+    await pumpEventQueue();
+    expect(bloc.state.error, isNull);
+    expect(bloc.state.rootMessage?.id, 'root');
+  });
+
+  test(
+    'retry from an old thread cannot reinitialize the current thread',
+    () async {
+      await initialize('new');
+      clearInteractions(repository);
+      bloc.add(
+        const InitializeThread(
+          roomId: '!room',
+          threadRootEventId: 'old',
+          isRetry: true,
+        ),
+      );
+      await pumpEventQueue();
+      expect(bloc.state.threadRootEventId, 'new');
+      verifyNever(() => repository.getThreadMessages(any(), any()));
+    },
+  );
 }

@@ -16,14 +16,16 @@ abstract class ThreadEvent extends Equatable {
 class InitializeThread extends ThreadEvent {
   final String roomId;
   final String threadRootEventId;
+  final bool isRetry;
 
   const InitializeThread({
     required this.roomId,
     required this.threadRootEventId,
+    this.isRetry = false,
   });
 
   @override
-  List<Object?> get props => [roomId, threadRootEventId];
+  List<Object?> get props => [roomId, threadRootEventId, if (isRetry) true];
 }
 
 /// 加载线程消息

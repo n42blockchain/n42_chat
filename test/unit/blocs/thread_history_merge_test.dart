@@ -152,12 +152,20 @@ void main() {
     () async {
       clearInteractions(repo);
       current = false;
+      bloc.add(
+        const InitializeThread(
+          roomId: '!room',
+          threadRootEventId: 'root',
+          isRetry: true,
+        ),
+      );
       bloc.add(ThreadMessagesUpdated([message('other-account')]));
       final completion = Completer<bool>();
       bloc.add(SendThreadTextMessage('text', completion: completion));
       await pumpEventQueue();
       expect(await completion.future, isFalse);
       expect(bloc.state.replies.map((m) => m.id), ['old']);
+      verifyNever(() => repo.getThreadMessages(any(), any()));
       verifyNever(() => repo.filterThreadHistory(any(), any()));
       verifyNever(() => repo.sendThreadTextMessage(any(), any(), any()));
     },

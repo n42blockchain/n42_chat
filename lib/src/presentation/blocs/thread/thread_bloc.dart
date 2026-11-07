@@ -107,6 +107,13 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     InitializeThread event,
     Emitter<ThreadState> emit,
   ) async {
+    if (event.isRetry &&
+        (state.isLoading ||
+            !_context(emit)() ||
+            event.roomId != state.roomId ||
+            event.threadRootEventId != state.threadRootEventId)) {
+      return;
+    }
     _generation++;
     _detachSubscription();
     final repository = _messageRepository;
