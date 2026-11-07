@@ -121,6 +121,7 @@ void main() {
       if (invalid == 'empty-user') when(() => client.userID).thenReturn('');
       if (invalid == 'unknown-server') when(() => client.homeserver).thenReturn(null);
       final backup = await service.createBackup();
+      expect(backup.warnings, contains(contains('ownership is unavailable')));
       final result = await service.restoreFromBackup(backupFilePath: backup.filePath);
       expect(result.hasErrors, isTrue);
       expect(result.settingsRestored, 0);

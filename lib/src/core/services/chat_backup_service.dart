@@ -271,6 +271,7 @@ class ChatBackupService {
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
     final warnings = <String>[];
+    _warnUnknownExportOwner(warnings);
     final fileName =
         'backup_${now.year}${now.month.toString().padLeft(2, '0')}'
         '${now.day.toString().padLeft(2, '0')}_'
@@ -535,6 +536,7 @@ class ChatBackupService {
     );
     var complete = true;
     final warnings = <String>[];
+    _warnUnknownExportOwner(warnings);
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
@@ -889,6 +891,14 @@ class ChatBackupService {
       hasSettings: data.containsKey('settings'),
       warnings: _restoreWarnings(manifest),
     );
+  }
+
+  void _warnUnknownExportOwner(List<String> warnings) {
+    final client = _clientManager.client;
+    if (client?.userID == null || client!.userID!.trim().isEmpty ||
+        client.homeserver == null) {
+      warnings.add('Backup account ownership is unavailable. This file cannot be restored until ownership is resolved.');
+    }
   }
 
   String? _backupOwnerError(Object? manifest) {
