@@ -222,22 +222,14 @@ class ArchiveIntegrityService {
       );
     }
 
-    // 校验完整性
-    if (expectedChecksum != null) {
-      final valid = await verifyArchive(compressedFile, expectedChecksum);
-      if (!valid) {
-        return const ImportResult(
-          success: false,
-          messagesImported: 0,
-          error: 'Checksum verification failed',
-        );
-      }
-    }
-
     try {
       lease?.ensureCurrent();
       final database = lease?.database ?? _db!;
-      final decompressed = await _readBoundedArchive(compressedFile, lease);
+      final decompressed = await _readBoundedArchive(
+        compressedFile,
+        lease,
+        expectedChecksum: expectedChecksum,
+      );
       String content;
       try {
         content = utf8.decode(decompressed);
@@ -341,22 +333,30 @@ class ArchiveIntegrityService {
 
   Future<Uint8List> _readBoundedArchive(
     File file,
-    ArchiveAccountLease? lease,
-  ) async {
+    ArchiveAccountLease? lease, {
+    String? expectedChecksum,
+  }) async {
+    final digest = _ArchiveDigestSink();
+    final hasher = sha256.startChunkedConversion(digest);
     Stream<List<int>> compressedChunks() async* {
       var total = 0;
-      await for (final chunk in file.openRead()) {
-        lease?.ensureCurrent();
-        total += chunk.length;
-        if (total > _importLimits.compressedBytes) {
-          throw const FormatException(
-            'Compressed archive exceeds import limit',
-          );
+      try {
+        await for (final chunk in file.openRead()) {
+          lease?.ensureCurrent();
+          total += chunk.length;
+          hasher.add(chunk);
+          if (total > _importLimits.compressedBytes) {
+            throw const FormatException(
+              'Compressed archive exceeds import limit',
+            );
+          }
+          // Bound the amount fed to each inflater call, including high-ratio input.
+          for (var offset = 0; offset < chunk.length; offset += 1024) {
+            yield chunk.sublist(offset, (offset + 1024).clamp(0, chunk.length));
+          }
         }
-        // Bound the amount fed to each inflater call, including high-ratio input.
-        for (var offset = 0; offset < chunk.length; offset += 1024) {
-          yield chunk.sublist(offset, (offset + 1024).clamp(0, chunk.length));
-        }
+      } finally {
+        hasher.close();
       }
     }
 
@@ -385,6 +385,10 @@ class ArchiveIntegrityService {
         }
       }
       output.add(chunk);
+    }
+    if (expectedChecksum != null &&
+        digest.value?.toString() != expectedChecksum) {
+      throw const FormatException('Checksum verification failed');
     }
     return output.takeBytes();
   }
@@ -486,4 +490,13 @@ class ArchiveIntegrityService {
       return null;
     }
   }
+}
+
+/// Retains only the digest, never the archived plaintext or compressed bytes.
+class _ArchiveDigestSink implements Sink<Digest> {
+  Digest? value;
+  @override
+  void add(Digest data) => value = data;
+  @override
+  void close() {}
 }

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
+
 import 'package:drift/native.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
@@ -19,6 +21,8 @@ class _Manager extends Mock implements MatrixClientManager {}
 class _Client extends Mock implements matrix.Client {}
 
 class _Database extends Mock implements ArchiveDatabase {}
+
+class _File extends Mock implements File {}
 
 void main() {
   late _Manager manager;
@@ -485,6 +489,65 @@ void main() {
       expect(await bob.getMessageCount('!shared:example.org'), 1);
     },
   );
+
+  test('checksum and import consume the same compressed byte stream', () async {
+    List<int> archive(String id) => gzip.encode(
+      utf8.encode(
+        jsonEncode({
+          'eid': id,
+          'rid': '!snapshot:example.org',
+          'sid': '@alice:example.org',
+          'ts': 100,
+          'tp': 'm.room.message',
+          'bd': id,
+          'q': 202601,
+        }),
+      ),
+    );
+    final original = archive('original');
+    final replacement = archive('replacement');
+    final file = _File();
+    when(() => file.existsSync()).thenReturn(true);
+    when(() => file.length()).thenAnswer((_) async => original.length);
+    when(() => file.path).thenReturn('fixture.db.gz');
+    var reads = 0;
+    when(() => file.openRead()).thenAnswer((_) {
+      final bytes = ++reads == 1 ? original : replacement;
+      return Stream.fromIterable([
+        for (var offset = 0; offset < bytes.length; offset += 7)
+          bytes.sublist(offset, (offset + 7).clamp(0, bytes.length)),
+      ]);
+    });
+    final checksum = sha256.convert(original).toString();
+    final result = await ArchiveIntegrityService(db: bob)
+        .importArchive(file, expectedChecksum: checksum);
+    expect(result.success, isTrue);
+    expect(await bob.isEventArchived('original'), isTrue);
+    expect(await bob.isEventArchived('replacement'), isFalse);
+    expect(reads, 1);
+  });
+
+  test('checksum mismatch rejects decoded archive before any insert', () async {
+    final directory = await Directory.systemTemp.createTemp(
+      'n42-checksum-reject-',
+    );
+    addTearDown(() => directory.delete(recursive: true));
+    final source = ArchiveIntegrityService(
+      db: alice,
+      documentsDirectory: () async => directory,
+    );
+    final exported = await source.exportQuarterlyArchive(202601);
+    final result = await ArchiveIntegrityService(db: bob).importArchive(
+      exported.file,
+      expectedChecksum: sha256.convert([1, 2, 3]).toString(),
+    );
+    expect(result.success, isFalse);
+    expect(result.error, contains('Checksum verification failed'));
+    expect(result.messagesImported, 0);
+    expect(await bob.isEventArchived('event-alice'), isFalse);
+    expect(await bob.getMetadata('!shared:example.org'), isNull);
+    expect(await bob.searchMessages('alice'), isEmpty);
+  });
 
   test('count completed after account switch is suppressed', () async {
     final database = _Database();
