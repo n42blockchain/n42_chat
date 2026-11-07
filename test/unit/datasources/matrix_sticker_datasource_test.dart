@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/data/repositories/sticker_repository_impl.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -56,6 +58,64 @@ void main() {
       },
     );
   });
+
+  for (final install in [false, true]) {
+    test(
+      'sticker mutation stops after account switch: install=$install',
+      () async {
+        final pending = Completer<void>();
+        final index = Completer<Map<String, dynamic>>();
+        when(() => client.setAccountData(any(), any(), any()))
+            .thenAnswer((_) => pending.future);
+        if (!install) {
+          when(
+            () => client.getAccountData(
+              '@alice:matrix.example.com',
+              MatrixStickerDataSource.installedPacksType,
+            ),
+          ).thenAnswer((_) => index.future);
+        }
+        final write = install
+            ? dataSource.installPack(
+                'pack-2',
+                const StickerPack(id: 'pack-2', name: 'Test'),
+              )
+            : dataSource.uninstallPack('pack-1');
+        when(() => client.userID).thenReturn('@bob:matrix.example.com');
+        pending.complete();
+        index.complete({
+          'pack_ids': ['pack-1'],
+        });
+        expect(await write, isFalse);
+        verifyNever(
+          () => client.setAccountData('@bob:matrix.example.com', any(), any()),
+        );
+        verifyNever(
+          () => client.getAccountData('@bob:matrix.example.com', any()),
+        );
+      },
+    );
+    test('stable sticker mutation succeeds: install=$install', () async {
+      when(() => client.setAccountData(any(), any(), any()))
+          .thenAnswer((_) async {});
+      final success = install
+          ? await dataSource.installPack(
+              'pack-2',
+              const StickerPack(id: 'pack-2', name: 'Test'),
+            )
+          : await dataSource.uninstallPack('pack-1');
+      expect(success, isTrue);
+      verify(
+        () => client.setAccountData(
+          '@alice:matrix.example.com',
+          MatrixStickerDataSource.installedPacksType,
+          {
+            'pack_ids': install ? ['pack-1', 'pack-2'] : <String>[],
+          },
+        ),
+      ).called(1);
+    });
+  }
 
   test('installed sticker cache does not cross account switches', () async {
     final repository = StickerRepositoryImpl(dataSource);

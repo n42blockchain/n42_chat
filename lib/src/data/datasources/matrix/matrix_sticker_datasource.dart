@@ -169,26 +169,31 @@ class MatrixStickerDataSource {
 
   /// 安装贴纸包
   Future<bool> installPack(String packId, StickerPack pack) async {
-    if (_client == null) return false;
+    final client = _client;
+    final userId = client?.userID;
+    if (client == null || userId == null) return false;
+    final origin = accountScope;
 
     try {
       // 保存贴纸包数据
-      await _client!.setAccountData(
-        _client!.userID!,
+      await client.setAccountData(
+        userId,
         '$stickerPackType.$packId',
         _packToJson(pack),
       );
 
+      if (accountScope != origin) return false;
       // 更新已安装列表
       final installedData = await _getInstalledPackIds();
+      if (accountScope != origin) return false;
       if (!installedData.contains(packId)) {
         installedData.add(packId);
-        await _client!.setAccountData(_client!.userID!, installedPacksType, {
+        await client.setAccountData(userId, installedPacksType, {
           'pack_ids': installedData,
         });
       }
 
-      return true;
+      return accountScope == origin;
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to install pack: $e');
       return false;
@@ -197,17 +202,21 @@ class MatrixStickerDataSource {
 
   /// 卸载贴纸包
   Future<bool> uninstallPack(String packId) async {
-    if (_client == null) return false;
+    final client = _client;
+    final userId = client?.userID;
+    if (client == null || userId == null) return false;
+    final origin = accountScope;
 
     try {
       // 从已安装列表移除
       final installedData = await _getInstalledPackIds();
+      if (accountScope != origin) return false;
       installedData.remove(packId);
-      await _client!.setAccountData(_client!.userID!, installedPacksType, {
+      await client.setAccountData(userId, installedPacksType, {
         'pack_ids': installedData,
       });
 
-      return true;
+      return accountScope == origin;
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to uninstall pack: $e');
       return false;
