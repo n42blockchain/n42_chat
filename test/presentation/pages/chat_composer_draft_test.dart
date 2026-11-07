@@ -203,6 +203,11 @@ void main() {
       final account = _ReportAccount();
       final chat = _Chat();
       when(() => chat.isClosed).thenReturn(false);
+      when(() => chat.captureCurrentSession()).thenAnswer((_) {
+        final roomId = chat.state.roomId;
+        return () =>
+            account.active && !chat.isClosed && chat.state.roomId == roomId;
+      });
       whenListen(
         chat,
         const Stream<ChatState>.empty(),
