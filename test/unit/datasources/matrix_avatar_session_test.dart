@@ -131,8 +131,9 @@ void main() {
               ),
               () => MockClient((request) async {
                 fallbackCalls++;
-                if (changeDuringFallback)
+                if (changeDuringFallback) {
                   client.accessToken = 'synthetic-second';
+                }
                 expect(
                   request.headers['Authorization'],
                   'Bearer synthetic-first',
