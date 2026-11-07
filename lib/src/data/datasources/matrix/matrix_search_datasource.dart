@@ -22,6 +22,20 @@ class MatrixSearchDataSource {
   /// 获取Matrix客户端
   matrix.Client? get _client => _clientManager.client;
 
+  bool Function() _captureSearchSession() {
+    final client = _client;
+    final user = client?.userID;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    final server = client?.homeserver;
+    return () =>
+        identical(_client, client) &&
+        client?.userID == user &&
+        client?.accessToken == token &&
+        client?.deviceID == device &&
+        client?.homeserver == server;
+  }
+
   // ============================================
   // 全局搜索
   // ============================================
@@ -33,9 +47,10 @@ class MatrixSearchDataSource {
   }) async {
     if (_client == null || query.trim().isEmpty) return [];
 
+    final current = _captureSearchSession();
     try {
       final result = await _client!.searchUserDirectory(query, limit: limit);
-      return result.results;
+      return current() ? result.results : [];
     } catch (e) {
       return [];
     }
@@ -48,12 +63,13 @@ class MatrixSearchDataSource {
   }) async {
     if (_client == null) return [];
 
+    final current = _captureSearchSession();
     try {
       final result = await _client!.queryPublicRooms(
         limit: limit,
         filter: matrix.PublicRoomQueryFilter(genericSearchTerm: query),
       );
-      return result.chunk;
+      return current() ? result.chunk : [];
     } catch (e) {
       return [];
     }
@@ -140,14 +156,17 @@ class MatrixSearchDataSource {
     MessageSearchFilter? filter,
     int limit = 50,
   }) async {
+    final current = _captureSearchSession();
     final room = _client?.getRoomById(roomId);
-    if (room == null || query.trim().isEmpty) return [];
+    if (room == null || query.trim().isEmpty || limit <= 0) return [];
 
     final lowerQuery = query.toLowerCase();
     final results = <matrix.Event>[];
 
+    matrix.Timeline? timeline;
     try {
-      final timeline = await room.getTimeline();
+      timeline = await room.getTimeline();
+      if (!current()) return [];
 
       // 遍历时间线中的消息
       for (final event in timeline.events) {
@@ -162,6 +181,7 @@ class MatrixSearchDataSource {
       // 如果结果不够，尝试加载更多历史
       if (results.length < limit) {
         await timeline.requestHistory(historyCount: 100);
+        if (!current()) return [];
 
         for (final event in timeline.events) {
           if (!_isMessageEvent(event)) continue;
@@ -176,9 +196,11 @@ class MatrixSearchDataSource {
     } catch (e) {
       // 搜索失败
       debugLog('Error: $e');
+    } finally {
+      timeline?.cancelSubscriptions();
     }
 
-    return results;
+    return current() ? results : [];
   }
 
   /// 全局搜索消息（所有房间）
@@ -188,16 +210,26 @@ class MatrixSearchDataSource {
     int limit = 50,
     int limitPerRoom = 10,
   }) async {
-    if (_client == null || query.trim().isEmpty) return [];
+    final current = _captureSearchSession();
+    final client = _client;
+    if (client == null ||
+        query.trim().isEmpty ||
+        limit <= 0 ||
+        limitPerRoom <= 0) {
+      return [];
+    }
 
     final results = <MessageSearchResult>[];
     final lowerQuery = query.toLowerCase();
 
-    for (final room in _client!.rooms) {
+    for (final room in List<matrix.Room>.of(client.rooms)) {
+      if (!current()) return [];
       if (room.membership != matrix.Membership.join) continue;
 
+      matrix.Timeline? timeline;
       try {
-        final timeline = await room.getTimeline();
+        timeline = await room.getTimeline();
+        if (!current()) return [];
         var roomResultCount = 0;
 
         for (final event in timeline.events) {
@@ -215,9 +247,12 @@ class MatrixSearchDataSource {
       } catch (e) {
         // 继续搜索其他房间
         debugLog('Error: $e');
+      } finally {
+        timeline?.cancelSubscriptions();
       }
     }
 
+    if (!current()) return [];
     // 按时间排序
     results.sort((a, b) {
       final aTime = a.event.originServerTs;
