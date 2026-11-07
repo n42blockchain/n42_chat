@@ -117,12 +117,66 @@ Future<void> runLocalE2eeSmoke({Map<String, String>? environment}) async {
         deliveries++;
       }
     }
+    final extraDb = await databaseFactoryFfi.openDatabase(
+      '${directory.path}/owner-second-device.sqlite',
+    );
+    final extraDatabase = await MatrixSdkDatabase.init(
+      'owner-second-device',
+      database: extraDb,
+      sqfliteFactory: databaseFactoryFfi,
+    );
+    final extra = Client('owner-second-device', database: extraDatabase);
+    clients.add(extra);
+    await extra.checkHomeserver(uri);
+    await extra.login(
+      LoginType.mLoginPassword,
+      identifier: AuthenticationUserIdentifier(
+        user: credentials.first.username,
+      ),
+      password: credentials.first.password,
+      initialDeviceDisplayName: 'Isolated owner second device',
+    );
+    if (extra.userID != clients.first.userID ||
+        extra.deviceID == clients.first.deviceID ||
+        !extra.encryptionEnabled) {
+      throw StateError('Second-device identity or encryption mismatch');
+    }
+    await _until(clients, () => extra.getRoomById(roomId)?.encrypted == true);
+    await _until(clients, () async {
+      await clients[1].updateUserDeviceKeys(additionalUsers: {extra.userID!});
+      return clients[1].userDeviceKeys[extra.userID]?.deviceKeys.containsKey(
+            extra.deviceID,
+          ) ==
+          true;
+    });
+    final freshBody = 'post-login encrypted payload $stamp';
+    final freshId = await clients[1]
+        .getRoomById(roomId)!
+        .sendTextEvent(freshBody);
+    if (freshId == null) throw StateError('Missing fresh event id');
+    final freshRaw = await clients[1].getOneRoomEvent(roomId, freshId);
+    if (freshRaw.type != EventTypes.Encrypted ||
+        jsonEncode(freshRaw.content).contains(freshBody)) {
+      throw StateError('Fresh server event is not opaque ciphertext');
+    }
+    for (final recipient in clients) {
+      await _until(clients, () async {
+        final event = await recipient
+            .getRoomById(roomId)!
+            .getEventById(freshId);
+        return event?.type == EventTypes.Message &&
+            event?.content['body'] == freshBody;
+      });
+      deliveries++;
+    }
     print(
       jsonEncode({
         'clients': clients.length,
-        'encrypted_events': 3,
+        'encrypted_events': 4,
+        'distinct_accounts': credentials.length,
+        'same_account_second_device': true,
         'decrypted_deliveries': deliveries,
-        'server_ciphertext_checks': 3,
+        'server_ciphertext_checks': 4,
         'passed': true,
         'scope': 'isolated protocol; not UI, recovery or device acceptance',
       }),
