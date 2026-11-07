@@ -308,6 +308,7 @@ class ChatBackupService {
         'roomCount': rooms.length,
         'includesMedia': includeMedia,
         'includesKeys': includesKeysInBackup,
+        'historyScope': 'loadedTimeline',
         'checksum': '',
       },
       'rooms': <String, dynamic>{},
@@ -329,9 +330,8 @@ class ChatBackupService {
           'memberCount': room.summary.mJoinedMemberCount ?? 0,
         };
 
-        // 获取消息（通过 room 的 lastEvent 等方式）
-        // Matrix SDK v6 不提供直接的 timeline getter
-        // 使用 room.getTimeline() 获取完整 timeline
+        // Export every eligible loaded event. Remote history pagination remains
+        // separate; the manifest explicitly describes this source scope.
         try {
           final timeline = await room.getTimeline();
           try {
@@ -339,7 +339,6 @@ class ChatBackupService {
             final events = timeline.events
                 .where((e) => e.type == 'm.room.message')
                 .where((e) => !_isEphemeralEvent(e))
-                .take(1000)
                 .map(
                   (e) => {
                     'eventId': e.eventId,

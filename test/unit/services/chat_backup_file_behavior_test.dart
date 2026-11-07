@@ -115,6 +115,25 @@ void main() {
     }
   }
 
+  test('full export retains more than 1000 loaded messages', () async {
+    final (room, timeline) = roomFixture('!large:example.org');
+    when(() => room.topic).thenReturn('');
+    when(() => room.isDirectChat).thenReturn(false);
+    when(() => room.summary).thenReturn(_Summary());
+    when(() => client.rooms).thenReturn([room]);
+    when(() => timeline.events).thenReturn(List.generate(1005, (index) => matrix.Event(
+      eventId: 'event-$index', senderId: '@alice:example.org',
+      originServerTs: DateTime(2026), type: 'm.room.message',
+      content: {'msgtype': 'm.text', 'body': 'message-$index'}, room: room,
+    )));
+    final result = await service.createBackup();
+    final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+    expect(result.messageCount, 1005);
+    expect(data['rooms']['!large:example.org']['messages'], hasLength(1005));
+    expect(data['manifest']['historyScope'], 'loadedTimeline');
+    verify(() => timeline.cancelSubscriptions()).called(1);
+  });
+
   for (final invalid in ['unknown-user', 'empty-user', 'unknown-server']) {
     test('restore rejects declared but invalid owner: $invalid', () async {
       if (invalid == 'unknown-user') when(() => client.userID).thenReturn(null);
