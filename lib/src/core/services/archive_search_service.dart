@@ -3,6 +3,7 @@ import '../../data/mappers/archived_message_mapper.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/search_result_entity.dart';
 import '../utils/debug_log.dart';
+import 'archive_account_access.dart';
 
 /// 归档搜索结果
 class ArchiveSearchResult {
@@ -20,10 +21,17 @@ class ArchiveSearchResult {
 /// 基于 FTS5 全文搜索引擎，支持在完整历史归档中搜索消息。
 /// 覆盖热数据和归档数据的联合搜索。
 class ArchiveSearchService {
-  final ArchiveDatabase _db;
+  final ArchiveDatabase? _db;
+  final ArchiveAccountAccess? _accountAccess;
   final ArchivedMessageMapper _mapper = const ArchivedMessageMapper();
 
-  ArchiveSearchService({required ArchiveDatabase db}) : _db = db;
+  ArchiveSearchService({required ArchiveDatabase db})
+    : _db = db,
+      _accountAccess = null;
+
+  ArchiveSearchService.accountScoped({required ArchiveAccountAccess access})
+    : _db = null,
+      _accountAccess = access;
 
   /// 搜索归档消息
   ///
@@ -47,7 +55,10 @@ class ArchiveSearchService {
     if (query.trim().isEmpty) return [];
 
     try {
-      final results = await _db.searchMessages(
+      final lease = await _accountAccess?.capture();
+      final database = lease?.database ?? _db!;
+      final effectiveUserId = lease?.userId ?? currentUserId;
+      final results = await database.searchMessages(
         query,
         roomId: roomId,
         afterTimestamp: after?.millisecondsSinceEpoch,
@@ -56,11 +67,15 @@ class ArchiveSearchService {
         limit: limit,
         offset: offset,
         filter: filter,
-        currentUserId: currentUserId,
+        currentUserId: effectiveUserId,
       );
 
+      lease?.ensureCurrent();
       return results.map((archived) {
-        final entity = _mapper.toEntity(archived, currentUserId: currentUserId);
+        final entity = _mapper.toEntity(
+          archived,
+          currentUserId: effectiveUserId,
+        );
 
         // 提取搜索匹配片段
         final snippet = _extractSnippet(
@@ -80,7 +95,13 @@ class ArchiveSearchService {
   Future<int> searchCount(String query, {String? roomId}) async {
     if (query.trim().isEmpty) return 0;
     try {
-      return await _db.searchCount(query, roomId: roomId);
+      final lease = await _accountAccess?.capture();
+      final count = await (lease?.database ?? _db!).searchCount(
+        query,
+        roomId: roomId,
+      );
+      lease?.ensureCurrent();
+      return count;
     } catch (e) {
       debugLog('ArchiveSearchService: Count failed: $e');
       return 0;
