@@ -40,3 +40,9 @@ layout and message wrapping matched the reviewed images. Linux renders the Ahem
 glyph edges differently from macOS. Both platform baselines retain strict pixel
 comparison. The CI matrix runs both hosts; a new host needs reviewed baselines
 rather than a skipped test or a relaxed threshold.
+
+The macOS job uses the xcode-27 runner family, matching the macOS 27 family
+on which the reviewed macOS baseline was generated (local host 27.2). A first
+macos-latest run used macOS 26.6.2 and differed by four/six icon-edge pixels
+with channel deltas of at most three. No comparator tolerance was changed;
+the aligned runner still needs a successful comparison.
