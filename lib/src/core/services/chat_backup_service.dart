@@ -322,23 +322,27 @@ class ChatBackupService {
         // 使用 room.getTimeline() 获取完整 timeline
         try {
           final timeline = await room.getTimeline();
-          ensureCurrent();
-          final events = timeline.events
-              .where((e) => e.type == 'm.room.message')
-              .where((e) => !_isEphemeralEvent(e))
-              .take(1000)
-              .map(
-                (e) => {
-                  'eventId': e.eventId,
-                  'sender': e.senderId,
-                  'type': e.messageType,
-                  'body': e.body,
-                  'timestamp': e.originServerTs.toIso8601String(),
-                },
-              )
-              .toList();
-          roomData['messages'] = events;
-          messageCount += events.length;
+          try {
+            ensureCurrent();
+            final events = timeline.events
+                .where((e) => e.type == 'm.room.message')
+                .where((e) => !_isEphemeralEvent(e))
+                .take(1000)
+                .map(
+                  (e) => {
+                    'eventId': e.eventId,
+                    'sender': e.senderId,
+                    'type': e.messageType,
+                    'body': e.body,
+                    'timestamp': e.originServerTs.toIso8601String(),
+                  },
+                )
+                .toList();
+            roomData['messages'] = events;
+            messageCount += events.length;
+          } finally {
+            timeline.cancelSubscriptions();
+          }
         } catch (_) {
           // Timeline not available, skip messages
         }
@@ -570,20 +574,24 @@ class ChatBackupService {
         // 1. 从 Timeline 获取热数据（新消息）
         try {
           final timeline = await room.getTimeline();
-          ensureCurrent();
-          for (final e in timeline.events) {
-            if (e.type != 'm.room.message') continue;
-            if (_isEphemeralEvent(e)) continue;
-            final ts = e.originServerTs.millisecondsSinceEpoch;
-            if (lastBackupTs > 0 && ts <= lastBackupTs) continue;
-            addMessage({
-              'eventId': e.eventId,
-              'sender': e.senderId,
-              'type': e.messageType,
-              'body': e.body,
-              'timestamp': e.originServerTs.toIso8601String(),
-              'ts': ts,
-            });
+          try {
+            ensureCurrent();
+            for (final e in timeline.events) {
+              if (e.type != 'm.room.message') continue;
+              if (_isEphemeralEvent(e)) continue;
+              final ts = e.originServerTs.millisecondsSinceEpoch;
+              if (lastBackupTs > 0 && ts <= lastBackupTs) continue;
+              addMessage({
+                'eventId': e.eventId,
+                'sender': e.senderId,
+                'type': e.messageType,
+                'body': e.body,
+                'timestamp': e.originServerTs.toIso8601String(),
+                'ts': ts,
+              });
+            }
+          } finally {
+            timeline.cancelSubscriptions();
           }
         } catch (e) {
           complete = false;
@@ -1029,9 +1037,8 @@ class ChatBackupService {
     final senderId = msgMap['sender']?.toString();
     final ts =
         msgMap['ts'] as int? ??
-        DateTime.tryParse(
-          msgMap['timestamp']?.toString() ?? '',
-        )?.millisecondsSinceEpoch;
+        DateTime.tryParse(msgMap['timestamp']?.toString() ?? '')
+            ?.millisecondsSinceEpoch;
     if (eventId == null || eventId.isEmpty || senderId == null || ts == null) {
       return null;
     }

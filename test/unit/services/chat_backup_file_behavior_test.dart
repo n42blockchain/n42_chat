@@ -26,6 +26,8 @@ class _Room extends Mock implements matrix.Room {}
 
 class _Archive extends Mock implements MessageArchiveService {}
 
+class _Summary extends Mock implements matrix.RoomSummary {}
+
 class _Timeline extends Mock implements matrix.Timeline {}
 
 void main() {
@@ -80,6 +82,30 @@ void main() {
       ),
     ]);
     return (room, timeline);
+  }
+
+  for (final incremental in [false, true]) {
+    for (final broken in [false, true]) {
+      test(
+        'export releases timeline: incremental=$incremental broken=$broken',
+        () async {
+          final (room, timeline) = roomFixture('!cleanup:example.org');
+          when(() => client.rooms).thenReturn([room]);
+          when(() => room.name).thenReturn('Cleanup');
+          when(() => room.topic).thenReturn('');
+          when(() => room.isDirectChat).thenReturn(false);
+          when(() => room.summary).thenReturn(_Summary());
+          if (broken)
+            when(() => timeline.events).thenThrow(StateError('read failed'));
+          if (incremental) {
+            await service.createIncrementalBackup();
+          } else {
+            await service.createBackup();
+          }
+          verify(() => timeline.cancelSubscriptions()).called(1);
+        },
+      );
+    }
   }
 
   test(
