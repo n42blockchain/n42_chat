@@ -1,3 +1,6 @@
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../data/services/account_action_capture.dart';
+import '../../../domain/repositories/auth_repository.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -471,14 +474,24 @@ class _RestoreSection extends StatelessWidget {
   }
 
   Future<void> _pickAndRestore(BuildContext context) async {
+    final dependencies = GetIt.instance;
+    if (!dependencies.isRegistered<MatrixClientManager>() ||
+        !dependencies.isRegistered<IAuthRepository>()) {
+      return;
+    }
+    final origin = captureAccountAction(
+      dependencies<MatrixClientManager>(), dependencies<IAuthRepository>(),
+    );
+    if (origin == null) return;
+    bool current() => context.mounted && origin.isCurrent;
     try {
       final file = await FilePicker.pickFile(type: FileType.any);
 
       if (file != null) {
         final filePath = file.path;
-        if (filePath != null && context.mounted) {
+        if (filePath != null && context.mounted && current()) {
           final preview = await GetIt.instance<ChatBackupService>().previewBackup(filePath);
-          if (!context.mounted) return;
+          if (!context.mounted || !current()) return;
           final l10n = S.of(context);
           final confirmed = await showDialog<bool>(
             context: context,
@@ -507,14 +520,14 @@ class _RestoreSection extends StatelessWidget {
               ],
             ),
           );
-          if (confirmed != true || !context.mounted) return;
+          if (confirmed != true || !context.mounted || !current()) return;
           context.read<BackupBloc>().add(
             RestoreFromBackup(backupFilePath: filePath),
           );
         }
       }
     } catch (e) {
-      if (context.mounted) {
+      if (context.mounted && current()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to pick file: $e'),

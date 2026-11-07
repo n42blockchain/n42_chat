@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Restore picker ownership (batch 260): picker/preview/confirmation now captures the existing account lifecycle origin before the first await and refuses stale dispatch/errors after account changes. Missing lifecycle dependencies fail closed. Scoped page analysis clean. Widget interaction, queued/in-progress service writes, encrypted password input, preview localization and host integration remain open; this only guards the page awaits, not the complete restore transaction.
+
 - Restore confirmation UI (batch 259): file selection now reads preview and presents room names, creation time and warnings in a scrollable confirmation dialog before dispatching RestoreFromBackup. Cancel/dismiss does not dispatch. Scoped page analysis is clean. Widget/device interaction, account-change handling across picker/dialog awaits, encrypted-file password input, warning localization and wallet pin integration remain open; source review is not UI acceptance.
 
 - Backup warning propagation (batch 258): BackupPreview now carries optional warnings; restoreFromBackup imports manifest warnings and synthesizes an incomplete-backup warning for hasReadErrors even when no text is present. String warnings are filtered and deduplicated. Eighty-two backup tests pass, including incomplete full-backup preview and restore assertions; scoped service analysis has six infos, no errors/warnings. UI display, localization, host integration and the remaining full-history/ownership requirements stay open.
