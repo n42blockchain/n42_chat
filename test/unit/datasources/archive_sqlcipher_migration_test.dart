@@ -163,7 +163,7 @@ void main() {
       expect(
         (await migrated.customSelect('PRAGMA user_version').get()).single
             .read<int>('user_version'),
-        1,
+        migrated.schemaVersion,
       );
       await ArchiveDatabase.closeInstance();
       expect(

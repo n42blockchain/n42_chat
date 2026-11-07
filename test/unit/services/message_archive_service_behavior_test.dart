@@ -244,4 +244,20 @@ void main() {
       },
     );
   }
+  test(
+    'deleted archived plaintext cannot return through a stale import',
+    () async {
+      final stale = _entry(
+        eventId: 'forgotten',
+        roomId: '!room:hs.test',
+        timestamp: 1,
+        body: 'forbidden secret',
+      );
+      await service.importArchivedMessages('!room:hs.test', [stale]);
+      await service.deleteArchivedMessage('forgotten');
+      expect(await service.importArchivedMessages('!room:hs.test', [stale]), 0);
+      expect(await database.searchMessages('forbidden'), isEmpty);
+      expect(await service.isEventArchived('forgotten'), isFalse);
+    },
+  );
 }

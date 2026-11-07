@@ -127,7 +127,7 @@ class MessageArchiveService {
       // redaction request as proof that the server accepted it. Reconcile
       // known redactions before insert-or-ignore can preserve old plaintext.
       for (final event in List<matrix.Event>.of(timeline.events)) {
-        if (event.redacted) await _db.deleteByEventId(event.eventId);
+        if (event.redacted) await _db.redactByEventId(event.eventId);
       }
 
       // 筛选需要归档的消息。
@@ -223,7 +223,7 @@ class MessageArchiveService {
   /// Removes redacted/self-destructed content from the full-text archive.
   Future<void> deleteArchivedMessage(String eventId) async {
     try {
-      await _db.deleteByEventId(eventId);
+      await _db.redactByEventId(eventId);
     } catch (e) {
       // Redaction must still complete if the local search cache is damaged,
       // but keep an observable signal for the residual plaintext risk.

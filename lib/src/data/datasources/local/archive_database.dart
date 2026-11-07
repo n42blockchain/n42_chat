@@ -9,6 +9,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart' as raw_sqlite;
+
 import '../../../core/utils/debug_log.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/search_result_entity.dart';
@@ -116,7 +117,7 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   }
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -149,9 +150,11 @@ class ArchiveDatabase extends _$ArchiveDatabase {
         'END',
       );
       await _createFtsDeleteTrigger();
+      await _createRedactionProtection();
     },
     onUpgrade: (Migrator m, int from, int to) async {
       debugLog('ArchiveDatabase: Migrating from v$from to v$to');
+      if (from < 2) await _createRedactionProtection();
     },
     beforeOpen: (details) async {
       if (details.hadUpgrade) {
@@ -165,6 +168,34 @@ class ArchiveDatabase extends _$ArchiveDatabase {
       await _createFtsDeleteTrigger();
     },
   );
+
+  // Like the FTS auxiliary tables, this is managed explicitly by migration.
+  // Store only event IDs, never the removed body or sender metadata.
+  Future<void> _createRedactionProtection() async {
+    await customStatement(
+      'CREATE TABLE IF NOT EXISTS archive_redactions ('
+      'event_id TEXT NOT NULL PRIMARY KEY)',
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS archive_reject_redacted_insert '
+      'BEFORE INSERT ON archived_messages '
+      'WHEN EXISTS (SELECT 1 FROM archive_redactions WHERE event_id = new.event_id) '
+      'BEGIN SELECT RAISE(IGNORE); END',
+    );
+  }
+
+  /// Persist a deletion marker and remove plaintext/FTS atomically. A marker
+  /// also protects events not yet archived from a later stale import.
+  Future<void> redactByEventId(String eventId) async {
+    if (eventId.isEmpty) throw ArgumentError('Event ID must not be empty');
+    await transaction(() async {
+      await customStatement(
+        'INSERT OR IGNORE INTO archive_redactions(event_id) VALUES (?)',
+        [eventId],
+      );
+      await deleteByEventId(eventId);
+    });
+  }
 
   /// Keeps an external-content FTS5 table synchronized on row deletion.
   Future<void> _createFtsDeleteTrigger() async {
