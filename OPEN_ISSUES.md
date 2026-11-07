@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Restore stale exception presentation (batch 263): BLoC exception handling now suppresses old-account failure content when the restore origin has expired. Combined backup service/BLoC suites pass 101 tests; scoped analysis has seven infos, no errors/warnings. UI interaction, encryption-password input, localization, rollback of started writes and full-history/ownership requirements remain open.
+
 - Restore confirmation provenance (batch 262): restore event carries the opening-account predicate into the service. BLoC rejects stale queued work; service combines it with its own client snapshot throughout restore, and late results omit old success/error content after predicate invalidation. Fifteen BackupBloc tests and one stale-origin service test pass; scoped analysis has seven infos, no errors/warnings. Already-started write rollback, complete UI interaction coverage, exception-path stale presentation, localization and host integration remain open.
 
 - Restore service session checks (batch 261): settings restore captures its starting session and checks after file reading/normalization, before and after each settings write, after progress callbacks and before returning success. Three progress-stage account mutations return failure; 85 backup tests pass. Service analysis has six infos, no errors/warnings. Already-started writes are not rolled back; queue delay before service invocation, account-owned backup validation, lifecycle generation beyond client field snapshots, UI interactions and host integration remain open.

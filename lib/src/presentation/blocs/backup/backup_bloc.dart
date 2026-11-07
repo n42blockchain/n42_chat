@@ -147,6 +147,10 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
         ));
       }
     } catch (e) {
+      if (event.isCurrent?.call() == false) {
+        emit(state.copyWith(isRestoring: false));
+        return;
+      }
       emit(state.copyWith(
         isRestoring: false,
         error: 'Restore failed: $e',
