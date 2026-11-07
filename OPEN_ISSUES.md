@@ -734,6 +734,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
 
+- 2026-11-07 SDK avatar upload isolation: a real SDK/temporary SQLite regression proved a replaced token still set the profile. Upload and both fallback paths now retain the captured client and recheck user/token/device/homeserver after asynchronous boundaries. Five avatar scenarios plus the existing database lifecycle case pass, including normal SDK/fallback success and replacement during fallback response. Scoped analysis has no new findings (two existing infos). Poke-text room-loop and real-device acceptance remain open.
+
 - 2026-11-07 profile cache/read-write isolation: four reproduced stale profile failures are fixed. Standard/custom profile responses and account-data writes now recheck their captured session before caching or proceeding. Token replacement and stable-account positive paths are covered; all 45 focused auth tests and scoped analysis pass. SDK avatar upload fallback, poke-text room-loop generation and real-device acceptance remain open.
 
 - 2026-11-07 avatar repository isolation: three reproduced failures now stop follow-up NFT metadata clearing/profile refresh when the session changes during upload or metadata write. All 38 auth tests pass, including stable-account success. SDK manager upload fallback and general profile-read/write cache generation checks still require separate validation; this does not establish complete avatar/session isolation.
