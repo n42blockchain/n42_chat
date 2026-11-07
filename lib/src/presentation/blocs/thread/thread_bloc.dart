@@ -161,7 +161,10 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     LoadThreadMessages event,
     Emitter<ThreadState> emit,
   ) async {
-    if (state.roomId == null || state.threadRootEventId == null) return;
+    if (state.roomId == null ||
+        state.threadRootEventId == null ||
+        state.isLoading)
+      return;
 
     final isCurrent = _context(emit);
     final roomId = state.roomId!;
@@ -198,7 +201,8 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     if (state.roomId == null ||
         state.threadRootEventId == null ||
-        !state.hasMore)
+        !state.hasMore ||
+        state.isLoading)
       return;
 
     final isCurrent = _context(emit);
@@ -224,7 +228,12 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
 
       emit(
         state.copyWith(
-          replies: [...newReplies, ...state.replies],
+          // Current entries win over overlapping older-page data, preserving
+          // updates that arrived while the request was in flight.
+          replies: {
+            for (final message in newReplies) message.id: message,
+            for (final message in state.replies) message.id: message,
+          }.values.toList(),
           isLoading: false,
           hasMore: messages.length >= 50,
         ),

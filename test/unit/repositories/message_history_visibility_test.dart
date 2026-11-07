@@ -58,7 +58,7 @@ void main() {
         room,
         'root',
         limit: any(named: 'limit'),
-        fromToken: any(named: 'fromToken'),
+        beforeEventId: any(named: 'beforeEventId'),
       ),
     ).thenAnswer(
       (_) async => [message('old', -1), message('root', 0), message('new', 1)],
@@ -87,7 +87,7 @@ void main() {
           room,
           'root',
           limit: 50,
-          fromToken: 'cursor',
+          beforeEventId: 'cursor',
         ),
       ).called(1);
     },

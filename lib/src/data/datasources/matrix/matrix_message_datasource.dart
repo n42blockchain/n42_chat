@@ -711,11 +711,13 @@ class MatrixMessageDataSource {
     String threadRootEventId, {
     int limit = 50,
     String? fromToken,
+    String? beforeEventId,
   }) => _threadHandler.getThreadMessages(
     roomId,
     threadRootEventId,
     limit: limit,
     fromToken: fromToken,
+    beforeEventId: beforeEventId,
   );
 
   /// 监听线程消息更新

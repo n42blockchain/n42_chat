@@ -1,5 +1,7 @@
 import 'direct_chat_send_guard.dart';
+
 import 'dart:typed_data';
+
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../domain/entities/message_entity.dart';
@@ -14,6 +16,18 @@ import '../../../../core/utils/debug_log.dart';
 class MatrixThreadHandler {
   final MatrixClientManager _clientManager;
   final MatrixEventMapper _eventMapper;
+  // An event ID is not a Matrix pagination token. Retain the continuation
+  // returned for each page's oldest displayed event, scoped to its session.
+  final Map<(String, String, String), String?> _threadCursors = {};
+  (matrix.Client?, String?, String?, String?, Uri?)? _cursorSession;
+
+  (matrix.Client?, String?, String?, String?, Uri?) get _session => (
+    _client,
+    _client?.userID,
+    _client?.accessToken,
+    _client?.deviceID,
+    _client?.homeserver,
+  );
 
   MatrixThreadHandler(this._clientManager, this._eventMapper);
 
@@ -113,18 +127,38 @@ class MatrixThreadHandler {
     String threadRootEventId, {
     int limit = 50,
     String? fromToken,
+    String? beforeEventId,
   }) async {
-    final room = _client?.getRoomById(roomId);
+    final session = _session;
+    if (_cursorSession != session) {
+      _threadCursors.clear();
+      _cursorSession = session;
+    }
+    final client = _client;
+    final room = client?.getRoomById(roomId);
     if (room == null) return [];
 
+    if (beforeEventId != null && fromToken != null) {
+      throw ArgumentError('Use either a thread event anchor or a token');
+    }
+    var token = fromToken;
+    if (beforeEventId != null) {
+      final key = (roomId, threadRootEventId, beforeEventId);
+      if (!_threadCursors.containsKey(key)) {
+        throw StateError('Thread pagination expired; refresh the thread');
+      }
+      token = _threadCursors[key];
+      if (token == null) return [];
+    }
     try {
       // 使用 Matrix /relations API
-      final response = await _client!.request(
+      final response = await client!.request(
         matrix.RequestType.GET,
         '/client/v1/rooms/${Uri.encodeComponent(roomId)}/relations/${Uri.encodeComponent(threadRootEventId)}/m.thread',
-        query: {'limit': limit.toString(), 'from': ?fromToken},
+        query: {'limit': limit.toString(), 'dir': 'b', 'from': ?token},
       );
 
+      if (_session != session) return [];
       final chunk = response['chunk'] as List<dynamic>? ?? [];
       final messages = <MessageEntity>[];
 
@@ -142,8 +176,22 @@ class MatrixThreadHandler {
 
       // 按时间升序排列
       messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      if (messages.isNotEmpty) {
+        final next = response['next_batch'];
+        if (next != null && (next is! String || next.isEmpty)) {
+          throw const FormatException('Invalid thread continuation');
+        }
+        if (next != null && next == token) {
+          throw StateError('Thread pagination did not advance');
+        }
+        _threadCursors[(roomId, threadRootEventId, messages.first.id)] =
+            next as String?;
+      }
       return messages;
     } catch (e) {
+      if (_session != session) return [];
+      // A failed older-page request must not masquerade as a fresh timeline.
+      if (beforeEventId != null || fromToken != null) rethrow;
       debugLog('MatrixMessageDataSource: Failed to get thread messages: $e');
       // 回退方案：从 timeline 过滤线程消息
       return _getThreadMessagesFromTimeline(room, threadRootEventId);

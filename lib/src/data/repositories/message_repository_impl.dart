@@ -1770,7 +1770,7 @@ class MessageRepositoryImpl implements IMessageRepository {
       roomId,
       threadRootEventId,
       limit: limit,
-      fromToken: fromEventId,
+      beforeEventId: fromEventId,
     );
     return _visibleHistory(roomId, messages, origin);
   }

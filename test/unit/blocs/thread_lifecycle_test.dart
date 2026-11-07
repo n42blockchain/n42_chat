@@ -115,6 +115,49 @@ void main() {
     expect(bloc.state.replies, isEmpty);
   });
 
+  test(
+    'pagination is single-flight and preserves newer overlapping content',
+    () async {
+      when(() => repository.getThreadMessages('!room', 'root')).thenAnswer(
+        (_) async => [
+          message('root'),
+          ...List.generate(49, (i) => message('reply$i')),
+        ],
+      );
+      await initialize('root');
+      final pending = Completer<List<MessageEntity>>();
+      when(
+        () => repository.getThreadMessages(
+          '!room',
+          'root',
+          limit: 50,
+          fromEventId: 'reply0',
+        ),
+      ).thenAnswer((_) => pending.future);
+      bloc.add(const LoadMoreThreadMessages());
+      await pumpEventQueue();
+      bloc.add(const LoadMoreThreadMessages());
+      bloc.add(const LoadThreadMessages());
+      final fresh = message('reply0')
+          .copyWith(content: 'updated during paging');
+      bloc.add(ThreadMessagesUpdated([fresh, message('live')]));
+      await pumpEventQueue();
+      pending.complete([message('older'), message('reply0'), message('older')]);
+      await pumpEventQueue();
+      expect(bloc.state.replies.map((m) => m.id), ['older', 'reply0', 'live']);
+      expect(bloc.state.replies[1].content, 'updated during paging');
+      verify(
+        () => repository.getThreadMessages(
+          '!room',
+          'root',
+          limit: 50,
+          fromEventId: 'reply0',
+        ),
+      ).called(1);
+      verify(() => repository.getThreadMessages('!room', 'root')).called(1);
+    },
+  );
+
   test('old send failure does not write error to new thread', () async {
     await initialize('old');
     final pending = Completer<MessageEntity?>();
