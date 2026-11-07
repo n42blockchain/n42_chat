@@ -125,3 +125,8 @@ class NavigateToResultIndex extends SearchEvent {
 class LoadMoreChatResults extends SearchEvent {
   const LoadMoreChatResults();
 }
+
+/// Clear visible results without reading history from a changing session.
+class SearchContextInvalidated extends SearchEvent {
+  const SearchContextInvalidated();
+}

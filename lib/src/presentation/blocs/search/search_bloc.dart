@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -10,7 +12,14 @@ import 'search_state.dart';
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final ISearchRepository _searchRepository;
 
-  SearchBloc(this._searchRepository) : super(const SearchInitial()) {
+  SearchBloc(
+    this._searchRepository, {
+    Iterable<Stream<void>> invalidationStreams = const [],
+  }) : super(const SearchInitial()) {
+    on<SearchContextInvalidated>((event, emit) {
+      final generation = _eventGenerations[event] ?? _generation;
+      if (_isCurrent(event, emit, generation)) emit(const SearchInitial());
+    });
     on<PerformSearch>(
       _onPerformSearch,
       transformer: _debounce(const Duration(milliseconds: 300)),
@@ -31,6 +40,21 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<NavigateToPreviousResult>(_onNavigateToPreviousResult);
     on<NavigateToResultIndex>(_onNavigateToResultIndex);
     on<LoadMoreChatResults>(_onLoadMoreChatResults);
+    for (final stream in invalidationStreams) {
+      _invalidationSubscriptions.add(
+        stream.listen(
+          (_) => _invalidateContext(),
+          onError: (Object _, StackTrace _) => _invalidateContext(),
+        ),
+      );
+    }
+  }
+
+  final _invalidationSubscriptions = <StreamSubscription<void>>[];
+  bool _disposing = false;
+
+  void _invalidateContext() {
+    if (!_disposing && !isClosed) add(const SearchContextInvalidated());
   }
 
   int _generation = 0;
@@ -46,10 +70,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         event is SearchGroups ||
         event is SearchMessages ||
         event is ClearSearch ||
-        event is LoadSearchHistory) {
+        event is LoadSearchHistory ||
+        event is SearchContextInvalidated) {
       _generation++;
     }
-    if (event is DeleteSearchHistoryItem || event is ClearSearchHistory) {
+    if (event is DeleteSearchHistoryItem ||
+        event is ClearSearchHistory ||
+        event is SearchContextInvalidated) {
       _historyRevision++;
     }
     _eventGenerations[event] = _generation;
@@ -68,9 +95,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       _eventGenerations[event] == generation;
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
+    _disposing = true;
     _generation++;
-    return super.close();
+    await Future.wait(
+      _invalidationSubscriptions.map((subscription) => subscription.cancel()),
+    );
+    await super.close();
   }
 
   /// 防抖转换器

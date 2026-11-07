@@ -13,11 +13,18 @@ class ChatHistoryClearStore {
   static Future<void> _tail = Future<void>.value();
   // Shared across store instances in this isolate; emitted only after durable
   // acknowledgement. Consumers reread rather than trusting an event payload.
-  static final _changes = StreamController<String>.broadcast();
+  static final _changes =
+      StreamController<({String key, String owner})>.broadcast();
+
+  /// Durable visibility changes, shared across instances in this isolate.
+  Stream<String> get changedOwners =>
+      _changes.stream.map((change) => change.owner);
 
   Stream<void> watch({required String ownerUserId, required String roomId}) {
     final key = _key(ownerUserId, roomId);
-    return _changes.stream.where((changed) => changed == key).map<void>((_) {});
+    return _changes.stream
+        .where((changed) => changed.key == key)
+        .map<void>((_) {});
   }
 
   ChatHistoryClearStore({Future<SharedPreferences> Function()? preferences})
@@ -96,7 +103,7 @@ class ChatHistoryClearStore {
     // A successful old-owner write remains in that owner's namespace. A stale
     // caller must not announce success or apply it to the newly selected room.
     if (!isCurrent()) throw StateError('History session changed');
-    _changes.add(key);
+    _changes.add((key: key, owner: ownerUserId));
     return next;
   });
 }

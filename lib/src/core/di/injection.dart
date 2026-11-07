@@ -1126,7 +1126,24 @@ void _registerBlocs() {
 
   // 搜索BLoC
   getIt.registerFactory<SearchBloc>(
-    () => SearchBloc(getIt<ISearchRepository>()),
+    () => SearchBloc(
+      getIt<ISearchRepository>(),
+      invalidationStreams: [
+        getIt<AuthBloc>().stream
+            .map((state) => (state.status, state.user?.userId))
+            .distinct()
+            .map<void>((_) {}),
+        getIt<IAuthRepository>().loginStateStream.map<void>((_) {}),
+        if (getIt<IAuthRepository>()
+            case final IAccountBoundAuthInvalidation auth)
+          auth.accountInvalidationStream
+              .where((origin) => origin.isCurrent)
+              .map<void>((_) {}),
+        ChatHistoryClearStore().changedOwners
+            .where((owner) => owner == getIt<MatrixClientManager>().userId)
+            .map<void>((_) {}),
+      ],
+    ),
   );
 
   // 消息操作BLoC
