@@ -68,3 +68,12 @@ Twenty Matrix SDK clients use independent SQLite stores. The run sends 10,000 ac
 An initial three-client preflight failed because the harness opened history before resumed sync. It now awaits sync first; final three-client/100-event preflight and the full run both exit 0. Fourteen pre-IO guard cases pass; scoped analysis has no issues. No product runtime source was changed to pass this test.
 
 Structured source/log hashes and per-recipient counts: `local-tuwunel-group-load-2026-11-07.json`. Full client/server logs are mode 0600 in the controlled matrix-load QA directory. The captured server log contains zero occurrences of the generated message-body canary prefix. This does not cover production or push logs. File-event bodies are checked, but this load test does not download/decrypt their attachments. Accounts are logged out, not deactivated; the owned database is retained. Physical UI, push, attachment payloads and other MSG-001 gaps remain open.
+
+
+## Final SDK 15 thirty-recovery result
+
+The rate-limited batch completed with actual process exit 0. Thirty independently initialized recovery clients each lack the historical key before recovery, reject a random validly encoded wrong recovery key without importing history, then restore four sessions with the correct key and decrypt the exact historical payload. Results: 30/30 correct recoveries and 30/30 wrong-key rejections, alongside the existing multidevice/revocation/ciphertext checks. The server's 333/334-second delays were honored without modifying its rate limits.
+
+The owned launcher supervisor preserved the same live Dart process after its original wrapper deadline and resumed the launcher only after the child ended; both handles completed successfully. No batch was restarted to bypass limits. Cleanup produced one M_UNKNOWN_TOKEN logout warning; all clients were disposed locally. Accounts were not deactivated. The owned database is retained and its loopback service can be stopped without affecting production or the independent SDK 16 server.
+
+Evidence and source/private-log hashes: `local-tuwunel-e2ee-30-2026-11-07.json`; controlled raw log: `e2ee-30-recoveries-final.log` (0600). This is SDK 15 protocol acceptance. It does not establish SDK 16 thirty-recovery, real-device storage/UI, production/push log leakage or interrupted/corrupt-backup acceptance.
