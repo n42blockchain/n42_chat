@@ -91,11 +91,19 @@ void main() {
     when(() => event.type).thenReturn(matrix.EventTypes.Message);
     when(() => event.status).thenReturn(matrix.EventStatus.synced);
     when(() => event.body).thenReturn('secret');
+    when(() => event.redacted).thenReturn(false);
     when(() => event.eventId).thenReturn('event');
     when(() => event.originServerTs).thenReturn(DateTime(2026));
     return event;
   }
 
+  test('redacted events are excluded even when a stale body matches', () async {
+    final item = message();
+    when(() => item.redacted).thenReturn(true);
+    when(() => timeline.events).thenReturn([item]);
+    expect(await source.searchMessagesInRoom('room', 'secret'), isEmpty);
+    expect(await source.searchMessagesGlobally('secret'), isEmpty);
+  });
   for (final global in [false, true]) {
     test('session changes during timeline load global=$global', () async {
       final gate = Completer<matrix.Timeline>();

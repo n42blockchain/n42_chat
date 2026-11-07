@@ -266,6 +266,7 @@ class MatrixSearchDataSource {
   /// 检查是否是消息事件
   bool _isMessageEvent(matrix.Event event) {
     return event.type == matrix.EventTypes.Message &&
+        !event.redacted &&
         event.status != matrix.EventStatus.error;
   }
 

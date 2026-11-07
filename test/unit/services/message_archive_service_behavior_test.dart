@@ -96,9 +96,8 @@ void main() {
       ]);
 
       expect(
-        (await database.searchMessages(
-          'redacted',
-        )).map((message) => message.eventId),
+        (await database.searchMessages('redacted'))
+            .map((message) => message.eventId),
         [r'$redacted'],
       );
 
@@ -181,4 +180,68 @@ void main() {
       verify(() => timeline.cancelSubscriptions()).called(1);
     },
   );
+  for (final previouslyArchived in [false, true]) {
+    test(
+      'redacted timeline removes archive and FTS previouslyArchived=$previouslyArchived',
+      () async {
+        final manager = _ClientManager();
+        final client = _Client();
+        final room = _Room();
+        final timeline = _Timeline();
+        when(() => manager.client).thenReturn(client);
+        when(() => client.getRoomById('!room:hs.test')).thenReturn(room);
+        when(() => room.id).thenReturn('!room:hs.test');
+        when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+        when(() => timeline.requestHistory(historyCount: 10))
+            .thenAnswer((_) async {});
+        if (previouslyArchived) {
+          await database.insertMessages([
+            _entry(
+              eventId: 'redacted',
+              roomId: '!room:hs.test',
+              timestamp: 1,
+              body: 'secret plaintext',
+            ),
+          ]);
+        }
+        await database.insertMessages([
+          _entry(
+            eventId: 'keep',
+            roomId: '!other:hs.test',
+            timestamp: 2,
+            body: 'retained text',
+          ),
+        ]);
+        final event = matrix.Event(
+          type: matrix.EventTypes.Message,
+          content: {'body': 'secret plaintext'},
+          senderId: '@alice:hs.test',
+          eventId: 'redacted',
+          room: room,
+          originServerTs: DateTime.utc(2026),
+        );
+        event.setRedactionEvent(
+          matrix.Event(
+            type: 'm.room.redaction',
+            content: {},
+            senderId: '@alice:hs.test',
+            eventId: 'redaction',
+            room: room,
+            originServerTs: DateTime.utc(2026),
+          ),
+        );
+        when(() => timeline.events).thenReturn([event]);
+        service = MessageArchiveService(db: database, clientManager: manager);
+        final result = await service.archiveRoom(
+          '!room:hs.test',
+          batchSize: 10,
+        );
+        expect(result.archivedCount, 0);
+        expect(await service.isEventArchived('redacted'), isFalse);
+        expect(await database.searchMessages('secret'), isEmpty);
+        expect(await service.isEventArchived('keep'), isTrue);
+        verify(() => timeline.cancelSubscriptions()).called(1);
+      },
+    );
+  }
 }

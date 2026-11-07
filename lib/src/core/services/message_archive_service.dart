@@ -109,9 +109,6 @@ class MessageArchiveService {
     // 泄漏一份 sync 订阅——复审 P1)
     final timeline = await room.getTimeline();
     try {
-      // 归档元数据(totalArchived 累计用;不再用 lastArchivedTs 做过滤)
-      final metadata = await _db.getMetadata(roomId);
-
       // 拉取足够历史消息（如果需要）
       // 尝试多轮拉取，最多 5 轮，每轮 batchSize 条
       for (int round = 0; round < 5; round++) {
@@ -124,6 +121,13 @@ class MessageArchiveService {
         }
         final after = timeline.events.length;
         if (after == before) break; // 没有更多历史
+      }
+
+      // The SDK's redacted flag is authoritative; do not treat a raw
+      // redaction request as proof that the server accepted it. Reconcile
+      // known redactions before insert-or-ignore can preserve old plaintext.
+      for (final event in List<matrix.Event>.of(timeline.events)) {
+        if (event.redacted) await _db.deleteByEventId(event.eventId);
       }
 
       // 筛选需要归档的消息。
@@ -170,7 +174,7 @@ class MessageArchiveService {
 
       // 更新归档元数据
       final oldestEvent = archivableEvents.last;
-      final newTotalArchived = (metadata?.totalArchived ?? 0) + totalInserted;
+      final newTotalArchived = await _db.getMessageCount(roomId);
       await _db.updateMetadata(
         ArchiveMetadataCompanion(
           roomId: Value(roomId),
@@ -300,6 +304,7 @@ class MessageArchiveService {
 
   /// 判断事件是否可归档
   bool _isArchivableEvent(matrix.Event event) {
+    if (event.redacted) return false;
     // 跳过编辑替换事件
     final relatesTo = event.content['m.relates_to'];
     if (relatesTo is Map && relatesTo['rel_type'] == 'm.replace') {
