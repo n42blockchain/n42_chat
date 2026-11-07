@@ -73,7 +73,9 @@ class _BackupRestoreView extends StatelessWidget {
               const SizedBox(height: AppDimensions.spacing),
               _RestoreSection(state: state),
               if (GetIt.instance.isRegistered<LegacyArchiveRecoveryService>())
-                LegacyArchiveRecoverySection(service: GetIt.instance<LegacyArchiveRecoveryService>()),
+                LegacyArchiveRecoverySection(service: GetIt.instance<LegacyArchiveRecoveryService>(),
+                  tryBegin: context.read<BackupBloc>().tryBeginRestoreSelection,
+                  onEnd: context.read<BackupBloc>().endRestoreSelection),
               const SizedBox(height: AppDimensions.spacingXXL),
             ],
           );
@@ -207,6 +209,7 @@ class _BackupSectionState extends State<_BackupSection> {
                 onPressed: widget.state.isCreating
                     ? null
                     : () {
+                        if (context.read<BackupBloc>().isBackupOperationBusy) return;
                         context.read<BackupBloc>().add(
                           CreateBackup(
                             password: _usePassword
@@ -365,6 +368,7 @@ class _BackupHistorySection extends StatelessWidget {
   }
 
   void _confirmDelete(BuildContext context, BackupInfo backup) {
+    if (context.read<BackupBloc>().isBackupOperationBusy) return;
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -496,6 +500,9 @@ class _RestoreSection extends StatelessWidget {
       dependencies<MatrixClientManager>(), dependencies<IAuthRepository>(),
     );
     if (origin == null) return;
+    final bloc = context.read<BackupBloc>();
+    if (!bloc.tryBeginRestoreSelection()) return;
+    var dispatched = false;
     bool current() => context.mounted && origin.isCurrent;
     try {
       var filePath = selectedPath;
@@ -588,9 +595,10 @@ class _RestoreSection extends StatelessWidget {
             ),
           );
           if (confirmed != true || !context.mounted || !current()) return;
-          context.read<BackupBloc>().add(
+          bloc.restoreFromSelection(
             RestoreFromBackup(backupFilePath: filePath, password: password, restoreMessages: true, isCurrent: current),
           );
+          dispatched = true;
         }
       }
     } catch (e) {
@@ -602,6 +610,8 @@ class _RestoreSection extends StatelessWidget {
           ),
         );
       }
+    } finally {
+      if (!dispatched) bloc.endRestoreSelection();
     }
   }
 }

@@ -14,7 +14,35 @@ class _Manager extends Mock implements MatrixClientManager {}
 
 class _Client extends Mock implements matrix.Client {}
 
+class _Recovery extends Mock implements LegacyArchiveRecoveryService {}
+
 void main() {
+  testWidgets('shared busy gate does not release another operation', (
+    tester,
+  ) async {
+    final service = _Recovery();
+    var ended = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: LegacyArchiveRecoverySection(
+            service: service,
+            tryBegin: () => false,
+            onEnd: () => ended++,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Recover older local history'));
+    await tester.pumpAndSettle();
+    verifyZeroInteractions(service);
+    expect(ended, 0);
+    expect(find.byType(AlertDialog), findsNothing);
+  });
   for (final mode in ['none', 'cancel', 'confirm', 'stale', 'changed-source']) {
     testWidgets('legacy recovery selection and confirmation: $mode', (
       tester,
@@ -55,12 +83,19 @@ void main() {
         access: access,
         openLegacy: () async => legacy,
       );
+      var ended = 0;
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           locale: const Locale('en'),
-          home: Scaffold(body: LegacyArchiveRecoverySection(service: service)),
+          home: Scaffold(
+            body: LegacyArchiveRecoverySection(
+              service: service,
+              tryBegin: () => true,
+              onEnd: () => ended++,
+            ),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -101,6 +136,7 @@ void main() {
         find.text('Done'),
         mode == 'confirm' ? findsOneWidget : findsNothing,
       );
+      expect(ended, 1);
       expect(tester.takeException(), isNull);
     });
   }

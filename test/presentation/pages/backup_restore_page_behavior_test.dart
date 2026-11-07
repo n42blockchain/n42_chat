@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
@@ -34,6 +35,7 @@ base class _PickedFile extends PlatformFile {
 
 class _FilePicker extends FilePickerPlatform {
   PlatformFile? result;
+  Future<PlatformFile?>? pending;
   Object? error;
   FileType? lastType;
   int calls = 0;
@@ -57,6 +59,7 @@ class _FilePicker extends FilePickerPlatform {
     onPick?.call();
     lastType = type;
     if (error != null) throw error!;
+    if (pending != null) return pending;
     return result;
   }
 }
@@ -93,6 +96,53 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+  testWidgets('pending file selection blocks duplicate and legacy restore entry', (tester) async {
+    final service = _Service();
+    final manager = _Manager();
+    final client = _Client();
+    final auth = _Auth();
+    when(() => manager.client).thenReturn(client);
+    when(() => client.userID).thenReturn('@me:hs.test');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => client.accessToken).thenReturn('fixture-token');
+    when(() => client.deviceID).thenReturn('fixture-device');
+    when(client.isLogged).thenReturn(true);
+    final generation = AuthSessionInvalidation(userId: '@me:hs.test',
+      homeserver: Uri.parse('https://hs.test'), deviceId: 'fixture-device',
+      isCurrent: () => true, matchesClient: (candidate) => identical(candidate, client));
+    when(() => auth.currentAccountGeneration).thenReturn(generation);
+    when(() => service.listBackups()).thenAnswer((_) async => []);
+    final gate = Completer<PlatformFile?>();
+    final previous = FilePickerPlatform.instance;
+    final picker = _FilePicker()..pending = gate.future;
+    FilePickerPlatform.instance = picker;
+    GetIt.instance.registerSingleton<ChatBackupService>(service);
+    GetIt.instance.registerSingleton<MatrixClientManager>(manager);
+    GetIt.instance.registerSingleton<IAuthRepository>(auth);
+    addTearDown(() async { FilePickerPlatform.instance = previous; await GetIt.instance.reset(); });
+    await tester.pumpWidget(const MaterialApp(localizationsDelegates: S.localizationsDelegates,
+      supportedLocales: S.supportedLocales, locale: Locale('en'), home: BackupRestorePage()));
+    await tester.pumpAndSettle();
+    for (final label in ['Choose Backup File', 'Choose Backup File', 'Older backup files']) {
+      await tester.ensureVisible(find.text(label));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(label));
+      await tester.pumpAndSettle();
+    }
+    expect(picker.calls, 1);
+    verifyNever(() => service.listLegacyBackupFiles());
+    gate.complete(null);
+    await tester.pumpAndSettle();
+    picker.pending = null;
+    await tester.ensureVisible(find.text('Choose Backup File'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Choose Backup File'));
+    await tester.pumpAndSettle();
+    expect(picker.calls, 2);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final outcome in ['cancel', 'stale-selection', 'stale-list', 'empty']) {
     testWidgets('legacy file selector is guarded: $outcome', (tester) async {
       final service = _Service();

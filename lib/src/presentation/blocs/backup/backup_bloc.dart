@@ -8,6 +8,30 @@ import '../../../core/utils/debug_log.dart';
 /// 备份 BLoC
 class BackupBloc extends Bloc<BackupEvent, BackupState> {
   final ChatBackupService _backupService;
+  bool _restoreSelectionPending = false;
+  bool _restoreDispatchPending = false;
+  bool _deletionPending = false;
+
+  bool get isBackupOperationBusy =>
+      _restoreSelectionPending || _restoreDispatchPending || _deletionPending ||
+      state.isCreating || state.isRestoring;
+
+  bool tryBeginRestoreSelection() {
+    if (isBackupOperationBusy || isClosed) return false;
+    _restoreSelectionPending = true;
+    return true;
+  }
+
+  void endRestoreSelection() => _restoreSelectionPending = false;
+
+  void restoreFromSelection(RestoreFromBackup event) {
+    if (isClosed || !_restoreSelectionPending) return;
+    _restoreSelectionPending = false;
+    _restoreDispatchPending = true;
+    add(event);
+  }
+
+
 
   BackupBloc({required ChatBackupService backupService})
       : _backupService = backupService,
@@ -43,6 +67,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     CreateBackup event,
     Emitter<BackupState> emit,
   ) async {
+    if (isBackupOperationBusy) return;
     emit(state.copyWith(isCreating: true, progress: 0, clearError: true));
     try {
       final result = await _backupService.createBackup(
@@ -77,11 +102,15 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     DeleteBackup event,
     Emitter<BackupState> emit,
   ) async {
+    if (isBackupOperationBusy) return;
+    _deletionPending = true;
     try {
       await _backupService.deleteBackup(event.backupId);
       add(const LoadBackupList());
     } catch (e) {
       emit(state.copyWith(error: 'Failed to delete backup: $e'));
+    } finally {
+      _deletionPending = false;
     }
   }
 
@@ -111,6 +140,8 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     RestoreFromBackup event,
     Emitter<BackupState> emit,
   ) async {
+    _restoreDispatchPending = false;
+    if (_restoreSelectionPending || _deletionPending || state.isCreating || state.isRestoring) return;
     if (event.isCurrent?.call() == false) return;
     emit(state.copyWith(isRestoring: true, progress: 0, clearError: true));
     try {

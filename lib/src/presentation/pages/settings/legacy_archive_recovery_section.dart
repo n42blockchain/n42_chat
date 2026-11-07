@@ -6,7 +6,14 @@ import '../../../core/services/legacy_archive_recovery_service.dart';
 /// Explicit recovery for history whose original account cannot be verified.
 class LegacyArchiveRecoverySection extends StatefulWidget {
   final LegacyArchiveRecoveryService service;
-  const LegacyArchiveRecoverySection({super.key, required this.service});
+  final bool Function()? tryBegin;
+  final VoidCallback? onEnd;
+  const LegacyArchiveRecoverySection({
+    super.key,
+    required this.service,
+    this.tryBegin,
+    this.onEnd,
+  });
 
   @override
   State<LegacyArchiveRecoverySection> createState() =>
@@ -19,7 +26,7 @@ class _LegacyArchiveRecoverySectionState
   double? _progress;
 
   Future<void> _recover() async {
-    if (_busy) return;
+    if (_busy || widget.tryBegin?.call() == false) return;
     setState(() {
       _busy = true;
       _progress = null;
@@ -115,6 +122,7 @@ class _LegacyArchiveRecoverySectionState
         );
       }
     } finally {
+      widget.onEnd?.call();
       if (mounted) setState(() => _busy = false);
     }
   }
