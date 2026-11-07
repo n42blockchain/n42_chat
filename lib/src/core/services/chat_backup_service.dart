@@ -300,6 +300,10 @@ class ChatBackupService {
         'backupId': backupId,
         'createdAt': now.toIso8601String(),
         'appVersion': _appVersion,
+        'owner': {
+          'userId': client.userID,
+          'homeserver': client.homeserver?.toString(),
+        },
         'roomCount': rooms.length,
         'includesMedia': includeMedia,
         'includesKeys': includesKeysInBackup,
@@ -556,6 +560,10 @@ class ChatBackupService {
         'backupId': backupId,
         'createdAt': now.toIso8601String(),
         'appVersion': _appVersion,
+        'owner': {
+          'userId': client.userID,
+          'homeserver': client.homeserver?.toString(),
+        },
         'roomCount': rooms.length,
         'isIncremental': true,
         'lastBackupTimestamp': lastBackupTs,
@@ -920,11 +928,22 @@ class ChatBackupService {
       ensureCurrent();
       final data = await _readBackupData(backupFilePath, password: password);
       ensureCurrent();
+      final manifest = data['manifest'];
+      final owner = manifest is Map ? manifest['owner'] : null;
+      final client = _clientManager.client;
+      if (owner is Map &&
+          (owner['userId'] != client?.userID ||
+           owner['homeserver'] != client?.homeserver?.toString())) {
+        return const RestoreResult(errors: ['Backup belongs to a different account or homeserver']);
+      }
       final rawSettings = data['settings'] as Map<String, dynamic>? ?? {};
 
       int settingsRestored = 0;
       final errors = <String>[];
       final warnings = _manifestWarnings(data['manifest']);
+      if (owner is! Map) {
+        warnings.add('This legacy backup has no verified account owner.');
+      }
 
       onProgress?.call(0.1);
       ensureCurrent();

@@ -115,6 +115,20 @@ void main() {
     }
   }
 
+  for (final mismatch in ['user', 'server']) {
+    test('restore rejects backup owner mismatch: $mismatch', () async {
+      final backup = await service.createBackup();
+      if (mismatch == 'user') {
+        when(() => client.userID).thenReturn('@other:example.org');
+      } else {
+        when(() => client.homeserver).thenReturn(Uri.parse('https://other.example.org'));
+      }
+      final result = await service.restoreFromBackup(backupFilePath: backup.filePath);
+      expect(result.hasErrors, isTrue);
+      expect(result.settingsRestored, 0);
+    });
+  }
+
   test('restore refuses stale confirmation origin even with unchanged client', () async {
     final backup = await service.createBackup();
     final result = await service.restoreFromBackup(

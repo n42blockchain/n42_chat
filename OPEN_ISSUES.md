@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Backup owner metadata (batch 271): new full/incremental manifests record userId/homeserver. Settings restore rejects an explicit owner mismatch before reading/writing settings. Two mismatch tests and 88 backup tests pass; service analysis has six infos, no errors/warnings. Legacy ownerless backups remain compatible with a warning, not verified ownership. Archive restore, preview owner display, cryptographic authenticity of unencrypted manifests, malformed/unknown owner handling, host pin and remaining history/account isolation stay open.
+
 - Backup event debug privacy (batch 270): BackupEvent disables Equatable field stringification so create/preview/restore passwords are not emitted by event toString even with global stringify enabled. Password-bearing equality remains intact. Fifty-five event/BLoC/page tests pass, scoped event/test analysis clean. Initial test expected a different harmless class-label format and was corrected. This does not establish privacy of all logs or erase passwords from memory; host pin integration and other backup requirements remain open.
 
 - Password failure/account invalidation interaction (batch 269): page tests confirm that invalidating the account while the password dialog is open blocks further preview/restore calls after confirm. Simulated invalid-password preview shows an error and never restores. Combined page/BLoC suites pass 26 tests. Test-only; actual encrypted-file integration, in-place wrong-password retry UX, localization and device acceptance remain open.
