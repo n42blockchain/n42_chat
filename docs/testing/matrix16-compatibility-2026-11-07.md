@@ -18,3 +18,8 @@ The first full run ends with 8,593 passed, four skipped and two failed. Both fai
 ## Actual Matrix 16 protocol smoke
 
 The existing E2EE tool exits 0 against the independent loopback server using resolved Matrix 16.0.1. Three accounts/five clients cover 16 decrypted deliveries, five opaque server-event checks, revoked-token rejection, retained historical keys but blocked new-session decryption for the revoked device, and actual app backup/restore. A validly encoded wrong recovery key is rejected; the right key restores four sessions into a fresh database and decrypts the historical message. This proves one isolated recovery, not thirty. Source/lock/private-log hashes: matrix16-local-e2ee-2026-11-07.json. Physical UI, push and production acceptance remain open.
+
+
+## Matrix 16 load follow-up in progress
+
+The twenty-client/10,000-event harness is now running again with Matrix 16.0.1, a new generated room/accounts, and a separate log on the owned port-18949 service. Its source and assertions are unchanged from the accepted SDK 15 run: independent databases, explicit transaction IDs, one offline recipient, exact unique/decrypted history checks. Final completion and exit code remain pending. The separate SDK 15 thirty-recovery batch continues unchanged and is not accepted as SDK 16 recovery coverage.
