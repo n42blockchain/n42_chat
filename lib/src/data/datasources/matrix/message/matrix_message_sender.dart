@@ -539,6 +539,16 @@ class MatrixMessageSender {
         // SDK media retries recover cached files and repeat failed uploads.
         // Existing remote attachments (including GIFs) do not need a local cache.
         // Non-media sends retain the event type (including m.sticker).
+        if (isMedia && !alreadyUploaded) {
+          if (originalTransaction == null || originalTransaction.isEmpty ||
+              event.content['filename'] is! String) return false;
+          // SDK sendAgain cancels the local event when its cache is missing.
+          // Check first so a recoverable failed message stays visible.
+          final cached = await client.database.getFile(
+            Uri(scheme: 'cache', host: 'file', path: originalTransaction),
+          );
+          if (!current() || cached == null) return false;
+        }
         final receipt = isMedia && !alreadyUploaded
             ? await event.sendAgain(txid: transaction)
             : await room.sendEvent(

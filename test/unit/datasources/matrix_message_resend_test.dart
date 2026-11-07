@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,8 @@ class _Room extends Mock implements matrix.Room {}
 class _Uploader extends Mock implements MatrixMediaUploader {}
 
 class _Event extends Mock implements matrix.Event {}
+
+class _Database extends Mock implements matrix.DatabaseApi {}
 
 void main() {
   late _Manager manager;
@@ -154,19 +157,30 @@ void main() {
     'media retry delegates cached upload to SDK with stable transaction',
     () async {
       final media = _Event();
+      final database = _Database();
+      when(() => client.database).thenReturn(database);
+      when(() => database.getFile(Uri.parse('cache://file/original-tx')))
+          .thenAnswer((_) async => Uint8List(1));
       event = media;
       when(() => media.room).thenReturn(room);
       when(() => media.senderId).thenReturn('@me:test');
       when(() => media.status).thenReturn(matrix.EventStatus.error);
       when(() => media.type).thenReturn('m.room.message');
-      when(() => media.content)
-          .thenReturn({'body': 'photo', 'msgtype': 'm.image'});
+      when(() => media.content).thenReturn({
+        'body': 'photo',
+        'filename': 'photo.png',
+        'msgtype': 'm.image',
+      });
       when(() => media.messageType).thenReturn('m.image');
       when(() => media.transactionId).thenReturn('original-tx');
       when(() => media.sendAgain(txid: 'original-tx'))
           .thenAnswer((_) async => r'$media');
       expect(await sender.resendMessage('!room:test', 'local-id'), isTrue);
       verify(() => media.sendAgain(txid: 'original-tx')).called(1);
+      when(() => database.getFile(Uri.parse('cache://file/original-tx')))
+          .thenAnswer((_) async => null);
+      expect(await sender.resendMessage('!room:test', 'local-id'), isFalse);
+      verifyNever(() => media.sendAgain(txid: 'original-tx'));
     },
   );
   for (final encrypted in [false, true]) {
