@@ -1,4 +1,5 @@
-#!/usr/bin/env dart
+// Run with Flutter's VM: this tool imports Flutter-backed media services.
+// flutter test tool/live_media_smoke_test.dart --no-pub --reporter expanded
 // ignore_for_file: avoid_print
 
 import 'dart:async';

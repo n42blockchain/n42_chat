@@ -1,0 +1,14 @@
+{
+  "started": 1794048778.49957,
+  "homeserver": "http://127.0.0.1:18948",
+  "synthetic_accounts_only": true,
+  "runner": "flutter test",
+  "exit_code": 0,
+  "finished": 1794048782.560839,
+  "environment": "isolated local Tuwunel 1.9.4",
+  "matrix_sdk": "15.0.0",
+  "production_touched": false,
+  "e2ee_accepted": false,
+  "log_sha256": "74977f696e5bacd40ced8e6e397dc3c48ba13fe9579477ae0a55232c3cbc28ee",
+  "image": "jevolk/tuwunel@sha256:0e86c6164d6c9f5b60291938eb61ad8395021c37fe58d47a963ea7edddbedaec"
+}
