@@ -11,6 +11,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
   bool _restoreSelectionPending = false;
   bool _restoreDispatchPending = false;
   bool _deletionPending = false;
+  int _listRequest = 0;
 
   bool get isBackupOperationBusy =>
       _restoreSelectionPending || _restoreDispatchPending || _deletionPending ||
@@ -48,14 +49,22 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     LoadBackupList event,
     Emitter<BackupState> emit,
   ) async {
+    final request = ++_listRequest;
     emit(state.copyWith(isLoading: true, clearError: true));
     try {
       final backups = await _backupService.listBackups();
+      if (request != _listRequest) return;
       emit(state.copyWith(
         backups: backups,
         isLoading: false,
       ));
     } catch (e) {
+      if (request != _listRequest) return;
+      if (e is BackupSessionChanged) {
+        emit(BackupState(isLoading: false,
+          isCreating: state.isCreating, isRestoring: state.isRestoring));
+        return;
+      }
       emit(state.copyWith(
         isLoading: false,
         error: 'Failed to load backups: $e',

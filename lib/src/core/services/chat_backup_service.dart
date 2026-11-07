@@ -22,6 +22,10 @@ class BackupPasswordRequired extends StateError {
   BackupPasswordRequired() : super('This backup is password-protected');
 }
 
+class BackupSessionChanged extends StateError {
+  BackupSessionChanged() : super('Backup session changed');
+}
+
 /// 备份结果
 class BackupResult {
   final String backupId;
@@ -217,7 +221,7 @@ class ChatBackupService {
           client.accessToken != token ||
           client.deviceID != device ||
           !identical(_archiveService, archive)) {
-        throw StateError('Backup session changed');
+        throw BackupSessionChanged();
       }
     };
   }
