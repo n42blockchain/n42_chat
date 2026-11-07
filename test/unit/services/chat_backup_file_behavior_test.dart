@@ -115,6 +115,16 @@ void main() {
     }
   }
 
+  test('restore refuses stale confirmation origin even with unchanged client', () async {
+    final backup = await service.createBackup();
+    final result = await service.restoreFromBackup(
+      backupFilePath: backup.filePath,
+      isCurrent: () => false,
+    );
+    expect(result.hasErrors, isTrue);
+    expect(result.settingsRestored, 0);
+  });
+
   for (final progress in [0.1, 0.5, 1.0]) {
     test('restore rejects account change at progress $progress', () async {
       final backup = await service.createBackup();

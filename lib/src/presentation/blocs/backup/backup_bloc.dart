@@ -111,6 +111,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     RestoreFromBackup event,
     Emitter<BackupState> emit,
   ) async {
+    if (event.isCurrent?.call() == false) return;
     emit(state.copyWith(isRestoring: true, progress: 0, clearError: true));
     try {
       final result = await _backupService.restoreFromBackup(
@@ -119,11 +120,16 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
         roomIds: event.roomIds,
         restoreSettings: event.restoreSettings,
         restoreKeys: event.restoreKeys,
+        isCurrent: event.isCurrent,
         onProgress: (progress) {
           debugLog('Restore progress: ${(progress * 100).toInt()}%');
         },
       );
 
+      if (event.isCurrent?.call() == false) {
+        emit(state.copyWith(isRestoring: false));
+        return;
+      }
       if (result.hasErrors) {
         emit(state.copyWith(
           isRestoring: false,

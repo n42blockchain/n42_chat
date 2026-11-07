@@ -59,6 +59,7 @@ class RestoreFromBackup extends BackupEvent {
   final List<String>? roomIds;
   final bool restoreSettings;
   final bool restoreKeys;
+  final bool Function()? isCurrent;
 
   const RestoreFromBackup({
     required this.backupFilePath,
@@ -66,11 +67,12 @@ class RestoreFromBackup extends BackupEvent {
     this.roomIds,
     this.restoreSettings = true,
     this.restoreKeys = false,
+    this.isCurrent,
   });
 
   @override
   List<Object?> get props =>
-      [backupFilePath, password, roomIds, restoreSettings, restoreKeys];
+      [backupFilePath, password, roomIds, restoreSettings, restoreKeys, isCurrent];
 }
 
 /// 估算备份大小

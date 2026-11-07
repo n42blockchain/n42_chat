@@ -522,7 +522,7 @@ class _RestoreSection extends StatelessWidget {
           );
           if (confirmed != true || !context.mounted || !current()) return;
           context.read<BackupBloc>().add(
-            RestoreFromBackup(backupFilePath: filePath),
+            RestoreFromBackup(backupFilePath: filePath, isCurrent: current),
           );
         }
       }

@@ -904,9 +904,14 @@ class ChatBackupService {
     List<String>? roomIds,
     bool restoreSettings = true,
     bool restoreKeys = false,
+    bool Function()? isCurrent,
     void Function(double progress)? onProgress,
   }) async {
-    final ensureCurrent = _captureBackupSession();
+    final sessionCurrent = _captureBackupSession();
+    void ensureCurrent() {
+      if (isCurrent?.call() == false) throw StateError('Restore account changed');
+      sessionCurrent();
+    }
     try {
       ensureCurrent();
       final data = await _readBackupData(backupFilePath, password: password);
