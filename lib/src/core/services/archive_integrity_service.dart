@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
@@ -45,15 +46,32 @@ class ExportInfo {
 /// 提供归档数据库的压缩导出、SHA-256 校验和完整性验证。
 /// 当前使用 gzip 压缩（Dart 内置），后续可替换为 Zstd 以获得
 /// 更高压缩率（+20-30%）和更快解压速度（3-5x）。
+class ArchiveImportLimits {
+  final int compressedBytes;
+  final int expandedBytes;
+  final int messages;
+  final int lineBytes;
+
+  const ArchiveImportLimits({
+    this.compressedBytes = 32 * 1024 * 1024,
+    this.expandedBytes = 64 * 1024 * 1024,
+    this.messages = 100000,
+    this.lineBytes = 1024 * 1024,
+  });
+}
+
 class ArchiveIntegrityService {
   final ArchiveDatabase? _db;
   final ArchiveAccountAccess? _access;
+  final ArchiveImportLimits _importLimits;
   final Future<Directory> Function() _documentsDirectory;
 
   ArchiveIntegrityService({
     required ArchiveDatabase db,
     Future<Directory> Function()? documentsDirectory,
-  }) : _db = db,
+    ArchiveImportLimits importLimits = const ArchiveImportLimits(),
+  }) : _importLimits = importLimits,
+       _db = db,
        _access = null,
        _documentsDirectory =
            documentsDirectory ?? getApplicationDocumentsDirectory;
@@ -61,7 +79,9 @@ class ArchiveIntegrityService {
   ArchiveIntegrityService.accountScoped({
     required ArchiveAccountAccess access,
     Future<Directory> Function()? documentsDirectory,
-  }) : _db = null,
+    ArchiveImportLimits importLimits = const ArchiveImportLimits(),
+  }) : _importLimits = importLimits,
+       _db = null,
        _access = access,
        _documentsDirectory =
            documentsDirectory ?? getApplicationDocumentsDirectory;
@@ -149,8 +169,7 @@ class ArchiveIntegrityService {
 
   /// 计算文件 SHA-256 校验和
   Future<String> computeChecksum(File file) async {
-    final bytes = await file.readAsBytes();
-    return sha256.convert(bytes).toString();
+    return (await sha256.bind(file.openRead()).first).toString();
   }
 
   /// 验证归档完整性（校验和比对）
@@ -184,6 +203,25 @@ class ArchiveIntegrityService {
       );
     }
 
+    try {
+      if (_importLimits.compressedBytes <= 0 ||
+          _importLimits.expandedBytes <= 0 ||
+          _importLimits.messages <= 0 ||
+          _importLimits.lineBytes <= 0) {
+        throw ArgumentError('Archive import limits must be positive');
+      }
+      if (await compressedFile.length() > _importLimits.compressedBytes) {
+        throw const FormatException('Compressed archive exceeds import limit');
+      }
+      lease?.ensureCurrent();
+    } catch (error) {
+      return ImportResult(
+        success: false,
+        messagesImported: 0,
+        error: error.toString(),
+      );
+    }
+
     // 校验完整性
     if (expectedChecksum != null) {
       final valid = await verifyArchive(compressedFile, expectedChecksum);
@@ -199,9 +237,7 @@ class ArchiveIntegrityService {
     try {
       lease?.ensureCurrent();
       final database = lease?.database ?? _db!;
-      // 解压
-      final compressedBytes = await compressedFile.readAsBytes();
-      final decompressed = gzip.decode(compressedBytes);
+      final decompressed = await _readBoundedArchive(compressedFile, lease);
       String content;
       try {
         content = utf8.decode(decompressed);
@@ -234,6 +270,11 @@ class ArchiveIntegrityService {
       } else if (lease != null && !allowUnownedLegacy) {
         throw StateError(
           'Legacy archive requires explicit ownership confirmation',
+        );
+      }
+      if (lines.length > _importLimits.messages) {
+        throw const FormatException(
+          'Archive message count exceeds import limit',
         );
       }
       final companions = <ArchivedMessagesCompanion>[];
@@ -296,6 +337,56 @@ class ArchiveIntegrityService {
         error: e.toString(),
       );
     }
+  }
+
+  Future<Uint8List> _readBoundedArchive(
+    File file,
+    ArchiveAccountLease? lease,
+  ) async {
+    Stream<List<int>> compressedChunks() async* {
+      var total = 0;
+      await for (final chunk in file.openRead()) {
+        lease?.ensureCurrent();
+        total += chunk.length;
+        if (total > _importLimits.compressedBytes) {
+          throw const FormatException(
+            'Compressed archive exceeds import limit',
+          );
+        }
+        // Bound the amount fed to each inflater call, including high-ratio input.
+        for (var offset = 0; offset < chunk.length; offset += 1024) {
+          yield chunk.sublist(offset, (offset + 1024).clamp(0, chunk.length));
+        }
+      }
+    }
+
+    final output = BytesBuilder(copy: false);
+    var expanded = 0;
+    var lineBytes = 0;
+    var lines = 0;
+    await for (final chunk in gzip.decoder.bind(compressedChunks())) {
+      lease?.ensureCurrent();
+      expanded += chunk.length;
+      if (expanded > _importLimits.expandedBytes) {
+        throw const FormatException('Expanded archive exceeds import limit');
+      }
+      for (final byte in chunk) {
+        if (byte == 10) {
+          lineBytes = 0;
+          lines++;
+          // One additional line is reserved for an account owner header.
+          if (lines > _importLimits.messages + 1) {
+            throw const FormatException(
+              'Archive message count exceeds import limit',
+            );
+          }
+        } else if (++lineBytes > _importLimits.lineBytes) {
+          throw const FormatException('Archive line exceeds import limit');
+        }
+      }
+      output.add(chunk);
+    }
+    return output.takeBytes();
   }
 
   /// 列出所有已导出的归档文件

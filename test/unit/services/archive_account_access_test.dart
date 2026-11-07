@@ -416,6 +416,76 @@ void main() {
     },
   );
 
+  for (final exceeded in [
+    'compressed',
+    'expanded',
+    'line',
+    'messages',
+    'none',
+  ]) {
+    test('quarter import enforces configured limits: $exceeded', () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'n42-quarter-limit-',
+      );
+      addTearDown(() => directory.delete(recursive: true));
+      final rows = List.generate(
+        2,
+        (i) => jsonEncode({
+          'eid': 'limit-$i',
+          'rid': '!limits:example.org',
+          'sid': '@alice:example.org',
+          'ts': i + 1,
+          'tp': 'm.room.message',
+          'bd': '中文 😀 $i',
+          'q': 202601,
+        }),
+      );
+      final raw = utf8.encode(rows.join('\n'));
+      final compressed = gzip.encode(raw);
+      final file = File('${directory.path}/limits.db.gz');
+      await file.writeAsBytes(compressed);
+      final maxLine = rows
+          .map((row) => utf8.encode(row).length)
+          .reduce((a, b) => a > b ? a : b);
+      final limits = ArchiveImportLimits(
+        compressedBytes: compressed.length - (exceeded == 'compressed' ? 1 : 0),
+        expandedBytes: raw.length - (exceeded == 'expanded' ? 1 : 0),
+        lineBytes: maxLine - (exceeded == 'line' ? 1 : 0),
+        messages: exceeded == 'messages' ? 1 : 2,
+      );
+      final service = ArchiveIntegrityService(db: bob, importLimits: limits);
+      final result = await service.importArchive(file);
+      expect(result.success, exceeded == 'none');
+      expect(result.messagesImported, exceeded == 'none' ? 2 : 0);
+      expect(
+        await bob.getMessageCount('!limits:example.org'),
+        exceeded == 'none' ? 2 : 0,
+      );
+      if (exceeded != 'none') expect(result.error, contains('limit'));
+    });
+  }
+
+  test(
+    'high ratio gzip stops at expanded limit without database writes',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'n42-gzip-limit-',
+      );
+      addTearDown(() => directory.delete(recursive: true));
+      final file = File('${directory.path}/bomb.db.gz');
+      await file.writeAsBytes(gzip.encode(List.filled(200000, 32)));
+      expect(await file.length(), lessThan(1024));
+      final service = ArchiveIntegrityService(
+        db: bob,
+        importLimits: const ArchiveImportLimits(expandedBytes: 1024),
+      );
+      final result = await service.importArchive(file);
+      expect(result.success, isFalse);
+      expect(result.error, contains('Expanded archive exceeds'));
+      expect(await bob.getMessageCount('!shared:example.org'), 1);
+    },
+  );
+
   test('count completed after account switch is suppressed', () async {
     final database = _Database();
     final started = Completer<void>();
