@@ -22,3 +22,13 @@ Flutter widget tests use the deterministic Ahem test font. These images are
 therefore a stable check for spacing, radii, wrapping, font size, and theme
 colors, rather than a substitute for reviewing platform glyph rendering on
 Android and iOS devices.
+
+The fixture must have a Material ancestor. A regression assertion rejects the
+MaterialApp error fallback text style and its yellow underlines before image
+comparison. Section headings use titleSmall, rather than the white primary
+button label style. Both baselines were regenerated after repairing that
+fixture; production widgets and pixel tolerances are unchanged.
+
+The Chat golden regression workflow compares exact pixels on Linux with
+Flutter 3.47.8 and preserves difference PNGs on failure. Local comparison is
+necessary but does not replace that Linux check.

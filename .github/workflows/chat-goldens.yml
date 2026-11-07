@@ -1,0 +1,43 @@
+name: Chat golden regression
+
+on:
+  push:
+    paths:
+      - '.github/workflows/chat-goldens.yml'
+      - 'test/goldens/**'
+      - 'lib/src/core/theme/**'
+      - 'lib/src/presentation/widgets/chat/**'
+      - 'lib/src/presentation/pages/conversation/conversation_tile.dart'
+  pull_request:
+    paths:
+      - '.github/workflows/chat-goldens.yml'
+      - 'test/goldens/**'
+      - 'lib/src/core/theme/**'
+      - 'lib/src/presentation/widgets/chat/**'
+      - 'lib/src/presentation/pages/conversation/conversation_tile.dart'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  goldens:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.8'
+          cache: true
+      - run: flutter pub get
+      - name: Compare exact golden pixels
+        run: flutter test test/goldens/chat_core_golden_test.dart --no-pub --reporter expanded
+      - name: Preserve golden failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chat-golden-failures
+          path: test/goldens/failures/
+          if-no-files-found: ignore
+          retention-days: 7

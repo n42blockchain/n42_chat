@@ -42,10 +42,23 @@ Future<void> _pumpGolden(WidgetTester tester, N42ChatTheme chatTheme) async {
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
       theme: chatTheme.toThemeData(),
-      home: _ChatCoreGolden(chatTheme: chatTheme),
+      home: Material(child: _ChatCoreGolden(chatTheme: chatTheme)),
     ),
   );
   await tester.pumpAndSettle();
+  final textStyle = DefaultTextStyle.of(
+    tester.element(find.byKey(const ValueKey('chat-core-golden'))),
+  ).style;
+  expect(
+    textStyle.debugLabel,
+    isNot(contains('fallback style')),
+    reason: 'Golden surfaces must inherit the real Material text style',
+  );
+  expect(
+    textStyle.decoration,
+    isNot(TextDecoration.underline),
+    reason: 'Missing Material applies Flutter error underlines',
+  );
 }
 
 class _ChatCoreGolden extends StatelessWidget {
@@ -55,7 +68,7 @@ class _ChatCoreGolden extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sectionStyle = Theme.of(context).textTheme.labelLarge;
+    final sectionStyle = Theme.of(context).textTheme.titleSmall;
 
     return RepaintBoundary(
       key: const ValueKey('chat-core-golden'),
@@ -143,9 +156,8 @@ class _ChatCoreGolden extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 MediaQuery(
-                  data: MediaQuery.of(
-                    context,
-                  ).copyWith(textScaler: const TextScaler.linear(1.3)),
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: const TextScaler.linear(1.3)),
                   child: MessageBubble(
                     isSelf: false,
                     avatarName: 'A',
