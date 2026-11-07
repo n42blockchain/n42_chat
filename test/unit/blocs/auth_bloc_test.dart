@@ -41,6 +41,36 @@ void main() {
   });
 
   group('AuthBloc', () {
+    test('late anonymous failure cannot replace an authenticated account', () async {
+      final pending = Completer<AuthResult>();
+      final started = Completer<void>();
+      when(() => mockAuthRepository.registerAnonymously(
+        homeserver: any(named: 'homeserver'),
+        password: any(named: 'password'),
+        registrationToken: any(named: 'registrationToken'),
+      )).thenAnswer((_) {
+        started.complete();
+        return pending.future;
+      });
+      final bloc = AuthBloc(authRepository: mockAuthRepository);
+      bloc.add(const AuthAnonymousRegisterRequested(
+        homeserver: 'https://server.com', password: 'synthetic',
+      ));
+      await started.future;
+      when(() => mockAuthRepository.isLoggedIn).thenReturn(true);
+      when(() => mockAuthRepository.currentUser).thenReturn(testUser);
+      final authenticated = bloc.stream.firstWhere(
+        (state) => state.status == AuthStatus.authenticated,
+      );
+      bloc.add(const AuthCheckRequested());
+      await authenticated;
+      pending.complete(AuthResult.failure('superseded', type: AuthErrorType.rateLimited));
+      await bloc.close();
+      expect(bloc.state.status, AuthStatus.authenticated);
+      expect(bloc.state.user, testUser);
+      expect(bloc.state.errorMessage, isNull);
+    });
+
     test(
       'duplicate registration cannot overwrite success with username taken',
       () async {

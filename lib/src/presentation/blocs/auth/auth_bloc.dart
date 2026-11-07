@@ -481,6 +481,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         registrationToken: event.registrationToken,
       );
 
+      // A normal login/session check may finish while guest preflight waits.
+      // Its authenticated UI must survive an obsolete guest completion.
+      final currentUser = _authRepository.currentUser;
+      if (state.status == AuthStatus.authenticated &&
+          _authRepository.isLoggedIn &&
+          currentUser != null &&
+          state.user?.userId == currentUser.userId &&
+          (!result.success || result.user?.userId != currentUser.userId)) {
+        return;
+      }
+
       if (result.success && result.user != null) {
         await _completeAuthenticatedFlow(result.user!, emit);
       } else {
