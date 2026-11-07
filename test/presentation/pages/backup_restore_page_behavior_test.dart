@@ -19,6 +19,18 @@ class _Auth extends Mock
 
 class _Service extends Mock implements ChatBackupService {}
 
+base class _PickedFile extends PlatformFile {
+  _PickedFile() : uri = Uri.file('/tmp/fixture.n42backup');
+  @override
+  final String name = 'fixture.n42backup';
+  @override
+  final Uri uri;
+  @override
+  int? lengthSync() => 1;
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _FilePicker extends FilePickerPlatform {
   PlatformFile? result;
   Object? error;
@@ -80,7 +92,14 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
-  for (final mode in ['cancel', 'active-error', 'stale-error']) {
+  for (final mode in [
+    'cancel',
+    'active-error',
+    'stale-error',
+    'preview-cancel',
+    'confirm',
+    'stale-confirm',
+  ]) {
     testWidgets('valid account picker outcome: $mode', (tester) async {
       final service = _Service();
       final manager = _Manager();
@@ -104,7 +123,35 @@ void main() {
       when(() => service.listBackups()).thenAnswer((_) async => []);
       final previous = FilePickerPlatform.instance;
       final picker = _FilePicker();
-      if (mode != 'cancel') picker.error = StateError('picker-fixture-error');
+      final selected = [
+        'preview-cancel',
+        'confirm',
+        'stale-confirm',
+      ].contains(mode);
+      if (selected) {
+        picker.result = _PickedFile();
+        when(() => service.previewBackup('/tmp/fixture.n42backup')).thenAnswer(
+          (_) async => BackupPreview(
+            backupId: 'fixture',
+            createdAt: DateTime(2026),
+            roomCount: 1,
+            roomNames: ['Fixture room'],
+            hasMedia: false,
+            hasKeys: false,
+            hasSettings: false,
+            warnings: ['Fixture incomplete backup'],
+          ),
+        );
+        when(
+          () => service.restoreFromBackup(
+            backupFilePath: '/tmp/fixture.n42backup',
+            isCurrent: any(named: 'isCurrent'),
+            onProgress: any(named: 'onProgress'),
+          ),
+        ).thenAnswer((_) async => const RestoreResult());
+      }
+      if (!selected && mode != 'cancel')
+        picker.error = StateError('picker-fixture-error');
       if (mode == 'stale-error') picker.onPick = () => current = false;
       FilePickerPlatform.instance = picker;
       GetIt.instance.registerSingleton<ChatBackupService>(service);
@@ -129,7 +176,37 @@ void main() {
       await tester.tap(find.text('Choose Backup File'));
       await tester.pumpAndSettle();
       expect(picker.calls, 1);
-      verifyZeroInteractions(service);
+      if (selected) {
+        expect(find.text('Fixture incomplete backup'), findsOneWidget);
+        expect(find.text('Fixture room'), findsOneWidget);
+        if (mode == 'stale-confirm') current = false;
+        await tester.tap(
+          find.widgetWithText(TextButton, 'Cancel').last,
+          warnIfMissed: true,
+        );
+        if (mode == 'confirm' || mode == 'stale-confirm') {
+          // Re-open to exercise explicit confirmation independently of cancel.
+          if (mode == 'stale-confirm') current = true;
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Choose Backup File'));
+          await tester.pumpAndSettle();
+          if (mode == 'stale-confirm') current = false;
+          await tester.tap(find.widgetWithText(FilledButton, 'Confirm').last);
+        }
+        await tester.pumpAndSettle();
+        final verification = () => service.restoreFromBackup(
+          backupFilePath: '/tmp/fixture.n42backup',
+          isCurrent: any(named: 'isCurrent'),
+          onProgress: any(named: 'onProgress'),
+        );
+        if (mode == 'confirm') {
+          verify(verification).called(1);
+        } else {
+          verifyNever(verification);
+        }
+      } else {
+        verifyZeroInteractions(service);
+      }
       expect(
         find.textContaining('picker-fixture-error'),
         mode == 'active-error' ? findsOneWidget : findsNothing,

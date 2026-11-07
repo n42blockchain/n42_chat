@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Restore confirmation interaction (batch 267): seven real page widget tests pass, covering displayed preview warnings/room names, cancel without restore, exactly one service call after confirmation and no restore when origin expires before confirmation. Test-only simulated file/service fixtures; no production logic changed. Test analysis has two infos, no errors/warnings. Password-dialog/real-file/device flows, localization and ownership/history remain open.
+
 - Valid-account picker interaction (batch 266): real page tests now cover cancel, active picker error and account-invalidated picker error with a lifecycle fixture. Picker is reached once; no preview/restore service calls occur in those paths, active errors display and stale errors stay hidden. Four page tests pass; test analysis clean. Actual selected-file/password/dialog flows and device acceptance remain open. Production source unchanged.
 
 - Backup page rendering (batch 265): a real page widget test exposed ListTile/ColoredBox material assertions. Card surfaces now use Material, preserving background and ink rendering. The page renders and refuses file selection without account lifecycle dependencies; final test passes without hit-test warnings. Password cancel/wrong-password/valid-account UI flows, localization and host integration remain open.
