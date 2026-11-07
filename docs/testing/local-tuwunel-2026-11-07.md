@@ -57,3 +57,14 @@ The 30-attempt batch hit the server's per-account login limit at recovery device
 ## Host golden CI result
 
 Chat golden regression run 42372807637 passes on both Ubuntu and xcode-27 macOS for source 6f6f811e. Exact comparison is retained. Material fixture inheritance, fixture heading contrast and separately reviewed host baselines were corrected. The earlier macOS 26 renderer's four/six edge pixels are resolved by aligning the runner to the macOS 27 family used for the reviewed baseline. This is a golden-test result only, not physical-device or production acceptance.
+
+
+## Twenty-client encrypted group load
+
+Final tool `local_group_load.dart` exits 0 against a second owned Tuwunel 1.9.4 instance, loopback port 18949, with federation disabled, independent database volume, 2 CPU / 2 GiB server limits and linux/amd64 Docker emulation. It does not alter the ongoing recovery server at port 18948.
+
+Twenty Matrix SDK clients use independent SQLite stores. The run sends 10,000 acknowledged events with explicit transaction IDs: text/notice/emote plus 100 encrypted file events. One recipient stops sync after key establishment and resumes after the send phase. Every recipient's history has exactly 10,000 unique expected event IDs and correct decrypted bodies: 200,000 verified deliveries, zero missing/duplicate/unreadable results. Send phase: 339,033 ms; total: 1,174,155 ms. These virtual-client measurements are not mobile or production throughput benchmarks.
+
+An initial three-client preflight failed because the harness opened history before resumed sync. It now awaits sync first; final three-client/100-event preflight and the full run both exit 0. Fourteen pre-IO guard cases pass; scoped analysis has no issues. No product runtime source was changed to pass this test.
+
+Structured source/log hashes and per-recipient counts: `local-tuwunel-group-load-2026-11-07.json`. Full client/server logs are mode 0600 in the controlled matrix-load QA directory. The captured server log contains zero occurrences of the generated message-body canary prefix. This does not cover production or push logs. File-event bodies are checked, but this load test does not download/decrypt their attachments. Accounts are logged out, not deactivated; the owned database is retained. Physical UI, push, attachment payloads and other MSG-001 gaps remain open.
