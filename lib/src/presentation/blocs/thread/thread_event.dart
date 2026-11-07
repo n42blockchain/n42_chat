@@ -90,10 +90,12 @@ class SetThreadReplyTarget extends ThreadEvent {
 class ThreadMessagesUpdated extends ThreadEvent {
   final List<MessageEntity> messages;
 
-  const ThreadMessagesUpdated(this.messages);
+  final bool Function()? isCurrent;
+
+  const ThreadMessagesUpdated(this.messages, {this.isCurrent});
 
   @override
-  List<Object?> get props => [messages];
+  List<Object?> get props => [messages, if (isCurrent != null) isCurrent];
 }
 
 /// 释放线程资源

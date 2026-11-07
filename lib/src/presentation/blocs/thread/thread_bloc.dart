@@ -15,13 +15,37 @@ import '../../../core/utils/debug_log.dart';
 /// 与 ChatBloc 解耦，避免进一步增加 ChatBloc 复杂度。
 class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   final IMessageRepository _messageRepository;
+  int _generation = 0;
+
+  bool Function() _context(Emitter<ThreadState>? emit) {
+    final generation = _generation;
+    final room = state.roomId;
+    final root = state.threadRootEventId;
+    return () =>
+        !isClosed &&
+        !(emit?.isDone ?? false) &&
+        generation == _generation &&
+        state.roomId == room &&
+        state.threadRootEventId == root;
+  }
+
+  void _detachSubscription() {
+    final subscription = _threadMessagesSubscription;
+    _threadMessagesSubscription = null;
+    if (subscription != null) {
+      unawaited(
+        subscription.cancel().catchError((Object error) {
+          debugLog('ThreadBloc: subscription cleanup failed: $error');
+        }),
+      );
+    }
+  }
 
   StreamSubscription<List<MessageEntity>>? _threadMessagesSubscription;
 
-  ThreadBloc({
-    required IMessageRepository messageRepository,
-  })  : _messageRepository = messageRepository,
-        super(ThreadState.initial()) {
+  ThreadBloc({required IMessageRepository messageRepository})
+    : _messageRepository = messageRepository,
+      super(ThreadState.initial()) {
     on<InitializeThread>(_onInitializeThread);
     on<LoadThreadMessages>(_onLoadThreadMessages);
     on<LoadMoreThreadMessages>(_onLoadMoreThreadMessages);
@@ -37,12 +61,16 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     InitializeThread event,
     Emitter<ThreadState> emit,
   ) async {
-    emit(state.copyWith(
-      isLoading: true,
-      roomId: event.roomId,
-      threadRootEventId: event.threadRootEventId,
-      clearError: true,
-    ));
+    _generation++;
+    _detachSubscription();
+    emit(
+      ThreadState(
+        isLoading: true,
+        roomId: event.roomId,
+        threadRootEventId: event.threadRootEventId,
+      ),
+    );
+    final isCurrent = _context(emit);
 
     try {
       // 加载线程消息
@@ -51,6 +79,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
         event.threadRootEventId,
       );
 
+      if (!isCurrent()) return;
       // 分离根消息和回复
       MessageEntity? rootMessage;
       final replies = <MessageEntity>[];
@@ -64,8 +93,12 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       }
 
       // 如果根消息不在返回结果中，单独获取
-      rootMessage ??= await _loadRootMessage(event.roomId, event.threadRootEventId);
+      rootMessage ??= await _loadRootMessage(
+        event.roomId,
+        event.threadRootEventId,
+      );
 
+      if (!isCurrent()) return;
       // 计算参与者
       final participantIds = <String>{};
       if (rootMessage != null) participantIds.add(rootMessage.senderId);
@@ -73,22 +106,22 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
         participantIds.add(reply.senderId);
       }
 
-      emit(state.copyWith(
-        rootMessage: rootMessage,
-        replies: replies,
-        isLoading: false,
-        participantCount: participantIds.length,
-        hasMore: messages.length >= 50,
-      ));
+      emit(
+        state.copyWith(
+          rootMessage: rootMessage,
+          replies: replies,
+          isLoading: false,
+          participantCount: participantIds.length,
+          hasMore: messages.length >= 50,
+        ),
+      );
 
       // 订阅线程消息更新
       _subscribeToThreadMessages(event.roomId, event.threadRootEventId);
     } catch (e) {
+      if (!isCurrent()) return;
       debugLog('ThreadBloc: Failed to initialize thread: $e');
-      emit(state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      ));
+      emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }
 
@@ -108,19 +141,20 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   }
 
   void _subscribeToThreadMessages(String roomId, String threadRootEventId) {
-    _threadMessagesSubscription?.cancel();
+    _detachSubscription();
+    final isCurrent = _context(null);
     _threadMessagesSubscription = _messageRepository
         .watchThreadMessages(roomId, threadRootEventId)
         .listen(
-      (messages) {
-        if (!isClosed) {
-          add(ThreadMessagesUpdated(messages));
-        }
-      },
-      onError: (Object e) {
-        debugLog('ThreadBloc: Thread messages stream error: $e');
-      },
-    );
+          (messages) {
+            if (isCurrent()) {
+              add(ThreadMessagesUpdated(messages, isCurrent: isCurrent));
+            }
+          },
+          onError: (Object e) {
+            debugLog('ThreadBloc: Thread messages stream error: $e');
+          },
+        );
   }
 
   Future<void> _onLoadThreadMessages(
@@ -129,23 +163,31 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     if (state.roomId == null || state.threadRootEventId == null) return;
 
+    final isCurrent = _context(emit);
+    final roomId = state.roomId!;
+    final rootId = state.threadRootEventId!;
+
     emit(state.copyWith(isLoading: true));
     try {
       final messages = await _messageRepository.getThreadMessages(
-        state.roomId!,
-        state.threadRootEventId!,
+        roomId,
+        rootId,
       );
 
+      if (!isCurrent()) return;
       final replies = messages
           .where((m) => m.id != state.threadRootEventId)
           .toList();
 
-      emit(state.copyWith(
-        replies: replies,
-        isLoading: false,
-        hasMore: messages.length >= 50,
-      ));
+      emit(
+        state.copyWith(
+          replies: replies,
+          isLoading: false,
+          hasMore: messages.length >= 50,
+        ),
+      );
     } catch (e) {
+      if (!isCurrent()) return;
       emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }
@@ -154,28 +196,41 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     LoadMoreThreadMessages event,
     Emitter<ThreadState> emit,
   ) async {
-    if (state.roomId == null || state.threadRootEventId == null || !state.hasMore) return;
+    if (state.roomId == null ||
+        state.threadRootEventId == null ||
+        !state.hasMore)
+      return;
+
+    final isCurrent = _context(emit);
+    final roomId = state.roomId!;
+    final rootId = state.threadRootEventId!;
 
     emit(state.copyWith(isLoading: true));
     try {
-      final beforeEventId = state.replies.isNotEmpty ? state.replies.first.id : null;
+      final beforeEventId = state.replies.isNotEmpty
+          ? state.replies.first.id
+          : null;
       final messages = await _messageRepository.getThreadMessages(
-        state.roomId!,
-        state.threadRootEventId!,
+        roomId,
+        rootId,
         limit: 50,
         fromEventId: beforeEventId,
       );
 
+      if (!isCurrent()) return;
       final newReplies = messages
           .where((m) => m.id != state.threadRootEventId)
           .toList();
 
-      emit(state.copyWith(
-        replies: [...newReplies, ...state.replies],
-        isLoading: false,
-        hasMore: messages.length >= 50,
-      ));
+      emit(
+        state.copyWith(
+          replies: [...newReplies, ...state.replies],
+          isLoading: false,
+          hasMore: messages.length >= 50,
+        ),
+      );
     } catch (e) {
+      if (!isCurrent()) return;
       emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }
@@ -186,15 +241,21 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     if (state.roomId == null || state.threadRootEventId == null) return;
 
+    final isCurrent = _context(emit);
+    final roomId = state.roomId!;
+    final rootId = state.threadRootEventId!;
+
     emit(state.copyWith(isSending: true, clearReplyTarget: true));
     try {
       await _messageRepository.sendThreadTextMessage(
-        state.roomId!,
-        state.threadRootEventId!,
+        roomId,
+        rootId,
         event.text,
       );
+      if (!isCurrent()) return;
       emit(state.copyWith(isSending: false));
     } catch (e) {
+      if (!isCurrent()) return;
       debugLog('ThreadBloc: Failed to send thread message: $e');
       emit(state.copyWith(isSending: false, error: e.toString()));
     }
@@ -206,17 +267,23 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     if (state.roomId == null || state.threadRootEventId == null) return;
 
+    final isCurrent = _context(emit);
+    final roomId = state.roomId!;
+    final rootId = state.threadRootEventId!;
+
     emit(state.copyWith(isSending: true));
     try {
       await _messageRepository.sendThreadImageMessage(
-        state.roomId!,
-        state.threadRootEventId!,
+        roomId,
+        rootId,
         imageBytes: Uint8List.fromList(event.imageBytes),
         filename: event.filename,
         mimeType: event.mimeType,
       );
+      if (!isCurrent()) return;
       emit(state.copyWith(isSending: false));
     } catch (e) {
+      if (!isCurrent()) return;
       emit(state.copyWith(isSending: false, error: e.toString()));
     }
   }
@@ -227,17 +294,23 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     if (state.roomId == null || state.threadRootEventId == null) return;
 
+    final isCurrent = _context(emit);
+    final roomId = state.roomId!;
+    final rootId = state.threadRootEventId!;
+
     emit(state.copyWith(isSending: true));
     try {
       await _messageRepository.sendThreadFileMessage(
-        state.roomId!,
-        state.threadRootEventId!,
+        roomId,
+        rootId,
         fileBytes: Uint8List.fromList(event.fileBytes),
         filename: event.filename,
         mimeType: event.mimeType,
       );
+      if (!isCurrent()) return;
       emit(state.copyWith(isSending: false));
     } catch (e) {
+      if (!isCurrent()) return;
       emit(state.copyWith(isSending: false, error: e.toString()));
     }
   }
@@ -257,6 +330,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     ThreadMessagesUpdated event,
     Emitter<ThreadState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     final replies = event.messages
         .where((m) => m.id != state.threadRootEventId)
         .toList();
@@ -268,29 +342,31 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
 
     // 计算参与者
     final participantIds = <String>{};
-    if (state.rootMessage != null) participantIds.add(state.rootMessage!.senderId);
+    if (state.rootMessage != null)
+      participantIds.add(state.rootMessage!.senderId);
     for (final reply in replies) {
       participantIds.add(reply.senderId);
     }
 
-    emit(state.copyWith(
-      rootMessage: updatedRoot ?? state.rootMessage,
-      replies: replies,
-      participantCount: participantIds.length,
-    ));
+    emit(
+      state.copyWith(
+        rootMessage: updatedRoot ?? state.rootMessage,
+        replies: replies,
+        participantCount: participantIds.length,
+      ),
+    );
   }
 
-  void _onDisposeThread(
-    DisposeThread event,
-    Emitter<ThreadState> emit,
-  ) {
-    _threadMessagesSubscription?.cancel();
-    _threadMessagesSubscription = null;
+  void _onDisposeThread(DisposeThread event, Emitter<ThreadState> emit) {
+    _generation++;
+    _detachSubscription();
+    emit(ThreadState.initial());
   }
 
   @override
   Future<void> close() {
-    _threadMessagesSubscription?.cancel();
+    _generation++;
+    _detachSubscription();
     return super.close();
   }
 }
