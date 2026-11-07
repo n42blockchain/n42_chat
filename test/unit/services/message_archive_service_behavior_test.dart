@@ -168,6 +168,49 @@ void main() {
     expect(await database.getMetadata(room), isNull);
   });
 
+  test('deleting latest and final messages updates archive metadata', () async {
+    const room = '!room:hs.test';
+    await service.importArchivedMessages(room, [
+      _entry(eventId: r'$old', roomId: room, timestamp: 100, body: 'old'),
+      _entry(eventId: r'$new', roomId: room, timestamp: 200, body: 'new'),
+    ]);
+    await service.deleteArchivedMessage(r'$new');
+    var metadata = (await database.getMetadata(room))!;
+    expect(metadata.totalArchived, 1);
+    expect(metadata.lastArchivedEventId, r'$old');
+    expect(metadata.lastArchivedTs, 100);
+    await service.deleteArchivedMessage(r'$old');
+    metadata = (await database.getMetadata(room))!;
+    expect(metadata.totalArchived, 0);
+    expect(metadata.lastArchivedEventId, isNull);
+    expect(metadata.lastArchivedTs, 0);
+    expect(await database.searchMessages('old'), isEmpty);
+  });
+
+  test(
+    'metadata failure rolls back imported rows and searchable text',
+    () async {
+      await database.customStatement("""
+      CREATE TRIGGER fail_metadata BEFORE INSERT ON archive_metadata
+      BEGIN SELECT RAISE(ABORT, 'fixture metadata failure'); END
+    """);
+      await expectLater(
+        service.importArchivedMessages('!room:hs.test', [
+          _entry(
+            eventId: r'$rollback',
+            roomId: '!room:hs.test',
+            timestamp: 100,
+            body: 'rollback searchable text',
+          ),
+        ]),
+        throwsA(isA<Exception>()),
+      );
+      expect(await database.getMessageCount('!room:hs.test'), 0);
+      expect(await database.searchMessages('rollback'), isEmpty);
+      expect(await database.getMetadata('!room:hs.test'), isNull);
+    },
+  );
+
   test('empty archive import does not create metadata', () async {
     expect(await service.importArchivedMessages('!empty:hs.test', []), 0);
     expect(await database.getMetadata('!empty:hs.test'), isNull);

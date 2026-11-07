@@ -193,7 +193,24 @@ class ArchiveDatabase extends _$ArchiveDatabase {
         'INSERT OR IGNORE INTO archive_redactions(event_id) VALUES (?)',
         [eventId],
       );
+      final removed = await (select(
+        archivedMessages,
+      )..where((row) => row.eventId.equals(eventId))).getSingleOrNull();
       await deleteByEventId(eventId);
+      if (removed != null) {
+        final latest = (await getMessages(
+          removed.roomId,
+          limit: 1,
+        )).firstOrNull;
+        await updateMetadata(
+          ArchiveMetadataCompanion(
+            roomId: Value(removed.roomId),
+            lastArchivedEventId: Value(latest?.eventId),
+            lastArchivedTs: Value(latest?.originServerTs ?? 0),
+            totalArchived: Value(await getMessageCount(removed.roomId)),
+          ),
+        );
+      }
     });
   }
 
@@ -220,9 +237,8 @@ class ArchiveDatabase extends _$ArchiveDatabase {
         // insertReturningOrNull:被 insertOrIgnore 忽略(eventId 已存在)时
         // 返回 null,真正插入才返回行——避免用 rowId>0 把被忽略行也计入
         // (last_insert_rowid 对被忽略行仍>0,会高估 totalArchived,复审 P2)。
-        final row = await into(
-          archivedMessages,
-        ).insertReturningOrNull(entry, mode: InsertMode.insertOrIgnore);
+        final row = await into(archivedMessages)
+            .insertReturningOrNull(entry, mode: InsertMode.insertOrIgnore);
         if (row != null) {
           inserted++;
         }

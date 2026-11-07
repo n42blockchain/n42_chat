@@ -295,24 +295,26 @@ class MessageArchiveService {
       throw ArgumentError('Archive entries must belong to the target room');
     }
 
-    final inserted = await _db.insertMessages(entries);
-    if (inserted == 0) return 0;
+    return _db.transaction(() async {
+      final inserted = await _db.insertMessages(entries);
+      if (inserted == 0) return 0;
 
-    // Input rows can be old or ignored duplicates. Derive both cursor fields
-    // from the same persisted row rather than mixing input with old metadata.
-    final latest = (await _db.getMessages(roomId, limit: 1)).first;
+      // Input rows can be old or ignored duplicates. Derive both cursor fields
+      // from the same persisted row rather than mixing input with old metadata.
+      final latest = (await _db.getMessages(roomId, limit: 1)).first;
 
-    await _db.updateMetadata(
-      ArchiveMetadataCompanion(
-        roomId: Value(roomId),
-        lastArchivedEventId: Value(latest.eventId),
-        lastArchivedTs: Value(latest.originServerTs),
-        totalArchived: Value(await _db.getMessageCount(roomId)),
-        lastArchiveTime: Value(DateTime.now()),
-      ),
-    );
+      await _db.updateMetadata(
+        ArchiveMetadataCompanion(
+          roomId: Value(roomId),
+          lastArchivedEventId: Value(latest.eventId),
+          lastArchivedTs: Value(latest.originServerTs),
+          totalArchived: Value(await _db.getMessageCount(roomId)),
+          lastArchiveTime: Value(DateTime.now()),
+        ),
+      );
 
-    return inserted;
+      return inserted;
+    });
   }
 
   Future<bool> isEventArchived(String eventId) async {
