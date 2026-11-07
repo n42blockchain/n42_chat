@@ -262,6 +262,104 @@ void main() {
         (await alice.getMessages('!shared:example.org')).first.body,
         '中文 😀 café',
       );
+      final metadata = await alice.getMetadata('!shared:example.org');
+      expect(metadata, isNotNull);
+      expect(metadata!.totalArchived, 2);
+      expect(metadata.lastArchivedEventId, 'unicode');
+      expect(metadata.lastArchivedTs, 200);
+    },
+  );
+
+  test(
+    'quarter import metadata failure rolls back messages and search text',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'n42-quarter-rollback-',
+      );
+      addTearDown(() => directory.delete(recursive: true));
+      final source = ArchiveIntegrityService(
+        db: alice,
+        documentsDirectory: () async => directory,
+      );
+      final exported = await source.exportQuarterlyArchive(202601);
+      await bob.customStatement('''
+      CREATE TRIGGER fail_quarter_metadata BEFORE INSERT ON archive_metadata
+      BEGIN SELECT RAISE(ABORT, 'fixture metadata failure'); END
+    ''');
+      final target = ArchiveIntegrityService(
+        db: bob,
+        documentsDirectory: () async => directory,
+      );
+      final imported = await target.importArchive(exported.file);
+      expect(imported.success, isFalse);
+      expect(imported.messagesImported, 0);
+      expect(await bob.isEventArchived('event-alice'), isFalse);
+      expect(await bob.searchMessages('alice'), isEmpty);
+      expect(await bob.getMessageCount('!shared:example.org'), 1);
+    },
+  );
+
+  test(
+    'quarter metadata uses persisted rows across rooms and duplicate imports',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'n42-quarter-rooms-',
+      );
+      addTearDown(() => directory.delete(recursive: true));
+      final file = File('${directory.path}/legacy.db.gz');
+      final rows = [
+        {
+          'eid': 'old',
+          'rid': '!shared:example.org',
+          'sid': '@alice:example.org',
+          'ts': 50,
+          'tp': 'm.room.message',
+          'bd': 'old',
+          'q': 202601,
+        },
+        {
+          'eid': 'second',
+          'rid': '!second:example.org',
+          'sid': '@alice:example.org',
+          'ts': 200,
+          'tp': 'm.room.message',
+          'bd': 'second',
+          'q': 202601,
+        },
+      ];
+      await file.writeAsBytes(
+        gzip.encode(utf8.encode(rows.map(jsonEncode).join('\n'))),
+      );
+      final service = ArchiveIntegrityService.accountScoped(
+        access: access,
+        documentsDirectory: () async => directory,
+      );
+      expect(
+        (await service.importArchive(
+          file,
+          allowUnownedLegacy: true,
+        )).messagesImported,
+        2,
+      );
+      final first = (await alice.getMetadata('!shared:example.org'))!;
+      expect(first.lastArchivedEventId, 'event-alice');
+      expect(first.lastArchivedTs, 100);
+      expect(first.totalArchived, 2);
+      final second = (await alice.getMetadata('!second:example.org'))!;
+      expect(second.lastArchivedEventId, 'second');
+      expect(second.lastArchivedTs, 200);
+      expect(second.totalArchived, 1);
+      expect(
+        (await service.importArchive(
+          file,
+          allowUnownedLegacy: true,
+        )).messagesImported,
+        0,
+      );
+      expect(
+        (await alice.getMetadata('!shared:example.org'))!.totalArchived,
+        2,
+      );
     },
   );
 

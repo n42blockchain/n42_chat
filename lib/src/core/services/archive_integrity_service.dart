@@ -261,6 +261,23 @@ class ArchiveIntegrityService {
       final inserted = await database.transaction(() async {
         lease?.ensureCurrent();
         final count = await database.insertMessages(companions);
+        for (final roomId
+            in companions.map((entry) => entry.roomId.value).toSet()) {
+          lease?.ensureCurrent();
+          final latest = (await database.getMessages(
+            roomId,
+            limit: 1,
+          )).firstOrNull;
+          await database.updateMetadata(
+            ArchiveMetadataCompanion(
+              roomId: Value(roomId),
+              lastArchivedEventId: Value(latest?.eventId),
+              lastArchivedTs: Value(latest?.originServerTs ?? 0),
+              totalArchived: Value(await database.getMessageCount(roomId)),
+              lastArchiveTime: Value(DateTime.now()),
+            ),
+          );
+        }
         lease?.ensureCurrent();
         return count;
       });
