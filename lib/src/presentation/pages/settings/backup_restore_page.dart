@@ -105,7 +105,7 @@ class _BackupSectionState extends State<_BackupSection> {
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 
-    return Container(
+    return Material(
       color: cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,7 +252,7 @@ class _BackupHistorySection extends StatelessWidget {
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 
-    return Container(
+    return Material(
       color: cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,7 +400,7 @@ class _RestoreSection extends StatelessWidget {
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 
-    return Container(
+    return Material(
       color: cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

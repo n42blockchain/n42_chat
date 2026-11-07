@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Backup page rendering (batch 265): a real page widget test exposed ListTile/ColoredBox material assertions. Card surfaces now use Material, preserving background and ink rendering. The page renders and refuses file selection without account lifecycle dependencies; final test passes without hit-test warnings. Password cancel/wrong-password/valid-account UI flows, localization and host integration remain open.
+
 - Encrypted restore password UI (batch 264): supported encrypted formats now raise a typed BackupPasswordRequired error. Picker prompts for an obscured password only for that error; cancellation/empty password stops, valid input is passed to preview and restore. Existing origin checks cover prompt completion. Protected-preview/restore service test passes; scoped analysis has six infos, no errors/warnings. Wrong-password retry UX, widget/device interaction, localization, host integration and complete backup ownership/history remain open.
 
 - Restore stale exception presentation (batch 263): BLoC exception handling now suppresses old-account failure content when the restore origin has expired. Combined backup service/BLoC suites pass 101 tests; scoped analysis has seven infos, no errors/warnings. UI interaction, encryption-password input, localization, rollback of started writes and full-history/ownership requirements remain open.
