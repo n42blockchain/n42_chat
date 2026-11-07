@@ -148,6 +148,36 @@ void main() {
     });
   }
 
+  for (final failAfterPage in [false, true]) {
+    test('remote paging error keeps loaded data: partial=$failAfterPage', () async {
+      final (room, timeline) = roomFixture('!partial:example.org');
+      when(() => room.topic).thenReturn('');
+      when(() => room.isDirectChat).thenReturn(false);
+      when(() => room.summary).thenReturn(_Summary());
+      when(() => client.rooms).thenReturn([room]);
+      final original = timeline.events.toList();
+      when(() => timeline.canRequestHistory).thenReturn(true);
+      var pages = 0;
+      when(() => timeline.requestHistory(historyCount: 500)).thenAnswer((_) async {
+        pages++;
+        if (!failAfterPage || pages > 1) throw StateError('fixture-network-failure');
+        when(() => timeline.events).thenReturn([...original, matrix.Event(
+          eventId: 'older-partial', senderId: '@alice:example.org',
+          originServerTs: DateTime(2019), type: 'm.room.message',
+          content: {'msgtype': 'm.text', 'body': 'retained older message'}, room: room,
+        )]);
+      });
+      final result = await service.createBackup(fetchRemoteHistory: true);
+      final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+      expect(result.messageCount, failAfterPage ? 2 : 1);
+      expect(data['manifest']['hasReadErrors'], isTrue);
+      expect(result.warnings, isNotEmpty);
+      expect(await service.verifyBackup(result.filePath), isTrue);
+      verify(() => timeline.requestHistory(historyCount: 500)).called(failAfterPage ? 2 : 1);
+      verify(() => timeline.cancelSubscriptions()).called(1);
+    });
+  }
+
   test('remote history paging stops when the SDK makes no progress', () async {
     final (room, timeline) = roomFixture('!history:example.org');
     when(() => room.topic).thenReturn('');
