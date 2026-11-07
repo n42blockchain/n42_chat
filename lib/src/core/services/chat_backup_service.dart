@@ -973,30 +973,37 @@ class ChatBackupService {
     String backupFilePath, {
     String? password,
   }) async {
-    final data = await _readBackupData(backupFilePath, password: password);
-    final manifest = data['manifest'] as Map<String, dynamic>? ?? {};
-    final ownerError = _backupOwnerError(manifest);
-    if (ownerError != null) throw StateError(ownerError);
-    final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
-
-    final roomNames = rooms.values
-        .map(
-          (r) => (r as Map<String, dynamic>)['name']?.toString() ?? 'Unknown',
-        )
-        .toList();
-
-    return BackupPreview(
-      backupId: manifest['backupId']?.toString() ?? '',
-      createdAt:
-          DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
-          DateTime.now(),
-      roomCount: rooms.length,
-      roomNames: roomNames,
-      hasMedia: manifest['includesMedia'] == true,
-      hasKeys: manifest['includesKeys'] == true,
-      hasSettings: data.containsKey('settings'),
-      warnings: _restoreWarnings(manifest),
-    );
+    final ensureCurrent = _captureBackupSession();
+    try {
+      final data = await _readBackupData(backupFilePath, password: password);
+      ensureCurrent();
+      final manifest = data['manifest'] as Map<String, dynamic>? ?? {};
+      final ownerError = _backupOwnerError(manifest);
+      if (ownerError != null) throw StateError(ownerError);
+      final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
+  
+      final roomNames = rooms.values
+          .map(
+            (r) => (r as Map<String, dynamic>)['name']?.toString() ?? 'Unknown',
+          )
+          .toList();
+  
+      return BackupPreview(
+        backupId: manifest['backupId']?.toString() ?? '',
+        createdAt:
+            DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
+            DateTime.now(),
+        roomCount: rooms.length,
+        roomNames: roomNames,
+        hasMedia: manifest['includesMedia'] == true,
+        hasKeys: manifest['includesKeys'] == true,
+        hasSettings: data.containsKey('settings'),
+        warnings: _restoreWarnings(manifest),
+      );
+    } catch (_) {
+      ensureCurrent();
+      rethrow;
+    }
   }
 
   void _warnUnknownExportOwner(List<String> warnings) {

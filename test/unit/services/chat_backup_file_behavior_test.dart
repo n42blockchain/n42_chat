@@ -869,6 +869,22 @@ void main() {
     expect(await File(backup.filePath).exists(), isTrue);
   });
 
+  for (final protected in [false, true]) {
+    test('preview rejects account change while reading: protected=$protected', () async {
+      final file = File('${directory.path}/preview-race.n42backup');
+      if (protected) {
+        await file.writeAsString('N42ENC3:password-required');
+      } else {
+        await file.writeAsString(jsonEncode({'manifest': {'backupId': 'old'},
+          'rooms': {'!old:example.org': {'name': 'private old room'}}}));
+      }
+      final pending = service.previewBackup(file.path);
+      final rejected = expectLater(pending, throwsA(isA<BackupSessionChanged>()));
+      when(() => client.userID).thenReturn('@bob:example.org');
+      await rejected;
+    });
+  }
+
   test('list ignores unrelated files and directories', () async {
     await File('${directory.path}/notes.txt').writeAsString('ignore');
     await Directory('${directory.path}/folder.n42backup').create();

@@ -7,11 +7,13 @@ import '../../../core/services/legacy_archive_recovery_service.dart';
 class LegacyArchiveRecoverySection extends StatefulWidget {
   final LegacyArchiveRecoveryService service;
   final bool Function()? tryBegin;
+  final bool Function()? isAccountCurrent;
   final VoidCallback? onEnd;
   const LegacyArchiveRecoverySection({
     super.key,
     required this.service,
     this.tryBegin,
+    this.isAccountCurrent,
     this.onEnd,
   });
 
@@ -34,7 +36,11 @@ class _LegacyArchiveRecoverySectionState
     LegacyArchivePreview? preview;
     try {
       preview = await widget.service.preview();
-      if (!mounted || !preview.isCurrent) return;
+      if (!mounted ||
+          widget.isAccountCurrent?.call() == false ||
+          !preview.isCurrent) {
+        return;
+      }
       setState(() => _progress = 0);
       final labels = S.of(context)!;
       final selected = <String>{};
@@ -98,23 +104,37 @@ class _LegacyArchiveRecoverySectionState
           ),
         ),
       );
-      if (confirmed != true || !mounted || !preview.isCurrent) return;
+      if (confirmed != true ||
+          !mounted ||
+          widget.isAccountCurrent?.call() == false ||
+          !preview.isCurrent) {
+        return;
+      }
       await widget.service.recover(
         preview,
         roomIds: selected,
         ownershipConfirmed: true,
+        isCurrent: () => mounted && widget.isAccountCurrent?.call() != false,
         onProgress: (value) {
-          if (!mounted || !preview!.isCurrent) {
+          if (!mounted ||
+              widget.isAccountCurrent?.call() == false ||
+              !preview!.isCurrent) {
             throw StateError('Legacy recovery view changed');
           }
           setState(() => _progress = value);
         },
       );
-      if (!mounted || !preview.isCurrent) return;
+      if (!mounted ||
+          widget.isAccountCurrent?.call() == false ||
+          !preview.isCurrent) {
+        return;
+      }
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(labels.commonDone)));
     } catch (error) {
-      if (mounted && (preview == null || preview.isCurrent)) {
+      if (mounted &&
+          widget.isAccountCurrent?.call() != false &&
+          (preview == null || preview.isCurrent)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(S.of(context)!.backupFailed(error.toString())),

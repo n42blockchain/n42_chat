@@ -150,6 +150,27 @@ void main() {
   );
 
   test(
+    'expired confirmation rolls back even when Matrix identity is unchanged',
+    () async {
+      final preview = await recovery.preview();
+      var current = true;
+      await expectLater(
+        recovery.recover(
+          preview,
+          roomIds: {room},
+          ownershipConfirmed: true,
+          isCurrent: () => current,
+          onProgress: (_) => current = false,
+        ),
+        throwsStateError,
+      );
+      expect(await account.getMessageCount(room), 1);
+      expect(await account.isEventArchived('old-1'), isFalse);
+      expect(await legacy.getMessageCount(room), 2);
+    },
+  );
+
+  test(
     'paginates more than 1000 equal timestamp events without loss',
     () async {
       await legacy.insertMessages(

@@ -25,9 +25,20 @@ class BackupRestorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          BackupBloc(backupService: GetIt.instance<ChatBackupService>())
-            ..add(const LoadBackupList()),
+      create: (_) {
+        final dependencies = GetIt.instance;
+        final auth = dependencies.isRegistered<IAuthRepository>()
+            ? dependencies<IAuthRepository>() : null;
+        final bound = auth is IAccountBoundDeletionLifecycle &&
+            dependencies.isRegistered<MatrixClientManager>();
+        final origin = bound ? captureAccountAction(
+          dependencies<MatrixClientManager>(), auth!,
+        ) : null;
+        return BackupBloc(backupService: dependencies<ChatBackupService>(),
+          isAccountCurrent: bound ? () => origin?.isCurrent ?? false : null,
+          accountChanges: bound ? auth!.loginStateStream : null,
+        )..add(const LoadBackupList());
+      },
       child: const _BackupRestoreView(),
     );
   }
@@ -75,6 +86,7 @@ class _BackupRestoreView extends StatelessWidget {
               if (GetIt.instance.isRegistered<LegacyArchiveRecoveryService>())
                 LegacyArchiveRecoverySection(service: GetIt.instance<LegacyArchiveRecoveryService>(),
                   tryBegin: context.read<BackupBloc>().tryBeginRestoreSelection,
+                  isAccountCurrent: () => context.read<BackupBloc>().isAccountCurrent,
                   onEnd: context.read<BackupBloc>().endRestoreSelection),
               const SizedBox(height: AppDimensions.spacingXXL),
             ],

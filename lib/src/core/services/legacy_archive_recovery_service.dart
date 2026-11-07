@@ -59,6 +59,7 @@ class LegacyArchiveRecoveryService {
     LegacyArchivePreview preview, {
     required Set<String> roomIds,
     required bool ownershipConfirmed,
+    bool Function()? isCurrent,
     void Function(double)? onProgress,
   }) async {
     if (!ownershipConfirmed) {
@@ -71,7 +72,14 @@ class LegacyArchiveRecoveryService {
     }
     final target = preview._target;
     final source = preview._source;
-    target.ensureCurrent();
+    void ensureCurrent() {
+      if (isCurrent?.call() == false) {
+        throw StateError('Legacy recovery confirmation changed');
+      }
+      target.ensureCurrent();
+    }
+
+    ensureCurrent();
     if (identical(source, target.database)) {
       throw StateError('Legacy recovery requires a separate account database');
     }
@@ -86,7 +94,7 @@ class LegacyArchiveRecoveryService {
           throw StateError('Legacy archive changed; review a new preview');
         }
       }
-      target.ensureCurrent();
+      ensureCurrent();
       final copied = await target.database.transaction(() async {
         var inserted = 0;
         var processed = 0;
@@ -98,7 +106,7 @@ class LegacyArchiveRecoveryService {
           int? timestamp;
           String? eventId;
           while (true) {
-            target.ensureCurrent();
+            ensureCurrent();
             final rows = await sourceZone.run(
               () => source.getMessages(
                 room,
@@ -107,14 +115,14 @@ class LegacyArchiveRecoveryService {
                 limit: 500,
               ),
             );
-            target.ensureCurrent();
+            ensureCurrent();
             if (rows.isEmpty) break;
             inserted += await target.database.insertMessages(
               rows.map((row) => row.toCompanion(true)).toList(),
             );
             processed += rows.length;
             onProgress?.call(total == 0 ? 1 : processed / total);
-            target.ensureCurrent();
+            ensureCurrent();
             timestamp = rows.last.originServerTs;
             eventId = rows.last.eventId;
           }
@@ -132,10 +140,10 @@ class LegacyArchiveRecoveryService {
             ),
           );
         }
-        target.ensureCurrent();
+        ensureCurrent();
         return inserted;
       });
-      target.ensureCurrent();
+      ensureCurrent();
       return copied;
     });
   }

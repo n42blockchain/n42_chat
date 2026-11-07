@@ -101,6 +101,7 @@ void main() {
     final manager = _Manager();
     final client = _Client();
     final auth = _Auth();
+    when(() => auth.loginStateStream).thenAnswer((_) => const Stream<bool>.empty());
     when(() => manager.client).thenReturn(client);
     when(() => client.userID).thenReturn('@me:hs.test');
     when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
@@ -143,12 +144,64 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('account notification clears loaded history and cancels pending picker', (tester) async {
+    final service = _Service();
+    final manager = _Manager();
+    final client = _Client();
+    final auth = _Auth();
+    final changes = StreamController<bool>.broadcast(sync: true);
+    var current = true;
+    when(() => auth.loginStateStream).thenAnswer((_) => changes.stream);
+    when(() => manager.client).thenReturn(client);
+    when(() => client.userID).thenReturn('@me:hs.test');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+    when(() => client.accessToken).thenReturn('fixture-token');
+    when(() => client.deviceID).thenReturn('fixture-device');
+    when(client.isLogged).thenReturn(true);
+    final generation = AuthSessionInvalidation(userId: '@me:hs.test', homeserver: Uri.parse('https://hs.test'),
+      deviceId: 'fixture-device', isCurrent: () => current, matchesClient: (candidate) => identical(candidate, client));
+    when(() => auth.currentAccountGeneration).thenReturn(generation);
+    when(() => service.listBackups()).thenAnswer((_) async => [BackupInfo(
+      backupId: 'old-account', filePath: '/tmp/private-old.n42backup', fileSizeBytes: 1,
+      createdAt: DateTime(2026), roomCount: 1, includesMedia: false, includesKeys: false)]);
+    final gate = Completer<PlatformFile?>();
+    final previous = FilePickerPlatform.instance;
+    final picker = _FilePicker()..pending = gate.future;
+    FilePickerPlatform.instance = picker;
+    GetIt.instance.registerSingleton<ChatBackupService>(service);
+    GetIt.instance.registerSingleton<MatrixClientManager>(manager);
+    GetIt.instance.registerSingleton<IAuthRepository>(auth);
+    addTearDown(() async { FilePickerPlatform.instance = previous; await changes.close(); await GetIt.instance.reset(); });
+    await tester.pumpWidget(const MaterialApp(localizationsDelegates: S.localizationsDelegates,
+      supportedLocales: S.supportedLocales, locale: Locale('en'), home: BackupRestorePage()));
+    await tester.pumpAndSettle();
+    expect(find.byType(PopupMenuButton<String>), findsOneWidget);
+    expect(changes.hasListener, isTrue);
+    await tester.ensureVisible(find.text('Choose Backup File'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Choose Backup File'));
+    await tester.pumpAndSettle();
+    current = false;
+    changes.add(false);
+    await tester.pumpAndSettle();
+    expect(find.byType(PopupMenuButton<String>), findsNothing);
+    gate.complete(_PickedFile());
+    await tester.pumpAndSettle();
+    verifyNever(() => service.previewBackup(any()));
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(picker.calls, 1);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    expect(changes.hasListener, isFalse);
+  });
+
   for (final outcome in ['cancel', 'confirm', 'stale']) {
     testWidgets('backup deletion confirmation belongs to opening account: $outcome', (tester) async {
       final service = _Service();
       final manager = _Manager();
       final client = _Client();
       final auth = _Auth();
+    when(() => auth.loginStateStream).thenAnswer((_) => const Stream<bool>.empty());
       var current = true;
       when(() => manager.client).thenReturn(client);
       when(() => client.userID).thenReturn('@me:hs.test');
@@ -200,6 +253,7 @@ void main() {
       final manager = _Manager();
       final client = _Client();
       final auth = _Auth();
+    when(() => auth.loginStateStream).thenAnswer((_) => const Stream<bool>.empty());
       var current = true;
       when(() => manager.client).thenReturn(client);
       when(() => client.userID).thenReturn('@me:hs.test');
@@ -264,6 +318,7 @@ void main() {
       final manager = _Manager();
       final client = _Client();
       final auth = _Auth();
+    when(() => auth.loginStateStream).thenAnswer((_) => const Stream<bool>.empty());
       var current = true;
       when(() => manager.client).thenReturn(client);
       when(() => client.userID).thenReturn('@me:hs.test');
