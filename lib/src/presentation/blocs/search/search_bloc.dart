@@ -89,9 +89,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final query = event.query.trim();
 
     if (query.isEmpty) {
-      final history = await _searchRepository.getRecentSearches();
-      if (!current()) return;
-      emit(SearchInitial(recentSearches: history));
+      try {
+        final history = await _searchRepository.getRecentSearches();
+        if (!current()) return;
+        emit(SearchInitial(recentSearches: history));
+      } catch (e) {
+        if (!current()) return;
+        emit(SearchError(e.toString()));
+      }
       return;
     }
 

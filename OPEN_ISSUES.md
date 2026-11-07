@@ -171,6 +171,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Search history storage follow-up (batch 226): scope persisted records by homeserver and user, never adopt the legacy unowned key, and serialize reads/mutations across data-source instances in one isolate. Capture client/user/server/device/token before enqueue and discard stale operations/results. Failed platform writes now restore cache and propagate errors; empty-query BLoC reads handle errors. 55 related tests pass, including 10 storage tests for isolation, ordering, expiry, limits and false/thrown write recovery; scoped analysis is clean. This does not establish cross-isolate/process atomicity or live/device acceptance. Global-search/history revision overlap, proactive account/clear invalidation and remaining MSG-001 gaps stay open.
+
 - Search history presentation follow-up (batch 225): ClearSearch removes displayed results before its history read completes. History reads/deletes/clear completions and errors are bound to the initiating search and history revision; old work cannot replace a newer search or restore cleared history. Six new cases plus existing search suites pass (46 total); scoped analysis clean. This does not serialize repository storage writes or establish proactive account/history-clear subscriptions; those boundaries, global-search/history-read overlap, old redactions and live/device acceptance remain open.
 
 

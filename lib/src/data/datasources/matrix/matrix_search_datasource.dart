@@ -319,64 +319,98 @@ class MatrixSearchDataSource {
   // 搜索历史
   // ============================================
 
-  /// 获取最近的搜索记录
-  Future<List<String>> getRecentSearches({int limit = 10}) async {
-    try {
+  // Shared across data-source instances in this isolate. Reads join the queue
+  // so they cannot observe the optimistic cache of an unfinished mutation.
+  static Future<void> _historyQueue = Future<void>.value();
+
+  Future<T> _withHistory<T>(
+    T empty,
+    Future<T> Function(SharedPreferences prefs, String key) operation,
+  ) {
+    final client = _client;
+    final user = client?.userID;
+    final server = client?.homeserver;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    if (client == null || user == null || server == null || token == null) {
+      return Future.value(empty);
+    }
+    // Never adopt the legacy unowned key into the first account that logs in.
+    final key =
+        '${_kSearchHistoryKey}_v2_${base64Url.encode(utf8.encode(jsonEncode([server.toString(), user])))}';
+    bool current() =>
+        identical(_client, client) &&
+        client.userID == user &&
+        client.homeserver == server &&
+        client.accessToken == token &&
+        client.deviceID == device;
+    final result = _historyQueue.then((_) async {
+      if (!current()) return empty;
       final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_kSearchHistoryKey);
-      if (raw == null) return [];
-      final list = (jsonDecode(raw) as List).cast<String>();
-      return list.take(limit).toList();
-    } catch (e) {
-      debugLog('MatrixSearchDataSource.getRecentSearches error: $e');
-      return [];
+      await prefs.reload();
+      if (!current()) return empty;
+      final value = await operation(prefs, key);
+      return current() ? value : empty;
+    });
+    _historyQueue = result.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return result;
+  }
+
+  List<String> _readHistory(SharedPreferences prefs, String key) {
+    final raw = prefs.getString(key);
+    if (raw == null) return [];
+    final decoded = jsonDecode(raw);
+    if (decoded is! List || decoded.any((value) => value is! String)) {
+      throw const FormatException('Invalid search history');
+    }
+    return decoded.cast<String>().toList();
+  }
+
+  Future<void> _writeHistory(
+    SharedPreferences prefs,
+    String key,
+    List<String>? values,
+  ) async {
+    try {
+      final saved = values == null
+          ? await prefs.remove(key)
+          : await prefs.setString(key, jsonEncode(values));
+      if (!saved) throw StateError('Search history write failed');
+    } catch (_) {
+      // SharedPreferences changes its cache before platform acknowledgement.
+      await prefs.reload();
+      rethrow;
     }
   }
 
-  /// 保存搜索记录（去重后插到队首，最多保留 $_kSearchHistoryLimit 条）
-  Future<void> saveSearchQuery(String query) async {
-    if (query.trim().isEmpty) return;
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_kSearchHistoryKey);
-      final list = raw != null
-          ? (jsonDecode(raw) as List).cast<String>()
-          : <String>[];
-      list.remove(query);
+  /// Account-scoped recent searches; unauthenticated callers see no history.
+  Future<List<String>> getRecentSearches({int limit = 10}) => _withHistory(
+    <String>[],
+    (prefs, key) async =>
+        _readHistory(prefs, key).take(limit < 0 ? 0 : limit).toList(),
+  );
+
+  Future<void> saveSearchQuery(String query) {
+    if (query.trim().isEmpty) return Future.value();
+    return _withHistory<void>(null, (prefs, key) async {
+      final list = _readHistory(prefs, key)..remove(query);
       list.insert(0, query);
-      if (list.length > _kSearchHistoryLimit) {
-        list.removeRange(_kSearchHistoryLimit, list.length);
-      }
-      await prefs.setString(_kSearchHistoryKey, jsonEncode(list));
-    } catch (e) {
-      debugLog('MatrixSearchDataSource.saveSearchQuery error: $e');
-    }
+      await _writeHistory(prefs, key, list.take(_kSearchHistoryLimit).toList());
+    });
   }
 
-  /// 清除搜索历史
-  Future<void> clearSearchHistory() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_kSearchHistoryKey);
-    } catch (e) {
-      debugLog('MatrixSearchDataSource.clearSearchHistory error: $e');
-    }
-  }
+  Future<void> clearSearchHistory() =>
+      _withHistory<void>(null, (prefs, key) => _writeHistory(prefs, key, null));
 
-  /// 删除单条搜索记录
-  Future<void> deleteSearchQuery(String query) async {
-    if (query.trim().isEmpty) return;
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_kSearchHistoryKey);
-      if (raw == null) return;
-
-      final list = (jsonDecode(raw) as List).cast<String>();
-      list.remove(query);
-      await prefs.setString(_kSearchHistoryKey, jsonEncode(list));
-    } catch (e) {
-      debugLog('MatrixSearchDataSource.deleteSearchQuery error: $e');
-    }
+  Future<void> deleteSearchQuery(String query) {
+    if (query.trim().isEmpty) return Future.value();
+    return _withHistory<void>(null, (prefs, key) async {
+      final list = _readHistory(prefs, key)..remove(query);
+      await _writeHistory(prefs, key, list);
+    });
   }
 }
 
