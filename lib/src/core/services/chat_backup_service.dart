@@ -305,6 +305,7 @@ class ChatBackupService {
 
     // 导出房间数据
     int messageCount = 0;
+    var hasReadErrors = false;
     for (var i = 0; i < rooms.length; i++) {
       ensureCurrent();
       final room = rooms[i];
@@ -344,11 +345,13 @@ class ChatBackupService {
             timeline.cancelSubscriptions();
           }
         } catch (_) {
-          // Timeline not available, skip messages
+          hasReadErrors = true;
+          // Preserve partial output while reporting the unread messages.
         }
 
         (backupData['rooms'] as Map<String, dynamic>)[room.id] = roomData;
       } catch (e) {
+        hasReadErrors = true;
         debugLog('ChatBackupService: Failed to export room ${room.id}: $e');
       }
 
@@ -373,12 +376,19 @@ class ChatBackupService {
       }
       backupData['settings'] = settings;
     } catch (e) {
+      hasReadErrors = true;
       debugLog('ChatBackupService: Failed to export settings: $e');
     }
 
     ensureCurrent();
     onProgress?.call(0.85);
     ensureCurrent();
+
+    if (hasReadErrors) {
+      warnings.add('Some messages or settings could not be read. This backup is incomplete.');
+    }
+    (backupData['manifest'] as Map<String, dynamic>)['hasReadErrors'] = hasReadErrors;
+    (backupData['manifest'] as Map<String, dynamic>)['warnings'] = warnings;
 
     // 写入文件
     final finalJsonStr = _finalizeBackupJson(backupData);

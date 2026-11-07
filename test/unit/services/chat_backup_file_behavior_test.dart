@@ -100,7 +100,10 @@ void main() {
           if (incremental) {
             await service.createIncrementalBackup();
           } else {
-            await service.createBackup();
+            final result = await service.createBackup();
+            final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+            expect(data['manifest']['hasReadErrors'], broken);
+            if (broken) expect(result.warnings, isNotEmpty);
           }
           verify(() => timeline.cancelSubscriptions()).called(1);
         },
