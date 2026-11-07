@@ -101,6 +101,8 @@ void main() {
     'stale-confirm',
     'password-cancel',
     'password-confirm',
+    'password-stale',
+    'password-wrong',
   ]) {
     testWidgets('valid account picker outcome: $mode', (tester) async {
       final service = _Service();
@@ -180,6 +182,14 @@ void main() {
           ),
         ).thenAnswer((_) async => const RestoreResult());
       }
+      if (mode == 'password-wrong') {
+        when(
+          () => service.previewBackup(
+            '/tmp/fixture.n42backup',
+            password: 'fixture-password',
+          ),
+        ).thenThrow(const FormatException('fixture-invalid-password'));
+      }
       if (!selected && mode != 'cancel')
         picker.error = StateError('picker-fixture-error');
       if (mode == 'stale-error') picker.onPick = () => current = false;
@@ -226,8 +236,34 @@ void main() {
           return;
         }
         await tester.enterText(input, 'fixture-password');
+        if (mode == 'password-stale') {
+          clearInteractions(service);
+          current = false;
+          await tester.tap(find.widgetWithText(FilledButton, 'Confirm').last);
+          await tester.pumpAndSettle();
+          verifyZeroInteractions(service);
+          expect(find.byType(AlertDialog), findsNothing);
+          expect(tester.takeException(), isNull);
+          return;
+        }
         await tester.tap(find.widgetWithText(FilledButton, 'Confirm').last);
         await tester.pumpAndSettle();
+        if (mode == 'password-wrong') {
+          expect(
+            find.textContaining('fixture-invalid-password'),
+            findsOneWidget,
+          );
+          verifyNever(
+            () => service.restoreFromBackup(
+              backupFilePath: '/tmp/fixture.n42backup',
+              password: 'fixture-password',
+              isCurrent: any(named: 'isCurrent'),
+              onProgress: any(named: 'onProgress'),
+            ),
+          );
+          expect(find.byType(AlertDialog), findsNothing);
+          return;
+        }
         expect(find.text('Fixture incomplete backup'), findsOneWidget);
         await tester.tap(find.widgetWithText(FilledButton, 'Confirm').last);
         await tester.pumpAndSettle();
