@@ -719,6 +719,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-002 Group-call token fetching and multi-party rendering were not live-tested
 
+- 2026-11-07 legacy authorization live protocol: real N42 handler and signed JWT tested against isolated Tuwunel 1.9.4/v11 rooms with three synthetic accounts. Six cases pass: owner publish, owner viewer downgrade, forged/omitted viewer role denied publish, nonmember 403 and ordinary group participant publish. All accounts deactivated. Host Go race tests/vet pass. Production still uses official MatrixRTC authorization; these role protections are not deployed there. Host evidence: docs/testing/livekit-real-policy-2026-11-07.json.
+
 - 2026-11-07 host broadcast preparation: wallet now creates the inactive n42.live.status marker atomically in createRoom initial_state before requesting a token, closing the unmarked startup interval for the N42 legacy policy service. All 66 host live-module tests and scoped analysis pass. Not included in uploaded 73424. Production official authorization role enforcement, Flutter media/background and multi-party device acceptance remain open.
 
 - Severity: M
