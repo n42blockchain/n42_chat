@@ -25,6 +25,26 @@ void main() {
     expect(calls, 2);
     expect(waits, [const Duration(seconds: 75)]);
   });
+  test(
+    'observed 333-second server wait is not shortened or rejected',
+    () async {
+      var calls = 0;
+      await smoke.retryRateLimited(
+        () async {
+          if (calls++ == 0) {
+            throw MatrixException.fromJson({
+              'errcode': 'M_LIMIT_EXCEEDED',
+              'retry_after_ms': 333000,
+            });
+          }
+        },
+        wait: (delay) async {
+          expect(delay, const Duration(seconds: 333));
+        },
+      );
+      expect(calls, 2);
+    },
+  );
   test('authorization failure never retries', () async {
     var calls = 0;
     await expectLater(

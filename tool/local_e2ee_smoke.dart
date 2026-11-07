@@ -425,9 +425,17 @@ Future<T> retryRateLimited<T>(
     try {
       return await action();
     } on MatrixException catch (error) {
-      if (error.errcode != 'M_LIMIT_EXCEEDED' || retry >= maxRetries) rethrow;
+      if (error.errcode != 'M_LIMIT_EXCEEDED' || retry >= maxRetries) {
+        print(
+          'QA login failure code=${error.errcode}; retry=${retry}; retry_after_ms=${error.retryAfterMs}',
+        );
+        rethrow;
+      }
       final milliseconds = error.retryAfterMs ?? 60000;
-      if (milliseconds < 0 || milliseconds > 300000) rethrow;
+      if (milliseconds < 0 || milliseconds > 900000) {
+        print('QA rate-limit wait exceeds run budget: $milliseconds ms');
+        rethrow;
+      }
       final delay = Duration(milliseconds: milliseconds);
       print('QA login rate limited; waiting ${delay.inMilliseconds} ms');
       await (wait ?? Future<void>.delayed)(delay);
