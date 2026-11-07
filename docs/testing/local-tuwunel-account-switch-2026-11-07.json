@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "passed": true,
+  "environment": "owned loopback Tuwunel 1.9.4; synthetic accounts only",
+  "testExit": 0,
+  "accountsCreated": 2,
+  "accountsDeactivated": 2,
+  "testSourceSha256": "97983f244b251221a79a7fdc6edd9068c08355c5e631c1b7bcf44e90744d9d88",
+  "privateLogSha256": "e7d521e53104c79314a9ae4c42d05eb75f9e05ba960ea3b01232c2dcd465c79c",
+  "checks": [
+    "account switch retains device identity",
+    "encrypted offline messages readable through shared repository",
+    "manager restart retains both accounts",
+    "wrong-password login retains prior identity",
+    "explicit logout affects only its session",
+    "logged-out recipient has no usable device keys",
+    "fresh password login receives new encrypted messages"
+  ],
+  "boundaries": [
+    "secure storage/preferences mocked",
+    "no physical-device UI",
+    "no production accounts",
+    "not a key-backup recovery test"
+  ]
+}
