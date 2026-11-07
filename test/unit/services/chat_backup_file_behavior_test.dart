@@ -621,6 +621,19 @@ void main() {
       );
     });
   }
+  test('ownerless legacy archive restore reports ownership warning', () async {
+    final database = ArchiveDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(database.close);
+    service.setArchiveService(MessageArchiveService(db: database, clientManager: manager));
+    const fixture = chatBackupV3Interop;
+    final file = File('${directory.path}/legacy-owner.n42backup');
+    await file.writeAsBytes(base64Decode(fixture['v3']!));
+    final result = await service.restoreToArchive(
+      backupFilePath: file.path, password: fixture['fixturePassword']!,
+    );
+    expect(result.warnings, contains('This legacy backup has no verified account owner.'));
+  });
+
   test('missing archive service returns an explicit restore failure', () async {
     final result = await service.createBackup();
     final restored = await service.restoreToArchive(

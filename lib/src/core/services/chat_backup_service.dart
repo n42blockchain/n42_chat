@@ -836,6 +836,7 @@ class ChatBackupService {
         roomsRestored: roomsRestored,
         settingsRestored: 0,
         errors: errors,
+        warnings: _restoreWarnings(data['manifest']),
       );
     } catch (e) {
       return RestoreResult(errors: ['Restore to archive failed: $e']);
@@ -905,6 +906,14 @@ class ChatBackupService {
     return null;
   }
 
+  List<String> _restoreWarnings(Object? manifest) {
+    final warnings = _manifestWarnings(manifest);
+    if (manifest is! Map || manifest['owner'] is! Map) {
+      warnings.add('This legacy backup has no verified account owner.');
+    }
+    return warnings;
+  }
+
   List<String> _manifestWarnings(Object? value) {
     if (value is! Map) return <String>[];
     final warnings = <String>{};
@@ -948,17 +957,13 @@ class ChatBackupService {
       final data = await _readBackupData(backupFilePath, password: password);
       ensureCurrent();
       final manifest = data['manifest'];
-      final owner = manifest is Map ? manifest['owner'] : null;
       final ownerError = _backupOwnerError(manifest);
       if (ownerError != null) return RestoreResult(errors: [ownerError]);
       final rawSettings = data['settings'] as Map<String, dynamic>? ?? {};
 
       int settingsRestored = 0;
       final errors = <String>[];
-      final warnings = _manifestWarnings(data['manifest']);
-      if (owner is! Map) {
-        warnings.add('This legacy backup has no verified account owner.');
-      }
+      final warnings = _restoreWarnings(data['manifest']);
 
       onProgress?.call(0.1);
       ensureCurrent();
