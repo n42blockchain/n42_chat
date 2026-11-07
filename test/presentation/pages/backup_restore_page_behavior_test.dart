@@ -143,6 +143,57 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final outcome in ['cancel', 'confirm', 'stale']) {
+    testWidgets('backup deletion confirmation belongs to opening account: $outcome', (tester) async {
+      final service = _Service();
+      final manager = _Manager();
+      final client = _Client();
+      final auth = _Auth();
+      var current = true;
+      when(() => manager.client).thenReturn(client);
+      when(() => client.userID).thenReturn('@me:hs.test');
+      when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => client.accessToken).thenReturn('fixture-token');
+      when(() => client.deviceID).thenReturn('fixture-device');
+      when(client.isLogged).thenReturn(true);
+      final generation = AuthSessionInvalidation(userId: '@me:hs.test',
+        homeserver: Uri.parse('https://hs.test'), deviceId: 'fixture-device',
+        isCurrent: () => current, matchesClient: (candidate) => identical(candidate, client));
+      when(() => auth.currentAccountGeneration).thenReturn(generation);
+      when(() => service.listBackups()).thenAnswer((_) async => [BackupInfo(
+        backupId: 'delete-fixture', filePath: '/tmp/delete.n42backup', fileSizeBytes: 10,
+        createdAt: DateTime(2026), roomCount: 1, includesMedia: false, includesKeys: false)]);
+      when(() => service.deleteBackup('delete-fixture', isCurrent: any(named: 'isCurrent')))
+        .thenAnswer((invocation) async {
+          final guard = invocation.namedArguments[#isCurrent] as bool Function();
+          expect(guard(), isTrue);
+        });
+      GetIt.instance.registerSingleton<ChatBackupService>(service);
+      GetIt.instance.registerSingleton<MatrixClientManager>(manager);
+      GetIt.instance.registerSingleton<IAuthRepository>(auth);
+      addTearDown(() => GetIt.instance.reset());
+      await tester.pumpWidget(const MaterialApp(localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales, locale: Locale('en'), home: BackupRestorePage()));
+      await tester.pumpAndSettle();
+      final menu = find.byType(PopupMenuButton<String>);
+      await tester.ensureVisible(menu);
+      await tester.pumpAndSettle();
+      await tester.tap(menu);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+      if (outcome == 'stale') current = false;
+      await tester.tap(find.widgetWithText(TextButton, outcome == 'cancel' ? 'Cancel' : 'Delete'));
+      await tester.pumpAndSettle();
+      final call = () => service.deleteBackup('delete-fixture', isCurrent: any(named: 'isCurrent'));
+      if (outcome == 'confirm') { verify(call).called(1); }
+      else { verifyNever(call); }
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final outcome in ['cancel', 'stale-selection', 'stale-list', 'empty']) {
     testWidgets('legacy file selector is guarded: $outcome', (tester) async {
       final service = _Service();

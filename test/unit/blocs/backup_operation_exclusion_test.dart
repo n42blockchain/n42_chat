@@ -97,6 +97,43 @@ void main() {
     bloc.endRestoreSelection();
   });
 
+  test('expired deletion confirmation never calls the service', () async {
+    bloc.add(DeleteBackup('file', isCurrent: () => false));
+    await Future<void>.delayed(Duration.zero);
+    verifyZeroInteractions(service);
+    expect(bloc.isBackupOperationBusy, isFalse);
+  });
+
+  for (final fails in [false, true]) {
+    test(
+      'late deletion outcome is suppressed after generation change: error=$fails',
+      () async {
+        var current = true;
+        final started = Completer<void>();
+        final finished = Completer<void>();
+        when(
+          () =>
+              service.deleteBackup('file', isCurrent: any(named: 'isCurrent')),
+        ).thenAnswer((_) {
+          started.complete();
+          return finished.future;
+        });
+        bloc.add(DeleteBackup('file', isCurrent: () => current));
+        await started.future;
+        current = false;
+        if (fails) {
+          finished.completeError(StateError('old-account-error'));
+        } else {
+          finished.complete();
+        }
+        await Future<void>.delayed(Duration.zero);
+        expect(bloc.state.error, isNull);
+        verifyNever(() => service.listBackups());
+        expect(bloc.isBackupOperationBusy, isFalse);
+      },
+    );
+  }
+
   test(
     'expired confirmation releases queued handoff without a write',
     () async {

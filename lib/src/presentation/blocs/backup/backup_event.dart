@@ -38,11 +38,12 @@ class CreateBackup extends BackupEvent {
 /// 删除备份
 class DeleteBackup extends BackupEvent {
   final String backupId;
+  final bool Function()? isCurrent;
 
-  const DeleteBackup(this.backupId);
+  const DeleteBackup(this.backupId, {this.isCurrent});
 
   @override
-  List<Object?> get props => [backupId];
+  List<Object?> get props => [backupId, isCurrent];
 }
 
 /// 预览备份

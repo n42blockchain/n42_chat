@@ -564,9 +564,14 @@ class ChatBackupService {
   }
 
   /// 删除备份
-  Future<void> deleteBackup(String backupId) async {
+  Future<void> deleteBackup(String backupId, {bool Function()? isCurrent}) async {
     if (_backupDirectoryScope() == null) return;
-    final ensureCurrent = _captureBackupSession();
+    final sessionCurrent = _captureBackupSession();
+    void ensureCurrent() {
+      if (isCurrent?.call() == false) throw StateError('Backup deletion account changed');
+      sessionCurrent();
+    }
+    ensureCurrent();
     final backups = await listBackups();
     ensureCurrent();
     final target = backups.where((b) => b.backupId == backupId).firstOrNull;

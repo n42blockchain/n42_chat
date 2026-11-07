@@ -102,12 +102,14 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     DeleteBackup event,
     Emitter<BackupState> emit,
   ) async {
-    if (isBackupOperationBusy) return;
+    if (isBackupOperationBusy || event.isCurrent?.call() == false) return;
     _deletionPending = true;
     try {
-      await _backupService.deleteBackup(event.backupId);
+      await _backupService.deleteBackup(event.backupId, isCurrent: event.isCurrent);
+      if (event.isCurrent?.call() == false) return;
       add(const LoadBackupList());
     } catch (e) {
+      if (event.isCurrent?.call() == false) return;
       emit(state.copyWith(error: 'Failed to delete backup: $e'));
     } finally {
       _deletionPending = false;

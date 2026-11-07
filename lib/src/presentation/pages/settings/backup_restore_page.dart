@@ -369,12 +369,21 @@ class _BackupHistorySection extends StatelessWidget {
 
   void _confirmDelete(BuildContext context, BackupInfo backup) {
     if (context.read<BackupBloc>().isBackupOperationBusy) return;
+    final dependencies = GetIt.instance;
+    if (!dependencies.isRegistered<MatrixClientManager>() ||
+        !dependencies.isRegistered<IAuthRepository>()) return;
+    final origin = captureAccountAction(
+      dependencies<MatrixClientManager>(), dependencies<IAuthRepository>(),
+    );
+    if (origin == null) return;
+    bool current() => context.mounted && origin.isCurrent;
+    final labels = S.of(context);
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Backup'),
-        content: const Text(
-          'Are you sure you want to delete this backup? This cannot be undone.',
+        title: Text(labels?.backupDelete ?? 'Delete Backup'),
+        content: Text(
+          labels?.backupDeleteConfirm ?? 'Are you sure you want to delete this backup? This cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -384,11 +393,12 @@ class _BackupHistorySection extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              context.read<BackupBloc>().add(DeleteBackup(backup.backupId));
+              if (!current() || context.read<BackupBloc>().isBackupOperationBusy) return;
+              context.read<BackupBloc>().add(DeleteBackup(backup.backupId, isCurrent: current));
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: AppColors.error),
+            child: Text(
+              labels?.backupDelete ?? 'Delete',
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],

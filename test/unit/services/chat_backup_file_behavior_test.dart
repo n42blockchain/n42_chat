@@ -855,6 +855,20 @@ void main() {
     expect(await database.searchMessages('restored'), isEmpty);
   });
 
+  test('deletion rechecks confirmation generation after directory await', () async {
+    final backup = await service.createBackup();
+    final gate = Completer<Directory>();
+    var current = true;
+    final guarded = ChatBackupService(clientManager: manager, secureStorage: secure,
+      preferencesStorage: preferences, backupDirProvider: () => gate.future);
+    final pending = guarded.deleteBackup(backup.backupId, isCurrent: () => current);
+    final rejected = expectLater(pending, throwsStateError);
+    current = false;
+    gate.complete(directory);
+    await rejected;
+    expect(await File(backup.filePath).exists(), isTrue);
+  });
+
   test('list ignores unrelated files and directories', () async {
     await File('${directory.path}/notes.txt').writeAsString('ignore');
     await Directory('${directory.path}/folder.n42backup').create();
