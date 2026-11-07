@@ -931,6 +931,12 @@ class ChatBackupService {
       final manifest = data['manifest'];
       final owner = manifest is Map ? manifest['owner'] : null;
       final client = _clientManager.client;
+      final declaresOwner = manifest is Map && manifest.containsKey('owner');
+      if (declaresOwner && (owner is! Map ||
+          owner['userId'] is! String || (owner['userId'] as String).trim().isEmpty ||
+          owner['homeserver'] is! String || (owner['homeserver'] as String).trim().isEmpty)) {
+        return const RestoreResult(errors: ['Backup account owner is invalid']);
+      }
       if (owner is Map &&
           (owner['userId'] != client?.userID ||
            owner['homeserver'] != client?.homeserver?.toString())) {

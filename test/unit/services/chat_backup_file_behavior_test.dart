@@ -115,6 +115,19 @@ void main() {
     }
   }
 
+  for (final invalid in ['unknown-user', 'empty-user', 'unknown-server']) {
+    test('restore rejects declared but invalid owner: $invalid', () async {
+      if (invalid == 'unknown-user') when(() => client.userID).thenReturn(null);
+      if (invalid == 'empty-user') when(() => client.userID).thenReturn('');
+      if (invalid == 'unknown-server') when(() => client.homeserver).thenReturn(null);
+      final backup = await service.createBackup();
+      final result = await service.restoreFromBackup(backupFilePath: backup.filePath);
+      expect(result.hasErrors, isTrue);
+      expect(result.settingsRestored, 0);
+      expect(result.errors.single, contains('owner is invalid'));
+    });
+  }
+
   for (final mismatch in ['user', 'server']) {
     test('restore rejects backup owner mismatch: $mismatch', () async {
       final backup = await service.createBackup();
