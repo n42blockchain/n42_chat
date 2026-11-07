@@ -4,6 +4,10 @@ import 'package:equatable/equatable.dart';
 abstract class BackupEvent extends Equatable {
   const BackupEvent();
 
+  // Event equality needs the password, but debug output must never print it.
+  @override
+  bool get stringify => false;
+
   @override
   List<Object?> get props => [];
 }
