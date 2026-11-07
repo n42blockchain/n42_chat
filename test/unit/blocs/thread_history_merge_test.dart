@@ -150,6 +150,7 @@ void main() {
   test(
     'account switch invalidates retained-session updates and sending',
     () async {
+      clearInteractions(repo);
       current = false;
       bloc.add(ThreadMessagesUpdated([message('other-account')]));
       final completion = Completer<bool>();

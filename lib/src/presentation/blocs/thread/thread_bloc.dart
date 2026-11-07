@@ -18,6 +18,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   final IMessageRepository _messageRepository;
   int _generation = 0;
   int _streamRevision = 0;
+  int _historyRevision = 0;
   StreamSubscription<void>? _historyChangesSubscription;
   bool Function()? _threadSessionGuard;
 
@@ -123,6 +124,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     final isCurrent = _context(emit);
 
     try {
+      _subscribeToHistoryChanges(event.roomId);
       // 加载线程消息
       final page = await _loadPage(event.roomId, event.threadRootEventId);
 
@@ -147,6 +149,29 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       );
 
       if (!isCurrent()) return;
+      // Root lookup can await after the page was filtered. Revalidate the
+      // complete result and repeat if a clear notification arrived meanwhile.
+      if (repository is IThreadHistoryVisibilityRepository) {
+        final candidates = [if (rootMessage != null) rootMessage, ...replies];
+        while (isCurrent()) {
+          final revision = _historyRevision;
+          final visible =
+              await (repository as IThreadHistoryVisibilityRepository)
+                  .filterThreadHistory(event.roomId, candidates);
+          if (!isCurrent()) return;
+          if (revision != _historyRevision) continue;
+          rootMessage = null;
+          replies.clear();
+          for (final message in visible) {
+            if (message.id == event.threadRootEventId) {
+              rootMessage = message;
+            } else {
+              replies.add(message);
+            }
+          }
+          break;
+        }
+      }
       // 计算参与者
       final participantIds = <String>{};
       if (rootMessage != null) participantIds.add(rootMessage.senderId);
@@ -191,7 +216,6 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   }
 
   void _subscribeToThreadMessages(String roomId, String threadRootEventId) {
-    _detachSubscription();
     final isCurrent = _context(null);
     _threadMessagesSubscription = _messageRepository
         .watchThreadMessages(roomId, threadRootEventId)
@@ -205,6 +229,10 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
             debugLog('ThreadBloc: Thread messages stream error: $e');
           },
         );
+  }
+
+  void _subscribeToHistoryChanges(String roomId) {
+    final isCurrent = _context(null);
     final repository = _messageRepository;
     if (repository is IThreadHistoryChangesRepository) {
       _historyChangesSubscription =
@@ -212,8 +240,10 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
               .watchThreadHistoryChanges(roomId)
               .listen(
                 (_) {
-                  if (isCurrent())
+                  if (isCurrent()) {
+                    _historyRevision++;
                     add(ThreadMessagesUpdated(const [], isCurrent: isCurrent));
+                  }
                 },
                 onError: (Object error) {
                   debugLog('ThreadBloc: history listener failed: $error');
