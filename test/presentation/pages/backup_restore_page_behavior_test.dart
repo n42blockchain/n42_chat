@@ -99,6 +99,8 @@ void main() {
     'preview-cancel',
     'confirm',
     'stale-confirm',
+    'password-cancel',
+    'password-confirm',
   ]) {
     testWidgets('valid account picker outcome: $mode', (tester) async {
       final service = _Service();
@@ -123,11 +125,10 @@ void main() {
       when(() => service.listBackups()).thenAnswer((_) async => []);
       final previous = FilePickerPlatform.instance;
       final picker = _FilePicker();
-      final selected = [
-        'preview-cancel',
-        'confirm',
-        'stale-confirm',
-      ].contains(mode);
+      final protected = mode.startsWith('password-');
+      final selected =
+          protected ||
+          ['preview-cancel', 'confirm', 'stale-confirm'].contains(mode);
       if (selected) {
         picker.result = _PickedFile();
         when(() => service.previewBackup('/tmp/fixture.n42backup')).thenAnswer(
@@ -145,6 +146,35 @@ void main() {
         when(
           () => service.restoreFromBackup(
             backupFilePath: '/tmp/fixture.n42backup',
+            isCurrent: any(named: 'isCurrent'),
+            onProgress: any(named: 'onProgress'),
+          ),
+        ).thenAnswer((_) async => const RestoreResult());
+      }
+      if (protected) {
+        when(() => service.previewBackup('/tmp/fixture.n42backup'))
+            .thenThrow(BackupPasswordRequired());
+        when(
+          () => service.previewBackup(
+            '/tmp/fixture.n42backup',
+            password: 'fixture-password',
+          ),
+        ).thenAnswer(
+          (_) async => BackupPreview(
+            backupId: 'protected',
+            createdAt: DateTime(2026),
+            roomCount: 1,
+            roomNames: ['Fixture room'],
+            hasMedia: false,
+            hasKeys: false,
+            hasSettings: false,
+            warnings: ['Fixture incomplete backup'],
+          ),
+        );
+        when(
+          () => service.restoreFromBackup(
+            backupFilePath: '/tmp/fixture.n42backup',
+            password: 'fixture-password',
             isCurrent: any(named: 'isCurrent'),
             onProgress: any(named: 'onProgress'),
           ),
@@ -176,6 +206,42 @@ void main() {
       await tester.tap(find.text('Choose Backup File'));
       await tester.pumpAndSettle();
       expect(picker.calls, 1);
+      if (protected) {
+        final input = find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        );
+        expect(tester.widget<TextField>(input).obscureText, isTrue);
+        if (mode == 'password-cancel') {
+          clearInteractions(service);
+          await tester.tap(find.widgetWithText(TextButton, 'Cancel').last);
+          await tester.pumpAndSettle();
+          verifyNever(
+            () => service.previewBackup(
+              '/tmp/fixture.n42backup',
+              password: any(named: 'password'),
+            ),
+          );
+          expect(find.byType(AlertDialog), findsNothing);
+          return;
+        }
+        await tester.enterText(input, 'fixture-password');
+        await tester.tap(find.widgetWithText(FilledButton, 'Confirm').last);
+        await tester.pumpAndSettle();
+        expect(find.text('Fixture incomplete backup'), findsOneWidget);
+        await tester.tap(find.widgetWithText(FilledButton, 'Confirm').last);
+        await tester.pumpAndSettle();
+        verify(
+          () => service.restoreFromBackup(
+            backupFilePath: '/tmp/fixture.n42backup',
+            password: 'fixture-password',
+            isCurrent: any(named: 'isCurrent'),
+            onProgress: any(named: 'onProgress'),
+          ),
+        ).called(1);
+        expect(tester.takeException(), isNull);
+        return;
+      }
       if (selected) {
         expect(find.text('Fixture incomplete backup'), findsOneWidget);
         expect(find.text('Fixture room'), findsOneWidget);

@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Password dialog interaction (batch 268): nine page tests pass, including obscured password input, cancellation without a password-bearing preview and correct password propagation into preview and exactly one confirmed restore. Mock service/file selection only; real encrypted-file/device recovery, wrong-password retry UX and localization remain open. Initial cancel-test verification also matched the expected initial no-password probe; interactions were reset before verifying cancellation. Production source unchanged.
+
 - Restore confirmation interaction (batch 267): seven real page widget tests pass, covering displayed preview warnings/room names, cancel without restore, exactly one service call after confirmation and no restore when origin expires before confirmation. Test-only simulated file/service fixtures; no production logic changed. Test analysis has two infos, no errors/warnings. Password-dialog/real-file/device flows, localization and ownership/history remain open.
 
 - Valid-account picker interaction (batch 266): real page tests now cover cancel, active picker error and account-invalidated picker error with a lifecycle fixture. Picker is reached once; no preview/restore service calls occur in those paths, active errors display and stale errors stay hidden. Four page tests pass; test analysis clean. Actual selected-file/password/dialog flows and device acceptance remain open. Production source unchanged.
