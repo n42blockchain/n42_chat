@@ -17,3 +17,12 @@ abstract interface class IThreadPaginationRepository {
     String? fromToken,
   });
 }
+
+/// Revalidates retained thread history against the local account/clear boundary.
+abstract interface class IThreadHistoryVisibilityRepository {
+  bool Function() captureThreadSession();
+  Future<List<MessageEntity>> filterThreadHistory(
+    String roomId,
+    List<MessageEntity> messages,
+  );
+}

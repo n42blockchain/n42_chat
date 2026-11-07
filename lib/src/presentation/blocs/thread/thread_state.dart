@@ -72,6 +72,7 @@ class ThreadState extends Equatable {
 
   ThreadState copyWith({
     MessageEntity? rootMessage,
+    bool clearRootMessage = false,
     List<MessageEntity>? replies,
     bool? isLoading,
     bool? hasMore,
@@ -87,7 +88,7 @@ class ThreadState extends Equatable {
     bool? isSending,
   }) {
     return ThreadState(
-      rootMessage: rootMessage ?? this.rootMessage,
+      rootMessage: clearRootMessage ? null : (rootMessage ?? this.rootMessage),
       replies: replies ?? this.replies,
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,

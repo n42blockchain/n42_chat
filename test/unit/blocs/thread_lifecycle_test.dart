@@ -144,7 +144,11 @@ void main() {
       await pumpEventQueue();
       pending.complete([message('older'), message('reply0'), message('older')]);
       await pumpEventQueue();
-      expect(bloc.state.replies.map((m) => m.id), ['older', 'reply0', 'live']);
+      expect(bloc.state.replies.map((m) => m.id), [
+        'older',
+        ...List.generate(49, (i) => 'reply$i'),
+        'live',
+      ]);
       expect(bloc.state.replies[1].content, 'updated during paging');
       verify(
         () => repository.getThreadMessages(

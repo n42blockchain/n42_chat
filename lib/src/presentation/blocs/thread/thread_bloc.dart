@@ -17,14 +17,18 @@ import '../../../core/utils/debug_log.dart';
 class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   final IMessageRepository _messageRepository;
   int _generation = 0;
+  int _streamRevision = 0;
+  bool Function()? _threadSessionGuard;
 
   bool Function() _context(Emitter<ThreadState>? emit) {
     final generation = _generation;
+    final sessionGuard = _threadSessionGuard;
     final room = state.roomId;
     final root = state.threadRootEventId;
     return () =>
         !isClosed &&
         !(emit?.isDone ?? false) &&
+        (sessionGuard?.call() ?? true) &&
         generation == _generation &&
         state.roomId == room &&
         state.threadRootEventId == root;
@@ -94,6 +98,11 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     _generation++;
     _detachSubscription();
+    final repository = _messageRepository;
+    _threadSessionGuard = repository is IThreadHistoryVisibilityRepository
+        ? (repository as IThreadHistoryVisibilityRepository)
+              .captureThreadSession()
+        : null;
     emit(
       ThreadState(
         isLoading: true,
@@ -198,6 +207,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       return;
 
     final isCurrent = _context(emit);
+    if (!isCurrent()) return;
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
@@ -237,6 +247,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       return;
 
     final isCurrent = _context(emit);
+    if (!isCurrent()) return;
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
@@ -284,7 +295,8 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     if (state.roomId == null ||
         state.threadRootEventId == null ||
-        state.isSending) {
+        state.isSending ||
+        !(_threadSessionGuard?.call() ?? true)) {
       if (event.completion?.isCompleted == false)
         event.completion!.complete(false);
       return;
@@ -293,6 +305,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     var accepted = false;
     final replyTarget = state.replyTarget;
     final isCurrent = _context(emit);
+    if (!isCurrent()) return;
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
@@ -331,11 +344,13 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     if (state.roomId == null ||
         state.threadRootEventId == null ||
-        state.isSending) {
+        state.isSending ||
+        !(_threadSessionGuard?.call() ?? true)) {
       return;
     }
 
     final isCurrent = _context(emit);
+    if (!isCurrent()) return;
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
@@ -365,11 +380,13 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   ) async {
     if (state.roomId == null ||
         state.threadRootEventId == null ||
-        state.isSending) {
+        state.isSending ||
+        !(_threadSessionGuard?.call() ?? true)) {
       return;
     }
 
     final isCurrent = _context(emit);
+    if (!isCurrent()) return;
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
@@ -404,35 +421,76 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     }
   }
 
-  void _onThreadMessagesUpdated(
+  Future<void> _onThreadMessagesUpdated(
     ThreadMessagesUpdated event,
     Emitter<ThreadState> emit,
-  ) {
-    if (event.isCurrent != null && !event.isCurrent!()) return;
-    final replies = event.messages
-        .where((m) => m.id != state.threadRootEventId)
-        .toList();
-
-    // 更新根消息（如果在更新列表中）
-    final updatedRoot = event.messages
-        .where((m) => m.id == state.threadRootEventId)
-        .firstOrNull;
-
-    // 计算参与者
-    final participantIds = <String>{};
-    if (state.rootMessage != null)
-      participantIds.add(state.rootMessage!.senderId);
-    for (final reply in replies) {
-      participantIds.add(reply.senderId);
+  ) async {
+    final isCurrent = _context(emit);
+    if (!isCurrent() || (event.isCurrent != null && !event.isCurrent!()))
+      return;
+    final revision = ++_streamRevision;
+    final repository = _messageRepository;
+    while (isCurrent() && revision == _streamRevision) {
+      final snapshot = state;
+      final merged = <String, MessageEntity>{
+        if (snapshot.rootMessage != null)
+          snapshot.rootMessage!.id: snapshot.rootMessage!,
+        for (final message in snapshot.replies) message.id: message,
+        for (final message in event.messages) message.id: message,
+      }.values.toList();
+      List<MessageEntity> visible;
+      try {
+        visible =
+            repository is IThreadHistoryVisibilityRepository &&
+                snapshot.roomId != null
+            ? await (repository as IThreadHistoryVisibilityRepository)
+                  .filterThreadHistory(snapshot.roomId!, merged)
+            : merged;
+      } catch (error) {
+        if (!isCurrent() || revision != _streamRevision) return;
+        emit(
+          state.copyWith(
+            clearRootMessage: true,
+            replies: const [],
+            clearReplyTarget: true,
+            participantCount: 0,
+            error: error.toString(),
+          ),
+        );
+        return;
+      }
+      if (!isCurrent() ||
+          revision != _streamRevision ||
+          (event.isCurrent != null && !event.isCurrent!()))
+        return;
+      // A page/send may complete while visibility is read. Rebuild from that
+      // newer state rather than losing its messages or resurrecting its root.
+      if (!identical(state, snapshot)) continue;
+      final root = visible
+          .where((m) => m.id == snapshot.threadRootEventId)
+          .firstOrNull;
+      final replies = visible
+          .where((m) => m.id != snapshot.threadRootEventId)
+          .toList();
+      final order = {for (var i = 0; i < replies.length; i++) replies[i].id: i};
+      replies.sort((a, b) {
+        final time = a.timestamp.compareTo(b.timestamp);
+        return time != 0 ? time : order[a.id]!.compareTo(order[b.id]!);
+      });
+      final participants = {
+        if (root != null) root.senderId,
+        for (final reply in replies) reply.senderId,
+      };
+      emit(
+        state.copyWith(
+          rootMessage: root,
+          clearRootMessage: root == null,
+          replies: replies,
+          participantCount: participants.length,
+        ),
+      );
+      return;
     }
-
-    emit(
-      state.copyWith(
-        rootMessage: updatedRoot ?? state.rootMessage,
-        replies: replies,
-        participantCount: participantIds.length,
-      ),
-    );
   }
 
   void _onDisposeThread(DisposeThread event, Emitter<ThreadState> emit) {

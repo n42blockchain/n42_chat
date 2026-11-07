@@ -102,6 +102,15 @@ void main() {
     expect(page.nextBatch, 'second');
   });
 
+  test('retained thread messages are filtered and session guard expires', () async {
+    final guard = repository.captureThreadSession();
+    expect(guard(), isTrue);
+    expect((await repository.filterThreadHistory(room, [message('old', -1), message('new', 1)]))
+      .map((m) => m.id), ['new']);
+    when(() => client.userID).thenReturn('@bob:test');
+    expect(guard(), isFalse);
+  });
+
   test('thread root list retains new roots only', () async {
     expect((await repository.getRoomThreadRoots(room)).map((m) => m.id), [
       'new',
