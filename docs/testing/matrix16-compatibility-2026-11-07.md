@@ -6,14 +6,14 @@ The official Pub package 16.0.1 (2026-11-06) fixes the sdp_transform constraint 
 
 Changed the package and example from ^15.0.0 to ^16.0.1, preserving other dependency constraints and native crypto version. The first upgrade resolved the package but failed on the example's old ^15 declaration. After updating the example, flutter pub get resolves both lockfiles with only Matrix advancing. Full flutter analyze --no-pub --no-fatal-infos exits 0, with informational lints and no errors/warnings.
 
-Full test/coverage execution is active using Flutter 3.47.8, four test isolates, a 4,096-file limit and the already built locked flutter_vodozemac 0.9 native library. Its final result is pending. This native-library override does not establish a packaged iOS/Android ABI result.
+The corrected complete test/coverage run exits 0 using Flutter 3.47.8, four test isolates and a 4,096-file limit: 8,596 passed, three opt-in live cases skipped, zero failures. Instrumented line coverage is 104,392/145,226 (71.882445%), above the unchanged 70% gate. The generated 200-image corpus executes in this run. Source/lock/log/LCOV and separate packaged/compiled library hashes are retained in matrix16-full-suite-2026-11-07.json. This does not establish packaged iOS/Android app acceptance.
 
 The SDK 15 production/frontend baseline remains unchanged. Previous 20-client/10,000-event load, account switch and key-recovery evidence is not SDK 16 acceptance. Before host integration, require full tests/coverage, current encrypted backup/restore/export and VoIP checks, real isolated protocol checks, host pin resolution and native builds. Do not infer compatibility from resolver/analyzer success alone.
 
 
 ## First full run and corrected native environment
 
-The first full run ends with 8,593 passed, four skipped and two failed. Both failures are loader errors for flutter_vodozemac.framework: the global FRB directory held only libvodozemac_bindings_dart.dylib, shadowing explicit packaged-library paths with the other stem. It does not contain the packaged libflutter_vodozemac.dylib. A new temporary directory links the compiled bindings library and the actual packaged macOS library under their own stems; neither source/cache binary is modified or substituted. The packaged ABI and encrypted-document files then pass all 105 tests, exit 0. A full coverage rerun is active with that environment and a separately generated 200-image corpus. Its terminal result remains pending.
+The first full run ends with 8,593 passed, four skipped and two failed. Both failures are loader errors for flutter_vodozemac.framework: the global FRB directory held only libvodozemac_bindings_dart.dylib, shadowing explicit packaged-library paths with the other stem. It does not contain the packaged libflutter_vodozemac.dylib. A new temporary directory links the compiled bindings library and the actual packaged macOS library under their own stems; neither source/cache binary is modified or substituted. The packaged ABI and encrypted-document files then pass all 105 tests, exit 0. The full coverage rerun with that environment and a separately generated 200-image corpus now passes as recorded above.
 
 ## Actual Matrix 16 protocol smoke
 

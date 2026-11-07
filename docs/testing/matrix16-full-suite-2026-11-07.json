@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "matrixVersion": "16.0.1",
+  "processExit": 0,
+  "testsPassed": 8596,
+  "testsSkipped": 3,
+  "testsFailed": 0,
+  "coverage": {
+    "found": 145226,
+    "hit": 104392,
+    "percent": 71.88244529216531,
+    "threshold": 70,
+    "passed": true
+  },
+  "lockfileSha256": "afb5c900af06e6c39a1745b177bc6427b71ac90abaeeb5112a8fa7a3fae3d5d6",
+  "testLogSha256": "a528ea6b493386b8eb9c2e65c0207a5414b7cbc46fbd72e8ba22f813baf4f556",
+  "lcovSha256": "370033f871ea5c2940be2258d56579de23a90bc2297f08885312a198f9a2c5ec",
+  "nativeLibraries": {
+    "packagedLibrarySha256": "16d0fd5036838c02c889388b3285591a83b5d8faebca051115e50b2e9b644f05",
+    "compiledLibrarySha256": "e5070a80ed8075693bbe93264d01dd918428df96977615e8c34d3ddc7699a8c7"
+  },
+  "imageCorpus": "200 generated synthetic still images; new independent corpus directory",
+  "boundaries": [
+    "three opt-in live account/registration/media cases skipped",
+    "not host/native app or physical-device acceptance",
+    "full group-load result pending separately"
+  ]
+}
