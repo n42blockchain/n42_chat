@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:n42_chat/src/data/repositories/sticker_repository_impl.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
@@ -20,9 +23,8 @@ void main() {
 
     when(() => clientManager.client).thenReturn(client);
     when(() => client.userID).thenReturn('@alice:matrix.example.com');
-    when(
-      () => client.homeserver,
-    ).thenReturn(Uri.parse('https://matrix.example.com'));
+    when(() => client.homeserver)
+        .thenReturn(Uri.parse('https://matrix.example.com'));
     when(
       () => client.getAccountData(
         '@alice:matrix.example.com',
@@ -54,6 +56,49 @@ void main() {
       },
     );
   });
+
+  test('installed sticker cache does not cross account switches', () async {
+    final repository = StickerRepositoryImpl(dataSource);
+    addTearDown(repository.dispose);
+    expect(
+      (await repository.getInstalledPacks()).any((p) => p.id == 'pack-1'),
+      isTrue,
+    );
+    when(() => client.userID).thenReturn('@bob:matrix.example.com');
+    when(
+      () => client.getAccountData(
+        '@bob:matrix.example.com',
+        MatrixStickerDataSource.installedPacksType,
+      ),
+    ).thenAnswer((_) async => {'pack_ids': <String>[]});
+    expect(
+      (await repository.getInstalledPacks()).any((p) => p.id == 'pack-1'),
+      isFalse,
+    );
+  });
+
+  test(
+    'held sticker index cannot fetch pack details as a replacement user',
+    () async {
+      final pending = Completer<Map<String, dynamic>>();
+      when(
+        () => client.getAccountData(
+          '@alice:matrix.example.com',
+          MatrixStickerDataSource.installedPacksType,
+        ),
+      ).thenAnswer((_) => pending.future);
+      final read = dataSource.getInstalledPacks();
+      when(() => client.userID).thenReturn('@bob:matrix.example.com');
+      pending.complete({
+        'pack_ids': ['pack-1'],
+      });
+      final packs = await read;
+      expect(packs.any((p) => p.id == 'pack-1'), isFalse);
+      verifyNever(
+        () => client.getAccountData('@bob:matrix.example.com', any()),
+      );
+    },
+  );
 
   test(
     'getInstalledPacks maps mxc urls to authenticated media download urls',

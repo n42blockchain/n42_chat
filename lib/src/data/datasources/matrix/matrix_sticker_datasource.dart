@@ -32,9 +32,18 @@ class MatrixStickerDataSource {
 
   matrix.Client? get _client => _clientManager.client;
 
+  /// Identity of the account whose private sticker data is being read.
+  Object? get accountScope {
+    final client = _client;
+    return client == null ? null :
+        (client, client.userID, client.deviceID, client.homeserver);
+  }
+
+
   /// 获取已安装的贴纸包列表
   Future<List<StickerPack>> getInstalledPacks() async {
     if (_client == null) return [];
+    final origin = accountScope;
 
     try {
       // 从账户数据获取已安装的贴纸包 ID 列表
@@ -43,13 +52,16 @@ class MatrixStickerDataSource {
         installedPacksType,
       );
 
+      if (accountScope != origin) return [];
       final packIds =
           (installedData['pack_ids'] as List?)?.cast<String>() ?? [];
       final packs = <StickerPack>[];
 
       // 获取每个贴纸包的详情
       for (final packId in packIds) {
+        if (accountScope != origin) return [];
         final pack = await _getPackFromAccountData(packId);
+        if (accountScope != origin) return [];
         if (pack != null) {
           packs.add(pack.copyWith(isInstalled: true));
         }
@@ -58,11 +70,13 @@ class MatrixStickerDataSource {
       // 添加内置贴纸包
       packs.addAll(await _getBuiltinPacks());
 
-      return packs;
+      return accountScope == origin ? packs : [];
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to get installed packs: $e');
       // 返回内置贴纸包作为后备
-      return await _getBuiltinPacks();
+      if (accountScope != origin) return [];
+      final fallback = await _getBuiltinPacks();
+      return accountScope == origin ? fallback : [];
     }
   }
 

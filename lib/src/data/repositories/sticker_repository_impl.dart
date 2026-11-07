@@ -15,6 +15,7 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   /// 已安装贴纸包缓存
   List<StickerPack>? _installedPacksCache;
+  Object? _installedPacksScope;
 
   /// 已安装贴纸包变化流控制器
   final _installedPacksController = StreamController<List<StickerPack>>.broadcast();
@@ -23,17 +24,23 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   @override
   Future<List<StickerPack>> getInstalledPacks() async {
+    final origin = _dataSource.accountScope;
+    if (_installedPacksScope != origin) _installedPacksCache = null;
     if (_installedPacksCache != null) {
       return _installedPacksCache!;
     }
 
     final remotePacks = await _dataSource.getInstalledPacks();
+    if (_dataSource.accountScope != origin) {
+      return List<StickerPack>.of(BundledStickerPacks.all);
+    }
     // 内置贴纸包始终置顶且默认"已安装"，保证面板不空；按 id 去重避免与远端重复。
     final bundledIds = BundledStickerPacks.all.map((p) => p.id).toSet();
     final packs = <StickerPack>[
       ...BundledStickerPacks.all,
       ...remotePacks.where((p) => !bundledIds.contains(p.id)),
     ];
+    _installedPacksScope = origin;
     _installedPacksCache = packs;
     return packs;
   }
