@@ -110,4 +110,67 @@ void main() {
     await settle();
     expect(bloc.state, isA<SearchInitial>());
   });
+  test('clear removes visible results before history lookup settles', () async {
+    when(() => repo.searchGlobal('old', type: null))
+        .thenAnswer((_) async => const SearchResults(query: 'old'));
+    bloc.add(const PerformSearch('old'));
+    await settle();
+    expect(bloc.state, isA<SearchLoaded>());
+    final history = Completer<List<String>>();
+    when(() => repo.getRecentSearches()).thenAnswer((_) => history.future);
+    bloc.add(const ClearSearch());
+    await Future<void>.delayed(Duration.zero);
+    expect(bloc.state, isA<SearchInitial>());
+    history.completeError(StateError('disk failure'));
+    await settle();
+    expect(bloc.state, isA<SearchError>());
+  });
+  for (final clear in [false, true]) {
+    for (final fail in [false, true]) {
+      test(
+        'stale history mutation clear=$clear failure=$fail preserves new search',
+        () async {
+          final pending = Completer<void>();
+          when(() => repo.deleteSearchQuery('old'))
+              .thenAnswer((_) => pending.future);
+          when(() => repo.clearSearchHistory())
+              .thenAnswer((_) => pending.future);
+          bloc.add(
+            clear
+                ? const ClearSearchHistory()
+                : const DeleteSearchHistoryItem('old'),
+          );
+          await Future<void>.delayed(Duration.zero);
+          when(() => repo.searchGlobal('new', type: null))
+              .thenAnswer((_) async => const SearchResults(query: 'new'));
+          when(() => repo.getRecentSearches()).thenAnswer((_) async => ['new']);
+          bloc.add(const PerformSearch('new'));
+          await settle();
+          when(() => repo.getRecentSearches())
+              .thenAnswer((_) async => ['stale']);
+          if (fail) {
+            pending.completeError(StateError('old failure'));
+          } else {
+            pending.complete();
+          }
+          await settle();
+          final state = bloc.state as SearchLoaded;
+          expect(state.results.query, 'new');
+          expect(state.recentSearches, ['new']);
+        },
+      );
+    }
+  }
+  test('delayed history read cannot restore cleared history', () async {
+    final history = Completer<List<String>>();
+    when(() => repo.getRecentSearches()).thenAnswer((_) => history.future);
+    when(() => repo.clearSearchHistory()).thenAnswer((_) async {});
+    bloc.add(const LoadSearchHistory());
+    await Future<void>.delayed(Duration.zero);
+    bloc.add(const ClearSearchHistory());
+    await Future<void>.delayed(Duration.zero);
+    history.complete(['deleted']);
+    await settle();
+    expect((bloc.state as SearchInitial).recentSearches, isEmpty);
+  });
 }

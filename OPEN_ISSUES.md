@@ -171,6 +171,9 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Search history presentation follow-up (batch 225): ClearSearch removes displayed results before its history read completes. History reads/deletes/clear completions and errors are bound to the initiating search and history revision; old work cannot replace a newer search or restore cleared history. Six new cases plus existing search suites pass (46 total); scoped analysis clean. This does not serialize repository storage writes or establish proactive account/history-clear subscriptions; those boundaries, global-search/history-read overlap, old redactions and live/device acceptance remain open.
+
+
 - Search intent lifecycle follow-up (batch 224): SearchBloc stamps new intents before debounce, drops stale global/room/history completions and errors after clear or scope changes, and allows only one active pagination request. Seven new lifecycle cases plus existing search suites pass (40 total); scoped analysis is clean. This prevents stale results repopulating a cleared search, not proactive history-clear notification or independent account-session invalidation. Remaining: proactive clear/account changes, delete-history completion races, old redaction refresh, cursor retention and live/device acceptance.
 
 

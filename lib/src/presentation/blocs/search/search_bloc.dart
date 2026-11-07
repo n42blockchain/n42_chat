@@ -34,7 +34,9 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   }
 
   int _generation = 0;
+  int _historyRevision = 0;
   final Expando<int> _eventGenerations = Expando<int>();
+  final Expando<int> _historyRevisions = Expando<int>();
 
   @override
   void onEvent(SearchEvent event) {
@@ -47,7 +49,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         event is LoadSearchHistory) {
       _generation++;
     }
+    if (event is DeleteSearchHistoryItem || event is ClearSearchHistory) {
+      _historyRevision++;
+    }
     _eventGenerations[event] = _generation;
+    _historyRevisions[event] = _historyRevision;
     super.onEvent(event);
   }
 
@@ -161,9 +167,20 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     bool current() => _isCurrent(event, emit, generation);
     if (!current()) return;
 
-    final history = await _searchRepository.getRecentSearches();
-    if (!current()) return;
-    emit(SearchInitial(recentSearches: history));
+    if (state is! SearchInitial ||
+        (state as SearchInitial).recentSearches.isNotEmpty) {
+      emit(const SearchInitial());
+    }
+    final revision = _historyRevisions[event] ?? _historyRevision;
+    try {
+      final history = await _searchRepository.getRecentSearches();
+      if (!current() || revision != _historyRevision) return;
+      emit(SearchInitial(recentSearches: history));
+    } catch (error) {
+      if (current() && revision == _historyRevision) {
+        emit(SearchError(error.toString()));
+      }
+    }
   }
 
   Future<void> _onLoadSearchHistory(
@@ -174,22 +191,38 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     bool current() => _isCurrent(event, emit, generation);
     if (!current()) return;
 
-    final history = await _searchRepository.getRecentSearches();
-    if (!current()) return;
-    emit(SearchInitial(recentSearches: history));
+    final revision = _historyRevisions[event] ?? _historyRevision;
+    try {
+      final history = await _searchRepository.getRecentSearches();
+      if (!current() || revision != _historyRevision) return;
+      emit(SearchInitial(recentSearches: history));
+    } catch (error) {
+      if (current() && revision == _historyRevision) {
+        emit(SearchError(error.toString()));
+      }
+    }
   }
 
   Future<void> _onDeleteSearchHistoryItem(
     DeleteSearchHistoryItem event,
     Emitter<SearchState> emit,
   ) async {
-    await _searchRepository.deleteSearchQuery(event.query);
-    final history = await _searchRepository.getRecentSearches();
+    final generation = _eventGenerations[event] ?? _generation;
+    final revision = _historyRevisions[event] ?? _historyRevision;
+    bool current() =>
+        _isCurrent(event, emit, generation) && revision == _historyRevision;
+    try {
+      await _searchRepository.deleteSearchQuery(event.query);
+      final history = await _searchRepository.getRecentSearches();
 
-    if (state is SearchInitial) {
-      emit(SearchInitial(recentSearches: history));
-    } else if (state is SearchLoaded) {
-      emit((state as SearchLoaded).copyWith(recentSearches: history));
+      if (!current()) return;
+      if (state is SearchInitial) {
+        emit(SearchInitial(recentSearches: history));
+      } else if (state is SearchLoaded) {
+        emit((state as SearchLoaded).copyWith(recentSearches: history));
+      }
+    } catch (error) {
+      if (current()) emit(SearchError(error.toString()));
     }
   }
 
@@ -197,12 +230,21 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     ClearSearchHistory event,
     Emitter<SearchState> emit,
   ) async {
-    await _searchRepository.clearSearchHistory();
+    final generation = _eventGenerations[event] ?? _generation;
+    final revision = _historyRevisions[event] ?? _historyRevision;
+    bool current() =>
+        _isCurrent(event, emit, generation) && revision == _historyRevision;
+    try {
+      await _searchRepository.clearSearchHistory();
 
-    if (state is SearchInitial) {
-      emit(const SearchInitial());
-    } else if (state is SearchLoaded) {
-      emit((state as SearchLoaded).copyWith(recentSearches: []));
+      if (!current()) return;
+      if (state is SearchInitial) {
+        emit(const SearchInitial());
+      } else if (state is SearchLoaded) {
+        emit((state as SearchLoaded).copyWith(recentSearches: []));
+      }
+    } catch (error) {
+      if (current()) emit(SearchError(error.toString()));
     }
   }
 
