@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:convert';
 
 import 'package:drift/native.dart';
 import 'package:drift/drift.dart' show Value;
@@ -7,6 +9,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/archive_account_access.dart';
 import 'package:n42_chat/src/core/services/archive_search_service.dart';
+import 'package:n42_chat/src/core/services/archive_integrity_service.dart';
 import 'package:n42_chat/src/core/services/message_archive_service.dart';
 import 'package:n42_chat/src/data/datasources/local/archive_database.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
@@ -207,6 +210,111 @@ void main() {
       expect(await database.getMessageCount('!shared:example.org'), 0);
       expect(await database.searchMessages('rollback'), isEmpty);
       expect(await database.getMetadata('!shared:example.org'), isNull);
+    },
+  );
+
+  test(
+    'quarter exports isolate files and preserve Unicode across restore',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'n42-integrity-scope-',
+      );
+      addTearDown(() => directory.delete(recursive: true));
+      await alice.insertMessages([
+        ArchivedMessagesCompanion.insert(
+          eventId: 'unicode',
+          roomId: '!shared:example.org',
+          senderId: '@alice:example.org',
+          originServerTs: 200,
+          type: 'm.room.message',
+          body: const Value('中文 😀 café'),
+          quarter: 202601,
+          archivedAt: DateTime(2026),
+        ),
+      ]);
+      final service = ArchiveIntegrityService.accountScoped(
+        access: access,
+        documentsDirectory: () async => directory,
+      );
+      final exported = await service.exportQuarterlyArchive(202601);
+      expect(
+        utf8.decode(gzip.decode(await exported.file.readAsBytes())),
+        contains('中文 😀 café'),
+      );
+      expect(
+        await service.verifyArchive(exported.file, exported.checksum),
+        isTrue,
+      );
+      expect(
+        (await service.listExportedArchives()).single.path,
+        exported.file.path,
+      );
+      identify('@bob:example.org');
+      expect(await service.listExportedArchives(), isEmpty);
+      final rejected = await service.importArchive(exported.file);
+      expect(rejected.success, isFalse);
+      expect(rejected.error, contains('owner'));
+      expect(await bob.getMessageCount('!shared:example.org'), 1);
+      identify('@alice:example.org');
+      await alice.deleteByEventId('unicode');
+      expect((await service.importArchive(exported.file)).success, isTrue);
+      expect(
+        (await alice.getMessages('!shared:example.org')).first.body,
+        '中文 😀 café',
+      );
+    },
+  );
+
+  test(
+    'legacy quarter import requires explicit confirmation in scoped mode',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'n42-legacy-scope-',
+      );
+      addTearDown(() => directory.delete(recursive: true));
+      final legacy = ArchiveIntegrityService(
+        db: alice,
+        documentsDirectory: () async => directory,
+      );
+      final exported = await legacy.exportQuarterlyArchive(202601);
+      final service = ArchiveIntegrityService.accountScoped(
+        access: access,
+        documentsDirectory: () async => directory,
+      );
+      expect((await service.importArchive(exported.file)).success, isFalse);
+      expect(
+        (await service.importArchive(
+          exported.file,
+          allowUnownedLegacy: true,
+        )).success,
+        isTrue,
+      );
+    },
+  );
+
+  test(
+    'export stops if account changes while resolving its directory',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'n42-export-race-',
+      );
+      addTearDown(() => directory.delete(recursive: true));
+      final started = Completer<void>();
+      final release = Completer<Directory>();
+      final service = ArchiveIntegrityService.accountScoped(
+        access: access,
+        documentsDirectory: () {
+          started.complete();
+          return release.future;
+        },
+      );
+      final pending = service.exportQuarterlyArchive(202601);
+      final rejected = expectLater(pending, throwsStateError);
+      await started.future;
+      identify('@bob:example.org');
+      release.complete(directory);
+      await rejected;
+      expect(directory.listSync(recursive: true).whereType<File>(), isEmpty);
     },
   );
 

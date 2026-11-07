@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../data/datasources/local/archive_database.dart';
 import '../utils/debug_log.dart';
+import 'archive_account_access.dart';
 
 /// 归档导入结果
 class ImportResult {
@@ -45,14 +46,32 @@ class ExportInfo {
 /// 当前使用 gzip 压缩（Dart 内置），后续可替换为 Zstd 以获得
 /// 更高压缩率（+20-30%）和更快解压速度（3-5x）。
 class ArchiveIntegrityService {
-  final ArchiveDatabase _db;
+  final ArchiveDatabase? _db;
+  final ArchiveAccountAccess? _access;
+  final Future<Directory> Function() _documentsDirectory;
 
-  ArchiveIntegrityService({required ArchiveDatabase db}) : _db = db;
+  ArchiveIntegrityService({
+    required ArchiveDatabase db,
+    Future<Directory> Function()? documentsDirectory,
+  }) : _db = db,
+       _access = null,
+       _documentsDirectory =
+           documentsDirectory ?? getApplicationDocumentsDirectory;
+
+  ArchiveIntegrityService.accountScoped({
+    required ArchiveAccountAccess access,
+    Future<Directory> Function()? documentsDirectory,
+  }) : _db = null,
+       _access = access,
+       _documentsDirectory =
+           documentsDirectory ?? getApplicationDocumentsDirectory;
 
   /// 获取归档目录
-  Future<Directory> _getArchiveDir() async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final archiveDir = Directory(p.join(appDir.path, 'n42_chat_archives'));
+  Future<Directory> _getArchiveDir({String? scope}) async {
+    final appDir = await _documentsDirectory();
+    final archiveDir = Directory(
+      p.join(appDir.path, 'n42_chat_archives', scope ?? ''),
+    );
     if (!archiveDir.existsSync()) {
       archiveDir.createSync(recursive: true);
     }
@@ -63,28 +82,50 @@ class ArchiveIntegrityService {
   ///
   /// 输出路径: `<AppDocuments>/n42_chat_archives/archive_Q{quarter}.db.gz`
   Future<ExportInfo> exportQuarterlyArchive(int quarter) async {
-    final archiveDir = await _getArchiveDir();
+    final lease = await _access?.capture();
+    final archiveDir = await _getArchiveDir(scope: lease?.storageId);
+    lease?.ensureCurrent();
     final outputFile = File(p.join(archiveDir.path, 'archive_Q$quarter.db.gz'));
 
     // 从数据库查询该季度所有消息
-    final messages = await _queryQuarterMessages(quarter);
+    final messages = await _queryQuarterMessages(
+      lease?.database ?? _db!,
+      quarter,
+    );
+    lease?.ensureCurrent();
     if (messages.isEmpty) {
       throw StateError('No messages found for quarter $quarter');
     }
 
     // 序列化为 JSON Lines 格式（每行一条消息）
     final buffer = StringBuffer();
+    if (lease != null) {
+      buffer.writeln(
+        jsonEncode({'archiveOwner': lease.storageId, 'encoding': 'utf-8'}),
+      );
+    }
     for (final msg in messages) {
       buffer.writeln(_serializeMessage(msg));
     }
-    final rawBytes = Uint8List.fromList(buffer.toString().codeUnits);
+    final rawBytes = Uint8List.fromList(utf8.encode(buffer.toString()));
 
     // 压缩
     final compressed = gzip.encode(rawBytes);
-    await outputFile.writeAsBytes(compressed);
-
-    // 计算校验和
-    final checksum = await computeChecksum(outputFile);
+    final pendingFile = File(
+      '${outputFile.path}.${DateTime.now().microsecondsSinceEpoch}.partial',
+    );
+    late final String checksum;
+    try {
+      lease?.ensureCurrent();
+      await pendingFile.writeAsBytes(compressed, flush: true);
+      lease?.ensureCurrent();
+      checksum = await computeChecksum(pendingFile);
+      lease?.ensureCurrent();
+      await pendingFile.rename(outputFile.path);
+      lease?.ensureCurrent();
+    } finally {
+      if (await pendingFile.exists()) await pendingFile.delete();
+    }
 
     final ratio = rawBytes.isNotEmpty
         ? 1.0 - (compressed.length / rawBytes.length)
@@ -123,7 +164,18 @@ class ArchiveIntegrityService {
   Future<ImportResult> importArchive(
     File compressedFile, {
     String? expectedChecksum,
+    bool allowUnownedLegacy = false,
   }) async {
+    ArchiveAccountLease? lease;
+    try {
+      lease = await _access?.capture();
+    } catch (error) {
+      return ImportResult(
+        success: false,
+        messagesImported: 0,
+        error: error.toString(),
+      );
+    }
     if (!compressedFile.existsSync()) {
       return const ImportResult(
         success: false,
@@ -145,13 +197,45 @@ class ArchiveIntegrityService {
     }
 
     try {
+      lease?.ensureCurrent();
+      final database = lease?.database ?? _db!;
       // 解压
       final compressedBytes = await compressedFile.readAsBytes();
       final decompressed = gzip.decode(compressedBytes);
-      final content = String.fromCharCodes(decompressed);
+      String content;
+      try {
+        content = utf8.decode(decompressed);
+      } on FormatException {
+        // Older archives used byte-sized code units; preserve that input path.
+        content = String.fromCharCodes(decompressed);
+      }
+      lease?.ensureCurrent();
 
       // 解析 JSON Lines
-      final lines = content.split('\n').where((l) => l.trim().isNotEmpty);
+      final lines = content
+          .split('\n')
+          .where((l) => l.trim().isNotEmpty)
+          .toList();
+      Object? first;
+      if (lines.isNotEmpty) {
+        try {
+          first = jsonDecode(lines.first);
+        } on FormatException {
+          // Preserve legacy per-line recovery; invalid message rows are skipped below.
+        }
+      }
+      final hasOwner = first is Map && first.containsKey('archiveOwner');
+      final owner = first is Map ? first['archiveOwner'] : null;
+      if (hasOwner) {
+        if (lease == null || owner is! String || owner != lease.storageId) {
+          throw StateError('Archive owner does not match the current account');
+        }
+        lines.removeAt(0);
+      } else if (lease != null && !allowUnownedLegacy) {
+        throw StateError(
+          'Legacy archive requires explicit ownership confirmation',
+        );
+      }
       final companions = <ArchivedMessagesCompanion>[];
 
       for (final line in lines) {
@@ -174,17 +258,20 @@ class ArchiveIntegrityService {
       }
 
       // 批量插入
-      final inserted = await _db.insertMessages(companions);
+      final inserted = await database.transaction(() async {
+        lease?.ensureCurrent();
+        final count = await database.insertMessages(companions);
+        lease?.ensureCurrent();
+        return count;
+      });
+      lease?.ensureCurrent();
 
       debugLog(
         'ArchiveIntegrityService: Imported $inserted messages '
         'from ${compressedFile.path}',
       );
 
-      return ImportResult(
-        success: true,
-        messagesImported: inserted,
-      );
+      return ImportResult(success: true, messagesImported: inserted);
     } catch (e) {
       return ImportResult(
         success: false,
@@ -196,7 +283,9 @@ class ArchiveIntegrityService {
 
   /// 列出所有已导出的归档文件
   Future<List<File>> listExportedArchives() async {
-    final archiveDir = await _getArchiveDir();
+    final lease = await _access?.capture();
+    final archiveDir = await _getArchiveDir(scope: lease?.storageId);
+    lease?.ensureCurrent();
     if (!archiveDir.existsSync()) return [];
     return archiveDir
         .listSync()
@@ -211,11 +300,16 @@ class ArchiveIntegrityService {
   // ============================================
 
   /// 查询指定季度的所有消息
-  Future<List<ArchivedMessage>> _queryQuarterMessages(int quarter) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM archived_messages WHERE quarter = ?',
-      variables: [Variable.withInt(quarter)],
-    ).get();
+  Future<List<ArchivedMessage>> _queryQuarterMessages(
+    ArchiveDatabase db,
+    int quarter,
+  ) async {
+    final rows = await db
+        .customSelect(
+          'SELECT * FROM archived_messages WHERE quarter = ?',
+          variables: [Variable.withInt(quarter)],
+        )
+        .get();
 
     return rows.map((row) {
       return ArchivedMessage(
