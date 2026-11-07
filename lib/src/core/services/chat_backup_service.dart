@@ -359,10 +359,13 @@ class ChatBackupService {
               }
             }
             ensureCurrent();
+            final loadedEvents = timeline.events.toList();
+            final privateEventIds = loadedEvents.where(_isEphemeralEvent)
+                .map((event) => event.eventId).toSet();
             final exportedEventIds = <String>{};
-            final events = timeline.events
+            final events = loadedEvents
                 .where((e) => e.type == 'm.room.message')
-                .where((e) => !_isEphemeralEvent(e))
+                .where((e) => !privateEventIds.contains(e.eventId))
                 .where((e) => exportedEventIds.add(e.eventId))
                 .map(
                   (e) => {
@@ -610,9 +613,11 @@ class ChatBackupService {
 
         final messages = <Map<String, dynamic>>[];
         final seenEventIds = <String>{};
+        final privateEventIds = <String>{};
 
         void addMessage(Map<String, dynamic> message) {
           final eventId = message['eventId']?.toString();
+          if (privateEventIds.contains(eventId)) return;
           if (eventId != null &&
               eventId.isNotEmpty &&
               !seenEventIds.add(eventId)) {
@@ -626,7 +631,10 @@ class ChatBackupService {
           final timeline = await room.getTimeline();
           try {
             ensureCurrent();
-            for (final e in timeline.events) {
+            final loadedEvents = timeline.events.toList();
+            privateEventIds.addAll(loadedEvents.where(_isEphemeralEvent)
+                .map((event) => event.eventId));
+            for (final e in loadedEvents) {
               if (e.type != 'm.room.message') continue;
               if (_isEphemeralEvent(e)) continue;
               final ts = e.originServerTs.millisecondsSinceEpoch;

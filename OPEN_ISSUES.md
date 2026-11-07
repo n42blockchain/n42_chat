@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Duplicate privacy metadata (batch 281): export snapshots loaded events and excludes every copy of an event ID when any loaded copy has n42.self_destruct. Incremental archive merging also rejects those IDs. Four ordering/mode cases and 103 backup tests pass; service analysis has six infos, no errors/warnings. This covers privacy markers visible in the loaded snapshot; later redactions/metadata, archive-only markers, host integration and full device/history acceptance remain open.
+
 - Full-export event deduplication (batch 280): full export now emits each eligible room event ID once, preserving first eligible occurrence and matching messageCount to serialized rows. A repeated-event input fixture verifies one output row and cleanup; 99 backup tests pass. Service analysis has six infos, no errors/warnings. This is export-boundary defense, not evidence of a live SDK duplicate bug. Concurrent edits/redactions/ephemeral metadata reconciliation, host integration, bounded memory, archive merge and real full-history acceptance remain open.
 
 - Remote paging partial failure evidence (batch 279): two new export-file tests cover first-request failure and one successful page followed by failure. Both retain loaded messages, set hasReadErrors/warnings, release Timeline and produce a checksum-valid file. Integrity validation is not history completeness. Both tests pass; test-file analysis has one existing info, no errors/warnings. Production source unchanged; timeout cancellation, memory bounds, UI activation/archive merge and real-server acceptance remain open.

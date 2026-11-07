@@ -193,6 +193,27 @@ void main() {
     verify(() => timeline.cancelSubscriptions()).called(1);
   });
 
+  for (final incremental in [false, true]) {
+    for (final privateFirst in [false, true]) {
+      test('private duplicate excludes all copies: incremental=$incremental first=$privateFirst', () async {
+        final (room, timeline) = roomFixture('!private:example.org');
+        when(() => room.topic).thenReturn('');
+        when(() => room.isDirectChat).thenReturn(false);
+        when(() => room.summary).thenReturn(_Summary());
+        when(() => client.rooms).thenReturn([room]);
+        final original = timeline.events.single;
+        final private = matrix.Event(eventId: original.eventId,
+          senderId: original.senderId, originServerTs: original.originServerTs,
+          type: 'm.room.message', room: room,
+          content: {'msgtype': 'm.text', 'body': 'private fixture', 'n42.self_destruct': {'seconds': 10}});
+        when(() => timeline.events).thenReturn(privateFirst ? [private, original] : [original, private]);
+        final result = incremental ? await service.createIncrementalBackup() : await service.createBackup();
+        expect(result.messageCount, 0);
+        expect(await File(result.filePath).readAsString(), isNot(contains('historical message')));
+      });
+    }
+  }
+
   test('full export deduplicates overlapping loaded event IDs', () async {
     final (room, timeline) = roomFixture('!overlap:example.org');
     when(() => room.topic).thenReturn('');
