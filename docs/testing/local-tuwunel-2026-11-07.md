@@ -53,3 +53,7 @@ The final-source run exits 0 and preserves the previous ciphertext, multidevice 
 ### Repeated-recovery batch status
 
 The 30-attempt batch hit the server's per-account login limit at recovery device four. Diagnostics established a retry delay of 333,000 ms, above the harness's original five-minute wait budget. These terminated runs are not recorded as successful batches. The tool now honors server delays up to 15 minutes, with five retries per login; only explicit rate-limit errors retry. The actual 333-second delay is covered by a focused test, and all 38 backup/configuration/retry tests pass. A fresh batch is running with the server limits unchanged. The structured acceptance JSON is intentionally left at the previous successful single-recovery result until the full batch produces its terminal result and exit code.
+
+## Host golden CI result
+
+Chat golden regression run 42372807637 passes on both Ubuntu and xcode-27 macOS for source 6f6f811e. Exact comparison is retained. Material fixture inheritance, fixture heading contrast and separately reviewed host baselines were corrected. The earlier macOS 26 renderer's four/six edge pixels are resolved by aligning the runner to the macOS 27 family used for the reviewed baseline. This is a golden-test result only, not physical-device or production acceptance.
