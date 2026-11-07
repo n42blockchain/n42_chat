@@ -266,6 +266,7 @@ class MatrixStickerDataSource {
   /// 获取常用贴纸
   Future<List<RecentSticker>> getRecentStickers({int limit = 20}) async {
     if (_client == null) return [];
+    final origin = accountScope;
 
     try {
       final data = await _client!.getAccountData(
@@ -273,6 +274,7 @@ class MatrixStickerDataSource {
         recentStickersType,
       );
 
+      if (accountScope != origin) return [];
       final recentList = data['recent'] as List? ?? [];
       final result = <RecentSticker>[];
 
@@ -284,7 +286,9 @@ class MatrixStickerDataSource {
           final count = item['count'] as int? ?? 1;
 
           if (packId != null && stickerId != null) {
+            if (accountScope != origin) return [];
             final pack = await _getPackFromAccountData(packId);
+            if (accountScope != origin) return [];
             final sticker = pack?.stickers
                 .where((s) => s.id == stickerId)
                 .firstOrNull;
@@ -305,7 +309,7 @@ class MatrixStickerDataSource {
         }
       }
 
-      return result;
+      return accountScope == origin ? result : [];
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to get recent stickers: $e');
       return [];
@@ -314,14 +318,17 @@ class MatrixStickerDataSource {
 
   /// 记录贴纸使用
   Future<void> recordStickerUsage(String packId, String stickerId) async {
-    if (_client == null) return;
+    final client = _client;
+    final userId = client?.userID;
+    if (client == null || userId == null) return;
+    final origin = accountScope;
 
     try {
       List<Map<String, dynamic>> recentList = [];
 
       try {
-        final data = await _client!.getAccountData(
-          _client!.userID!,
+        final data = await client.getAccountData(
+          userId,
           recentStickersType,
         );
         recentList =
@@ -331,6 +338,9 @@ class MatrixStickerDataSource {
         debugLog('Error: $e');
       }
 
+      if (accountScope != origin) return;
+      // Own the list before reordering; SDK account data must stay unchanged.
+      recentList = List<Map<String, dynamic>>.of(recentList);
       // 查找现有记录
       final existingIndex = recentList.indexWhere(
         (item) => item['pack_id'] == packId && item['sticker_id'] == stickerId,
@@ -363,7 +373,7 @@ class MatrixStickerDataSource {
         recentList = recentList.sublist(0, 50);
       }
 
-      await _client!.setAccountData(_client!.userID!, recentStickersType, {
+      await client.setAccountData(userId, recentStickersType, {
         'recent': recentList,
       });
     } catch (e) {
@@ -390,15 +400,17 @@ class MatrixStickerDataSource {
     String filename,
     String? mimeType,
   ) async {
-    if (_client == null) return null;
+    final client = _client;
+    if (client == null) return null;
+    final origin = accountScope;
 
     try {
-      final uri = await _client!.uploadContent(
+      final uri = await client.uploadContent(
         bytes,
         filename: filename,
         contentType: mimeType,
       );
-      return uri.toString();
+      return accountScope == origin ? uri.toString() : null;
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to upload sticker: $e');
       return null;

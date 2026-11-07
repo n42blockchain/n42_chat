@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 
@@ -58,6 +59,94 @@ void main() {
       },
     );
   });
+
+  test('held recent index cannot query replacement account packs', () async {
+    final pending = Completer<Map<String, dynamic>>();
+    when(
+      () => client.getAccountData(
+        '@alice:matrix.example.com',
+        MatrixStickerDataSource.recentStickersType,
+      ),
+    ).thenAnswer((_) => pending.future);
+    final read = dataSource.getRecentStickers();
+    when(() => client.userID).thenReturn('@bob:matrix.example.com');
+    pending.complete({
+      'recent': <Map<String, dynamic>>[
+        {'pack_id': 'pack-1', 'sticker_id': 'cat'},
+      ],
+    });
+    expect(await read, isEmpty);
+    verifyNever(() => client.getAccountData('@bob:matrix.example.com', any()));
+  });
+
+  for (final switched in [false, true]) {
+    test('recent usage stays account bound: switched=$switched', () async {
+      final pending = Completer<Map<String, dynamic>>();
+      when(
+        () => client.getAccountData(
+          '@alice:matrix.example.com',
+          MatrixStickerDataSource.recentStickersType,
+        ),
+      ).thenAnswer((_) => pending.future);
+      when(() => client.setAccountData(any(), any(), any()))
+          .thenAnswer((_) async {});
+      final write = dataSource.recordStickerUsage('pack-1', 'cat');
+      if (switched) {
+        when(() => client.userID).thenReturn('@bob:matrix.example.com');
+      }
+      pending.complete({
+        'recent': <Map<String, dynamic>>[
+          {'pack_id': 'pack-1', 'sticker_id': 'cat', 'count': 2},
+        ],
+      });
+      await write;
+      verifyNever(
+        () => client.setAccountData('@bob:matrix.example.com', any(), any()),
+      );
+      if (switched) {
+        verifyNever(
+          () =>
+              client.setAccountData('@alice:matrix.example.com', any(), any()),
+        );
+      } else {
+        final writes = verify(
+          () => client.setAccountData(
+            '@alice:matrix.example.com',
+            MatrixStickerDataSource.recentStickersType,
+            captureAny(),
+          ),
+        ).captured;
+        expect(((writes.single as Map)['recent'] as List).single['count'], 3);
+      }
+    });
+    test(
+      'sticker upload completion stays account bound: switched=$switched',
+      () async {
+        final bytes = Uint8List.fromList([1, 2, 3]);
+        final pending = Completer<Uri>();
+        when(
+          () => client.uploadContent(
+            bytes,
+            filename: 'sticker.png',
+            contentType: 'image/png',
+          ),
+        ).thenAnswer((_) => pending.future);
+        final upload = dataSource.uploadStickerImage(
+          bytes,
+          'sticker.png',
+          'image/png',
+        );
+        if (switched) {
+          when(() => client.userID).thenReturn('@bob:matrix.example.com');
+        }
+        pending.complete(Uri.parse('mxc://matrix.example.com/sticker'));
+        expect(
+          await upload,
+          switched ? isNull : 'mxc://matrix.example.com/sticker',
+        );
+      },
+    );
+  }
 
   for (final install in [false, true]) {
     test(
