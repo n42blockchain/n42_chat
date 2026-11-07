@@ -9,7 +9,7 @@ import 'package:vodozemac/vodozemac.dart' as vod;
 
 import 'live_smoke_credentials.dart';
 
-/// Explicit loopback-only, three-client encrypted group protocol check.
+/// Explicit loopback-only encrypted group and device-revocation protocol check.
 /// Requires N42_TEST_HOMESERVER and N42_TEST_INVITE_CODE. Creates random users;
 /// no existing accounts, credentials, recovery keys, or production endpoints.
 Future<void> main() => runLocalE2eeSmoke();
@@ -169,14 +169,104 @@ Future<void> runLocalE2eeSmoke({Map<String, String>? environment}) async {
       });
       deliveries++;
     }
+    // Keep the revoked device's existing keys for a meaningful offline check.
+    await extra.abortSync();
+    final revokedToken = extra.accessToken!;
+    Future<void> revoke(String? session) => clients.first.deleteDevice(
+      extra.deviceID!,
+      auth: AuthenticationPassword(
+        session: session,
+        password: credentials.first.password,
+        identifier: AuthenticationUserIdentifier(user: clients.first.userID!),
+      ),
+    );
+    try {
+      await revoke(null);
+    } on MatrixException catch (error) {
+      if (error.response?.statusCode != 401) rethrow;
+      final session =
+          (jsonDecode(error.response!.body) as Map)['session'] as String?;
+      if (session == null) rethrow;
+      await revoke(session);
+    }
+    final http = HttpClient();
+    try {
+      final request = await http.getUrl(
+        uri.resolve('/_matrix/client/v3/account/whoami'),
+      );
+      request.headers.set(
+        HttpHeaders.authorizationHeader,
+        'Bearer $revokedToken',
+      );
+      final response = await request.close();
+      final responseBody =
+          jsonDecode(await utf8.decoder.bind(response).join()) as Map;
+      if (response.statusCode != 401 ||
+          responseBody['errcode'] != 'M_UNKNOWN_TOKEN') {
+        throw StateError('Revoked device session remained authorized');
+      }
+    } finally {
+      http.close(force: true);
+    }
+    final activeClients = clients.take(3).toList();
+    await _until(activeClients, () async {
+      await clients[1].updateUserDeviceKeys(additionalUsers: {extra.userID!});
+      return clients[1].userDeviceKeys[extra.userID]?.deviceKeys.containsKey(
+            extra.deviceID,
+          ) ==
+          false;
+    });
+    final afterBody = 'after-revocation encrypted payload $stamp';
+    final afterId = await clients[1]
+        .getRoomById(roomId)!
+        .sendTextEvent(afterBody);
+    if (afterId == null) throw StateError('Missing post-revocation event id');
+    final afterRaw = await clients[1].getOneRoomEvent(roomId, afterId);
+    if (afterRaw.type != EventTypes.Encrypted ||
+        jsonEncode(afterRaw.content).contains(afterBody) ||
+        afterRaw.content['session_id'] == freshRaw.content['session_id']) {
+      throw StateError('Revocation did not rotate the encrypted session');
+    }
+    for (final recipient in activeClients) {
+      await _until(activeClients, () async {
+        final event = await recipient
+            .getRoomById(roomId)!
+            .getEventById(afterId);
+        return event?.type == EventTypes.Message &&
+            event?.content['body'] == afterBody;
+      });
+      deliveries++;
+    }
+    if (!extra.encryptionEnabled) {
+      throw StateError('Revoked offline crypto was cleared');
+    }
+    final retainedEvent = await extra.encryption!.decryptRoomEvent(
+      Event.fromMatrixEvent(freshRaw, extra.getRoomById(roomId)!),
+    );
+    if (retainedEvent.type != EventTypes.Message ||
+        retainedEvent.content['body'] != freshBody) {
+      throw StateError(
+        'Revoked offline device lost its previously received keys',
+      );
+    }
+    final revokedEvent = await extra.encryption!.decryptRoomEvent(
+      Event.fromMatrixEvent(afterRaw, extra.getRoomById(roomId)!),
+    );
+    if (revokedEvent.type == EventTypes.Message ||
+        revokedEvent.content['body'] == afterBody) {
+      throw StateError('Revoked device decrypted a fresh session');
+    }
     print(
       jsonEncode({
         'clients': clients.length,
-        'encrypted_events': 4,
+        'encrypted_events': 5,
+        'revoked_session_rejected': true,
+        'revoked_device_retains_previous_session_keys': true,
+        'revoked_device_cannot_decrypt_new_session': true,
         'distinct_accounts': credentials.length,
         'same_account_second_device': true,
         'decrypted_deliveries': deliveries,
-        'server_ciphertext_checks': 4,
+        'server_ciphertext_checks': 5,
         'passed': true,
         'scope': 'isolated protocol; not UI, recovery or device acceptance',
       }),
