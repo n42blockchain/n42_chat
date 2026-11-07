@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -10,6 +11,14 @@ import '../../../core/utils/preference_write_utils.dart';
 class ChatHistoryClearStore {
   final Future<SharedPreferences> Function() _preferences;
   static Future<void> _tail = Future<void>.value();
+  // Shared across store instances in this isolate; emitted only after durable
+  // acknowledgement. Consumers reread rather than trusting an event payload.
+  static final _changes = StreamController<String>.broadcast();
+
+  Stream<void> watch({required String ownerUserId, required String roomId}) {
+    final key = _key(ownerUserId, roomId);
+    return _changes.stream.where((changed) => changed == key).map<void>((_) {});
+  }
 
   ChatHistoryClearStore({Future<SharedPreferences> Function()? preferences})
     : _preferences = preferences ?? SharedPreferences.getInstance;
@@ -87,6 +96,7 @@ class ChatHistoryClearStore {
     // A successful old-owner write remains in that owner's namespace. A stale
     // caller must not announce success or apply it to the newly selected room.
     if (!isCurrent()) throw StateError('History session changed');
+    _changes.add(key);
     return next;
   });
 }

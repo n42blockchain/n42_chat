@@ -18,6 +18,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   final IMessageRepository _messageRepository;
   int _generation = 0;
   int _streamRevision = 0;
+  StreamSubscription<void>? _historyChangesSubscription;
   bool Function()? _threadSessionGuard;
 
   bool Function() _context(Emitter<ThreadState>? emit) {
@@ -37,6 +38,15 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   void _detachSubscription() {
     final subscription = _threadMessagesSubscription;
     _threadMessagesSubscription = null;
+    final historySubscription = _historyChangesSubscription;
+    _historyChangesSubscription = null;
+    if (historySubscription != null) {
+      unawaited(
+        historySubscription.cancel().catchError((Object error) {
+          debugLog('ThreadBloc: history listener cleanup failed: $error');
+        }),
+      );
+    }
     if (subscription != null) {
       unawaited(
         subscription.cancel().catchError((Object error) {
@@ -195,6 +205,21 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
             debugLog('ThreadBloc: Thread messages stream error: $e');
           },
         );
+    final repository = _messageRepository;
+    if (repository is IThreadHistoryChangesRepository) {
+      _historyChangesSubscription =
+          (repository as IThreadHistoryChangesRepository)
+              .watchThreadHistoryChanges(roomId)
+              .listen(
+                (_) {
+                  if (isCurrent())
+                    add(ThreadMessagesUpdated(const [], isCurrent: isCurrent));
+                },
+                onError: (Object error) {
+                  debugLog('ThreadBloc: history listener failed: $error');
+                },
+              );
+    }
   }
 
   Future<void> _onLoadThreadMessages(

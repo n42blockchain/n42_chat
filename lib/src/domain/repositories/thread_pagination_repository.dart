@@ -26,3 +26,7 @@ abstract interface class IThreadHistoryVisibilityRepository {
     List<MessageEntity> messages,
   );
 }
+
+abstract interface class IThreadHistoryChangesRepository {
+  Stream<void> watchThreadHistoryChanges(String roomId);
+}

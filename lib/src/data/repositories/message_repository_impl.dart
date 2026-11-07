@@ -19,7 +19,7 @@ import '../../core/utils/debug_log.dart';
 import '../../core/utils/matrix_utils.dart';
 
 /// 消息仓库实现
-class MessageRepositoryImpl implements IMessageRepository, IThreadPaginationRepository, IThreadHistoryVisibilityRepository {
+class MessageRepositoryImpl implements IMessageRepository, IThreadPaginationRepository, IThreadHistoryVisibilityRepository, IThreadHistoryChangesRepository {
   final MatrixMessageDataSource _messageDataSource;
   final MatrixClientManager _clientManager;
   final PreferencesDataSource _secureStorage;
@@ -1758,6 +1758,16 @@ class MessageRepositoryImpl implements IMessageRepository, IThreadPaginationRepo
   // ============================================
   // 消息线程 (MSC3440)
   // ============================================
+
+  @override
+  Stream<void> watchThreadHistoryChanges(String roomId) {
+    final origin = _historyOrigin();
+    final owner = origin.owner;
+    final store = _historyClearStore;
+    if (owner == null || owner.isEmpty || store == null) return const Stream.empty();
+    return store.watch(ownerUserId: owner, roomId: roomId)
+        .where((_) => origin.isCurrent());
+  }
 
   @override
   bool Function() captureThreadSession() => _historyOrigin().isCurrent;

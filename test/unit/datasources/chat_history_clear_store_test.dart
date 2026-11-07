@@ -18,6 +18,31 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
+  test('rejected platform writes emit no clear notification', () async {
+    final preferences = _Preferences();
+    when(() => preferences.reload()).thenAnswer((_) async {});
+    when(() => preferences.getString(any())).thenReturn(null);
+    when(() => preferences.setString(any(), any()))
+        .thenAnswer((_) async => false);
+    final store = ChatHistoryClearStore(preferences: () async => preferences);
+    var changes = 0;
+    final subscription = store
+        .watch(ownerUserId: owner, roomId: room)
+        .listen((_) => changes++);
+    await expectLater(
+      store.clearThrough(
+        ownerUserId: owner,
+        roomId: room,
+        boundary: boundary,
+        isCurrent: current,
+      ),
+      throwsA(isA<StateError>()),
+    );
+    await pumpEventQueue();
+    expect(changes, 0);
+    await subscription.cancel();
+  });
+
   test('survives recreated store and isolates owner and room', () async {
     final store = ChatHistoryClearStore();
     await store.clearThrough(
