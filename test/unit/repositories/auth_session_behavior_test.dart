@@ -292,6 +292,51 @@ void main() {
       },
     );
   }
+  for (final code in ['M_USER_LOCKED', 'M_USER_DEACTIVATED']) {
+    for (final flow in ['password', 'token', 'restore']) {
+      test(
+        '$flow preserves $code without removing account credentials',
+        () async {
+          final failure = MatrixException.fromJson({
+            'errcode': code,
+            'error': 'Account unavailable',
+            'soft_logout': true,
+          });
+          when(
+            () => auth.loginWithPassword(
+              homeserver: any(named: 'homeserver'),
+              username: any(named: 'username'),
+              password: any(named: 'password'),
+            ),
+          ).thenThrow(failure);
+          when(
+            () => auth.loginWithToken(
+              homeserver: any(named: 'homeserver'),
+              accessToken: any(named: 'accessToken'),
+              userId: any(named: 'userId'),
+              deviceId: any(named: 'deviceId'),
+            ),
+          ).thenThrow(failure);
+          when(storage.getSession).thenAnswer((_) async => session);
+          final result = flow == 'password'
+              ? await login()
+              : flow == 'token'
+              ? await tokenLogin()
+              : await repository.restoreSession();
+          expect(result.success, isFalse);
+          expect(
+            result.errorType?.name,
+            code == 'M_USER_LOCKED' ? 'accountLocked' : 'accountDeactivated',
+          );
+          expect(result.errorMessage, 'Account unavailable');
+          verifyNever(storage.clearSession);
+          verifyNever(storage.clearCredentials);
+          verifyNever(() => storage.removeAccount(any()));
+          verifyNever(auth.logout);
+        },
+      );
+    }
+  }
   test(
     'a pending password login rejects concurrent auth but releases the lock',
     () async {

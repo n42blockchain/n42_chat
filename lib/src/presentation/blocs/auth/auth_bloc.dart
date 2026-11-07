@@ -581,6 +581,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     if (result.success && result.user != null) {
       await _completeAuthenticatedFlow(result.user!, emit);
+    } else if (result.errorType == AuthErrorType.accountLocked ||
+        result.errorType == AuthErrorType.accountDeactivated) {
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorType: result.errorType,
+          errorMessage: result.errorMessage,
+        ),
+      );
     } else {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
     }

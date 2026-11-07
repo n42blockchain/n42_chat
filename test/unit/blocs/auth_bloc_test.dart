@@ -310,6 +310,34 @@ void main() {
       ],
     );
 
+    for (final type in [
+      AuthErrorType.accountLocked,
+      AuthErrorType.accountDeactivated,
+    ]) {
+      blocTest<AuthBloc, AuthState>(
+        'retains $type on restore without logging out',
+        build: () {
+          when(() => mockAuthRepository.restoreSession()).thenAnswer(
+            (_) async => AuthResult.failure('Account unavailable', type: type),
+          );
+          return AuthBloc(authRepository: mockAuthRepository);
+        },
+        act: (bloc) => bloc.add(const AuthRestoreSessionRequested()),
+        expect: () => [
+          isA<AuthState>().having(
+            (s) => s.status,
+            'status',
+            AuthStatus.checking,
+          ),
+          isA<AuthState>()
+              .having((s) => s.status, 'status', AuthStatus.error)
+              .having((s) => s.errorType, 'errorType', type)
+              .having((s) => s.errorMessage, 'message', 'Account unavailable'),
+        ],
+        verify: (_) => verifyNever(() => mockAuthRepository.logout()),
+      );
+    }
+
     blocTest<AuthBloc, AuthState>(
       'emits [checking, unauthenticated] when session restore fails',
       build: () {

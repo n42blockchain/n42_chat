@@ -383,7 +383,11 @@ class AuthRepositoryImpl
             return result;
           }
 
-          authLog('Token restore failed, trying credentials');
+          if (result.errorType == AuthErrorType.accountLocked ||
+              result.errorType == AuthErrorType.accountDeactivated) {
+            return result;
+          }
+          authLog('Token restore failed, re-authentication required');
         }
       }
 
@@ -1421,6 +1425,19 @@ class AuthRepositoryImpl
 
   AuthResult _handleMatrixError(MatrixException e) {
     final errorCode = e.errcode;
+
+    if (errorCode == 'M_USER_LOCKED') {
+      return AuthResult.failure(
+        e.errorMessage,
+        type: AuthErrorType.accountLocked,
+      );
+    }
+    if (errorCode == 'M_USER_DEACTIVATED') {
+      return AuthResult.failure(
+        e.errorMessage,
+        type: AuthErrorType.accountDeactivated,
+      );
+    }
 
     if (errorCode.contains('M_FORBIDDEN') ||
         errorCode.contains('M_UNAUTHORIZED')) {

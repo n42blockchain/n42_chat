@@ -11,6 +11,13 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
+### MATRIX-UPGRADE-001 Tuwunel 1.9.4 acceptance remains open
+
+- Severity: H
+- Added: 2026-11-06
+- Current state: public endpoints report Tuwunel 1.9.3. Password/token login and stored-session restore now preserve M_USER_LOCKED / M_USER_DEACTIVATED as distinct errors without removing credentials. AuthBloc exposes those restore errors without dispatching logout. Six regression cases failed before the fix; the repository and bloc suites now pass 97 tests. Scoped analysis has 11 existing info diagnostics, no errors or warnings.
+- Next step: validate sync-time account locking and unlocking without key loss, UIAA request retention, E2EE recovery and room permissions against an isolated 1.9.4 instance. SDK 15.0.0 sync soft-logout handling is tied to M_UNKNOWN_TOKEN; this login-path fix does not establish sync compatibility. Verify database/media/config backups and restore rehearsal before any live upgrade.
+
 ### UGC-001 Matrix reporting still needs room, moment and operational acceptance
 
 - Severity: H

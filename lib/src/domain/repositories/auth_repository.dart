@@ -322,6 +322,12 @@ class AuthResult {
 
 /// 认证错误类型
 enum AuthErrorType {
+  /// Temporarily locked by the homeserver; retain local recovery material.
+  accountLocked,
+
+  /// Deactivated by the homeserver.
+  accountDeactivated,
+
   /// 未知错误
   unknown,
 
