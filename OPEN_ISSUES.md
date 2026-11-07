@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Valid-account picker interaction (batch 266): real page tests now cover cancel, active picker error and account-invalidated picker error with a lifecycle fixture. Picker is reached once; no preview/restore service calls occur in those paths, active errors display and stale errors stay hidden. Four page tests pass; test analysis clean. Actual selected-file/password/dialog flows and device acceptance remain open. Production source unchanged.
+
 - Backup page rendering (batch 265): a real page widget test exposed ListTile/ColoredBox material assertions. Card surfaces now use Material, preserving background and ink rendering. The page renders and refuses file selection without account lifecycle dependencies; final test passes without hit-test warnings. Password cancel/wrong-password/valid-account UI flows, localization and host integration remain open.
 
 - Encrypted restore password UI (batch 264): supported encrypted formats now raise a typed BackupPasswordRequired error. Picker prompts for an obscured password only for that error; cancellation/empty password stops, valid input is passed to preview and restore. Existing origin checks cover prompt completion. Protected-preview/restore service test passes; scoped analysis has six infos, no errors/warnings. Wrong-password retry UX, widget/device interaction, localization, host integration and complete backup ownership/history remain open.
