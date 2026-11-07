@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import '../../../domain/entities/chat_sync_phase.dart';
 
 import '../../../core/extensions/context_extension.dart';
@@ -14,7 +15,9 @@ import '../../../../l10n/app_localizations.dart';
 /// 在用户首次登录后、Matrix 客户端完成初始同步前，显示加载动画与进度提示。
 /// 同步完成后自动消失（淡出动画）。
 class SyncProgressOverlay extends StatefulWidget {
-  const SyncProgressOverlay({super.key});
+  const SyncProgressOverlay({super.key, this.clientManager});
+
+  final MatrixClientManager? clientManager;
 
   @override
   State<SyncProgressOverlay> createState() => _SyncProgressOverlayState();
@@ -24,6 +27,10 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
     with SingleTickerProviderStateMixin {
   bool _isSyncing = false;
   bool _visible = false;
+  bool _hasError = false;
+  bool _retrying = false;
+  bool Function()? _ownsSession;
+  Future<void> Function()? _retrySync;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   StreamSubscription<ChatSyncPhase>? _syncSub;
@@ -51,13 +58,24 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
   }
 
   void _checkSyncState() {
-    final clientManager = MatrixClientManager.instance;
+    final clientManager = widget.clientManager ?? MatrixClientManager.instance;
     final onSyncStatus = clientManager.onChatSyncPhase;
     if (onSyncStatus == null) return;
 
     // 若 prevBatch 为 null，说明尚未完成首次同步
     final client = clientManager.client;
     if (client != null && client.prevBatch == null) {
+      final userId = client.userID;
+      final deviceId = client.deviceID;
+      final token = client.accessToken;
+      final homeserver = client.homeserver;
+      _ownsSession = () =>
+          identical(clientManager.client, client) &&
+          client.userID == userId &&
+          client.deviceID == deviceId &&
+          client.accessToken == token &&
+          client.homeserver == homeserver;
+      _retrySync = () => client.oneShotSync(timeout: Duration.zero);
       setState(() {
         _isSyncing = true;
         _visible = true;
@@ -65,11 +83,41 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
       _fadeController.value = 1.0;
 
       _syncSub = onSyncStatus.listen((status) {
-        if (!mounted) return;
+        if (!mounted || !_isSyncing) return;
+        if (_ownsSession?.call() != true) {
+          _hideSyncOverlay();
+          return;
+        }
+        if (status == ChatSyncPhase.error) {
+          setState(() => _hasError = true);
+        }
         if (status == ChatSyncPhase.finished && _isSyncing) {
           _hideSyncOverlay();
         }
       });
+    }
+  }
+
+  Future<void> _retry() async {
+    if (_retrying || !_isSyncing) return;
+    if (_ownsSession?.call() != true) {
+      _hideSyncOverlay();
+      return;
+    }
+    setState(() => _retrying = true);
+    try {
+      await _retrySync?.call();
+    } catch (_) {
+      // Preserve recovery controls. The SDK normally reports failure on its
+      // stream, but transport/start failures can also complete with an error.
+    } finally {
+      if (mounted && _isSyncing) {
+        if (_ownsSession?.call() != true) {
+          _hideSyncOverlay();
+        } else {
+          setState(() => _retrying = false);
+        }
+      }
     }
   }
 
@@ -97,16 +145,37 @@ class _SyncProgressOverlayState extends State<SyncProgressOverlay>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: CircularProgressIndicator(strokeWidth: 3),
-                ),
+                if (_hasError)
+                  Icon(Icons.sync_problem, size: 48, color: secondary)
+                else
+                  const SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: CircularProgressIndicator(strokeWidth: 3),
+                  ),
                 const SizedBox(height: AppDimensions.spacingL),
                 Text(
-                  l10n?.syncInProgress ?? 'Syncing message history...',
+                  _hasError
+                      ? (l10n?.commonLoadFailed ?? 'Failed to load')
+                      : (l10n?.syncInProgress ?? 'Syncing message history...'),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.bodyMedium.copyWith(color: secondary),
+                ),
+                const SizedBox(height: AppDimensions.spacingL),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: AppDimensions.spacingM,
+                  children: [
+                    if (_hasError)
+                      FilledButton(
+                        onPressed: _retrying ? null : _retry,
+                        child: Text(l10n?.commonRetry ?? 'Retry'),
+                      ),
+                    TextButton(
+                      onPressed: _hideSyncOverlay,
+                      child: Text(l10n?.commonClose ?? 'Close'),
+                    ),
+                  ],
                 ),
               ],
             ),
