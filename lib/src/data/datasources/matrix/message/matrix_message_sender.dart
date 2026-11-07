@@ -20,6 +20,7 @@ import '../../../../core/utils/debug_log.dart';
 class MatrixMessageSender {
   final MatrixClientManager _clientManager;
   late final MatrixMediaSender _mediaSender;
+  final Map<Object, Future<bool>> _pendingResends = {};
 
   MatrixMessageSender(
     this._clientManager,
@@ -477,20 +478,83 @@ class MatrixMessageSender {
   }
 
   /// 重发消息
-  Future<bool> resendMessage(String roomId, String eventId) async {
-    final room = await prepareRoomForSending(_client, roomId);
-    if (room == null) return false;
-
-    final event = await room.getEventById(eventId);
-    if (event == null) return false;
-
-    // 获取原始内容并重新发送
-    try {
-      await room.sendEvent(event.content);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<bool> resendMessage(String roomId, String eventId) {
+    final client = _client;
+    if (client == null || !client.isLogged()) return Future.value(false);
+    final user = client.userID,
+        token = client.accessToken,
+        device = client.deviceID,
+        server = client.homeserver;
+    if (user == null || user.isEmpty) return Future.value(false);
+    final key = (client, user, token, device, server, roomId, eventId);
+    bool current() =>
+        identical(_client, client) &&
+        client.isLogged() &&
+        client.userID == user &&
+        client.accessToken == token &&
+        client.deviceID == device &&
+        client.homeserver == server;
+    return _pendingResends.putIfAbsent(key, () async {
+      try {
+        final room = await prepareRoomForSending(client, roomId);
+        if (!current() || room == null || !identical(room.client, client)) {
+          return false;
+        }
+        final event = await room.getEventById(eventId);
+        if (!current() ||
+            !identical(client.getRoomById(roomId), room) ||
+            event == null ||
+            !identical(event.room, room) ||
+            event.senderId != user ||
+            event.status != matrix.EventStatus.error ||
+            event.stateKey != null ||
+            event.type == matrix.EventTypes.Encrypted) {
+          return false;
+        }
+        // Reuse the original transaction for server-side retry idempotency.
+        final originalTransaction = event.transactionId;
+        final transaction =
+            originalTransaction == null || originalTransaction.isEmpty
+            ? eventId
+            : originalTransaction;
+        final isMedia =
+            event.type == matrix.EventTypes.Message &&
+            {
+              matrix.MessageTypes.Image,
+              matrix.MessageTypes.Video,
+              matrix.MessageTypes.Audio,
+              matrix.MessageTypes.File,
+            }.contains(event.messageType);
+        final encryptedFile = event.content['file'];
+        final attachmentUrl = encryptedFile is Map
+            ? encryptedFile['url']
+            : event.content['url'];
+        final attachment = attachmentUrl is String
+            ? Uri.tryParse(attachmentUrl)
+            : null;
+        final alreadyUploaded =
+            attachment != null &&
+            attachment.host.isNotEmpty &&
+            {'mxc', 'https', 'http'}.contains(attachment.scheme);
+        // SDK media retries recover cached files and repeat failed uploads.
+        // Existing remote attachments (including GIFs) do not need a local cache.
+        // Non-media sends retain the event type (including m.sticker).
+        final receipt = isMedia && !alreadyUploaded
+            ? await event.sendAgain(txid: transaction)
+            : await room.sendEvent(
+                event.content,
+                txid: transaction,
+                type: event.type,
+              );
+        return receipt != null && receipt.isNotEmpty;
+      } catch (_) {
+        return false;
+      } finally {
+        // This removes the current operation, not a new asynchronous task.
+        // ignore: unawaited_futures
+        _pendingResends.remove(key);
+      }
+    });
   }
 
   /// 发送系统通知/拍一拍消息
