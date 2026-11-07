@@ -6108,4 +6108,11 @@ class SKo extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       '검토할 수 있도록 현재 초안에 텍스트를 추가합니다. 아무것도 전송되지 않습니다. 첨부 파일, 멘션 및 타이머는 복원되지 않습니다. 이 메시지가 이미 전달되었는지 확인하세요.';
+
+  @override
+  String get backupRecoverLegacyArchive => '이전 로컬 기록 복구';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      '이 기록의 소유자는 확인되지 않았습니다. 본인의 채팅방만 아래 계정으로 복사하세요. 원본은 유지됩니다.';
 }

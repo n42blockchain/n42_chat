@@ -6272,4 +6272,12 @@ class SRu extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Добавьте текст в текущий черновик для проверки. Ничего не будет отправлено. Вложения, упоминания и таймеры не восстанавливаются. Проверьте, не было ли это сообщение уже доставлено.';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'Восстановить старую локальную историю';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Владелец этой истории не подтверждён. Копируйте только свои комнаты в указанную ниже учётную запись. Оригинал сохранится.';
 }

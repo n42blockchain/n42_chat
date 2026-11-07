@@ -2894,5 +2894,7 @@
   "scheduledRecoveryExportHint": "Faili hili lina maandishi ya rasimu na maelezo ya akaunti ambayo hayajasimbwa kwa njia fiche. Viambatisho havijajumuishwa. Chagua mahali unapoamini.",
   "scheduledRecoveryImport": "Ingiza nakala ya urejeshaji",
   "scheduledRecoveryImportHint": "Hifadhi onyesho hili kama nakala ya urejeshaji pekee. Hakuna ujumbe utakaoratibiwa au kutumwa. Viambatisho havijajumuishwa. Mwandishi wa faili hajathibitishwa.",
-  "scheduledRecoveryComposerHint": "Ongeza maandishi kwenye rasimu ya sasa ili uyakague. Hakuna kitakachotumwa. Viambatisho, mitajo na vipima muda havitarejeshwa. Angalia kama ujumbe huu tayari umewasilishwa."
+  "scheduledRecoveryComposerHint": "Ongeza maandishi kwenye rasimu ya sasa ili uyakague. Hakuna kitakachotumwa. Viambatisho, mitajo na vipima muda havitarejeshwa. Angalia kama ujumbe huu tayari umewasilishwa.",
+  "backupRecoverLegacyArchive": "Rejesha historia ya zamani ya kifaa",
+  "backupLegacyArchiveWarning": "Mmiliki wa historia hii hajathibitishwa. Nakili vyumba vyako tu kwenye akaunti iliyo hapa chini. Historia asili itahifadhiwa."
 }

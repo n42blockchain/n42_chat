@@ -6284,4 +6284,12 @@ class SEs extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Añade el texto al borrador actual para revisarlo. No se enviará nada. No se restaurarán los archivos adjuntos, las menciones ni los temporizadores. Comprueba si este mensaje ya se entregó.';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'Recuperar el historial local anterior';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'No se ha verificado a quién pertenece este historial. Copia solo tus salas a la cuenta indicada abajo. Se conserva el original.';
 }

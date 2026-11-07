@@ -6067,6 +6067,13 @@ class SZh extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       '将文本追加到当前草稿以供检查，不会发送消息。附件、提及和定时设置不会恢复。请确认此消息是否已送达。';
+
+  @override
+  String get backupRecoverLegacyArchive => '恢复旧的本地历史';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      '这些历史记录的账号归属未经验证。请仅将属于你的房间复制到下方账号，原始记录会保留。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12132,4 +12139,11 @@ class SZhTw extends SZh {
   @override
   String get scheduledRecoveryComposerHint =>
       '將文字附加到目前草稿以供檢查，不會傳送訊息。附件、提及和定時設定不會還原。請確認此訊息是否已送達。';
+
+  @override
+  String get backupRecoverLegacyArchive => '復原舊的本機歷史';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      '這些歷史記錄的帳號歸屬未經驗證。請僅將屬於你的聊天室複製到下方帳號，原始記錄會保留。';
 }

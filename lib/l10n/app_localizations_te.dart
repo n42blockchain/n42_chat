@@ -6287,4 +6287,12 @@ class STe extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'సమీక్ష కోసం ప్రస్తుత చిత్తుప్రతికి వచనాన్ని జోడించండి. ఏదీ పంపబడదు. జోడింపులు, ప్రస్తావనలు, టైమర్‌లు పునరుద్ధరించబడవు. ఈ సందేశం ఇప్పటికే చేరిందో లేదో తనిఖీ చేయండి.';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'పాత స్థానిక చరిత్రను పునరుద్ధరించండి';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'ఈ చరిత్ర యజమాని ధృవీకరించబడలేదు. మీ గదులను మాత్రమే దిగువ ఖాతాకు కాపీ చేయండి. అసలు చరిత్ర అలాగే ఉంచబడుతుంది.';
 }

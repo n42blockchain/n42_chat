@@ -6243,4 +6243,11 @@ class STr extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'İncelemek için metni mevcut taslağa ekleyin. Hiçbir şey gönderilmez. Ekler, bahsetmeler ve zamanlayıcılar geri yüklenmez. Bu mesajın daha önce iletilip iletilmediğini kontrol edin.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Eski yerel geçmişi kurtar';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Bu geçmişin sahibi doğrulanmamıştır. Yalnızca kendi odalarınızı aşağıdaki hesaba kopyalayın. Orijinal korunur.';
 }

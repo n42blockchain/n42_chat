@@ -6238,4 +6238,12 @@ class SMr extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'तपासण्यासाठी सध्याच्या मसुद्यात मजकूर जोडा. काहीही पाठवले जाणार नाही. संलग्नक, उल्लेख आणि टाइमर पुनर्संचयित होणार नाहीत. हा संदेश आधीच पोहोचला आहे का ते तपासा.';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'जुना स्थानिक इतिहास पुनर्संचयित करा';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'या इतिहासाच्या मालकाची पडताळणी झालेली नाही. फक्त तुमच्या खोल्या खालील खात्यात कॉपी करा. मूळ इतिहास जतन केला जाईल.';
 }

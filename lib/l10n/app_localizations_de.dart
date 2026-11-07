@@ -6291,4 +6291,12 @@ class SDe extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Text zur Prüfung an den aktuellen Entwurf anhängen. Es wird nichts gesendet. Anhänge, Erwähnungen und Timer werden nicht wiederhergestellt. Prüfen Sie, ob diese Nachricht bereits zugestellt wurde.';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'Älteren lokalen Verlauf wiederherstellen';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Der Besitzer dieses Verlaufs ist nicht bestätigt. Kopiere nur deine Räume in das unten angegebene Konto. Das Original bleibt erhalten.';
 }

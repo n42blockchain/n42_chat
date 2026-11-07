@@ -6239,4 +6239,12 @@ class SHi extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'समीक्षा के लिए वर्तमान ड्राफ़्ट में टेक्स्ट जोड़ें। कुछ भी नहीं भेजा जाएगा। अटैचमेंट, उल्लेख और टाइमर बहाल नहीं होंगे। जाँचें कि यह संदेश पहले ही पहुँच चुका है या नहीं।';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'पुराना स्थानीय इतिहास पुनर्स्थापित करें';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'इस इतिहास के मालिक की पुष्टि नहीं हुई है। केवल अपने कमरे नीचे दिए खाते में कॉपी करें। मूल इतिहास सुरक्षित रहेगा।';
 }

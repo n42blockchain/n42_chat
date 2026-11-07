@@ -6253,4 +6253,11 @@ class SId extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Tambahkan teks ke draf saat ini untuk ditinjau. Tidak ada yang dikirim. Lampiran, sebutan, dan pengatur waktu tidak dipulihkan. Periksa apakah pesan ini sudah terkirim.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Pulihkan riwayat lokal lama';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Pemilik riwayat ini belum diverifikasi. Salin hanya ruang milik Anda ke akun di bawah. Riwayat asli tetap disimpan.';
 }

@@ -2894,5 +2894,7 @@
   "scheduledRecoveryExportHint": "Diese Datei enthält unverschlüsselten Entwurfstext und Kontodaten. Anhänge sind nicht enthalten. Wähle ein vertrauenswürdiges Ziel.",
   "scheduledRecoveryImport": "Wiederherstellungskopie importieren",
   "scheduledRecoveryImportHint": "Diese Vorschau nur als Wiederherstellungskopie speichern. Es werden keine Nachrichten geplant oder gesendet. Anhänge sind nicht enthalten. Der Dateiautor ist nicht verifiziert.",
-  "scheduledRecoveryComposerHint": "Text zur Prüfung an den aktuellen Entwurf anhängen. Es wird nichts gesendet. Anhänge, Erwähnungen und Timer werden nicht wiederhergestellt. Prüfen Sie, ob diese Nachricht bereits zugestellt wurde."
+  "scheduledRecoveryComposerHint": "Text zur Prüfung an den aktuellen Entwurf anhängen. Es wird nichts gesendet. Anhänge, Erwähnungen und Timer werden nicht wiederhergestellt. Prüfen Sie, ob diese Nachricht bereits zugestellt wurde.",
+  "backupRecoverLegacyArchive": "Älteren lokalen Verlauf wiederherstellen",
+  "backupLegacyArchiveWarning": "Der Besitzer dieses Verlaufs ist nicht bestätigt. Kopiere nur deine Räume in das unten angegebene Konto. Das Original bleibt erhalten."
 }

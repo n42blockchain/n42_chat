@@ -6241,4 +6241,12 @@ class SBn extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'পর্যালোচনার জন্য বর্তমান খসড়ায় পাঠ্য যোগ করুন। কিছুই পাঠানো হবে না। সংযুক্তি, উল্লেখ ও টাইমার পুনরুদ্ধার হবে না। বার্তাটি ইতিমধ্যে পৌঁছেছে কি না যাচাই করুন।';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'পুরোনো স্থানীয় ইতিহাস পুনরুদ্ধার করুন';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'এই ইতিহাসের মালিক যাচাই করা হয়নি। শুধু আপনার কক্ষগুলো নিচের অ্যাকাউন্টে কপি করুন। মূল ইতিহাস রাখা হবে।';
 }

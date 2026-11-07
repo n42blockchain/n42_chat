@@ -2894,5 +2894,7 @@
   "scheduledRecoveryExportHint": "Este archivo contiene texto de borradores y datos de la cuenta sin cifrar. No incluye archivos adjuntos. Elige un destino de confianza.",
   "scheduledRecoveryImport": "Importar copia de recuperación",
   "scheduledRecoveryImportHint": "Guardar esta vista previa solo como copia de recuperación. No se programarán ni enviarán mensajes. No se incluyen archivos adjuntos. El autor del archivo no está verificado.",
-  "scheduledRecoveryComposerHint": "Añade el texto al borrador actual para revisarlo. No se enviará nada. No se restaurarán los archivos adjuntos, las menciones ni los temporizadores. Comprueba si este mensaje ya se entregó."
+  "scheduledRecoveryComposerHint": "Añade el texto al borrador actual para revisarlo. No se enviará nada. No se restaurarán los archivos adjuntos, las menciones ni los temporizadores. Comprueba si este mensaje ya se entregó.",
+  "backupRecoverLegacyArchive": "Recuperar el historial local anterior",
+  "backupLegacyArchiveWarning": "No se ha verificado a quién pertenece este historial. Copia solo tus salas a la cuenta indicada abajo. Se conserva el original."
 }

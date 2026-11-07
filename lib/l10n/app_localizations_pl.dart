@@ -6280,4 +6280,11 @@ class SPl extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Dołącz tekst do bieżącej wersji roboczej do sprawdzenia. Nic nie zostanie wysłane. Załączniki, wzmianki i minutniki nie zostaną przywrócone. Sprawdź, czy ta wiadomość została już dostarczona.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Przywróć starszą historię lokalną';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Właściciel tej historii nie został zweryfikowany. Skopiuj tylko swoje pokoje do konta poniżej. Oryginał zostanie zachowany.';
 }

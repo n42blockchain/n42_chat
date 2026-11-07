@@ -6229,4 +6229,11 @@ class SVi extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Thêm văn bản vào bản nháp hiện tại để xem lại. Không có gì được gửi. Tệp đính kèm, lượt nhắc và bộ hẹn giờ không được khôi phục. Hãy kiểm tra xem tin nhắn này đã được giao chưa.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Khôi phục lịch sử cục bộ cũ';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Chưa xác minh chủ sở hữu lịch sử này. Chỉ sao chép phòng của bạn vào tài khoản bên dưới. Bản gốc được giữ lại.';
 }

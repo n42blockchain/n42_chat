@@ -6275,6 +6275,13 @@ class SPt extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Recuperar histórico local anterior';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'O proprietário deste histórico não foi verificado. Copie apenas as suas salas para a conta abaixo. O original é mantido.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12549,4 +12556,11 @@ class SPtBr extends SPt {
   @override
   String get scheduledRecoveryComposerHint =>
       'Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Recuperar histórico local anterior';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'O proprietário deste histórico não foi verificado. Copie apenas suas salas para a conta abaixo. O original será mantido.';
 }

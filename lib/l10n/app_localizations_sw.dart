@@ -6273,4 +6273,12 @@ class SSw extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Ongeza maandishi kwenye rasimu ya sasa ili uyakague. Hakuna kitakachotumwa. Viambatisho, mitajo na vipima muda havitarejeshwa. Angalia kama ujumbe huu tayari umewasilishwa.';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'Rejesha historia ya zamani ya kifaa';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Mmiliki wa historia hii hajathibitishwa. Nakili vyumba vyako tu kwenye akaunti iliyo hapa chini. Historia asili itahifadhiwa.';
 }

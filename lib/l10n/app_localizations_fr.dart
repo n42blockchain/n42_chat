@@ -6309,4 +6309,12 @@ class SFr extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Ajoutez le texte au brouillon actuel pour le vérifier. Rien ne sera envoyé. Les pièces jointes, mentions et minuteries ne seront pas restaurées. Vérifiez si ce message a déjà été remis.';
+
+  @override
+  String get backupRecoverLegacyArchive =>
+      'Restaurer un ancien historique local';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Le propriétaire de cet historique n’est pas vérifié. Copiez uniquement vos salons vers le compte ci-dessous. L’original est conservé.';
 }

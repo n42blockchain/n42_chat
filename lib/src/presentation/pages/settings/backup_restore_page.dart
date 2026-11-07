@@ -9,6 +9,8 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_backup_service.dart';
+import '../../../core/services/legacy_archive_recovery_service.dart';
+import 'legacy_archive_recovery_section.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/backup/backup_bloc.dart';
 import '../../blocs/backup/backup_event.dart';
@@ -70,6 +72,8 @@ class _BackupRestoreView extends StatelessWidget {
               _BackupHistorySection(state: state),
               const SizedBox(height: AppDimensions.spacing),
               _RestoreSection(state: state),
+              if (GetIt.instance.isRegistered<LegacyArchiveRecoveryService>())
+                LegacyArchiveRecoverySection(service: GetIt.instance<LegacyArchiveRecoveryService>()),
               const SizedBox(height: AppDimensions.spacingXXL),
             ],
           );

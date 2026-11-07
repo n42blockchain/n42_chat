@@ -15,6 +15,15 @@ class LegacyArchivePreview {
     : roomMessageCounts = Map.unmodifiable(rooms);
 
   String get targetUserId => _target.userId;
+
+  bool get isCurrent {
+    try {
+      _target.ensureCurrent();
+      return true;
+    } on StateError {
+      return false;
+    }
+  }
 }
 
 /// Copies selected unowned history only after explicit ownership confirmation.

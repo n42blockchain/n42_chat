@@ -11488,6 +11488,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered.'**
   String get scheduledRecoveryComposerHint;
+
+  /// No description provided for @backupRecoverLegacyArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover older local history'**
+  String get backupRecoverLegacyArchive;
+
+  /// No description provided for @backupLegacyArchiveWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This history has no verified owner. Copy only your rooms to the account below. The original is kept.'**
+  String get backupLegacyArchiveWarning;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

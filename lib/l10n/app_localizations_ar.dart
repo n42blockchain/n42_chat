@@ -6213,4 +6213,11 @@ class SAr extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'أضف النص إلى المسودة الحالية لمراجعته. لن تُرسل أي رسالة. لن تُستعاد المرفقات أو الإشارات أو المؤقتات. تحقق مما إذا كانت هذه الرسالة قد وصلت بالفعل.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'استعادة السجل المحلي القديم';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'لم يتم التحقق من مالك هذا السجل. انسخ غرفك فقط إلى الحساب أدناه. سيُحتفظ بالأصل.';
 }

@@ -6255,4 +6255,11 @@ class SUr extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'جائزے کے لیے موجودہ مسودے میں متن شامل کریں۔ کچھ بھی نہیں بھیجا جائے گا۔ منسلکات، تذکرے اور ٹائمر بحال نہیں ہوں گے۔ چیک کریں کہ آیا یہ پیغام پہلے ہی پہنچ چکا ہے۔';
+
+  @override
+  String get backupRecoverLegacyArchive => 'پرانی مقامی تاریخ بحال کریں';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'اس تاریخ کے مالک کی تصدیق نہیں ہوئی۔ صرف اپنے کمرے نیچے دیے گئے اکاؤنٹ میں نقل کریں۔ اصل محفوظ رہے گا۔';
 }

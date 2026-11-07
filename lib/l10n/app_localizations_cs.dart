@@ -6253,4 +6253,11 @@ class SCs extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Připojte text k aktuálnímu konceptu ke kontrole. Nic se neodešle. Přílohy, zmínky ani časovače se neobnoví. Zkontrolujte, zda již byla zpráva doručena.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Obnovit starší místní historii';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Vlastník této historie nebyl ověřen. Zkopírujte pouze své místnosti do níže uvedeného účtu. Originál zůstane zachován.';
 }

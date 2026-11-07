@@ -2282,5 +2282,7 @@
   "scheduledRecoveryExportHint": "此檔案包含未加密的草稿文字和帳號資訊，不包含附件。請選擇可信任的儲存或分享位置。",
   "scheduledRecoveryImport": "匯入復原副本",
   "scheduledRecoveryImportHint": "僅將預覽內容儲存為復原副本，不會排程或傳送訊息。檔案不含附件，檔案作者未經驗證。",
-  "scheduledRecoveryComposerHint": "將文字附加到目前草稿以供檢查，不會傳送訊息。附件、提及和定時設定不會還原。請確認此訊息是否已送達。"
+  "scheduledRecoveryComposerHint": "將文字附加到目前草稿以供檢查，不會傳送訊息。附件、提及和定時設定不會還原。請確認此訊息是否已送達。",
+  "backupRecoverLegacyArchive": "復原舊的本機歷史",
+  "backupLegacyArchiveWarning": "這些歷史記錄的帳號歸屬未經驗證。請僅將屬於你的聊天室複製到下方帳號，原始記錄會保留。"
 }

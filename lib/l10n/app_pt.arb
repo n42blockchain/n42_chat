@@ -2894,5 +2894,7 @@
   "scheduledRecoveryExportHint": "Este ficheiro contém texto de rascunhos e dados da conta não encriptados. Os anexos não estão incluídos. Escolha um destino de confiança.",
   "scheduledRecoveryImport": "Importar cópia de recuperação",
   "scheduledRecoveryImportHint": "Guardar esta pré-visualização apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do ficheiro não foi verificado.",
-  "scheduledRecoveryComposerHint": "Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue."
+  "scheduledRecoveryComposerHint": "Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue.",
+  "backupRecoverLegacyArchive": "Recuperar histórico local anterior",
+  "backupLegacyArchiveWarning": "O proprietário deste histórico não foi verificado. Copie apenas as suas salas para a conta abaixo. O original é mantido."
 }

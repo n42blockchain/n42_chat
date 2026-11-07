@@ -6105,4 +6105,11 @@ class SJa extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       '確認用に現在の下書きへテキストを追加します。送信はされません。添付ファイル、メンション、タイマーは復元されません。このメッセージがすでに配信されていないか確認してください。';
+
+  @override
+  String get backupRecoverLegacyArchive => '以前のローカル履歴を復元';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'この履歴の所有者は確認されていません。自分のルームだけを下のアカウントにコピーしてください。元の履歴は保持されます。';
 }

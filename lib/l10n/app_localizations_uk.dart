@@ -6273,4 +6273,11 @@ class SUk extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Додайте текст до поточної чернетки для перевірки. Нічого не буде надіслано. Вкладення, згадки й таймери не відновлюються. Перевірте, чи це повідомлення вже було доставлено.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Відновити стару локальну історію';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Власника цієї історії не підтверджено. Копіюйте лише свої кімнати до вказаного нижче облікового запису. Оригінал збережеться.';
 }

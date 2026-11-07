@@ -6212,4 +6212,11 @@ class SEn extends S {
   @override
   String get scheduledRecoveryComposerHint =>
       'Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Recover older local history';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'This history has no verified owner. Copy only your rooms to the account below. The original is kept.';
 }
