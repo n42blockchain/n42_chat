@@ -206,6 +206,7 @@ void main() {
         when(
           () => service.restoreFromBackup(
             backupFilePath: '/tmp/fixture.n42backup',
+            restoreMessages: true,
             isCurrent: any(named: 'isCurrent'),
             onProgress: any(named: 'onProgress'),
           ),
@@ -234,6 +235,7 @@ void main() {
         when(
           () => service.restoreFromBackup(
             backupFilePath: '/tmp/fixture.n42backup',
+            restoreMessages: true,
             password: 'fixture-password',
             isCurrent: any(named: 'isCurrent'),
             onProgress: any(named: 'onProgress'),
@@ -329,6 +331,7 @@ void main() {
           verifyNever(
             () => service.restoreFromBackup(
               backupFilePath: '/tmp/fixture.n42backup',
+            restoreMessages: true,
               password: 'fixture-password',
               isCurrent: any(named: 'isCurrent'),
               onProgress: any(named: 'onProgress'),
@@ -343,6 +346,7 @@ void main() {
         verify(
           () => service.restoreFromBackup(
             backupFilePath: '/tmp/fixture.n42backup',
+            restoreMessages: true,
             password: 'fixture-password',
             isCurrent: any(named: 'isCurrent'),
             onProgress: any(named: 'onProgress'),
@@ -371,6 +375,7 @@ void main() {
         await tester.pumpAndSettle();
         final verification = () => service.restoreFromBackup(
           backupFilePath: '/tmp/fixture.n42backup',
+            restoreMessages: true,
           isCurrent: any(named: 'isCurrent'),
           onProgress: any(named: 'onProgress'),
         );

@@ -589,7 +589,7 @@ class _RestoreSection extends StatelessWidget {
           );
           if (confirmed != true || !context.mounted || !current()) return;
           context.read<BackupBloc>().add(
-            RestoreFromBackup(backupFilePath: filePath, password: password, isCurrent: current),
+            RestoreFromBackup(backupFilePath: filePath, password: password, restoreMessages: true, isCurrent: current),
           );
         }
       }

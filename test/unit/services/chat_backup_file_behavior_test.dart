@@ -797,6 +797,64 @@ void main() {
     expect((await service.listBackups()).single.backupId, owned.backupId);
   });
 
+  test('combined restore uses one snapshot for settings and selected-room history', () async {
+    final database = ArchiveDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(database.close);
+    service.setArchiveService(MessageArchiveService(db: database, clientManager: manager));
+    final file = File('${directory.path}/combined.n42backup');
+    Map<String, dynamic> message(String id, String body) => {
+      'eventId': id, 'sender': '@alice:example.org', 'type': 'm.text', 'body': body, 'ts': 100,
+    };
+    await file.writeAsString(jsonEncode({
+      'manifest': {'backupId': 'combined', 'owner': {'userId': '@alice:example.org', 'homeserver': 'https://example.org'}},
+      'settings': {'n42_chat_settings': '{"fixture":"restored"}'},
+      'rooms': {
+        '!selected:example.org': {'messages': [message('retained', 'original snapshot'),
+          message('private', 'must not return'), {...message('private', 'private'), 'isViewOnce': true}]},
+        '!excluded:example.org': {'messages': [message('excluded', 'not selected')]},
+      },
+    }));
+    final result = await service.restoreFromBackup(backupFilePath: file.path,
+      restoreMessages: true, roomIds: ['!selected:example.org'],
+      onProgress: (progress) { if (progress == 0.5) file.writeAsStringSync('replaced file'); });
+    expect(result.errors, isEmpty);
+    expect(result.roomsRestored, 1);
+    expect(result.settingsRestored, 1);
+    expect(await preferences.read('n42_chat_settings'), contains('restored'));
+    expect((await database.getMessages('!selected:example.org')).single.body, 'original snapshot');
+    expect(await database.isEventArchived('private'), isFalse);
+    expect(await database.isEventArchived('excluded'), isFalse);
+  });
+
+  test('requested message restoration reports unavailable archive instead of success', () async {
+    final backup = await service.createBackup();
+    final result = await service.restoreFromBackup(backupFilePath: backup.filePath,
+      restoreMessages: true, restoreSettings: false);
+    expect(result.hasErrors, isTrue);
+    expect(result.errors, contains('Archive service not available'));
+    expect(result.roomsRestored, 0);
+  });
+
+  test('combined restore cancels before message writes when confirmation expires', () async {
+    final database = ArchiveDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(database.close);
+    service.setArchiveService(MessageArchiveService(db: database, clientManager: manager));
+    final file = File('${directory.path}/cancelled-combined.n42backup');
+    await file.writeAsString(jsonEncode({
+      'manifest': {'backupId': 'cancelled'},
+      'rooms': {'!selected:example.org': {'messages': [
+        {'eventId': 'not-restored', 'sender': '@alice:example.org', 'type': 'm.text', 'body': 'not restored', 'ts': 100},
+      ]}},
+    }));
+    var current = true;
+    final result = await service.restoreFromBackup(backupFilePath: file.path,
+      restoreMessages: true, restoreSettings: false, isCurrent: () => current,
+      onProgress: (progress) { if (progress > 0.5 && progress < 1) current = false; });
+    expect(result.hasErrors, isTrue);
+    expect(await database.getMessageCount('!selected:example.org'), 0);
+    expect(await database.searchMessages('restored'), isEmpty);
+  });
+
   test('list ignores unrelated files and directories', () async {
     await File('${directory.path}/notes.txt').writeAsString('ignore');
     await Directory('${directory.path}/folder.n42backup').create();

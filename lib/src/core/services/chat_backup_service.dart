@@ -818,6 +818,26 @@ class ChatBackupService {
   Future<RestoreResult> restoreToArchive({
     required String backupFilePath,
     String? password,
+    List<String>? roomIds,
+    void Function(double progress)? onProgress,
+  }) async {
+    if (_archiveService == null) {
+      return const RestoreResult(errors: ['Archive service not available']);
+    }
+    final ensureCurrent = _captureBackupSession();
+    try {
+      final data = await _readBackupData(backupFilePath, password: password);
+      ensureCurrent();
+      return await _restoreArchiveData(data, roomIds: roomIds,
+        checkCurrent: ensureCurrent, onProgress: onProgress);
+    } catch (error) {
+      return RestoreResult(errors: ['Restore to archive failed: $error']);
+    }
+  }
+
+  Future<RestoreResult> _restoreArchiveData(Map<String, dynamic> data, {
+    List<String>? roomIds,
+    void Function()? checkCurrent,
     void Function(double progress)? onProgress,
   }) async {
     if (_archiveService == null) {
@@ -831,6 +851,7 @@ class ChatBackupService {
     final server = origin?.homeserver;
     final archiveDb = _archiveService!;
     void ensureCurrent() {
+      checkCurrent?.call();
       if (!identical(_clientManager.client, origin) ||
           !identical(_archiveService, archiveDb) ||
           origin?.userID != user ||
@@ -842,7 +863,6 @@ class ChatBackupService {
     }
 
     try {
-      final data = await _readBackupData(backupFilePath, password: password);
       ensureCurrent();
       final ownerError = _backupOwnerError(data['manifest']);
       if (ownerError != null) return RestoreResult(errors: [ownerError]);
@@ -851,7 +871,7 @@ class ChatBackupService {
 
       onProgress?.call(0.1);
 
-      final roomEntries = rooms.entries.toList();
+      final roomEntries = rooms.entries.where((entry) => roomIds == null || roomIds.contains(entry.key)).toList();
       var roomsRestored = 0;
 
       for (var i = 0; i < roomEntries.length; i++) {
@@ -1033,6 +1053,7 @@ class ChatBackupService {
     List<String>? roomIds,
     bool restoreSettings = true,
     bool restoreKeys = false,
+    bool restoreMessages = false,
     bool Function()? isCurrent,
     void Function(double progress)? onProgress,
   }) async {
@@ -1086,16 +1107,25 @@ class ChatBackupService {
         warnings.add(_unsupportedKeyBackupWarning);
       }
 
-      // 注意：消息恢复依赖 Matrix 同步机制
-      // 本地备份主要用于保留设置和加密密钥
-      // 消息会在重新登录后从服务器同步
+      var roomsRestored = 0;
+      if (restoreMessages) {
+        final archived = await _restoreArchiveData(data,
+          roomIds: roomIds, checkCurrent: ensureCurrent,
+          onProgress: (progress) => onProgress?.call(0.5 + 0.5 * progress));
+        ensureCurrent();
+        roomsRestored = archived.roomsRestored;
+        errors.addAll(archived.errors);
+        for (final warning in archived.warnings) {
+          if (!warnings.contains(warning)) warnings.add(warning);
+        }
+      }
 
       ensureCurrent();
       onProgress?.call(1.0);
       ensureCurrent();
 
       return RestoreResult(
-        roomsRestored: 0,
+        roomsRestored: roomsRestored,
         settingsRestored: settingsRestored,
         keysRestored: false,
         errors: errors,

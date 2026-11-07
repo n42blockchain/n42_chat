@@ -120,6 +120,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
         roomIds: event.roomIds,
         restoreSettings: event.restoreSettings,
         restoreKeys: event.restoreKeys,
+        restoreMessages: event.restoreMessages,
         isCurrent: event.isCurrent,
         onProgress: (progress) {
           debugLog('Restore progress: ${(progress * 100).toInt()}%');
@@ -139,7 +140,7 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
         emit(state.copyWith(
           isRestoring: false,
           successMessage: _composeMessage(
-            result.roomsRestored > 0
+            event.restoreMessages || result.roomsRestored > 0
                 ? 'Restored ${result.settingsRestored} settings from ${result.roomsRestored} rooms'
                 : 'Restored ${result.settingsRestored} settings. Messages will sync from server after login.',
             result.warnings,
