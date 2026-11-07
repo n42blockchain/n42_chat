@@ -107,6 +107,34 @@ void main() {
       expect(bloc.state, const SearchInitial());
     },
   );
+  test('stream error clears visible private results', () async {
+    bloc.add(const PerformSearch('secret'));
+    await settle();
+    expect(bloc.state, isA<SearchLoaded>());
+    clearInteractions(repo);
+    changes.addError(StateError('session observer failed'));
+    await pumpEventQueue();
+    expect(bloc.state, const SearchInitial());
+    verifyNever(() => repo.getRecentSearches());
+  });
+
+  test(
+    'stream error cancels pending search before its late completion',
+    () async {
+      final gate = Completer<SearchResults>();
+      when(() => repo.searchGlobal('secret', type: null))
+          .thenAnswer((_) => gate.future);
+      bloc.add(const PerformSearch('secret'));
+      await settle();
+      changes.addError(StateError('session observer failed'));
+      await pumpEventQueue();
+      gate.complete(const SearchResults(query: 'old private result'));
+      await pumpEventQueue();
+      expect(bloc.state, const SearchInitial());
+      verifyNever(() => repo.getRecentSearches());
+    },
+  );
+
   test('new search still works after invalidation', () async {
     changes.add(null);
     await pumpEventQueue();
