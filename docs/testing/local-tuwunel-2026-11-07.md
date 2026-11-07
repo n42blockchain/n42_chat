@@ -21,3 +21,7 @@
 The independent live message smoke completed with exit 0 against this local environment. Ten checked steps include registration, room creation, normalized UTF-8/rich-text content, reply relations, edit aggregation, reaction/redaction, thread relations, and anonymous poll/vote/end round trips through the SDK and app mapper. Result and log hash: local-tuwunel-messages-2026-11-07.json. This is not encrypted, cross-device or production acceptance.
 
 These rooms are not encrypted. Production identities, real E2EE and device verification, key recovery/revocation, mobile push/calls, large-transfer limits, mobile memory/disk behavior and physical-device acceptance remain open. Temporary QA accounts are logged out, not deactivated; only this owned disposable database contains them. Retain evidence before shutting down and cleaning up owned QA resources. Do not reuse any production credential or change production registration policy.
+
+## Legacy CLI regression
+
+The hardened `tool/server_test.dart` completed against the same owned loopback server using a new random disposable account: 13 checks passed, zero failed, exit 0. This includes registration-token UIA, profile read/write, sync, room creation, text send, user/public-room queries and logout. The registration token is absent from the private log. The structured record is `local-tuwunel-legacy-2026-11-07.json`. This test remains single-account and unencrypted; E2EE, recovery, push and production acceptance remain open.
