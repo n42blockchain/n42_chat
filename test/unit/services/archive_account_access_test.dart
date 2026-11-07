@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:drift/native.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/archive_account_access.dart';
 import 'package:n42_chat/src/core/services/archive_search_service.dart';
+import 'package:n42_chat/src/core/services/message_archive_service.dart';
 import 'package:n42_chat/src/data/datasources/local/archive_database.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 
@@ -107,6 +109,106 @@ void main() {
       },
     );
   }
+
+  test(
+    'archive reads writes and deletion stay within the selected account',
+    () async {
+      final service = MessageArchiveService.accountScoped(
+        access: access,
+        clientManager: manager,
+      );
+      final entry = ArchivedMessagesCompanion.insert(
+        eventId: 'shared-event',
+        roomId: '!shared:example.org',
+        senderId: '@alice:example.org',
+        originServerTs: 200,
+        type: 'm.room.message',
+        body: const Value('alice only'),
+        quarter: 202601,
+        archivedAt: DateTime(2026),
+      );
+      expect(
+        await service.importArchivedMessages('!shared:example.org', [entry]),
+        1,
+      );
+      expect(await service.isEventArchived('shared-event'), isTrue);
+      identify('@bob:example.org');
+      expect(await service.isEventArchived('shared-event'), isFalse);
+      expect(
+        (await service.getArchivedMessages('!shared:example.org'))
+            .single
+            .eventId,
+        'event-bob',
+      );
+      expect(
+        (await service.getArchiveStatus('!shared:example.org')).totalArchived,
+        1,
+      );
+      await service.deleteArchivedMessage('shared-event');
+      identify('@alice:example.org');
+      expect(await service.isEventArchived('shared-event'), isTrue);
+      expect(
+        (await service.getArchiveStatus('!shared:example.org')).totalArchived,
+        2,
+      );
+      expect(await service.getQuarterlyStats('!shared:example.org'), {
+        202601: 2,
+      });
+      expect(await service.getArchivedRoomIds(), ['!shared:example.org']);
+      expect((await service.getTotalStats()).totalMessages, 2);
+    },
+  );
+
+  test(
+    'account change during metadata write rolls back the complete import',
+    () async {
+      final database = ArchiveDatabase.forTesting(
+        NativeDatabase.memory(
+          setup: (db) {
+            db.createFunction(
+              functionName: 'switch_account',
+              directOnly: false,
+              function: (_) {
+                identify('@bob:example.org');
+                return 0;
+              },
+            );
+          },
+        ),
+      );
+      addTearDown(database.close);
+      await database.customStatement('''
+      CREATE TRIGGER change_account BEFORE INSERT ON archive_metadata
+      BEGIN SELECT switch_account(); END
+    ''');
+      final scoped = ArchiveAccountAccess(
+        clientManager: manager,
+        open: (_, _) async => database,
+      );
+      final service = MessageArchiveService.accountScoped(
+        access: scoped,
+        clientManager: manager,
+      );
+      await expectLater(
+        service.importArchivedMessages('!shared:example.org', [
+          ArchivedMessagesCompanion.insert(
+            eventId: 'rollback',
+            roomId: '!shared:example.org',
+            senderId: '@alice:example.org',
+            originServerTs: 300,
+            type: 'm.room.message',
+            body: const Value('rollback text'),
+            quarter: 202601,
+            archivedAt: DateTime(2026),
+          ),
+        ]),
+        throwsStateError,
+      );
+      expect(await database.getMessageCount('!shared:example.org'), 0);
+      expect(await database.searchMessages('rollback'), isEmpty);
+      expect(await database.getMetadata('!shared:example.org'), isNull);
+    },
+  );
 
   test('count completed after account switch is suppressed', () async {
     final database = _Database();

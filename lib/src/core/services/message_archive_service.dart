@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../data/datasources/local/archive_database.dart';
 import '../../data/datasources/matrix/matrix_client_manager.dart';
 import '../utils/debug_log.dart';
+import 'archive_account_access.dart';
 
 /// 归档操作结果
 class ArchiveResult {
@@ -51,14 +52,41 @@ class ArchiveStatus {
 ///
 /// 与 MatrixSdkDatabase 完全隔离，归档层故障不影响正常聊天。
 class MessageArchiveService {
-  final ArchiveDatabase _db;
+  final ArchiveDatabase? _db;
+  final ArchiveAccountAccess? _accountAccess;
   final MatrixClientManager _clientManager;
 
   MessageArchiveService({
     required ArchiveDatabase db,
     required MatrixClientManager clientManager,
   }) : _db = db,
+       _accountAccess = null,
        _clientManager = clientManager;
+
+  MessageArchiveService.accountScoped({
+    required ArchiveAccountAccess access,
+    required MatrixClientManager clientManager,
+  }) : _db = null,
+       _accountAccess = access,
+       _clientManager = clientManager;
+
+  Future<T> _withDatabase<T>(
+    Future<T> Function(ArchiveDatabase) action, {
+    bool write = false,
+  }) async {
+    final lease = await _accountAccess?.capture();
+    final database = lease?.database ?? _db!;
+    Future<T> execute() async {
+      lease?.ensureCurrent();
+      final result = await action(database);
+      lease?.ensureCurrent();
+      return result;
+    }
+
+    final result = await (write ? database.transaction(execute) : execute());
+    lease?.ensureCurrent();
+    return result;
+  }
 
   matrix.Client? get _client => _clientManager.client;
 
@@ -78,7 +106,10 @@ class MessageArchiveService {
     final token = origin?.accessToken;
     final device = origin?.deviceID;
     final server = origin?.homeserver;
+    final lease = await _accountAccess?.capture();
+    final database = lease?.database ?? _db!;
     void ensureCurrent() {
+      lease?.ensureCurrent();
       if (!identical(_client, origin) ||
           origin?.userID != user ||
           origin?.accessToken != token ||
@@ -151,7 +182,7 @@ class MessageArchiveService {
       // known redactions before insert-or-ignore can preserve old plaintext.
       for (final event in List<matrix.Event>.of(timeline.events)) {
         ensureCurrent();
-        if (event.redacted) await _db.redactByEventId(event.eventId);
+        if (event.redacted) await database.redactByEventId(event.eventId);
       }
 
       ensureCurrent();
@@ -194,9 +225,9 @@ class MessageArchiveService {
         final end = (i + batchSize).clamp(0, companions.length);
         final batch = companions.sublist(i, end);
         ensureCurrent();
-        final inserted = await _db.transaction(() async {
+        final inserted = await database.transaction(() async {
           ensureCurrent();
-          final count = await importArchivedMessages(roomId, batch);
+          final count = await _importEntries(database, roomId, batch);
           ensureCurrent();
           return count;
         });
@@ -226,23 +257,25 @@ class MessageArchiveService {
     String? beforeEventId,
     int limit = 50,
   }) async {
-    return _db.getMessages(
-      roomId,
-      beforeTimestamp: beforeTimestamp,
-      beforeEventId: beforeEventId,
-      limit: limit,
+    return _withDatabase(
+      (db) => db.getMessages(
+        roomId,
+        beforeTimestamp: beforeTimestamp,
+        beforeEventId: beforeEventId,
+        limit: limit,
+      ),
     );
   }
 
   /// 按季度统计
   Future<Map<int, int>> getQuarterlyStats(String roomId) async {
-    return _db.getQuarterlyStats(roomId);
+    return _withDatabase((db) => db.getQuarterlyStats(roomId));
   }
 
   /// Removes redacted/self-destructed content from the full-text archive.
   Future<void> deleteArchivedMessage(String eventId) async {
     try {
-      await _db.redactByEventId(eventId);
+      await _withDatabase((db) => db.redactByEventId(eventId), write: true);
     } catch (e) {
       // Redaction must still complete if the local search cache is damaged,
       // but keep an observable signal for the residual plaintext risk.
@@ -254,24 +287,26 @@ class MessageArchiveService {
 
   /// 获取归档状态
   Future<ArchiveStatus> getArchiveStatus(String roomId) async {
-    final metadata = await _db.getMetadata(roomId);
-    final count = await _db.getMessageCount(roomId);
-    return ArchiveStatus(
-      roomId: roomId,
-      totalArchived: count,
-      lastArchiveTime: metadata?.lastArchiveTime,
-      lastArchivedEventId: metadata?.lastArchivedEventId,
-    );
+    return _withDatabase((db) async {
+      final metadata = await db.getMetadata(roomId);
+      final count = await db.getMessageCount(roomId);
+      return ArchiveStatus(
+        roomId: roomId,
+        totalArchived: count,
+        lastArchiveTime: metadata?.lastArchiveTime,
+        lastArchivedEventId: metadata?.lastArchivedEventId,
+      );
+    });
   }
 
   /// 获取归档数据库总统计
   Future<ArchiveTotalStats> getTotalStats() async {
-    return _db.getTotalStats();
+    return _withDatabase((db) => db.getTotalStats());
   }
 
   /// 获取所有有归档的房间 ID
   Future<List<String>> getArchivedRoomIds() async {
-    return _db.getArchivedRoomIds();
+    return _withDatabase((db) => db.getArchivedRoomIds());
   }
 
   /// 导入外部备份中的归档消息
@@ -286,20 +321,31 @@ class MessageArchiveService {
       throw ArgumentError('Archive entries must belong to the target room');
     }
 
-    return _db.transaction(() async {
-      final inserted = await _db.insertMessages(entries);
+    return _withDatabase(
+      (db) => _importEntries(db, roomId, entries),
+      write: true,
+    );
+  }
+
+  Future<int> _importEntries(
+    ArchiveDatabase db,
+    String roomId,
+    List<ArchivedMessagesCompanion> entries,
+  ) async {
+    return db.transaction(() async {
+      final inserted = await db.insertMessages(entries);
       if (inserted == 0) return 0;
 
       // Input rows can be old or ignored duplicates. Derive both cursor fields
       // from the same persisted row rather than mixing input with old metadata.
-      final latest = (await _db.getMessages(roomId, limit: 1)).first;
+      final latest = (await db.getMessages(roomId, limit: 1)).first;
 
-      await _db.updateMetadata(
+      await db.updateMetadata(
         ArchiveMetadataCompanion(
           roomId: Value(roomId),
           lastArchivedEventId: Value(latest.eventId),
           lastArchivedTs: Value(latest.originServerTs),
-          totalArchived: Value(await _db.getMessageCount(roomId)),
+          totalArchived: Value(await db.getMessageCount(roomId)),
           lastArchiveTime: Value(DateTime.now()),
         ),
       );
@@ -309,7 +355,7 @@ class MessageArchiveService {
   }
 
   Future<bool> isEventArchived(String eventId) async {
-    return _db.isEventArchived(eventId);
+    return _withDatabase((db) => db.isEventArchived(eventId));
   }
 
   // ============================================
