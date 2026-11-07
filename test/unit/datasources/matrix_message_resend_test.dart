@@ -183,6 +183,34 @@ void main() {
       verifyNever(() => media.sendAgain(txid: 'original-tx'));
     },
   );
+  test('account switch during cache lookup blocks media retry', () async {
+    final media = _Event();
+    final database = _Database();
+    final entered = Completer<void>();
+    final cached = Completer<Uint8List?>();
+    event = media;
+    when(() => client.database).thenReturn(database);
+    when(() => media.room).thenReturn(room);
+    when(() => media.senderId).thenReturn('@me:test');
+    when(() => media.status).thenReturn(matrix.EventStatus.error);
+    when(() => media.type).thenReturn('m.room.message');
+    when(() => media.content)
+        .thenReturn({'filename': 'photo.png', 'msgtype': 'm.image'});
+    when(() => media.messageType).thenReturn('m.image');
+    when(() => media.transactionId).thenReturn('original-tx');
+    when(() => database.getFile(Uri.parse('cache://file/original-tx')))
+        .thenAnswer((_) {
+          entered.complete();
+          return cached.future;
+        });
+    final result = sender.resendMessage('!room:test', 'local-id');
+    await entered.future;
+    when(() => client.accessToken).thenReturn('replacement');
+    cached.complete(Uint8List(1));
+    expect(await result, isFalse);
+    verifyNever(() => media.sendAgain(txid: 'original-tx'));
+  });
+
   for (final encrypted in [false, true]) {
     test(
       'already uploaded media reuses content without local cache: $encrypted',
