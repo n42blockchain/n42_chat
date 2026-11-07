@@ -820,23 +820,27 @@ class AuthRepositoryImpl
       );
       return;
     }
+    final isCurrent = _captureProfileSession();
     _activePokeSyncs++;
     try {
       final client = _authDataSource.clientManager.client;
-      if (client == null) return;
+      if (client == null || !isCurrent()) return;
+      final userId = client.userID;
+      if (userId == null) return;
 
       // 获取所有已加入的房间
-      final rooms = client.rooms.where(
-        (room) => room.membership == Membership.join,
-      );
+      final rooms = client.rooms
+          .where((room) => room.membership == Membership.join)
+          .toList();
 
       for (final room in rooms) {
+        if (!isCurrent()) return;
         try {
           // 设置房间状态事件，以便其他成员可以读取
           await client.setRoomStateWithKey(
             room.id,
             'n42.member.profile',
-            client.userID!,
+            userId,
             {'pokeText': pokeText},
           );
           authLog('Synced pokeText to room ${room.id}');

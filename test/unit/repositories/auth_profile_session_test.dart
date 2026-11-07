@@ -16,6 +16,8 @@ class _Client extends Mock implements Client {}
 
 class _Storage extends Mock implements SecureStorageDataSource {}
 
+class _Room extends Mock implements Room {}
+
 void main() {
   late _Auth auth;
   late _Manager manager;
@@ -129,6 +131,46 @@ void main() {
     expect(profile.displayName, 'Current name');
     expect(profile.signature, 'Current signature');
   });
+
+  for (final switched in [true, false]) {
+    test('room profile sync respects account switch=$switched', () async {
+      final rooms = [_Room(), _Room()];
+      for (var i = 0; i < rooms.length; i++) {
+        when(() => rooms[i].id).thenReturn('!room$i:example');
+        when(() => rooms[i].membership).thenReturn(Membership.join);
+      }
+      when(() => client.rooms).thenReturn(rooms);
+      when(() => client.getAccountData(any(), any()))
+          .thenAnswer((_) async => <String, dynamic>{});
+      final entered = Completer<void>();
+      final release = Completer<String>();
+      final writes = <(String, String)>[];
+      when(() => client.setRoomStateWithKey(any(), any(), any(), any()))
+          .thenAnswer((invocation) {
+            final room = invocation.positionalArguments[0] as String;
+            writes.add((room, invocation.positionalArguments[2] as String));
+            if (writes.length == 1) {
+              entered.complete();
+              return release.future;
+            }
+            return Future.value('event-id');
+          });
+      final update = repository.updateUserProfileData(pokeText: 'QA poke');
+      await entered.future;
+      if (switched) userId = '@second:example';
+      release.complete('event-id');
+      expect(await update, !switched);
+      expect(
+        writes,
+        switched
+            ? [('!room0:example', '@first:example')]
+            : [
+                ('!room0:example', '@first:example'),
+                ('!room1:example', '@first:example'),
+              ],
+      );
+    });
+  }
 
   test('same account retains profile fields and accepts its update', () async {
     when(() => client.getAccountData(any(), any()))
