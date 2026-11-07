@@ -25,3 +25,11 @@ These rooms are not encrypted. Production identities, real E2EE and device verif
 ## Legacy CLI regression
 
 The hardened `tool/server_test.dart` completed against the same owned loopback server using a new random disposable account: 13 checks passed, zero failed, exit 0. This includes registration-token UIA, profile read/write, sync, room creation, text send, user/public-room queries and logout. The registration token is absent from the private log. The structured record is `local-tuwunel-legacy-2026-11-07.json`. This test remains single-account and unencrypted; E2EE, recovery, push and production acceptance remain open.
+
+## Three-client encrypted group
+
+`tool/local_e2ee_smoke.dart` now provides an explicit loopback-only check with three generated accounts and three separate SQLite databases. Six configuration guards reject public endpoints, credentials embedded in URLs, existing accounts and missing registration configuration before native initialization or network access.
+
+The real 1.9.4 run passed: three sent events were opaque encrypted events on the server, and all three clients correctly decrypted every payload (nine deliveries). Exit 0; no registration token appeared in the log. See `local-tuwunel-e2ee-2026-11-07.json` for source and log hashes. An initial invalid harness reused the SQLite in-memory database and failed; it was corrected to separate database files before the successful run.
+
+Run explicitly with the controlled local homeserver and registration token in the environment, and a compatible native vodozemac library configured through `FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR`: `dart run tool/local_e2ee_smoke.dart`. This tool only creates synthetic accounts; it logs out sessions but does not delete accounts. This proves isolated encrypted group transport/decryption, not same-account multidevice, recovery, revocation, physical-device UI, production push or the original load target.

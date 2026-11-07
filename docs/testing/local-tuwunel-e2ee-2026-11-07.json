@@ -1,0 +1,20 @@
+{
+  "clients": 3,
+  "encrypted_events": 3,
+  "decrypted_deliveries": 9,
+  "server_ciphertext_checks": 3,
+  "passed": true,
+  "scope": "isolated protocol; not UI, recovery or device acceptance",
+  "exit_code": 0,
+  "server_version": "Tuwunel 1.9.4",
+  "homeserver": "http://127.0.0.1:18948",
+  "source_sha256": "550dfb8f6c3f70179c3cd112dff2079072cd3a8e084cd998f504b4657c8c64bb",
+  "log_sha256": "746554c828773d29d597a4887c324d10a62b8088c7a2c086d3e221e82c8bd73f",
+  "credential_output": false,
+  "limits": [
+    "three separate accounts; not same-account multidevice",
+    "not physical-device UI acceptance",
+    "no backup restore or device revocation",
+    "not production push or 10000-message load acceptance"
+  ]
+}
