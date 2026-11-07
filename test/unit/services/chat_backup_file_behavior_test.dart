@@ -193,6 +193,21 @@ void main() {
     verify(() => timeline.cancelSubscriptions()).called(1);
   });
 
+  test('full export deduplicates overlapping loaded event IDs', () async {
+    final (room, timeline) = roomFixture('!overlap:example.org');
+    when(() => room.topic).thenReturn('');
+    when(() => room.isDirectChat).thenReturn(false);
+    when(() => room.summary).thenReturn(_Summary());
+    when(() => client.rooms).thenReturn([room]);
+    final original = timeline.events.single;
+    when(() => timeline.events).thenReturn([original, original, original]);
+    final result = await service.createBackup();
+    final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+    expect(result.messageCount, 1);
+    expect(data['rooms']['!overlap:example.org']['messages'], hasLength(1));
+    verify(() => timeline.cancelSubscriptions()).called(1);
+  });
+
   test('full export retains more than 1000 loaded messages', () async {
     final (room, timeline) = roomFixture('!large:example.org');
     when(() => room.topic).thenReturn('');

@@ -359,9 +359,11 @@ class ChatBackupService {
               }
             }
             ensureCurrent();
+            final exportedEventIds = <String>{};
             final events = timeline.events
                 .where((e) => e.type == 'm.room.message')
                 .where((e) => !_isEphemeralEvent(e))
+                .where((e) => exportedEventIds.add(e.eventId))
                 .map(
                   (e) => {
                     'eventId': e.eventId,
