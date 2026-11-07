@@ -1,3 +1,5 @@
+import 'package:matrix/matrix.dart';
+import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:n42_chat/src/data/datasources/local/chat_history_clear_store.dart';
 import 'dart:async';
@@ -25,6 +27,8 @@ import 'package:n42_chat/src/presentation/blocs/chat/chat_state.dart';
 // ---------------------------------------------------------------------------
 
 class MockMessageRepository extends Mock implements IMessageRepository {}
+class RetryClient extends Mock implements Client {}
+class RetryManager extends Mock implements MatrixClientManager {}
 class MockGroupRepository extends Mock implements IGroupRepository {}
 
 class MockSecureStorage extends Mock implements PreferencesDataSource {}
@@ -124,6 +128,86 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     return bloc;
   }
+
+  group('automatic retry ownership', () {
+    setUp(() {
+      when(() => mockSecureStorage.getScheduledMessages(any(), ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => <ScheduledMessageDraft>[]);
+      when(() => mockRepository.getCurrentUserId()).thenAnswer((_) async => '@me:server.com');
+      when(() => mockSecureStorage.getTranslationSettings()).thenAnswer((_) async => null);
+    });
+    Future<void> initialize(ChatBloc bloc, String room) async {
+      bloc.add(InitializeChat(room));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+    for (final duringDelay in [false, true]) {
+      test('retry rejects account token change, duringDelay=$duringDelay', () async {
+        final manager = RetryManager();
+        final client = RetryClient();
+        when(() => manager.client).thenReturn(client);
+        when(() => client.isLogged()).thenReturn(true);
+        when(() => client.userID).thenReturn('@me:server.com');
+        when(() => client.accessToken).thenReturn('old-token');
+        final bloc = ChatBloc(messageRepository: mockRepository,
+          secureStorage: mockSecureStorage, clientManager: manager);
+        addTearDown(bloc.close);
+        await initialize(bloc, _roomId);
+        bloc.enqueueForRetry('old-retry');
+        if (duringDelay) {
+          bloc.add(const RetryPendingMessages());
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+        }
+        when(() => client.accessToken).thenReturn('new-token');
+        if (!duringDelay) bloc.add(const RetryPendingMessages());
+        await Future<void>.delayed(const Duration(milliseconds: 2100));
+        verifyNever(() => mockRepository.resendMessage(any(), 'old-retry'));
+      });
+    }
+
+    for (final roundTrip in [false, true]) {
+      test('delayed retry stops on room switch, roundTrip=$roundTrip', () async {
+        when(() => mockRepository.resendMessage(any(), any())).thenAnswer((_) async => true);
+        final bloc = buildBloc();
+        addTearDown(bloc.close);
+        await initialize(bloc, _roomId);
+        bloc.enqueueForRetry('old-retry');
+        bloc.add(const RetryPendingMessages());
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        await initialize(bloc, '!other:server.com');
+        if (roundTrip) await initialize(bloc, _roomId);
+        await Future<void>.delayed(const Duration(milliseconds: 2100));
+        verifyNever(() => mockRepository.resendMessage(any(), 'old-retry'));
+      });
+    }
+    test('overlapping sync completions cannot retry one message twice', () async {
+      when(() => mockRepository.resendMessage(any(), any())).thenAnswer((_) async => true);
+      final bloc = buildBloc();
+      addTearDown(bloc.close);
+      await initialize(bloc, _roomId);
+      bloc.enqueueForRetry('single-retry');
+      bloc.add(const RetryPendingMessages());
+      bloc.add(const RetryPendingMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 2200));
+      verify(() => mockRepository.resendMessage(_roomId, 'single-retry')).called(1);
+    });
+    test('late old failure does not enqueue retries into the new room', () async {
+      final pending = Completer<bool>();
+      when(() => mockRepository.resendMessage(_roomId, 'old-retry')).thenAnswer((_) => pending.future);
+      when(() => mockRepository.resendMessage('!other:server.com', 'old-retry')).thenAnswer((_) async => true);
+      final bloc = buildBloc();
+      addTearDown(bloc.close);
+      await initialize(bloc, _roomId);
+      bloc.enqueueForRetry('old-retry');
+      bloc.add(const RetryPendingMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 2100));
+      verify(() => mockRepository.resendMessage(_roomId, 'old-retry')).called(1);
+      await initialize(bloc, '!other:server.com');
+      pending.complete(false);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      bloc.add(const RetryPendingMessages());
+      await Future<void>.delayed(const Duration(milliseconds: 4200));
+      verifyNever(() => mockRepository.resendMessage('!other:server.com', 'old-retry'));
+    });
+  });
 
   for (final roundTrip in [false, true]) {
     test('late background settings retain current room, roundTrip=$roundTrip', () async {

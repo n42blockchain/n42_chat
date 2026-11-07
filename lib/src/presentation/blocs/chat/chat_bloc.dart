@@ -83,6 +83,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 待重试的消息ID及其重试次数
   final Map<String, int> _pendingRetryMessages = {};
+  int? _activeRetryGeneration;
+  bool Function()? _retryQueueIsCurrent;
 
   /// 已耗尽自动重试次数的消息ID集合
   ///
@@ -274,6 +276,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     _chatGeneration++;
+    _pendingRetryMessages.clear();
+    _permanentlyFailedMessages.clear();
     _translationRequests.clear();
     _currentRoomId = event.roomId;
     _historyOwner = null;
