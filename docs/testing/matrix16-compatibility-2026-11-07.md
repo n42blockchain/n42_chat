@@ -23,3 +23,8 @@ The existing E2EE tool exits 0 against the independent loopback server using res
 ## Matrix 16 load follow-up in progress
 
 The twenty-client/10,000-event harness is now running again with Matrix 16.0.1, a new generated room/accounts, and a separate log on the owned port-18949 service. Its source and assertions are unchanged from the accepted SDK 15 run: independent databases, explicit transaction IDs, one offline recipient, exact unique/decrypted history checks. Final completion and exit code remain pending. The separate SDK 15 thirty-recovery batch has now completed with exit 0 and 30/30 correct restores plus 30/30 wrong-key rejections. Its record is local-tuwunel-e2ee-30-2026-11-07.json and is not SDK 16 recovery coverage.
+
+
+## Final Matrix 16 group-load result
+
+The separate full load run exits 0: 20 clients each verify 10,000 unique readable message events, including the offline recipient, for 200,000 verified deliveries. It includes 100 encrypted file events; attachment payload download is outside this harness. The captured isolated server log has zero generated message-canary prefixes. Send phase: 392,119 ms; total: 1,166,169 ms. Concurrent full-suite/analysis work means these timings are not a controlled SDK 15/16 performance comparison. Source/lock/client-log/server-log hashes and all recipient counts: matrix16-group-load-2026-11-07.json. Native UI, production, push and existing-database upgrade acceptance remain separate gates.
