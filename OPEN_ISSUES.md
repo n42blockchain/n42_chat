@@ -738,7 +738,7 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
 
-- 2026-11-07 sticker account isolation: reproduced installed-pack cache leaking the previous account and delayed index reads requesting pack details as a replacement user. Cache ownership now uses SDK client/user/device/homeserver scope; index/detail/fallback completions reject changed scope. The 48-test installed-pack/repository/bundled-sender cluster and scoped analysis pass. Pending full regression, host integration and native account switching remain separate; sharing/import (MEDIA-005) is still unimplemented.
+- 2026-11-07 sticker account isolation: reproduced installed-pack cache leaking the previous account and delayed index reads requesting pack details as a replacement user. Cache ownership now uses SDK client/user/device/homeserver scope; index/detail/fallback completions reject changed scope. The 48-test installed-pack/repository/bundled-sender cluster and scoped analysis pass. Full suite at a993d22c passes 8,637 tests, zero failures and four skips (exit 0). Host integration and native account switching remain separate; sharing/import (MEDIA-005) is still unimplemented.
 
 - 2026-11-07 full anonymous-auth regression: complete suite at runtime source 644fd852 passes 8,635 tests, zero failures and four skips (exit 0). This includes registration mutex, anonymous preflight generation, authenticated UI retention and guest completion session checks. Host live suite passes 76 tests. Native/physical/production acceptance and other QA-005 boundaries remain separate.
 
