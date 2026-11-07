@@ -22,7 +22,11 @@ permissions:
 
 jobs:
   goldens:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: chat-golden-failures
+          name: chat-golden-failures-${{ runner.os }}
           path: test/goldens/failures/
           if-no-files-found: ignore
           retention-days: 7

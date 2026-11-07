@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
@@ -15,7 +17,9 @@ void main() {
 
     await expectLater(
       find.byKey(const ValueKey('chat-core-golden')),
-      matchesGoldenFile('baselines/chat_core_light.png'),
+      matchesGoldenFile(
+        'baselines/chat_core_light_${Platform.operatingSystem}.png',
+      ),
     );
   });
 
@@ -24,7 +28,9 @@ void main() {
 
     await expectLater(
       find.byKey(const ValueKey('chat-core-golden')),
-      matchesGoldenFile('baselines/chat_core_dark.png'),
+      matchesGoldenFile(
+        'baselines/chat_core_dark_${Platform.operatingSystem}.png',
+      ),
     );
   });
 }

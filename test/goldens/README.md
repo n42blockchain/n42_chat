@@ -32,3 +32,11 @@ fixture; production widgets and pixel tolerances are unchanged.
 The Chat golden regression workflow compares exact pixels on Linux with
 Flutter 3.47.8 and preserves difference PNGs on failure. Local comparison is
 necessary but does not replace that Linux check.
+
+macOS and Linux keep separately reviewed baselines, selected by the actual host
+OS (not Flutter's simulated target platform). The first Linux run of the repaired
+Material fixture still differed by 11,130 glyph pixels in each theme, while
+layout and message wrapping matched the reviewed images. Linux renders the Ahem
+glyph edges differently from macOS. Both platform baselines retain strict pixel
+comparison. The CI matrix runs both hosts; a new host needs reviewed baselines
+rather than a skipped test or a relaxed threshold.
