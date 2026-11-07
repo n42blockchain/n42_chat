@@ -211,6 +211,63 @@ void main() {
     },
   );
 
+  for (final failMetadata in [false, true]) {
+    test(
+      'background archive keeps persisted cursor and atomic writes: fail=$failMetadata',
+      () async {
+        const id = '!room:hs.test';
+        await service.importArchivedMessages(id, [
+          _entry(eventId: 'newer', roomId: id, timestamp: 200, body: 'newer'),
+        ]);
+        if (failMetadata) {
+          await database.customStatement("""
+          CREATE TRIGGER fail_background_metadata BEFORE INSERT ON archive_metadata
+          BEGIN SELECT RAISE(ABORT, 'fixture metadata failure'); END
+        """);
+        }
+        final manager = _ClientManager();
+        final client = _Client();
+        final room = _Room();
+        final timeline = _Timeline();
+        when(() => manager.client).thenReturn(client);
+        when(() => client.getRoomById(id)).thenReturn(room);
+        when(() => room.id).thenReturn(id);
+        when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+        when(() => timeline.requestHistory(historyCount: 10))
+            .thenAnswer((_) async {});
+        when(() => timeline.events).thenReturn([
+          matrix.Event(
+            type: matrix.EventTypes.Message,
+            content: {'msgtype': 'm.text', 'body': 'older'},
+            senderId: '@alice:hs.test',
+            eventId: 'older',
+            room: room,
+            originServerTs: DateTime.fromMillisecondsSinceEpoch(100),
+          ),
+        ]);
+        service = MessageArchiveService(db: database, clientManager: manager);
+        if (failMetadata) {
+          await expectLater(
+            service.archiveRoom(id, batchSize: 10),
+            throwsA(isA<Exception>()),
+          );
+          expect(await database.isEventArchived('older'), isFalse);
+          expect(await database.searchMessages('older'), isEmpty);
+        } else {
+          expect(
+            (await service.archiveRoom(id, batchSize: 10)).archivedCount,
+            1,
+          );
+        }
+        final metadata = (await database.getMetadata(id))!;
+        expect(metadata.lastArchivedEventId, 'newer');
+        expect(metadata.lastArchivedTs, 200);
+        expect(metadata.totalArchived, failMetadata ? 1 : 2);
+        verify(() => timeline.cancelSubscriptions()).called(1);
+      },
+    );
+  }
+
   test('empty archive import does not create metadata', () async {
     expect(await service.importArchivedMessages('!empty:hs.test', []), 0);
     expect(await database.getMetadata('!empty:hs.test'), isNull);

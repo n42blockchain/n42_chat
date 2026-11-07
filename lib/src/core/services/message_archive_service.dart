@@ -191,26 +191,14 @@ class MessageArchiveService {
         final end = (i + batchSize).clamp(0, companions.length);
         final batch = companions.sublist(i, end);
         ensureCurrent();
-        final inserted = await _db.insertMessages(batch);
+        final inserted = await _db.transaction(() async {
+          ensureCurrent();
+          final count = await importArchivedMessages(roomId, batch);
+          ensureCurrent();
+          return count;
+        });
         totalInserted += inserted;
       }
-
-      ensureCurrent();
-      // 更新归档元数据
-      final oldestEvent = archivableEvents.last;
-      final newTotalArchived = await _db.getMessageCount(roomId);
-      ensureCurrent();
-      await _db.updateMetadata(
-        ArchiveMetadataCompanion(
-          roomId: Value(roomId),
-          lastArchivedEventId: Value(oldestEvent.eventId),
-          lastArchivedTs: Value(
-            oldestEvent.originServerTs.millisecondsSinceEpoch,
-          ),
-          totalArchived: Value(newTotalArchived),
-          lastArchiveTime: Value(DateTime.now()),
-        ),
-      );
 
       ensureCurrent();
       sw.stop();
