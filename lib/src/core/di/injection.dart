@@ -1,3 +1,4 @@
+import 'archive_registration.dart';
 import '../../data/datasources/local/chat_history_clear_store.dart';
 import '../../domain/repositories/chat_catch_up_repository.dart';
 import '../../data/services/matrix_history_sharing.dart';
@@ -40,7 +41,6 @@ import '../../data/datasources/matrix/matrix_story_datasource.dart';
 import '../../presentation/pages/game/services/game_score_service.dart';
 import '../services/chat_backup_service.dart';
 import '../services/data_tier_service.dart';
-import '../services/archive_integrity_service.dart';
 import '../services/archive_search_service.dart';
 import '../services/message_archive_service.dart';
 import '../services/download_service.dart';
@@ -532,23 +532,7 @@ Future<void> _registerServices(
     }
   });
 
-  // 消息归档服务
-  getIt.registerLazySingleton<MessageArchiveService>(
-    () => MessageArchiveService(
-      db: getIt<ArchiveDatabase>(),
-      clientManager: getIt<MatrixClientManager>(),
-    ),
-  );
-
-  // 归档完整性服务
-  getIt.registerLazySingleton<ArchiveIntegrityService>(
-    () => ArchiveIntegrityService(db: getIt<ArchiveDatabase>()),
-  );
-
-  // 归档搜索服务
-  getIt.registerLazySingleton<ArchiveSearchService>(
-    () => ArchiveSearchService(db: getIt<ArchiveDatabase>()),
-  );
+  registerAccountArchiveServices(getIt);
 
   // 媒体生命周期服务
   getIt.registerLazySingleton<MediaLifecycleService>(() {
