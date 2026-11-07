@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -260,4 +262,46 @@ void main() {
       expect(await service.isEventArchived('forgotten'), isFalse);
     },
   );
+  for (final duringHistory in [false, true]) {
+    test(
+      'archive stops on account change during history=$duringHistory',
+      () async {
+        final manager = _ClientManager();
+        final client = _Client();
+        final room = _Room();
+        final timeline = _Timeline();
+        when(() => manager.client).thenReturn(client);
+        when(() => client.userID).thenReturn('@a:test');
+        when(() => client.getRoomById('room')).thenReturn(room);
+        final entered = Completer<void>();
+        final load = Completer<matrix.Timeline>();
+        final history = Completer<void>();
+        when(() => room.getTimeline()).thenAnswer((_) {
+          if (!duringHistory) entered.complete();
+          return duringHistory ? Future.value(timeline) : load.future;
+        });
+        when(() => timeline.events).thenReturn([]);
+        when(() => timeline.requestHistory(historyCount: 10)).thenAnswer((_) {
+          entered.complete();
+          return history.future;
+        });
+        service = MessageArchiveService(db: database, clientManager: manager);
+        final pending = service.archiveRoom('room', batchSize: 10);
+        final assertion = expectLater(pending, throwsStateError);
+        await entered.future;
+        when(() => client.userID).thenReturn('@b:test');
+        if (duringHistory) {
+          history.complete();
+        } else {
+          load.complete(timeline);
+        }
+        await assertion;
+        expect(await database.getMessageCount('room'), 0);
+        if (!duringHistory) {
+          verifyNever(() => timeline.requestHistory(historyCount: 10));
+        }
+        verify(() => timeline.cancelSubscriptions()).called(1);
+      },
+    );
+  }
 }

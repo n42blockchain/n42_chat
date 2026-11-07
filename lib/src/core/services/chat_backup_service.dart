@@ -640,18 +640,36 @@ class ChatBackupService {
       return const RestoreResult(errors: ['Archive service not available']);
     }
 
+    final origin = _clientManager.client;
+    final user = origin?.userID;
+    final token = origin?.accessToken;
+    final device = origin?.deviceID;
+    final server = origin?.homeserver;
+    final archiveDb = _archiveService!;
+    void ensureCurrent() {
+      if (!identical(_clientManager.client, origin) ||
+          !identical(_archiveService, archiveDb) ||
+          origin?.userID != user ||
+          origin?.accessToken != token ||
+          origin?.deviceID != device ||
+          origin?.homeserver != server) {
+        throw StateError('Archive restore session changed');
+      }
+    }
+
     try {
       final data = await _readBackupData(backupFilePath, password: password);
+      ensureCurrent();
       final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
       final errors = <String>[];
 
       onProgress?.call(0.1);
 
-      final archiveDb = _archiveService!;
       final roomEntries = rooms.entries.toList();
       var roomsRestored = 0;
 
       for (var i = 0; i < roomEntries.length; i++) {
+        ensureCurrent();
         final entry = roomEntries[i];
         final roomId = entry.key;
         final roomData = entry.value as Map<String, dynamic>;
@@ -659,6 +677,7 @@ class ChatBackupService {
         final companions = <ArchivedMessagesCompanion>[];
 
         for (final msg in messages) {
+          ensureCurrent();
           try {
             final msgMap = msg as Map<String, dynamic>;
             final eventId = msgMap['eventId']?.toString();
@@ -666,7 +685,9 @@ class ChatBackupService {
               continue;
             }
 
-            if (await archiveDb.isEventArchived(eventId)) {
+            final archived = await archiveDb.isEventArchived(eventId);
+            ensureCurrent();
+            if (archived) {
               continue;
             }
 
@@ -679,11 +700,13 @@ class ChatBackupService {
           }
         }
 
+        ensureCurrent();
         if (companions.isNotEmpty) {
           final inserted = await archiveDb.importArchivedMessages(
             roomId,
             companions,
           );
+          ensureCurrent();
           if (inserted > 0) {
             roomsRestored++;
           }
@@ -692,6 +715,7 @@ class ChatBackupService {
         onProgress?.call(0.1 + 0.9 * (i + 1) / roomEntries.length);
       }
 
+      ensureCurrent();
       return RestoreResult(
         roomsRestored: roomsRestored,
         settingsRestored: 0,

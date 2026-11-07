@@ -70,6 +70,21 @@ class MessageArchiveService {
     String roomId, {
     int batchSize = 500,
   }) async {
+    final origin = _client;
+    final user = origin?.userID;
+    final token = origin?.accessToken;
+    final device = origin?.deviceID;
+    final server = origin?.homeserver;
+    void ensureCurrent() {
+      if (!identical(_client, origin) ||
+          origin?.userID != user ||
+          origin?.accessToken != token ||
+          origin?.deviceID != device ||
+          origin?.homeserver != server) {
+        throw StateError('Archive session changed');
+      }
+    }
+
     final sw = Stopwatch()..start();
 
     // 检查磁盘空间
@@ -85,7 +100,8 @@ class MessageArchiveService {
       );
     }
 
-    final client = _client;
+    ensureCurrent();
+    final client = origin;
     if (client == null) {
       return ArchiveResult(
         roomId: roomId,
@@ -109,9 +125,11 @@ class MessageArchiveService {
     // 泄漏一份 sync 订阅——复审 P1)
     final timeline = await room.getTimeline();
     try {
+      ensureCurrent();
       // 拉取足够历史消息（如果需要）
       // 尝试多轮拉取，最多 5 轮，每轮 batchSize 条
       for (int round = 0; round < 5; round++) {
+        ensureCurrent();
         final before = timeline.events.length;
         try {
           await timeline.requestHistory(historyCount: batchSize);
@@ -119,17 +137,21 @@ class MessageArchiveService {
           debugLog('MessageArchiveService: requestHistory failed: $e');
           break;
         }
+        ensureCurrent();
         final after = timeline.events.length;
         if (after == before) break; // 没有更多历史
       }
 
+      ensureCurrent();
       // The SDK's redacted flag is authoritative; do not treat a raw
       // redaction request as proof that the server accepted it. Reconcile
       // known redactions before insert-or-ignore can preserve old plaintext.
       for (final event in List<matrix.Event>.of(timeline.events)) {
+        ensureCurrent();
         if (event.redacted) await _db.redactByEventId(event.eventId);
       }
 
+      ensureCurrent();
       // 筛选需要归档的消息。
       // 注意:不做"只归档比断点更老"的时间过滤——那会让断点单调走向历史,
       // 首轮归档之后的新消息永远进不了 FTS(接线复审 P0)。去重由
@@ -168,13 +190,16 @@ class MessageArchiveService {
       for (int i = 0; i < companions.length; i += batchSize) {
         final end = (i + batchSize).clamp(0, companions.length);
         final batch = companions.sublist(i, end);
+        ensureCurrent();
         final inserted = await _db.insertMessages(batch);
         totalInserted += inserted;
       }
 
+      ensureCurrent();
       // 更新归档元数据
       final oldestEvent = archivableEvents.last;
       final newTotalArchived = await _db.getMessageCount(roomId);
+      ensureCurrent();
       await _db.updateMetadata(
         ArchiveMetadataCompanion(
           roomId: Value(roomId),
@@ -187,6 +212,7 @@ class MessageArchiveService {
         ),
       );
 
+      ensureCurrent();
       sw.stop();
       final result = ArchiveResult(
         roomId: roomId,
