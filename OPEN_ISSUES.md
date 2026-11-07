@@ -179,6 +179,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### MSG-001 Recent real-homeserver smoke does not cover several advanced message features
 
+- Restore confirmation UI (batch 259): file selection now reads preview and presents room names, creation time and warnings in a scrollable confirmation dialog before dispatching RestoreFromBackup. Cancel/dismiss does not dispatch. Scoped page analysis is clean. Widget/device interaction, account-change handling across picker/dialog awaits, encrypted-file password input, warning localization and wallet pin integration remain open; source review is not UI acceptance.
+
 - Backup warning propagation (batch 258): BackupPreview now carries optional warnings; restoreFromBackup imports manifest warnings and synthesizes an incomplete-backup warning for hasReadErrors even when no text is present. String warnings are filtered and deduplicated. Eighty-two backup tests pass, including incomplete full-backup preview and restore assertions; scoped service analysis has six infos, no errors/warnings. UI display, localization, host integration and the remaining full-history/ownership requirements stay open.
 
 - Full export read errors (batch 257): Timeline, room metadata and settings exceptions now mark the full backup manifest hasReadErrors and add a result/manifest warning. Partial output stays usable. Eighty-two related tests and four final-source lifecycle/manifest cases pass. Full history is still limited by loaded Timeline data and the 1,000-message cap; this flag only records observed read errors, not historical completeness. Host pin integration and scoped analysis remain pending.

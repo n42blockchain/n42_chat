@@ -477,6 +477,37 @@ class _RestoreSection extends StatelessWidget {
       if (file != null) {
         final filePath = file.path;
         if (filePath != null && context.mounted) {
+          final preview = await GetIt.instance<ChatBackupService>().previewBackup(filePath);
+          if (!context.mounted) return;
+          final l10n = S.of(context);
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+              title: Text(l10n?.commonConfirm ?? 'Confirm'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(preview.createdAt.toLocal().toString()),
+                    for (final name in preview.roomNames) Text(name),
+                    for (final warning in preview.warnings)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(warning, style: const TextStyle(color: AppColors.warning)),
+                      ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(dialogContext, false),
+                  child: Text(l10n?.commonCancel ?? 'Cancel')),
+                FilledButton(onPressed: () => Navigator.pop(dialogContext, true),
+                  child: Text(l10n?.commonConfirm ?? 'Confirm')),
+              ],
+            ),
+          );
+          if (confirmed != true || !context.mounted) return;
           context.read<BackupBloc>().add(
             RestoreFromBackup(backupFilePath: filePath),
           );
