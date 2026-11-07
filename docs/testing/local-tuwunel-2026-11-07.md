@@ -18,6 +18,6 @@
 
 ## Open acceptance
 
-The independent live message smoke is still running against this local environment. Keep its current process; do not restart it solely because observation times out. Its final exit/result must be inspected before claiming complete message acceptance.
+The independent live message smoke completed with exit 0 against this local environment. Ten checked steps include registration, room creation, normalized UTF-8/rich-text content, reply relations, edit aggregation, reaction/redaction, thread relations, and anonymous poll/vote/end round trips through the SDK and app mapper. Result and log hash: local-tuwunel-messages-2026-11-07.json. This is not encrypted, cross-device or production acceptance.
 
 These rooms are not encrypted. Production identities, real E2EE and device verification, key recovery/revocation, mobile push/calls, large-transfer limits, mobile memory/disk behavior and physical-device acceptance remain open. Temporary QA accounts are logged out, not deactivated; only this owned disposable database contains them. Retain evidence before shutting down and cleaning up owned QA resources. Do not reuse any production credential or change production registration policy.
