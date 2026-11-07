@@ -196,6 +196,39 @@ class ChatBackupService {
     _archiveService = service;
   }
 
+  void Function() _captureBackupSession() {
+    final client = _clientManager.client;
+    if (client == null) throw StateError('Matrix client not available');
+    final user = client.userID;
+    final server = client.homeserver;
+    final token = client.accessToken;
+    final device = client.deviceID;
+    final archive = _archiveService;
+    return () {
+      if (!identical(_clientManager.client, client) ||
+          client.userID != user ||
+          client.homeserver != server ||
+          client.accessToken != token ||
+          client.deviceID != device ||
+          !identical(_archiveService, archive)) {
+        throw StateError('Backup session changed');
+      }
+    };
+  }
+
+  // The unscoped legacy cursor has no provable owner. Start a full incremental
+  // scan for a new/unknown identity instead of skipping another user's history.
+  String? _incrementalCursorKey() {
+    final client = _clientManager.client;
+    final user = client?.userID;
+    final server = client?.homeserver;
+    if (user == null || user.isEmpty || server == null) return null;
+    final owner = sha256.convert(
+      utf8.encode(jsonEncode([server.toString(), user])),
+    );
+    return '${_keyLastIncrementalBackupTs}_v2_$owner';
+  }
+
   /// 获取备份目录
   Future<Directory> _getBackupDir() async {
     if (_backupDirProvider != null) {
@@ -224,6 +257,8 @@ class ChatBackupService {
     String? password,
     void Function(double progress)? onProgress,
   }) async {
+    final ensureCurrent = _captureBackupSession();
+    final client = _clientManager.client!;
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
@@ -236,14 +271,15 @@ class ChatBackupService {
         '${StorageConstants.backupExtension}';
     final filePath = p.join(backupDir.path, fileName);
 
-    final client = _clientManager.client;
-    if (client == null) throw StateError('Matrix client not available');
+    ensureCurrent();
 
     final rooms = roomIds != null
         ? client.rooms.where((r) => roomIds.contains(r.id)).toList()
         : client.rooms;
 
+    ensureCurrent();
     onProgress?.call(0.1);
+    ensureCurrent();
 
     final includesKeysInBackup = await _collectKeyBackupSupport(
       includeKeys,
@@ -268,6 +304,7 @@ class ChatBackupService {
     // 导出房间数据
     int messageCount = 0;
     for (var i = 0; i < rooms.length; i++) {
+      ensureCurrent();
       final room = rooms[i];
       try {
         final roomData = <String, dynamic>{
@@ -283,6 +320,7 @@ class ChatBackupService {
         // 使用 room.getTimeline() 获取完整 timeline
         try {
           final timeline = await room.getTimeline();
+          ensureCurrent();
           final events = timeline.events
               .where((e) => e.type == 'm.room.message')
               .where((e) => !_isEphemeralEvent(e))
@@ -308,6 +346,7 @@ class ChatBackupService {
         debugLog('ChatBackupService: Failed to export room ${room.id}: $e');
       }
 
+      ensureCurrent();
       onProgress?.call(0.1 + 0.7 * (i + 1) / rooms.length);
     }
 
@@ -322,14 +361,18 @@ class ChatBackupService {
       ];
       final settings = <String, String?>{};
       for (final key in settingsKeys) {
+        ensureCurrent();
         settings[key] = await _preferencesStorage.read(key);
+        ensureCurrent();
       }
       backupData['settings'] = settings;
     } catch (e) {
       debugLog('ChatBackupService: Failed to export settings: $e');
     }
 
+    ensureCurrent();
     onProgress?.call(0.85);
+    ensureCurrent();
 
     // 写入文件
     final finalJsonStr = _finalizeBackupJson(backupData);
@@ -346,9 +389,11 @@ class ChatBackupService {
       await file.writeAsString(finalJsonStr);
     }
 
+    ensureCurrent();
     onProgress?.call(1.0);
 
     final fileSize = await File(filePath).length();
+    ensureCurrent();
 
     return BackupResult(
       backupId: backupId,
@@ -454,6 +499,9 @@ class ChatBackupService {
     String? password,
     void Function(double progress)? onProgress,
   }) async {
+    final ensureCurrent = _captureBackupSession();
+    final client = _clientManager.client!;
+    final cursorKey = _incrementalCursorKey();
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
@@ -465,17 +513,18 @@ class ChatBackupService {
         '${StorageConstants.backupExtension}';
     final filePath = p.join(backupDir.path, fileName);
 
-    final client = _clientManager.client;
-    if (client == null) throw StateError('Matrix client not available');
+    ensureCurrent();
 
     // 获取上次增量备份时间
-    final lastBackupTs = await _getLastIncrementalBackupTs();
+    final lastBackupTs = await _getLastIncrementalBackupTs(cursorKey);
 
     final rooms = roomIds != null
         ? client.rooms.where((r) => roomIds.contains(r.id)).toList()
         : client.rooms;
 
+    ensureCurrent();
     onProgress?.call(0.1);
+    ensureCurrent();
 
     final backupData = <String, dynamic>{
       'manifest': {
@@ -492,6 +541,7 @@ class ChatBackupService {
 
     int messageCount = 0;
     for (var i = 0; i < rooms.length; i++) {
+      ensureCurrent();
       final room = rooms[i];
       try {
         final roomData = <String, dynamic>{
@@ -515,6 +565,7 @@ class ChatBackupService {
         // 1. 从 Timeline 获取热数据（新消息）
         try {
           final timeline = await room.getTimeline();
+          ensureCurrent();
           for (final e in timeline.events) {
             if (e.type != 'm.room.message') continue;
             if (_isEphemeralEvent(e)) continue;
@@ -533,6 +584,7 @@ class ChatBackupService {
           debugLog('ChatBackupService: Timeline error for ${room.id}: $e');
         }
 
+        ensureCurrent();
         // 2. 从归档获取历史消息（分页加载，避免 OOM）
         if (_archiveService != null) {
           try {
@@ -547,6 +599,7 @@ class ChatBackupService {
                 limit: pageSize,
               );
 
+              ensureCurrent();
               if (archived.isEmpty) break;
               hasMore = archived.length == pageSize;
 
@@ -592,10 +645,13 @@ class ChatBackupService {
         debugLog('ChatBackupService: Failed to backup room ${room.id}: $e');
       }
 
+      ensureCurrent();
       onProgress?.call(0.1 + 0.7 * (i + 1) / rooms.length);
     }
 
+    ensureCurrent();
     onProgress?.call(0.85);
+    ensureCurrent();
 
     // 写入文件
     final finalJsonStr = _finalizeBackupJson(backupData);
@@ -610,12 +666,15 @@ class ChatBackupService {
       await File(filePath).writeAsString(finalJsonStr);
     }
 
+    ensureCurrent();
     // 记录本次备份时间
-    await _setLastIncrementalBackupTs(now.millisecondsSinceEpoch);
+    await _setLastIncrementalBackupTs(now.millisecondsSinceEpoch, cursorKey);
+    ensureCurrent();
 
     onProgress?.call(1.0);
 
     final fileSize = await File(filePath).length();
+    ensureCurrent();
 
     return BackupResult(
       backupId: backupId,
@@ -727,9 +786,10 @@ class ChatBackupService {
   }
 
   /// 获取上次增量备份时间戳
-  Future<int> _getLastIncrementalBackupTs() async {
+  Future<int> _getLastIncrementalBackupTs(String? key) async {
+    if (key == null) return 0;
     try {
-      final value = await _secureStorage.read(_keyLastIncrementalBackupTs);
+      final value = await _secureStorage.read(key);
       return int.tryParse(value ?? '') ?? 0;
     } catch (_) {
       return 0;
@@ -737,8 +797,9 @@ class ChatBackupService {
   }
 
   /// 记录增量备份时间戳
-  Future<void> _setLastIncrementalBackupTs(int ts) async {
-    await _secureStorage.write(_keyLastIncrementalBackupTs, ts.toString());
+  Future<void> _setLastIncrementalBackupTs(int ts, String? key) async {
+    if (key == null) return;
+    await _secureStorage.write(key, ts.toString());
   }
 
   /// 预览备份内容

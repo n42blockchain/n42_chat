@@ -23,6 +23,7 @@ void main() {
   late Directory directory;
   late _Manager manager;
   late _Secure secure;
+  late _Client client;
   late PreferencesDataSource preferences;
   late ChatBackupService service;
   setUp(() async {
@@ -31,14 +32,15 @@ void main() {
     manager = _Manager();
     secure = _Secure();
     final stored = <String, String?>{};
-    when(
-      () => secure.read(any()),
-    ).thenAnswer((i) async => stored[i.positionalArguments[0]]);
+    when(() => secure.read(any()))
+        .thenAnswer((i) async => stored[i.positionalArguments[0]]);
     when(() => secure.write(any(), any())).thenAnswer((i) async {
       stored[i.positionalArguments[0] as String] =
           i.positionalArguments[1] as String?;
     });
-    final client = _Client();
+    client = _Client();
+    when(() => client.userID).thenReturn('@alice:example.org');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://example.org'));
     when(() => manager.client).thenReturn(client);
     when(() => client.rooms).thenReturn([]);
     preferences = PreferencesDataSource();
@@ -51,6 +53,76 @@ void main() {
   });
   tearDown(() async => directory.delete(recursive: true));
 
+  for (final change in ['user', 'server', 'unknown', 'legacy']) {
+    test('incremental cursor does not cross $change ownership', () async {
+      final first = await service.createIncrementalBackup();
+      if (change == 'user') {
+        when(() => client.userID).thenReturn('@bob:example.org');
+      } else if (change == 'server') {
+        when(() => client.homeserver)
+            .thenReturn(Uri.parse('https://other.org'));
+      } else if (change == 'unknown') {
+        when(() => client.userID).thenReturn(null);
+      } else {
+        when(() => client.userID).thenReturn('@new:example.org');
+        await secure.write(
+          'n42_chat_last_incremental_backup_ts',
+          first.createdAt.millisecondsSinceEpoch.toString(),
+        );
+      }
+      final next = await service.createIncrementalBackup();
+      final data = jsonDecode(await File(next.filePath).readAsString()) as Map;
+      expect((data['manifest'] as Map)['lastBackupTimestamp'], 0);
+      if (change == 'user') {
+        when(() => client.userID).thenReturn('@alice:example.org');
+        final resumed = await service.createIncrementalBackup();
+        final restored =
+            jsonDecode(await File(resumed.filePath).readAsString()) as Map;
+        expect(
+          (restored['manifest'] as Map)['lastBackupTimestamp'],
+          first.createdAt.millisecondsSinceEpoch,
+        );
+      }
+    });
+  }
+  for (final incremental in [false, true]) {
+    for (final phase in [0.1, 0.85]) {
+      for (final mutation in ['user', 'server', 'token', 'device', 'client']) {
+        test(
+          'backup rejects session changes at $phase incremental=$incremental mutation=$mutation',
+          () async {
+            void progress(double value) {
+              if (value == phase) {
+                switch (mutation) {
+                  case 'user':
+                    when(() => client.userID).thenReturn('@other:example.org');
+                  case 'server':
+                    when(() => client.homeserver)
+                        .thenReturn(Uri.parse('https://other.org'));
+                  case 'token':
+                    when(() => client.accessToken)
+                        .thenReturn('changed-fixture-token');
+                  case 'device':
+                    when(() => client.deviceID).thenReturn('changed-device');
+                  case 'client':
+                    when(() => manager.client).thenReturn(_Client());
+                }
+              }
+            }
+
+            await expectLater(
+              incremental
+                  ? service.createIncrementalBackup(onProgress: progress)
+                  : service.createBackup(onProgress: progress),
+              throwsStateError,
+            );
+            expect(await directory.list().toList(), isEmpty);
+            verifyNever(() => secure.write(any(), any()));
+          },
+        );
+      }
+    }
+  }
   for (final incremental in [false, true]) {
     test(
       '${incremental ? 'incremental' : 'full'} consecutive backups preserve both files',
