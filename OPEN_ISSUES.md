@@ -719,6 +719,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-002 Group-call token fetching and multi-party rendering were not live-tested
 
+- 2026-11-07 host broadcast preparation: wallet now creates the inactive n42.live.status marker atomically in createRoom initial_state before requesting a token, closing the unmarked startup interval for the N42 legacy policy service. All 66 host live-module tests and scoped analysis pass. Not included in uploaded 73424. Production official authorization role enforcement, Flutter media/background and multi-party device acceptance remain open.
+
 - Severity: M
 - Added: 2026-03-21
 - Current state: the new group-call entry flow now fetches LiveKit JWTs dynamically and the screen switched from a placeholder renderer to the real `VideoTrackRenderer`, but this path has only been compile/test verified so far, not exercised end to end against a real Matrix homeserver + LiveKit focus.
