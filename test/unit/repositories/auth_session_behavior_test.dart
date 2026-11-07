@@ -104,6 +104,28 @@ void main() {
     },
   );
 
+  test('anonymous preflight cannot register after another authentication', () async {
+    final availability = Completer<bool>();
+    when(() => auth.isUsernameAvailable(any(), any()))
+        .thenAnswer((_) => availability.future);
+    when(() => auth.register(
+      homeserver: any(named: 'homeserver'), username: any(named: 'username'),
+      password: any(named: 'password'), email: any(named: 'email'),
+      registrationToken: any(named: 'registrationToken'),
+    )).thenAnswer((_) async => RegisterResponse(userId: '@guest:hs.test'));
+    final guest = repository.registerAnonymously(
+      homeserver: 'https://hs.test', password: 'fixture-password',
+    );
+    expect((await login()).success, isTrue);
+    availability.complete(true);
+    expect((await guest).errorType, AuthErrorType.rateLimited);
+    verifyNever(() => auth.register(
+      homeserver: any(named: 'homeserver'), username: any(named: 'username'),
+      password: any(named: 'password'), email: any(named: 'email'),
+      registrationToken: any(named: 'registrationToken'),
+    ));
+  });
+
   for (final anonymous in [false, true]) {
     for (final message in [
       'M_FORBIDDEN: Registration has been disabled',

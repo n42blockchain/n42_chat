@@ -738,6 +738,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-005 Multi-account switching and persisted notification settings were not live-tested end to end
 
+- 2026-11-07 anonymous preflight audit: reproduced a delayed username lookup starting registration after a separate login completed. Every mutex-owning authentication now advances a generation; anonymous preflight rejects a changed generation before registering. All 61 session behavior tests pass and scoped analysis is clean. Host bootstrap and AuthBloc stale-result handling remain to be verified before host integration.
+
 - 2026-11-07 registration audit: reproduced password login proceeding during a pending registration. Registration now shares the existing authentication mutex and releases it on additional-auth/failure paths. Session behavior suite: 60 passed. Anonymous username preflight and stale UI completion remain under audit; this does not close QA-005.
 
 - 2026-11-07 room profile sync isolation: reproduced a second-room write under a replacement user after the first room request was held. Poke-text sync now captures its user and room list and checks the session before each write. Changed-account rejection and stable-account all-room success pass; the combined auth/avatar/database cluster passes 53 tests. Scoped analysis has two pre-existing datasource infos only. Full current-source suite, native account switch and production acceptance remain separate.

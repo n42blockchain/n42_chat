@@ -58,6 +58,7 @@ class AuthRepositoryImpl
   bool _isAuthenticating = false;
   // 并发登录互斥
   Completer<void>? _authInProgress;
+  int _authenticationGeneration = 0;
   // dispose 后禁止再向已关闭的 StreamController 发送事件
   bool _isDisposed = false;
   // 认证窗口内收到的 SDK 登出状态，待流程结束后再统一处理
@@ -165,6 +166,7 @@ class AuthRepositoryImpl
     if (_authInProgress != null && !_authInProgress!.isCompleted) {
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
+    _authenticationGeneration++;
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
@@ -245,6 +247,7 @@ class AuthRepositoryImpl
     if (_authInProgress != null && !_authInProgress!.isCompleted) {
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
+    _authenticationGeneration++;
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
@@ -317,6 +320,7 @@ class AuthRepositoryImpl
     if (_authInProgress != null && !_authInProgress!.isCompleted) {
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
+    _authenticationGeneration++;
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
@@ -472,6 +476,7 @@ class AuthRepositoryImpl
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
     final operation = Completer<void>();
+    _authenticationGeneration++;
     _authInProgress = operation;
     _isAuthenticating = true;
     try {
@@ -553,7 +558,17 @@ class AuthRepositoryImpl
     String? registrationToken,
   }) async {
     try {
+      final generation = _authenticationGeneration;
+      if (_isDisposed || isLoggedIn || _isAuthenticating) {
+        return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+      }
       final username = await _generateAnonymousUsername(homeserver);
+      // Availability checks do not own the authentication lock. A completed
+      // login also invalidates them, even if that session has since logged out.
+      if (_isDisposed || isLoggedIn || _isAuthenticating ||
+          generation != _authenticationGeneration) {
+        return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+      }
       final result = await register(
         homeserver: homeserver,
         username: username,
@@ -1121,6 +1136,7 @@ class AuthRepositoryImpl
     if (_authInProgress != null && !_authInProgress!.isCompleted) {
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
+    _authenticationGeneration++;
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
