@@ -643,12 +643,14 @@ class AuthRepositoryImpl
     final userId = client.userID;
     if (userId == null) return null;
 
+    final isCurrent = _captureProfileSession();
     try {
       // 并行请求标准资料和自定义资料
       final results = await Future.wait([
         _authDataSource.clientManager.getUserProfile(userId),
         getUserProfileData(),
       ]);
+      if (!isCurrent()) return null;
       final profile = results[0] as Profile;
 
       final avatarHttpUrl = MatrixUtils.getAvatarUrl(
@@ -661,10 +663,11 @@ class AuthRepositoryImpl
       _cachedAvatarUrl = avatarHttpUrl;
       _cachedDisplayName = profile.displayName ?? userId.localpart ?? '';
       await _syncStoredAccountProfile();
+      if (!isCurrent()) return null;
       return _buildCurrentUserEntity(userId);
     } catch (e) {
       authLog('Get profile failed - $e');
-      return currentUser;
+      return isCurrent() ? currentUser : null;
     }
   }
 
@@ -757,9 +760,13 @@ class AuthRepositoryImpl
     final client = _authDataSource.clientManager.client;
     if (client == null) return false;
 
+    final isCurrent = _captureProfileSession();
+    final userId = client.userID;
+    if (userId == null) return false;
     try {
       // 获取现有数据
       final existingData = await getUserProfileData() ?? {};
+      if (!isCurrent()) return false;
 
       // 合并新数据
       final newData = Map<String, dynamic>.from(existingData);
@@ -785,7 +792,8 @@ class AuthRepositoryImpl
       if (nftImageUrl != null) newData['nftImageUrl'] = nftImageUrl;
 
       // 保存到 Matrix 账户数据
-      await client.setAccountData(client.userID!, 'n42.user.profile', newData);
+      await client.setAccountData(userId, 'n42.user.profile', newData);
+      if (!isCurrent()) return false;
 
       // 更新缓存
       _cachedProfileData = newData;
@@ -795,6 +803,7 @@ class AuthRepositoryImpl
         await _syncPokeTextToRooms(pokeText);
       }
 
+      if (!isCurrent()) return false;
       authLog('Profile data updated (${newData.keys.length} fields)');
       return true;
     } catch (e) {
@@ -857,6 +866,7 @@ class AuthRepositoryImpl
       return null;
     }
 
+    final isCurrent = _captureProfileSession();
     try {
       authLog('Getting account data for ${client.userID}');
       final data = await client.getAccountData(
@@ -864,6 +874,7 @@ class AuthRepositoryImpl
         'n42.user.profile',
       );
 
+      if (!isCurrent()) return null;
       _cachedProfileData = data;
       authLog('Profile data loaded (${data.keys.length} fields)');
       return data;
