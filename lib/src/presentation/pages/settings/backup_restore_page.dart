@@ -320,15 +320,16 @@ class _BackupHistorySection extends StatelessWidget {
                     if (action == 'delete') {
                       _confirmDelete(context, backup);
                     } else if (action == 'restore') {
-                      context.read<BackupBloc>().add(
-                        RestoreFromBackup(backupFilePath: backup.filePath),
+                      _RestoreSection._pickAndRestore(
+                        context, selectedPath: backup.filePath,
                       );
                     }
                   },
                   itemBuilder: (_) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
+                      enabled: !state.isRestoring,
                       value: 'restore',
-                      child: Row(
+                      child: const Row(
                         children: [
                           Icon(Icons.restore, size: 18),
                           SizedBox(width: AppDimensions.spacingS),
@@ -473,7 +474,7 @@ class _RestoreSection extends StatelessWidget {
     );
   }
 
-  Future<void> _pickAndRestore(BuildContext context) async {
+  static Future<void> _pickAndRestore(BuildContext context, {String? selectedPath}) async {
     final dependencies = GetIt.instance;
     if (!dependencies.isRegistered<MatrixClientManager>() ||
         !dependencies.isRegistered<IAuthRepository>()) {
@@ -485,11 +486,10 @@ class _RestoreSection extends StatelessWidget {
     if (origin == null) return;
     bool current() => context.mounted && origin.isCurrent;
     try {
-      final file = await FilePicker.pickFile(type: FileType.any);
+      final filePath = selectedPath ?? (await FilePicker.pickFile(type: FileType.any))?.path;
 
-      if (file != null) {
-        final filePath = file.path;
-        if (filePath != null && context.mounted && current()) {
+      if (filePath != null) {
+        if (context.mounted && current()) {
           final service = GetIt.instance<ChatBackupService>();
           BackupPreview preview;
           String? password;

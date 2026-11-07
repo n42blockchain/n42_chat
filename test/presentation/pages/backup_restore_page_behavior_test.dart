@@ -104,7 +104,8 @@ void main() {
     'password-stale',
     'password-wrong',
   ]) {
-    testWidgets('valid account picker outcome: $mode', (tester) async {
+    for (final fromHistory in [false, if (!['cancel', 'active-error', 'stale-error'].contains(mode)) true]) {
+    testWidgets('valid account restore outcome: $mode history=$fromHistory', (tester) async {
       final service = _Service();
       final manager = _Manager();
       final client = _Client();
@@ -124,7 +125,10 @@ void main() {
         matchesClient: (candidate) => identical(candidate, client),
       );
       when(() => auth.currentAccountGeneration).thenReturn(generation);
-      when(() => service.listBackups()).thenAnswer((_) async => []);
+      when(() => service.listBackups()).thenAnswer((_) async => fromHistory ? [BackupInfo(
+        backupId: 'fixture', filePath: '/tmp/fixture.n42backup', fileSizeBytes: 1024,
+        createdAt: DateTime(2026), roomCount: 1, includesMedia: false, includesKeys: false,
+      )] : []);
       final previous = FilePickerPlatform.instance;
       final picker = _FilePicker();
       final protected = mode.startsWith('password-');
@@ -210,12 +214,20 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Choose Backup File'));
-      await tester.pumpAndSettle();
       clearInteractions(service);
-      await tester.tap(find.text('Choose Backup File'));
+      if (fromHistory) {
+        final menu = find.byType(PopupMenuButton<String>);
+        await tester.ensureVisible(menu);
+        await tester.tap(menu);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Restore').last);
+      } else {
+        await tester.ensureVisible(find.text('Choose Backup File'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Choose Backup File'));
+      }
       await tester.pumpAndSettle();
-      expect(picker.calls, 1);
+      expect(picker.calls, fromHistory ? 0 : 1);
       if (protected) {
         final input = find.descendant(
           of: find.byType(AlertDialog),
@@ -316,5 +328,6 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
       expect(tester.takeException(), isNull);
     });
+    }
   }
 }
