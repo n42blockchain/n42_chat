@@ -2896,5 +2896,7 @@
   "scheduledRecoveryImportHint": "Salvar esta prévia apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do arquivo não foi verificado.",
   "scheduledRecoveryComposerHint": "Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue.",
   "backupRecoverLegacyArchive": "Recuperar histórico local anterior",
-  "backupLegacyArchiveWarning": "O proprietário deste histórico não foi verificado. Copie apenas suas salas para a conta abaixo. O original será mantido."
+  "backupLegacyArchiveWarning": "O proprietário deste histórico não foi verificado. Copie apenas suas salas para a conta abaixo. O original será mantido.",
+  "backupOlderFiles": "Arquivos de backup anteriores",
+  "backupOlderFilesWarning": "Estes arquivos podem pertencer a outra conta. Selecione um arquivo para verificar o conteúdo e o proprietário antes de restaurar."
 }

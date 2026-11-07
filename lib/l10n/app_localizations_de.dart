@@ -6299,4 +6299,11 @@ class SDe extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Der Besitzer dieses Verlaufs ist nicht bestätigt. Kopiere nur deine Räume in das unten angegebene Konto. Das Original bleibt erhalten.';
+
+  @override
+  String get backupOlderFiles => 'Ältere Sicherungsdateien';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Diese Dateien gehören möglicherweise zu einem anderen Konto. Wähle eine Datei, um Inhalt und Kontozugehörigkeit vor der Wiederherstellung zu prüfen.';
 }

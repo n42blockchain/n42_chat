@@ -6219,4 +6219,11 @@ class SEn extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'This history has no verified owner. Copy only your rooms to the account below. The original is kept.';
+
+  @override
+  String get backupOlderFiles => 'Older backup files';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'These files may belong to another account. Select a file to check its contents and ownership before restoring.';
 }

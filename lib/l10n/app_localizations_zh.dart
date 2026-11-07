@@ -6074,6 +6074,12 @@ class SZh extends S {
   @override
   String get backupLegacyArchiveWarning =>
       '这些历史记录的账号归属未经验证。请仅将属于你的房间复制到下方账号，原始记录会保留。';
+
+  @override
+  String get backupOlderFiles => '旧备份文件';
+
+  @override
+  String get backupOlderFilesWarning => '这些文件可能属于其他账号。请选择文件，核对内容和账号归属后再恢复。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12146,4 +12152,10 @@ class SZhTw extends SZh {
   @override
   String get backupLegacyArchiveWarning =>
       '這些歷史記錄的帳號歸屬未經驗證。請僅將屬於你的聊天室複製到下方帳號，原始記錄會保留。';
+
+  @override
+  String get backupOlderFiles => '舊備份檔案';
+
+  @override
+  String get backupOlderFilesWarning => '這些檔案可能屬於其他帳號。請選擇檔案，核對內容和帳號歸屬後再復原。';
 }

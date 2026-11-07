@@ -473,12 +473,20 @@ class _RestoreSection extends StatelessWidget {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(AppDimensions.spacing),
+            child: OutlinedButton.icon(
+              onPressed: state.isRestoring ? null : () => _pickAndRestore(context, legacyFiles: true),
+              icon: const Icon(Icons.history),
+              label: Text(S.of(context)!.backupOlderFiles),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  static Future<void> _pickAndRestore(BuildContext context, {String? selectedPath}) async {
+  static Future<void> _pickAndRestore(BuildContext context, {String? selectedPath, bool legacyFiles = false}) async {
     final dependencies = GetIt.instance;
     if (!dependencies.isRegistered<MatrixClientManager>() ||
         !dependencies.isRegistered<IAuthRepository>()) {
@@ -490,7 +498,32 @@ class _RestoreSection extends StatelessWidget {
     if (origin == null) return;
     bool current() => context.mounted && origin.isCurrent;
     try {
-      final filePath = selectedPath ?? (await FilePicker.pickFile(type: FileType.any))?.path;
+      var filePath = selectedPath;
+      if (legacyFiles) {
+        final files = await dependencies<ChatBackupService>().listLegacyBackupFiles();
+        if (!context.mounted || !current()) return;
+        final labels = S.of(context)!;
+        filePath = await showDialog<String>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(labels.backupOlderFiles),
+            content: SizedBox(width: 480, child: Column(mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(labels.backupOlderFilesWarning),
+                if (files.isEmpty) Text(labels.backupNoBackups)
+                else SizedBox(height: MediaQuery.sizeOf(dialogContext).height * 0.35,
+                  child: ListView.builder(itemCount: files.length, itemBuilder: (_, index) {
+                    final file = files[index];
+                    return ListTile(title: Text(file.uri.pathSegments.last),
+                      onTap: () => Navigator.pop(dialogContext, file.path));
+                  })),
+              ])),
+            actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(labels.commonCancel))],
+          ),
+        );
+      } else {
+        filePath ??= (await FilePicker.pickFile(type: FileType.any))?.path;
+      }
 
       if (filePath != null) {
         if (context.mounted && current()) {

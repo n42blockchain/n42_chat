@@ -2896,5 +2896,7 @@
   "scheduledRecoveryImportHint": "Simpan pratinjau ini hanya sebagai salinan pemulihan. Tidak ada pesan yang dijadwalkan atau dikirim. Lampiran tidak disertakan. Penulis berkas belum diverifikasi.",
   "scheduledRecoveryComposerHint": "Tambahkan teks ke draf saat ini untuk ditinjau. Tidak ada yang dikirim. Lampiran, sebutan, dan pengatur waktu tidak dipulihkan. Periksa apakah pesan ini sudah terkirim.",
   "backupRecoverLegacyArchive": "Pulihkan riwayat lokal lama",
-  "backupLegacyArchiveWarning": "Pemilik riwayat ini belum diverifikasi. Salin hanya ruang milik Anda ke akun di bawah. Riwayat asli tetap disimpan."
+  "backupLegacyArchiveWarning": "Pemilik riwayat ini belum diverifikasi. Salin hanya ruang milik Anda ke akun di bawah. Riwayat asli tetap disimpan.",
+  "backupOlderFiles": "File cadangan lama",
+  "backupOlderFilesWarning": "File ini mungkin milik akun lain. Pilih file untuk memeriksa isi dan pemiliknya sebelum memulihkan."
 }

@@ -6281,4 +6281,11 @@ class SSw extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Mmiliki wa historia hii hajathibitishwa. Nakili vyumba vyako tu kwenye akaunti iliyo hapa chini. Historia asili itahifadhiwa.';
+
+  @override
+  String get backupOlderFiles => 'Faili za zamani za nakala rudufu';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Faili hizi huenda ni za akaunti nyingine. Chagua faili ili ukague maudhui na mmiliki kabla ya kurejesha.';
 }

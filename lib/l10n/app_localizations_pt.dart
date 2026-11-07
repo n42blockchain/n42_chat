@@ -6282,6 +6282,13 @@ class SPt extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'O proprietário deste histórico não foi verificado. Copie apenas as suas salas para a conta abaixo. O original é mantido.';
+
+  @override
+  String get backupOlderFiles => 'Ficheiros de cópia anteriores';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Estes ficheiros podem pertencer a outra conta. Selecione um ficheiro para verificar o conteúdo e o proprietário antes de restaurar.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12563,4 +12570,11 @@ class SPtBr extends SPt {
   @override
   String get backupLegacyArchiveWarning =>
       'O proprietário deste histórico não foi verificado. Copie apenas suas salas para a conta abaixo. O original será mantido.';
+
+  @override
+  String get backupOlderFiles => 'Arquivos de backup anteriores';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Estes arquivos podem pertencer a outra conta. Selecione um arquivo para verificar o conteúdo e o proprietário antes de restaurar.';
 }

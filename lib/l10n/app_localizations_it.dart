@@ -6278,4 +6278,11 @@ class SIt extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Il proprietario di questa cronologia non è verificato. Copia solo le tue stanze nell’account qui sotto. L’originale viene conservato.';
+
+  @override
+  String get backupOlderFiles => 'File di backup precedenti';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Questi file potrebbero appartenere a un altro account. Seleziona un file per verificarne contenuto e proprietario prima del ripristino.';
 }

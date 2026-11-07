@@ -6246,4 +6246,11 @@ class SMr extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'या इतिहासाच्या मालकाची पडताळणी झालेली नाही. फक्त तुमच्या खोल्या खालील खात्यात कॉपी करा. मूळ इतिहास जतन केला जाईल.';
+
+  @override
+  String get backupOlderFiles => 'जुन्या बॅकअप फायली';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'या फायली दुसऱ्या खात्याच्या असू शकतात. पुनर्संचयित करण्यापूर्वी मजकूर आणि मालक तपासण्यासाठी फाइल निवडा.';
 }

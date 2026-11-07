@@ -2896,5 +2896,7 @@
   "scheduledRecoveryImportHint": "Bu önizlemeyi yalnızca kurtarma kopyası olarak kaydet. Hiçbir mesaj planlanmaz veya gönderilmez. Ekler dahil değildir. Dosyanın yazarı doğrulanmamıştır.",
   "scheduledRecoveryComposerHint": "İncelemek için metni mevcut taslağa ekleyin. Hiçbir şey gönderilmez. Ekler, bahsetmeler ve zamanlayıcılar geri yüklenmez. Bu mesajın daha önce iletilip iletilmediğini kontrol edin.",
   "backupRecoverLegacyArchive": "Eski yerel geçmişi kurtar",
-  "backupLegacyArchiveWarning": "Bu geçmişin sahibi doğrulanmamıştır. Yalnızca kendi odalarınızı aşağıdaki hesaba kopyalayın. Orijinal korunur."
+  "backupLegacyArchiveWarning": "Bu geçmişin sahibi doğrulanmamıştır. Yalnızca kendi odalarınızı aşağıdaki hesaba kopyalayın. Orijinal korunur.",
+  "backupOlderFiles": "Eski yedek dosyaları",
+  "backupOlderFilesWarning": "Bu dosyalar başka bir hesaba ait olabilir. Geri yüklemeden önce içeriğini ve sahibini kontrol etmek için bir dosya seçin."
 }

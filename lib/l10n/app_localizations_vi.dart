@@ -6236,4 +6236,11 @@ class SVi extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Chưa xác minh chủ sở hữu lịch sử này. Chỉ sao chép phòng của bạn vào tài khoản bên dưới. Bản gốc được giữ lại.';
+
+  @override
+  String get backupOlderFiles => 'Tệp sao lưu cũ';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Các tệp này có thể thuộc tài khoản khác. Chọn tệp để kiểm tra nội dung và chủ sở hữu trước khi khôi phục.';
 }

@@ -252,16 +252,35 @@ class ChatBackupService {
   /// Legacy root files are retained for explicit file selection, never adopted.
   Future<Directory> _getBackupDir() async {
     final scope = _backupDirectoryScope() ?? 'unowned';
-    final Directory root;
-    if (_backupDirProvider != null) {
-      root = await _backupDirProvider();
-    } else {
-      final appDir = await getApplicationDocumentsDirectory();
-      root = Directory(p.join(appDir.path, StorageConstants.backupDirName));
-    }
+    final root = await _getBackupRoot();
     final directory = Directory(p.join(root.path, scope));
     if (!directory.existsSync()) directory.createSync(recursive: true);
     return directory;
+  }
+
+  Future<Directory> _getBackupRoot() async {
+    if (_backupDirProvider != null) return _backupDirProvider();
+    final appDir = await getApplicationDocumentsDirectory();
+    return Directory(p.join(appDir.path, StorageConstants.backupDirName));
+  }
+
+  /// Explicit legacy discovery exposes filenames only, never adopts or deletes.
+  Future<List<File>> listLegacyBackupFiles() async {
+    if (_backupDirectoryScope() == null) return [];
+    final ensureCurrent = _captureBackupSession();
+    final root = await _getBackupRoot();
+    ensureCurrent();
+    if (!root.existsSync()) return [];
+    final files = <File>[];
+    await for (final entity in root.list(followLinks: false)) {
+      ensureCurrent();
+      if (entity is File && entity.path.endsWith(StorageConstants.backupExtension)) {
+        files.add(entity);
+      }
+    }
+    ensureCurrent();
+    files.sort((a, b) => a.path.compareTo(b.path));
+    return files;
   }
 
   /// 创建备份

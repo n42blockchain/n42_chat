@@ -2896,5 +2896,7 @@
   "scheduledRecoveryImportHint": "Enregistrer cet aperçu uniquement comme copie de récupération. Aucun message ne sera programmé ni envoyé. Les pièces jointes ne sont pas incluses. L’auteur du fichier n’est pas vérifié.",
   "scheduledRecoveryComposerHint": "Ajoutez le texte au brouillon actuel pour le vérifier. Rien ne sera envoyé. Les pièces jointes, mentions et minuteries ne seront pas restaurées. Vérifiez si ce message a déjà été remis.",
   "backupRecoverLegacyArchive": "Restaurer un ancien historique local",
-  "backupLegacyArchiveWarning": "Le propriétaire de cet historique n’est pas vérifié. Copiez uniquement vos salons vers le compte ci-dessous. L’original est conservé."
+  "backupLegacyArchiveWarning": "Le propriétaire de cet historique n’est pas vérifié. Copiez uniquement vos salons vers le compte ci-dessous. L’original est conservé.",
+  "backupOlderFiles": "Anciens fichiers de sauvegarde",
+  "backupOlderFilesWarning": "Ces fichiers peuvent appartenir à un autre compte. Sélectionnez un fichier pour vérifier son contenu et son propriétaire avant de le restaurer."
 }

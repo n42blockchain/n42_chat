@@ -6250,4 +6250,11 @@ class STr extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Bu geçmişin sahibi doğrulanmamıştır. Yalnızca kendi odalarınızı aşağıdaki hesaba kopyalayın. Orijinal korunur.';
+
+  @override
+  String get backupOlderFiles => 'Eski yedek dosyaları';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Bu dosyalar başka bir hesaba ait olabilir. Geri yüklemeden önce içeriğini ve sahibini kontrol etmek için bir dosya seçin.';
 }

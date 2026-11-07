@@ -6249,4 +6249,11 @@ class SBn extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'এই ইতিহাসের মালিক যাচাই করা হয়নি। শুধু আপনার কক্ষগুলো নিচের অ্যাকাউন্টে কপি করুন। মূল ইতিহাস রাখা হবে।';
+
+  @override
+  String get backupOlderFiles => 'পুরোনো ব্যাকআপ ফাইল';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'এই ফাইলগুলো অন্য অ্যাকাউন্টের হতে পারে। পুনরুদ্ধারের আগে বিষয়বস্তু ও মালিক যাচাই করতে একটি ফাইল বেছে নিন।';
 }

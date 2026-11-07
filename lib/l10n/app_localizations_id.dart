@@ -6260,4 +6260,11 @@ class SId extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Pemilik riwayat ini belum diverifikasi. Salin hanya ruang milik Anda ke akun di bawah. Riwayat asli tetap disimpan.';
+
+  @override
+  String get backupOlderFiles => 'File cadangan lama';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'File ini mungkin milik akun lain. Pilih file untuk memeriksa isi dan pemiliknya sebelum memulihkan.';
 }

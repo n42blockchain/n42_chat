@@ -786,6 +786,17 @@ void main() {
     });
   }
 
+  test('legacy discovery lists only root backup files and preserves them', () async {
+    final owned = await service.createBackup();
+    final old = await File(owned.filePath).copy('${directory.path}/old.n42backup');
+    await File('${directory.path}/notes.txt').writeAsString('ignore');
+    await Directory('${directory.path}/folder.n42backup').create();
+    final files = await service.listLegacyBackupFiles();
+    expect(files.map((file) => file.path), [old.path]);
+    expect(await old.exists(), isTrue);
+    expect((await service.listBackups()).single.backupId, owned.backupId);
+  });
+
   test('list ignores unrelated files and directories', () async {
     await File('${directory.path}/notes.txt').writeAsString('ignore');
     await Directory('${directory.path}/folder.n42backup').create();

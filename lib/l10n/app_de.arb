@@ -2896,5 +2896,7 @@
   "scheduledRecoveryImportHint": "Diese Vorschau nur als Wiederherstellungskopie speichern. Es werden keine Nachrichten geplant oder gesendet. Anhänge sind nicht enthalten. Der Dateiautor ist nicht verifiziert.",
   "scheduledRecoveryComposerHint": "Text zur Prüfung an den aktuellen Entwurf anhängen. Es wird nichts gesendet. Anhänge, Erwähnungen und Timer werden nicht wiederhergestellt. Prüfen Sie, ob diese Nachricht bereits zugestellt wurde.",
   "backupRecoverLegacyArchive": "Älteren lokalen Verlauf wiederherstellen",
-  "backupLegacyArchiveWarning": "Der Besitzer dieses Verlaufs ist nicht bestätigt. Kopiere nur deine Räume in das unten angegebene Konto. Das Original bleibt erhalten."
+  "backupLegacyArchiveWarning": "Der Besitzer dieses Verlaufs ist nicht bestätigt. Kopiere nur deine Räume in das unten angegebene Konto. Das Original bleibt erhalten.",
+  "backupOlderFiles": "Ältere Sicherungsdateien",
+  "backupOlderFilesWarning": "Diese Dateien gehören möglicherweise zu einem anderen Konto. Wähle eine Datei, um Inhalt und Kontozugehörigkeit vor der Wiederherstellung zu prüfen."
 }

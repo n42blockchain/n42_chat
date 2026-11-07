@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
@@ -92,6 +93,56 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+  for (final outcome in ['cancel', 'stale-selection', 'stale-list', 'empty']) {
+    testWidgets('legacy file selector is guarded: $outcome', (tester) async {
+      final service = _Service();
+      final manager = _Manager();
+      final client = _Client();
+      final auth = _Auth();
+      var current = true;
+      when(() => manager.client).thenReturn(client);
+      when(() => client.userID).thenReturn('@me:hs.test');
+      when(() => client.homeserver).thenReturn(Uri.parse('https://hs.test'));
+      when(() => client.accessToken).thenReturn('fixture-token');
+      when(() => client.deviceID).thenReturn('fixture-device');
+      when(client.isLogged).thenReturn(true);
+      final generation = AuthSessionInvalidation(userId: '@me:hs.test',
+        homeserver: Uri.parse('https://hs.test'), deviceId: 'fixture-device',
+        isCurrent: () => current, matchesClient: (candidate) => identical(candidate, client));
+      when(() => auth.currentAccountGeneration).thenReturn(generation);
+      when(() => service.listBackups()).thenAnswer((_) async => []);
+      when(() => service.listLegacyBackupFiles()).thenAnswer((_) async {
+        if (outcome == 'stale-list') current = false;
+        return outcome == 'empty' ? [] : [File('/tmp/fixture.n42backup')];
+      });
+      GetIt.instance.registerSingleton<ChatBackupService>(service);
+      GetIt.instance.registerSingleton<MatrixClientManager>(manager);
+      GetIt.instance.registerSingleton<IAuthRepository>(auth);
+      addTearDown(() => GetIt.instance.reset());
+      await tester.pumpWidget(const MaterialApp(localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales, locale: Locale('en'), home: BackupRestorePage()));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Older backup files'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Older backup files'));
+      await tester.pumpAndSettle();
+      verify(() => service.listLegacyBackupFiles()).called(1);
+      if (outcome == 'stale-list') {
+        expect(find.byType(AlertDialog), findsNothing);
+      } else if (outcome == 'stale-selection') {
+        current = false;
+        await tester.tap(find.text('fixture.n42backup'));
+      } else {
+        if (outcome == 'empty') expect(find.text('No backups yet'), findsWidgets);
+        await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      }
+      await tester.pumpAndSettle();
+      verifyNever(() => service.previewBackup(any()));
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final mode in [
     'cancel',
     'active-error',
@@ -104,8 +155,10 @@ void main() {
     'password-stale',
     'password-wrong',
   ]) {
-    for (final fromHistory in [false, if (!['cancel', 'active-error', 'stale-error'].contains(mode)) true]) {
-    testWidgets('valid account restore outcome: $mode history=$fromHistory', (tester) async {
+    for (final source in ['picker', if (!['cancel', 'active-error', 'stale-error'].contains(mode)) ...['history', 'legacy']]) {
+    final fromHistory = source == 'history';
+    final fromLegacy = source == 'legacy';
+    testWidgets('valid account restore outcome: $mode source=$source', (tester) async {
       final service = _Service();
       final manager = _Manager();
       final client = _Client();
@@ -129,6 +182,7 @@ void main() {
         backupId: 'fixture', filePath: '/tmp/fixture.n42backup', fileSizeBytes: 1024,
         createdAt: DateTime(2026), roomCount: 1, includesMedia: false, includesKeys: false,
       )] : []);
+      when(() => service.listLegacyBackupFiles()).thenAnswer((_) async => [File('/tmp/fixture.n42backup')]);
       final previous = FilePickerPlatform.instance;
       final picker = _FilePicker();
       final protected = mode.startsWith('password-');
@@ -221,13 +275,20 @@ void main() {
         await tester.tap(menu);
         await tester.pumpAndSettle();
         await tester.tap(find.text('Restore').last);
+      } else if (fromLegacy) {
+        await tester.ensureVisible(find.text('Older backup files'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Older backup files'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('may belong to another account'), findsOneWidget);
+        await tester.tap(find.text('fixture.n42backup'));
       } else {
         await tester.ensureVisible(find.text('Choose Backup File'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Choose Backup File'));
       }
       await tester.pumpAndSettle();
-      expect(picker.calls, fromHistory ? 0 : 1);
+      expect(picker.calls, fromHistory || fromLegacy ? 0 : 1);
       if (protected) {
         final input = find.descendant(
           of: find.byType(AlertDialog),

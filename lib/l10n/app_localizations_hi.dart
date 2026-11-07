@@ -6247,4 +6247,11 @@ class SHi extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'इस इतिहास के मालिक की पुष्टि नहीं हुई है। केवल अपने कमरे नीचे दिए खाते में कॉपी करें। मूल इतिहास सुरक्षित रहेगा।';
+
+  @override
+  String get backupOlderFiles => 'पुरानी बैकअप फ़ाइलें';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'ये फ़ाइलें किसी दूसरे खाते की हो सकती हैं। पुनर्स्थापित करने से पहले सामग्री और मालिक की जाँच के लिए फ़ाइल चुनें।';
 }

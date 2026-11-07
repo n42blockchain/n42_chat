@@ -2925,5 +2925,7 @@
   "scheduledRecoveryImportHint": "Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.",
   "scheduledRecoveryComposerHint": "Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered.",
   "backupRecoverLegacyArchive": "Recover older local history",
-  "backupLegacyArchiveWarning": "This history has no verified owner. Copy only your rooms to the account below. The original is kept."
+  "backupLegacyArchiveWarning": "This history has no verified owner. Copy only your rooms to the account below. The original is kept.",
+  "backupOlderFiles": "Older backup files",
+  "backupOlderFilesWarning": "These files may belong to another account. Select a file to check its contents and ownership before restoring."
 }

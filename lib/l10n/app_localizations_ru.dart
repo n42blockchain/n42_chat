@@ -6280,4 +6280,11 @@ class SRu extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Владелец этой истории не подтверждён. Копируйте только свои комнаты в указанную ниже учётную запись. Оригинал сохранится.';
+
+  @override
+  String get backupOlderFiles => 'Старые файлы резервных копий';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Эти файлы могут принадлежать другой учётной записи. Выберите файл и проверьте его содержимое и владельца перед восстановлением.';
 }

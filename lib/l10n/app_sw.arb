@@ -2896,5 +2896,7 @@
   "scheduledRecoveryImportHint": "Hifadhi onyesho hili kama nakala ya urejeshaji pekee. Hakuna ujumbe utakaoratibiwa au kutumwa. Viambatisho havijajumuishwa. Mwandishi wa faili hajathibitishwa.",
   "scheduledRecoveryComposerHint": "Ongeza maandishi kwenye rasimu ya sasa ili uyakague. Hakuna kitakachotumwa. Viambatisho, mitajo na vipima muda havitarejeshwa. Angalia kama ujumbe huu tayari umewasilishwa.",
   "backupRecoverLegacyArchive": "Rejesha historia ya zamani ya kifaa",
-  "backupLegacyArchiveWarning": "Mmiliki wa historia hii hajathibitishwa. Nakili vyumba vyako tu kwenye akaunti iliyo hapa chini. Historia asili itahifadhiwa."
+  "backupLegacyArchiveWarning": "Mmiliki wa historia hii hajathibitishwa. Nakili vyumba vyako tu kwenye akaunti iliyo hapa chini. Historia asili itahifadhiwa.",
+  "backupOlderFiles": "Faili za zamani za nakala rudufu",
+  "backupOlderFilesWarning": "Faili hizi huenda ni za akaunti nyingine. Chagua faili ili ukague maudhui na mmiliki kabla ya kurejesha."
 }

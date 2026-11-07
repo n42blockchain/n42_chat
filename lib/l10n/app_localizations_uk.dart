@@ -6280,4 +6280,11 @@ class SUk extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Власника цієї історії не підтверджено. Копіюйте лише свої кімнати до вказаного нижче облікового запису. Оригінал збережеться.';
+
+  @override
+  String get backupOlderFiles => 'Старі файли резервних копій';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Ці файли можуть належати іншому обліковому запису. Виберіть файл і перевірте його вміст та власника перед відновленням.';
 }

@@ -11500,6 +11500,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'This history has no verified owner. Copy only your rooms to the account below. The original is kept.'**
   String get backupLegacyArchiveWarning;
+
+  /// No description provided for @backupOlderFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Older backup files'**
+  String get backupOlderFiles;
+
+  /// No description provided for @backupOlderFilesWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'These files may belong to another account. Select a file to check its contents and ownership before restoring.'**
+  String get backupOlderFilesWarning;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

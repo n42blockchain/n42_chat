@@ -2896,5 +2896,7 @@
   "scheduledRecoveryImportHint": "Chỉ lưu bản xem trước này dưới dạng bản sao khôi phục. Không có tin nhắn nào được lên lịch hoặc gửi. Không bao gồm tệp đính kèm. Tác giả tệp chưa được xác minh.",
   "scheduledRecoveryComposerHint": "Thêm văn bản vào bản nháp hiện tại để xem lại. Không có gì được gửi. Tệp đính kèm, lượt nhắc và bộ hẹn giờ không được khôi phục. Hãy kiểm tra xem tin nhắn này đã được giao chưa.",
   "backupRecoverLegacyArchive": "Khôi phục lịch sử cục bộ cũ",
-  "backupLegacyArchiveWarning": "Chưa xác minh chủ sở hữu lịch sử này. Chỉ sao chép phòng của bạn vào tài khoản bên dưới. Bản gốc được giữ lại."
+  "backupLegacyArchiveWarning": "Chưa xác minh chủ sở hữu lịch sử này. Chỉ sao chép phòng của bạn vào tài khoản bên dưới. Bản gốc được giữ lại.",
+  "backupOlderFiles": "Tệp sao lưu cũ",
+  "backupOlderFilesWarning": "Các tệp này có thể thuộc tài khoản khác. Chọn tệp để kiểm tra nội dung và chủ sở hữu trước khi khôi phục."
 }

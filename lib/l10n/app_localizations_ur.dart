@@ -6262,4 +6262,11 @@ class SUr extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'اس تاریخ کے مالک کی تصدیق نہیں ہوئی۔ صرف اپنے کمرے نیچے دیے گئے اکاؤنٹ میں نقل کریں۔ اصل محفوظ رہے گا۔';
+
+  @override
+  String get backupOlderFiles => 'پرانی بیک اپ فائلیں';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'یہ فائلیں کسی دوسرے اکاؤنٹ کی ہو سکتی ہیں۔ بحالی سے پہلے مواد اور مالک کی جانچ کے لیے فائل منتخب کریں۔';
 }

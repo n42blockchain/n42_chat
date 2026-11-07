@@ -2896,5 +2896,7 @@
   "scheduledRecoveryImportHint": "Uložit tento náhled pouze jako kopii pro obnovení. Žádné zprávy se nenaplánují ani neodešlou. Přílohy nejsou zahrnuty. Autor souboru není ověřen.",
   "scheduledRecoveryComposerHint": "Připojte text k aktuálnímu konceptu ke kontrole. Nic se neodešle. Přílohy, zmínky ani časovače se neobnoví. Zkontrolujte, zda již byla zpráva doručena.",
   "backupRecoverLegacyArchive": "Obnovit starší místní historii",
-  "backupLegacyArchiveWarning": "Vlastník této historie nebyl ověřen. Zkopírujte pouze své místnosti do níže uvedeného účtu. Originál zůstane zachován."
+  "backupLegacyArchiveWarning": "Vlastník této historie nebyl ověřen. Zkopírujte pouze své místnosti do níže uvedeného účtu. Originál zůstane zachován.",
+  "backupOlderFiles": "Starší soubory záloh",
+  "backupOlderFilesWarning": "Tyto soubory mohou patřit jinému účtu. Vyberte soubor a před obnovením ověřte jeho obsah a vlastníka."
 }

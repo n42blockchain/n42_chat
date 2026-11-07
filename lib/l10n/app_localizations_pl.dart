@@ -6287,4 +6287,11 @@ class SPl extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Właściciel tej historii nie został zweryfikowany. Skopiuj tylko swoje pokoje do konta poniżej. Oryginał zostanie zachowany.';
+
+  @override
+  String get backupOlderFiles => 'Starsze pliki kopii zapasowych';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Te pliki mogą należeć do innego konta. Wybierz plik i sprawdź jego zawartość oraz właściciela przed przywróceniem.';
 }

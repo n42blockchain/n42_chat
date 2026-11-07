@@ -6317,4 +6317,11 @@ class SFr extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Le propriétaire de cet historique n’est pas vérifié. Copiez uniquement vos salons vers le compte ci-dessous. L’original est conservé.';
+
+  @override
+  String get backupOlderFiles => 'Anciens fichiers de sauvegarde';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Ces fichiers peuvent appartenir à un autre compte. Sélectionnez un fichier pour vérifier son contenu et son propriétaire avant de le restaurer.';
 }

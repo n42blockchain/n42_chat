@@ -6260,4 +6260,11 @@ class SCs extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'Vlastník této historie nebyl ověřen. Zkopírujte pouze své místnosti do níže uvedeného účtu. Originál zůstane zachován.';
+
+  @override
+  String get backupOlderFiles => 'Starší soubory záloh';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Tyto soubory mohou patřit jinému účtu. Vyberte soubor a před obnovením ověřte jeho obsah a vlastníka.';
 }

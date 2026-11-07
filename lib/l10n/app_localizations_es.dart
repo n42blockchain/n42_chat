@@ -6292,4 +6292,11 @@ class SEs extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'No se ha verificado a quién pertenece este historial. Copia solo tus salas a la cuenta indicada abajo. Se conserva el original.';
+
+  @override
+  String get backupOlderFiles => 'Archivos de copia anteriores';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Estos archivos pueden pertenecer a otra cuenta. Selecciona uno para comprobar su contenido y propietario antes de restaurarlo.';
 }

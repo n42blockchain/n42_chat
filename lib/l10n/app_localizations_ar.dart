@@ -6220,4 +6220,11 @@ class SAr extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'لم يتم التحقق من مالك هذا السجل. انسخ غرفك فقط إلى الحساب أدناه. سيُحتفظ بالأصل.';
+
+  @override
+  String get backupOlderFiles => 'ملفات النسخ الاحتياطي القديمة';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'قد تنتمي هذه الملفات إلى حساب آخر. اختر ملفًا للتحقق من محتواه ومالكه قبل الاستعادة.';
 }

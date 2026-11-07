@@ -6115,4 +6115,11 @@ class SKo extends S {
   @override
   String get backupLegacyArchiveWarning =>
       '이 기록의 소유자는 확인되지 않았습니다. 본인의 채팅방만 아래 계정으로 복사하세요. 원본은 유지됩니다.';
+
+  @override
+  String get backupOlderFiles => '이전 백업 파일';
+
+  @override
+  String get backupOlderFilesWarning =>
+      '다른 계정의 파일일 수 있습니다. 파일을 선택하고 내용과 소유자를 확인한 후 복원하세요.';
 }

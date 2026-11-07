@@ -6112,4 +6112,11 @@ class SJa extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'この履歴の所有者は確認されていません。自分のルームだけを下のアカウントにコピーしてください。元の履歴は保持されます。';
+
+  @override
+  String get backupOlderFiles => '以前のバックアップファイル';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'これらのファイルは別のアカウントのものかもしれません。ファイルを選び、内容と所有者を確認してから復元してください。';
 }

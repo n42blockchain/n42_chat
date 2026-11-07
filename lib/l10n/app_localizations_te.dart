@@ -6295,4 +6295,11 @@ class STe extends S {
   @override
   String get backupLegacyArchiveWarning =>
       'ఈ చరిత్ర యజమాని ధృవీకరించబడలేదు. మీ గదులను మాత్రమే దిగువ ఖాతాకు కాపీ చేయండి. అసలు చరిత్ర అలాగే ఉంచబడుతుంది.';
+
+  @override
+  String get backupOlderFiles => 'పాత బ్యాకప్ ఫైళ్లు';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'ఈ ఫైళ్లు మరొక ఖాతాకు చెందినవి కావచ్చు. పునరుద్ధరించే ముందు విషయాన్ని, యజమానిని తనిఖీ చేయడానికి ఫైల్‌ను ఎంచుకోండి.';
 }
