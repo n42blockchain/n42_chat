@@ -801,11 +801,65 @@ void main() {
   });
 
   group('Scheduled rich messages', () {
+    for (final subscription in [false, true]) {
+      test('server refresh retains local scheduled preview: subscription=$subscription', () async {
+        final bloc = buildBloc();
+        addTearDown(bloc.close);
+        await initBloc(bloc);
+        final draft = _msg.copyWith(
+          id: 'scheduled_local', content: 'Local scheduled intent',
+          senderId: '@me:server.com', isFromMe: true,
+          scheduledAt: DateTime(2030),
+        );
+        final previewReady = bloc.stream.firstWhere(
+          (state) => state.messages.any((message) => message.id == draft.id),
+        );
+        bloc.add(ScheduledMessagesPreviewLoaded([draft]));
+        await previewReady.timeout(const Duration(seconds: 5));
+        final remote = _msg.copyWith(id: 'remote_reloaded');
+        when(() => mockRepo.getMessages(any(), limit: any(named: 'limit')))
+            .thenAnswer((_) async => [remote]);
+        final refreshed = bloc.stream.firstWhere(
+          (state) => state.messages.any((message) => message.id == remote.id),
+        );
+        bloc.add(subscription ? MessagesUpdated([remote]) : const LoadMessages(_roomId));
+        final state = await refreshed.timeout(const Duration(seconds: 5));
+        expect(state.messages.map((message) => message.id), contains(draft.id));
+        expect(state.messages.where((message) => message.id == draft.id), hasLength(1));
+      });
+    }
+
     void pendingRecord(String roomId, String id) {
       when(() => mockPrefs.getScheduledMessages(roomId, ownerUserId: any(named: 'ownerUserId'))).thenAnswer((_) async => [
         ScheduledMessageDraft(messageId: id, roomId: roomId, text: 'Pending', type: MessageType.text,
           createdAt: DateTime(2026), scheduledAt: DateTime(2030)),
       ]);
+    }
+
+    for (final matchingOwner in [true, false]) {
+      test('scheduled refresh deduplicates and checks draft owner: matching=$matchingOwner', () async {
+        final bloc = buildBlocWithClientManager();
+        addTearDown(bloc.close);
+        await initBloc(bloc);
+        final draft = _msg.copyWith(
+          id: 'scheduled_owner', isFromMe: true,
+          senderId: matchingOwner ? '@me:server.com' : '@previous:server.com',
+          scheduledAt: DateTime(2030),
+        );
+        final previewReady = bloc.stream.firstWhere(
+          (state) => state.messages.any((message) => message.id == draft.id),
+        );
+        bloc.add(ScheduledMessagesPreviewLoaded([draft]));
+        await previewReady.timeout(const Duration(seconds: 5));
+        final remote = _msg.copyWith(id: 'owner_refresh');
+        final refreshed = bloc.stream.firstWhere(
+          (state) => state.messages.any((message) => message.id == remote.id),
+        );
+        bloc.add(MessagesUpdated([remote, if (matchingOwner) draft]));
+        final state = await refreshed.timeout(const Duration(seconds: 5));
+        expect(state.messages.where((message) => message.id == draft.id),
+            hasLength(matchingOwner ? 1 : 0));
+      });
     }
 
     test('missing draft is not reported as successfully cancelled', () async {

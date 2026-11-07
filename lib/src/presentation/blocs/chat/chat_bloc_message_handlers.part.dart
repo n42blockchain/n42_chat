@@ -73,7 +73,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
 
       emit(
         state.copyWith(
-          messages: _visibleHistory(mergedMessages),
+          messages: _visibleHistory(_withLocalScheduledPreviews(mergedMessages)),
           isLoading: false,
           hasMore: messages.length >= event.limit && !_historyBoundaryReached(messages),
         ),
@@ -431,7 +431,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
     final typingUsers = _resolveCurrentTypingUsers();
 
     if (!isClosed) {
-      emit(state.copyWith(messages: _visibleHistory(mergedMessages), typingUsers: typingUsers));
+      emit(state.copyWith(messages: _visibleHistory(_withLocalScheduledPreviews(mergedMessages)), typingUsers: typingUsers));
       _scheduleTypingUsersRefresh(typingUsers);
 
       // 扫描失败消息加入自动重试队列

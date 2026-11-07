@@ -331,7 +331,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
         emit(
           state.copyWith(
-            messages: _visibleHistory(filteredMessages),
+            messages: _visibleHistory(_withLocalScheduledPreviews(filteredMessages)),
             isLoading: false,
             hasMore: !_historyBoundaryReached(cachedMessages),
           ),
@@ -460,6 +460,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   /// 后台加载完整消息数据
+  List<MessageEntity> _withLocalScheduledPreviews(List<MessageEntity> messages) {
+    final ids = messages.map((message) => message.id).toSet();
+    final owner = _clientManager?.client?.userID ?? _authRepository?.currentUser?.userId;
+    final previews = state.messages.where((message) =>
+        message.isScheduled &&
+        message.isFromMe &&
+        message.roomId == _currentRoomId &&
+        (owner == null || message.senderId == owner) &&
+        ids.add(message.id)).toList();
+    if (previews.isEmpty) return messages;
+    return [...messages, ...previews]
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+  }
+
   void _loadFullMessagesInBackground(String roomId) {
     final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
