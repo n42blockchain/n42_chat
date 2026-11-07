@@ -721,6 +721,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-002 Group-call token fetching and multi-party rendering were not live-tested
 
+- 2026-11-07 raw SFU grant enforcement: LiveKit 1.13.11 accepted a publisher AddTrack and returned explicit NOT_ALLOWED for the viewer using raw protobuf WebSocket signaling, bypassing SDK publish prechecks. Only two synthetic identities in an owned room were used; the room was deleted and no RTP/media or chat was sent. This validates enforcement of a restrictive token, not Matrix membership or the production issuer role policy. Host evidence: docs/testing/webrtc-raw-grants-2026-11-07.json.
+
 - 2026-11-07 offline policy acceptance: host commit 7fa420b6b adds a bounded offline JWT verifier for signature, expiry, issuer, participant, room and explicit publish grants; privileged grants are rejected. Go race tests and vet pass. Deployment guidance now covers every reachable issuer and removes online JWT decoding. This is an operator tool, not production policy deployment or SFU viewer rejection evidence.
 
 - 2026-11-07 host permissions: empty or incomplete camera/microphone result maps incorrectly passed the all-returned-values check. Three failing page cases reproduced it; both required keys must now explicitly be granted before any room is created. Host live-module 74 tests pass and scoped analysis is clean. Real native prompts and media acceptance remain open; not included in 73424.
