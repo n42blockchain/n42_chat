@@ -234,12 +234,10 @@ void main() {
       final auth = invocation.namedArguments[#auth];
       authAttempts.add(auth);
       if (auth == null) {
-        throw MatrixException(
-          http.Response(
-            '{"flows":[{"stages":["m.login.password"]}],"session":"test"}',
-            401,
-          ),
-        );
+        throw MatrixException.fromJson({
+          'flows': [{'stages': ['m.login.password']}],
+          'session': 'test',
+        });
       }
       activeDevices = devices
           .where((device) => device.deviceId != 'RECENT_DEVICE')

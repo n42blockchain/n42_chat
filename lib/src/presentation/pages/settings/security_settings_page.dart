@@ -16,7 +16,6 @@ import '../../../core/services/biometric_service.dart';
 import '../../../core/services/totp_2fa_store.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
-import '../../../core/utils/matrix_uia_utils.dart';
 import '../../../core/utils/matrix_deletion_uia_coordinator.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
@@ -2198,14 +2197,17 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
         await _authDataSource.deleteDevice(device.deviceId);
       } on MatrixException catch (e) {
         if (!mounted || !isCurrent()) return;
-        if (e.response?.statusCode == 401 &&
-            matrixUiaSupportsPassword(e.response?.body)) {
+        if (e.requireAdditionalAuthentication &&
+            (e.authenticationFlows?.any(
+                  (flow) => flow.stages.contains('m.login.password'),
+                ) ??
+                false)) {
           // UIA required - show password dialog
           if (mounted) {
             setState(() => _isLoading = false);
             await _showUiaPasswordDialog(
               device,
-              session: matrixUiaSession(e.response?.body),
+              session: e.session,
               isCurrent: isCurrent,
             );
             return;
