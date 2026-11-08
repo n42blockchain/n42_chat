@@ -2189,7 +2189,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           // UIA required - show password dialog
           if (mounted) {
             setState(() => _isLoading = false);
-            await _showUiaPasswordDialog(device);
+            await _showUiaPasswordDialog(
+              device,
+              session: matrixUiaSession(e.response?.body),
+            );
             return;
           }
         }
@@ -2218,7 +2221,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     }
   }
 
-  Future<void> _showUiaPasswordDialog(DeviceInfo device) async {
+  Future<void> _showUiaPasswordDialog(
+    DeviceInfo device, {
+    String? session,
+  }) async {
     final passwordController = TextEditingController();
     final route = DialogRoute<bool>(
       context: context,
@@ -2261,7 +2267,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       await route.completed;
 
       if (confirmed == true) {
-        final password = passwordController.text.trim();
+        final password = passwordController.text;
         if (password.isNotEmpty) {
           if (!mounted) return;
           _invalidatePendingDataLoads();
@@ -2269,6 +2275,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           try {
             final userId = widget.e2eeManager.client.userID ?? '';
             final auth = AuthenticationPassword(
+              session: session,
               password: password,
               identifier: AuthenticationUserIdentifier(user: userId),
             );

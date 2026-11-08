@@ -255,7 +255,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(l10n.settingsVerifyIdentity), findsOneWidget);
-    await tester.enterText(find.byType(TextField).last, 'account password');
+    await tester.enterText(find.byType(TextField).last, ' account password ');
     await tester.tap(find.text(l10n.commonConfirm));
     await tester.pumpAndSettle();
 
@@ -263,7 +263,8 @@ void main() {
     expect(authAttempts.first, isNull);
     expect(authAttempts.last, isA<AuthenticationPassword>());
     final passwordAuth = authAttempts.last as AuthenticationPassword;
-    expect(passwordAuth.password, 'account password');
+    expect(passwordAuth.password, ' account password ');
+    expect(passwordAuth.session, 'test');
     expect(
       (passwordAuth.identifier as AuthenticationUserIdentifier).user,
       '@alice:example.org',
