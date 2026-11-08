@@ -6318,4 +6318,12 @@ class SRu extends S {
 
   @override
   String get stickerPackImages => 'Изображения';
+
+  @override
+  String get stickerPublishNotice =>
+      'Опубликуйте этот набор в выбранной группе. Изображения и метаданные не защищены сквозным шифрованием. Люди, которые могут читать состояние группы, могут получить к ним доступ.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Публикация не подтверждена. Проверьте группу перед повторной попыткой.';
 }

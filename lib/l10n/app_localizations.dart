@@ -11566,6 +11566,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Images'**
   String get stickerPackImages;
+
+  /// No description provided for @stickerPublishNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish this pack to the selected group. Its images and metadata are not end-to-end encrypted. People who can read the group state may access them.'**
+  String get stickerPublishNotice;
+
+  /// No description provided for @stickerPublishFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Publication was not confirmed. Check the group before trying again.'**
+  String get stickerPublishFailed;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

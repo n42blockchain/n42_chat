@@ -2295,5 +2295,7 @@
   "stickerImportFailed": "無法新增此貼圖包，請重試。",
   "stickerImportAccountChanged": "帳號已變更或登入已失效，請重新開啟貼圖匯入。",
   "stickerPackSourceRoom": "來源對話",
-  "stickerPackImages": "圖片"
+  "stickerPackImages": "圖片",
+  "stickerPublishNotice": "將此貼圖包發佈到所選群組。圖片和中繼資料不受端對端加密保護。可讀取群組狀態的人可能存取這些內容。",
+  "stickerPublishFailed": "無法確認發佈結果。請先檢查群組，再決定是否重試。"
 }

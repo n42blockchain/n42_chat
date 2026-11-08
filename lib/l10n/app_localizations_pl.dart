@@ -6325,4 +6325,12 @@ class SPl extends S {
 
   @override
   String get stickerPackImages => 'Obrazy';
+
+  @override
+  String get stickerPublishNotice =>
+      'Opublikuj ten pakiet w wybranej grupie. Obrazy i metadane nie są szyfrowane metodą end-to-end. Osoby mogące odczytać stan grupy mogą mieć do nich dostęp.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Nie potwierdzono publikacji. Sprawdź grupę przed ponowną próbą.';
 }

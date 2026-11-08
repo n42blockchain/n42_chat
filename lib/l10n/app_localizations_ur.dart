@@ -6300,4 +6300,12 @@ class SUr extends S {
 
   @override
   String get stickerPackImages => 'تصاویر';
+
+  @override
+  String get stickerPublishNotice =>
+      'یہ اسٹیکر پیک منتخب گروپ میں شائع کریں۔ اس کی تصاویر اور میٹا ڈیٹا سرے سے سرے تک انکرپٹ نہیں ہیں۔ گروپ کی حالت پڑھ سکنے والے لوگ ان تک رسائی حاصل کر سکتے ہیں۔';
+
+  @override
+  String get stickerPublishFailed =>
+      'اشاعت کی تصدیق نہیں ہوئی۔ دوبارہ کوشش کرنے سے پہلے گروپ دیکھیں۔';
 }

@@ -79,6 +79,14 @@ abstract class IStickerRepository {
   /// Read the original shared snapshot link; does not publish private packs.
   Future<String?> getPackShareUrl(String packId);
 
+  /// Publish an owned pack to a joined room after explicit user confirmation.
+  /// Room state and its media are not end-to-end encrypted.
+  Future<String?> publishPack(
+    String packId,
+    String roomId, {
+    required StickerPack reviewedPack,
+  });
+
   /// 监听已安装贴纸包变化
   Stream<List<StickerPack>> watchInstalledPacks();
 }

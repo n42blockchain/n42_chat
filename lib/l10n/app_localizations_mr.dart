@@ -6284,4 +6284,12 @@ class SMr extends S {
 
   @override
   String get stickerPackImages => 'प्रतिमा';
+
+  @override
+  String get stickerPublishNotice =>
+      'हा स्टिकर संच निवडलेल्या गटात प्रकाशित करा. त्यातील प्रतिमा आणि मेटाडेटा एंड-टू-एंड एन्क्रिप्ट केलेले नाहीत. गटाची स्थिती वाचू शकणारे लोक ते पाहू शकतात.';
+
+  @override
+  String get stickerPublishFailed =>
+      'प्रकाशनाची खात्री झाली नाही. पुन्हा प्रयत्न करण्यापूर्वी गट तपासा.';
 }

@@ -6318,4 +6318,12 @@ class SUk extends S {
 
   @override
   String get stickerPackImages => 'Зображення';
+
+  @override
+  String get stickerPublishNotice =>
+      'Опублікуйте цей набір у вибраній групі. Зображення та метадані не захищені наскрізним шифруванням. Люди, які можуть читати стан групи, можуть отримати до них доступ.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Публікацію не підтверджено. Перевірте групу перед повторною спробою.';
 }

@@ -6287,4 +6287,12 @@ class SBn extends S {
 
   @override
   String get stickerPackImages => 'ছবি';
+
+  @override
+  String get stickerPublishNotice =>
+      'এই স্টিকার প্যাকটি নির্বাচিত গ্রুপে প্রকাশ করুন। এর ছবি ও মেটাডেটা প্রান্ত থেকে প্রান্তে এনক্রিপ্ট করা নয়। যারা গ্রুপের অবস্থা পড়তে পারেন তারা এগুলো দেখতে পারেন।';
+
+  @override
+  String get stickerPublishFailed =>
+      'প্রকাশ নিশ্চিত করা যায়নি। আবার চেষ্টা করার আগে গ্রুপটি দেখুন।';
 }

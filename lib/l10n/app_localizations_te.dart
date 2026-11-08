@@ -6333,4 +6333,12 @@ class STe extends S {
 
   @override
   String get stickerPackImages => 'చిత్రాలు';
+
+  @override
+  String get stickerPublishNotice =>
+      'ఈ స్టిక్కర్ ప్యాక్‌ను ఎంచుకున్న గ్రూపులో ప్రచురించండి. చిత్రాలు, మెటాడేటా ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్ట్ చేయబడవు. గ్రూపు స్థితిని చదవగలవారు వీటిని చూడవచ్చు.';
+
+  @override
+  String get stickerPublishFailed =>
+      'ప్రచురణ నిర్ధారించబడలేదు. మళ్లీ ప్రయత్నించే ముందు గ్రూపును తనిఖీ చేయండి.';
 }

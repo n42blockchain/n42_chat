@@ -719,7 +719,7 @@ class SZh extends S {
   String get groupEnterGroupDescription => '請輸入羣簡介';
 
   @override
-  String get groupPublish => '發佈';
+  String get groupPublish => '发布';
 
   @override
   String get chatClearHistoryConfirm => '確定要清空聊天記錄嗎？此操作不可恢復。';
@@ -6107,6 +6107,13 @@ class SZh extends S {
 
   @override
   String get stickerPackImages => '图片';
+
+  @override
+  String get stickerPublishNotice =>
+      '将此贴纸包发布到所选群聊。图片和元数据不受端到端加密保护。可读取群状态的人可能访问这些内容。';
+
+  @override
+  String get stickerPublishFailed => '未能确认发布结果。请先检查群聊，再决定是否重试。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12212,4 +12219,11 @@ class SZhTw extends SZh {
 
   @override
   String get stickerPackImages => '圖片';
+
+  @override
+  String get stickerPublishNotice =>
+      '將此貼圖包發佈到所選群組。圖片和中繼資料不受端對端加密保護。可讀取群組狀態的人可能存取這些內容。';
+
+  @override
+  String get stickerPublishFailed => '無法確認發佈結果。請先檢查群組，再決定是否重試。';
 }

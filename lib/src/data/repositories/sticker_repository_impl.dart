@@ -5,6 +5,7 @@ import '../../domain/entities/sticker_pack_entity.dart';
 import '../../domain/repositories/sticker_repository.dart';
 import '../datasources/matrix/matrix_sticker_datasource.dart';
 import '../datasources/bundled_sticker_packs.dart';
+import '../services/matrix_sticker_publication.dart';
 import '../../core/utils/debug_log.dart';
 import '../../core/utils/sticker_suggestion_utils.dart';
 import '../../core/utils/matrix_sticker_pack_link.dart';
@@ -23,7 +24,9 @@ class StickerRepositoryImpl implements IStickerRepository {
   final _installedPacksController =
       StreamController<List<StickerPack>>.broadcast();
 
-  StickerRepositoryImpl(this._dataSource);
+  final MatrixStickerPublication? publication;
+
+  StickerRepositoryImpl(this._dataSource, {this.publication});
 
   @override
   Future<List<StickerPack>> getInstalledPacks() async {
@@ -424,6 +427,39 @@ class StickerRepositoryImpl implements IStickerRepository {
     final scope = _dataSource.accountScope;
     final pack = await getPackById(packId);
     return _dataSource.accountScope == scope ? pack?.origin?.shareUrl : null;
+  }
+
+  @override
+  Future<String?> publishPack(
+    String packId,
+    String roomId, {
+    required StickerPack reviewedPack,
+  }) async {
+    final publisher = publication;
+    final generation = publisher?.lifecycle.currentAccountGeneration;
+    final scope = _dataSource.accountScope;
+    if (publisher == null ||
+        generation == null ||
+        !generation.isCurrent ||
+        scope == null) {
+      return null;
+    }
+    final pack = await getPackById(packId);
+    if (pack == null ||
+        pack != reviewedPack ||
+        pack.source != StickerPackSource.custom ||
+        _dataSource.accountScope != scope ||
+        !generation.isCurrent ||
+        !identical(publisher.lifecycle.currentAccountGeneration, generation)) {
+      return null;
+    }
+    final origin = await publisher.publish(pack, roomId);
+    if (_dataSource.accountScope != scope ||
+        !generation.isCurrent ||
+        !identical(publisher.lifecycle.currentAccountGeneration, generation)) {
+      return null;
+    }
+    return origin.shareUrl;
   }
 
   @override

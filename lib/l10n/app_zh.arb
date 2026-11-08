@@ -232,7 +232,7 @@
   "commonEnterGroupName": "請輸入羣名稱",
   "commonConfirm": "確認",
   "groupEnterGroupDescription": "請輸入羣簡介",
-  "groupPublish": "發佈",
+  "groupPublish": "发布",
   "chatClearHistoryConfirm": "確定要清空聊天記錄嗎？此操作不可恢復。",
   "chatClearAction": "清空",
   "commonChatHistoryCleared": "聊天記錄已清空",
@@ -2295,5 +2295,7 @@
   "stickerImportFailed": "无法添加此贴纸包，请重试。",
   "stickerImportAccountChanged": "账号已变更或登录已失效，请重新打开贴纸导入。",
   "stickerPackSourceRoom": "来源会话",
-  "stickerPackImages": "图片"
+  "stickerPackImages": "图片",
+  "stickerPublishNotice": "将此贴纸包发布到所选群聊。图片和元数据不受端到端加密保护。可读取群状态的人可能访问这些内容。",
+  "stickerPublishFailed": "未能确认发布结果。请先检查群聊，再决定是否重试。"
 }

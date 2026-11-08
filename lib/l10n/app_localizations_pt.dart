@@ -6321,6 +6321,14 @@ class SPt extends S {
 
   @override
   String get stickerPackImages => 'Imagens';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publique este pacote no grupo selecionado. As imagens e os metadados não têm encriptação ponto a ponto. Quem puder ler o estado do grupo poderá aceder-lhes.';
+
+  @override
+  String get stickerPublishFailed =>
+      'A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12640,4 +12648,12 @@ class SPtBr extends SPt {
 
   @override
   String get stickerPackImages => 'Imagens';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publique este pacote no grupo selecionado. As imagens e os metadados não têm criptografia de ponta a ponta. Quem puder ler o estado do grupo poderá acessá-los.';
+
+  @override
+  String get stickerPublishFailed =>
+      'A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.';
 }

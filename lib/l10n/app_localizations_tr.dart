@@ -6287,4 +6287,12 @@ class STr extends S {
 
   @override
   String get stickerPackImages => 'Görseller';
+
+  @override
+  String get stickerPublishNotice =>
+      'Bu paketi seçilen grupta yayımlayın. Görseller ve meta veriler uçtan uca şifrelenmez. Grup durumunu okuyabilen kişiler bunlara erişebilir.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Yayımlama onaylanmadı. Yeniden denemeden önce grubu kontrol edin.';
 }

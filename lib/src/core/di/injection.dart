@@ -1,3 +1,4 @@
+import '../../data/services/matrix_sticker_publication.dart';
 import 'archive_registration.dart';
 import '../../data/datasources/local/chat_history_clear_store.dart';
 import '../../domain/repositories/chat_catch_up_repository.dart';
@@ -975,7 +976,13 @@ void _registerRepositories() {
 
   // 贴纸仓库
   getIt.registerLazySingleton<IStickerRepository>(
-    () => StickerRepositoryImpl(getIt<MatrixStickerDataSource>()),
+    () => StickerRepositoryImpl(
+      getIt<MatrixStickerDataSource>(),
+      publication: MatrixStickerPublication(
+        getIt<MatrixClientManager>(),
+        getIt<IAuthRepository>() as IAccountBoundDeletionLifecycle,
+      ),
+    ),
   );
 
   // AI 生成贴纸服务（云端文生图 → 贴纸包）。AiProviderRouter 总注册，

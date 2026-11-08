@@ -2907,5 +2907,7 @@
   "stickerImportFailed": "Balíček se nepodařilo přidat. Zkuste to znovu.",
   "stickerImportAccountChanged": "Účet se změnil nebo relace vypršela. Znovu otevřete import nálepek.",
   "stickerPackSourceRoom": "Zdrojový chat",
-  "stickerPackImages": "Obrázky"
+  "stickerPackImages": "Obrázky",
+  "stickerPublishNotice": "Zveřejněte tento balíček ve vybrané skupině. Obrázky a metadata nejsou koncově šifrované. Mohou k nim přistupovat lidé, kteří mohou číst stav skupiny.",
+  "stickerPublishFailed": "Zveřejnění nebylo potvrzeno. Před dalším pokusem zkontrolujte skupinu."
 }

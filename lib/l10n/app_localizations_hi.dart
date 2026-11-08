@@ -6285,4 +6285,12 @@ class SHi extends S {
 
   @override
   String get stickerPackImages => 'चित्र';
+
+  @override
+  String get stickerPublishNotice =>
+      'इस स्टिकर पैक को चुने गए समूह में प्रकाशित करें। इसकी छवियाँ और मेटाडेटा एंड-टू-एंड एन्क्रिप्टेड नहीं हैं। समूह की स्थिति पढ़ सकने वाले लोग इन्हें देख सकते हैं।';
+
+  @override
+  String get stickerPublishFailed =>
+      'प्रकाशन की पुष्टि नहीं हुई। दोबारा कोशिश करने से पहले समूह देखें।';
 }

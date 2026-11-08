@@ -2907,5 +2907,7 @@
   "stickerImportFailed": "Nie udało się dodać tego pakietu. Spróbuj ponownie.",
   "stickerImportAccountChanged": "Konto zostało zmienione lub sesja wygasła. Otwórz ponownie import naklejek.",
   "stickerPackSourceRoom": "Czat źródłowy",
-  "stickerPackImages": "Obrazy"
+  "stickerPackImages": "Obrazy",
+  "stickerPublishNotice": "Opublikuj ten pakiet w wybranej grupie. Obrazy i metadane nie są szyfrowane metodą end-to-end. Osoby mogące odczytać stan grupy mogą mieć do nich dostęp.",
+  "stickerPublishFailed": "Nie potwierdzono publikacji. Sprawdź grupę przed ponowną próbą."
 }

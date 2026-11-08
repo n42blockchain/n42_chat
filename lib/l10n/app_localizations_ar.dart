@@ -6257,4 +6257,12 @@ class SAr extends S {
 
   @override
   String get stickerPackImages => 'الصور';
+
+  @override
+  String get stickerPublishNotice =>
+      'انشر حزمة الملصقات هذه في المجموعة المحددة. صورها وبياناتها الوصفية غير مشفرة من طرف إلى طرف. قد يتمكن من يستطيع قراءة حالة المجموعة من الوصول إليها.';
+
+  @override
+  String get stickerPublishFailed =>
+      'لم يتم تأكيد النشر. تحقق من المجموعة قبل المحاولة مجددًا.';
 }

@@ -1,9 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 
 // Update these accessors after regenerating the localization classes.
 // This test loads every supported locale and reads each non-parameter label.
 final _labels = <(String, String Function(S))>[
+  ('stickerImportTitle', (s) => s.stickerImportTitle),
+  ('stickerImportLinkHint', (s) => s.stickerImportLinkHint),
+  ('stickerImportPreview', (s) => s.stickerImportPreview),
+  ('stickerImportUnavailable', (s) => s.stickerImportUnavailable),
+  ('stickerImportCopyNotice', (s) => s.stickerImportCopyNotice),
+  ('stickerImportFailed', (s) => s.stickerImportFailed),
+  ('stickerImportAccountChanged', (s) => s.stickerImportAccountChanged),
+  ('stickerPackSourceRoom', (s) => s.stickerPackSourceRoom),
+  ('stickerPackImages', (s) => s.stickerPackImages),
+  ('stickerPublishNotice', (s) => s.stickerPublishNotice),
+  ('stickerPublishFailed', (s) => s.stickerPublishFailed),
   ('scheduledMessagesTitle', (s) => s.scheduledMessagesTitle),
   ('scheduledMessagesEmpty', (s) => s.scheduledMessagesEmpty),
   ('scheduledMessagesHint', (s) => s.scheduledMessagesHint),
@@ -2426,8 +2438,12 @@ final _formattedLabels = <(String, List<String> Function(S))>[
 ];
 
 void main() {
+  test('publication uses the correct Chinese script for each locale', () async {
+    expect((await S.delegate.load(const Locale('zh'))).groupPublish, '发布');
+    expect((await S.delegate.load(const Locale('zh', 'TW'))).groupPublish, '發佈');
+  });
   test('all supported locales provide readable labels', () async {
-    expect(_labels, hasLength(1694));
+    expect(_labels, hasLength(1705));
     expect(_formattedLabels, hasLength(182));
     expect(_labels.map((entry) => entry.$1).toSet(), hasLength(_labels.length));
     final emptyLabels = <String>[];

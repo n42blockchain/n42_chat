@@ -6337,4 +6337,12 @@ class SDe extends S {
 
   @override
   String get stickerPackImages => 'Bilder';
+
+  @override
+  String get stickerPublishNotice =>
+      'Veröffentliche dieses Paket in der ausgewählten Gruppe. Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt. Personen, die den Gruppenstatus lesen können, können darauf zugreifen.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Die Veröffentlichung wurde nicht bestätigt. Prüfe die Gruppe vor einem erneuten Versuch.';
 }

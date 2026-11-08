@@ -2907,5 +2907,7 @@
   "stickerImportFailed": "Paket ini tidak dapat ditambahkan. Coba lagi.",
   "stickerImportAccountChanged": "Akun berubah atau sesi berakhir. Buka kembali impor stiker.",
   "stickerPackSourceRoom": "Chat sumber",
-  "stickerPackImages": "Gambar"
+  "stickerPackImages": "Gambar",
+  "stickerPublishNotice": "Publikasikan paket ini ke grup yang dipilih. Gambar dan metadatanya tidak dienkripsi dari ujung ke ujung. Orang yang dapat membaca status grup mungkin dapat mengaksesnya.",
+  "stickerPublishFailed": "Publikasi belum dikonfirmasi. Periksa grup sebelum mencoba lagi."
 }

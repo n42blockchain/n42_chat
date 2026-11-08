@@ -6298,4 +6298,12 @@ class SId extends S {
 
   @override
   String get stickerPackImages => 'Gambar';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publikasikan paket ini ke grup yang dipilih. Gambar dan metadatanya tidak dienkripsi dari ujung ke ujung. Orang yang dapat membaca status grup mungkin dapat mengaksesnya.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Publikasi belum dikonfirmasi. Periksa grup sebelum mencoba lagi.';
 }

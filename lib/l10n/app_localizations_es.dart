@@ -6330,4 +6330,12 @@ class SEs extends S {
 
   @override
   String get stickerPackImages => 'Imágenes';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publica este paquete en el grupo seleccionado. Sus imágenes y metadatos no tienen cifrado de extremo a extremo. Quienes puedan leer el estado del grupo podrían acceder a ellos.';
+
+  @override
+  String get stickerPublishFailed =>
+      'No se confirmó la publicación. Revisa el grupo antes de volver a intentarlo.';
 }

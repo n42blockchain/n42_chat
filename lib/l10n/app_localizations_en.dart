@@ -6256,4 +6256,12 @@ class SEn extends S {
 
   @override
   String get stickerPackImages => 'Images';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publish this pack to the selected group. Its images and metadata are not end-to-end encrypted. People who can read the group state may access them.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Publication was not confirmed. Check the group before trying again.';
 }

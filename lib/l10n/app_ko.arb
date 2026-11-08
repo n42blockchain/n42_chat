@@ -2907,5 +2907,7 @@
   "stickerImportFailed": "이 팩을 추가할 수 없습니다. 다시 시도하세요.",
   "stickerImportAccountChanged": "계정이 변경되었거나 세션이 만료되었습니다. 스티커 가져오기를 다시 여세요.",
   "stickerPackSourceRoom": "출처 채팅",
-  "stickerPackImages": "이미지"
+  "stickerPackImages": "이미지",
+  "stickerPublishNotice": "이 팩을 선택한 그룹에 게시합니다. 이미지와 메타데이터는 종단 간 암호화되지 않습니다. 그룹 상태를 읽을 수 있는 사람이 접근할 수 있습니다.",
+  "stickerPublishFailed": "게시가 확인되지 않았습니다. 다시 시도하기 전에 그룹을 확인하세요."
 }

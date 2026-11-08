@@ -6354,4 +6354,12 @@ class SFr extends S {
 
   @override
   String get stickerPackImages => 'Images';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publiez ce pack dans le groupe sélectionné. Ses images et métadonnées ne sont pas chiffrées de bout en bout. Les personnes pouvant lire l’état du groupe peuvent y accéder.';
+
+  @override
+  String get stickerPublishFailed =>
+      'La publication n’a pas été confirmée. Vérifiez le groupe avant de réessayer.';
 }

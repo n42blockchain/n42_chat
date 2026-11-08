@@ -2907,5 +2907,7 @@
   "stickerImportFailed": "Impossibile aggiungere questo pacchetto. Riprova.",
   "stickerImportAccountChanged": "L’account è cambiato o la sessione è scaduta. Riapri l’importazione degli adesivi.",
   "stickerPackSourceRoom": "Chat di origine",
-  "stickerPackImages": "Immagini"
+  "stickerPackImages": "Immagini",
+  "stickerPublishNotice": "Pubblica questo pacchetto nel gruppo selezionato. Le immagini e i metadati non sono crittografati end-to-end. Chi può leggere lo stato del gruppo potrebbe accedervi.",
+  "stickerPublishFailed": "La pubblicazione non è stata confermata. Controlla il gruppo prima di riprovare."
 }

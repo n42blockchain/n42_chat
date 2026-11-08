@@ -2907,5 +2907,7 @@
   "stickerImportFailed": "Dieses Paket konnte nicht hinzugefügt werden. Versuche es erneut.",
   "stickerImportAccountChanged": "Das Konto wurde gewechselt oder die Sitzung ist abgelaufen. Öffne den Stickerimport erneut.",
   "stickerPackSourceRoom": "Ursprünglicher Chat",
-  "stickerPackImages": "Bilder"
+  "stickerPackImages": "Bilder",
+  "stickerPublishNotice": "Veröffentliche dieses Paket in der ausgewählten Gruppe. Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt. Personen, die den Gruppenstatus lesen können, können darauf zugreifen.",
+  "stickerPublishFailed": "Die Veröffentlichung wurde nicht bestätigt. Prüfe die Gruppe vor einem erneuten Versuch."
 }

@@ -6148,4 +6148,11 @@ class SJa extends S {
 
   @override
   String get stickerPackImages => '画像';
+
+  @override
+  String get stickerPublishNotice =>
+      'このパックを選択したグループに公開します。画像とメタデータはエンドツーエンド暗号化されません。グループの状態を読み取れる人がアクセスできる場合があります。';
+
+  @override
+  String get stickerPublishFailed => '公開結果を確認できませんでした。再試行する前にグループを確認してください。';
 }

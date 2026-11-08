@@ -6273,4 +6273,12 @@ class SVi extends S {
 
   @override
   String get stickerPackImages => 'Hình ảnh';
+
+  @override
+  String get stickerPublishNotice =>
+      'Đăng gói này vào nhóm đã chọn. Hình ảnh và siêu dữ liệu không được mã hóa đầu cuối. Người có thể đọc trạng thái nhóm có thể truy cập chúng.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Chưa xác nhận được việc đăng. Hãy kiểm tra nhóm trước khi thử lại.';
 }

@@ -2907,5 +2907,7 @@
   "stickerImportFailed": "Impossible d’ajouter ce pack. Réessayez.",
   "stickerImportAccountChanged": "Le compte a changé ou la session a expiré. Rouvrez l’importation de stickers.",
   "stickerPackSourceRoom": "Discussion d’origine",
-  "stickerPackImages": "Images"
+  "stickerPackImages": "Images",
+  "stickerPublishNotice": "Publiez ce pack dans le groupe sélectionné. Ses images et métadonnées ne sont pas chiffrées de bout en bout. Les personnes pouvant lire l’état du groupe peuvent y accéder.",
+  "stickerPublishFailed": "La publication n’a pas été confirmée. Vérifiez le groupe avant de réessayer."
 }

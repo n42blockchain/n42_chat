@@ -2907,5 +2907,7 @@
   "stickerImportFailed": "Bu paket eklenemedi. Yeniden deneyin.",
   "stickerImportAccountChanged": "Hesap değişti veya oturumun süresi doldu. Çıkartma içe aktarma ekranını yeniden açın.",
   "stickerPackSourceRoom": "Kaynak sohbet",
-  "stickerPackImages": "Görseller"
+  "stickerPackImages": "Görseller",
+  "stickerPublishNotice": "Bu paketi seçilen grupta yayımlayın. Görseller ve meta veriler uçtan uca şifrelenmez. Grup durumunu okuyabilen kişiler bunlara erişebilir.",
+  "stickerPublishFailed": "Yayımlama onaylanmadı. Yeniden denemeden önce grubu kontrol edin."
 }

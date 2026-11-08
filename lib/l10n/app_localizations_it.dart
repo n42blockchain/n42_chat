@@ -6316,4 +6316,12 @@ class SIt extends S {
 
   @override
   String get stickerPackImages => 'Immagini';
+
+  @override
+  String get stickerPublishNotice =>
+      'Pubblica questo pacchetto nel gruppo selezionato. Le immagini e i metadati non sono crittografati end-to-end. Chi può leggere lo stato del gruppo potrebbe accedervi.';
+
+  @override
+  String get stickerPublishFailed =>
+      'La pubblicazione non è stata confermata. Controlla il gruppo prima di riprovare.';
 }

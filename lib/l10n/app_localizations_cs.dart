@@ -6298,4 +6298,12 @@ class SCs extends S {
 
   @override
   String get stickerPackImages => 'Obrázky';
+
+  @override
+  String get stickerPublishNotice =>
+      'Zveřejněte tento balíček ve vybrané skupině. Obrázky a metadata nejsou koncově šifrované. Mohou k nim přistupovat lidé, kteří mohou číst stav skupiny.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Zveřejnění nebylo potvrzeno. Před dalším pokusem zkontrolujte skupinu.';
 }

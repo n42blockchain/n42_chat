@@ -6320,4 +6320,12 @@ class SSw extends S {
 
   @override
   String get stickerPackImages => 'Picha';
+
+  @override
+  String get stickerPublishNotice =>
+      'Chapisha kifurushi hiki katika kikundi kilichochaguliwa. Picha na metadata zake hazijasimbwa kutoka mwanzo hadi mwisho. Watu wanaoweza kusoma hali ya kikundi wanaweza kuzifikia.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Uchapishaji haujathibitishwa. Angalia kikundi kabla ya kujaribu tena.';
 }

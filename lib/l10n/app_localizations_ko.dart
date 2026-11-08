@@ -6151,4 +6151,11 @@ class SKo extends S {
 
   @override
   String get stickerPackImages => '이미지';
+
+  @override
+  String get stickerPublishNotice =>
+      '이 팩을 선택한 그룹에 게시합니다. 이미지와 메타데이터는 종단 간 암호화되지 않습니다. 그룹 상태를 읽을 수 있는 사람이 접근할 수 있습니다.';
+
+  @override
+  String get stickerPublishFailed => '게시가 확인되지 않았습니다. 다시 시도하기 전에 그룹을 확인하세요.';
 }

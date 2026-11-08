@@ -10,10 +10,17 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart'
 import 'package:n42_chat/src/data/datasources/matrix/matrix_sticker_datasource.dart';
 import 'package:n42_chat/src/data/repositories/sticker_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_origin.dart';
+import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
+import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
+import 'package:n42_chat/src/data/services/matrix_sticker_publication.dart';
 
 class _Client extends Mock implements Client {}
 
 class _Manager extends Mock implements MatrixClientManager {}
+
+class _Lifecycle extends Mock implements IAccountBoundDeletionLifecycle {}
+
+class _Room extends Mock implements Room {}
 
 class _TokenAuth extends AuthenticationData {
   _TokenAuth(this.token, {super.session})
@@ -76,24 +83,74 @@ void main() {
           name: 'Owned image pack',
           preset: CreateRoomPreset.privateChat,
         );
-        final eventId = await apis.first.setRoomStateWithKey(
+        final ownerClient = _Client(), ownerManager = _Manager();
+        final lifecycle = _Lifecycle(), ownerRoom = _Room();
+        when(() => ownerManager.client).thenReturn(ownerClient);
+        when(() => ownerClient.userID).thenReturn(accounts.first.userId);
+        when(() => ownerClient.deviceID).thenReturn(accounts.first.deviceId);
+        when(() => ownerClient.homeserver).thenReturn(uri);
+        when(() => ownerClient.accessToken)
+            .thenReturn(accounts.first.accessToken);
+        when(() => ownerClient.getRoomById(roomId)).thenReturn(ownerRoom);
+        final creation = await apis.first.getRoomStateWithKey(
           roomId,
-          'm.room.image_pack',
-          'qa',
-          {
-            'pack': {
-              'display_name': 'Owned shared art',
-              'attribution': 'Synthetic QA',
-            },
-            'images': {
-              'smile': {
-                'url': '$mxc',
-                'body': 'Synthetic pixel',
-                'info': {'mimetype': 'image/png'},
-              },
-            },
-          },
+          EventTypes.RoomCreate,
+          '',
         );
+        when(() => ownerRoom.roomVersion)
+            .thenReturn(creation['room_version'] as String? ?? '1');
+        // Cache adapter for the room just created by this disposable owner.
+        when(() => ownerRoom.creatorUserIds)
+            .thenReturn({accounts.first.userId});
+        final generation = AuthSessionInvalidation(
+          userId: accounts.first.userId,
+          homeserver: uri,
+          deviceId: accounts.first.deviceId,
+          isCurrent: () => true,
+          matchesClient: (client) => identical(client, ownerClient),
+        );
+        when(() => lifecycle.currentAccountGeneration).thenReturn(generation);
+        when(() => ownerClient.getJoinedMembersByRoom(any())).thenAnswer(
+          (call) => apis.first.getJoinedMembersByRoom(
+            call.positionalArguments[0] as String,
+          ),
+        );
+        when(() => ownerClient.getRoomStateWithKey(any(), any(), any()))
+            .thenAnswer(
+              (call) => apis.first.getRoomStateWithKey(
+                call.positionalArguments[0] as String,
+                call.positionalArguments[1] as String,
+                call.positionalArguments[2] as String,
+              ),
+            );
+        when(() => ownerClient.setRoomStateWithKey(any(), any(), any(), any()))
+            .thenAnswer(
+              (call) => apis.first.setRoomStateWithKey(
+                call.positionalArguments[0] as String,
+                call.positionalArguments[1] as String,
+                call.positionalArguments[2] as String,
+                call.positionalArguments[3] as Map<String, dynamic>,
+              ),
+            );
+        final published =
+            await MatrixStickerPublication(ownerManager, lifecycle).publish(
+              StickerPack(
+                id: 'custom_live',
+                name: 'Owned shared art',
+                author: 'Synthetic QA',
+                source: StickerPackSource.custom,
+                stickers: [
+                  Sticker(
+                    id: 'smile',
+                    url: '$mxc',
+                    name: 'Synthetic pixel',
+                    mimeType: 'image/png',
+                  ),
+                ],
+              ),
+              roomId,
+            );
+        final eventId = published.eventId;
         final reference = StickerPackOrigin(
           roomId: roomId,
           eventId: eventId,
@@ -137,7 +194,7 @@ void main() {
         await apis.last.joinRoom(roomId);
         final preview = await repository.importPack(reference.shareUrl);
         expect(preview, isNotNull);
-        expect(preview!.origin!.stateKey, 'qa');
+        expect(preview!.origin!.stateKey, published.stateKey);
         verifyNever(() => client.setAccountData(any(), any(), any()));
         final media = await apis.last.httpClient.get(
           Uri.parse(preview.stickers.single.httpUrl!),
